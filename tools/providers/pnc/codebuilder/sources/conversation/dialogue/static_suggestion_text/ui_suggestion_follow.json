@@ -5,33 +5,24 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.follow.label",
-        "text": {
-          "EN": "Follow me.",
-          "TL": "Sumunod ka sa akin."
-        }
+        "key": "suggestion.follow.label"
       },
       {
-        "key": "suggestion.follow.utterance",
-        "text": {
-          "EN": "Follow me.",
-          "TL": "Sumunod ka sa akin."
-        }
+        "key": "suggestion.follow.utterance"
       }
     ]
   },
   "affordance": {
-    "label": {
-      "EN": "Follow me.",
-      "TL": "Sumunod ka sa akin."
-    },
     "consumers": [
       "player"
     ]
   },
   "say": {
-    "EN": "Follow me.",
-    "TL": "Sumunod ka sa akin."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

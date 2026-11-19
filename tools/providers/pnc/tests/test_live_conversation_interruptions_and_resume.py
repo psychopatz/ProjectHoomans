@@ -112,7 +112,7 @@ class LiveRegressionL4Tests(WarmWorkerTestMixin, unittest.TestCase):
                 "utterance_plan",
             )
             self.assertIn(
-                f"construction.{language.lower()}.social.warn_",
+                "construction.en.social.warn_",
                 current["realizationVariant"],
             )
         self.assertNotEqual(surfaces["EN"][0], surfaces["TL"][0])

@@ -3,7 +3,7 @@ return {
     ["conversation.acknowledged.default"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "conversation.acknowledged.default",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["emote.player.clap"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.player.clap",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["emote.player.insult"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.player.insult",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["emote.player.salute"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.player.salute",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["emote.player.thankyou"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.player.thankyou",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["emote.player.thumbsdown"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.player.thumbsdown",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["emote.player.thumbsup"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.player.thumbsup",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["emote.player.wavebye"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.player.wavebye",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["emote.player.wavehi"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.player.wavehi",
         ["kind"] = "dialogue",
@@ -84,7 +84,7 @@ return {
     ["emote.reply.clap"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.reply.clap",
         ["kind"] = "dialogue",
@@ -93,7 +93,7 @@ return {
     ["emote.reply.default"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.reply.default",
         ["kind"] = "dialogue",
@@ -102,7 +102,7 @@ return {
     ["emote.reply.insult"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.reply.insult",
         ["kind"] = "dialogue",
@@ -111,7 +111,7 @@ return {
     ["emote.reply.salute"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.reply.salute",
         ["kind"] = "dialogue",
@@ -120,7 +120,7 @@ return {
     ["emote.reply.thankyou"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ConversationAcknowledgedDefaultToEmoteReplyThankyou",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.reply.thankyou",
         ["kind"] = "dialogue",
@@ -129,7 +129,7 @@ return {
     ["emote.reply.thumbsdown"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsdownToWavehi",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.reply.thumbsdown",
         ["kind"] = "dialogue",
@@ -141,7 +141,7 @@ return {
         },
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsdownToWavehi",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.reply.thumbsup",
         ["kind"] = "dialogue",
@@ -150,7 +150,7 @@ return {
     ["emote.reply.thumbsup.active"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsdownToWavehi",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.reply.thumbsup.active",
         ["kind"] = "dialogue",
@@ -162,7 +162,7 @@ return {
     ["emote.reply.wavebye"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsdownToWavehi",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.reply.wavebye",
         ["kind"] = "dialogue",
@@ -171,7 +171,7 @@ return {
     ["emote.reply.wavehi"] = {
         ["domain"] = "social_emotes",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialEmotes/ThumbsdownToWavehi",
+            "PNC/ConvoEngine/Dialogue/SocialEmotes",
         },
         ["id"] = "emote.reply.wavehi",
         ["kind"] = "dialogue",

@@ -1,0 +1,14 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.ask_about.neutral",
+  "locale": "TL",
+  "entries": {
+    "response.turn.opening.text": "Ano ang gusto mong malaman?",
+    "response.turn.opening.offer.background.label": "Ano ang ginawa mo bago ang lahat ng ito?",
+    "response.turn.opening.offer.background.utterance": "Ano ang ginawa mo bago ang lahat ng ito?",
+    "response.turn.opening.offer.background.responseText": "mahabang kwento yan. Siguro isa na dapat sabihin.",
+    "response.turn.opening.offer.skills.label": "Ano ang kaya mong gawin?",
+    "response.turn.opening.offer.skills.utterance": "Ano ang kaya mong gawin?",
+    "response.turn.opening.offer.skills.responseText": "Sapat na ang mga bagay para mabuhay ng ganito katagal."
+  }
+}

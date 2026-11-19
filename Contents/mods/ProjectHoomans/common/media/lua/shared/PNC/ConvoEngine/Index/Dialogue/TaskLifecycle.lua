@@ -8,7 +8,7 @@ return {
         },
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskLifecycle/GiftToTaskDrink",
+            "PNC/ConvoEngine/Dialogue/TaskLifecycle",
         },
         ["id"] = "gift",
         ["kind"] = "dialogue",
@@ -17,7 +17,7 @@ return {
     ["task.consume"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskLifecycle/GiftToTaskDrink",
+            "PNC/ConvoEngine/Dialogue/TaskLifecycle",
         },
         ["id"] = "task.consume",
         ["kind"] = "dialogue",
@@ -26,7 +26,7 @@ return {
     ["task.drink"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskLifecycle/GiftToTaskDrink",
+            "PNC/ConvoEngine/Dialogue/TaskLifecycle",
         },
         ["id"] = "task.drink",
         ["kind"] = "dialogue",
@@ -35,7 +35,7 @@ return {
     ["task.eat"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskLifecycle/EatToGive",
+            "PNC/ConvoEngine/Dialogue/TaskLifecycle",
         },
         ["id"] = "task.eat",
         ["kind"] = "dialogue",
@@ -44,7 +44,7 @@ return {
     ["task.fetch"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskLifecycle/EatToGive",
+            "PNC/ConvoEngine/Dialogue/TaskLifecycle",
         },
         ["id"] = "task.fetch",
         ["kind"] = "dialogue",
@@ -53,7 +53,7 @@ return {
     ["task.give"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskLifecycle/EatToGive",
+            "PNC/ConvoEngine/Dialogue/TaskLifecycle",
         },
         ["id"] = "task.give",
         ["kind"] = "dialogue",
@@ -62,7 +62,7 @@ return {
     ["task.refill"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskLifecycle/RefillToWaitAt",
+            "PNC/ConvoEngine/Dialogue/TaskLifecycle",
         },
         ["id"] = "task.refill",
         ["kind"] = "dialogue",
@@ -71,7 +71,7 @@ return {
     ["task.wait_at"] = {
         ["domain"] = "task_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/TaskLifecycle/RefillToWaitAt",
+            "PNC/ConvoEngine/Dialogue/TaskLifecycle",
         },
         ["id"] = "task.wait_at",
         ["kind"] = "dialogue",

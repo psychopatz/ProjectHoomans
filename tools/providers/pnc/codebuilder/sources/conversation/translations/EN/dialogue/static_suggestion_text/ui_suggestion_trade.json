@@ -1,0 +1,11 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.trade",
+  "locale": "EN",
+  "entries": {
+    "affordance.label": "Open trading",
+    "say.variants.default": "Let's trade.",
+    "textRows.suggestion.trade.label": "Open trading",
+    "textRows.suggestion.trade.utterance": "Let's trade."
+  }
+}

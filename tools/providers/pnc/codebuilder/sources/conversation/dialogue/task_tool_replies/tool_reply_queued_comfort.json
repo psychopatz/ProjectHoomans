@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I hear you.",
-              "I hear your comfort.",
-              "Got the message. Thanks.",
-              "I hear what you're trying to do.",
-              "Heard and appreciated.",
-              "I hear your reassurance.",
-              "Got it. Taking it to heart.",
-              "I hear you. It helps a bit.",
-              "Understood. I hear your voice.",
-              "Heard clearly."
-            ],
-            "TL": [
-              "Narinig kita.",
-              "Naririnig ko ang pampalubag-loob mo.",
-              "Nakuha ko ang mensahe. Salamat.",
-              "Naririnig ko ang sinusubukan mong gawin.",
-              "Narinig at pinahahalagahan.",
-              "Naririnig ko ang pampanatag mo.",
-              "Nakuha ko. Isinasapuso ko.",
-              "Naririnig kita. Nakakatulong nang kaunti.",
-              "Naintindihan. Naririnig ko ang boses mo.",
-              "Narinig nang malinaw."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Thanks for saying that.",
-              "I appreciate you saying that to me.",
-              "Thank you. That takes some edge off.",
-              "I needed to hear that. Thank you.",
-              "Appreciate the soothing words.",
-              "Thanks for taking the time to say that.",
-              "Good of you to speak up. Thanks.",
-              "Thank you for the comfort.",
-              "Thanks. That means something out here.",
-              "Appreciate your kindness today."
-            ],
-            "TL": [
-              "Salamat sa pagsabi niyan.",
-              "Salamat at sinabi mo 'yan sa akin.",
-              "Maraming salamat. Nabawasan ang kaba ko.",
-              "Kailangan kong marinig 'yan. Salamat.",
-              "Salamat sa nakapagpapatahang mga salita.",
-              "Salamat sa paglalaan ng oras para sabihin 'yan.",
-              "Mabuti sa 'yo ang magsalita. Salamat.",
-              "Salamat sa pampalubag-loob.",
-              "Salamat. May halaga 'yan dito.",
-              "Salamat sa kabaitan mo ngayong araw."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

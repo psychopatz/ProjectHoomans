@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.hunger",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Medyo gutom ako, kung tutuusin. May makakain ka ba?",
+      "Kanina pa kumakalam ang sikmura ko. May maibibigay ka bang pagkain?",
+      "Ramdam na ramdam ko ang gutom ngayon. Kailangan ko ng makakain.",
+      "Medyo matagal na mula noong huli akong kumain. May rasyon ka ba?",
+      "Kailangan ko ng lakas bago ako manghina. Mayroon ka ba riyan?",
+      "Gutom na gutom na ako rito. Kahit lumang biskwit tatanggapin ko.",
+      "Kailangan ko na talagang kumain. May laman ba ang bag mo?",
+      "Mahirap mag-isip kapag walang laman ang tiyan. Penge namang makakain?",
+      "Kailangan ko talaga ng meryenda o de-lata ngayon.",
+      "Nanghihina na ako sa gutom. May maibabahagi ka bang rasyon?"
+    ]
+  }
+}

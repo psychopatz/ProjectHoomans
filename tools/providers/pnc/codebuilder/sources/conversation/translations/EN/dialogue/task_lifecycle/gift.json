@@ -1,0 +1,67 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "gift",
+  "locale": "EN",
+  "entries": {
+    "reply.completed.say.variants.default": [
+      "Thank you for the gift.",
+      "I appreciate this gesture. Thank you.",
+      "That's generous of you. Thanks.",
+      "Thank you! This will be put to good use.",
+      "A welcome surprise. Thank you, friend.",
+      "Much obliged for the gift.",
+      "I'm grateful for this. Thank you.",
+      "You didn't have to, but thanks a lot.",
+      "Received with gratitude. Thank you.",
+      "Thanks for thinking of me with this gift."
+    ],
+    "reply.failed.say.variants.default": [
+      "I couldn't accept that gift.",
+      "Something went wrong while transferring the gift.",
+      "Gift transfer failed. My hands were full.",
+      "Couldn't receive that right now.",
+      "Unable to take the gift into my inventory.",
+      "Transaction interrupted. Gift not taken.",
+      "Failed to receive the offering.",
+      "I dropped it or couldn't hold it.",
+      "Gift transfer could not be completed.",
+      "Couldn't take that from you."
+    ],
+    "reply.pending.say.variants.default": [
+      "I'll take a look at that gift.",
+      "Let's see what you brought.",
+      "Considering the gift now.",
+      "Inspecting what you have for me.",
+      "Hold on, looking at the offering.",
+      "I'll review the item you offered.",
+      "Checking out the gift.",
+      "Let me examine what this is.",
+      "Looking over your gift.",
+      "Give me a second to check this item."
+    ],
+    "reply.rejected.say.variants.default": [
+      "I can't accept that gift right now.",
+      "Keep it. You need it more than I do.",
+      "I have no room for gifts in my pack.",
+      "I don't feel comfortable taking this from you.",
+      "Refusing this gift. We're not there yet.",
+      "Save your supplies. Don't waste them on me.",
+      "I cannot take that offering.",
+      "No thanks. I carry my own weight.",
+      "Gift rejected. Keep your belongings.",
+      "I won't accept that from you today."
+    ],
+    "reply.selection_required.say.variants.default": [
+      "I need to see what you brought me first.",
+      "What exactly are you offering me?",
+      "Select an item to gift before I decide.",
+      "Show me what you want to give.",
+      "Which item are you trying to hand over?",
+      "Pick the specific item first.",
+      "I can't take anything until you select it.",
+      "Show me what's in your hands.",
+      "What gift are we talking about? Choose one.",
+      "Specify the gift from your inventory."
+    ]
+  }
+}

@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Zombies {scene.relative}!",
-            "Watch out, dead heads {scene.relative}!",
-            "Walkers approaching {scene.relative}!",
-            "Look {scene.relative}! Zombies!",
-            "Incoming dead {scene.relative}!",
-            "Zombies closing in {scene.relative}!",
-            "Eyes {scene.relative}, we've got walkers!",
-            "Dead heads spotted {scene.relative}!",
-            "Check {scene.relative}! Swarm incoming!",
-            "Danger {scene.relative}! Zombies!"
-          ],
-          "TL": [
-            "Mga zombie {scene.relative}!",
-            "Mag-ingat, may mga patay {scene.relative}!",
-            "May mga walker na papalapit {scene.relative}!",
-            "Tumingin {scene.relative}! Mga zombie!",
-            "Paparating na mga patay {scene.relative}!",
-            "Lumalapit ang mga zombie {scene.relative}!",
-            "Tumingin {scene.relative}, may mga walker tayo!",
-            "May nakitang mga zombie {scene.relative}!",
-            "Suriin {scene.relative}! May paparating na kawan!",
-            "Panganib {scene.relative}! Mga zombie!"
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

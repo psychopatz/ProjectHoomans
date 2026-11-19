@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Someone died here. We should remember that.",
-            "Poor bastard. Didn't make it.",
-            "Another body in the dirt. World's unforgiving.",
-            "They fought hard, by the looks of it.",
-            "Someone lost a life here. Tread with respect.",
-            "Looks like they got trapped. Rest easy.",
-            "Could've been any of us. Keep walking.",
-            "Another survivor cut down too early.",
-            "Body's cold. Let's make sure we don't end up like this.",
-            "Rest in peace, stranger. Let's keep moving."
-          ],
-          "TL": [
-            "May namatay dito. Dapat nating alalahanin 'yon.",
-            "Kawawa naman. Hindi nakaligtas.",
-            "Isa na namang bangkay sa lupa. Malupit ang mundo.",
-            "Lumaban nang husto, base sa hitsura.",
-            "May nawalan ng buhay rito. Maglakad nang may galang.",
-            "Mukhang naipit sila rito. Mamahinga ka na.",
-            "Kahit sino sa atin pwedeng maging ganyan. Lakad na.",
-            "Isa na namang survivor ang pumanaw nang maaga.",
-            "Malamig na ang bangkay. Siguruhin nating hindi tayo matutulad dito.",
-            "Sumalangit nawa ang kaluluwa mo. Magpatuloy tayo."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

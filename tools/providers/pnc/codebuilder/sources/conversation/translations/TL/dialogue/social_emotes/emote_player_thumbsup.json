@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.player.thumbsup",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Mahusay, {addressee.name}.",
+      "Iyan ang gusto kong makita, {addressee.name}.",
+      "Ipagpatuloy mo, {addressee.name}."
+    ]
+  }
+}

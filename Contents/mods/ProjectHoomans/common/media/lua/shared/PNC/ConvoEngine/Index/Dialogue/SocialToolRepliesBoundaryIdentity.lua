@@ -3,7 +3,7 @@ return {
     ["tool_reply.hostile"] = {
         ["domain"] = "social_tool_replies_boundary_identity",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/HostileToRomantic",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity",
         },
         ["id"] = "tool_reply.hostile",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["tool_reply.insult"] = {
         ["domain"] = "social_tool_replies_boundary_identity",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/HostileToRomantic",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity",
         },
         ["id"] = "tool_reply.insult",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["tool_reply.orientation"] = {
         ["domain"] = "social_tool_replies_boundary_identity",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/HostileToRomantic",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity",
         },
         ["id"] = "tool_reply.orientation",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["tool_reply.personality"] = {
         ["domain"] = "social_tool_replies_boundary_identity",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/HostileToRomantic",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity",
         },
         ["id"] = "tool_reply.personality",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["tool_reply.praise"] = {
         ["domain"] = "social_tool_replies_boundary_identity",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/HostileToRomantic",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity",
         },
         ["id"] = "tool_reply.praise",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["tool_reply.relationship"] = {
         ["domain"] = "social_tool_replies_boundary_identity",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/HostileToRomantic",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity",
         },
         ["id"] = "tool_reply.relationship",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["tool_reply.romantic"] = {
         ["domain"] = "social_tool_replies_boundary_identity",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/HostileToRomantic",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity",
         },
         ["id"] = "tool_reply.romantic",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["tool_reply.sexual"] = {
         ["domain"] = "social_tool_replies_boundary_identity",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity/ToolReplySexual",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIdentity",
         },
         ["id"] = "tool_reply.sexual",
         ["kind"] = "dialogue",

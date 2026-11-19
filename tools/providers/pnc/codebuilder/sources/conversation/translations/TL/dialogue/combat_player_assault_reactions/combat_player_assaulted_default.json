@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.player_assaulted.default",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Bakit mo ginawa iyon?!",
+      "Ano bang problema mo?!",
+      "Hoy! Tingnan mo ang ginagawa mo!",
+      "Hinataw mo ba ako?!",
+      "Gusto mo ba akong patayin?!",
+      "Ano bang iniisip mo?! Tigil!",
+      "Teka! Atras!",
+      "Huwag mo akong saktan! Ano bang nangyayari sa'yo?!",
+      "Huwag mo akong pagbantaan!",
+      "Umatras ka palayo sa akin!"
+    ]
+  }
+}

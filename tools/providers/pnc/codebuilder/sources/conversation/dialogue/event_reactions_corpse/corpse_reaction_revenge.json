@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Someone is going to answer for this.",
-            "They didn't deserve this. Whoever did it will pay.",
-            "This wasn't rottens, this was murder. They'll bleed for it.",
-            "I'll find whoever did this and make them regret it.",
-            "They slaughtered them. There's no forgiving this.",
-            "Mark my words, retribution is coming for them.",
-            "Whoever left this body won't walk away clean.",
-            "Cold-blooded. I won't forget this sight.",
-            "Blood demands blood. We settle this score.",
-            "They butchered one of our own. They will pay."
-          ],
-          "TL": [
-            "May mananagot para rito.",
-            "Hindi nila nararapat 'to. Pagbabayaran 'to ng may gawa.",
-            "Hindi 'to gawa ng infected, patayan 'to. Dudugo sila para rito.",
-            "Hahanapin ko ang may gawa nito at pagsisisihan nila.",
-            "Pinaslang nila sila. Walang kapatawaran ito.",
-            "Tandaan mo, darating ang ganti para sa kanila.",
-            "Ang nag-iwan ng bangkay na 'to ay hindi makakatakas nang buo.",
-            "Walang awang pagpatay. Hindi ko makakalimutan ang nakita ko.",
-            "Dugo ang kabayaran ng dugo. Tutuldukan natin 'to.",
-            "Kinatay nila ang isa sa atin. Pagbabayaran nila."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

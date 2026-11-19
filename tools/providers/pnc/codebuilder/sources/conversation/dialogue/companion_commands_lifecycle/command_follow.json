@@ -34,65 +34,23 @@
     "rejected": {
       "act": "REPLY",
       "say": {
-        "EN": [
-          "I can't follow you right now.",
-          "I need to stay here. Can't follow.",
-          "Refusing to follow into that danger.",
-          "Too exhausted or injured to keep up. I can't follow.",
-          "I have business here. You go on ahead.",
-          "Can't follow. My hands are full.",
-          "Not following you into that mess.",
-          "I won't follow you right now.",
-          "Stay back, I'm not following.",
-          "Follow order rejected. I'm holding position."
-        ],
-        "TL": [
-          "Hindi kita masusundan ngayon.",
-          "Kailangan kong manatili rito. Di makasusunod.",
-          "Tumatangging sumunod sa panganib na 'yan.",
-          "Masyadong pagod o sugatan para sumabay. Di makasusunod.",
-          "May inaasikaso ako rito. Mauna ka na.",
-          "Di makasusunod. Marami akong ginagawa.",
-          "Di kita susundan sa gulong 'yan.",
-          "Hindi kita susundan sa ngayon.",
-          "Umatras ka, di ako susunod.",
-          "Tinatanggihan ang utos na sumunod. Hawak ko ang pwesto."
+        "variants": [
+          {
+            "id": "default"
+          }
         ]
       }
     },
     "failed": {
       "act": "REPLY",
       "say": {
-        "EN": [
-          "I couldn't start following you.",
-          "Failed to follow. Path was obstructed.",
-          "I tried to follow, but got caught on something.",
-          "Lost your trail. Couldn't keep following.",
-          "Unable to follow through that passage.",
-          "Follow command failed. Way is blocked.",
-          "I couldn't match your route.",
-          "Blocked off. Can't follow that way.",
-          "Attempted to follow, but lost visual.",
-          "Can't reach you to follow. Clear the path."
-        ],
-        "TL": [
-          "Hindi ko masimulan ang pagsunod sa iyo.",
-          "Bigo sa pagsunod. May harang sa daan.",
-          "Sinubukan kong sumunod, pero naipit ako sa kung saan.",
-          "Nawala ang bakas mo. Di nakasunod.",
-          "Di makasunod sa lagusang 'yan.",
-          "Pumalpak ang utos na sumunod. Barado ang daan.",
-          "Hindi ko nasabayan ang ruta mo.",
-          "May harang. Di makasunod sa daang 'yan.",
-          "Sinubukang sumunod, pero nawala sa paningin.",
-          "Di kita maabot para sumunod. Hawiin ang daan."
+        "variants": [
+          {
+            "id": "default"
+          }
         ]
       }
     }
-  },
-  "textSidecars": {
-    "EN": "translations/command_follow.en.json",
-    "TL": "translations/command_follow.tl.json"
   },
   "roles": {
     "speaker": {

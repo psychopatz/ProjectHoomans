@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.player.attack_auto",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "{addressee.name}, use your best judgment.",
+      "{addressee.name}, handle threats as you see fit.",
+      "Watch our backs, {addressee.name}."
+    ]
+  }
+}

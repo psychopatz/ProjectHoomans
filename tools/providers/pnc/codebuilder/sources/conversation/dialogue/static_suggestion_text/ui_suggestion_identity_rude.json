@@ -5,26 +5,14 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.identity.rude.label",
-        "text": {
-          "EN": "Don't tell your name",
-          "TL": "Huwag sabihin ang pangalan"
-        }
+        "key": "suggestion.identity.rude.label"
       },
       {
-        "key": "suggestion.identity.rude.utterance",
-        "text": {
-          "EN": "That's none of your business.",
-          "TL": "Wala ka nang pakialam."
-        }
+        "key": "suggestion.identity.rude.utterance"
       }
     ]
   },
   "affordance": {
-    "label": {
-      "EN": "Don't tell your name",
-      "TL": "Huwag sabihin ang pangalan"
-    },
     "consumers": [
       "player"
     ]
@@ -33,29 +21,7 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "That's none of your business.",
-              "You don't need my name.",
-              "I'm not giving you my name.",
-              "Keep walking. You're not getting my name.",
-              "None of your concern.",
-              "Forget it. You don't need to know who I am.",
-              "My name isn't for you to know.",
-              "I don't owe you my name."
-            ],
-            "TL": [
-              "Wala ka nang pakialam.",
-              "Hindi mo kailangan ang pangalan ko.",
-              "Hindi ko ibibigay ang pangalan ko sa'yo.",
-              "Huwag mo nang alamin ang pangalan ko.",
-              "Wala kang kinalaman doon.",
-              "Kalimutan mo na. Hindi mo kailangang malaman.",
-              "Hindi para sa'yo ang pangalan ko.",
-              "Hindi ako obligadong magpakilala sa'yo."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "quest.clinic_supplies.status",
+  "locale": "TL",
+  "entries": {
+    "reply.queued.say.variants.default": [
+      "Susuriin ko ang kahilingan para sa suplay ng klinika.",
+      "Titingnan ko kung kamusta na ang mga medikal na suplay natin.",
+      "Sinusuri na ang progreso natin sa gamot para sa klinika.",
+      "Sisiyasatin ko ang katayuan ng gawain sa klinika.",
+      "Sinusuri kung nasaan na tayo sa mga suplay ng klinika.",
+      "Kukunin ko ang listahan ng suplay para sa klinika.",
+      "Hayaan mong kumpirmahin ko ang bilang ng suplay sa klinika.",
+      "Sinusuri ko ang progreso ng mga medikal na suplay.",
+      "Titingnan ko ang katayuan ng suplay sa klinika para sa'yo.",
+      "Sinisiyasat ko na ang kahilingan ng klinika ngayon."
+    ],
+    "reply.rejected.say.variants.default": [
+      "Hindi ko masuri ang kahilingang iyon ngayon.",
+      "Masyadong abala para suriin ang katayuan ng klinika.",
+      "Hindi masisilip ang listahan ng suplay sa sandaling ito.",
+      "Hindi ko mabuksan ang katayuang 'yan ngayon.",
+      "Hindi ko susuriin ang kahilingang 'yan ngayon.",
+      "Kailangan kong tanggihan ang pagsilip sa katayuan ngayon.",
+      "Hindi masusuri ang progreso ng suplay sa klinika ngayon.",
+      "Hindi magagawang suriin ang kahilingan sa oras na 'to.",
+      "Hindi ko matututukan ang gawaing 'yan sa klinika sa kasalukuyan.",
+      "Hindi titingnan ang katayuan sa klinika ngayon. Magtanong mamaya."
+    ],
+    "reply.failed.say.variants.default": [
+      "Hindi ko masuri ang kahilingang iyon.",
+      "Hindi ko makumpirma ang katayuan ng mga suplay sa klinika.",
+      "Bigo ang pagsusuri sa katayuan ng mga suplay.",
+      "Hindi makuha ang mga detalye ng misyon sa klinika.",
+      "Hindi ko nasuri ang katayuan ng kahilingan.",
+      "Bigo sa pagtingin sa katayuan ng suplay sa klinika.",
+      "Hindi makumpirma ang progreso sa gawaing 'yan.",
+      "Hindi masuri ang progreso natin sa suplay sa klinika.",
+      "Hindi natuloy ang pagsusuri sa kahilingang 'yan.",
+      "Hindi makakuha ng ulat sa medikal na lakad."
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "navigation.camp",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Where should we set up?",
+      "Which location are you considering for camp?",
+      "Where do you want to establish our rest site?",
+      "Where are we making camp today?",
+      "Point out the spot you have in mind.",
+      "Where should we pitch our camp?",
+      "Which area looks suitable for stopping?",
+      "Where do you want to place the campsite?",
+      "Tell me where you want to settle down.",
+      "Where are we setting our base for the night?"
+    ],
+    "say.variants.guarded": [
+      "Where do you want to risk it?",
+      "Which spot are you eyeing? Better be defendable.",
+      "Make sure it has more than one exit.",
+      "Where do you want to hole up? Don't pick a trap.",
+      "Which site? I don't want us cornered.",
+      "Pick carefully. A bad camp gets us killed.",
+      "Where? I need to see the choke points first.",
+      "Where are you planning to bed down? Watch the perimeter.",
+      "Show me where. I'll inspect the sightlines.",
+      "Where? We need high ground or solid barricades."
+    ],
+    "say.variants.terse": [
+      "Where?",
+      "Which spot?",
+      "Camp where?",
+      "Location?",
+      "Point it out.",
+      "Which site?",
+      "Where to?",
+      "Name the spot.",
+      "Where at?",
+      "Show me."
+    ],
+    "say.variants.warm": [
+      "Where should we set up camp?",
+      "Where would you like us to settle down, friend?",
+      "Found a cozy spot for us to rest?",
+      "Where shall we make our camp today?",
+      "I'm happy to camp wherever you feel safe.",
+      "Lead on to our camp spot. I'm right with you.",
+      "Where do you think we can rest easy tonight?",
+      "Any spot you choose works for me.",
+      "Let's find somewhere warm and secure to camp.",
+      "Where would you like to put down our packs?"
+    ]
+  }
+}

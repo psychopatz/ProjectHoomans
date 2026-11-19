@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greetings.acquaintance.sunset",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Hey. Been a long day?",
+      "Good timing. I was about to settle in.",
+      "There you are. Find anything useful today?",
+      "The day's winding down. What's up?",
+      "You look tired. Everything okay?"
+    ],
+    "textRows.greeting.001": "Hey. Been a long day?",
+    "textRows.greeting.002": "Good timing. I was about to settle in.",
+    "textRows.greeting.003": "There you are. Find anything useful today?",
+    "textRows.greeting.004": "The day's winding down. What's up?",
+    "textRows.greeting.005": "You look tired. Everything okay?"
+  }
+}

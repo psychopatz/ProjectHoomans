@@ -1,0 +1,26 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.follow_up.responses",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": "Okay naman ako, sa lahat ng bagay.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetAllThingsConsidered": "Okay naman ako, sa lahat ng bagay.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetGettingBy": "Kinakaya ko araw-araw. Ikaw, kumusta?",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetHangingIn": "Kumakapit pa rin ako. Salamat sa pagtatanong.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetHungry": "Gutom ako, pero kakayanin ko. Kung may sobra kang pagkain, magpapasalamat ako.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetThirsty": "Uhaw na uhaw ako. Kung may tubig ka, maaari ba akong makahingi?",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetTired": "Pagod ako, pero kaya ko pa sa ngayon.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpDefault": "Wala pa akong sapat na detalye para masabi kung ano ang mali.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpFatigue": "Pagod na pagod pa rin ako.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpHunger": "Gutom pa rin ako.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpInjured": "Malakas ang tama sa akin. Masakit pa rin ito.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpPanic": "Nanginginig pa rin ako sa nangyari.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpStress": "Tensiyonado pa rin ako at nahihirapan akong kumalma.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpThirst": "Uhaw na uhaw pa rin ako.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpUnknown": "Wala pa akong sapat na detalye para masabi kung ano ang mali.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedFriendlyFact": "Tinamaan ako nang malakas, pero kaya ko pa ring magpatuloy.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedFriendlyTone": "Salamat sa pag-aalala.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedWithdrawnFact": "Nasaktan ako, pero kinakaya ko.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedWithdrawnTone": "Ayoko sanang palakihin pa ito."
+  }
+}

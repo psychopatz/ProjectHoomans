@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Good work. Keep watching the area.",
-            "Threat's handled. Stay on your toes.",
-            "Nice job. Don't relax just yet.",
-            "Target down. Keep scanning the perimeter.",
-            "Handled. Watch your surroundings.",
-            "Good strike. Stay vigilant.",
-            "That one's finished. Check the corners.",
-            "Well done. Keep weapons at the ready.",
-            "Clear here. Eyes on the shadows.",
-            "Threat eliminated. Keep moving carefully."
-          ],
-          "TL": [
-            "Magandang trabaho. Patuloy na bantayan ang paligid.",
-            "Naasikaso ang banta. Maging handa.",
-            "Mahusay. Huwag munang magpakampante.",
-            "Bagsak ang target. Patuloy na suriin ang paligid.",
-            "Naasikaso na. Bantayan ang paligid mo.",
-            "Magandang tama. Manatiling alerto.",
-            "Tapos na ang isang 'yon. Tignan ang mga sulok.",
-            "Magaling. Ihanda pa rin ang sandata.",
-            "Malinis dito. Tumingin sa mga anino.",
-            "Banta naalis na. Tuloy sa maingat na pagkilos."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

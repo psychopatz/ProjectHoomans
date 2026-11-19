@@ -1,0 +1,14 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "work_orders.member.status",
+  "locale": "EN",
+  "entries": {
+    "response.turn.opening.text": "I'm ready. What needs doing?",
+    "response.turn.opening.offer.orders.label": "I have work for you.",
+    "response.turn.opening.offer.orders.utterance": "I have work for you.",
+    "response.turn.opening.offer.orders.responseText": "Tell me what needs doing.",
+    "response.turn.opening.offer.status.label": "Report on your current work.",
+    "response.turn.opening.offer.status.utterance": "Report on your current work.",
+    "response.turn.opening.offer.status.responseText": "Everything is on track for now."
+  }
+}

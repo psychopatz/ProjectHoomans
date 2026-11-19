@@ -10,99 +10,21 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Down.",
-              "Eliminated.",
-              "Dead.",
-              "Handled.",
-              "Dropped.",
-              "Target down.",
-              "Neutralized.",
-              "Done.",
-              "Fell.",
-              "Ceased."
-            ],
-            "TL": [
-              "Patay.",
-              "Naalis.",
-              "Bagsak.",
-              "Naasikaso.",
-              "Tumba.",
-              "Bagsak ang target.",
-              "Naitumba.",
-              "Tapos.",
-              "Nalugmok.",
-              "Tumigil."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Got it.",
-              "Took it.",
-              "Hit.",
-              "Finished.",
-              "Cleared.",
-              "Taken care of.",
-              "Struck.",
-              "Resolved.",
-              "Dealt with.",
-              "Connected."
-            ],
-            "TL": [
-              "Nakuha ko.",
-              "Tinamaan ko.",
-              "Sapul.",
-              "Yari.",
-              "Malinis.",
-              "Naayos na.",
-              "Tinamaan.",
-              "Tapos na.",
-              "Nalutas.",
-              "Tumama."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "3": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Clear.",
-              "Path open.",
-              "Secure.",
-              "Nothing here.",
-              "Clean.",
-              "No contacts.",
-              "Lane clear.",
-              "Safe.",
-              "Open.",
-              "Quiet now."
-            ],
-            "TL": [
-              "Malinis.",
-              "Bukas ang daan.",
-              "Ligtas.",
-              "Walang anuman dito.",
-              "Maayos.",
-              "Walang kalaban.",
-              "Malinis ang linya.",
-              "Ayos.",
-              "Bukas.",
-              "Tahimik na."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

@@ -1,0 +1,29 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "needs.member.support",
+  "locale": "TL",
+  "entries": {
+    "response.turn.opening.text": "Hayaan akong isipin kung ano ang kulang sa grupo.",
+    "response.turn.opening.offer.supplies.label": "What supplies are we short buhay?",
+    "response.turn.opening.offer.supplies.utterance": "What supplies are we short buhay?",
+    "response.turn.opening.offer.supplies.responseText": "Pagkain, tubig, at mga kasangkapan. Ang karaniwan.",
+    "response.turn.opening.offer.medical.label": "May nangangailangan ba ng tulong medikal?",
+    "response.turn.opening.offer.medical.utterance": "May nangangailangan ba ng tulong medikal?",
+    "response.turn.opening.offer.medical.responseText": "Walang kagyat, ngunit suriin ang mga bendahe.",
+    "response.turn.opening.offer.gift.label": "Mayroon akong isang bagay na maaaring kailanganin mo.",
+    "response.turn.opening.offer.gift.utterance": "Mayroon akong isang bagay na maaaring kailanganin mo.",
+    "response.turn.opening.offer.gift.responseText": "Hayaan akong makita kung ano ang maaari mong matitira.",
+    "response.turn.gift.text": "Pumili ng ibibigay sa akin, pagkatapos ay bumalik sa usapan.",
+    "response.turn.gift.offer.gift_return.label": "Hahawakan ko ang natitira.",
+    "response.turn.gift.offer.gift_return.utterance": "Hahawakan ko ang natitira.",
+    "response.turn.gift.offer.gift_return.responseText": "Understood.",
+    "textRows.gift.offer.multiple": "Mayroon akong {giftItemSummary} para sa grupo.",
+    "textRows.gift.offer.multiple.alt": "Ilagay ang mga ito sa aming mga tindahan: {giftItemSummary}.",
+    "textRows.gift.offer.single": "Narito ang {giftItemName} para sa grupo.",
+    "textRows.gift.offer.single.alt": "Dinala ko ito para sa atin: {giftItemName}.",
+    "textRows.gift.received.equipment": "Iyan mismo ang uri ng kontribusyon na nagpapanatili sa isang komunidad na gumagalaw.",
+    "textRows.gift.received.food": "Perpektong timing. Sisiguraduhin kong makakarating ito sa taong nangangailangan nito.",
+    "textRows.gift.received.general": "salamat po. Ilalagay ko ito kung saan ito nagdudulot ng pinakamabuti.",
+    "textRows.gift.received.medical": "Diretso ito sa ating mga reserba. Ginawa mo lang mas ligtas ang buong grupo."
+  }
+}

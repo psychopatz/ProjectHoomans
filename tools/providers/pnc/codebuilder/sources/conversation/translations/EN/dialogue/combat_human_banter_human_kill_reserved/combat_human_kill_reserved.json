@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.human_kill.reserved",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "He's down.",
+      "Hostile down.",
+      "Shooter eliminated.",
+      "Dead.",
+      "Threat removed.",
+      "Finished.",
+      "Downed.",
+      "No more fire from him.",
+      "Target down.",
+      "Ceased."
+    ],
+    "say.2.neutral": [
+      "Done.",
+      "Over.",
+      "Confirmed.",
+      "Handled.",
+      "Dealt with.",
+      "Expired.",
+      "Neutralized.",
+      "Finished off.",
+      "Resolved.",
+      "Cleared."
+    ],
+    "say.3.neutral": [
+      "Clear.",
+      "Area secure.",
+      "Threat cleared.",
+      "Sector clear.",
+      "No movement.",
+      "Quiet.",
+      "All clear here.",
+      "Safe for now.",
+      "Clear lane.",
+      "Nothing moving."
+    ]
+  }
+}

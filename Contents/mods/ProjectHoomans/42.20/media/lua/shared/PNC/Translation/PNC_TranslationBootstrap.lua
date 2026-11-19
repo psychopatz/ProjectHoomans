@@ -30,7 +30,6 @@ require "PNC/Translation/PNC_TranslationBootstrap_Segments"
 local SEGMENT_SYSTEMS = Translation.Internal.SegmentSystems
 
 Translation.Systems = Translation.Systems or {}
-Translation.ConvoInline = Translation.ConvoInline or {}
 for _, systemName in ipairs(SYSTEMS) do
     if not Translation.Systems[systemName] then
         Translation.Systems[systemName] = Scope.registerSystem(
@@ -45,45 +44,13 @@ end
 -- now lives at media/translation/<LANG>/Character/Character.json.
 Translation.Traits = Translation.Systems.Character
 
-local function activeInlineLanguage()
-    if type(CustomTranslationManager) == "table"
-        and type(CustomTranslationManager.getLanguage) == "function"
-    then
-        local ok, value = pcall(CustomTranslationManager.getLanguage)
-        if ok and type(value) == "string" and value ~= "" then
-            return string.upper(value)
-        end
-    end
-    if type(Translator) == "table"
-        and type(Translator.getLanguage) == "function"
-    then
-        local ok, value = pcall(Translator.getLanguage)
-        if ok and value and type(value.toString) == "function" then
-            return string.upper(tostring(value:toString()))
-        end
-    end
-    return "EN"
-end
-
-function Translation.RegisterInlineText(language, key, text)
-    if type(language) ~= "string" or language == ""
-        or type(key) ~= "string" or key == ""
-        or type(text) ~= "string" or text == ""
-    then
-        return false
-    end
-    local langCode = string.upper(language)
-    Translation.ConvoInline[langCode] = Translation.ConvoInline[langCode] or {}
-    Translation.ConvoInline[langCode][key] = text
-    return true
-end
-
 local function systemForKey(key)
     if type(key) ~= "string" then return nil end
     if string.match(key, "^UI_PNC_Conversation_Telemetry_") then
         return "Debug"
     end
-    if string.match(key, "^conversation%.content%.")
+    if string.match(key, "^convo%.")
+        or string.match(key, "^conversation%.content%.")
         or string.match(key, "^semantic%.")
         or string.match(key, "^UI_DT_Conversation_")
     then
@@ -94,25 +61,25 @@ local function systemForKey(key)
 end
 
 function Translation.Get(systemName, key, fallback)
-    local inlineCatalog = Translation.ConvoInline[activeInlineLanguage()]
-    local inlineValue = inlineCatalog and inlineCatalog[key] or nil
     local handle = Translation.Systems[systemName]
     if handle and type(handle.get) == "function" then
-        if inlineValue ~= nil then
-            if type(handle.load) == "function" then handle:load() end
-            local data = type(CustomTranslationManager) == "table"
-                and CustomTranslationManager.Data or nil
-            local modData = data and data.ProjectHoomans or nil
-            local sysData = modData and modData[systemName] or nil
-            local override = sysData and sysData[key] or nil
-            if type(override) == "string" and override ~= "" then
-                return override
-            end
-            return inlineValue
+        local sentinel = "__PNC_TR_MISS__"
+        local value = handle:get(key, sentinel)
+        if value ~= sentinel then
+            return value
         end
-        return handle:get(key, fallback)
     end
-    return inlineValue or fallback or key or ""
+    if systemName == "Conversation"
+        and type(PsychopatzCore) == "table"
+        and type(PsychopatzCore.Translation) == "table"
+        and type(PsychopatzCore.Translation.GetKey) == "function"
+    then
+        local coreVal = PsychopatzCore.Translation.GetKey(key, fallback)
+        if type(coreVal) == "string" and coreVal ~= "" then
+            return coreVal
+        end
+    end
+    return fallback or key or ""
 end
 
 function Translation.GetKey(key, fallback)

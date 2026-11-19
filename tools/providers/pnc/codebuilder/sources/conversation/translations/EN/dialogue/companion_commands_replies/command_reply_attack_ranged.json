@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.attack_ranged",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "I'll cover you.",
+      "Ranged weapon ready. Watching the distance.",
+      "Providing covering fire.",
+      "I'll pick them off from here.",
+      "Sights aligned. Firing at range.",
+      "Keeping my distance and shooting.",
+      "Understood. Overwatching with ranged fire.",
+      "Ready on the trigger. Staying back.",
+      "Covering the field from back here.",
+      "Ranged attack stance confirmed."
+    ]
+  }
+}

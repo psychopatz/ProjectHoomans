@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Stay alert.",
-            "Keep your eyes peeled.",
-            "Watch our surroundings.",
-            "Don't let your guard down.",
-            "Stay sharp out here.",
-            "Keep quiet and listen.",
-            "Keep checking the corners.",
-            "Stay cautious.",
-            "Eyes front and back.",
-            "Stay focused."
-          ],
-          "TL": [
-            "Manatiling alerto.",
-            "Buksan ang mga mata.",
-            "Bantayan ang paligid natin.",
-            "Huwag ibaba ang depensa.",
-            "Maging handa rito sa labas.",
-            "Tumahimik at makinig.",
-            "Tignan palagi ang mga sulok.",
-            "Mag-ingat palagi.",
-            "Tumingin sa harap at likod.",
-            "Manatiling nakapokus."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

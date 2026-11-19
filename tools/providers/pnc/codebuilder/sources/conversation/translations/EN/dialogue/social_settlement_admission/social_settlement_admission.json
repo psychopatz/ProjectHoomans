@@ -1,0 +1,16 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.settlement_admission",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Please… let me stay. We have been walking for days, and I do not know how much longer the others can keep going.",
+      "I am not asking for much. A roof, a meal, and a chance to be useful. Please let us join you.",
+      "You have a settlement. We have nothing left but each other. If there is room, I will work for it."
+    ],
+    "textRows.opening.001": "Please… let me stay. We have been walking for days, and I do not know how much longer the others can keep going.",
+    "textRows.opening.002": "I am not asking for much. A roof, a meal, and a chance to be useful. Please let us join you.",
+    "textRows.opening.003": "You have a settlement. We have nothing left but each other. If there is room, I will work for it.",
+    "textRows.response.settlement_admission.accepted.1": "Thank you. I thought I would have to keep walking until there was nowhere left to go."
+  }
+}

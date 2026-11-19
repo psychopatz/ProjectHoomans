@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.companion_orders.label",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": "I need you to do something...",
+    "textRows.suggestion.companion_orders.label": "I need you to do something..."
+  }
+}

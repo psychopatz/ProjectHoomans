@@ -9,10 +9,6 @@
     "variants": [
       {
         "id": "question.backstory.ambiguous.authored",
-        "text": {
-          "EN": "Which part of my past do you mean?",
-          "TL": "Aling bahagi ng nakaraan ko ang ibig mong sabihin?"
-        },
         "metadata": {
           "fallback": "Which part of my past do you mean?",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous"

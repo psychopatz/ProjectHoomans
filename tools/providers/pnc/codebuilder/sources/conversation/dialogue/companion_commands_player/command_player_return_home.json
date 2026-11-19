@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "{addressee.name}, head home.",
-            "Return to the base, {addressee.name}.",
-            "{addressee.name}, get back home safely."
-          ],
-          "TL": [
-            "{addressee.name}, umuwi na kayo.",
-            "Bumalik sa base, {addressee.name}.",
-            "{addressee.name}, ligtas na umuwi."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

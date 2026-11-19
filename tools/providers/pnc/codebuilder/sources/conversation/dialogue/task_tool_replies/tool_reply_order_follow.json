@@ -10,99 +10,21 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "All right. I am with you.",
-              "I'm right behind you.",
-              "Following your lead.",
-              "Understood. Moving out together.",
-              "With you all the way.",
-              "Sticking close behind.",
-              "On your heels. Let's move.",
-              "Right with you, partner.",
-              "Following as ordered.",
-              "Moving in lockstep with you."
-            ],
-            "TL": [
-              "Sige. Sasama ako sa iyo.",
-              "Nasa likod mo lang ako.",
-              "Sumusunod sa pangunguna mo.",
-              "Naintindihan. Sabay tayong lalakad.",
-              "Kasama mo sa buong daan.",
-              "Didikit ako sa likod mo.",
-              "Nasa likod mo lang. Kilos na.",
-              "Kasabay mo na ako, kasama.",
-              "Sumusunod ayon sa utos.",
-              "Kasabay sa bawat hakbang mo."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Lead the way.",
-              "You lead, I follow.",
-              "After you. Watch our front.",
-              "Take point. I've got your rear.",
-              "Lead on. I'm ready.",
-              "Show the path. I'm right behind.",
-              "Lead the way. Eyes sharp.",
-              "You take the front, partner.",
-              "Point the direction and walk.",
-              "Lead the way out."
-            ],
-            "TL": [
-              "Ituro ang daan.",
-              "Ikaw ang mauna, susunod ako.",
-              "Kasunod mo ako. Bantayan ang unahan natin.",
-              "Mauna ka sa harap. Hawak ko ang likod mo.",
-              "Mauna na. Handa na ako.",
-              "Ipakita ang daan. Nasa likod mo lang ako.",
-              "Ituro ang daan. Matalas ang paningin.",
-              "Ikaw ang mauna sa harap, kasama.",
-              "Ituro ang direksyon at lumakad.",
-              "Ituro ang daan palabas."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "3": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I will stay close.",
-              "Won't let you out of my sight.",
-              "Sticking right by your side.",
-              "Keeping tight formation with you.",
-              "Close proximity confirmed.",
-              "I'll match your pace and stay near.",
-              "Right beside you. Don't worry.",
-              "Staying within arm's reach.",
-              "I won't lag behind.",
-              "Staying close behind you."
-            ],
-            "TL": [
-              "Mananatili akong malapit.",
-              "Di kita iwawala sa paningin ko.",
-              "Didikit ako sa tabi mo.",
-              "Didikit sa pormasyon kasama mo.",
-              "Kumpirmadong malapit lang.",
-              "Sasabayan ko ang bilis mo at mananatiling malapit.",
-              "Nasa tabi mo lang. Huwag mag-alala.",
-              "Nasa abot-kamay lang ako.",
-              "Hindi ako magpapahuli.",
-              "Mananatiling malapit sa likod mo."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

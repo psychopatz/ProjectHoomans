@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.camp_rejected",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Wala akong makitang ligtas na silid o apoy dito.",
+      "Hindi sapat ang ligtas ng lugar para magkampo rito.",
+      "Kailangan natin ng pader o apoy bago magkampo.",
+      "Masyadong bukas. Humanap muna ng mas maayos na silungan.",
+      "Ayokong matulog sa bukas na lugar nang ganito.",
+      "Hindi pwedeng magkampo rito. Napakaraming panganib.",
+      "Maghanap ng ligtas na kwarto bago tayo matulog.",
+      "Walang silong, walang init. Di tayo pwedeng magkampo rito.",
+      "Maling pwesto para magkampo. Kailangan natin ng tunay na silungan.",
+      "Mapapatay tayo kapag natulog dito. Humanap ng mas ligtas na bahay."
+    ]
+  }
+}

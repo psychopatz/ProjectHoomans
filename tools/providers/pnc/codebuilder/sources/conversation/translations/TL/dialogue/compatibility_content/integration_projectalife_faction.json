@@ -1,0 +1,16 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "integration.projectalife.faction",
+  "locale": "TL",
+  "entries": {
+    "say.variants.hostile": [
+      "That faction may be hostile toward us now. Stay alert."
+    ],
+    "say.variants.incoming": [
+      "They just opened fire on us. Stay close."
+    ],
+    "say.variants.outgoing": [
+      "We hit them. They may retaliate soon."
+    ]
+  }
+}

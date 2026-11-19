@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "return_home",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": "Umuwi ka na."
+  }
+}

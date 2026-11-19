@@ -1,0 +1,11 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.trade",
+  "locale": "TL",
+  "entries": {
+    "affordance.label": "Buksan ang kalakalan",
+    "say.variants.default": "Magpalitan tayo.",
+    "textRows.suggestion.trade.label": "Buksan ang kalakalan",
+    "textRows.suggestion.trade.utterance": "Magpalitan tayo."
+  }
+}

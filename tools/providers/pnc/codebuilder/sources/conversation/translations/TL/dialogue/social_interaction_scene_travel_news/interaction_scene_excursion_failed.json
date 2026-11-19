@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.scene.excursion_failed",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Kanselado ang biyahe. May nangyaring mali.",
+      "Kailangang kanselahin ang lakad. Hindi ligtas.",
+      "Pumalpak ang plano. Ititigil natin ang paglabas.",
+      "Kanselahin na. Masyadong mapanganib ang kalagayan.",
+      "Ititigil ang misyon. Magtipon pabalik sa loob.",
+      "Kanselado ang biyahe. May sumira sa ruta natin.",
+      "Hindi matutuloy ngayon. Umatras pabalik sa base.",
+      "Bigo ang misyon. Mas mabuting ihinto kaysa may mamatay.",
+      "Kanselado ang paglabas. Bumalik sa loob.",
+      "Ititigil ang lakad. Pag-iisipan natin muli ang plano."
+    ],
+    "say.variants.guarded": [
+      "Bigo ang paglalakbay. Magtipon ulit tayo rito.",
+      "May sumira sa operasyon. Umatras agad-agad.",
+      "Kamatayan kapag pinilit ang lakad na 'to. Ihinto.",
+      "Umatras at alamin kung anong pumalpak sa loob ng pinto.",
+      "Nasira ang ruta. Aatras tayo ngayon din.",
+      "Kanselado ang lakad. Bantayan ang likod habang bumabalik.",
+      "Maling balita o malas. Alinman doon, itigil na.",
+      "Huwag lumusob sa tambang. Itigil ang misyon.",
+      "Tigil. I-secure ang lagusan at mag-usap.",
+      "Bigong pagtatangka. Umatras at i-secure ang armas."
+    ],
+    "say.variants.terse": [
+      "Kanselado ang biyahe.",
+      "Ihinto.",
+      "Kanselado.",
+      "Balik sa loob.",
+      "Kanselahin.",
+      "Bigo. Umatras.",
+      "Hindi ngayon.",
+      "Tigil.",
+      "Wala na.",
+      "Magtipon ulit."
+    ],
+    "say.variants.warm": [
+      "Ititigil muna natin. Mas mabuting ligtas kaysa pilitin.",
+      "Huwag kang panghinaan ng loob, kaibigan. Susubukan natin ulit sa ibang araw.",
+      "Mas gusto kitang buhay kaysa sa anumang gamit sa labas.",
+      "Ayos lang, kasama. Tama ang desisyon nating huminto.",
+      "Kaligtasan ang una sa lahat. Halika, sabay tayong bumalik.",
+      "Huwag mong sisihin sarili mo. Ginawa natin ang makakaya.",
+      "Mabubuhay tayo para lumaban muli. Iyon ang tunay na panalo, kaibigan.",
+      "Matalinong desisyon ang huminto. Masaya akong ligtas ka sa tabi ko.",
+      "Huminga ka muna. Magpapahinga tayo at magpaplano nang mas maayos.",
+      "Makakabawi tayo sa susunod, kasama. Pumasok na tayo."
+    ]
+  }
+}

@@ -166,19 +166,19 @@ class NeedsWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
     ) -> None:
         expected = {
             "EN": (
-                "conversation.content.semantic.question.needs.offer.hunger.neutral.01",
+                "convo.question.needs.offer.say.1.hunger.1",
                 "Food would help, but I don't have an exact amount yet.",
-                "conversation.content.semantic.question.needs.quantity.hunger.neutral.01",
+                "convo.question.needs.quantity.say.1.hunger.1",
                 "I know food is what I need, but I can't give you an exact amount yet.",
-                "conversation.content.semantic.question.needs.proposal.hunger.neutral.01",
+                "convo.question.needs.proposal.say.1.hunger.1",
                 "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
             ),
             "TL": (
-                "conversation.content.semantic.question.needs.offer.hunger.neutral.01",
+                "convo.question.needs.offer.say.1.hunger.1",
                 "Makakatulong ang pagkain, pero wala akong eksaktong dami ngayon.",
-                "conversation.content.semantic.question.needs.quantity.hunger.neutral.01",
+                "convo.question.needs.quantity.say.1.hunger.1",
                 "Alam kong pagkain ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
-                "conversation.content.semantic.question.needs.proposal.hunger.neutral.01",
+                "convo.question.needs.proposal.say.1.hunger.1",
                 "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
             ),
         }

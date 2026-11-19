@@ -20,112 +20,48 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.question.backstory.known.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Before all this, I was %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Bago ang lahat ng ito, ako ay %1.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "I studied %1.",
                                 ["id"] = "education",
                                 ["templateID"] = "convo.question.backstory.known.say.1.education",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I studied %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Nag-aral ako ng %1.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "My family was %1.",
                                 ["id"] = "family_background",
                                 ["templateID"] = "convo.question.backstory.known.say.1.family_background",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "My family was %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Ang pamilya ko ay %1.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "I have always been afraid of %1.",
                                 ["id"] = "fear",
                                 ["templateID"] = "convo.question.backstory.known.say.1.fear",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I have always been afraid of %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Palagi akong natatakot sa %1.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "I worked as %1 before all this.",
                                 ["id"] = "former_job",
                                 ["templateID"] = "convo.question.backstory.known.say.1.former_job",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I worked as %1 before all this.",
-                                    },
-                                    ["TL"] = {
-                                        "Nagtrabaho ako bilang %1 bago ang lahat ng ito.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "I used to enjoy %1.",
                                 ["id"] = "hobby",
                                 ["templateID"] = "convo.question.backstory.known.say.1.hobby",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I used to enjoy %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Mahilig ako noon sa %1.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "I grew up in %1.",
                                 ["id"] = "hometown",
                                 ["templateID"] = "convo.question.backstory.known.say.1.hometown",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I grew up in %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Lumaki ako sa %1.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Something happened: %1.",
                                 ["id"] = "tragedy",
                                 ["templateID"] = "convo.question.backstory.known.say.1.tragedy",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Something happened: %1.",
-                                    },
-                                    ["TL"] = {
-                                        "May nangyari: %1.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -139,14 +75,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.known.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Before all this, I was %1.",
-                        },
-                        ["TL"] = {
-                            "Bago ang lahat ng ito, ako ay %1.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -154,14 +82,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.known.say.1.education",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I studied %1.",
-                        },
-                        ["TL"] = {
-                            "Nag-aral ako ng %1.",
-                        },
-                    },
                     ["variantID"] = "education",
                 },
                 {
@@ -169,14 +89,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.known.say.1.family_background",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "My family was %1.",
-                        },
-                        ["TL"] = {
-                            "Ang pamilya ko ay %1.",
-                        },
-                    },
                     ["variantID"] = "family_background",
                 },
                 {
@@ -184,14 +96,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.known.say.1.fear",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I have always been afraid of %1.",
-                        },
-                        ["TL"] = {
-                            "Palagi akong natatakot sa %1.",
-                        },
-                    },
                     ["variantID"] = "fear",
                 },
                 {
@@ -199,14 +103,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.known.say.1.former_job",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I worked as %1 before all this.",
-                        },
-                        ["TL"] = {
-                            "Nagtrabaho ako bilang %1 bago ang lahat ng ito.",
-                        },
-                    },
                     ["variantID"] = "former_job",
                 },
                 {
@@ -214,14 +110,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.known.say.1.hobby",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I used to enjoy %1.",
-                        },
-                        ["TL"] = {
-                            "Mahilig ako noon sa %1.",
-                        },
-                    },
                     ["variantID"] = "hobby",
                 },
                 {
@@ -229,14 +117,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.known.say.1.hometown",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I grew up in %1.",
-                        },
-                        ["TL"] = {
-                            "Lumaki ako sa %1.",
-                        },
-                    },
                     ["variantID"] = "hometown",
                 },
                 {
@@ -244,14 +124,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.known.say.1.tragedy",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Something happened: %1.",
-                        },
-                        ["TL"] = {
-                            "May nangyari: %1.",
-                        },
-                    },
                     ["variantID"] = "tragedy",
                 },
             },
@@ -305,6 +177,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Before all this, I was %1.",
                                 ["id"] = "default",
                                 ["metadata"] = {
                                     ["fallback"] = "Before all this, I was %1.",
@@ -313,16 +186,9 @@ return {
                                         ["content"] = "fact_content",
                                     },
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Before all this, I was %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Bago ang lahat ng ito, ako ay %1.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "I studied %1.",
                                 ["id"] = "education",
                                 ["metadata"] = {
                                     ["fallback"] = "I studied %1.",
@@ -331,16 +197,9 @@ return {
                                         ["content"] = "fact_content",
                                     },
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I studied %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Nag-aral ako ng %1.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "My family was %1.",
                                 ["id"] = "family_background",
                                 ["metadata"] = {
                                     ["fallback"] = "My family was %1.",
@@ -349,16 +208,9 @@ return {
                                         ["content"] = "fact_content",
                                     },
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "My family was %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Ang pamilya ko ay %1.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "I have always been afraid of %1.",
                                 ["id"] = "fear",
                                 ["metadata"] = {
                                     ["fallback"] = "I have always been afraid of %1.",
@@ -367,16 +219,9 @@ return {
                                         ["content"] = "fact_content",
                                     },
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I have always been afraid of %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Palagi akong natatakot sa %1.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "I worked as %1 before all this.",
                                 ["id"] = "former_job",
                                 ["metadata"] = {
                                     ["fallback"] = "I worked as %1 before all this.",
@@ -385,16 +230,9 @@ return {
                                         ["content"] = "fact_content",
                                     },
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I worked as %1 before all this.",
-                                    },
-                                    ["TL"] = {
-                                        "Nagtrabaho ako bilang %1 bago ang lahat ng ito.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "I used to enjoy %1.",
                                 ["id"] = "hobby",
                                 ["metadata"] = {
                                     ["fallback"] = "I used to enjoy %1.",
@@ -403,16 +241,9 @@ return {
                                         ["content"] = "fact_content",
                                     },
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I used to enjoy %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Mahilig ako noon sa %1.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "I grew up in %1.",
                                 ["id"] = "hometown",
                                 ["metadata"] = {
                                     ["fallback"] = "I grew up in %1.",
@@ -421,30 +252,15 @@ return {
                                         ["content"] = "fact_content",
                                     },
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I grew up in %1.",
-                                    },
-                                    ["TL"] = {
-                                        "Lumaki ako sa %1.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Something happened: %1.",
                                 ["id"] = "tragedy",
                                 ["metadata"] = {
                                     ["fallback"] = "Something happened: %1.",
                                     ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy",
                                     ["translationArgs"] = {
                                         ["content"] = "fact_content",
-                                    },
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Something happened: %1.",
-                                    },
-                                    ["TL"] = {
-                                        "May nangyari: %1.",
                                     },
                                 },
                             },
@@ -523,14 +339,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.known.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Before all this, I was %1.",
-                    },
-                    ["TL"] = {
-                        "Bago ang lahat ng ito, ako ay %1.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -538,14 +346,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.known.say.1.education",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I studied %1.",
-                    },
-                    ["TL"] = {
-                        "Nag-aral ako ng %1.",
-                    },
-                },
                 ["variantID"] = "education",
             },
             {
@@ -553,14 +353,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.known.say.1.family_background",
-                ["translations"] = {
-                    ["EN"] = {
-                        "My family was %1.",
-                    },
-                    ["TL"] = {
-                        "Ang pamilya ko ay %1.",
-                    },
-                },
                 ["variantID"] = "family_background",
             },
             {
@@ -568,14 +360,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.known.say.1.fear",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I have always been afraid of %1.",
-                    },
-                    ["TL"] = {
-                        "Palagi akong natatakot sa %1.",
-                    },
-                },
                 ["variantID"] = "fear",
             },
             {
@@ -583,14 +367,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.known.say.1.former_job",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I worked as %1 before all this.",
-                    },
-                    ["TL"] = {
-                        "Nagtrabaho ako bilang %1 bago ang lahat ng ito.",
-                    },
-                },
                 ["variantID"] = "former_job",
             },
             {
@@ -598,14 +374,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.known.say.1.hobby",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I used to enjoy %1.",
-                    },
-                    ["TL"] = {
-                        "Mahilig ako noon sa %1.",
-                    },
-                },
                 ["variantID"] = "hobby",
             },
             {
@@ -613,14 +381,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.known.say.1.hometown",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I grew up in %1.",
-                    },
-                    ["TL"] = {
-                        "Lumaki ako sa %1.",
-                    },
-                },
                 ["variantID"] = "hometown",
             },
             {
@@ -628,14 +388,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.known.say.1.tragedy",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Something happened: %1.",
-                    },
-                    ["TL"] = {
-                        "May nangyari: %1.",
-                    },
-                },
                 ["variantID"] = "tragedy",
             },
         },

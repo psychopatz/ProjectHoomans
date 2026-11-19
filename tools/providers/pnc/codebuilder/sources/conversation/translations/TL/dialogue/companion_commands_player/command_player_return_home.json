@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.player.return_home",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "{addressee.name}, umuwi na kayo.",
+      "Bumalik sa base, {addressee.name}.",
+      "{addressee.name}, ligtas na umuwi."
+    ]
+  }
+}

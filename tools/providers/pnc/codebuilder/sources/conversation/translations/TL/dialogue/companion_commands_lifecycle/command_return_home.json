@@ -1,0 +1,91 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.return_home",
+  "locale": "TL",
+  "entries": {
+    "reply.queued.say.1.neutral": [
+      "Sige, uuwi ako.",
+      "Pabalik na sa base ngayon.",
+      "Naintindihan. Papatungo na sa tahanan.",
+      "Babalik ako sa silungan natin.",
+      "Babalik sa kampo ayon sa utos.",
+      "Sige. Oras na para umuwi.",
+      "Naiintindihan ko. Binabalikan ang daan sa base.",
+      "Papauwi na ako ngayon.",
+      "Nakuha ko. Pabalik sa mga coordinate ng tahanan.",
+      "Papasok na pauwi."
+    ],
+    "reply.queued.say.1.friendly": [
+      "Sige, uuwi ako. Kita tayo roon agad!",
+      "Napakaganda, kaibigan. Babalik ako sa kampo nang ligtas.",
+      "Pauwi na, kasama! Tiyakin mong mag-iingat ka rin.",
+      "Pupunta ako para panatilihing mainit ang apoy pagbalik mo.",
+      "Magandang ideya! Uuwi ako at itatabi ang gamit natin.",
+      "Masayang uuwi. Huwag kang magpagabi sa labas, kaibigan!",
+      "Papauwi na sa ligtas nating lugar. Mag-ingat ka!",
+      "Pauwi nang may ngiti. Magkita tayo maya-maya, kasama.",
+      "Aayusin ko ang mga gamit sa base para sa atin.",
+      "Pauwi na! Mag-ingat ka sa pagbalik mo."
+    ],
+    "reply.queued.say.1.repeated": [
+      "Pauwi pa rin ako.",
+      "Pauwi na ako. Dumaraan lang sa ligtas na ruta.",
+      "Naglalakbay pa rin patungong base. Nandoon na agad.",
+      "Di ako humihinto sa paglakad pauwi.",
+      "Pauwi na nga ako. Kumalma ka lang.",
+      "Nasa daan pa rin pauwi.",
+      "Malapit na roon. Papatungo pa rin sa base.",
+      "Sumusunod na sa rutang pabalik.",
+      "Nasa biyahe pa rin pauwi. Di kailangang sumigaw.",
+      "Pauwi na talaga ako."
+    ],
+    "reply.queued.say.1.trusted": [
+      "Sige, pauwi na ako. Bantayan mo ang likod.",
+      "Tiwala ako sa pasya mo. Titiyakin kong ligtas ang base.",
+      "Pauwi na, kasama. Huwag sumugal sa panganib dito.",
+      "Naintindihan. Maghihintay ako sa kampo sa pagbalik mo.",
+      "Pauwi na. Tiyakin mong makababalik ka nang buo.",
+      "Babantayan ko ang kuta hanggang sa makabalik ka.",
+      "Pabalik na. Nagtitiwala akong iingatan mo ang sarili mo.",
+      "Magkita tayo sa bahay, kaibigan. Manatiling mapagmatyag.",
+      "Babalik sa kanlungan natin. Manatiling buhay para sa akin.",
+      "Naiintindihan ko. Pabalik na para i-secure ang tahanan natin."
+    ],
+    "reply.queued.say.1.withdrawn": [
+      "Uuwi ako.",
+      "Babalik na ngayon.",
+      "Papatungo sa base.",
+      "Naintindihan. Bahay.",
+      "Sige. Aalis na ako.",
+      "Babalik mag-isa.",
+      "Uuwi na. Kahit ano pa.",
+      "Sige. Pabalik na.",
+      "Babalik na.",
+      "Papatungo sa silungan."
+    ],
+    "reply.rejected.say.variants.default": [
+      "Hindi ako makauuwi ngayon.",
+      "Pinutol ng mga kawan ang daan pauwi.",
+      "Di kita iiwan dito nang mag-isa. Di ako uuwi.",
+      "Masyadong maraming panganib sa daan pabalik ngayon.",
+      "Tumatangging umuwi habang napapaligiran tayo.",
+      "Kailangan kong tapusin ang sinimulan bago umuwi.",
+      "Di makauwi. May sira ang tarangkahan.",
+      "Di makabalik sa base sa ngayon.",
+      "Di ko tatalikuran ang misyon para lang umuwi ngayon.",
+      "Tinatanggihan ang pag-uwi. Di ligtas maglakbay."
+    ],
+    "reply.failed.say.variants.default": [
+      "Hindi ako nakauwi.",
+      "Ganap na may harang ang daan pabalik sa tahanan.",
+      "Bigo sa pag-uwi. Masyadong maraming kalaban sa ruta.",
+      "Wala akong makitang ligtas na daan pabalik sa base.",
+      "Pumalpak ang pag-uwi. Kinailangang bumalik.",
+      "Di makarating sa tahanan nang ligtas sa ngayon.",
+      "Sinubukang umuwi, pero pinamumugaran ang mga kalsada.",
+      "Nawala ang daan pauwi sa gitna ng gulo.",
+      "Di maabot ang base mula sa pwestong ito.",
+      "Itinigil ang pag-uwi sa base. May aberya sa ruta."
+    ]
+  }
+}

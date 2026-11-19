@@ -79,8 +79,11 @@
     }
   ],
   "say": {
-    "EN": "Stay here.",
-    "TL": "Dito ka lang."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

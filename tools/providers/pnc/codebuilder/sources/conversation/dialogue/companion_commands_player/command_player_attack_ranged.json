@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "{addressee.name}, keep your distance.",
-            "Give us ranged cover, {addressee.name}.",
-            "{addressee.name}, engage from a safe distance."
-          ],
-          "TL": [
-            "{addressee.name}, panatilihin ang distansya.",
-            "Takpan kami mula sa malayo, {addressee.name}.",
-            "{addressee.name}, lumaban mula sa ligtas na layo."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

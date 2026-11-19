@@ -10,62 +10,10 @@
   "say": {
     "variants": [
       {
-        "id": "friendly",
-        "text": {
-          "EN": [
-            "You're welcome. It's good to see you too.",
-            "Anytime. Glad you're here.",
-            "Always glad to talk. Stay safe out there.",
-            "No problem. Holler if you need a hand.",
-            "Anytime, friend. Take care of yourself.",
-            "Glad we caught up. Catch you in a bit.",
-            "No trouble at all. Good to have you around.",
-            "Sure thing. Watch yourself out there, alright?",
-            "Take care. We'll talk again soon.",
-            "Always. Glad to see you on your feet."
-          ],
-          "TL": [
-            "Walang anuman. Mabuti at nakita rin kita.",
-            "Kahit kailan. Masaya akong nandito ka.",
-            "Palaging masayang makausap ka. Mag-ingat ka sa labas.",
-            "Walang problema. Tawagin mo ako kapag kailangan mo ng tulong.",
-            "Kahit kailan, kaibigan. Alagaan mo ang sarili mo.",
-            "Mabuti at nagkausap tayo. Magkita tayo mamaya.",
-            "Walang problema talaga. Mabuti at nandito ka.",
-            "Oo naman. Mag-ingat ka sa labas, ha?",
-            "Mag-iingat ka. Mag-usap tayo ulit mamaya.",
-            "Palagi. Masaya akong maayos ang lagay mo."
-          ]
-        }
+        "id": "friendly"
       },
       {
-        "id": "default",
-        "text": {
-          "EN": [
-            "You're welcome. Take care.",
-            "No trouble. Stay safe.",
-            "Anytime. Watch your back out there.",
-            "Don't mention it. See you around.",
-            "Glad to help. Take it easy.",
-            "All right. Stay alert today.",
-            "No problem at all. Be careful.",
-            "Sure thing. Keep your eyes open.",
-            "Take care of yourself out there.",
-            "Until next time. Stay safe."
-          ],
-          "TL": [
-            "Walang anuman. Mag-iingat ka.",
-            "Walang problema. Manatiling ligtas.",
-            "Kahit kailan. Mag-ingat ka sa labas.",
-            "Wala 'yon. Magkikita pa tayo.",
-            "Masayang nakatulong. Dahan-dahan lang.",
-            "Sige. Maging alerto ka ngayon.",
-            "Walang anuman talaga. Mag-ingat ka.",
-            "Oo naman. Buksan mo ang mga mata mo.",
-            "Alagaan mo ang sarili mo sa labas.",
-            "Hanggang sa muli. Manatiling ligtas."
-          ]
-        }
+        "id": "default"
       }
     ]
   },

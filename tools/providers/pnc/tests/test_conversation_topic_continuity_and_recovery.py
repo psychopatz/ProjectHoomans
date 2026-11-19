@@ -193,10 +193,10 @@ class ConversationTopicContinuityAndRecoveryTests(WarmWorkerTestMixin, unittest.
                 ),
             },
             "TL": {
-                ("Putang ina mo rin.", "construction.tl.social.mirror_retort"),
+                ("Putang ina mo rin.", "construction.en.social.mirror_retort"),
                 (
                     "Ha? Putang ina mo rin.",
-                    "construction.tl.social.mirror_retort_challenge",
+                    "construction.en.social.mirror_retort_challenge",
                 ),
             },
         }
@@ -266,10 +266,6 @@ class ConversationTopicContinuityAndRecoveryTests(WarmWorkerTestMixin, unittest.
                 "PsychopatzCore/ConvoEngine/"
                 "Realization/Templates/SocialIdentityClosure"
             ],
-        )
-        self.assertEqual(
-            index["construction.tl.social.mirror_retort"]["source"],
-            "realization/social_identity_closure/social_mirror_retort.json",
         )
         self.assertEqual(
             index["lexeme.social.profanity.fuck"]["source"],

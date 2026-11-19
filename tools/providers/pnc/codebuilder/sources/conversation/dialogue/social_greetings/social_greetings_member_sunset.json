@@ -36,62 +36,26 @@
     "responseAct": "GREETING",
     "textRows": [
       {
-        "key": "greeting.001",
-        "text": {
-          "EN": "We made it through the day. That's something.",
-          "TL": "Nalampasan natin ang araw. May halaga iyon."
-        }
+        "key": "greeting.001"
       },
       {
-        "key": "greeting.002",
-        "text": {
-          "EN": "Hey. Need a hand before we wrap up?",
-          "TL": "Hey. Kailangan ng kamay bago tayo magtapos?"
-        }
+        "key": "greeting.002"
       },
       {
-        "key": "greeting.003",
-        "text": {
-          "EN": "Long day, but I'm still ready if you need me.",
-          "TL": "Mahabang araw, pero handa pa rin ako kung kailangan mo ako."
-        }
+        "key": "greeting.003"
       },
       {
-        "key": "greeting.004",
-        "text": {
-          "EN": "Everyone accounted for?",
-          "TL": "Lahat ng tao accounted para sa?"
-        }
+        "key": "greeting.004"
       },
       {
-        "key": "greeting.005",
-        "text": {
-          "EN": "The light's fading. We should finish up soon.",
-          "TL": "Kumukupas na ang liwanag. Dapat na tayong magtapos."
-        }
+        "key": "greeting.005"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "We made it through the day. That's something.",
-            "Hey. Need a hand before we wrap up?",
-            "Long day, but I'm still ready if you need me.",
-            "Everyone accounted for?",
-            "The light's fading. We should finish up soon."
-          ],
-          "TL": [
-            "Nalampasan natin ang araw. May halaga iyon.",
-            "Hey. Kailangan ng kamay bago tayo magtapos?",
-            "Mahabang araw, pero handa pa rin ako kung kailangan mo ako.",
-            "Lahat ng tao accounted para sa?",
-            "Kumukupas na ang liwanag. Dapat na tayong magtapos."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

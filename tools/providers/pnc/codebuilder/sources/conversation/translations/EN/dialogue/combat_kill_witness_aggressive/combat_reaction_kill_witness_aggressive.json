@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_witness_aggressive",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "Nice. Hit the next one.",
+      "Good strike! Take down another.",
+      "Solid hit! Keep swinging.",
+      "Dropped 'em! Who's next in line?",
+      "Beautiful kill! Take the next one out.",
+      "That skull shattered! Don't stop now.",
+      "Down it goes! Next target is yours.",
+      "Great shot! Press the attack.",
+      "Tore right through it! Keep going.",
+      "Hard hit! Line up the next one."
+    ],
+    "say.2.neutral": [
+      "That's how you do it. Keep going.",
+      "Textbook hit. Don't lose that momentum.",
+      "That's how we put them down. Keep pushing.",
+      "Hell of a blow! Don't let up.",
+      "Crushed it! Keep that fire burning.",
+      "Right in the dirt! Keep moving forward.",
+      "That's the way! Tear through them.",
+      "Brutal! Keep swinging like that.",
+      "Put down hard. Don't stop now.",
+      "That's what they get! Move to the next."
+    ],
+    "say.3.neutral": [
+      "Good kill. Don't let up.",
+      "Clean drop. Keep up the pressure.",
+      "Nice work! Stay aggressive.",
+      "Downed him. Don't give them an inch.",
+      "Great hit. Keep charging.",
+      "That one's history. Stay on the offense.",
+      "Solid work. Don't slow down.",
+      "Good kill. Make every strike count.",
+      "Down for good. Stay locked in.",
+      "Took it right out. Keep pushing."
+    ]
+  }
+}

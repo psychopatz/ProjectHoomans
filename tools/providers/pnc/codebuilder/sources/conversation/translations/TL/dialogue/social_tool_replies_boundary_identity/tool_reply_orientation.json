@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.orientation",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Hindi talaga ganoon ang hilig ko.",
+      "Hindi ako ganoon magkainteres, para alam mo lang.",
+      "Hindi ko gusto ang ganoon, pero salamat sa pagiging tapat.",
+      "Salamat sa katapatan, pero hindi 'yan para sa akin.",
+      "Hindi ko tipo ang ganyang bagay.",
+      "Para malinaw sa atin, hindi kita tinitingnan sa ganoong paraan.",
+      "Hindi ako interesado sa ganyang uri ng ugnayan.",
+      "Nirerespeto ko, pero hindi 'yan ang patutunguhan ko.",
+      "Hanggang magkaibigan lang talaga ako rito.",
+      "Mabuting malaman ang panig mo, pero hindi ganoon ang akin."
+    ],
+    "say.2.neutral": [
+      "Mas gusto kong panatilihing simple ang lahat sa pagitan natin.",
+      "Panatilihin na lang nating hindi magulo ito.",
+      "Magulo na ang kaligtasan para dagdagan pa niyan.",
+      "Gusto ko kung nasaan tayo ngayon. Huwag na nating guluhin.",
+      "Mas maayos tayong nagtutulungan kapag diretso lang ang usapan.",
+      "Hindi ako naghahanap ng anumang kumplikado dito.",
+      "Ligtas kapag simple. Panatilihin nating ganoon.",
+      "Masyadong mahalaga ang samahan natin para gawing asiwa.",
+      "Magpokus na lang tayo sa pananatiling buhay.",
+      "Mas maganda para sa ating dalawa kung malinaw at simple lang."
+    ]
+  }
+}

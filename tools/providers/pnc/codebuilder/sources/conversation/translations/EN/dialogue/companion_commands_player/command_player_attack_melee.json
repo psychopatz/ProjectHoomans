@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.player.attack_melee",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "{addressee.name}, keep it close.",
+      "Take the front line, {addressee.name}.",
+      "{addressee.name}, save your ammunition."
+    ]
+  }
+}

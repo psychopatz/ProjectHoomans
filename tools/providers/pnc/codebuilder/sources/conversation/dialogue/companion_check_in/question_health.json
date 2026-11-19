@@ -31,10 +31,6 @@
     "topic": "medical"
   },
   "affordance": {
-    "label": {
-      "EN": "Ask about injuries",
-      "TL": "Itanong ang mga sugat"
-    },
     "consumers": [
       "player",
       "npc"
@@ -47,8 +43,11 @@
     }
   },
   "say": {
-    "EN": "Are you hurt?",
-    "TL": "Nasaktan ka ba?"
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "accept",
+  "locale": "EN",
+  "entries": {
+    "say.variants.accept.dataset.pending_started": "Okay, I'll get started.",
+    "say.variants.accept.dataset.pending_care": "All right. I can take care of that."
+  }
+}

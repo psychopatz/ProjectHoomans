@@ -20,7 +20,7 @@
           "text": "how are you",
           "language": "EN",
           "expect": {
-            "lastKey": "conversation.content.semantic.question.wellbeing.injured.neutral.01"
+            "lastKey": "convo.question.wellbeing.injured.say.1.neutral.1"
           }
         }
       ],
@@ -44,7 +44,7 @@
           "text": "how are you",
           "language": "TL",
           "expect": {
-            "lastKey": "conversation.content.semantic.question.wellbeing.injured.neutral.01",
+            "lastKey": "convo.question.wellbeing.injured.say.1.neutral.1",
             "fallbackLookups": 0
           }
         }

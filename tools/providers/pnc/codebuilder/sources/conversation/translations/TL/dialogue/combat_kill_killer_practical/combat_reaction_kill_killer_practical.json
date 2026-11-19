@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_killer_practical",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Nakuha ko. Suriin ang paligid.",
+      "Bagsak ang banta. Magmasid muna bago maghalughog.",
+      "Naalis ang target. Suriin ang paligid.",
+      "Bagsak. Linisin ang mga anggulo.",
+      "Naasikaso ko 'yon. Bantayan ang mga nasa tabi.",
+      "Patay na. Magmasid sa buong paligid.",
+      "Nakuha ko na siya. Huwag ibaba ang depensa.",
+      "Bagsak. Tignan sa likod ng pinto.",
+      "Tapos na. Tiyaking wala nang gumagalaw.",
+      "Bagsak ang target. Tumingin sa paligid bago magpahinga."
+    ],
+    "say.2.neutral": [
+      "Isa na. Tuloy tayo.",
+      "Inasikaso ang isa. Huwag magtagal dito.",
+      "Patay ang banta. Panatilihin ang bwelo.",
+      "Isa ang tinanggal. Sulong sa layunin.",
+      "Bagsak. Lumakad bago kumalat ang ingay.",
+      "Nakuha ang isa. Lipat sa susunod na kwarto.",
+      "Isang bangkay. Huwag manatili sa lantad na lugar.",
+      "Tapos na. Lumayo na tayo rito.",
+      "Bagsak ang target. Sumabay sa pader sa paglakad.",
+      "Bagsak. Pasulong nang tahimik."
+    ],
+    "say.3.neutral": [
+      "Malinis dito. Bantayan ang iba.",
+      "Bagsak. Asahang may kasunod 'yan.",
+      "Patay na. Baka umakit ng iba ang tunog.",
+      "Isang patay kumpirmado. Makinig sa mga yabag.",
+      "Target naalis na. Tumingin sa mga anino.",
+      "Tapos na. Baka may dumating na mga naiwan.",
+      "Bagsak. Bantayan ang bawat pintuan.",
+      "Banta naalis. Suriin ang susunod na daan.",
+      "Malinis na patay. Maging handa sa kasunod.",
+      "Naibagsak ko na. Patuloy na makinig."
+    ]
+  }
+}

@@ -5,50 +5,26 @@
     "textTarget": "convo/SemanticResponses",
     "textRows": [
       {
-        "key": "UI_PNC_Conversation_Semantic_QuestionKnowledgeKnown",
-        "text": {
-          "EN": "I know about %s.",
-          "TL": "May alam ako tungkol sa %s."
-        }
+        "key": "UI_PNC_Conversation_Semantic_QuestionKnowledgeKnown"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_QuestionKnowledgeUnknown",
-        "text": {
-          "EN": "I don't have reliable information about %s.",
-          "TL": "Wala akong mapagkakatiwalaang impormasyon tungkol sa %s."
-        }
+        "key": "UI_PNC_Conversation_Semantic_QuestionKnowledgeUnknown"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative",
-        "text": {
-          "EN": "No, I don't have a recorded bite.",
-          "TL": "Wala akong naitalang kagat."
-        }
+        "key": "UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_QuestionMedicalBitePositive",
-        "text": {
-          "EN": "Yes, I've been bitten.",
-          "TL": "Oo, nakagat na ako."
-        }
+        "key": "UI_PNC_Conversation_Semantic_QuestionMedicalBitePositive"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_QuestionMedicalBiteUnknown",
-        "text": {
-          "EN": "I can't confirm whether I've been bitten.",
-          "TL": "Hindi ko makumpirma kung nakagat na ako."
-        }
+        "key": "UI_PNC_Conversation_Semantic_QuestionMedicalBiteUnknown"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": "I know about %s.",
-          "TL": "May alam ako tungkol sa %s."
-        }
+        "id": "neutral"
       }
     ]
   },

@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greetings.lover.dawn",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "You're awake already. I was hoping you'd sleep a little longer.",
+      "Morning, love. Come here before the day starts.",
+      "I missed you, and you were only asleep.",
+      "First light looks better with you here.",
+      "Couldn't sleep without checking on everyone, could you?"
+    ],
+    "textRows.greeting.001": "You're awake already. I was hoping you'd sleep a little longer.",
+    "textRows.greeting.002": "Morning, love. Come here before the day starts.",
+    "textRows.greeting.003": "I missed you, and you were only asleep.",
+    "textRows.greeting.004": "First light looks better with you here.",
+    "textRows.greeting.005": "Couldn't sleep without checking on everyone, could you?"
+  }
+}

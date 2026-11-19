@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.follow",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Right behind you.",
+      "Following your lead.",
+      "I'm with you. Lead on.",
+      "Right on your heels.",
+      "Understood. Sticking close.",
+      "Following. Watch our front.",
+      "I'll follow your pace.",
+      "Right with you.",
+      "Moving with you now.",
+      "Lead the way. I'm right behind."
+    ]
+  }
+}

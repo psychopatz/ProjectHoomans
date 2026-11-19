@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.reply.insult",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Keep it respectful.",
+      "Save that attitude for the dead.",
+      "Not in the mood for that.",
+      "Watch yourself.",
+      "Keep your hands and words to yourself.",
+      "Don't start something out here.",
+      "Grow up. We have real threats to worry about.",
+      "Not amused.",
+      "Check yourself before you cause trouble.",
+      "I'm ignoring that for now. Don't push it."
+    ],
+    "say.variants.warm": [
+      "You're lucky I know you.",
+      "Very funny. Don't make a habit of it.",
+      "I'll let that slide because it's you.",
+      "Haha, watch it, or I might just get even.",
+      "Good thing we're friends, or we'd have words.",
+      "You always like testing my patience, don't you?",
+      "Play nice. I know you're just messing around.",
+      "You're pushing your luck, but I'll allow it this once.",
+      "Only you could get away with saying that to me.",
+      "Haha, all right, point taken, smart-mouth."
+    ]
+  }
+}

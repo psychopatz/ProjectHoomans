@@ -10,99 +10,21 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "All right.",
-              "Understood.",
-              "Got it.",
-              "Right.",
-              "Copy that.",
-              "On it.",
-              "Will do.",
-              "Heard.",
-              "Acknowledged.",
-              "Sure."
-            ],
-            "TL": [
-              "Sige.",
-              "Naintindihan.",
-              "Nakuha ko.",
-              "Tama.",
-              "Kopyado.",
-              "Inaasikaso na.",
-              "Gagawin ko.",
-              "Narinig ko.",
-              "Kinikilala ko.",
-              "Sige ba."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Understood.",
-              "Order received loud and clear.",
-              "Understood. Moving on that now.",
-              "Clear as crystal. Executing.",
-              "Message understood.",
-              "Understood. I will comply.",
-              "Orders clear. Starting now.",
-              "Understood. No problem.",
-              "Clear. On my way to do it.",
-              "Understood completely."
-            ],
-            "TL": [
-              "Naiintindihan ko.",
-              "Natanggap ang utos nang malakas at malinaw.",
-              "Naintindihan. Kikilos na roon ngayon.",
-              "Kasing-linaw ng kristal. Isasakatuparan.",
-              "Naiintindihan ang mensahe.",
-              "Naintindihan. Susunod ako.",
-              "Malinaw ang mga utos. Simulan na ngayon.",
-              "Naiintindihan ko. Walang problema.",
-              "Malinaw. Papunta na para gawin.",
-              "Lubos na naiintindihan."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "3": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I will handle it.",
-              "Consider it done.",
-              "I'll take care of this.",
-              "Leave it to me.",
-              "I'm on the job.",
-              "I'll see to it right away.",
-              "Handling that now.",
-              "I've got this covered.",
-              "Taking care of business.",
-              "I'll get it sorted out."
-            ],
-            "TL": [
-              "Ako na ang bahala.",
-              "Ituring mo nang tapos na.",
-              "Aasikasuhin ko ito.",
-              "Ipaubaya mo sa akin.",
-              "Nasa trabaho na ako.",
-              "Titiyakin kong magagawa agad.",
-              "Hinahawakan na 'yan ngayon.",
-              "Hawak ko na ito.",
-              "Inaasikaso ang kailangan.",
-              "Aayusin ko iyan."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

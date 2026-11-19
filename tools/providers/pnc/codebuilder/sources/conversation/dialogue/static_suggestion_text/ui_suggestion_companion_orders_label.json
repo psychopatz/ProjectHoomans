@@ -6,22 +6,14 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.companion_orders.label",
-        "text": {
-          "EN": "I need you to do something...",
-          "TL": "May ipapagawa ako sa iyo..."
-        }
+        "key": "suggestion.companion_orders.label"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": "I need you to do something...",
-          "TL": "May ipapagawa ako sa iyo..."
-        }
+        "id": "neutral"
       }
     ]
   },

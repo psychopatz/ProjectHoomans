@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Heading home.",
-            "Returning to our base now.",
-            "Understood. Going back to safe ground.",
-            "I'll head back to our shelter.",
-            "Making my way back home.",
-            "Homeward bound. See you back at camp.",
-            "Understood. I will return to base.",
-            "Heading back to the compound.",
-            "Heading home. Stay safe out here.",
-            "Returning to base coordinates."
-          ],
-          "TL": [
-            "Uuwi na ako.",
-            "Pabalik na sa base natin ngayon.",
-            "Naiintindihan ko. Babalik sa ligtas na lugar.",
-            "Babalik ako sa silungan natin.",
-            "Pauwi na ako ngayon.",
-            "Pauwi na. Magkita tayo sa kampo.",
-            "Naintindihan. Babalik ako sa base.",
-            "Pabalik na sa himpilan.",
-            "Pauwi na ako. Mag-ingat ka rito.",
-            "Pabalik na sa mga coordinate ng base."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

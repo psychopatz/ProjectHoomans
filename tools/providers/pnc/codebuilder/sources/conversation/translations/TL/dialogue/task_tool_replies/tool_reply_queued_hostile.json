@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.queued_hostile",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Narinig kita. Mag-ingat ka sa sarili mo.",
+      "Narinig ko ang tonong 'yan. Mag-ingat sa hakbang.",
+      "Narinig ko ang galit. Kontrolin mo 'yan.",
+      "Narinig kita, pero huwag mong tawirin ang hangganan.",
+      "Narinig ang mensahe. Magpigil ka.",
+      "Narinig nang malakas at malinaw. Umatras ka.",
+      "Narinig kita. Huwag kang gumawa ng pagkakamaling di mo mababawi.",
+      "Narinig ko ang banta. Mag-ingat sa pagtapak.",
+      "Tala ko na. Huwag mong hayaang mapatay ka ng galit mo.",
+      "Narinig kita. Bantayan mo ang likod mo."
+    ],
+    "say.2.neutral": [
+      "Tala ko na. Piliin mong mabuti ang susunod mong sasabihin.",
+      "Maging maingat sa susunod na lalabas sa bibig mo.",
+      "Nasa manipis kang yelo sa salitang 'yan.",
+      "Mag-isip ka nang dalawang beses bago ulitin 'yan.",
+      "Piliin ang susunod mong hakbang nang buong pag-iingat.",
+      "Sinusubukan mo ang mga hangganang may bangil.",
+      "Mag-ingat ka. May kapalit ang salita dito.",
+      "Bantayan mo ang susunod mong sasabihin.",
+      "Isang maling salita at magtatapos sa masama ang usapang ito.",
+      "Tala ko na. Ingatan ang dila mo."
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "leader_loss.colonist",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Our leader is gone. We keep the group together.",
+      "The leader fell, but the colony endures.",
+      "We must maintain order. The group cannot collapse.",
+      "Our founder is dead, but our camp will survive.",
+      "Stay organized. We carry on their work.",
+      "A terrible loss, but our community must stand firm.",
+      "Don't panic. We keep rations and duties moving.",
+      "The colony needs everyone focused right now.",
+      "We built this together. We keep it standing together.",
+      "Leadership may change, but the settlement survives."
+    ]
+  }
+}

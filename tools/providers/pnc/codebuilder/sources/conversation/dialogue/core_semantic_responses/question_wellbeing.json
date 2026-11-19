@@ -57,10 +57,6 @@
       }
     ]
   },
-  "textSidecars": {
-    "EN": "translations/question_wellbeing.en.json",
-    "TL": "translations/question_wellbeing.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

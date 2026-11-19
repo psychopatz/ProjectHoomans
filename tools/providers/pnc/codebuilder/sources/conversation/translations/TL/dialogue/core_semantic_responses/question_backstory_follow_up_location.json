@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.backstory.follow_up.location",
+  "locale": "TL",
+  "entries": {
+    "say.variants.question.backstory.follow_up.location.authored": "Naaalala ko ang bahaging iyon ng buhay ko, pero wala akong higit na detalye kung saan iyon."
+  }
+}

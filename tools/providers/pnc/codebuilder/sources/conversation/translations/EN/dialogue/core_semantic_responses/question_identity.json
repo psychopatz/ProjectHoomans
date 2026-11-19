@@ -1,0 +1,11 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "response_pool.question.identity",
+  "locale": "EN",
+  "entries": {
+    "say.variants.question.identity.dataset.stranger_alt_1": "I keep my name to myself until I know someone better. What should I call you?",
+    "say.variants.question.identity.dataset.stranger_alt_2": "Let's get to know each other first. What do people call you?",
+    "say.variants.question.identity.dataset.wary_alt_1": "I don't trust you enough to share my name. Who are you, really?",
+    "say.variants.question.identity.dataset.wary_alt_2": "After that lie, I'm not telling you my name. Tell me the truth about yours."
+  }
+}

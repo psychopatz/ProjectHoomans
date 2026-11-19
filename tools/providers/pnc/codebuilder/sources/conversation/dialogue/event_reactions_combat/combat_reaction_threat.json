@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "That threat is down. Stay alert.",
-            "Threat neutralized. Don't drop your guard.",
-            "Target eliminated. Keep watching.",
-            "Danger's passed for now. Stay sharp.",
-            "Handled that hazard. Eyes open.",
-            "Threat's in the dirt. Scan the flanks.",
-            "Threat ceased. Maintain alertness.",
-            "Downed the contact. Watch your sector.",
-            "No more threat from that one. Stay ready.",
-            "Handled. Stay focused on remaining risks."
-          ],
-          "TL": [
-            "Bagsak na ang banta. Manatiling alerto.",
-            "Naalis na ang banta. Huwag ibaba ang depensa.",
-            "Target naalis na. Patuloy na magmatyag.",
-            "Lumipas na ang panganib pansamantala. Maging handa.",
-            "Nalutas ang panganib na 'yon. Buksan ang mata.",
-            "Nasa lupa na ang banta. Suriin ang gilid.",
-            "Tumigil na ang banta. Panatilihin ang pag-iingat.",
-            "Naitumba ang kalaban. Bantayan ang parte mo.",
-            "Wala nang panganib mula sa kanya. Maging handa.",
-            "Naayos na. Tutukan ang iba pang panganib."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

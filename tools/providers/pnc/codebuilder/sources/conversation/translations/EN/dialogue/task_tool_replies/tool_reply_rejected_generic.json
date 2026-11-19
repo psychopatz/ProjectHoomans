@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.rejected_generic",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "That did not land well.",
+      "That went over poorly.",
+      "That didn't work out.",
+      "That was not well received.",
+      "You miscalculated that one.",
+      "That completely backfired.",
+      "Not a good approach.",
+      "That fell flat on its face.",
+      "That missed completely.",
+      "That was a mistake."
+    ],
+    "say.2.neutral": [
+      "I am not taking that from you right now.",
+      "I'm not in the mood for that kind of talk.",
+      "I'm rejecting that completely.",
+      "You can keep that nonsense to yourself.",
+      "I'm not putting up with that today.",
+      "Not taking that. Walk it back.",
+      "I refuse to engage with that.",
+      "I'm shutting that down immediately.",
+      "Not tolerating that right now.",
+      "I'm not accepting that from you."
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.queued_compliment",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Narinig ko ang papuri.",
+      "Nakuha ko ang papuri. Salamat.",
+      "Narinig ko ang sinabi mo tungkol sa akin.",
+      "Naitala ang papuri.",
+      "Narinig ko ang magandang puna.",
+      "Narinig ang papuri mo nang malakas at malinaw.",
+      "Nakuha ko ang papuring 'yon. Salamat.",
+      "Natanggap ang papuri.",
+      "Narinig ko 'yon. Salamat.",
+      "Narinig ang mabubuti mong salita."
+    ],
+    "say.2.neutral": [
+      "Mabait sa 'yo ang magsabi niyan.",
+      "Salamat sa magandang kaisipan.",
+      "Salamat sa magalang na papuri.",
+      "Mabuti sa 'yo ang banggitin 'yan.",
+      "Nagpapasalamat ako sa papuri.",
+      "Mabuti at sinabi mo 'yon.",
+      "Salamat. Ginagawa ko ang buong makakaya ko.",
+      "Salamat sa pagpansin.",
+      "Laging malugod na tinatanggap ang magagandang salita.",
+      "Napakabait mo naman."
+    ]
+  }
+}

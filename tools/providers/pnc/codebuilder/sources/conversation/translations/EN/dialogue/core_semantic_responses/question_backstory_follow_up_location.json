@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.backstory.follow_up.location",
+  "locale": "EN",
+  "entries": {
+    "say.variants.question.backstory.follow_up.location.authored": "I remember that part of my life, but I don't have more detail about where it was."
+  }
+}

@@ -250,7 +250,7 @@ class SocialApologyWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
                     self.assertEqual(realization["locale"], language)
                     self.assertEqual(
                         realization["constructionID"],
-                        f"construction.{language.lower()}.social.acknowledge",
+                        "construction.en.social.acknowledge",
                     )
                     self.assertEqual(
                         payload["text"],

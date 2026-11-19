@@ -13,11 +13,7 @@
     "textDomain": "pnc.convo.social.territory.member.claim",
     "textRows": [
       {
-        "key": "locked.base_established",
-        "text": {
-          "EN": "Our territory is already established.",
-          "TL": "Ang aming teritoryo ay naitatag na."
-        }
+        "key": "locked.base_established"
       }
     ]
   },
@@ -29,21 +25,9 @@
         "metadata": {
           "textKey": "opening"
         },
-        "text": {
-          "EN": "We have enough people to stop surviving from one night to the next. Pick a place, mark it as ours, and we can start building something that lasts.",
-          "TL": "We have enough people to stop surviving from one night to the next. Pick a place, mark it as ours, and we can simulan gusali something that lasts."
-        },
         "offers": [
           {
             "id": "set_territory",
-            "label": {
-              "EN": "Set Territory",
-              "TL": "Itakda ang Teritoryo"
-            },
-            "utterance": {
-              "EN": "Set Territory",
-              "TL": "Itakda ang Teritoryo"
-            },
             "frame": {
               "intent": "REQUEST",
               "speechAct": "REQUEST",
@@ -53,10 +37,6 @@
             "metadata": {
               "choiceKey": "choice.set_territory",
               "responseKey": "response.set_territory",
-              "responseText": {
-                "EN": "Then let us find ground worth defending. I will help turn it into home.",
-                "TL": "Then let us find ground worth defending. I will tulong turn it into home."
-              },
               "close": true,
               "effects": [
                 {

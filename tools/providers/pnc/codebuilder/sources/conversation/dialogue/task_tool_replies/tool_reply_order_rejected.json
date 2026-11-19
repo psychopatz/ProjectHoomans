@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I cannot do that right now.",
-              "That's not something I can pull off here.",
-              "Unable to execute that request at this time.",
-              "I have to decline that order.",
-              "Not possible under current circumstances.",
-              "I can't carry that out right now.",
-              "Unable to comply with that command.",
-              "I can't do that. Find another solution.",
-              "Order declined. Conditions won't allow it.",
-              "I cannot perform that action right now."
-            ],
-            "TL": [
-              "Hindi ko magagawa iyon ngayon.",
-              "Hindi ko magagawa 'yan dito.",
-              "Di maisakatuparan ang hiling na 'yan sa ngayon.",
-              "Kailangan kong tanggihan ang utos na 'yan.",
-              "Hindi posible sa kasalukuyang kalagayan.",
-              "Di ko kayang isakatuparan 'yan ngayon.",
-              "Di makasusunod sa utos na 'yan.",
-              "Di ko magagawa 'yan. Humanap ng ibang solusyon.",
-              "Tinatanggihan ang utos. Di pinapayagan ng sitwasyon.",
-              "Hindi ko maisasagawa ang kilos na 'yan sa ngayon."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "That order is not going to work.",
-              "That's a bad plan and it won't succeed.",
-              "That order makes no sense in this situation.",
-              "That won't work. We need a different approach.",
-              "I'm not following an order that leads to failure.",
-              "That command will only get us killed.",
-              "Not going to work out. Try another idea.",
-              "Flawed order. I won't execute it.",
-              "That plan is dead in the water.",
-              "That won't work out here. Give a better order."
-            ],
-            "TL": [
-              "Hindi uubra ang utos na iyan.",
-              "Masamang plano 'yan at hindi magtatagumpay.",
-              "Walang saysay ang utos na 'yan sa sitwasyong ito.",
-              "Hindi uubra 'yan. Kailangan natin ng ibang diskarte.",
-              "Di ako susunod sa utos na papunta sa kapahamakan.",
-              "Ipapahamak lang tayo ng utos na 'yan.",
-              "Hindi magiging maayos 'yan. Sumubok ng ibang ideya.",
-              "May depekto ang utos. Di ko isasakatuparan.",
-              "Patay ang planong 'yan sa simula pa lang.",
-              "Di uubra 'yan dito. Magbigay ka ng mas maayos na utos."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

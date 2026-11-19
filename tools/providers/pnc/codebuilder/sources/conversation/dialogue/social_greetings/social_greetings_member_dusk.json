@@ -36,62 +36,26 @@
     "responseAct": "GREETING",
     "textRows": [
       {
-        "key": "greeting.001",
-        "text": {
-          "EN": "Evening. Perimeter looks clear.",
-          "TL": "Gabi. Mukhang malinaw ang perimeter."
-        }
+        "key": "greeting.001"
       },
       {
-        "key": "greeting.002",
-        "text": {
-          "EN": "Need me for something before night watch?",
-          "TL": "Kailangan mo ba ako bago ang pagbabantay sa gabi?"
-        }
+        "key": "greeting.002"
       },
       {
-        "key": "greeting.003",
-        "text": {
-          "EN": "We're all still here. I'll call that a good day.",
-          "TL": "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw."
-        }
+        "key": "greeting.003"
       },
       {
-        "key": "greeting.004",
-        "text": {
-          "EN": "Keep it quiet. The others are settling down.",
-          "TL": "Manahimik ka. Umayos na yung iba."
-        }
+        "key": "greeting.004"
       },
       {
-        "key": "greeting.005",
-        "text": {
-          "EN": "I can take first watch if you need the rest.",
-          "TL": "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa."
-        }
+        "key": "greeting.005"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Evening. Perimeter looks clear.",
-            "Need me for something before night watch?",
-            "We're all still here. I'll call that a good day.",
-            "Keep it quiet. The others are settling down.",
-            "I can take first watch if you need the rest."
-          ],
-          "TL": [
-            "Gabi. Mukhang malinaw ang perimeter.",
-            "Kailangan mo ba ako bago ang pagbabantay sa gabi?",
-            "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw.",
-            "Manahimik ka. Umayos na yung iba.",
-            "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

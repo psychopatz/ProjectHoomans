@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "You just made a big mistake.",
-            "All right. You want a fight, you've got one.",
-            "You hit me? You're going to regret that.",
-            "Try that again and see what happens.",
-            "Wrong person to mess with.",
-            "You want some of this?! Come on then!",
-            "That was your last free shot.",
-            "I'll put you in the ground for that.",
-            "You swung at me? Big mistake.",
-            "You really want to do this? Let's go."
-          ],
-          "TL": [
-            "Malaking pagkakamali ang ginawa mo.",
-            "Sige. Gusto mo ng laban, makukuha mo.",
-            "Sinaktan mo ako? Pagsisisihan mo 'yan.",
-            "Ulitin mo pa at tignan natin ang mangyayari.",
-            "Maling tao ang binangga mo.",
-            "Gusto mo pala ng gulo?! Halika rito!",
-            "Huling libreng tira mo na 'yon.",
-            "Ililibing kita sa ginawa mo.",
-            "Hinataw mo ako? Malaking mali.",
-            "Gusto mo talagang gawin 'to? Tara."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

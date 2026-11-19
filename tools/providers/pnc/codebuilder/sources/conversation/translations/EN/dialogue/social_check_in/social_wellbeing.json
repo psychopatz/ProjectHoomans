@@ -1,0 +1,14 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.wellbeing.neutral",
+  "locale": "EN",
+  "entries": {
+    "response.turn.opening.text": "I'm managing. What did you want to ask?",
+    "response.turn.opening.offer.condition.label": "How are you holding up?",
+    "response.turn.opening.offer.condition.utterance": "How are you holding up?",
+    "response.turn.opening.offer.condition.responseText": "I'm still breathing. That's enough for now.",
+    "response.turn.opening.offer.offer_help.label": "Do you need any help?",
+    "response.turn.opening.offer.offer_help.utterance": "Do you need any help?",
+    "response.turn.opening.offer.offer_help.responseText": "I'll manage, but thanks for asking."
+  }
+}

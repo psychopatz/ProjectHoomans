@@ -9,62 +9,10 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Stay sharp.",
-            "Keep your guard up.",
-            "Eyes forward.",
-            "At ease.",
-            "Stay safe out there.",
-            "Watch your six.",
-            "Salute returned.",
-            "Keep moving and stay vigilant.",
-            "Understood. Stay ready.",
-            "Stand firm."
-          ],
-          "TL": [
-            "Manatiling alerto.",
-            "Huwag ibaba ang bantay.",
-            "Tumingin sa unahan.",
-            "Magpahinga.",
-            "Mag-ingat ka sa labas.",
-            "Bantayan mo ang likod mo.",
-            "Ganti ang pagsaludo.",
-            "Patuloy na lumakad at maging mapagmatyag.",
-            "Naintindihan. Maging laging handa.",
-            "Magpakatatag."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Always. Stay safe out there.",
-            "Salute to you too, friend.",
-            "Right back at you. Let's make it back in one piece.",
-            "Honored to stand with you.",
-            "Keep your head down and stay alive for me.",
-            "Good to have you beside me out here.",
-            "Salute returned with respect, partner.",
-            "We watch each other's backs. Always.",
-            "Take care of yourself today. I mean it.",
-            "Stay strong out there. We'll get through this."
-          ],
-          "TL": [
-            "Palagi. Mag-ingat ka sa labas.",
-            "Saludo rin sa 'yo, kaibigan.",
-            "Pabalik din sa 'yo. Tiyakin nating makababalik tayo nang buo.",
-            "Ikinararangal kong makatabi ka sa laban.",
-            "Yumuko ka sa panganib at manatiling buhay para sa akin.",
-            "Mabuting kasama kita rito.",
-            "May kasamang respeto ang ganting saludo ko, kasama.",
-            "Binabantayan natin ang likod ng isa't isa. Palagi.",
-            "Ingatan mo ang sarili mo ngayong araw. Seryoso ako.",
-            "Magpakatatag ka sa labas. Malalampasan natin ito."
-          ]
-        }
+        "id": "warm"
       }
     ]
   },

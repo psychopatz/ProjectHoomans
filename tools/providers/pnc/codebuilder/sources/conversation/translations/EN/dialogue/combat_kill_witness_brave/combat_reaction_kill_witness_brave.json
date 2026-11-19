@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_witness_brave",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "Clean kill. Check the flanks.",
+      "Good strike. Scan our blind spots.",
+      "Solid takedown. Watch the perimeter.",
+      "Downed cleanly. Keep your eyes on the sides.",
+      "Decisive blow. Scan the lane.",
+      "Threat cleared. Watch for secondary contacts.",
+      "Clean hit. Don't get tunnel vision.",
+      "Down. Maintain field awareness.",
+      "Well executed. Check behind cover.",
+      "Target neutralized. Scan all directions."
+    ],
+    "say.2.neutral": [
+      "One down. Keep your head up.",
+      "Good kill. Stay vigilant.",
+      "Threat eliminated. Maintain discipline.",
+      "That's one less. Eyes open.",
+      "Downed. Don't relax your posture.",
+      "Handled. Keep looking forward.",
+      "One in the dirt. Stay sharp.",
+      "Solid work. Keep ready for the next.",
+      "Target down. Don't lose focus.",
+      "Good takedown. Hold your stance."
+    ],
+    "say.3.neutral": [
+      "Good. Keep moving before they bunch up.",
+      "Clean hit. Don't let them gather.",
+      "Downed. Advance before they form a crowd.",
+      "Handled. Push through before more arrive.",
+      "Threat dead. Keep moving through the area.",
+      "Solid kill. Advance while the lane is open.",
+      "Target down. Move before the swarm groups.",
+      "Down. Keep momentum before reinforcements come.",
+      "Clean work. Don't stay stationary.",
+      "Handled. Keep pushing forward."
+    ]
+  }
+}

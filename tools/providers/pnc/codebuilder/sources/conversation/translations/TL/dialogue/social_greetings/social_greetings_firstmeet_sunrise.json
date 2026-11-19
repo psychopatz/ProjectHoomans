@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greetings.firstmeet.sunrise",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Umaga. Hindi pa kita nakikita kanina.",
+      "Malapit na yun. Magsimula sa iyong pangalan.",
+      "Bagong mukha. Ikaw ba ay dumadaan o may hinahanap?",
+      "Pinapadali ito ng liwanag ng araw. sino ka ba",
+      "hindi kita kilala. Mag-usap, at panatilihin itong kalmado."
+    ],
+    "textRows.greeting.001": "Umaga. Hindi pa kita nakikita kanina.",
+    "textRows.greeting.002": "Malapit na yun. Magsimula sa iyong pangalan.",
+    "textRows.greeting.003": "Bagong mukha. Ikaw ba ay dumadaan o may hinahanap?",
+    "textRows.greeting.004": "Pinapadali ito ng liwanag ng araw. sino ka ba",
+    "textRows.greeting.005": "hindi kita kilala. Mag-usap, at panatilihin itong kalmado."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.cooldown",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "You have had your turn with the compliments today.",
+      "Save some of those kind words for tomorrow.",
+      "You already flattered me enough for one day.",
+      "Praise limit reached. Let's get back to surviving.",
+      "I heard you the first few times. Let it rest.",
+      "We've traded enough compliments for today.",
+      "Easy on the flattery. Don't overdo it.",
+      "Give it a rest until tomorrow.",
+      "One compliment per day is plenty out here.",
+      "Save your breath. You've hit the limit for now."
+    ],
+    "say.2.neutral": [
+      "Save the sweet talk for tomorrow.",
+      "Hold your charm for another time.",
+      "Too much sweet talk for one afternoon.",
+      "We've got work to do. Charm me later.",
+      "Save the smooth lines. Focus on survival.",
+      "You're pouring on the charm too thick right now.",
+      "Let's take a break from the flirting.",
+      "Charm cooldown. Let's get back to reality.",
+      "I've had my fill of sweet words for today.",
+      "Hold that thought until tomorrow morning."
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.backstory.refusal",
+  "locale": "TL",
+  "entries": {
+    "say.variants.question.backstory.refusal.authored": "Hindi pa ako handang pag-usapan iyan."
+  }
+}

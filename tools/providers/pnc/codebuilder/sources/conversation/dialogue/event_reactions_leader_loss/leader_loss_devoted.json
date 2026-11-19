@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "We lost someone important. We need to stay together.",
-            "They were our guiding light. I don't know what to do without them.",
-            "I gave my loyalty to them. I feel empty inside.",
-            "They inspired all of us. We must uphold their ideals.",
-            "Our beacon is extinguished. God help us.",
-            "I would have followed them to the end. Rest well.",
-            "They were everything to this cause. We cannot let it die.",
-            "My faith is shaken, but I will stay with our people.",
-            "A visionary has fallen. We must honor their sacrifice.",
-            "They believed in us. We have to prove them right."
-          ],
-          "TL": [
-            "Nawalan tayo ng mahalagang tao. Kailangan nating magsama-sama.",
-            "Sila ang tanglaw natin. Hindi ko alam ang gagawin nang wala sila.",
-            "Ibinigay ko ang katapatan ko sa kanila. Parang walang laman ang puso ko.",
-            "Binigyan nila tayo ng lakas. Dapat nating itaguyod ang simulain nila.",
-            "Namatay na ang tanglaw natin. Diyos ko tulungan mo kami.",
-            "Susundan ko sana sila hanggang dulo. Mamahinga ka na.",
-            "Sila ang lahat para sa layuning 'to. Hindi natin hahayaang mamatay 'to.",
-            "Nayanig ang pananampalataya ko, pero mananatili ako sa ating mga kasama.",
-            "Bumagsak ang ating pinuno. Dapat nating igalang ang sakripisyo nila.",
-            "Naniwala sila sa atin. Kailangan nating patunayan na tama sila."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

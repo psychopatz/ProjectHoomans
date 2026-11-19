@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "We'll make camp here.",
-            "Setting up camp in this spot.",
-            "Understood. Resting here.",
-            "This place works for a camp. Securing it.",
-            "Making camp. Let's get comfortable.",
-            "Good spot to bed down.",
-            "Camp established. I'll settle in.",
-            "Understood. Dropping gear and resting.",
-            "Setting watches and bedding down here.",
-            "Camp confirmed. Staying put."
-          ],
-          "TL": [
-            "Magkakampo tayo rito.",
-            "Magtatayo ng kampo sa pwestong ito.",
-            "Naintindihan. Magpapahinga rito.",
-            "Pwede ang lugar na ito para magkampo. Seselyuhan ito.",
-            "Nagtatayo ng kampo. Magpahinga na tayo.",
-            "Magandang lugar para matulog.",
-            "Naitayo na ang kampo. Aayos na ako ng pwesto.",
-            "Naiintindihan ko. Ibaba ang gamit at magpahinga.",
-            "Magtatalaga ng bantay at matutulog dito.",
-            "Kumpirmadong kampo. Mananatili rito."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

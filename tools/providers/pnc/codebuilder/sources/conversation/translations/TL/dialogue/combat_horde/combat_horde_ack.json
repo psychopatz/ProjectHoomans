@@ -1,0 +1,115 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.horde.ack",
+  "locale": "TL",
+  "entries": {
+    "say.variants.avoid_default": [
+      "Sige. Iikot tayo.",
+      "Naintindihan. Iiwasan ang kawan.",
+      "Lalampasan ang kawan sa malayo.",
+      "Dadaan sa gilid. Nang tahimik.",
+      "Kopyado. Lalayo sa paningin nila.",
+      "Iikot tayo sa paligid nila.",
+      "Naiintindihan ko. Walang labanang magaganap.",
+      "Lalayo sa kawan.",
+      "Sige. Papalusot sa mga patay.",
+      "Iiwas sa engkwentro. Ituro ang daan."
+    ],
+    "say.variants.avoid_relief": [
+      "Mabuti. Umikot tayo.",
+      "Salamat sa Diyos. Napakalaki ng kawang 'yon.",
+      "Mabuti at nagpasya ka ng ganoon. Tatakas na tayo.",
+      "Matalinong desisyon. Mabubuhay pa tayo sa susunod na oras.",
+      "Gumaan ang loob ko nang marinig 'yan. Iikot na ngayon.",
+      "Magandang pasya. Manahimik habang lumalampas.",
+      "Mas maganda kaysa mamatay dito. Iikot na tayo.",
+      "Nakahinga nang maluwag. Yumuko tayo.",
+      "Mabuti at iniwasan natin ang katayang 'yon. Mauna ka na.",
+      "Ligtas na pasya. Dadaan sa ibang ruta."
+    ],
+    "say.variants.engage_default": [
+      "Kasama mo ako. Tara.",
+      "Lalaban na ngayon. Bantayan ang tagiliran.",
+      "Nasa likod mo papunta sa laban.",
+      "Naintindihan. Sabay tayong lalaban.",
+      "Lalapit para humampas.",
+      "Hawiin natin ang daan.",
+      "Handa sa laban. Gawin na natin ito.",
+      "Inaasikaso na. Nakatutok sa kalaban.",
+      "Susulong para lumaban.",
+      "Kasama mo sa buong laban. Sumugod na tayo."
+    ],
+    "say.variants.engage_eager": [
+      "Handa nang humampas! Patumbahin natin sila.",
+      "Tara na! Hawak ko ang likod mo.",
+      "Handa na ako kapag handa ka na! Sugod!",
+      "Pilahin sila! Kaya nating ubusin ang buong kawan.",
+      "Sabik at armado. Manalanta na tayo.",
+      "Handa na akong lumaban! Susulong na!",
+      "Durogin natin sila nang sabay!",
+      "Handa ang armas. Angkinin natin ang labanan!",
+      "Buong bilis pasulong! Di nila malalaman ang tumama sa kanila.",
+      "Oo naman! Ubusin natin sila."
+    ],
+    "say.variants.engage_hesitant": [
+      "Kung sinasabi mo... sige. Kasama mo ako.",
+      "Kapusukan ito, pero hindi kita iiwan.",
+      "Masama ang kutob ko rito, pero sasama ako.",
+      "Bantayan mo ang likod ko... heto na tayo.",
+      "Sana alam mo ang ginagawa mo. Susulong na.",
+      "Di maganda ang tsansa, pero lalaban ako sa tabi mo.",
+      "Nag-aalangan, pero sasabak. Dumikit ka.",
+      "Sige... huwag mo lang silang hayaang pumaligid.",
+      "Papasok sa gilingan ng karne. Tiyakin nating makalabas nang buhay.",
+      "Sige... tiwala ako sa talim mo. Tara."
+    ],
+    "say.variants.engage_reserved": [
+      "Sige. Galaw.",
+      "Susulong nang maingat.",
+      "Naintindihan. Lalabanan ang kawan.",
+      "Nasa pwesto. Kikilos para umatake.",
+      "Nakahugot ang armas. Susulong sa pormasyon.",
+      "Planadong paglusob. Gawin nating malinis.",
+      "Utos natanggap. Tatayo para lumaban.",
+      "Panatilihin ang ritmo. Lalabanan ang puntirya.",
+      "Pumapasok sa sakop. Itaas ang armas.",
+      "Naiintindihan ko. Papatungo na sa bakbakan."
+    ],
+    "say.variants.hold_default": [
+      "Hinto muna tayo.",
+      "Hawak ang pwesto. Binabantayan ang kawan.",
+      "Dito lang hanggang sumenyas ka.",
+      "Naiintindihan ko. Nakahanda.",
+      "Hawak ang lupa dito mismo.",
+      "Nasa pwesto. Naghihintay ng utos.",
+      "Hawak muna. Minamasid ang galaw ng banta.",
+      "Matatag sa pwesto.",
+      "Pinananatili ang posisyon.",
+      "Tigil muna. Tingnan natin ang gagawin nila."
+    ],
+    "say.variants.hold_eager": [
+      "Hawak muna. Sabihin mo kung kailan.",
+      "Handa sa hudyat mo! Hawak ang pwesto.",
+      "Nakahandang sumugod. Sabihin mo lang.",
+      "Tigil-putok, pero sabik nang sumugod.",
+      "Handang lumundag. Naghihintay.",
+      "Nakatutok na! Sabihin mo lang at aatake ako.",
+      "Dito muna. Huwag mo akong paghintayin nang matagal!",
+      "Handa at naghihintay! Ibigay ang senyas.",
+      "Handang sumugod. Hawak ang lupa.",
+      "Sabihin mo lang. Handa na ako."
+    ],
+    "say.variants.hold_hesitant": [
+      "Sige. Dito muna ako.",
+      "Dito lang ako. Sana di nila tayo makita.",
+      "Hawak ang pwesto... pakiusap tumahimik.",
+      "Hawak ang pwesto. Lumalakas ang tibok ng puso ko.",
+      "Maghihintay ako rito, pero mag-ingat tayo.",
+      "Walang kikilos. Huwag gagawa ng tunog.",
+      "Hawak muna... naghihintay sa utos mo.",
+      "Nakayuko. Sana magtagumpay ito.",
+      "Hawak dito. Binabantayan ang kuko nila.",
+      "Naintindihan... di gagalaw dito mismo."
+    ]
+  }
+}

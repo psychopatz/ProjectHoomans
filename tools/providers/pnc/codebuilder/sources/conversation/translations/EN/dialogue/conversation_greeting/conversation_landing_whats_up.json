@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "conversation.landing.whats_up",
+  "locale": "EN",
+  "entries": {
+    "playerChoice.label": "What's up",
+    "playerChoice.choice": "What's up?"
+  }
+}

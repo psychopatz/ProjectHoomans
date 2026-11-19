@@ -79,8 +79,11 @@
     }
   ],
   "say": {
-    "EN": "Go home.",
-    "TL": "Umuwi ka na."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

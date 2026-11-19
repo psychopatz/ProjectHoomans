@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.hostile_short",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Bantayan mo ang pananalita mo.",
+      "Mapanganib ang ganyang salita rito.",
+      "Panatilihing maayos ang mga salita mo.",
+      "Binabalaan kitang kumalma.",
+      "Huwag mong palalain ang sitwasyong ito.",
+      "Pigilan mo ang init ng ulo mo.",
+      "Walang puwang ang ganyang asal dito.",
+      "Ingatan ang bibig at mag-isip bago magsalita.",
+      "Kailangan mong kontrolin 'yan.",
+      "Maging maayos ka o lumayo ka na."
+    ],
+    "say.variants.guarded": [
+      "Bantayan mo ang pananalita mo. Ngayon.",
+      "Itikom mo ang bibig mo bago ko pa itikom 'yan.",
+      "Sinasagad mo ako. Tigil.",
+      "Isa pang salita mula sa 'yo.",
+      "Bantayan mo ang kilos mo ngayon.",
+      "Maling tao ang sinusubukan mo.",
+      "Tahimik. Bago maging bayolente ito.",
+      "Gusto mo ng gulo? Sige, magsalita ka pa.",
+      "Pigilan mo ang dila mo.",
+      "Kagatin mo ang dila mo ngayon."
+    ],
+    "say.variants.terse": [
+      "Tumahimik ka.",
+      "Mag-ingat ka.",
+      "Sapat na.",
+      "Tahimik.",
+      "Mag-ingat.",
+      "Itikom mo.",
+      "Tigil.",
+      "Kumalma ka.",
+      "Tapos.",
+      "Huling babala."
+    ],
+    "say.variants.warm": [
+      "Huy, ingatan mo ang bibig mo, kaibigan. Mas maayos tayo riyan.",
+      "Huwag kang magsalita nang ganyan. Higit ka sa galit mong 'yan.",
+      "Sige na, ayusin mo ang tono mo sa akin.",
+      "Huminga ka muna bago ka magsabi ng pagsisisihan mo.",
+      "Alam kong naiinis ka, pero huwag mong ibunton sa akin.",
+      "Dahan-dahan lang. Magkasama tayo rito.",
+      "Ayusin mo sarili mo, kasama. Kakampi mo ako, hindi kalaban.",
+      "Huwag mong hayaang manalo ang galit ngayon. Sumama ka sa 'kin.",
+      "Binibigyan kita ng puwang, pero bantayan mo ang sinasabi mo.",
+      "Pigilan mo ang salita mo. Mag-usap tayo kapag kalmado ka na."
+    ]
+  }
+}

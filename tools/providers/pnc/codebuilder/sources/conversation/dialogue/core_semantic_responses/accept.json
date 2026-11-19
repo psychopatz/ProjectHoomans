@@ -10,10 +10,6 @@
     "variants": [
       {
         "id": "accept.dataset.pending_started",
-        "text": {
-          "EN": "Okay, I'll get started.",
-          "TL": "Okay, I'll get started."
-        },
         "when": "conversation.hasPendingRequest == true",
         "metadata": {
           "fallback": "Okay, I'll get started.",
@@ -23,10 +19,6 @@
       },
       {
         "id": "accept.dataset.pending_care",
-        "text": {
-          "EN": "All right. I can take care of that.",
-          "TL": "All right. I can take care of that."
-        },
         "when": "conversation.hasPendingRequest == true",
         "metadata": {
           "fallback": "All right. I can take care of that.",

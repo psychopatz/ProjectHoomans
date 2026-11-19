@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.reply.thumbsup",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Mabuti.",
+      "Magandang plano 'yan.",
+      "Mabuti at nagkasundo tayo.",
+      "Tama 'yan.",
+      "Naintindihan. Isakatuparan na natin.",
+      "Handa na.",
+      "Ayos 'yan sa akin.",
+      "Sang-ayon ako.",
+      "Handa na ang lahat kung ganoon.",
+      "Matibay."
+    ],
+    "say.variants.warm": [
+      "Iyan ang magandang sigla.",
+      "Napakaganda. Tapusin na natin ito.",
+      "Gusto ko ang sigla mo! Tara na.",
+      "Pareho tayo ng magandang takbo ng isip, kaibigan.",
+      "Oo naman. Kayang-kaya natin ito.",
+      "Iyan ang gusto kong makita. Tuloy-tuloy lang.",
+      "Magandang usapan. Mabuti at kasama ka rito.",
+      "Kasama mo ako riyan! Tapusin na natin.",
+      "Nagbigay 'yan ng lakas sa akin. Salamat.",
+      "Perpekto. Tugma ang takbo natin."
+    ]
+  }
+}

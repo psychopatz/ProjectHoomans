@@ -1,0 +1,16 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "integration.projectalife.encounter",
+  "locale": "EN",
+  "entries": {
+    "say.variants.friendly": [
+      "Those survivors seem friendly. Keep your hands visible."
+    ],
+    "say.variants.hostile": [
+      "That group looks hostile. Keep cover between us and them."
+    ],
+    "say.variants.unknown": [
+      "Someone is out there. Let us watch before we approach."
+    ]
+  }
+}

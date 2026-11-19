@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.weather.raining",
+  "locale": "EN",
+  "entries": {
+    "say.variants.flow.weather.raining.dataset.contextual_switch": "It is raining right now. We can return to that proposal when you are ready.",
+    "say.variants.flow.weather.raining.dataset.contextual_switch.plan.turn.dataset_contextual_weather_switch.segment.0": "It is raining right now. We can return to that proposal when you are ready."
+  }
+}

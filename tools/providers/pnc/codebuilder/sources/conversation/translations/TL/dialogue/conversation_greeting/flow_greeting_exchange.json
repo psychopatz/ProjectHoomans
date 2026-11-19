@@ -1,0 +1,10 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "exchange",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": "Kamusta.",
+    "reply.hostile.say.variants.default": "Lumayo ka.",
+    "reply.friendly.say.variants.default": "Mabuti at nandito ka."
+  }
+}

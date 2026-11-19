@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I hear you.",
-              "Understood.",
-              "Message received.",
-              "Got it.",
-              "I hear what you said.",
-              "Heard.",
-              "Fair enough. I hear you.",
-              "Point noted.",
-              "I'm listening.",
-              "Acknowledged."
-            ],
-            "TL": [
-              "Narinig kita.",
-              "Naiintindihan ko.",
-              "Natanggap ang mensahe.",
-              "Nakuha ko.",
-              "Narinig ko ang sinabi mo.",
-              "Narinig.",
-              "Makatwiran. Narinig kita.",
-              "Tala ang punto.",
-              "Nakikinig ako.",
-              "Kinikilala ko."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Give me a moment.",
-              "Hold on just a second.",
-              "Let me finish what I'm doing first.",
-              "Just a minute.",
-              "Give me a bit of time.",
-              "Hang on a second.",
-              "I need a moment to process that.",
-              "Hold your horses for a minute.",
-              "Give me a brief moment.",
-              "One second. I'm wrapped up right now."
-            ],
-            "TL": [
-              "Bigyan mo ako ng sandali.",
-              "Teka sandali lang.",
-              "Hayaan mong tapusin ko muna ang ginagawa ko.",
-              "Sandali lang.",
-              "Bigyan mo ako ng kaunting oras.",
-              "Teka lang saglit.",
-              "Kailangan ko ng sandali para pag-isipan 'yan.",
-              "Dahan-dahan lang sandali.",
-              "Bigyan mo ako ng maikling sandali.",
-              "Isang segundo. May inaasikaso pa ako ngayon."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

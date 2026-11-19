@@ -173,13 +173,23 @@ local function selectPhrase(templateID, styleVariant, context, salt, localSelect
         phraseHistoryOrder[#phraseHistoryOrder + 1] = key
     end
     phraseHistory[key] = selected.id
-    local ConvoPlanFamily = PNC.ConvoEngine and PNC.ConvoEngine.ConvoPlanFamily or nil
-    local lang = type(ConvoPlanFamily) == "table"
-        and type(ConvoPlanFamily.ActiveLanguage) == "function"
-        and ConvoPlanFamily.ActiveLanguage() or "EN"
-    local localizedFallback = (type(selected.translations) == "table"
-        and (selected.translations[lang] or selected.translations.EN))
-        or selected.fallback or ""
+    local localizedFallback = selected.fallback or ""
+    local resolveKey = (type(selected.lookupKey) == "string" and selected.lookupKey ~= "")
+        and selected.lookupKey or selected.key
+    if type(resolveKey) == "string" and resolveKey ~= ""
+        and PNC and PNC.Translation and type(PNC.Translation.GetKey) == "function"
+    then
+        local resolved = PNC.Translation.GetKey(resolveKey, localizedFallback)
+        if type(resolved) == "string" and resolved ~= "" and resolved ~= resolveKey then
+            localizedFallback = resolved
+        end
+    elseif type(selected.translations) == "table" then
+        local ConvoPlanFamily = PNC.ConvoEngine and PNC.ConvoEngine.ConvoPlanFamily or nil
+        local lang = type(ConvoPlanFamily) == "table"
+            and type(ConvoPlanFamily.ActiveLanguage) == "function"
+            and ConvoPlanFamily.ActiveLanguage() or "EN"
+        localizedFallback = selected.translations[lang] or selected.translations.EN or localizedFallback
+    end
     local result = {
         familyID = familyID,
         semanticTemplateID = tostring(templateID),

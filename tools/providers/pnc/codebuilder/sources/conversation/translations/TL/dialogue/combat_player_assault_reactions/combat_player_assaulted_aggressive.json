@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.player_assaulted.aggressive",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Malaking pagkakamali ang ginawa mo.",
+      "Sige. Gusto mo ng laban, makukuha mo.",
+      "Sinaktan mo ako? Pagsisisihan mo 'yan.",
+      "Ulitin mo pa at tignan natin ang mangyayari.",
+      "Maling tao ang binangga mo.",
+      "Gusto mo pala ng gulo?! Halika rito!",
+      "Huling libreng tira mo na 'yon.",
+      "Ililibing kita sa ginawa mo.",
+      "Hinataw mo ako? Malaking mali.",
+      "Gusto mo talagang gawin 'to? Tara."
+    ]
+  }
+}

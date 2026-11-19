@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.human_kill.brave",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "Threat's down. Stay sharp.",
+      "Shooter neutralized. Hold position.",
+      "Target down. Scan the perimeter.",
+      "He's eliminated. Maintain alertness.",
+      "Gunman is down. Stay behind cover.",
+      "Hostile neutralized. Check your angles.",
+      "Confirmed kill. Keep your discipline.",
+      "He took his shot and lost. Stay ready.",
+      "Threat extinguished. Eyes on the high ground.",
+      "Done. Stay in formation."
+    ],
+    "say.2.neutral": [
+      "He's done. Watch the rest.",
+      "That one's down. Focus on any survivors.",
+      "One less rifle against us. Watch the flanks.",
+      "Hostile down. Don't let your guard down.",
+      "He won't be firing again. Check the bushes.",
+      "Downed. Scan for secondary shooters.",
+      "He's finished. Keep watching the tree line.",
+      "Target ceased. Search the area.",
+      "One enemy down. Expect more.",
+      "Confirmed casualty. Keep the pressure on."
+    ],
+    "say.3.neutral": [
+      "Down. Don't freeze up now.",
+      "He's dead. Keep moving, don't stall.",
+      "Kill confirmed. Stay in the fight.",
+      "He's on the ground. Keep your head clear.",
+      "Target down. Don't let adrenaline take over.",
+      "Dead. Breathe and scan your sector.",
+      "Threat removed. Stay proactive.",
+      "He's finished. Keep momentum going.",
+      "Eliminated. Don't look at the body, look ahead.",
+      "Threat neutralized. Move when ready."
+    ]
+  }
+}

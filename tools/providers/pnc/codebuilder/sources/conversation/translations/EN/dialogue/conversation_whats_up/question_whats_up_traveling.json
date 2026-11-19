@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.whats_up.traveling",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "I'm keeping moving and watching what is ahead.",
+      "Just trekking from point to point. Road's fairly calm.",
+      "Making headway before the sun starts dropping.",
+      "Covering some ground today. How's the path behind you?",
+      "On the road again. Gotta keep moving to find supplies.",
+      "Heading out on a scouting loop. Everything looks quiet.",
+      "Putting miles under my boots. Helps clear my head.",
+      "Just moving between shelters. Don't want to linger anywhere too long.",
+      "Traveling down the lane. Hoping to avoid any hordes.",
+      "On my way across the sector. How are things looking your way?"
+    ],
+    "say.variants.guarded": [
+      "Keeping moving. Don't slow me down.",
+      "On the move. Don't block my path.",
+      "Travel's dangerous right now. Step aside.",
+      "Covering ground. I don't stay in one spot too long.",
+      "Moving fast, staying light. No time to chat.",
+      "Don't follow too closely. I walk alone.",
+      "Just passing through. Mind your own road.",
+      "Got places to be before dark. Move along.",
+      "Traveling light and watching behind me. Stand clear.",
+      "Moving between points. Don't compromise my route."
+    ],
+    "say.variants.terse": [
+      "Keeping moving.",
+      "On the road.",
+      "Traveling.",
+      "Moving out.",
+      "Passing through.",
+      "Covering ground.",
+      "On the move.",
+      "Headed out.",
+      "In transit.",
+      "Pushing ahead."
+    ],
+    "say.variants.warm": [
+      "I'm keeping moving and watching what is ahead. Come along if you want.",
+      "On the trail today! It's always safer and nicer walking together.",
+      "Traveling light. Feel free to tag along if you're headed that way.",
+      "Making my way down the road. Glad I crossed paths with you today.",
+      "Covering ground, but always happy to pause and say hello to a friend.",
+      "Walking between camps. Safe travels on your end, my friend.",
+      "Heading out for a bit. Watch your step, and maybe we'll meet again soon.",
+      "The road feels a lot less lonely whenever I see you around.",
+      "Moving along, but I'm glad our paths crossed. Stay safe out there.",
+      "Traveling to check on our boundaries. Good to see you in high spirits."
+    ]
+  }
+}

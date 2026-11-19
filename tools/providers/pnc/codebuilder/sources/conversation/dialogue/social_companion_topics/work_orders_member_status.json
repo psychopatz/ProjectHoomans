@@ -18,21 +18,9 @@
         "metadata": {
           "textKey": "opening"
         },
-        "text": {
-          "EN": "I'm ready. What needs doing?",
-          "TL": "handa na ako. Ano ang kailangang gawin?"
-        },
         "offers": [
           {
             "id": "orders",
-            "label": {
-              "EN": "I have work for you.",
-              "TL": "may trabaho ako sayo."
-            },
-            "utterance": {
-              "EN": "I have work for you.",
-              "TL": "may trabaho ako sayo."
-            },
             "frame": {
               "intent": "REQUEST",
               "speechAct": "REQUEST",
@@ -41,23 +29,11 @@
             },
             "metadata": {
               "choiceKey": "choice.orders",
-              "responseKey": "response.orders",
-              "responseText": {
-                "EN": "Tell me what needs doing.",
-                "TL": "Sabihin mo sa akin kung ano ang kailangang gawin."
-              }
+              "responseKey": "response.orders"
             }
           },
           {
             "id": "status",
-            "label": {
-              "EN": "Report on your current work.",
-              "TL": "Mag-ulat sa iyong kasalukuyang gawain."
-            },
-            "utterance": {
-              "EN": "Report on your current work.",
-              "TL": "Mag-ulat sa iyong kasalukuyang gawain."
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -66,11 +42,7 @@
             },
             "metadata": {
               "choiceKey": "choice.status",
-              "responseKey": "response.status",
-              "responseText": {
-                "EN": "Everything is on track for now.",
-                "TL": "Ang lahat ay nasa track sa ngayon."
-              }
+              "responseKey": "response.status"
             }
           }
         ]

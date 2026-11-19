@@ -21,10 +21,6 @@
       }
     ]
   },
-  "textSidecars": {
-    "EN": "translations/navigation_subject_change.en.json",
-    "TL": "translations/navigation_subject_change.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

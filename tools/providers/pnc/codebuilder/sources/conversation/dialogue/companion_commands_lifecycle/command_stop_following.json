@@ -34,65 +34,23 @@
     "rejected": {
       "act": "REPLY",
       "say": {
-        "EN": [
-          "I can't stop following right now.",
-          "It's too dangerous to split up. I'm staying with you.",
-          "I won't leave you alone against that swarm.",
-          "We need to stay together to survive this. Refusing to halt.",
-          "If I stop following here, I'll be completely cut off.",
-          "Cannot halt here. Too many dead around us.",
-          "I'm sticking with you until we reach actual cover.",
-          "Splitting up now will get us killed. I'm following.",
-          "Unable to break follow in active combat.",
-          "Order rejected. We survive together or not at all."
-        ],
-        "TL": [
-          "Hindi ako makapaghinto sa pagsunod ngayon.",
-          "Masyadong mapanganib maghiwalay. Sasama ako sa 'yo.",
-          "Di kita iiwan mag-isa laban sa kawang 'yan.",
-          "Kailangan nating magsama para mabuhay. Tumatangging huminto.",
-          "Kapag huminto ako rito, ganap akong mahihiwalay.",
-          "Di makahinto rito. Napakaraming patay sa paligid.",
-          "Didikit ako sa 'yo hanggang makarating sa tunay na silong.",
-          "Ikinamamatay ang paghihiwalay ngayon. Susunod ako.",
-          "Di makatigil sa pagsunod habang may bakbakan.",
-          "Tinatanggihan ang utos. Sabay tayong mabubuhay o mamamatay."
+        "variants": [
+          {
+            "id": "default"
+          }
         ]
       }
     },
     "failed": {
       "act": "REPLY",
       "say": {
-        "EN": [
-          "I couldn't stop following.",
-          "Failed to break follow stance.",
-          "I tried to hold back, but the crowd pushed me with you.",
-          "Couldn't disengage from following.",
-          "Stop following failed. Route required continuous movement.",
-          "Unable to stop following right now.",
-          "Attempted to halt, but had to keep moving.",
-          "Can't detach from follow mode here.",
-          "Follow lock failed to release.",
-          "Couldn't stop following in this tight corridor."
-        ],
-        "TL": [
-          "Hindi ako nakahinto sa pagsunod.",
-          "Bigo sa pagtigil sa pagsunod.",
-          "Sinubukan kong huminto, pero itinulak ako ng kawan kasabay mo.",
-          "Hindi makahiwalay sa pagsunod.",
-          "Pumalpak ang paghinto sa pagsunod. Kailangan ng tuloy-tuloy na galaw.",
-          "Di makahinto sa pagsunod ngayon.",
-          "Sinubukang huminto, pero kinailangang magpatuloy.",
-          "Di makahiwalay sa pagsunod dito.",
-          "Di bumitaw ang pagsunod.",
-          "Di makahinto sa pagsunod sa makipot na daang ito."
+        "variants": [
+          {
+            "id": "default"
+          }
         ]
       }
     }
-  },
-  "textSidecars": {
-    "EN": "translations/command_stop_following.en.json",
-    "TL": "translations/command_stop_following.tl.json"
   },
   "roles": {
     "speaker": {

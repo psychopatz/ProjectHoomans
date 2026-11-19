@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.queued_flirt",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "I heard you.",
+      "I heard that little remark.",
+      "Caught that.",
+      "I heard what you whispered.",
+      "Message heard.",
+      "I hear where your head is at.",
+      "Got that loud and clear.",
+      "I heard you just fine.",
+      "Heard you. Don't think I missed it.",
+      "I caught that flirt."
+    ],
+    "say.2.neutral": [
+      "You are bold, I will give you that.",
+      "You certainly don't lack nerve.",
+      "Bold move talking like that out here.",
+      "You have plenty of confidence, I'll say that.",
+      "That's quite a forward thing to say.",
+      "You certainly know how to shoot your shot.",
+      "Bold words for someone in danger.",
+      "I admire the guts, if nothing else.",
+      "You're definitely not shy.",
+      "You like living dangerously, don't you?"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.player.salute",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Paggalang, {addressee.name}.",
+      "Nakikita kita, {addressee.name}.",
+      "Manatiling alerto, {addressee.name}."
+    ]
+  }
+}

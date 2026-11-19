@@ -1,0 +1,14 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.small_talk.neutral",
+  "locale": "TL",
+  "entries": {
+    "response.turn.opening.text": "Sige. Maaari tayong mag-usap sandali.",
+    "response.turn.opening.offer.weather.label": "Ilang panahon ang nararanasan natin.",
+    "response.turn.opening.offer.weather.utterance": "Ilang panahon ang nararanasan natin.",
+    "response.turn.opening.offer.weather.responseText": "At least natatakpan ng ulan ang mga yapak namin.",
+    "response.turn.opening.offer.quiet_day.label": "Tahimik na araw hanggang ngayon.",
+    "response.turn.opening.offer.quiet_day.utterance": "Tahimik na araw hanggang ngayon.",
+    "response.turn.opening.offer.quiet_day.responseText": "Huwag tuksuhin ang kapalaran, ngunit kukunin ko ito."
+  }
+}

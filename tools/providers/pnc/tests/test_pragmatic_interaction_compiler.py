@@ -181,16 +181,22 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
             repository = Path(directory)
             source_root = repository / CONVERSATION_SOURCE_RELATIVE
             shutil.copytree(CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
-            path = (
+            tr_en_path = (
                 source_root
-                / "dialogue/core_text_social_departure/departure_confirmed.json"
+                / "translations/EN/dialogue/core_text_social_departure/departure_confirmed.json"
             )
-            document = json.loads(path.read_text(encoding="utf-8"))
-            document["metadata"]["textRows"][0]["text"][
-                "XX"
-            ] = "Synthetic interaction wording."
-            path.write_text(
-                json.dumps(document, ensure_ascii=False, indent=2, sort_keys=True)
+            tr_xx_path = (
+                source_root
+                / "translations/XX/dialogue/core_text_social_departure/departure_confirmed.json"
+            )
+            tr_xx_path.parent.mkdir(parents=True, exist_ok=True)
+            tr_doc = json.loads(tr_en_path.read_text(encoding="utf-8"))
+            tr_doc["locale"] = "XX"
+            for key in list(tr_doc.get("entries") or {}):
+                if key.startswith("textRows."):
+                    tr_doc["entries"][key] = "Synthetic interaction wording."
+            tr_xx_path.write_text(
+                json.dumps(tr_doc, ensure_ascii=False, indent=2, sort_keys=True)
                 + "\n",
                 encoding="utf-8",
             )

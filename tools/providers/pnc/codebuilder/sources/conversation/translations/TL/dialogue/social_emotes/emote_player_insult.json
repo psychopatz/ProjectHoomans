@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.player.insult",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Lumayo ka, {addressee.name}.",
+      "Naghahanap ka ng gulo, {addressee.name}.",
+      "Panatilihin ang distansya, {addressee.name}."
+    ]
+  }
+}

@@ -44,50 +44,37 @@ local function appendLocalizedLines(phrases, installAs, styleKey, localized, bas
                 and string.sub(templateKey, 1, 3) == "UI_"
                 and templateKey or nil))
         or nil
-    for index = 1, #localized do
-        local fallback = localized[index]
+    local variantCount = type(variant) == "table" and tonumber(variant.variantCount) or nil
+    local total = (variantCount and variantCount > #localized) and variantCount or #localized
+    for index = 1, total do
+        local fallback = localized[index] or localized[1]
         if type(fallback) == "string" and fallback ~= "" then
             local seq = string.format("%02d", #phrases + 1)
-            local translationsByLang = {}
-            local hasTranslations = false
-            if type(textMap) == "table" then
-                for langCode, rawList in pairs(textMap) do
-                    local code = string.upper(tostring(langCode))
-                    if type(rawList) == "table" then
-                        local item = rawList[index]
-                        if type(item) == "string" and item ~= "" then
-                            translationsByLang[code] = item
-                            hasTranslations = true
-                        end
-                    elseif type(rawList) == "string" and rawList ~= "" and index == 1 then
-                        translationsByLang[code] = rawList
-                        hasTranslations = true
-                    end
+            local lookupKey
+            if total == 1 and type(explicitKey) == "string" and explicitKey ~= "" then
+                lookupKey = explicitKey
+            elseif type(templateKey) == "string" and templateKey ~= "" then
+                lookupKey = (total > 1) and (templateKey .. "." .. tostring(index)) or templateKey
+            else
+                local styleToken = tostring(styleKey or "neutral")
+                if styleToken ~= "neutral"
+                    and string.sub(installAs, -(#styleToken + 1)) == ("." .. styleToken)
+                then
+                    styleToken = "neutral"
                 end
+                lookupKey = "conversation.content.semantic." .. installAs .. "." .. styleToken .. "." .. seq
             end
-            local enFallback = translationsByLang.EN or fallback
-            local styleToken = tostring(styleKey or "neutral")
-            if styleToken ~= "neutral"
-                and string.sub(installAs, -(#styleToken + 1)) == ("." .. styleToken)
-            then
-                styleToken = "neutral"
-            end
-            local contentKey = (#localized == 1 and type(explicitKey) == "string" and explicitKey ~= "")
-                and explicitKey
-                or ("conversation.content.semantic." .. installAs .. "." .. styleToken .. "." .. seq)
-            if hasTranslations and PNC and PNC.Translation
-                and type(PNC.Translation.RegisterInlineText) == "function"
-            then
-                for langCode, text in pairs(translationsByLang) do
-                    PNC.Translation.RegisterInlineText(langCode, contentKey, text)
+            if index > 1 and PNC and PNC.Translation and type(PNC.Translation.GetKey) == "function" then
+                local resolved = PNC.Translation.GetKey(lookupKey, fallback)
+                if type(resolved) == "string" and resolved ~= "" and resolved ~= lookupKey then
+                    fallback = resolved
                 end
             end
             phrases[#phrases + 1] = {
                 id = "phrase." .. installAs .. "." .. styleKey .. "." .. seq,
-                key = contentKey,
-                fallback = enFallback,
-                translations = hasTranslations and translationsByLang or nil,
-                convoPlanTemplateID = type(variant) == "table" and variant.templateID or nil,
+                key = lookupKey,
+                fallback = fallback,
+                convoPlanTemplateID = templateKey,
                 phraseID = tostring(basePhraseID or (styleKey .. "." .. index)),
             }
         end

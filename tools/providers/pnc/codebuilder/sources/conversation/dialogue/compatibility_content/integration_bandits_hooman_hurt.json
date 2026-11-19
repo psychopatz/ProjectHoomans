@@ -10,48 +10,16 @@
   "say": {
     "variants": [
       {
-        "id": "colonist",
-        "text": {
-          "EN": [
-            "Bandit fire! Pull back and cover the wounded colonist."
-          ],
-          "TL": [
-            "Bandit fire! Pull back and cover the wounded colonist."
-          ]
-        }
+        "id": "colonist"
       },
       {
-        "id": "default",
-        "text": {
-          "EN": [
-            "Bandit fire! Stay with the wounded survivor and watch the flank."
-          ],
-          "TL": [
-            "Bandit fire! Stay with the wounded survivor and watch the flank."
-          ]
-        }
+        "id": "default"
       },
       {
-        "id": "family",
-        "text": {
-          "EN": [
-            "Bandit fire! Stay together and cover the wounded family member."
-          ],
-          "TL": [
-            "Bandit fire! Stay together and cover the wounded family member."
-          ]
-        }
+        "id": "family"
       },
       {
-        "id": "lover",
-        "text": {
-          "EN": [
-            "Bandit fire. Stay close; I have got you."
-          ],
-          "TL": [
-            "Bandit fire. Stay close; I have got you."
-          ]
-        }
+        "id": "lover"
       }
     ]
   },

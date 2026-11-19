@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.attack_auto",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Ako na ang bahala.",
+      "Lalabanan kapag kinakailangan.",
+      "Pipiliin ko ang mga puntirya ko.",
+      "Malaya nang lumaban. Naintindihan.",
+      "Lalabanan ko ang anumang lumapit.",
+      "Inaasikaso na. Patutumbahin ko sila habang dumarating.",
+      "Pangkaraniwang tindig sa laban. Naintindihan.",
+      "Ipagtatanggol ko ang sarili at tutulungan kita.",
+      "Aatake ayon sa sitwasyon.",
+      "Naiintindihan ko. Kusang aatake sa mga banta."
+    ]
+  }
+}

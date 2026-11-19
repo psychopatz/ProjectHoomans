@@ -1,0 +1,10 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "thanks",
+  "locale": "EN",
+  "entries": {
+    "say.variants.thanks.dataset.no_problem": "No problem at all.",
+    "say.variants.thanks.dataset.anytime": "Anytime.",
+    "say.variants.thanks.dataset.glady": "Glad I could help."
+  }
+}

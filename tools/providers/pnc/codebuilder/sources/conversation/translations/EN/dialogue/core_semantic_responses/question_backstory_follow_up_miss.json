@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.backstory.follow_up.miss",
+  "locale": "EN",
+  "entries": {
+    "say.variants.question.backstory.follow_up.miss.authored": "Sometimes. I still think about that part of my life."
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.rejected_hostile",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "Back off.",
+      "Step back right now.",
+      "Get out of my face.",
+      "Give me space before I lose my temper.",
+      "Back away from me immediately.",
+      "I said back off.",
+      "Keep your distance.",
+      "Step back and cool down.",
+      "Back off while you still have the chance.",
+      "Last warning: back off."
+    ],
+    "say.2.neutral": [
+      "You do not get to speak to me that way.",
+      "Mind your mouth before someone breaks it for you.",
+      "You don't talk to me with that disrespect.",
+      "Check your tone right now.",
+      "I won't tolerate that disrespect from anyone.",
+      "Who do you think you're talking to?",
+      "You have crossed a serious line with that mouth.",
+      "Watch how you address me.",
+      "Lower your tone and show some basic respect.",
+      "You don't get to address me like that."
+    ]
+  }
+}

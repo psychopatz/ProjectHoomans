@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.argument.deescalate",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Easy. We don't need to make this worse.",
+      "Let's calm down and talk this through reasonably.",
+      "Take a breath. Bickering won't fix anything.",
+      "No need for tempers to flare. Let's settle it.",
+      "Easy does it. We're on the same side here.",
+      "Let's step back and look at the situation calmly.",
+      "We can resolve this without shouting.",
+      "Keep cool. Let's find a workable solution.",
+      "Easy now. Don't lose your head over this.",
+      "Hold on. Let's de-escalate before someone gets hurt."
+    ],
+    "say.variants.guarded": [
+      "Fine. Just lower your voice.",
+      "Lower your tone before you draw attention.",
+      "Stop yelling. You want every dead head hearing this?",
+      "All right. Keep it down and back off.",
+      "Enough. Lower the volume right now.",
+      "I heard you. Now drop the shouting.",
+      "Shh! Keep your voice down.",
+      "Keep it civil and quiet. We're in danger.",
+      "Lower your voice. I'm not deaf.",
+      "Fine. Just tone it down."
+    ],
+    "say.variants.terse": [
+      "Easy.",
+      "Calm down.",
+      "Drop it.",
+      "Quiet.",
+      "Breathe.",
+      "Cool off.",
+      "Steady.",
+      "Enough.",
+      "Hold up.",
+      "Stop."
+    ],
+    "say.variants.warm": [
+      "Calm down. This isn't helping either of us.",
+      "Hey, look at me. We're friends, remember?",
+      "Take a breath. I'm right here with you. Let's work it out.",
+      "I know you're stressed. Let's pause and decompress.",
+      "Don't let the anger take over. We care about each other.",
+      "We're going to get through this, I promise. Calm down.",
+      "I hear your pain. Let's talk gently.",
+      "It's all right. I'm listening. Just bring the energy down.",
+      "We've survived too much together to fight like this.",
+      "Peace, friend. We are stronger together."
+    ]
+  }
+}

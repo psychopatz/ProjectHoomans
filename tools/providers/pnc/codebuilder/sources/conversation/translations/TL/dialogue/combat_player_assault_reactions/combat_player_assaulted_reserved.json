@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.player_assaulted.reserved",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Lumayo ka. Ngayon na.",
+      "Tama na. Lumayo ka sa akin.",
+      "Umatras ka.",
+      "Huwag mong uulitin 'yon.",
+      "Huwag mo akong hahawakan.",
+      "Huling babala.",
+      "Diyan ka lang sa malayo.",
+      "Ibaba mo 'yan.",
+      "Dumistansya ka.",
+      "Isang hakbang pabalik. Ngayon na."
+    ]
+  }
+}

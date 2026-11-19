@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.generic_rejected",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "I can't do that right now.",
+      "That's not possible in this situation.",
+      "Unable to comply with that order.",
+      "I can't carry that out.",
+      "Not going to happen right now.",
+      "I don't have the means to do that.",
+      "That order doesn't make sense right now.",
+      "Can't do it. Find another way.",
+      "I'm tied up or unable to fulfill that.",
+      "Negative on that request."
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.rejected_sexual",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "That is not happening.",
+      "Not a chance. Forget about it.",
+      "I am not interested in that at all.",
+      "That is completely off the table.",
+      "No. Never going to happen.",
+      "Absolutely not.",
+      "I'm shutting that down right now. No.",
+      "That won't be happening between us.",
+      "Drop that idea entirely. Not happening.",
+      "No means no. It's not happening."
+    ],
+    "say.2.neutral": [
+      "Do not talk to me like that.",
+      "Keep those inappropriate remarks to yourself.",
+      "You're crossing serious personal boundaries.",
+      "That's completely uncalled for. Stop.",
+      "I don't appreciate that kind of talk.",
+      "Keep your indecent propositions away from me.",
+      "Watch how you speak to me. That's out of line.",
+      "You need to show respect and stop talking like that.",
+      "I won't be objectified out here. Back off.",
+      "Shut your mouth. Don't speak to me that way."
+    ],
+    "say.3.neutral": [
+      "You are moving far too fast.",
+      "Slow down. We are nowhere near that point.",
+      "You need to hit the brakes. That's way too fast.",
+      "Pace yourself. We barely know each other.",
+      "You're rushing into territory we haven't earned.",
+      "Slow your roll. That's moving way too fast for me.",
+      "Pull back. We have not built that kind of closeness.",
+      "You're getting way ahead of where we stand.",
+      "Take a massive step back. Way too fast.",
+      "Slow down before you ruin whatever trust we have."
+    ]
+  }
+}

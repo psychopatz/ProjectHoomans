@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.threat",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "That threat is down. Stay alert.",
+      "Threat neutralized. Don't drop your guard.",
+      "Target eliminated. Keep watching.",
+      "Danger's passed for now. Stay sharp.",
+      "Handled that hazard. Eyes open.",
+      "Threat's in the dirt. Scan the flanks.",
+      "Threat ceased. Maintain alertness.",
+      "Downed the contact. Watch your sector.",
+      "No more threat from that one. Stay ready.",
+      "Handled. Stay focused on remaining risks."
+    ]
+  }
+}

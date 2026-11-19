@@ -16,21 +16,9 @@
         "metadata": {
           "textKey": "opening"
         },
-        "text": {
-          "EN": "I'm managing. What did you want to ask?",
-          "TL": "pinamamahalaan ko. Ano ang gusto mong itanong?"
-        },
         "offers": [
           {
             "id": "condition",
-            "label": {
-              "EN": "How are you holding up?",
-              "TL": "Kamusta ka na?"
-            },
-            "utterance": {
-              "EN": "How are you holding up?",
-              "TL": "Kamusta ka na?"
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -60,23 +48,11 @@
                   "approval": 1,
                   "familiarity": 1
                 }
-              ],
-              "responseText": {
-                "EN": "I'm still breathing. That's enough for now.",
-                "TL": "humihinga pa ako. Tama na sa ngayon."
-              }
+              ]
             }
           },
           {
             "id": "offer_help",
-            "label": {
-              "EN": "Do you need any help?",
-              "TL": "Kailangan mo ba ng anumang tulong?"
-            },
-            "utterance": {
-              "EN": "Do you need any help?",
-              "TL": "Kailangan mo ba ng anumang tulong?"
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -106,11 +82,7 @@
                   "approval": 2,
                   "respect": 1
                 }
-              ],
-              "responseText": {
-                "EN": "I'll manage, but thanks for asking.",
-                "TL": "Aayusin ko, pero salamat sa pagtatanong."
-              }
+              ]
             }
           }
         ]

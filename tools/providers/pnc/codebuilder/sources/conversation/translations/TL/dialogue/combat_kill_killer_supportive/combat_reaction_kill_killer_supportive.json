@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_killer_supportive",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Patay na. Dito ka lang.",
+      "Bagsak ang banta. Dito ka lang sa tabi ko.",
+      "Inasikaso ko na. Dumikit ka lang.",
+      "Nakuha ko na 'yon. Huwag kang lumayo.",
+      "Patay na. Hawak ko ang parteng 'to.",
+      "Ibinagsak ko na. Sumama ka sa akin.",
+      "Tapos na ang isang 'yon. Dumikit sa balikat ko.",
+      "Naasikaso na. Bantayan ang likod habang nangunguna ako.",
+      "Bagsak ang target. Diyan ka lang sa malapit.",
+      "Tinapos ko na. Ligtas tayo sa parteng 'to."
+    ],
+    "say.2.neutral": [
+      "Tapos na. Okay ka lang?",
+      "Nailayo ko sa atin. Nasaktan ka ba?",
+      "Naalis ang banta. Ayos ka lang ba?",
+      "Patay na. Tignan mo sarili mo.",
+      "Ibinagsak ko 'yon. Ayos lang ang lahat sa'yo?",
+      "Ibinagsak ko na. Ligtas ka riyan?",
+      "Tapos na 'yon. Ayos ka lang?",
+      "Ibinagsak bago pa makalapit sa'yo. Ayos ka?",
+      "Naasikaso ang banta. Kamusta ka riyan?",
+      "Hindi ka na mahahawakan no'n. Okay ka lang?"
+    ],
+    "say.3.neutral": [
+      "Isa na lang ang nabawas. Kasama mo ako.",
+      "Wala na ang banta. Nandito lang ako.",
+      "Ibinagsak ko na. Protektado ka.",
+      "Bawas ang aalahanin. Kasama mo ako.",
+      "Naasikaso na. Hindi ko hahayaang mahawakan ka nila.",
+      "Patay na. Hawak ko ang likod mo.",
+      "Bawas sa dinaraanan. Sumandal ka sa akin kung kailangan.",
+      "Inasikaso ko ang isang 'yon. Malalampasan natin 'to.",
+      "Banta bagsak na. Ligtas ka kasama ko.",
+      "Wala na ang isang 'yon. Nakabantay ako sa'yo."
+    ]
+  }
+}

@@ -15,6 +15,19 @@ PNC = {
     },
 }
 
+local Json = require "PsychopatzCore/Serialization/PsychopatzJson"
+local combatCatalog = Json.Decode(T.read(
+    "ProjectHoomans",
+    "common_mod",
+    "media/translation/EN/Conversation/Text/convo/ConvoEngine_combat.json"
+)) or {}
+PNC.Translation = PNC.Translation or {}
+PNC.Translation.GetKey = function(key, fallback)
+    local val = combatCatalog[key]
+    if type(val) == "string" and val ~= "" then return val end
+    return fallback or key or ""
+end
+
 T.load(
     "ProjectHoomans",
     "shared",

@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.player.clap",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Well done, {addressee.name}.",
+      "That's worth celebrating, {addressee.name}.",
+      "Nice work, {addressee.name}."
+    ]
+  }
+}

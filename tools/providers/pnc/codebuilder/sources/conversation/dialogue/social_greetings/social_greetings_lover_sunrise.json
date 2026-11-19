@@ -36,62 +36,26 @@
     "responseAct": "GREETING",
     "textRows": [
       {
-        "key": "greeting.001",
-        "text": {
-          "EN": "Morning, love. You sleep all right?",
-          "TL": "Umaga, mahal. Matulog ka na okay?"
-        }
+        "key": "greeting.001"
       },
       {
-        "key": "greeting.002",
-        "text": {
-          "EN": "There you are. I was starting to miss you.",
-          "TL": "Narito ka pala. Nagsisimula na kitang ma-miss."
-        }
+        "key": "greeting.002"
       },
       {
-        "key": "greeting.003",
-        "text": {
-          "EN": "Good morning. Stay close today, okay?",
-          "TL": "Magandang umaga po. Manatiling malapit ngayon, okay?"
-        }
+        "key": "greeting.003"
       },
       {
-        "key": "greeting.004",
-        "text": {
-          "EN": "Seeing you first thing still makes this place feel almost normal.",
-          "TL": "Ang una mong makita ay halos normal pa rin ang pakiramdam ng lugar na ito."
-        }
+        "key": "greeting.004"
       },
       {
-        "key": "greeting.005",
-        "text": {
-          "EN": "Morning. Whatever happens today, we handle it together.",
-          "TL": "Umaga. Kung ano man ang mangyari ngayon, sabay nating haharapin."
-        }
+        "key": "greeting.005"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Morning, love. You sleep all right?",
-            "There you are. I was starting to miss you.",
-            "Good morning. Stay close today, okay?",
-            "Seeing you first thing still makes this place feel almost normal.",
-            "Morning. Whatever happens today, we handle it together."
-          ],
-          "TL": [
-            "Umaga, mahal. Matulog ka na okay?",
-            "Narito ka pala. Nagsisimula na kitang ma-miss.",
-            "Magandang umaga po. Manatiling malapit ngayon, okay?",
-            "Ang una mong makita ay halos normal pa rin ang pakiramdam ng lugar na ito.",
-            "Umaga. Kung ano man ang mangyari ngayon, sabay nating haharapin."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

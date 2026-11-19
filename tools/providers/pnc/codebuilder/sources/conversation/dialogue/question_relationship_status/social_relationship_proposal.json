@@ -41,26 +41,38 @@
     }
   ],
   "say": {
-    "EN": "Be my partner.",
-    "TL": "Maging kapareha kita."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "reply": {
     "already_partner": {
       "say": {
-        "EN": "We're already together.",
-        "TL": "Magkasama na tayo."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     },
     "accepted": {
       "say": {
-        "EN": "Yes, I want that too.",
-        "TL": "Oo, gusto ko rin iyon."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     },
     "rejected": {
       "say": {
-        "EN": "I'm not ready for that.",
-        "TL": "Hindi pa ako handa para diyan."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     }
   },

@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.human_kill.aggressive",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "He's down. Keep pushing.",
+      "Took him out. Don't let up.",
+      "That one's finished. Push their line.",
+      "Down in the dirt. Keep firing.",
+      "One dead. Press the advantage.",
+      "Dropped him. Don't give them room to breathe.",
+      "He thought he had us. Keep moving.",
+      "Tore him down. Forward.",
+      "Scratch that bastard. Keep pressing.",
+      "He's bleeding out. Advance on them."
+    ],
+    "say.2.neutral": [
+      "One less bastard shooting at us.",
+      "That's for trying to kill us.",
+      "Should've stayed in your hole.",
+      "He drew down on us. Now he's dead.",
+      "Another shooter down.",
+      "That'll teach 'em to ambush us.",
+      "Good riddance to that one.",
+      "Picked the wrong crew to fight.",
+      "He got what he was asking for.",
+      "Dead where he stood."
+    ],
+    "say.3.neutral": [
+      "Threat's dead. Eyes up.",
+      "Dead. Who else wants some?",
+      "Target eliminated. Keep scanning.",
+      "Down. Check for friends.",
+      "That one's history. Eyes open.",
+      "Dropped him cold. Next target.",
+      "He's done. Watch your sectors.",
+      "Put him down. Stay ready.",
+      "No more trouble from that one.",
+      "Finished him. Stay locked in."
+    ]
+  }
+}

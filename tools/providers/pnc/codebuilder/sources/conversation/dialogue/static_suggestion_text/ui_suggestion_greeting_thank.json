@@ -5,33 +5,24 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.greeting_thank.label",
-        "text": {
-          "EN": "Thank them",
-          "TL": "Pasalamatan siya"
-        }
+        "key": "suggestion.greeting_thank.label"
       },
       {
-        "key": "suggestion.greeting_thank.utterance",
-        "text": {
-          "EN": "Thanks.",
-          "TL": "Salamat."
-        }
+        "key": "suggestion.greeting_thank.utterance"
       }
     ]
   },
   "affordance": {
-    "label": {
-      "EN": "Thank them",
-      "TL": "Pasalamatan siya"
-    },
     "consumers": [
       "player"
     ]
   },
   "say": {
-    "EN": "Thanks.",
-    "TL": "Salamat."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

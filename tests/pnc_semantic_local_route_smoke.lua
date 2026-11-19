@@ -355,7 +355,7 @@ T.equal(queued[8].payload.semanticTemplateID,
     "flow.greeting.opening.rain",
     "provider-disabled greeting retains canonical semantic template provenance")
 T.truthy(string.find(tostring(queued[8].payload.translationKey or ""),
-    "^conversation%.content%.semantic%.flow%.greeting%.opening%.rain%."),
+    "^convo%.flow%.greeting%.opening%.rain%."),
     "provider-disabled greeting retains canonical content provenance")
 T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",
     "provider-disabled greeting remains on the deterministic route")

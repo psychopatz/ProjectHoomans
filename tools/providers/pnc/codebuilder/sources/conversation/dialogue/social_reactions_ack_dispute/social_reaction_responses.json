@@ -5,218 +5,98 @@
     "textTarget": "convo/SemanticResponses",
     "textRows": [
       {
-        "key": "UI_PNC_Conversation_Semantic_ApologyTrusted",
-        "text": {
-          "EN": "I appreciate you saying that. We're all under pressure.",
-          "TL": "Pinahahalagahan ko ang paghingi mo ng tawad. Nahihirapan lang tayong lahat."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ApologyTrusted"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_ComplimentAlternate",
-        "text": {
-          "EN": "I appreciate you saying that.",
-          "TL": "Pinahahalagahan ko ang sinabi mo."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ComplimentAlternate"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_ComplimentDefault",
-        "text": {
-          "EN": "Thanks. That's kind of you.",
-          "TL": "Salamat. Mabait mong sabihin iyan."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ComplimentDefault"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_ComplimentFriendly",
-        "text": {
-          "EN": "Thanks. You seem pretty great yourself.",
-          "TL": "Salamat. Ang galing mo rin naman."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ComplimentFriendly"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_ComplimentTrusted",
-        "text": {
-          "EN": "Thanks. Hearing that from you means a lot.",
-          "TL": "Salamat. Malaki ang ibig sabihin niyan kapag galing sa iyo."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ComplimentTrusted"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_ComplimentWithdrawn",
-        "text": {
-          "EN": "Oh. Thank you, that's kind of you.",
-          "TL": "Ay. Salamat, mabait mong sabihin iyan."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ComplimentWithdrawn"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_DisputeFriendly",
-        "text": {
-          "EN": "I see it differently, but we're okay.",
-          "TL": "Iba ang tingin ko rito, pero ayos lang tayo."
-        }
+        "key": "UI_PNC_Conversation_Semantic_DisputeFriendly"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_DisputeStressed",
-        "text": {
-          "EN": "I hear you, but I can't take that on while I'm this tense.",
-          "TL": "Naririnig kita, pero hindi ko ito kayang asikasuhin habang ganito ako katensiyonado."
-        }
+        "key": "UI_PNC_Conversation_Semantic_DisputeStressed"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_DisputeTrusted",
-        "text": {
-          "EN": "I respect that. I still don't agree.",
-          "TL": "Iginagalang ko iyan. Hindi pa rin ako sang-ayon."
-        }
+        "key": "UI_PNC_Conversation_Semantic_DisputeTrusted"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_DisputeWithdrawn",
-        "text": {
-          "EN": "Let's leave it there.",
-          "TL": "Iwan na natin iyon."
-        }
+        "key": "UI_PNC_Conversation_Semantic_DisputeWithdrawn"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_OfferFriendly",
-        "text": {
-          "EN": "That's kind of you. I'll keep it in mind.",
-          "TL": "Mabuti ka. Tatandaan ko iyan."
-        }
+        "key": "UI_PNC_Conversation_Semantic_OfferFriendly"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_OfferStressed",
-        "text": {
-          "EN": "I appreciate it, but I need a moment before I can think about food.",
-          "TL": "Pinahahalagahan ko ito, pero kailangan ko munang kumalma bago isipin ang pagkain."
-        }
+        "key": "UI_PNC_Conversation_Semantic_OfferStressed"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_OfferTrusted",
-        "text": {
-          "EN": "Thanks. I know I can count on you.",
-          "TL": "Salamat. Alam kong maaasahan kita."
-        }
+        "key": "UI_PNC_Conversation_Semantic_OfferTrusted"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_OfferWithdrawn",
-        "text": {
-          "EN": "No, thanks. I'd rather handle it myself.",
-          "TL": "Hindi, salamat. Mas gusto kong ako na ang bahala."
-        }
+        "key": "UI_PNC_Conversation_Semantic_OfferWithdrawn"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterCompliment",
-        "text": {
-          "EN": "That's kind of you to ask. I don't have a clear answer right now.",
-          "TL": "Mabait mong itanong iyan. Wala pa akong malinaw na sagot sa ngayon."
-        }
+        "key": "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterCompliment"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentAlt",
-        "text": {
-          "EN": "Thanks for saying that. I can't give you a clear answer about relationships right now.",
-          "TL": "Salamat sa sinabi mo. Hindi ko pa masagot nang malinaw ang tungkol sa relasyon ngayon."
-        }
+        "key": "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentAlt"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentCommitted",
-        "text": {
-          "EN": "Thanks for the compliment, but I thought we were already together.",
-          "TL": "Salamat sa papuri, pero akala ko tayo na."
-        }
+        "key": "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentCommitted"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentWithdrawn",
-        "text": {
-          "EN": "Thanks, but I'd rather keep that personal.",
-          "TL": "Salamat, pero mas gusto kong sarilinin muna iyan."
-        }
+        "key": "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentWithdrawn"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_RefuseRequest",
-        "text": {
-          "EN": "No problem. I'll leave it.",
-          "TL": "Walang problema. Iiwan ko na iyon."
-        }
+        "key": "UI_PNC_Conversation_Semantic_RefuseRequest"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_SelfReflectionDefault",
-        "text": {
-          "EN": "Don't talk about yourself like that.",
-          "TL": "Huwag mong pagsalitaan nang masama ang sarili mo."
-        }
+        "key": "UI_PNC_Conversation_Semantic_SelfReflectionDefault"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_SelfReflectionFriendly",
-        "text": {
-          "EN": "Hey. Don't talk about yourself like that. You matter.",
-          "TL": "Huwag mong pagsalitaan nang ganyan ang sarili mo. Mahalaga ka."
-        }
+        "key": "UI_PNC_Conversation_Semantic_SelfReflectionFriendly"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_SelfReflectionStressed",
-        "text": {
-          "EN": "We've all made mistakes. Focus on what comes next.",
-          "TL": "Lahat tayo ay nagkakamali. Ituon mo ang pansin sa susunod na hakbang."
-        }
+        "key": "UI_PNC_Conversation_Semantic_SelfReflectionStressed"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_SelfReflectionTrusted",
-        "text": {
-          "EN": "You're harder on yourself than you need to be.",
-          "TL": "Mas mahigpit ka sa sarili mo kaysa kailangan."
-        }
+        "key": "UI_PNC_Conversation_Semantic_SelfReflectionTrusted"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_SelfReflectionWithdrawn",
-        "text": {
-          "EN": "Don't make a habit of saying things like that.",
-          "TL": "Huwag mong gawing ugali ang pagsasabi ng ganyan."
-        }
+        "key": "UI_PNC_Conversation_Semantic_SelfReflectionWithdrawn"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_SocialInteractionRejected",
-        "text": {
-          "EN": "I heard you, but I couldn't apply that social reaction.",
-          "TL": "Narinig kita, pero hindi ko mailapat ang sosyal na reaksyon."
-        }
+        "key": "UI_PNC_Conversation_Semantic_SocialInteractionRejected"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_SocialInteractionUnavailable",
-        "text": {
-          "EN": "I heard you, but I couldn't send that social reaction right now.",
-          "TL": "Narinig kita, pero hindi ko maipadala ang sosyal na reaksyon ngayon."
-        }
+        "key": "UI_PNC_Conversation_Semantic_SocialInteractionUnavailable"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_ThreatStressed",
-        "text": {
-          "EN": "I've had enough. Back off before this gets worse.",
-          "TL": "Sobra na. Lumayo ka bago lumala ito."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ThreatStressed"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_ThreatTrusted",
-        "text": {
-          "EN": "Don't make this personal. Step back.",
-          "TL": "Huwag mong gawing personal ito. Umatras ka."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ThreatTrusted"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_ThreatWithdrawn",
-        "text": {
-          "EN": "Keep your distance. I'm not discussing this.",
-          "TL": "Lumayo ka. Hindi ko ito pag-uusapan."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ThreatWithdrawn"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": "I appreciate you saying that. We're all under pressure.",
-          "TL": "Pinahahalagahan ko ang paghingi mo ng tawad. Nahihirapan lang tayong lahat."
-        }
+        "id": "neutral"
       }
     ]
   },

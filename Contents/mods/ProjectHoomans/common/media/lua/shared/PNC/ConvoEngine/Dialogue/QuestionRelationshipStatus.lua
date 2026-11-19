@@ -20,14 +20,6 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.question.relationship_status.responses.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "That's kind of you to ask. I don't have a clear answer right now.",
-                                    },
-                                    ["TL"] = {
-                                        "Mabait mong itanong iyan. Wala pa akong malinaw na sagot sa ngayon.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -41,14 +33,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.relationship_status.responses.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "That's kind of you to ask. I don't have a clear answer right now.",
-                        },
-                        ["TL"] = {
-                            "Mabait mong itanong iyan. Wala pa akong malinaw na sagot sa ngayon.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -84,81 +68,48 @@ return {
             ["metadata"] = {
                 ["textRows"] = {
                     {
+                        ["fallback"] = "That's kind of you to ask. I don't have a clear answer right now.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterCompliment",
-                        ["text"] = {
-                            ["EN"] = "That's kind of you to ask. I don't have a clear answer right now.",
-                            ["TL"] = "Mabait mong itanong iyan. Wala pa akong malinaw na sagot sa ngayon.",
-                        },
                     },
                     {
+                        ["fallback"] = "Thanks for saying that. I can't give you a clear answer about relationships right now.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentAlt",
-                        ["text"] = {
-                            ["EN"] = "Thanks for saying that. I can't give you a clear answer about relationships right now.",
-                            ["TL"] = "Salamat sa sinabi mo. Hindi ko pa masagot nang malinaw ang tungkol sa relasyon ngayon.",
-                        },
                     },
                     {
+                        ["fallback"] = "Thanks for the compliment, but I thought we were already together.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentCommitted",
-                        ["text"] = {
-                            ["EN"] = "Thanks for the compliment, but I thought we were already together.",
-                            ["TL"] = "Salamat sa papuri, pero akala ko tayo na.",
-                        },
                     },
                     {
+                        ["fallback"] = "Thanks, but I'd rather keep that personal.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentWithdrawn",
-                        ["text"] = {
-                            ["EN"] = "Thanks, but I'd rather keep that personal.",
-                            ["TL"] = "Salamat, pero mas gusto kong sarilinin muna iyan.",
-                        },
                     },
                     {
+                        ["fallback"] = "I thought we were already together.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusCommitted",
-                        ["text"] = {
-                            ["EN"] = "I thought we were already together.",
-                            ["TL"] = "Akala ko tayo na.",
-                        },
                     },
                     {
+                        ["fallback"] = "I haven't really thought about dating. Right now, I'm focused on surviving.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusUncertain",
-                        ["text"] = {
-                            ["EN"] = "I haven't really thought about dating. Right now, I'm focused on surviving.",
-                            ["TL"] = "Hindi ko pa talaga naiisip ang makipag-date. Mas iniisip ko muna kung paano makakaligtas.",
-                        },
                     },
                     {
+                        ["fallback"] = "Honestly, I haven't had much room to think about relationships lately.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusUncertainAlt",
-                        ["text"] = {
-                            ["EN"] = "Honestly, I haven't had much room to think about relationships lately.",
-                            ["TL"] = "Sa totoo lang, wala akong gaanong panahon para isipin ang tungkol sa relasyon ngayon.",
-                        },
                     },
                     {
+                        ["fallback"] = "I'd rather not get into that. There's too much going on right now.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusWithdrawn",
-                        ["text"] = {
-                            ["EN"] = "I'd rather not get into that. There's too much going on right now.",
-                            ["TL"] = "Mas gusto kong huwag munang pag-usapan iyan. Marami pa tayong pinagdaraanan ngayon.",
-                        },
                     },
                     {
+                        ["fallback"] = "Thanks for understanding. It's hard to think about relationships with everything going on.",
                         ["key"] = "UI_PNC_Conversation_Semantic_RelationshipStatusAcknowledged",
-                        ["text"] = {
-                            ["EN"] = "Thanks for understanding. It's hard to think about relationships with everything going on.",
-                            ["TL"] = "Salamat sa pag-unawa. Mahirap isipin ang relasyon sa dami ng nangyayari ngayon.",
-                        },
                     },
                     {
+                        ["fallback"] = "I appreciate you listening. It's hard to make plans while we're trying to survive.",
                         ["key"] = "UI_PNC_Conversation_Semantic_RelationshipStatusAcknowledgedAlt",
-                        ["text"] = {
-                            ["EN"] = "I appreciate you listening. It's hard to make plans while we're trying to survive.",
-                            ["TL"] = "Salamat sa pakikinig. Mahirap magplano habang sinusubukan nating mabuhay.",
-                        },
                     },
                     {
+                        ["fallback"] = "Thanks. I'd rather leave it there for now.",
                         ["key"] = "UI_PNC_Conversation_Semantic_RelationshipStatusAcknowledgedWithdrawn",
-                        ["text"] = {
-                            ["EN"] = "Thanks. I'd rather leave it there for now.",
-                            ["TL"] = "Salamat. Mas gusto kong hanggang dito na lang muna.",
-                        },
                     },
                 },
                 ["textTarget"] = "convo/SemanticResponses",
@@ -174,15 +125,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "That's kind of you to ask. I don't have a clear answer right now.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "That's kind of you to ask. I don't have a clear answer right now.",
-                                    },
-                                    ["TL"] = {
-                                        "Mabait mong itanong iyan. Wala pa akong malinaw na sagot sa ngayon.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -251,14 +195,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.relationship_status.responses.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "That's kind of you to ask. I don't have a clear answer right now.",
-                    },
-                    ["TL"] = {
-                        "Mabait mong itanong iyan. Wala pa akong malinaw na sagot sa ngayon.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -284,14 +220,6 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.social.relationship.proposal.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Be my partner.",
-                                    },
-                                    ["TL"] = {
-                                        "Maging kapareha kita.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -321,14 +249,6 @@ return {
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.relationship.proposal.reply.accepted.say.1.default",
                                         ["textRole"] = "response",
-                                        ["translations"] = {
-                                            ["EN"] = {
-                                                "Yes, I want that too.",
-                                            },
-                                            ["TL"] = {
-                                                "Oo, gusto ko rin iyon.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -354,14 +274,6 @@ return {
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.relationship.proposal.reply.already_partner.say.1.default",
                                         ["textRole"] = "response",
-                                        ["translations"] = {
-                                            ["EN"] = {
-                                                "We're already together.",
-                                            },
-                                            ["TL"] = {
-                                                "Magkasama na tayo.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -387,14 +299,6 @@ return {
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.relationship.proposal.reply.rejected.say.1.default",
                                         ["textRole"] = "response",
-                                        ["translations"] = {
-                                            ["EN"] = {
-                                                "I'm not ready for that.",
-                                            },
-                                            ["TL"] = {
-                                                "Hindi pa ako handa para diyan.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -410,14 +314,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.relationship.proposal.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Be my partner.",
-                        },
-                        ["TL"] = {
-                            "Maging kapareha kita.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -426,14 +322,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "response",
                     ["templateID"] = "convo.social.relationship.proposal.reply.accepted.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Yes, I want that too.",
-                        },
-                        ["TL"] = {
-                            "Oo, gusto ko rin iyon.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -442,14 +330,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "response",
                     ["templateID"] = "convo.social.relationship.proposal.reply.already_partner.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "We're already together.",
-                        },
-                        ["TL"] = {
-                            "Magkasama na tayo.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -458,14 +338,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "response",
                     ["templateID"] = "convo.social.relationship.proposal.reply.rejected.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'm not ready for that.",
-                        },
-                        ["TL"] = {
-                            "Hindi pa ako handa para diyan.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
             },
@@ -524,15 +396,8 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
+                                        ["fallback"] = "Yes, I want that too.",
                                         ["id"] = "default",
-                                        ["text"] = {
-                                            ["EN"] = {
-                                                "Yes, I want that too.",
-                                            },
-                                            ["TL"] = {
-                                                "Oo, gusto ko rin iyon.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -554,15 +419,8 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
+                                        ["fallback"] = "We're already together.",
                                         ["id"] = "default",
-                                        ["text"] = {
-                                            ["EN"] = {
-                                                "We're already together.",
-                                            },
-                                            ["TL"] = {
-                                                "Magkasama na tayo.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -584,15 +442,8 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
+                                        ["fallback"] = "I'm not ready for that.",
                                         ["id"] = "default",
-                                        ["text"] = {
-                                            ["EN"] = {
-                                                "I'm not ready for that.",
-                                            },
-                                            ["TL"] = {
-                                                "Hindi pa ako handa para diyan.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -613,15 +464,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Be my partner.",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Be my partner.",
-                                    },
-                                    ["TL"] = {
-                                        "Maging kapareha kita.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -714,14 +558,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.relationship.proposal.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Be my partner.",
-                    },
-                    ["TL"] = {
-                        "Maging kapareha kita.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -730,14 +566,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "response",
                 ["templateID"] = "convo.social.relationship.proposal.reply.accepted.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Yes, I want that too.",
-                    },
-                    ["TL"] = {
-                        "Oo, gusto ko rin iyon.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -746,14 +574,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "response",
                 ["templateID"] = "convo.social.relationship.proposal.reply.already_partner.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "We're already together.",
-                    },
-                    ["TL"] = {
-                        "Magkasama na tayo.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -762,14 +582,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "response",
                 ["templateID"] = "convo.social.relationship.proposal.reply.rejected.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'm not ready for that.",
-                    },
-                    ["TL"] = {
-                        "Hindi pa ako handa para diyan.",
-                    },
-                },
                 ["variantID"] = "default",
             },
         },

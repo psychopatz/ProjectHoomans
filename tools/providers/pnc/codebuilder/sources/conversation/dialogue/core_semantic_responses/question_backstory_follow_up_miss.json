@@ -9,10 +9,6 @@
     "variants": [
       {
         "id": "question.backstory.follow_up.miss.authored",
-        "text": {
-          "EN": "Sometimes. I still think about that part of my life.",
-          "TL": "Minsan. Naiisip ko pa rin ang bahaging iyon ng buhay ko."
-        },
         "metadata": {
           "fallback": "Sometimes. I still think about that part of my life.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss"

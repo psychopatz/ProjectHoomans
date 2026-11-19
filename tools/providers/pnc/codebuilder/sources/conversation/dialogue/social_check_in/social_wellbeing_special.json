@@ -16,21 +16,9 @@
         "metadata": {
           "textKey": "opening"
         },
-        "text": {
-          "EN": "I'll be honest with you, {addressee.name}. Ask.",
-          "TL": "Magiging tapat ako sa iyo, {addressee.name}. Magtanong."
-        },
         "offers": [
           {
             "id": "condition",
-            "label": {
-              "EN": "How are you really doing?",
-              "TL": "Kamusta ka na talaga?"
-            },
-            "utterance": {
-              "EN": "How are you really doing?",
-              "TL": "Kamusta ka na talaga?"
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -60,23 +48,11 @@
                   "approval": 1,
                   "familiarity": 1
                 }
-              ],
-              "responseText": {
-                "EN": "Better now that you're here.",
-                "TL": "Mas mabuti na ngayong nandito ka na."
-              }
+              ]
             }
           },
           {
             "id": "offer_help",
-            "label": {
-              "EN": "Let me help.",
-              "TL": "Hayaan mo akong tumulong."
-            },
-            "utterance": {
-              "EN": "Let me help.",
-              "TL": "Hayaan mo akong tumulong."
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -106,11 +82,7 @@
                   "approval": 2,
                   "respect": 1
                 }
-              ],
-              "responseText": {
-                "EN": "All right. Just stay close for a minute.",
-                "TL": "Sige. Manatiling malapit sa isang minuto."
-              }
+              ]
             }
           }
         ]

@@ -1,0 +1,29 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "needs.special.support",
+  "locale": "TL",
+  "entries": {
+    "response.turn.opening.text": "Dahil ikaw ito, sasabihin ko sa iyo kung ano ang kailangan ko.",
+    "response.turn.opening.offer.supplies.label": "Ano ang maaari kong dalhin sa iyo?",
+    "response.turn.opening.offer.supplies.utterance": "Ano ang maaari kong dalhin sa iyo?",
+    "response.turn.opening.offer.supplies.responseText": "Bumalik ka na lang ng matiwasay. Anumang bagay ay dagdag.",
+    "response.turn.opening.offer.medical.label": "nasaktan ka ba",
+    "response.turn.opening.offer.medical.utterance": "nasaktan ka ba",
+    "response.turn.opening.offer.medical.responseText": "Hindi. Sasabihin ko sa iyo kung ako nga.",
+    "response.turn.opening.offer.gift.label": "Mayroon akong isang bagay na maaaring kailanganin mo.",
+    "response.turn.opening.offer.gift.utterance": "Mayroon akong isang bagay na maaaring kailanganin mo.",
+    "response.turn.opening.offer.gift.responseText": "Hayaan akong makita kung ano ang maaari mong matitira.",
+    "response.turn.gift.text": "Pumili ng ibibigay sa akin, pagkatapos ay bumalik sa usapan.",
+    "response.turn.gift.offer.gift_return.label": "Hahawakan ko ang natitira.",
+    "response.turn.gift.offer.gift_return.utterance": "Hahawakan ko ang natitira.",
+    "response.turn.gift.offer.gift_return.responseText": "Understood.",
+    "textRows.gift.offer.multiple": "Nagdala ako ng {giftItemSummary} para sa iyo.",
+    "textRows.gift.offer.multiple.alt": "Iyo ang mga ito kung kailangan mo: {giftItemSummary}.",
+    "textRows.gift.offer.single": "Narito ang {giftItemName}. Akala ko magagamit mo.",
+    "textRows.gift.offer.single.alt": "Para sa iyo ito: {giftItemName}.",
+    "textRows.gift.received.equipment": "Kapaki-pakinabang, pinag-isipan, at mahusay na pinili. Natututuhan mo na kung paano ako mag-isip.",
+    "textRows.gift.received.food": "Naalala mo ako. Masisiyahan ako rito, at maaalala ko ang ginawa mong ito.",
+    "textRows.gift.received.general": "Iyan ay nag-iisip sa iyo. salamat po.",
+    "textRows.gift.received.medical": "Napansin mo ang kailangan ko bago ko pa hingin. Mas mahalaga iyon kaysa sa mismong gamot."
+  }
+}

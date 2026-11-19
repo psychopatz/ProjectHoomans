@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "navigation.default",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "All right. What would you like to discuss?",
+      "I'm listening. What did you want to talk about?",
+      "What's on your mind?",
+      "Go ahead. What do you need to discuss?",
+      "I'm here. What would you like to say?",
+      "What are you thinking?",
+      "Ready when you are. What's up?",
+      "Yes? What did you want to bring up?",
+      "I have a moment. What is it?",
+      "Sure, what's on your mind?"
+    ],
+    "say.variants.guarded": [
+      "All right. What now?",
+      "What is it? Keep it short.",
+      "Make it quick. We're exposed.",
+      "What do you want? Eyes open.",
+      "Speak up, but don't draw attention.",
+      "What's on your mind? Watch the street.",
+      "What now? We can't linger here.",
+      "I'm listening, but keep scanning.",
+      "State your business quickly.",
+      "What is it? Trouble?"
+    ],
+    "say.variants.terse": [
+      "What is it?",
+      "Yes?",
+      "Speak.",
+      "What?",
+      "Go on.",
+      "Listening.",
+      "What's up?",
+      "Say it.",
+      "Make it quick.",
+      "Talk."
+    ],
+    "say.variants.warm": [
+      "Sure. What would you like to discuss?",
+      "Always glad to talk with you. What's on your mind?",
+      "I'm all ears. What did you want to share?",
+      "Take your time. What would you like to discuss?",
+      "Happy to chat. What's going on?",
+      "Good to talk to you. What's on your heart?",
+      "I'm right here with you. What did you need?",
+      "Whatever you need to talk about, I'm listening.",
+      "Sure thing. What did you want to talk through?",
+      "It's always nice catching up with you. What is it?"
+    ]
+  }
+}

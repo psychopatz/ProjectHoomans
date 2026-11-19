@@ -616,19 +616,19 @@ return {
         ["domain"] = "social_affirmation",
         ["kind"] = "realization",
         ["module"] = "PNC/ConvoEngine/Index/Realization/SocialAffirmation",
-        ["recordCount"] = 18,
+        ["recordCount"] = 12,
     },
     {
         ["domain"] = "social_challenge",
         ["kind"] = "realization",
         ["module"] = "PNC/ConvoEngine/Index/Realization/SocialChallenge",
-        ["recordCount"] = 27,
+        ["recordCount"] = 18,
     },
     {
         ["domain"] = "social_identity_closure",
         ["kind"] = "realization",
         ["module"] = "PNC/ConvoEngine/Index/Realization/SocialIdentityClosure",
-        ["recordCount"] = 18,
+        ["recordCount"] = 12,
     },
     {
         ["domain"] = "social_lexemes",
@@ -640,6 +640,6 @@ return {
         ["domain"] = "social_warning_wellbeing",
         ["kind"] = "realization",
         ["module"] = "PNC/ConvoEngine/Index/Realization/SocialWarningWellbeing",
-        ["recordCount"] = 30,
+        ["recordCount"] = 20,
     },
 }

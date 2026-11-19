@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.praise",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Ginawa ko lang kung ano ang kailangang gawin.",
+      "Kahit sino gagawin din ang ganoon.",
+      "Tungkulin ko lang para mapanatili tayong buhay.",
+      "Mabuti at nagawa ko nang maayos.",
+      "Iyon ang hiningi ng sitwasyon.",
+      "Wala 'yon. Ginagawa lang ang trabaho.",
+      "Masayang tumulong. Magkasama tayo rito.",
+      "Mabuti na lang at naging maayos ang kinahinatnan.",
+      "Ginawa ko ang kaya ko. Salamat sa pagpansin.",
+      "Parte lang 'yan ng pagsisikap na mabuhay pa ng isang araw."
+    ],
+    "say.2.neutral": [
+      "Mabuti. Umasa nga akong mapapansin mo.",
+      "Mabuti at hindi nawalang-bisa ang pagod ko.",
+      "Masarap sa pakiramdam na kinikilala 'yon.",
+      "Pinagpawisan ko 'yon. Mabuti at nakita mo.",
+      "Salamat. Malaking bagay na nakita mo ang pinaghirapan ko.",
+      "Mabuting makuha ang pagsang-ayon mo roon.",
+      "Gusto kong matiyak na tama ang pagkakagawa.",
+      "Salamat. Malaking pampalakas ng loob ang pagkilala.",
+      "Mabuti at nagbubunga ang pagod ko para sa atin.",
+      "Magandang marinig. Ipagpapatuloy ko 'yan."
+    ],
+    "say.3.neutral": [
+      "Masarap marinig 'yan galing sa 'yo.",
+      "Salamat. Dahil galing sa 'yo, may bigat 'yan.",
+      "Iginagalang ko ang opinyon mo, kaya salamat.",
+      "Nakapagbigay 'yan ng lakas sa akin. Salamat.",
+      "Salamat at narinig ko 'yan ngayong araw.",
+      "Laging magandang malaman kung ano ang tingin mo sa akin.",
+      "Salamat. Nabawasan ang pagod ko riyan.",
+      "Nagpapasalamat ako sa papuri.",
+      "Salamat. Nakakapagpalakas ng loob.",
+      "Maraming salamat. Tuloy lang tayo sa tagumpay."
+    ]
+  }
+}

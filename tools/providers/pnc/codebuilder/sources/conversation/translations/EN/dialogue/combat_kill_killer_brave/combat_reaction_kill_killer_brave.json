@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_killer_brave",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "Down. Keep moving.",
+      "Threat eliminated. Push forward.",
+      "Target down. Don't break stride.",
+      "Dead. Move through the sector.",
+      "Handled. Keep the momentum.",
+      "Downed. Advance.",
+      "One kill confirmed. Step up.",
+      "Clear here. Continue the push.",
+      "It's down. Walk through.",
+      "Finished. Keep pace."
+    ],
+    "say.2.neutral": [
+      "Got it. Watch my side.",
+      "Threat down. Cover my flank.",
+      "Took that one out. Check my blind spot.",
+      "Target eliminated. Guard the flank.",
+      "Downed. Keep eyes on my right.",
+      "Handled that one. Watch my shoulder.",
+      "It's dead. Don't let anything sneak up on us.",
+      "Dead. Keep the flank tight.",
+      "Got it. Keep looking left and right.",
+      "Finished. Watch our perimeter."
+    ],
+    "say.3.neutral": [
+      "One less. Stay sharp.",
+      "Threat neutralized. Keep your senses up.",
+      "One down. Stay alert.",
+      "Dead. Don't get complacent.",
+      "Count one off. Eyes everywhere.",
+      "Downed. Keep your edge.",
+      "One less danger. Stay focused.",
+      "Target gone. Keep watching corners.",
+      "Handled. Vigilance stays up.",
+      "One less threat. Keep your weapon ready."
+    ]
+  }
+}

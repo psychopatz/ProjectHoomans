@@ -1,0 +1,10 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "set",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": "Itakda natin ang lugar na ito bilang teritoryo natin.",
+    "reply.blocked.say.variants.default": "Hindi ako kabilang sa settlement mo.",
+    "reply.accepted.say.variants.default": "Naitakda na ang teritoryo."
+  }
+}

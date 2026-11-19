@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "medical.distress.teammate",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": [
+      "Nasaktan sila! Samahan mo sila habang binabantayan ko kayo.",
+      "Bagsak ang kasama natin! Gamutin mo, babantayan ko kayo.",
+      "Sugatan sila! Bendahan mo habang nagmamasid ako.",
+      "Tignan mo sila ngayon din! Haharangin ko ang mga kalaban.",
+      "Tinamaan sila! Tingnan mo ang sugat nila, nakabantay ako.",
+      "Sugatan ang kasama! Maglapat ng first aid, hawak ko likod niyo.",
+      "Dumurugo sila! Gamutin mo habang binabantayan ko ang paligid.",
+      "Tulungan mo silang tumayo! Lilinisin ko ang daanan.",
+      "Kailangan nila ng lunas! Gamutin mo, poprotektahan ko kayong dalawa.",
+      "Nasaktan ang kaibigan natin! Tulungan mo sila, nakabantay ako."
+    ],
+    "say.variants.found": [
+      "Nakahanap ako ng benda para sa kanila. Huwag kang gagalaw habang ginagamot ko sila.",
+      "May pambenda ako rito. Binabalot ko na ang sugat ngayon.",
+      "Nakahanap ako ng gamot! Kapit lang, ginagamot ko na ang pinsala.",
+      "May malinis akong tela. Manatiling nakapirmi habang itinatali ko.",
+      "May nahanap na benda. Dinidiinan ko na ang hiwa nila.",
+      "May medical wrap ako. Huwag kang pumalag, inaayos ko na.",
+      "May nahanap na gamit para sa kanila. Binabalot ko na nang mahigpit.",
+      "Handa na ang benda. Nilalapat ko na sa sugat.",
+      "May gamit ako rito. Huwag gagalaw, magiging maayos ka rin agad.",
+      "Hawak ko na ang benda! Ginagamot ko na ang mga sugat nila."
+    ],
+    "say.variants.missing": [
+      "Naubusan ako ng benda! May makakapagbahagi ba ng isa para sa kanila?",
+      "Wala nang telang panggamot! May benda ba ang kahit sino sa inyo?!",
+      "Walang laman ang bag ko para sa benda! Tulungan niyo sila, bilis!",
+      "Hindi ko magagamot ang sugat na 'to nang walang gamit! Tignan ang mga bag niyo!",
+      "Wala na tayong first aid! Sino may malinis na basahan?!",
+      "Wala sa akin ang kailangan para mapatigil ang dugo nila! Maghanap ng gamit!",
+      "Ubos na ang benda! May mag-abot sa akin ng panggamot!",
+      "Wala akong hawak! Kailangan natin ng benda para sa kaibigan natin ngayon din!",
+      "Walang antiseptic, walang benda. Maghalughog sa mga drawer, bilis!",
+      "Hindi ko sila kayang gamutin mag-isa! Sino may kagamitang medikal?!"
+    ]
+  }
+}

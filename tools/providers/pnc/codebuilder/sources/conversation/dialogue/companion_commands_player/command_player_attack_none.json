@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "{addressee.name}, stay out of the fight.",
-            "Avoid trouble, {addressee.name}.",
-            "{addressee.name}, don't engage unless I change the order."
-          ],
-          "TL": [
-            "{addressee.name}, huwag sumali sa laban.",
-            "Iwasan ang gulo, {addressee.name}.",
-            "{addressee.name}, huwag lumaban hangga't hindi ko binabago ang utos."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

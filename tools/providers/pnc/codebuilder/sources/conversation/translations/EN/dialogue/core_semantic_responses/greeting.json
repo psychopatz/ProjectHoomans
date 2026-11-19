@@ -1,0 +1,10 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "greeting",
+  "locale": "EN",
+  "entries": {
+    "say.variants.greeting.dataset.holding_up": "Hey. How are you holding up?",
+    "say.variants.greeting.dataset.good_to_see": "Good to see you again.",
+    "say.variants.greeting.dataset.how_things": "Hey. How are things going?"
+  }
+}

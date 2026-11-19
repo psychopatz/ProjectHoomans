@@ -1,0 +1,67 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "task.wait_at",
+  "locale": "EN",
+  "entries": {
+    "reply.admitted.say.variants.default": [
+      "Okay, I'll wait there.",
+      "Understood. Moving to the waiting spot.",
+      "I'll go stand by over there.",
+      "All right, I'll wait at that position.",
+      "Heading to the waypoint to wait.",
+      "Understood. I will hold that ground.",
+      "Right. Setting up to wait there.",
+      "I'll wait at the assigned marker.",
+      "Moving to wait as ordered.",
+      "Sounds good. Going to wait there."
+    ],
+    "reply.active.say.variants.default": [
+      "Waiting here now.",
+      "Currently holding position and waiting.",
+      "Standing by at the designated spot.",
+      "Waiting at this location as ordered.",
+      "Keeping watch while waiting right here.",
+      "Holding at the marker.",
+      "Waiting quietly. Eyes open.",
+      "In position and waiting.",
+      "Stationary at the post.",
+      "Waiting here. Take your time."
+    ],
+    "reply.completed.say.variants.default": [
+      "Finished waiting.",
+      "Done waiting. What's the next move?",
+      "Wait time concluded. Ready for orders.",
+      "Held the spot. Standing down now.",
+      "Waiting task complete.",
+      "Done holding this ground.",
+      "Time is up. Finished waiting here.",
+      "Rejoining you. Wait is over.",
+      "Held the post as long as needed.",
+      "Completed the wait order."
+    ],
+    "reply.rejected.say.variants.default": [
+      "I can't wait there right now.",
+      "That spot is in the line of fire. I won't wait there.",
+      "Standing out in the open like that is suicide.",
+      "Refusing to wait in an unsecured position.",
+      "Too many hostiles nearby to just stand around.",
+      "I need to stay on the move. Can't wait there.",
+      "Wait order rejected. Find a safer spot.",
+      "I won't wait in a compromised sector.",
+      "Unable to comply. That location has zero cover.",
+      "I can't wait at that position."
+    ],
+    "reply.failed.say.variants.default": [
+      "I couldn't wait there.",
+      "Position was overrun. Couldn't keep waiting.",
+      "Enemies forced me out of the waiting spot.",
+      "Couldn't reach the designated waiting location.",
+      "Unable to hold ground there. Too dangerous.",
+      "Waiting failed. Had to relocate for safety.",
+      "Aborted waiting. Sector became hostile.",
+      "I had to abandon the post.",
+      "Could not remain stationary there.",
+      "Failed to hold the wait point."
+    ]
+  }
+}

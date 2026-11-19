@@ -10,7 +10,7 @@ return {
         },
         ["domain"] = "medical_distress",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/MedicalDistress/MedicalDistressToMedicalDistressRepeat",
+            "PNC/ConvoEngine/Dialogue/MedicalDistress",
         },
         ["id"] = "medical.distress",
         ["kind"] = "dialogue",
@@ -19,7 +19,7 @@ return {
     ["medical.distress.call"] = {
         ["domain"] = "medical_distress",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/MedicalDistress/MedicalDistressToMedicalDistressRepeat",
+            "PNC/ConvoEngine/Dialogue/MedicalDistress",
         },
         ["id"] = "medical.distress.call",
         ["kind"] = "dialogue",
@@ -31,7 +31,7 @@ return {
     ["medical.distress.repeat"] = {
         ["domain"] = "medical_distress",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/MedicalDistress/MedicalDistressToMedicalDistressRepeat",
+            "PNC/ConvoEngine/Dialogue/MedicalDistress",
         },
         ["id"] = "medical.distress.repeat",
         ["kind"] = "dialogue",
@@ -43,7 +43,7 @@ return {
     ["medical.distress.teammate"] = {
         ["domain"] = "medical_distress",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/MedicalDistress/TeammateToUpdate",
+            "PNC/ConvoEngine/Dialogue/MedicalDistress",
         },
         ["id"] = "medical.distress.teammate",
         ["kind"] = "dialogue",
@@ -55,7 +55,7 @@ return {
     ["medical.distress.update"] = {
         ["domain"] = "medical_distress",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/MedicalDistress/TeammateToUpdate",
+            "PNC/ConvoEngine/Dialogue/MedicalDistress",
         },
         ["id"] = "medical.distress.update",
         ["kind"] = "dialogue",

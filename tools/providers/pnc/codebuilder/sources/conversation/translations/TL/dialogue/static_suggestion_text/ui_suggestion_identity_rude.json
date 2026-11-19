@@ -1,0 +1,20 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.identity.rude",
+  "locale": "TL",
+  "entries": {
+    "affordance.label": "Huwag sabihin ang pangalan",
+    "say.1.neutral": [
+      "Wala ka nang pakialam.",
+      "Hindi mo kailangan ang pangalan ko.",
+      "Hindi ko ibibigay ang pangalan ko sa'yo.",
+      "Huwag mo nang alamin ang pangalan ko.",
+      "Wala kang kinalaman doon.",
+      "Kalimutan mo na. Hindi mo kailangang malaman.",
+      "Hindi para sa'yo ang pangalan ko.",
+      "Hindi ako obligadong magpakilala sa'yo."
+    ],
+    "textRows.suggestion.identity.rude.label": "Huwag sabihin ang pangalan",
+    "textRows.suggestion.identity.rude.utterance": "Wala ka nang pakialam."
+  }
+}

@@ -13,14 +13,6 @@ return {
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
                 },
-                ["translations"] = {
-                    ["EN"] = {
-                        "Before all this, I was %1.",
-                    },
-                    ["TL"] = {
-                        "Bago ang lahat ng ito, ako ay %1.",
-                    },
-                },
             },
             {
                 ["dialogueAct"] = "KNOWN",
@@ -29,14 +21,6 @@ return {
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
-                },
-                ["translations"] = {
-                    ["EN"] = {
-                        "I studied %1.",
-                    },
-                    ["TL"] = {
-                        "Nag-aral ako ng %1.",
-                    },
                 },
             },
             {
@@ -47,14 +31,6 @@ return {
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
                 },
-                ["translations"] = {
-                    ["EN"] = {
-                        "My family was %1.",
-                    },
-                    ["TL"] = {
-                        "Ang pamilya ko ay %1.",
-                    },
-                },
             },
             {
                 ["dialogueAct"] = "KNOWN",
@@ -63,14 +39,6 @@ return {
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFear",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
-                },
-                ["translations"] = {
-                    ["EN"] = {
-                        "I have always been afraid of %1.",
-                    },
-                    ["TL"] = {
-                        "Palagi akong natatakot sa %1.",
-                    },
                 },
             },
             {
@@ -81,14 +49,6 @@ return {
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
                 },
-                ["translations"] = {
-                    ["EN"] = {
-                        "I worked as %1 before all this.",
-                    },
-                    ["TL"] = {
-                        "Nagtrabaho ako bilang %1 bago ang lahat ng ito.",
-                    },
-                },
             },
             {
                 ["dialogueAct"] = "KNOWN",
@@ -97,14 +57,6 @@ return {
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryHobby",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
-                },
-                ["translations"] = {
-                    ["EN"] = {
-                        "I used to enjoy %1.",
-                    },
-                    ["TL"] = {
-                        "Mahilig ako noon sa %1.",
-                    },
                 },
             },
             {
@@ -115,14 +67,6 @@ return {
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
                 },
-                ["translations"] = {
-                    ["EN"] = {
-                        "I grew up in %1.",
-                    },
-                    ["TL"] = {
-                        "Lumaki ako sa %1.",
-                    },
-                },
             },
             {
                 ["dialogueAct"] = "KNOWN",
@@ -131,14 +75,6 @@ return {
                 ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy",
                 ["translationArgs"] = {
                     ["content"] = "fact_content",
-                },
-                ["translations"] = {
-                    ["EN"] = {
-                        "Something happened: %1.",
-                    },
-                    ["TL"] = {
-                        "May nangyari: %1.",
-                    },
                 },
             },
         },

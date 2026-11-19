@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Take care, {addressee.name}.",
-            "See you around, {addressee.name}.",
-            "Stay safe, {addressee.name}."
-          ],
-          "TL": [
-            "Mag-ingat, {addressee.name}.",
-            "Kita tayo, {addressee.name}.",
-            "Manatiling ligtas, {addressee.name}."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

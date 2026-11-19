@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.attack_none",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "I'll avoid trouble.",
+      "Holding fire. Keeping passive.",
+      "Staying out of fights.",
+      "Understood. Ceasing all attacks.",
+      "I won't provoke anything.",
+      "Keeping my weapon stowed.",
+      "Pacifist stance. Understood.",
+      "I'll steer clear of hostiles.",
+      "Standing down from combat.",
+      "No attacking. Got it."
+    ]
+  }
+}

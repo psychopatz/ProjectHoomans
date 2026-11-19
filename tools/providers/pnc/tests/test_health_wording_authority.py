@@ -172,29 +172,29 @@ class HealthWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
         expected = {
             "EN": {
                 "injured": (
-                    "conversation.content.semantic.question.health_state.injured.neutral.01",
+                    "convo.question.health_state.reply.injured.say.1.neutral.1",
                     "I'm hurt, but I'm managing.",
                 ),
                 "healthy": (
-                    "conversation.content.semantic.question.health_state.healthy.neutral.01",
+                    "convo.question.health_state.reply.healthy.say.1.neutral.1",
                     "I'm doing okay.",
                 ),
                 "unknown": (
-                    "conversation.content.semantic.question.health_state.unknown.neutral.01",
+                    "convo.question.health_state.reply.unknown.say.1.neutral.1",
                     "I can't confirm my health status right now.",
                 ),
             },
             "TL": {
                 "injured": (
-                    "conversation.content.semantic.question.health_state.injured.neutral.01",
+                    "convo.question.health_state.reply.injured.say.1.neutral.1",
                     "Nasaktan ako, pero kinakaya ko.",
                 ),
                 "healthy": (
-                    "conversation.content.semantic.question.health_state.healthy.neutral.01",
+                    "convo.question.health_state.reply.healthy.say.1.neutral.1",
                     "Ayos lang ako.",
                 ),
                 "unknown": (
-                    "conversation.content.semantic.question.health_state.unknown.neutral.01",
+                    "convo.question.health_state.reply.unknown.say.1.neutral.1",
                     "Hindi ko makumpirma ang kalagayan ko ngayon.",
                 ),
             },

@@ -233,8 +233,8 @@ local function buildIdentityOption(Provider, context, spec)
     if type(speechText) ~= "string" or trimText(speechText) == "" then
         return nil
     end
-    local labelFallback = (type(enLabel) == "string" and trimText(enLabel) ~= "")
-        and enLabel or spec.fallbackLabel
+    local labelFallback = spec.fallbackLabel
+        or ((type(enLabel) == "string" and trimText(enLabel) ~= "") and enLabel or "")
     local labelDisplay = (type(realizedLabel) == "string" and trimText(realizedLabel) ~= "")
         and realizedLabel or labelFallback
     local socialContext = {}
@@ -308,7 +308,7 @@ local function identityChoiceCandidates(context, Provider, IdentityAlias)
             claimMode = "canonical",
             claimedName = source.playerName,
             responseStyle = nil,
-            labelKey = "UI_PNC_Conversation_Suggestion_Identity_Real_Label",
+            labelKey = "convo.ui.suggestion.identity.real.affordance.label",
             fallbackLabel = "Say your real name",
             rank = 10,
         },
@@ -320,7 +320,7 @@ local function identityChoiceCandidates(context, Provider, IdentityAlias)
             claimMode = nil,
             claimedName = nil,
             responseStyle = "rude",
-            labelKey = "UI_PNC_Conversation_Suggestion_Identity_Rude_Label",
+            labelKey = "convo.ui.suggestion.identity.rude.affordance.label",
             fallbackLabel = "Don't tell your name",
             rank = 20,
         },
@@ -332,7 +332,7 @@ local function identityChoiceCandidates(context, Provider, IdentityAlias)
             claimMode = "generated",
             claimedName = alias,
             responseStyle = nil,
-            labelKey = "UI_PNC_Conversation_Suggestion_Identity_Lie_Label",
+            labelKey = "convo.ui.suggestion.identity.lie.affordance.label",
             fallbackLabel = "Lie about your name",
             rank = 30,
         },

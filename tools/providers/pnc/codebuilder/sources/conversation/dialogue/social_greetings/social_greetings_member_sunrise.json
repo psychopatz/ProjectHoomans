@@ -36,62 +36,26 @@
     "responseAct": "GREETING",
     "textRows": [
       {
-        "key": "greeting.001",
-        "text": {
-          "EN": "Morning. Ready when you are.",
-          "TL": "Umaga. Handa kung kailan ka na."
-        }
+        "key": "greeting.001"
       },
       {
-        "key": "greeting.002",
-        "text": {
-          "EN": "Good, you're here. What are we doing today?",
-          "TL": "Buti nandito ka. Ano ang ginagawa natin ngayon?"
-        }
+        "key": "greeting.002"
       },
       {
-        "key": "greeting.003",
-        "text": {
-          "EN": "Another day with the crew. Could be worse.",
-          "TL": "Panibagong araw kasama ang crew. Maaaring mas masahol pa."
-        }
+        "key": "greeting.003"
       },
       {
-        "key": "greeting.004",
-        "text": {
-          "EN": "Morning. Supplies are holding for now.",
-          "TL": "Umaga. Ang mga suplay ay hawak sa ngayon."
-        }
+        "key": "greeting.004"
       },
       {
-        "key": "greeting.005",
-        "text": {
-          "EN": "I was about to look for you. What's up?",
-          "TL": "Hinahanap na sana kita. Anong meron?"
-        }
+        "key": "greeting.005"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Morning. Ready when you are.",
-            "Good, you're here. What are we doing today?",
-            "Another day with the crew. Could be worse.",
-            "Morning. Supplies are holding for now.",
-            "I was about to look for you. What's up?"
-          ],
-          "TL": [
-            "Umaga. Handa kung kailan ka na.",
-            "Buti nandito ka. Ano ang ginagawa natin ngayon?",
-            "Panibagong araw kasama ang crew. Maaaring mas masahol pa.",
-            "Umaga. Ang mga suplay ay hawak sa ngayon.",
-            "Hinahanap na sana kita. Anong meron?"
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

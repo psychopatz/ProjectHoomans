@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.whats_up.default",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Not much. I'm just trying to keep things together.",
+      "Just another day trying to stay alive and in one piece.",
+      "Taking things as they come. Anything interesting happening?",
+      "Not a whole lot. Keeping an eye on the surroundings.",
+      "Just waiting to see what the afternoon brings.",
+      "Ordinary day out here, if you can call this ordinary.",
+      "Just trying to make it to sundown without issues.",
+      "Holding down the fort. How are things with you?",
+      "Quiet so far. That's usually a blessing.",
+      "Not much news. Just staying out of harm's way."
+    ],
+    "say.variants.guarded": [
+      "Nothing worth discussing. Stay alert.",
+      "Same old story. Don't let your guard down.",
+      "Just watching the perimeter. You should do the same.",
+      "Nothing new, and quiet usually means trouble is brewing.",
+      "Nothing to share. Keep moving along.",
+      "Surviving another day. That's about it.",
+      "I keep my thoughts to myself out here.",
+      "All quiet on my watch. Keep your distance.",
+      "Not much, and I'd like to keep it that way.",
+      "Nothing you need to concern yourself with."
+    ],
+    "say.variants.terse": [
+      "Just getting by.",
+      "Not much.",
+      "Quiet.",
+      "Same as ever.",
+      "Still here.",
+      "Nothing new.",
+      "All calm.",
+      "Surviving.",
+      "Holding on.",
+      "Taking it slow."
+    ],
+    "say.variants.warm": [
+      "Not much. I'm just trying to keep things together. Good to see you, though.",
+      "Just grateful to see another sunrise. It's lovely having you here.",
+      "Not much happening, but having good folks around brightens the day.",
+      "Just taking it easy for a moment. Really glad you stopped to talk.",
+      "Things are calm today, thank goodness. How has your day been going?",
+      "Nothing out of the ordinary, but seeing you always lifts my spirits.",
+      "Holding steady with a smile. Hope everything is smooth on your side.",
+      "Just soaking in the peace while it lasts. Good to see you, friend.",
+      "Counting my blessings out here. Having reliable people is number one.",
+      "Nothing major, just glad we're both standing. How's everything with you?"
+    ]
+  }
+}

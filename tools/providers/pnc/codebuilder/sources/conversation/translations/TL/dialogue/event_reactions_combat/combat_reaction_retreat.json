@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.retreat",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Kailangan ko muna ng saglit bago makahataw ulit.",
+      "Mabigat ang mga braso ko. Bigyan mo ako ng saglit.",
+      "Aatras muna! Kailangang makabawi ng lakas.",
+      "Hinihingal ako! Umatras muna nang kaunti.",
+      "Hindi ko kayang tuloy-tuloy ang hataw. Aatras muna.",
+      "Bigyan mo ako ng puwang para makahinga.",
+      "Masyado akong pagod para humampas. Umuurong muna.",
+      "Kailangan ko ng sampung segundo para ipagpag ang braso ko.",
+      "Atras! Sagad na ang hingal ko.",
+      "Umatras! Pahingahin mo muna ako."
+    ]
+  }
+}

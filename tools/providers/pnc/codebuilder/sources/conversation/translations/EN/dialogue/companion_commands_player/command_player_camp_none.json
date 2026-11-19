@@ -1,0 +1,10 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.player.camp_none",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "..."
+    ]
+  }
+}

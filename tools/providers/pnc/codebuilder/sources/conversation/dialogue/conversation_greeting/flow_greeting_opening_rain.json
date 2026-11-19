@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Hey there. Wet one today.",
-            "Rain's not letting up anytime soon.",
-            "Keep dry if you can out there.",
-            "Miserable weather, but we're still kicking.",
-            "Ground's completely soaked out there.",
-            "Cold rain like this makes everything harder.",
-            "Watch your footing in this mud.",
-            "Rain makes it hard to hear them coming. Stay alert.",
-            "Good day to stay under a solid roof if you've got one.",
-            "At least the rain washes away the tracks. Stay dry."
-          ],
-          "TL": [
-            "Uy, maulan ngayon.",
-            "Mukhang hindi titigil ang ulan agad.",
-            "Magpatuyo ka kung kaya mo sa labas.",
-            "Masamang panahon, pero buhay pa rin tayo.",
-            "Babad na babad ang lupa sa labas.",
-            "Ang malamig na ulan na ito ang nagpapahirap sa lahat.",
-            "Mag-ingat sa paghakbang sa putikan.",
-            "Mahirap silang marinig dahil sa ulan. Maging alerto ka.",
-            "Magandang araw para sumilong sa maayos na bubong.",
-            "Kahit papaano nabubura ng ulan ang mga bakas. Manatiling tuyo."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

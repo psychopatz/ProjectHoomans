@@ -9,23 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Make camp here, {addressee.name}.",
-            "Settle in here, {addressee.name}.",
-            "We'll camp here for now, {addressee.name}.",
-            "We could make camp here, {addressee.name}.",
-            "Let's make this our camp, {addressee.name}."
-          ],
-          "TL": [
-            "Magkampo tayo rito, {addressee.name}.",
-            "Manatili tayo rito, {addressee.name}.",
-            "Magkakampo muna tayo rito, {addressee.name}.",
-            "Maaari tayong magkampo rito, {addressee.name}.",
-            "Gawin nating kampo ito, {addressee.name}."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

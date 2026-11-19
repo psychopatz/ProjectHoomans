@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greetings.acquaintance.sunset",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Hey. Isang mahabang araw?",
+      "Magandang timing. Malapit na akong tumira.",
+      "Narito ka pala. May nakita ka bang kapaki-pakinabang ngayon?",
+      "Palubog na ang araw. Anong meron?",
+      "Mukha kang pagod. Ayos ka lang ba?"
+    ],
+    "textRows.greeting.001": "Hey. Isang mahabang araw?",
+    "textRows.greeting.002": "Magandang timing. Malapit na akong tumira.",
+    "textRows.greeting.003": "Narito ka pala. May nakita ka bang kapaki-pakinabang ngayon?",
+    "textRows.greeting.004": "Palubog na ang araw. Anong meron?",
+    "textRows.greeting.005": "Mukha kang pagod. Ayos ka lang ba?"
+  }
+}

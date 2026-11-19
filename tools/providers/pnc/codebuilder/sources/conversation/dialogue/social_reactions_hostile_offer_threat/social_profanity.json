@@ -122,15 +122,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Watch your language."
-          ],
-          "TL": [
-            "Mag-ingat ka sa pananalita mo."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

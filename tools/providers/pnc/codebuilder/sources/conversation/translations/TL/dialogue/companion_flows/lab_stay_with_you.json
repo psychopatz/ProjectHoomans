@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "pnc.lab.stay_with_you",
+  "locale": "TL",
+  "entries": {
+    "say.variants.accepted": "Sige, mananatili ako sa iyo."
+  }
+}

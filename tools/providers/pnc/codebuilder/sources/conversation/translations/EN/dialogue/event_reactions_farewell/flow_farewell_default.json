@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.default",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Take care.",
+      "Stay safe out there.",
+      "Watch yourself.",
+      "Until next time.",
+      "Keep your guard up.",
+      "Stay sharp on the road.",
+      "Catch you later.",
+      "Safe travels.",
+      "Keep breathing out there.",
+      "See you around."
+    ]
+  }
+}

@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I hear you.",
-              "I hear your praise.",
-              "Heard and appreciated.",
-              "I hear what you said about my work.",
-              "Got that positive feedback.",
-              "I hear you clearly. Thanks.",
-              "Praise heard. Good to know.",
-              "I hear the support.",
-              "Heard. Glad to help.",
-              "I hear you. We did good."
-            ],
-            "TL": [
-              "Narinig kita.",
-              "Naririnig ko ang papuri mo.",
-              "Narinig at pinahahalagahan.",
-              "Narinig ko ang sinabi mo sa trabaho ko.",
-              "Nakuha ko ang magandang puna.",
-              "Naririnig kita nang malinaw. Salamat.",
-              "Narinig ang papuri. Mabuting malaman.",
-              "Naririnig ko ang suporta.",
-              "Narinig. Masayang tumulong.",
-              "Narinig kita. Maganda ang nagawa natin."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I will remember that.",
-              "I'll keep that positive note in mind.",
-              "I won't forget that you recognized my effort.",
-              "That will stay with me. Thanks.",
-              "I'll remember you said that when times get tough.",
-              "Remembered and valued.",
-              "I will hold onto that praise.",
-              "That sticks in my memory. Thank you.",
-              "I'll remember your good words.",
-              "Noted in my heart. Thanks."
-            ],
-            "TL": [
-              "Tandaan ko iyan.",
-              "Isasaisip ko ang magandang sinabi mo.",
-              "Di ko malilimutan na kinilala mo ang pagod ko.",
-              "Mananatili sa akin 'yan. Salamat.",
-              "Tandaan ko 'yan kapag naging mahirap ang panahon.",
-              "Tanda ko at pinahahalagahan.",
-              "Iingatan ko ang papuring 'yan.",
-              "Tumatatak 'yan sa alaala ko. Salamat.",
-              "Tatandaan ko ang mabubuti mong salita.",
-              "Nakatatak sa puso ko. Salamat."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

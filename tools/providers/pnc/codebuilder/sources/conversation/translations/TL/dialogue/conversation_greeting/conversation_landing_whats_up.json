@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "conversation.landing.whats_up",
+  "locale": "TL",
+  "entries": {
+    "playerChoice.label": "Ano ang balita",
+    "playerChoice.choice": "Ano ang balita?"
+  }
+}

@@ -9,62 +9,10 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Take care.",
-            "See you around.",
-            "Watch your back out there.",
-            "Until next time.",
-            "Stay safe.",
-            "Keep your guard up on the way.",
-            "Catch you later.",
-            "Farewell for now.",
-            "Keep your head down.",
-            "See you when you get back."
-          ],
-          "TL": [
-            "Mag-ingat ka.",
-            "Magkita na lang tayo mamaya.",
-            "Bantayan mo ang likod mo sa labas.",
-            "Hanggang sa muli.",
-            "Manatiling ligtas.",
-            "Huwag ibaba ang bantay habang naglalakad.",
-            "Usap na lang tayo mamaya.",
-            "Paalam muna sa ngayon.",
-            "Yumuko ka sa panganib.",
-            "Kita tayo pagbalik mo."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "Goodbye. Come back in one piece.",
-            "Take good care of yourself, friend.",
-            "See you soon. Don't do anything reckless.",
-            "I'll be waiting right here. Stay safe.",
-            "Farewell for now. Looking forward to our next talk.",
-            "Safe travels out there. Keep your wits about you.",
-            "Goodbye! Make sure you make it back.",
-            "Catch you later, partner. Be careful.",
-            "Take care. I'll keep the fire going.",
-            "See you later. Stay alive out there."
-          ],
-          "TL": [
-            "Paalam. Bumalik ka nang buo.",
-            "Ingatan mo nang maayos ang sarili mo, kaibigan.",
-            "Magkita tayo agad. Huwag kang gagawa ng padalos-dalos.",
-            "Maghihintay ako rito. Mag-ingat ka.",
-            "Paalam muna. Inaasahan ko ang susunod nating usapan.",
-            "Ligtas na paglalakbay sa labas. Gamitin lagi ang isip.",
-            "Paalam! Tiyakin mong makababalik ka.",
-            "Kita tayo mamaya, kasama. Mag-iingat ka.",
-            "Mag-ingat ka. Pananatilihin kong may apoy rito.",
-            "Kita tayo mamaya. Manatiling buhay sa labas."
-          ]
-        }
+        "id": "warm"
       }
     ]
   },

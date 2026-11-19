@@ -22,10 +22,6 @@
       }
     ]
   },
-  "textSidecars": {
-    "EN": "translations/interaction_first_contact_challenge.en.json",
-    "TL": "translations/interaction_first_contact_challenge.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

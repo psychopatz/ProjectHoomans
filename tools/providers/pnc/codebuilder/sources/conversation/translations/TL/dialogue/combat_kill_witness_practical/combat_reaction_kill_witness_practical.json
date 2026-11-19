@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_witness_practical",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Ayos. Suriin natin ang paligid.",
+      "Magandang patay. Magmasid bago lumapit.",
+      "Bagsak ang target. Linisin ang mga sulok.",
+      "Magandang pagpabagsak. Tignan kung may pumapaligid.",
+      "Bagsak na. Bantayan ang mga anino.",
+      "Solidong tama. Siguraduhin muna ang kwarto.",
+      "Maayos na napigilan. Huwag lalabas nang hindi nagmamasid.",
+      "Banta naalis. Tumingin sa buong paligid.",
+      "Malinis na tama. Tiyaking ligtas ang paligid.",
+      "Naibagsak mo. Magmasid bago magpatuloy."
+    ],
+    "say.2.neutral": [
+      "Isa na. Bantayan ang iba.",
+      "Magandang tama. Asahan ang mga naiwan.",
+      "Isa 'yan. Huwag ipalagay na malinis na ang lugar.",
+      "Bagsak. Makinig kung may mga yabag pa.",
+      "Isa ang tinanggal. Bantayan ang mga bintana.",
+      "Patay ang banta. Maging alerto sa mga susunod.",
+      "Naasikaso 'yon. Bantayan ang pasilyo.",
+      "Isa sa lupa. Panatilihing nakataas ang depensa.",
+      "Magandang pagtumba. Baka may iba pang malapit.",
+      "Bagsak. Buksan ang pandinig."
+    ],
+    "say.3.neutral": [
+      "Maganda. Siguraduhin nating malinaw ang paligid.",
+      "Malinis na pagbagsak. Kumpirmahin ang buong bahagi.",
+      "Magandang tama. Tignan sa likod ng lahat ng pinto.",
+      "Bagsak ang target. Kumpirmahing wala nang galaw.",
+      "Magaling. Linisin natin ang natitira sa kwarto.",
+      "Banta naalis. Maingat na pagsusuri ang susunod.",
+      "Solidong patay. Sabay nating linisin ang paligid.",
+      "Malinis na naibagsak. Tiyaking bukas ang labasan natin.",
+      "Naasikaso na. Siguruhing walang gumagapang palapit.",
+      "Magandang trabaho. Tiyakin nating malinis ang daan."
+    ]
+  }
+}

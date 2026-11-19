@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.player.thankyou",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Salamat, {addressee.name}.",
+      "Pinahahalagahan ko iyan, {addressee.name}.",
+      "Salamat sa iyo, {addressee.name}."
+    ]
+  }
+}

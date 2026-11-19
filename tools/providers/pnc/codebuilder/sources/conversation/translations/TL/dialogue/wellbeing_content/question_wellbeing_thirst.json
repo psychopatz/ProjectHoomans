@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.thirst",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Uhaw na uhaw ako. Maaari ba akong makahingi ng tubig?",
+      "Tuyong-tuyo ang lalamunan ko. May malinis ka bang tubig?",
+      "Kailangan ko na talagang uminom. Nauuhaw na ako nang husto.",
+      "Kailangan ko ng kahit kaunting lagok ng tubig kung mayroon ka.",
+      "Pinapabagal talaga ako ng uhaw ngayong araw.",
+      "Natuyo na ang lalagyan ko kanina pa. May tubig ka ba?",
+      "Kailangang-kailangan ko ng maiinom na sariwang tubig ngayon.",
+      "Tuyot na tuyot ang bibig ko. Makakahingi ba ng kaunting tubig?",
+      "Kailangan ko ng tubig bago pa sumakit ang ulo ko sa uhaw.",
+      "May sobra ka bang botelya ng tubig? Uhaw na uhaw na ako."
+    ]
+  }
+}

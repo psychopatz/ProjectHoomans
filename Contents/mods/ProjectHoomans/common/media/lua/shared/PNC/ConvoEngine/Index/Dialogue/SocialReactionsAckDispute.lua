@@ -8,7 +8,7 @@ return {
         },
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/AcknowledgedToDisputeTrusted",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
         },
         ["id"] = "social.acknowledged",
         ["kind"] = "dialogue",
@@ -17,7 +17,7 @@ return {
     ["social.dispute_friendly"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/AcknowledgedToDisputeTrusted",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
         },
         ["id"] = "social.dispute_friendly",
         ["kind"] = "dialogue",
@@ -26,7 +26,7 @@ return {
     ["social.dispute_stressed"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/AcknowledgedToDisputeTrusted",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
         },
         ["id"] = "social.dispute_stressed",
         ["kind"] = "dialogue",
@@ -35,7 +35,7 @@ return {
     ["social.dispute_trusted"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/AcknowledgedToDisputeTrusted",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
         },
         ["id"] = "social.dispute_trusted",
         ["kind"] = "dialogue",
@@ -44,7 +44,7 @@ return {
     ["social.dispute_withdrawn"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/DisputeWithdrawnToReactionResponses",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
         },
         ["id"] = "social.dispute_withdrawn",
         ["kind"] = "dialogue",
@@ -56,7 +56,7 @@ return {
         },
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/DisputeWithdrawnToReactionResponses",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
         },
         ["id"] = "social.hostile_boundary",
         ["kind"] = "dialogue",
@@ -65,7 +65,7 @@ return {
     ["social.reaction.responses"] = {
         ["domain"] = "social_reactions_ack_dispute",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute/DisputeWithdrawnToReactionResponses",
+            "PNC/ConvoEngine/Dialogue/SocialReactionsAckDispute",
         },
         ["id"] = "social.reaction.responses",
         ["kind"] = "dialogue",

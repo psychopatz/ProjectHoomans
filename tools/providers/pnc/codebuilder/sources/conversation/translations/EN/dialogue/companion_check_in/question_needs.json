@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.needs",
+  "locale": "EN",
+  "entries": {
+    "affordance.label": "Ask about needs",
+    "say.variants.default": "Do you need anything?"
+  }
+}

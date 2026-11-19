@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.queued_generic",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Narinig kita.",
+      "Naiintindihan ko.",
+      "Natanggap ang mensahe.",
+      "Nakuha ko.",
+      "Narinig ko ang sinabi mo.",
+      "Narinig.",
+      "Makatwiran. Narinig kita.",
+      "Tala ang punto.",
+      "Nakikinig ako.",
+      "Kinikilala ko."
+    ],
+    "say.2.neutral": [
+      "Bigyan mo ako ng sandali.",
+      "Teka sandali lang.",
+      "Hayaan mong tapusin ko muna ang ginagawa ko.",
+      "Sandali lang.",
+      "Bigyan mo ako ng kaunting oras.",
+      "Teka lang saglit.",
+      "Kailangan ko ng sandali para pag-isipan 'yan.",
+      "Dahan-dahan lang sandali.",
+      "Bigyan mo ako ng maikling sandali.",
+      "Isang segundo. May inaasikaso pa ako ngayon."
+    ]
+  }
+}

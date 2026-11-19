@@ -404,7 +404,7 @@ class SemanticHarnessTests(WarmWorkerTestMixin, unittest.TestCase):
         self.assertEqual(name_reply["toolCalls"][0]["label"], "ask_name")
         self.assertTrue(any(
             lookup["key"].startswith(
-                "conversation.content.semantic.tool_reply.ask_name.named."
+                "convo.tool_reply.ask_name.named."
             )
             for lookup in name_reply["translationLookups"]
         ))
@@ -413,7 +413,7 @@ class SemanticHarnessTests(WarmWorkerTestMixin, unittest.TestCase):
         self.assertTrue(camp_reply["text"])
         self.assertTrue(any(
             lookup["key"].startswith(
-                "conversation.content.semantic.tool_reply.order_camp."
+                "convo.tool_reply.order_camp."
             )
             for lookup in camp_reply["translationLookups"]
         ))
@@ -459,7 +459,7 @@ class SemanticHarnessTests(WarmWorkerTestMixin, unittest.TestCase):
             reflection = worker.input("I'm an idiot")
         initial_payload = initial["messages"][0]["payload"]
         self.assertTrue(initial_payload["translationKey"].startswith(
-            "conversation.content.semantic.question.identity."
+            "convo.question.identity."
         ))
         self.assertNotIn("Mara", initial_payload["text"])
         self.assertTrue(any(

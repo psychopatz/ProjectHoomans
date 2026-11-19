@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.greeting.opening.rain",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Uy, maulan ngayon.",
+      "Mukhang hindi titigil ang ulan agad.",
+      "Magpatuyo ka kung kaya mo sa labas.",
+      "Masamang panahon, pero buhay pa rin tayo.",
+      "Babad na babad ang lupa sa labas.",
+      "Ang malamig na ulan na ito ang nagpapahirap sa lahat.",
+      "Mag-ingat sa paghakbang sa putikan.",
+      "Mahirap silang marinig dahil sa ulan. Maging alerto ka.",
+      "Magandang araw para sumilong sa maayos na bubong.",
+      "Kahit papaano nabubura ng ulan ang mga bakas. Manatiling tuyo."
+    ]
+  }
+}

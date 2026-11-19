@@ -1,0 +1,33 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.group",
+  "locale": "TL",
+  "entries": {
+    "say.variants.actions.label": "Mga aksyon sa usapan",
+    "say.variants.flow.label": "Kasalukuyang sangay ng usapan",
+    "say.variants.identity.label": "Pagkakakilanlan",
+    "say.variants.landing.label": "Usapan",
+    "say.variants.medical.label": "Medikal",
+    "say.variants.movement.label": "Mga utos sa kasamang pag-aari",
+    "say.variants.needs.label": "Pangangailangan",
+    "say.variants.response.label": "Sagot ng NPC",
+    "say.variants.time.label": "Oras at petsa",
+    "say.variants.utilities.label": "Mga gamit sa usapan",
+    "say.variants.weather.label": "Panahon",
+    "say.variants.wellbeing.label": "Kalagayan",
+    "say.variants.whats_up.label": "Ano ang balita",
+    "textRows.suggestion.group.actions.label": "Mga aksyon sa usapan",
+    "textRows.suggestion.group.flow.label": "Kasalukuyang sangay ng usapan",
+    "textRows.suggestion.group.identity.label": "Pagkakakilanlan",
+    "textRows.suggestion.group.landing.label": "Usapan",
+    "textRows.suggestion.group.medical.label": "Medikal",
+    "textRows.suggestion.group.movement.label": "Mga utos sa kasamang pag-aari",
+    "textRows.suggestion.group.needs.label": "Pangangailangan",
+    "textRows.suggestion.group.response.label": "Sagot ng NPC",
+    "textRows.suggestion.group.time.label": "Oras at petsa",
+    "textRows.suggestion.group.utilities.label": "Mga gamit sa usapan",
+    "textRows.suggestion.group.weather.label": "Panahon",
+    "textRows.suggestion.group.wellbeing.label": "Kalagayan",
+    "textRows.suggestion.group.whats_up.label": "Ano ang balita"
+  }
+}

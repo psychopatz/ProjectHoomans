@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.health",
+  "locale": "EN",
+  "entries": {
+    "affordance.label": "Ask about injuries",
+    "say.variants.default": "Are you hurt?"
+  }
+}

@@ -22,10 +22,6 @@
       }
     ]
   },
-  "textSidecars": {
-    "EN": "translations/interaction_scene_horde_prompt.en.json",
-    "TL": "translations/interaction_scene_horde_prompt.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

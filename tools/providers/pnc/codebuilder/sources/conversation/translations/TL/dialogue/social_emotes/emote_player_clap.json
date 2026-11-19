@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.player.clap",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Magaling, {addressee.name}.",
+      "Karapat-dapat ipagdiwang iyan, {addressee.name}.",
+      "Mahusay na trabaho, {addressee.name}."
+    ]
+  }
+}

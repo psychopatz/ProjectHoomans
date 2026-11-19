@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.player.wavehi",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Uy, {addressee.name}.",
+      "Mabuti at nakita kita, {addressee.name}.",
+      "Magandang umaga, {addressee.name}."
+    ]
+  }
+}

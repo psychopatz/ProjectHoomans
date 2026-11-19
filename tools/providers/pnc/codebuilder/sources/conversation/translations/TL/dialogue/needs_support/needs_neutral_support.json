@@ -1,0 +1,29 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "needs.neutral.support",
+  "locale": "TL",
+  "entries": {
+    "response.turn.opening.text": "May ilang bagay akong magagamit.",
+    "response.turn.opening.offer.supplies.label": "Kailangan ng anumang mga supply?",
+    "response.turn.opening.offer.supplies.utterance": "Kailangan ng anumang mga supply?",
+    "response.turn.opening.offer.supplies.responseText": "Ang pagkain at malinis na tubig ay hindi nasaktan.",
+    "response.turn.opening.offer.medical.label": "Anumang mga medikal na problema?",
+    "response.turn.opening.offer.medical.utterance": "Anumang mga medikal na problema?",
+    "response.turn.opening.offer.medical.responseText": "Wala akong kakayanin ngayon.",
+    "response.turn.opening.offer.gift.label": "Mayroon akong isang bagay na maaaring kailanganin mo.",
+    "response.turn.opening.offer.gift.utterance": "Mayroon akong isang bagay na maaaring kailanganin mo.",
+    "response.turn.opening.offer.gift.responseText": "Hayaan akong makita kung ano ang maaari mong matitira.",
+    "response.turn.gift.text": "Pumili ng ibibigay sa akin, pagkatapos ay bumalik sa usapan.",
+    "response.turn.gift.offer.gift_return.label": "Hahawakan ko ang natitira.",
+    "response.turn.gift.offer.gift_return.utterance": "Hahawakan ko ang natitira.",
+    "response.turn.gift.offer.gift_return.responseText": "Understood.",
+    "textRows.gift.offer.multiple": "Mayroon akong {giftItemSummary} para sa iyo.",
+    "textRows.gift.offer.multiple.alt": "Kunin ang mga ito kung magagamit mo ang mga ito: {giftItemSummary}.",
+    "textRows.gift.offer.single": "Narito ang {giftItemName}.",
+    "textRows.gift.offer.single.alt": "Maaari ko itong iligtas: {giftItemName}.",
+    "textRows.gift.received.equipment": "Magandang pagpipilian. Maaaring pigilan ng isang bagay na tulad nito ang masamang araw na lumala.",
+    "textRows.gift.received.food": "Hindi ito mauubos. Pinapahalagahan ko ang pagbabahagi mo nito sa akin.",
+    "textRows.gift.received.general": "Magagamit ko ito. salamat po.",
+    "textRows.gift.received.medical": "Kapaki-pakinabang iyan. Salamat sa pag-iisip nang maaga sa halip na maghintay ng krisis."
+  }
+}

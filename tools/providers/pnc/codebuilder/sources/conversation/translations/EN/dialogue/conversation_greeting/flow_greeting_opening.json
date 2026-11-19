@@ -1,0 +1,127 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.greeting.opening",
+  "locale": "EN",
+  "entries": {
+    "say.variants.default": [
+      "Hey there. Good to see you.",
+      "Hello there. How are things?",
+      "Good to see you.",
+      "Morning. Hope the day treats you well.",
+      "Hey again. What's going on?",
+      "There you are. Everything quiet?",
+      "Afternoon. Staying out of trouble?",
+      "Hello. Good to run into another living person.",
+      "Hey. How's the perimeter looking?",
+      "Evening. Still on your feet, I see."
+    ],
+    "say.variants.default.guarded": [
+      "State your business. Keep your distance.",
+      "Hold it right there. What do you want?",
+      "Hands where I can see them. Who are you?",
+      "Don't come any closer until I know your business.",
+      "Keep your hands clear. Talk from there.",
+      "I'm watching you. What brings you here?",
+      "Easy now. Step back and speak your piece.",
+      "Keep your distance. Times are too dangerous for strangers.",
+      "That's close enough. What are you looking for?",
+      "Stay where you are. I don't know you yet."
+    ],
+    "say.variants.default.terse": [
+      "Hello.",
+      "Hi.",
+      "Hey.",
+      "Morning.",
+      "There you are.",
+      "Still here.",
+      "Afternoon.",
+      "Quiet day.",
+      "You good?",
+      "Evening."
+    ],
+    "say.variants.default.warm": [
+      "Hey! It is good to see you.",
+      "Hey, good to see you in one piece.",
+      "Glad to see you. How are you holding up?",
+      "Hey. Really glad you made it back safe.",
+      "Back already? Good to have you around.",
+      "It's always a relief seeing you walk through.",
+      "Good to see you on your feet today.",
+      "Hey there! How's your day been treating you?",
+      "Always good seeing a friendly face out here.",
+      "Welcome back. Hope things were quiet out there."
+    ],
+    "say.variants.friendly": [
+      "Good to see you.",
+      "I was hoping we'd cross paths today.",
+      "Good to see you. How's the camp holding?",
+      "There you are. Ready for another day?",
+      "Back again. How's the scavenging going?",
+      "Good to see you again. Need a hand with anything?",
+      "Hey there. Glad we ran into each other.",
+      "Morning! How are things on your end?",
+      "Hey! What's the plan for today?",
+      "Good to catch up. How are you doing?"
+    ],
+    "say.variants.friendly.guarded": [
+      "Hey. Everything holding together?",
+      "Good timing. We could use your help.",
+      "Hey again. Everything quiet around here?",
+      "Back again? Keep your weapon close.",
+      "Hey. You notice anything strange out there?",
+      "Good to see you. Stay watchful though.",
+      "You made it back. Keep low and stay alert.",
+      "Glad you're safe. We've got to watch the treeline.",
+      "Hey. Hope nobody followed you in.",
+      "There you are. Let's keep our eyes sharp."
+    ],
+    "say.variants.friendly.terse": [
+      "Back again? You holding up?",
+      "Good to see you again.",
+      "Hey. How have you been?",
+      "Didn't expect to see you so soon.",
+      "Hey again. How's it going?",
+      "There you are again.",
+      "Holding steady?",
+      "Good. You're here.",
+      "All clear?",
+      "Hey. Need something?"
+    ],
+    "say.variants.friendly.warm": [
+      "There you are! Good to see you.",
+      "I was hoping I'd run into you today.",
+      "Back so soon? Glad you're safe.",
+      "I was hoping you'd come back in one piece.",
+      "There you are. You doing alright today?",
+      "Good to see you. Pull up a chair.",
+      "Always makes my day better seeing you back safe.",
+      "Hey there! Really glad you're around today.",
+      "It's good to see your face. How're you feeling?",
+      "Welcome back, my friend. Good to see you."
+    ],
+    "say.variants.question.default": [
+      "How have you been?",
+      "How are you holding up?",
+      "Everything all right with you?",
+      "How's your day going so far?",
+      "Staying safe out there?",
+      "How are things treating you today?",
+      "Feeling alright today?",
+      "Any trouble on the road?",
+      "How are you managing out here?",
+      "Everything quiet on your end?"
+    ],
+    "say.variants.question.friendly": [
+      "How have you been holding up lately?",
+      "How's the camp holding together?",
+      "Need anything while we're talking?",
+      "How's your supply situation looking?",
+      "Getting enough rest between runs?",
+      "How are you feeling about things around here?",
+      "You managing to stay warm and dry?",
+      "How are the others treating you?",
+      "Everything staying solid with you?",
+      "Good to see you. How have things been going?"
+    ]
+  }
+}

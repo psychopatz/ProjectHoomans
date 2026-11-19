@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Why did you do that?!",
-            "What the hell is wrong with you?!",
-            "Hey! Watch what you're doing!",
-            "Did you just swing at me?!",
-            "Are you trying to kill me?!",
-            "What are you thinking?! Stop it!",
-            "Whoa! Back off!",
-            "Don't hit me! What's wrong with you?!",
-            "Stop swinging at me!",
-            "Back away from me!"
-          ],
-          "TL": [
-            "Bakit mo ginawa iyon?!",
-            "Ano bang problema mo?!",
-            "Hoy! Tingnan mo ang ginagawa mo!",
-            "Hinataw mo ba ako?!",
-            "Gusto mo ba akong patayin?!",
-            "Ano bang iniisip mo?! Tigil!",
-            "Teka! Atras!",
-            "Huwag mo akong saktan! Ano bang nangyayari sa'yo?!",
-            "Huwag mo akong pagbantaan!",
-            "Umatras ka palayo sa akin!"
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

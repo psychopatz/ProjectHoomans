@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "The leader is gone. Someone needs to decide what comes next.",
-            "I barely knew them, but we still need structure.",
-            "Leader died. Life goes on. Who's in charge?",
-            "A casualty like any other. Let's elect someone new.",
-            "They're gone. We still need food and guards.",
-            "Another name scratched off. Let's sort out the command.",
-            "Doesn't change my daily tasks. Who's giving orders now?",
-            "Leader's expired. Pick a replacement and move forward.",
-            "Death is common here. Let's figure out our routine.",
-            "They're dead. What's the practical plan?"
-          ],
-          "TL": [
-            "Wala na ang pinuno. May kailangang magpasya sa susunod.",
-            "Halos hindi ko sila kilala, pero kailangan pa rin natin ng kaayusan.",
-            "Namatay ang pinuno. Tuloy ang buhay. Sino'ng mamumuno?",
-            "Biktima tulad ng iba. Pumili tayo ng bago.",
-            "Wala na sila. Kailangan pa rin natin ng pagkain at bantay.",
-            "Isa na namang pangalan ang nabura. Ayusin natin ang pamumuno.",
-            "Hindi nababago ang gawain ko. Sino na ang mag-uutos ngayon?",
-            "Pumanaw na ang lider. Pumili ng kapalit at magpatuloy.",
-            "Pangkaraniwan ang kamatayan dito. Ayusin natin ang patakaran.",
-            "Patay na sila. Ano ang praktikal na plano?"
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

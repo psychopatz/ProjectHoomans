@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "conversation.safety.default",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Stay alert.",
+      "Keep your eyes peeled.",
+      "Watch our surroundings.",
+      "Don't let your guard down.",
+      "Stay sharp out here.",
+      "Keep quiet and listen.",
+      "Keep checking the corners.",
+      "Stay cautious.",
+      "Eyes front and back.",
+      "Stay focused."
+    ]
+  }
+}

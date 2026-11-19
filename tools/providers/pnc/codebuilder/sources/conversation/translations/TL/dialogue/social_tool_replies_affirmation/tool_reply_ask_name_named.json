@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.ask_name.named",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Ako si %s.",
+      "%s ang pangalan ko.",
+      "Tawagin mo akong %s.",
+      "%s ang tawag sa akin.",
+      "%s ang itawag mo sa akin.",
+      "Ako si %s, ikinagagalak kitang makilala.",
+      "Kilala ako ng mga tao rito bilang %s.",
+      "%s ang pangalan ko. Ikinagagalak kitang makilala.",
+      "Maaari mo akong makilala bilang %s.",
+      "Ako si %s, na kaharap mo ngayon."
+    ],
+    "say.2.neutral": [
+      "%s ang pangalan ko.",
+      "Ako si %s. Mabuti at pormal tayong nagkakilala.",
+      "Kausap mo si %s.",
+      "%s ang pangalan ko. Tandaan mo 'yan.",
+      "Sumasagot ako sa pangalang %s.",
+      "Tinatawag nila akong %s dito sa lugar na ito.",
+      "%s ang pangalan. Mabuti at nalaman mo na.",
+      "Tawagin mo na lang akong %s.",
+      "Kilala ako bilang %s ng mga nakaligtas dito.",
+      "%s ako. Mabuti at may pangalan na ang mukhang ito."
+    ],
+    "say.3.neutral": [
+      "Maaari mo akong tawaging %s.",
+      "Sige lang, tawagin mo akong %s.",
+      "Ayos na ang %s para sa akin.",
+      "Ako si %s. Iyan ang ginagamit kong pagkakakilanlan.",
+      "Maaari mo akong tawaging %s kung nais mo.",
+      "%s ang tawag sa akin ng mga kasamahan ko.",
+      "Mas gusto ko ang %s, kung nagtatanong ka.",
+      "Tawagin mo akong %s. Madaling matandaan.",
+      "%s ang pangalan. Itatak mo sa isip mo.",
+      "Ako si %s. Siguraduhin nating pareho tayong mabuhay ngayon."
+    ]
+  }
+}

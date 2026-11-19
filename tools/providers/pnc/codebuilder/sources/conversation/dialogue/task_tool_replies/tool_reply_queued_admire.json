@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I hear you.",
-              "Message received.",
-              "I hear what you're saying.",
-              "Understood. I heard that.",
-              "Got your words.",
-              "Heard and acknowledged.",
-              "I hear you, loud and clear.",
-              "Fair enough. I heard that.",
-              "Noted. I hear you.",
-              "I'm listening. Heard."
-            ],
-            "TL": [
-              "Narinig kita.",
-              "Natanggap ang mensahe.",
-              "Naririnig ko ang sinasabi mo.",
-              "Naintindihan. Narinig ko 'yon.",
-              "Nakuha ko ang sinabi mo.",
-              "Narinig at kinilala.",
-              "Naririnig kita, malakas at malinaw.",
-              "Makatwiran. Narinig ko 'yon.",
-              "Tala ko na. Naririnig kita.",
-              "Nakikinig ako. Narinig."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "That got through.",
-              "That reached me. Thank you.",
-              "I took that in.",
-              "Your message made its mark.",
-              "I felt that. Thanks.",
-              "That registered with me.",
-              "That got through to me.",
-              "I received that clearly.",
-              "That landed well. Thank you.",
-              "Understood. That made an impression."
-            ],
-            "TL": [
-              "Nakarating iyon sa akin.",
-              "Tumagos iyon sa akin. Salamat.",
-              "Inintindi ko iyon.",
-              "Nag-iwan ng marka ang mensahe mo.",
-              "Naramdaman ko iyon. Salamat.",
-              "Tumatak iyon sa akin.",
-              "Nakarating iyon sa loob ko.",
-              "Malinaw kong natanggap iyon.",
-              "Maganda ang naging dating niyan. Salamat.",
-              "Naintindihan. Nag-iwan 'yan ng magandang impresyon."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

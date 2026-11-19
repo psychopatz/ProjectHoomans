@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.default",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Magandang trabaho. Patuloy na bantayan ang paligid.",
+      "Naasikaso ang banta. Maging handa.",
+      "Mahusay. Huwag munang magpakampante.",
+      "Bagsak ang target. Patuloy na suriin ang paligid.",
+      "Naasikaso na. Bantayan ang paligid mo.",
+      "Magandang tama. Manatiling alerto.",
+      "Tapos na ang isang 'yon. Tignan ang mga sulok.",
+      "Magaling. Ihanda pa rin ang sandata.",
+      "Malinis dito. Tumingin sa mga anino.",
+      "Banta naalis na. Tuloy sa maingat na pagkilos."
+    ]
+  }
+}

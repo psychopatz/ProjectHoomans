@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "That's it. You're done.",
-            "Bad choice. Defend yourself.",
-            "You shouldn't have done that.",
-            "I gave you space. Now defend yourself.",
-            "That's where this ends.",
-            "You made your choice.",
-            "I won't let you hurt me. Stand down or fight.",
-            "Unacceptable. Drop your weapon.",
-            "You crossed the line.",
-            "Stand down right now, or I finish this."
-          ],
-          "TL": [
-            "Tama na. Tapos ka na.",
-            "Maling desisyon. Ipagtanggol mo ang sarili mo.",
-            "Hindi mo dapat ginawa 'yon.",
-            "Binigyan kita ng puwang. Ipagtanggol mo sarili mo ngayon.",
-            "Diyan na nagtatapos 'to.",
-            "Pumili ka na ng kahihinatnan mo.",
-            "Hindi kita hahayaang saktan ako. Sumuko ka o lumaban.",
-            "Hindi katanggap-tanggap. Ibaba mo ang sandata mo.",
-            "Lumagpas ka sa linya.",
-            "Tumigil ka ngayon din, o tatapusin ko 'to."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

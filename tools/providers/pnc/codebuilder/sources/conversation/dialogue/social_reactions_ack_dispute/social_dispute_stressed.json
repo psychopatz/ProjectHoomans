@@ -22,10 +22,6 @@
       }
     ]
   },
-  "textSidecars": {
-    "EN": "translations/social_dispute_stressed.en.json",
-    "TL": "translations/social_dispute_stressed.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

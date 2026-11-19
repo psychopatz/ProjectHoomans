@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.queued_insult",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "I heard you.",
+      "I heard that insult.",
+      "Caught that remark.",
+      "I hear the childish jab.",
+      "Message heard. Doesn't bother me.",
+      "Heard you. Weak effort.",
+      "I heard the slander.",
+      "Heard it. Moving on.",
+      "I heard that petty comment.",
+      "I hear your barking."
+    ],
+    "say.2.neutral": [
+      "Noted.",
+      "Noted, and dismissed.",
+      "Noted. You're wasting your breath.",
+      "Noted. Doesn't mean a thing to me.",
+      "Duly noted. Try harder next time.",
+      "Noted. I've heard worse from strangers.",
+      "Noted. Water off a duck's back.",
+      "Noted. Don't expect a reaction.",
+      "Noted. Moving along.",
+      "Noted and ignored."
+    ]
+  }
+}

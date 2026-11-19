@@ -9,62 +9,10 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Keep it respectful.",
-            "Save that attitude for the dead.",
-            "Not in the mood for that.",
-            "Watch yourself.",
-            "Keep your hands and words to yourself.",
-            "Don't start something out here.",
-            "Grow up. We have real threats to worry about.",
-            "Not amused.",
-            "Check yourself before you cause trouble.",
-            "I'm ignoring that for now. Don't push it."
-          ],
-          "TL": [
-            "Maging magalang ka.",
-            "Itabi mo ang ugaling 'yan para sa mga patay.",
-            "Wala ako sa mood para diyan.",
-            "Mag-ingat ka.",
-            "Itago mo sa sarili mo ang mga salita mo.",
-            "Huwag kang magsimula ng gulo rito.",
-            "Magpakatanda ka. May mga totoong panganib tayong kinakaharap.",
-            "Hindi nakatutuwa.",
-            "Pagsabihan mo ang sarili mo bago ka makagawa ng gulo.",
-            "Pinalalampas ko muna 'yan. Huwag mong sagarin."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "You're lucky I know you.",
-            "Very funny. Don't make a habit of it.",
-            "I'll let that slide because it's you.",
-            "Haha, watch it, or I might just get even.",
-            "Good thing we're friends, or we'd have words.",
-            "You always like testing my patience, don't you?",
-            "Play nice. I know you're just messing around.",
-            "You're pushing your luck, but I'll allow it this once.",
-            "Only you could get away with saying that to me.",
-            "Haha, all right, point taken, smart-mouth."
-          ],
-          "TL": [
-            "Suwerte ka dahil kilala kita.",
-            "Nakakatawa. Huwag mong gagawing bisyo 'yan.",
-            "Palalampasin ko 'yan dahil ikaw 'yan.",
-            "Haha, mag-ingat ka, baka gumanti ako.",
-            "Mabuti na lang magkaibigan tayo, kundi magkakatuusan tayo.",
-            "Gusto mo talagang sinusubukan ang pasensya ko, 'no?",
-            "Mag-ayos ka. Alam kong nagbibiro ka lang.",
-            "Sinusugal mo ang suwerte mo, pero papayagan ko muna ngayon.",
-            "Ikaw lang ang makalulusot sa pagsasabi niyan sa akin.",
-            "Haha, sige na, nakuha ko na, pilosopo."
-          ]
-        }
+        "id": "warm"
       }
     ]
   },

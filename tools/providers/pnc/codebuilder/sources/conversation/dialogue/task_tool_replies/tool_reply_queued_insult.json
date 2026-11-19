@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I heard you.",
-              "I heard that insult.",
-              "Caught that remark.",
-              "I hear the childish jab.",
-              "Message heard. Doesn't bother me.",
-              "Heard you. Weak effort.",
-              "I heard the slander.",
-              "Heard it. Moving on.",
-              "I heard that petty comment.",
-              "I hear your barking."
-            ],
-            "TL": [
-              "Narinig kita.",
-              "Narinig ko ang pambabastos na 'yon.",
-              "Narinig ang patutsadang 'yon.",
-              "Naririnig ko ang pambatang sundot.",
-              "Narinig ang mensahe. Di ako apektado.",
-              "Narinig kita. Mahinang banat.",
-              "Narinig ko ang paninira.",
-              "Narinig ko. Lumilipas na.",
-              "Narinig ko ang mababaw na komentong 'yon.",
-              "Naririnig ko ang tahol mo."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Noted.",
-              "Noted, and dismissed.",
-              "Noted. You're wasting your breath.",
-              "Noted. Doesn't mean a thing to me.",
-              "Duly noted. Try harder next time.",
-              "Noted. I've heard worse from strangers.",
-              "Noted. Water off a duck's back.",
-              "Noted. Don't expect a reaction.",
-              "Noted. Moving along.",
-              "Noted and ignored."
-            ],
-            "TL": [
-              "Tala ko na.",
-              "Tala ko na, at binalewala.",
-              "Tala ko na. Sinasayang mo lang ang laway mo.",
-              "Tala ko na. Walang halaga sa akin 'yan.",
-              "Tala ko na. Galingan mo sa susunod.",
-              "Tala ko na. Nakarining na ako ng mas masahol pa sa iba.",
-              "Tala ko na. Para lang tubig sa dahon ng gabi.",
-              "Tala ko na. Huwag kang umasa ng reaksyon.",
-              "Tala ko na. Tuloy ang lakad.",
-              "Tala ko na at kinalimutan."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

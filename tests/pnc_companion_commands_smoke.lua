@@ -794,6 +794,19 @@ PNC.CompanionCommandPresentation = nil
 T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
     function() return PNC.NPCIdentityPresentation end
+local Json = require "PsychopatzCore/Serialization/PsychopatzJson"
+local commandCatalog = Json.Decode(T.read(
+    "ProjectHoomans",
+    "common_mod",
+    "media/translation/EN/Conversation/Text/convo/ConvoEngine_command.json"
+)) or {}
+PNC.Translation = PNC.Translation or {}
+PNC.Translation.GetKey = function(key, fallback)
+    local val = commandCatalog[key]
+    if type(val) == "string" and val ~= "" then return val end
+    return fallback or key or ""
+end
+
 T.load(CLIENT_ROOT .. "Commands/PNC_CompanionCommandPresentation.lua")
 for i = 1, 8 do
     PNC.CompanionCommandPresentation.ShowPlayerSpeech(

@@ -97,7 +97,7 @@ local function registerRecord(record)
             end
         end
     elseif record.type == "construction" then
-        local locale = string.upper(tostring(record.locale or ""))
+        local locale = string.upper(tostring(record.locale or "EN"))
         local strategy = string.upper(tostring(record.strategy or ""))
         if locale ~= "" and strategy ~= "" then
             constructions[locale] = constructions[locale] or {}
@@ -254,20 +254,61 @@ local function constructionFor(plan, locale)
     return eligible[index]
 end
 
+local function externalConvoText(key, fallback)
+    if type(key) ~= "string" or key == "" then return nil end
+    local manager = CustomTranslationManager
+    if type(manager) == "table" and type(manager.get) == "function" then
+        local ok, value = pcall(manager.get, "PsychopatzCore", "Conversation", key, fallback)
+        if ok and type(value) == "string" and value ~= "" and value ~= key then
+            return value
+        end
+    end
+    return nil
+end
+
+local function parseTemplateTokens(pattern)
+    local tokens = {}
+    local pos = 1
+    while pos <= #pattern do
+        local s, e, kind, slot = string.find(pattern, "{(lexeme):([^}]+)}", pos)
+        local s2, e2, kind2, slot2 = string.find(pattern, "{(slot):([^}]+)}", pos)
+        if s2 and (not s or s2 < s) then
+            s, e, kind, slot = s2, e2, kind2, slot2
+        end
+        if not s then
+            tokens[#tokens + 1] = { kind = "literal", value = string.sub(pattern, pos) }
+            break
+        end
+        if s > pos then
+            tokens[#tokens + 1] = { kind = "literal", value = string.sub(pattern, pos, s - 1) }
+        end
+        tokens[#tokens + 1] = { kind = kind, slot = slot }
+        pos = e + 1
+    end
+    return tokens
+end
+
 function UtterancePlan.Realize(plan)
     if type(plan) ~= "table" or plan.kind ~= "semantic_utterance_plan" then
         return nil, "utterance_plan_invalid"
     end
     local locale = currentLocale(plan)
-    local construction = constructionFor(plan, locale)
+    local construction = constructionFor(plan, locale) or constructionFor(plan, "EN")
     if not construction then
         return nil, "construction_unavailable"
     end
 
     loadCatalog()
+    local activeTokens = construction.tokens or {}
+    if locale ~= "EN" and type(construction.translationKey) == "string" and construction.translationKey ~= "" then
+        local localizedPattern = externalConvoText(construction.translationKey, nil)
+        if localizedPattern then
+            activeTokens = parseTemplateTokens(localizedPattern)
+        end
+    end
     local parts = {}
     local usedLexemes = {}
-    for _, token in ipairs(construction.tokens or {}) do
+    for _, token in ipairs(activeTokens) do
         local kind = tostring(token.kind or "")
         if kind == "literal" then
             parts[#parts + 1] = bounded(token.value, 128)
@@ -275,7 +316,9 @@ function UtterancePlan.Realize(plan)
             local concept = plan.lexemes[tostring(token.slot or "")]
             local lexeme = concept and lexemesByConcept[concept] or nil
             local form = lexeme and lexeme.forms
-                and (lexeme.forms[locale] or lexeme.forms.EN) or nil
+                and (lexeme.forms[locale] or lexeme.forms.EN)
+                or (lexeme and (externalConvoText(lexeme.translationKey, lexeme.fallback) or lexeme.fallback))
+                or nil
             if not form or form == "" then
                 return nil, "lexeme_unavailable"
             end

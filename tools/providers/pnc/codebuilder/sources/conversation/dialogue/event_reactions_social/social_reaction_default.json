@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I hear you.",
-            "Understood.",
-            "Got it.",
-            "I'm listening.",
-            "Fair enough.",
-            "Sounds good.",
-            "Copy that.",
-            "Noted.",
-            "Makes sense.",
-            "I agree."
-          ],
-          "TL": [
-            "Narinig kita.",
-            "Naiintindihan ko.",
-            "Nakuha ko.",
-            "Nakikinig ako.",
-            "Makatarungan 'yan.",
-            "Mabuti 'yan.",
-            "Kopya.",
-            "Tandaan ko 'yan.",
-            "May punto ka.",
-            "Sumasang-ayon ako."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

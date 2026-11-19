@@ -5,64 +5,32 @@
     "textTarget": "convo/SemanticResponses",
     "textRows": [
       {
-        "key": "UI_PNC_Conversation_Semantic_ActionFollowUnavailable",
-        "text": {
-          "EN": "I can't follow you right now.",
-          "TL": "Hindi kita masusundan ngayon."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ActionFollowUnavailable"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_ActionStayUnavailable",
-        "text": {
-          "EN": "I can't stay right now.",
-          "TL": "Hindi ako makapananatili ngayon."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ActionStayUnavailable"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_ActionStopUnavailable",
-        "text": {
-          "EN": "I can't stop right now.",
-          "TL": "Hindi ako makahinto ngayon."
-        }
+        "key": "UI_PNC_Conversation_Semantic_ActionStopUnavailable"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_RealizationCompanionFollowGuarded",
-        "text": {
-          "EN": "I'll follow. Stay close.",
-          "TL": "Susunod ako. Manatili kang malapit."
-        }
+        "key": "UI_PNC_Conversation_Semantic_RealizationCompanionFollowGuarded"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_RealizationCompanionFollowNeutral",
-        "text": {
-          "EN": "Of course, I'll follow.",
-          "TL": "Siyempre, susunod ako."
-        }
+        "key": "UI_PNC_Conversation_Semantic_RealizationCompanionFollowNeutral"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_RealizationCompanionFollowTerse",
-        "text": {
-          "EN": "I'll follow.",
-          "TL": "Susunod ako."
-        }
+        "key": "UI_PNC_Conversation_Semantic_RealizationCompanionFollowTerse"
       },
       {
-        "key": "UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm",
-        "text": {
-          "EN": "Of course, I'll follow you.",
-          "TL": "Siyempre, susunod ako sa iyo."
-        }
+        "key": "UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": "I can't follow you right now.",
-          "TL": "Hindi kita masusundan ngayon."
-        }
+        "id": "neutral"
       }
     ]
   },

@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greetings.firstmeet.dusk",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Tumigil ka dyan. Dahil sa takipsilim, mahirap basahin ang mga estranghero.",
+      "Wala nang gaanong ilaw. Magpakilala ka.",
+      "Nagulat mo ako. Ano ang kailangan mo?",
+      "Hinaan mo ang boses mo at sabihin sa akin kung bakit ka nandito.",
+      "Hindi ko maaninag ang mukha mo. Huwag kang lalapit."
+    ],
+    "textRows.greeting.001": "Tumigil ka dyan. Dahil sa takipsilim, mahirap basahin ang mga estranghero.",
+    "textRows.greeting.002": "Wala nang gaanong ilaw. Magpakilala ka.",
+    "textRows.greeting.003": "Nagulat mo ako. Ano ang kailangan mo?",
+    "textRows.greeting.004": "Hinaan mo ang boses mo at sabihin sa akin kung bakit ka nandito.",
+    "textRows.greeting.005": "Hindi ko maaninag ang mukha mo. Huwag kang lalapit."
+  }
+}

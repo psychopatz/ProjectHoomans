@@ -58,8 +58,11 @@
     }
   ],
   "say": {
-    "EN": "Join my group.",
-    "TL": "Sumali ka sa grupo ko."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "reply": {
     "already_member": {
@@ -67,8 +70,11 @@
         "templateID": "recruitment.reject.member.1"
       },
       "say": {
-        "EN": "I'm already with your group.",
-        "TL": "Kasama na ako sa grupo mo."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     },
     "rejected": {
@@ -76,14 +82,20 @@
         "templateID": "recruitment.reject.hostile.1"
       },
       "say": {
-        "EN": "Not a chance.",
-        "TL": "Hindi maaari."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     },
     "accepted": {
       "say": {
-        "EN": "Alright, I'll join you.",
-        "TL": "Sige, sasama ako sa iyo."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     }
   },

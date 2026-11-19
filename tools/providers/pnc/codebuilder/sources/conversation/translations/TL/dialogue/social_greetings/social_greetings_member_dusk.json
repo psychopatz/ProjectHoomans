@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greetings.member.dusk",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Gabi. Mukhang malinaw ang perimeter.",
+      "Kailangan mo ba ako bago ang pagbabantay sa gabi?",
+      "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw.",
+      "Manahimik ka. Umayos na yung iba.",
+      "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa."
+    ],
+    "textRows.greeting.001": "Gabi. Mukhang malinaw ang perimeter.",
+    "textRows.greeting.002": "Kailangan mo ba ako bago ang pagbabantay sa gabi?",
+    "textRows.greeting.003": "Narito pa rin tayong lahat. Ituturing ko iyong magandang araw.",
+    "textRows.greeting.004": "Manahimik ka. Umayos na yung iba.",
+    "textRows.greeting.005": "Maaari akong kumuha ng unang panonood kung kailangan mo ang iba pa."
+  }
+}

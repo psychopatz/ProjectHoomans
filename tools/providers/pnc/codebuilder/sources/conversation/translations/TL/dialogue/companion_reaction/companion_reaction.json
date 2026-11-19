@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "companion.reaction",
+  "locale": "TL",
+  "entries": {
+    "say.variants.abandonment": [
+      "Sumabay ka sa akin sa susunod. Nagbabantayan tayo ng likod.",
+      "Huwag mo akong iiwan nang gano'n. Sabay tayong mabubuhay.",
+      "Halos makuyog ako no'ng umalis ka. Dumikit ka lang.",
+      "Magkasama tayo. Huwag kang aalis nang mag-isa.",
+      "Saan ka pumunta?! Hindi ka pwedeng mawala na lang.",
+      "Sa susunod, sabihan mo ako bago ka umalis.",
+      "Akala ko naiwan na akong mag-isa. Magsama tayo.",
+      "Ang pag-iwan sa kasama ay nakakamatay. Dumikit ka.",
+      "Mabuti at bumalik ka, pero huwag mo na akong iiwan ulit.",
+      "Sumabay ka sa akin. Mas malakas tayo kapag magkasama."
+    ],
+    "say.variants.camp_rejected": [
+      "Wala akong makitang ligtas na kwarto o campfire sa malapit.",
+      "Walang ligtas na pahingahan dito. Kailangan natin ng mas maayos na silungan.",
+      "Hindi pwedeng magkampo sa lantad nang ganito. Masyadong delikado.",
+      "Kailangan natin ng pader o apoy bago huminto.",
+      "Hindi sapat ang kaligtasan ng pwestong 'to para sa kampo. Lakad pa.",
+      "Walang masisilungan dito. Maghanap muna tayo ng apat na pader.",
+      "Hindi pwedeng matulog dito. Madaling makakapasok ang mga infected.",
+      "Kailangan natin ng may barikadang kwarto o campfire bago magpahinga.",
+      "Hindi ako magkakampo rito. Maghanap tayo ng ligtas na gusali.",
+      "Masyadong lantad. Hanapan mo tayo ng tunay na matutuluyan."
+    ],
+    "say.variants.default": [
+      "Narinig kita. Sabay natin 'yang haharapin.",
+      "Naintindihan ko. Nandito lang ako kasama mo.",
+      "Nakuha ko ang sabi mo. Tapusin na natin.",
+      "Kasama mo ako. Ikaw ang manguna.",
+      "Narinig ko. Kahit ano'ng dumating, lalabanan natin.",
+      "Kopya. Dito lang ako sa tabi mo.",
+      "Malinaw kong narinig. Kilos na tayo.",
+      "Maaasahan mo ako. Magkasama tayo rito.",
+      "Naiintindihan ko. Panatilihing malinaw ang isip natin.",
+      "Nasa likod mo lang ako. Asikasuhin natin 'to."
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.attack_ranged",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Bibigyan kita ng takip.",
+      "Handa ang baril. Binabantayan ang malayo.",
+      "Magbibigay ng suportang putok.",
+      "Isa-isa ko silang titirahin mula rito.",
+      "Nakatutok na ang paningin. Babaril sa malayo.",
+      "Lalayo ako at magpapaputok.",
+      "Naintindihan. Magbabantay gamit ang baril.",
+      "Nasa gatilyo ang daliri. Mananatili sa likod.",
+      "Tatakpan ko ang lugar mula rito.",
+      "Kumpirmado ang malayuang pag-atake."
+    ]
+  }
+}

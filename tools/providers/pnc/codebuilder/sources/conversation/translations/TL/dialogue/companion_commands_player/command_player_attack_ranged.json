@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.player.attack_ranged",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "{addressee.name}, panatilihin ang distansya.",
+      "Takpan kami mula sa malayo, {addressee.name}.",
+      "{addressee.name}, lumaban mula sa ligtas na layo."
+    ]
+  }
+}

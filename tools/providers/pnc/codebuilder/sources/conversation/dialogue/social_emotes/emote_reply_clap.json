@@ -9,62 +9,10 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Thanks.",
-            "Appreciate the applause.",
-            "Just doing what had to be done.",
-            "Glad you liked it.",
-            "Much appreciated.",
-            "All in a day's work.",
-            "Thanks. Good to know it landed well.",
-            "Appreciate it.",
-            "Thanks. Let's keep the momentum going.",
-            "Thank you for the encouragement."
-          ],
-          "TL": [
-            "Salamat.",
-            "Salamat sa palakpak.",
-            "Ginawa lang ang kailangang gawin.",
-            "Mabuti at nagustuhan mo.",
-            "Maraming salamat.",
-            "Bahagi lang 'yan ng araw-araw na trabaho.",
-            "Salamat. Mabuting malaman na maayos ang dating.",
-            "Salamat.",
-            "Salamat. Tuloy lang natin ang sigla.",
-            "Salamat sa pampalakas ng loob."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "You're too kind.",
-            "Thanks! That really puts a smile on my face.",
-            "Appreciate the cheer! We make a solid team.",
-            "Thank you! Couldn't have done it without good company.",
-            "Haha, thanks! Glad to bring some light into the day.",
-            "That makes me feel good. Thank you!",
-            "You're awesome. Thanks for the cheer.",
-            "Appreciate the love! Let's keep winning.",
-            "Thanks a bunch! That means a lot to me.",
-            "Haha, bowing now! Thanks, friend."
-          ],
-          "TL": [
-            "Napakabait mo naman.",
-            "Salamat! Napangiti talaga ako roon.",
-            "Salamat sa suporta! Matibay tayong grupo.",
-            "Salamat! Hindi ko magagawa 'yon nang walang maayos na kasama.",
-            "Haha, salamat! Mabuti at nakapagbigay ng sigla ngayong araw.",
-            "Napakasarap sa pakiramdam niyan. Salamat!",
-            "Ang galing mo. Salamat sa pagpalakpak.",
-            "Salamat sa suporta! Tuloy lang tayo sa tagumpay.",
-            "Maraming salamat! Malaking bagay 'yan sa akin.",
-            "Haha, yumuyukod na ako! Salamat, kaibigan."
-          ]
-        }
+        "id": "warm"
       }
     ]
   },

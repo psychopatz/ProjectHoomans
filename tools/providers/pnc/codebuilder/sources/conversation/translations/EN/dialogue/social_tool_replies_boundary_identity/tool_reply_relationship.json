@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.relationship",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "We are not there yet.",
+      "Slow down. We need more time before that.",
+      "Let us take things one step at a time.",
+      "Trust takes time out here. We are not there yet.",
+      "We are still figuring each other out.",
+      "Hold on. That is moving faster than I am ready for.",
+      "Let us build some history first.",
+      "I need to know you better before we go there.",
+      "Not yet. Let us keep our feet on the ground.",
+      "We are allies right now. Let us leave it at that."
+    ],
+    "say.2.neutral": [
+      "That is a little too familiar for us.",
+      "You are getting ahead of where we stand.",
+      "Let us keep a professional distance for now.",
+      "We have not earned that kind of closeness yet.",
+      "Pull back a step. That is too close for comfort.",
+      "I like you, but do not push the boundaries.",
+      "That feels a bit presumptuous.",
+      "Let us not pretend we are closer than we actually are.",
+      "Boundary check. Step it back.",
+      "We have boundaries. Respect them."
+    ]
+  }
+}

@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Respect, {addressee.name}.",
-            "I see you, {addressee.name}.",
-            "Stay sharp, {addressee.name}."
-          ],
-          "TL": [
-            "Paggalang, {addressee.name}.",
-            "Nakikita kita, {addressee.name}.",
-            "Manatiling alerto, {addressee.name}."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

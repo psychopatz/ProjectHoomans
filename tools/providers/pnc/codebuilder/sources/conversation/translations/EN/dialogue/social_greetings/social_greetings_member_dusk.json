@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greetings.member.dusk",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Evening. Perimeter looks clear.",
+      "Need me for something before night watch?",
+      "We're all still here. I'll call that a good day.",
+      "Keep it quiet. The others are settling down.",
+      "I can take first watch if you need the rest."
+    ],
+    "textRows.greeting.001": "Evening. Perimeter looks clear.",
+    "textRows.greeting.002": "Need me for something before night watch?",
+    "textRows.greeting.003": "We're all still here. I'll call that a good day.",
+    "textRows.greeting.004": "Keep it quiet. The others are settling down.",
+    "textRows.greeting.005": "I can take first watch if you need the rest."
+  }
+}

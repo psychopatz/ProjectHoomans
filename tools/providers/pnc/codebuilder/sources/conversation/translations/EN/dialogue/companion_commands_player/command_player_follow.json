@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.player.follow",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "{addressee.name}, on me.",
+      "Stay close, {addressee.name}.",
+      "{addressee.name}, let's move."
+    ]
+  }
+}

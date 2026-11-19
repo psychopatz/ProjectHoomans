@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.horde.deescalated",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Kumokonti sila. Huwag munang kampante.",
+      "Bagsak na karamihan sa kuyog. Tignan ang mga naiwan.",
+      "Nawasak na ang bulto. Tuloy sa pagmamasid.",
+      "Kakaunti na lang ang dumarating. Huminga muna.",
+      "Kalat na ang kuyog. Ubusin ang natitira.",
+      "Nalagpasan natin ang pinakamarami. Manatiling nakatutok.",
+      "Bumaba na ang bilang nila. Tuloy ang laban.",
+      "Nawawalan na sila ng pwersa. Tapusin na natin sila.",
+      "Ilan-ilan na lang ang natitira. Bantayan ang distansya.",
+      "Bumagal na ang pagdagsa. Maganda ang ginawa natin."
+    ]
+  }
+}

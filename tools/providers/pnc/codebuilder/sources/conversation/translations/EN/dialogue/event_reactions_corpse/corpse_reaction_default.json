@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "corpse.reaction.default",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Someone died here. We should remember that.",
+      "Poor bastard. Didn't make it.",
+      "Another body in the dirt. World's unforgiving.",
+      "They fought hard, by the looks of it.",
+      "Someone lost a life here. Tread with respect.",
+      "Looks like they got trapped. Rest easy.",
+      "Could've been any of us. Keep walking.",
+      "Another survivor cut down too early.",
+      "Body's cold. Let's make sure we don't end up like this.",
+      "Rest in peace, stranger. Let's keep moving."
+    ]
+  }
+}

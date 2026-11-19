@@ -1,0 +1,45 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.needs.quantity",
+  "locale": "EN",
+  "entries": {
+    "say.variants.hunger": [
+      "I know food is what I need, but I can't give you an exact amount yet.",
+      "Whatever you can spare to eat would be plenty.",
+      "Even one can or a couple rations would keep me going.",
+      "I'm not picky about the portion size, just need food.",
+      "A small portion or a full meal, anything helps.",
+      "Just enough food to fill the hollow feeling in my gut.",
+      "Don't need a banquet, just whatever food you're willing to share.",
+      "A couple bites would buy me a few more hours of strength.",
+      "Hard to name a count. Just give me what you don't need.",
+      "Any amount of food is better than nothing right now."
+    ],
+    "say.variants.thirst": [
+      "I know water is what I need, but I can't give you an exact amount yet.",
+      "Even half a bottle of water would make a difference.",
+      "Just enough clean water to wet my throat, please.",
+      "A single flask or a few gulps would be fantastic.",
+      "I'm parched. Any amount of safe water would help.",
+      "Don't need a whole gallon, just enough to stay hydrated.",
+      "Whatever water you can afford to part with right now.",
+      "A cup or a bottle, I won't turn it down.",
+      "Enough water to get through the afternoon would be great.",
+      "Just a small sip or two to keep my strength up."
+    ],
+    "say.variants.unknown": [
+      "I can't confirm an exact amount yet. Which item do you mean?",
+      "Tell me what item you're talking about first, then we can talk quantity.",
+      "Depends on what you have. Which supply are we discussing?",
+      "Hard to give a number without knowing what item you're offering.",
+      "What specific item do you have in mind to trade or share?",
+      "Let me know what you're holding before I name an amount.",
+      "Which supply are we discussing? I need details first.",
+      "Can't tell you how many until I know what it is.",
+      "What kind of gear or supplies are we talking about here?",
+      "Specify the item first, and then I'll let you know how much I need."
+    ],
+    "say.variants.default": "I can confirm water is a need, but which item do you mean?",
+    "say.variants.default.plan.turn.dataset_needs_clarification.segment.0": "I can confirm water is a need, but which item do you mean?"
+  }
+}

@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Well done, {addressee.name}.",
-            "That's worth celebrating, {addressee.name}.",
-            "Nice work, {addressee.name}."
-          ],
-          "TL": [
-            "Magaling, {addressee.name}.",
-            "Karapat-dapat ipagdiwang iyan, {addressee.name}.",
-            "Mahusay na trabaho, {addressee.name}."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

@@ -22,10 +22,6 @@
       }
     ]
   },
-  "textSidecars": {
-    "EN": "translations/interaction_memory_acknowledge.en.json",
-    "TL": "translations/interaction_memory_acknowledge.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

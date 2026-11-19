@@ -54,20 +54,29 @@
     }
   ],
   "say": {
-    "EN": "Hello.",
-    "TL": "Kamusta."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "reply": {
     "hostile": {
       "say": {
-        "EN": "Stay back.",
-        "TL": "Lumayo ka."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     },
     "friendly": {
       "say": {
-        "EN": "Good to see you.",
-        "TL": "Mabuti at nandito ka."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     }
   },

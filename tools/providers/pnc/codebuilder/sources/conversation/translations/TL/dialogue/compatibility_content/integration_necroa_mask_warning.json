@@ -1,0 +1,16 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "integration.necroa.mask_warning",
+  "locale": "TL",
+  "entries": {
+    "say.variants.colonist": [
+      "Mask up. We keep the camp safe together."
+    ],
+    "say.variants.default": [
+      "Put your mask back on. Knox is airborne."
+    ],
+    "say.variants.family": [
+      "Put your mask on, family. I am not losing you to the air."
+    ]
+  }
+}

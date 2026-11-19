@@ -1,0 +1,11 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.greeting_report_fine",
+  "locale": "EN",
+  "entries": {
+    "affordance.label": "Say you're doing fine",
+    "say.variants.default": "I'm fine, thank you.",
+    "textRows.suggestion.greeting_report_fine.label": "Say you're doing fine",
+    "textRows.suggestion.greeting_report_fine.utterance": "I'm fine, thank you."
+  }
+}

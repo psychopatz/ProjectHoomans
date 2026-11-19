@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.scene.horde_prompt",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Kawan iyan. Lalaban ba tayo o uurong?",
+      "Tingnan mo ang dami nila. Maninindigan ba tayo o tatakbo?",
+      "Malaking kawan sa unahan. Anong pasya: lalaban o aatras?",
+      "Matinding kawan 'yan. Lalabanan ba natin o iiwasan?",
+      "Dumudumog sila. Babasagin ba natin o aatras tayo?",
+      "Napakaraming patay sa labas. Ano ang gusto mong gawin?",
+      "May kawan sa unahan. Lalabanan ba natin o maghahanap ng ibang daan?",
+      "Napakalaking grupo ang papalapit. Lalaban o lilikas?",
+      "Kawan 'yan. Mag-utos ka: laban o urong?",
+      "Tingnan mo ang dami nila laban sa atin. Tatayo o aatras?"
+    ],
+    "say.variants.guarded": [
+      "Malaking grupo sa harap. Magpasya tayo ngayon: lumaban o umiwas.",
+      "Lalapain tayo ng kawang 'yan kapag nag-atubili tayo. Anong galaw?",
+      "Masamang tsansa. Lumaban nang may disiplina o tumakas agad ngayon.",
+      "Di ako mamamatay dito. Magpasya ka: basagin o umatras?",
+      "Tingnan mo ang dami. Lumaban lang kung may masisikipang daan.",
+      "Palapit na ang kawan. Pumili bago nila tayo mapaligiran.",
+      "Di tayo pwede magkamali sa kawang 'yan. Lalaban o aatras?",
+      "Bantayan ang tagiliran. Lalaban ba tayo o aalis na agad?",
+      "Tatalunin nila tayo sa bukas na lugar. Magpasya ka na.",
+      "Malaking kawan. Kung lalaban, walang sisira sa pormasyon."
+    ],
+    "say.variants.terse": [
+      "Kawan. Laban o urong?",
+      "Sobra sila. Magpasya: tayo o takbo?",
+      "Kawan sa unahan. Laban o urong?",
+      "Kawan. Anong desisyon?",
+      "Malaking grupo. Sulong o urong?",
+      "Masama ang bilang. Lalaban?",
+      "Kawan nakita. Desisyon ngayon na.",
+      "Dose-dosena sila. Lalaban o tatakas?",
+      "Kawan parating. Pasya mo.",
+      "Grupo sa harap. Laban o atras?"
+    ],
+    "say.variants.warm": [
+      "Ang dami nila. Dumikit ka—lalaban o uurong?",
+      "Masyadong marami para maging panatag, kaibigan. Anong kutob mo: laban o takbo?",
+      "Manatili ka sa tabi ko. Sabay ba nating lalabanan o aalis tayo?",
+      "Delikado ang kawang 'yan. Gusto kong mabuhay tayo—laban o urong?",
+      "Kasama mo ako kahit anong desisyon mo. Susulong ba tayo o aatras?",
+      "Mag-ingat, kasama. Malaking kawan 'yan. Sabihin mo ang plano.",
+      "Mag-ingat, kaibigan! Uubusin ba natin sila o magtitipid ng lakas at tatakbo?",
+      "Nasa lahat sila ng sulok. Dumikit ka—laban o urong?",
+      "Tiwala ako sa pasya mo. Lalabanan ba natin ang kawang ito o babalik?",
+      "Malaking kawan sa unahan. Huwag kang mag-alala, magkasama tayo. Anong plano?"
+    ]
+  }
+}

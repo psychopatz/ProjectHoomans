@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.stress",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Tensiyonado ako, pero kaya ko pa.",
+      "Naiipit ang mga nerbyos ko. Ramdam ko ang tensiyon.",
+      "Laging mabigat ang pakiramdam dito sa labas.",
+      "Kabado ako, nabibigla sa bawat anino.",
+      "Mas nakakapagod ang stress kaysa sa mismong paglalakad.",
+      "Mahirap magrelaks kapag may panganib kahit saan.",
+      "Mabigat ang mga balikat ko sa sobrang stress.",
+      "Pinipilit ko lang mapanatili ang katinuan ko.",
+      "Bawat kaluskos napapahawak ako agad sa armas ko.",
+      "Mabigat dalhin ang lahat, pero tinitiis ko."
+    ]
+  }
+}

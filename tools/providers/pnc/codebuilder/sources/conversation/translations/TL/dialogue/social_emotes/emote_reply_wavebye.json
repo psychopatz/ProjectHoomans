@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.reply.wavebye",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Mag-ingat ka.",
+      "Magkita na lang tayo mamaya.",
+      "Bantayan mo ang likod mo sa labas.",
+      "Hanggang sa muli.",
+      "Manatiling ligtas.",
+      "Huwag ibaba ang bantay habang naglalakad.",
+      "Usap na lang tayo mamaya.",
+      "Paalam muna sa ngayon.",
+      "Yumuko ka sa panganib.",
+      "Kita tayo pagbalik mo."
+    ],
+    "say.variants.warm": [
+      "Paalam. Bumalik ka nang buo.",
+      "Ingatan mo nang maayos ang sarili mo, kaibigan.",
+      "Magkita tayo agad. Huwag kang gagawa ng padalos-dalos.",
+      "Maghihintay ako rito. Mag-ingat ka.",
+      "Paalam muna. Inaasahan ko ang susunod nating usapan.",
+      "Ligtas na paglalakbay sa labas. Gamitin lagi ang isip.",
+      "Paalam! Tiyakin mong makababalik ka.",
+      "Kita tayo mamaya, kasama. Mag-iingat ka.",
+      "Mag-ingat ka. Pananatilihin kong may apoy rito.",
+      "Kita tayo mamaya. Manatiling buhay sa labas."
+    ]
+  }
+}

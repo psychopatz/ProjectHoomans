@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_witness_brave",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Malinis. Bantayan ang gilid.",
+      "Magandang tama. Tignan ang mga bulag na sulok.",
+      "Solidong pagpabagsak. Bantayan ang paligid.",
+      "Bagsak nang malinis. Tumingin sa magkabilang gilid.",
+      "Tiyak na hampas. Suriin ang daanan.",
+      "Banta naalis. Bantayan kung may susunod pa.",
+      "Malinis na tama. Huwag matutok sa iisang lugar.",
+      "Bagsak. Maging alerto sa buong paligid.",
+      "Magaling ang pagkagawa. Tignan sa likod ng kublihan.",
+      "Target naalis. Magmasid sa lahat ng direksyon."
+    ],
+    "say.2.neutral": [
+      "Isa na. Huwag magpakampante.",
+      "Magandang patay. Manatiling gising.",
+      "Banta naalis. Panatilihin ang disiplina.",
+      "Bawas ang isa. Buksan ang mga mata.",
+      "Bagsak na. Huwag magpakarelax sa tindig.",
+      "Naasikaso. Patuloy na tumingin sa unahan.",
+      "Isa sa lupa. Maging matalas ang pakiramdam.",
+      "Solido. Maging handa sa susunod.",
+      "Target bagsak na. Huwag mawalan ng pokus.",
+      "Magandang pagtumba. Hawakan ang pwesto mo."
+    ],
+    "say.3.neutral": [
+      "Ayos. Gumalaw tayo bago sila dumami.",
+      "Malinis na tama. Huwag silang hayaang magtipon.",
+      "Bagsak na. Sulong bago maging kuyog.",
+      "Naasikaso. Lusot bago may dumating pa.",
+      "Patay ang banta. Tuloy sa paggalaw sa lugar.",
+      "Solidong patay. Abante habang bukas ang daan.",
+      "Target bagsak na. Kilos bago magsama-sama ang iba.",
+      "Bagsak. Panatilihin ang bwelo bago may sumaklolo.",
+      "Malinis na trabaho. Huwag maging nakatigil.",
+      "Naasikaso na. Tuloy ang pagsulong."
+    ]
+  }
+}

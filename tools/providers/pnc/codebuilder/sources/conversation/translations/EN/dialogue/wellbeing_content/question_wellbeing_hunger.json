@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.hunger",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "I'm pretty hungry, if I'm honest. Do you have anything to eat?",
+      "My stomach has been growling for hours. Got any food to spare?",
+      "Really feeling the hunger right now. Could use a bite.",
+      "Haven't had a proper meal in a while. Any rations on you?",
+      "Need some calories before my strength fades. Got anything?",
+      "I'm starving out here. Even stale crackers would do.",
+      "Food is getting urgent for me. Anything in your pack?",
+      "Hard to focus when your stomach is this empty. Spare any food?",
+      "I could really use a snack or some canned goods right now.",
+      "Getting weak from hunger. Do you have any rations to share?"
+    ]
+  }
+}

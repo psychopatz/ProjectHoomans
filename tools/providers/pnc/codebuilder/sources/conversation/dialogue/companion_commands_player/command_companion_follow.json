@@ -96,8 +96,11 @@
     }
   ],
   "say": {
-    "EN": "Follow me.",
-    "TL": "Sumunod ka sa akin."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

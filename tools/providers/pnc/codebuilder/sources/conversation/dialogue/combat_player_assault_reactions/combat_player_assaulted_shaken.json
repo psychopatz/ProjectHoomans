@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "What the hell?! Stay back!",
-            "Why are you attacking me?! Get back!",
-            "Stop! What are you doing?!",
-            "Don't touch me! Are you crazy?!",
-            "Get away from me right now!",
-            "Jesus, back off! Put that away!",
-            "Why would you hit me?! Get back!",
-            "Stay away from me! Don't do this!",
-            "Are you out of your mind?! Stop!",
-            "Back off! Don't come any closer!"
-          ],
-          "TL": [
-            "Ano ba?! Lumayo ka!",
-            "Bakit mo ako inaatake?! Lumayo ka!",
-            "Tigil! Ano bang ginagawa mo?!",
-            "Huwag mo akong hawakan! Nababaliw ka na ba?!",
-            "Umalis ka sa harap ko ngayon din!",
-            "Diyos ko, atras! Ibaba mo 'yan!",
-            "Bakit mo ako sinaktan?! Lumayo ka!",
-            "Lumayo ka sa akin! Huwag mong gawin 'to!",
-            "Nawawala ka na ba sa sarili mo?! Tigil!",
-            "Atras! Huwag kang lalapit pa!"
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

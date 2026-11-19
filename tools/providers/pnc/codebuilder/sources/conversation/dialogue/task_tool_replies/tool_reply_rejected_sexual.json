@@ -10,99 +10,21 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "That is not happening.",
-              "Not a chance. Forget about it.",
-              "I am not interested in that at all.",
-              "That is completely off the table.",
-              "No. Never going to happen.",
-              "Absolutely not.",
-              "I'm shutting that down right now. No.",
-              "That won't be happening between us.",
-              "Drop that idea entirely. Not happening.",
-              "No means no. It's not happening."
-            ],
-            "TL": [
-              "Hindi iyan mangyayari.",
-              "Walang pag-asa. Kalimutan mo na.",
-              "Hindi talaga ako interesado riyan.",
-              "Wala sa pagpipilian 'yan kailanman.",
-              "Hindi. Di kailanman mangyayari.",
-              "Hinding-hindi.",
-              "Papatayin ko ang paksang 'yan ngayon. Hindi.",
-              "Hindi 'yan mangyayari sa pagitan natin.",
-              "Iwan mo nang buo ang ideyang 'yan. Di mangyayari.",
-              "Ang hindi ay hindi. Di mangyayari 'yan."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Do not talk to me like that.",
-              "Keep those inappropriate remarks to yourself.",
-              "You're crossing serious personal boundaries.",
-              "That's completely uncalled for. Stop.",
-              "I don't appreciate that kind of talk.",
-              "Keep your indecent propositions away from me.",
-              "Watch how you speak to me. That's out of line.",
-              "You need to show respect and stop talking like that.",
-              "I won't be objectified out here. Back off.",
-              "Shut your mouth. Don't speak to me that way."
-            ],
-            "TL": [
-              "Huwag mo akong kausapin nang ganyan.",
-              "Itago mo sa sarili mo ang di-angkop na mga salitang 'yan.",
-              "Tumatawid ka sa seryosong personal na hangganan.",
-              "Wala sa lugar 'yan. Tigil.",
-              "Hindi ko gusto ang ganyang uri ng pananalita.",
-              "Ilayo mo sa akin ang malaswang alok mo.",
-              "Bantayan mo ang pagsasalita mo sa akin. Sobra na 'yan.",
-              "Kailangan mong magpakita ng respeto at tumigil sa ganyang pananalita.",
-              "Di ako magpapakababa rito. Umatras ka.",
-              "Itikom mo ang bibig mo. Huwag mo akong kakausapin nang ganyan."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "3": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "You are moving far too fast.",
-              "Slow down. We are nowhere near that point.",
-              "You need to hit the brakes. That's way too fast.",
-              "Pace yourself. We barely know each other.",
-              "You're rushing into territory we haven't earned.",
-              "Slow your roll. That's moving way too fast for me.",
-              "Pull back. We have not built that kind of closeness.",
-              "You're getting way ahead of where we stand.",
-              "Take a massive step back. Way too fast.",
-              "Slow down before you ruin whatever trust we have."
-            ],
-            "TL": [
-              "Masyadong mabilis ang takbo mo.",
-              "Dahan-dahan. Malayo pa tayo sa puntong iyan.",
-              "Kailangan mong magpreno. Masyadong mabilis 'yan.",
-              "Huwag kang magmadali. Halos di pa nga tayo magkakilala.",
-              "Nagmamadali ka sa lugar na di pa natin nararating.",
-              "Dahan-dahan lang. Masyadong mabilis 'yan para sa akin.",
-              "Umatras ka. Wala pa tayong ganyang kalapit na ugnayan.",
-              "Nauuna ka nang malayo sa kung ano lang tayo.",
-              "Humakbang ka paatras nang malaki. Masyadong mabilis.",
-              "Magdahan-dahan ka bago mo sirain ang anumang tiwalang mayroon tayo."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

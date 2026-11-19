@@ -10,10 +10,6 @@
     "variants": [
       {
         "id": "compliment.dataset.kind_of_you",
-        "text": {
-          "EN": "That's kind of you. I appreciate it.",
-          "TL": "That's kind of you. I appreciate it."
-        },
         "metadata": {
           "fallback": "That's kind of you. I appreciate it.",
           "templateID": "compliment.dataset.kind_of_you"
@@ -21,10 +17,6 @@
       },
       {
         "id": "compliment.dataset.means_a_lot",
-        "text": {
-          "EN": "Aw, thank you. That means a lot.",
-          "TL": "Aw, thank you. That means a lot."
-        },
         "metadata": {
           "fallback": "Aw, thank you. That means a lot.",
           "templateID": "compliment.dataset.means_a_lot"

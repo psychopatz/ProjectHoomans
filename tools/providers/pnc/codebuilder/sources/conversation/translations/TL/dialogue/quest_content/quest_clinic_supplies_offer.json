@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "quest.clinic_supplies.offer",
+  "locale": "TL",
+  "entries": {
+    "reply.queued.say.variants.default": [
+      "Matutulungan kita sa mga suplay ng klinika.",
+      "Handa akong tumulong sa mga medikal na gamit na 'yon.",
+      "Ilista mo ako para sa pagkuha ng suplay sa klinika.",
+      "Available ako para tumulong mag-ipon ng gamot.",
+      "Makatutulong ako sa pagkuha ng kailangan ng klinika.",
+      "Isama mo ako sa suplay para sa klinika.",
+      "Tutulong ako sa pagkuha ng medikal na suplay.",
+      "Maaari kong ialok ang tulong ko sa gawaing ito sa klinika.",
+      "Masaya akong makatulong maihatid ang mga suplay sa klinika.",
+      "Kaya kong gampanan ang bahagi ng gawaing 'yan sa klinika."
+    ],
+    "reply.rejected.say.variants.default": [
+      "Hindi ko matatanggap ang kahilingan para sa suplay ngayon.",
+      "Kailangan kong tanggihan ang alok sa klinika sa ngayon.",
+      "Hindi makakatulong sa mga medikal na suplay ngayon.",
+      "Hindi ako makakasali sa misyong 'yan sa klinika.",
+      "Kailangang tanggihan ang alok na suplay sa klinika.",
+      "Hindi ko matatanggap ang alok sa panahong ito.",
+      "Hindi ko kayang gawin ang pagkuha ng medikal na suplay ngayon.",
+      "Lalagpasan ko muna ang alok na 'to para sa klinika.",
+      "Hindi maaring hawakan ang medikal na gawain ngayon.",
+      "Kailangan kong tanggihan ang alok na 'yan sa sandaling ito."
+    ],
+    "reply.failed.say.variants.default": [
+      "Hindi ko masuri ang kahilingan para sa suplay.",
+      "Hindi ko masilip ang alok sa suplay ng klinika.",
+      "Hindi maproseso ang alok na 'yan.",
+      "May nagkaproblema habang sinusuri ang medikal na alok.",
+      "Hindi masuri ang kahilingan sa suplay ngayon.",
+      "Hindi ko makumpirma ang alok na 'yon sa klinika.",
+      "Bigo sa pagsusuri ng detalye ng suplay sa klinika.",
+      "Hindi ko nasuri ang kahilingang iyon.",
+      "Hindi maayos na nasuri ang medikal na alok.",
+      "Hindi gumana ang pagsusuri sa alok na 'yon."
+    ]
+  }
+}

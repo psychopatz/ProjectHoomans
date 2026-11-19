@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.scene.excursion_departing",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "We're moving out. Keep close.",
+      "Heading out now. Stay sharp.",
+      "Departure time. Keep your eyes peeled.",
+      "Stepping outside the wire. Watch your surroundings.",
+      "We're on the move. Maintain distance and formation.",
+      "Moving out. Quiet footsteps.",
+      "Time to go. Stick to the planned route.",
+      "Excursion begins now. Stay focused.",
+      "Here we go. Eyes front and watch your flanks.",
+      "Moving outbound. Keep noise to a minimum."
+    ],
+    "say.variants.guarded": [
+      "We're outbound. Keep the group tight.",
+      "Crossing outside. Weapons ready, safety off.",
+      "No talking from here on out. Hand signals only.",
+      "Keep low and match my speed. Don't wander off.",
+      "Scan your sectors continuously as we move.",
+      "Outbound. If we take fire, dive for immediate cover.",
+      "Watch the tree line and rooftops. Moving out.",
+      "Stay alert. The outside world is completely hostile.",
+      "We're moving. Anyone who strays gets left behind.",
+      "Formation tight. Moving into enemy territory."
+    ],
+    "say.variants.terse": [
+      "Moving out. Stay close.",
+      "Moving out.",
+      "Let's move.",
+      "Heading out.",
+      "Outbound.",
+      "On the move.",
+      "Stay tight.",
+      "Quiet steps.",
+      "Marching.",
+      "Go."
+    ],
+    "say.variants.warm": [
+      "We're heading out. Stay close and we'll get through it.",
+      "Off we go, friend! Right beside you all the way.",
+      "Stay close to me, partner. We watch out for each other.",
+      "Moving out together. Let's make it a safe trip.",
+      "Here we go! Keep your chin up and stay close.",
+      "Heading out. Don't worry, we've got this covered.",
+      "Step together, friend. We'll be back before you know it.",
+      "On our way! Stay safe and keep smiling.",
+      "Moving out. I'm right behind you if you need a hand.",
+      "Let's bring back good loot and all our limbs! Moving out."
+    ]
+  }
+}

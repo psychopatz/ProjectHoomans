@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "navigation.camp_empty",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "I don't see a good place to set up here.",
+      "This area lacks suitable spots for a camp.",
+      "Nowhere practical to establish camp around here.",
+      "We should look elsewhere. No good campsites here.",
+      "Doesn't look like we can camp in this vicinity.",
+      "There are no secure structures or clear ground here.",
+      "Can't find a decent place to bed down here.",
+      "No campsite available here. Let's keep searching.",
+      "This location isn't viable for setting up camp.",
+      "Nothing suitable nearby. We need to move on."
+    ],
+    "say.variants.guarded": [
+      "There is nowhere safe to set up here.",
+      "This place is wide open. We'd get slaughtered.",
+      "No cover, no defenses. We can't stay here.",
+      "I won't camp in this death trap. Move on.",
+      "Zero security here. We'd be sitting ducks.",
+      "Not a single defensible corner. Keep walking.",
+      "Sleeping here is suicide. Find real shelter.",
+      "Nothing here keeps the dead out. No camp.",
+      "Too exposed. I refuse to rest here.",
+      "Nowhere to hide if a horde passes. Move."
+    ],
+    "say.variants.terse": [
+      "No good place here.",
+      "Nothing here.",
+      "Unsuitable.",
+      "Can't camp here.",
+      "No spots.",
+      "Too bare.",
+      "Nowhere to rest.",
+      "Move on.",
+      "Not here.",
+      "Bad ground."
+    ],
+    "say.variants.warm": [
+      "I don't see a safe place to set up here.",
+      "I'd rather find us a warmer, safer spot than this.",
+      "Nothing comfortable or secure around here, I'm afraid.",
+      "Let's keep looking. You deserve a better resting spot.",
+      "This area doesn't feel right for us. Let's walk a bit more.",
+      "We can do better than this place. Let's find real shelter.",
+      "I want us both safe tonight. No good camp here.",
+      "Let's find somewhere cozy before we stop.",
+      "I don't think we'd get any peaceful sleep here.",
+      "Come on, let's look further ahead for a proper camp."
+    ]
+  }
+}

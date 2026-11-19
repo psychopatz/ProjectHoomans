@@ -3,7 +3,7 @@ return {
     ["tool_reply.accepted_generic"] = {
         ["domain"] = "social_tool_replies_affirmation",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/AcceptedGenericToAskNameUnnamed",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
         },
         ["id"] = "tool_reply.accepted_generic",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["tool_reply.admire"] = {
         ["domain"] = "social_tool_replies_affirmation",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/AcceptedGenericToAskNameUnnamed",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
         },
         ["id"] = "tool_reply.admire",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["tool_reply.apology"] = {
         ["domain"] = "social_tool_replies_affirmation",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/AcceptedGenericToAskNameUnnamed",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
         },
         ["id"] = "tool_reply.apology",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["tool_reply.ask_name.named"] = {
         ["domain"] = "social_tool_replies_affirmation",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/AcceptedGenericToAskNameUnnamed",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
         },
         ["id"] = "tool_reply.ask_name.named",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["tool_reply.ask_name.prompt"] = {
         ["domain"] = "social_tool_replies_affirmation",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/AcceptedGenericToAskNameUnnamed",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
         },
         ["id"] = "tool_reply.ask_name.prompt",
         ["kind"] = "dialogue",
@@ -48,7 +48,7 @@ return {
     ["tool_reply.ask_name.rejected"] = {
         ["domain"] = "social_tool_replies_affirmation",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/AcceptedGenericToAskNameUnnamed",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
         },
         ["id"] = "tool_reply.ask_name.rejected",
         ["kind"] = "dialogue",
@@ -57,7 +57,7 @@ return {
     ["tool_reply.ask_name.unnamed"] = {
         ["domain"] = "social_tool_replies_affirmation",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/AcceptedGenericToAskNameUnnamed",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
         },
         ["id"] = "tool_reply.ask_name.unnamed",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
     ["tool_reply.comfort"] = {
         ["domain"] = "social_tool_replies_affirmation",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/ComfortToFlirt",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
         },
         ["id"] = "tool_reply.comfort",
         ["kind"] = "dialogue",
@@ -75,7 +75,7 @@ return {
     ["tool_reply.compliment"] = {
         ["domain"] = "social_tool_replies_affirmation",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/ComfortToFlirt",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
         },
         ["id"] = "tool_reply.compliment",
         ["kind"] = "dialogue",
@@ -87,7 +87,7 @@ return {
     ["tool_reply.flirt"] = {
         ["domain"] = "social_tool_replies_affirmation",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation/ComfortToFlirt",
+            "PNC/ConvoEngine/Dialogue/SocialToolRepliesAffirmation",
         },
         ["id"] = "tool_reply.flirt",
         ["kind"] = "dialogue",

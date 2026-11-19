@@ -20,14 +20,6 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.command.companion.follow.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Follow me.",
-                                    },
-                                    ["TL"] = {
-                                        "Sumunod ka sa akin.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -45,14 +37,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.companion.follow.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Follow me.",
-                        },
-                        ["TL"] = {
-                            "Sumunod ka sa akin.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
             },
@@ -120,15 +104,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Follow me.",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Follow me.",
-                                    },
-                                    ["TL"] = {
-                                        "Sumunod ka sa akin.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -284,14 +261,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.companion.follow.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Follow me.",
-                    },
-                    ["TL"] = {
-                        "Sumunod ka sa akin.",
-                    },
-                },
                 ["variantID"] = "default",
             },
         },
@@ -317,14 +286,6 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.command.companion.return_home.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Go home.",
-                                    },
-                                    ["TL"] = {
-                                        "Umuwi ka na.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -342,14 +303,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.companion.return_home.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Go home.",
-                        },
-                        ["TL"] = {
-                            "Umuwi ka na.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
             },
@@ -411,15 +364,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Go home.",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Go home.",
-                                    },
-                                    ["TL"] = {
-                                        "Umuwi ka na.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -558,14 +504,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.companion.return_home.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Go home.",
-                    },
-                    ["TL"] = {
-                        "Umuwi ka na.",
-                    },
-                },
                 ["variantID"] = "default",
             },
         },
@@ -591,14 +529,6 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.command.companion.stay.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Stay here.",
-                                    },
-                                    ["TL"] = {
-                                        "Dito ka lang.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -616,14 +546,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.companion.stay.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Stay here.",
-                        },
-                        ["TL"] = {
-                            "Dito ka lang.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
             },
@@ -685,15 +607,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Stay here.",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Stay here.",
-                                    },
-                                    ["TL"] = {
-                                        "Dito ka lang.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -832,14 +747,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.companion.stay.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Stay here.",
-                    },
-                    ["TL"] = {
-                        "Dito ka lang.",
-                    },
-                },
                 ["variantID"] = "default",
             },
         },
@@ -865,18 +772,7 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.command.player.attack_auto.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, use your best judgment.",
-                                        "{addressee.name}, handle threats as you see fit.",
-                                        "Watch our backs, {addressee.name}.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, gamitin ang iyong pasya.",
-                                        "{addressee.name}, harapin ang banta ayon sa iyong pasya.",
-                                        "Bantayan mo kami, {addressee.name}.",
-                                    },
-                                },
+                                ["variantCount"] = 3,
                             },
                         },
                     },
@@ -890,18 +786,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.player.attack_auto.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "{addressee.name}, use your best judgment.",
-                            "{addressee.name}, handle threats as you see fit.",
-                            "Watch our backs, {addressee.name}.",
-                        },
-                        ["TL"] = {
-                            "{addressee.name}, gamitin ang iyong pasya.",
-                            "{addressee.name}, harapin ang banta ayon sa iyong pasya.",
-                            "Bantayan mo kami, {addressee.name}.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -956,19 +840,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "{addressee.name}, use your best judgment.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, use your best judgment.",
-                                        "{addressee.name}, handle threats as you see fit.",
-                                        "Watch our backs, {addressee.name}.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, gamitin ang iyong pasya.",
-                                        "{addressee.name}, harapin ang banta ayon sa iyong pasya.",
-                                        "Bantayan mo kami, {addressee.name}.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1045,18 +918,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.player.attack_auto.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "{addressee.name}, use your best judgment.",
-                        "{addressee.name}, handle threats as you see fit.",
-                        "Watch our backs, {addressee.name}.",
-                    },
-                    ["TL"] = {
-                        "{addressee.name}, gamitin ang iyong pasya.",
-                        "{addressee.name}, harapin ang banta ayon sa iyong pasya.",
-                        "Bantayan mo kami, {addressee.name}.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -1082,18 +943,7 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.command.player.attack_melee.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, keep it close.",
-                                        "Take the front line, {addressee.name}.",
-                                        "{addressee.name}, save your ammunition.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, lumaban nang malapitan.",
-                                        "Ikaw sa unahan, {addressee.name}.",
-                                        "{addressee.name}, itabi ang bala.",
-                                    },
-                                },
+                                ["variantCount"] = 3,
                             },
                         },
                     },
@@ -1107,18 +957,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.player.attack_melee.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "{addressee.name}, keep it close.",
-                            "Take the front line, {addressee.name}.",
-                            "{addressee.name}, save your ammunition.",
-                        },
-                        ["TL"] = {
-                            "{addressee.name}, lumaban nang malapitan.",
-                            "Ikaw sa unahan, {addressee.name}.",
-                            "{addressee.name}, itabi ang bala.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -1173,19 +1011,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "{addressee.name}, keep it close.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, keep it close.",
-                                        "Take the front line, {addressee.name}.",
-                                        "{addressee.name}, save your ammunition.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, lumaban nang malapitan.",
-                                        "Ikaw sa unahan, {addressee.name}.",
-                                        "{addressee.name}, itabi ang bala.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1262,18 +1089,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.player.attack_melee.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "{addressee.name}, keep it close.",
-                        "Take the front line, {addressee.name}.",
-                        "{addressee.name}, save your ammunition.",
-                    },
-                    ["TL"] = {
-                        "{addressee.name}, lumaban nang malapitan.",
-                        "Ikaw sa unahan, {addressee.name}.",
-                        "{addressee.name}, itabi ang bala.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -1299,18 +1114,7 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.command.player.attack_none.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, stay out of the fight.",
-                                        "Avoid trouble, {addressee.name}.",
-                                        "{addressee.name}, don't engage unless I change the order.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, huwag sumali sa laban.",
-                                        "Iwasan ang gulo, {addressee.name}.",
-                                        "{addressee.name}, huwag lumaban hangga't hindi ko binabago ang utos.",
-                                    },
-                                },
+                                ["variantCount"] = 3,
                             },
                         },
                     },
@@ -1324,18 +1128,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.player.attack_none.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "{addressee.name}, stay out of the fight.",
-                            "Avoid trouble, {addressee.name}.",
-                            "{addressee.name}, don't engage unless I change the order.",
-                        },
-                        ["TL"] = {
-                            "{addressee.name}, huwag sumali sa laban.",
-                            "Iwasan ang gulo, {addressee.name}.",
-                            "{addressee.name}, huwag lumaban hangga't hindi ko binabago ang utos.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -1390,19 +1182,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "{addressee.name}, stay out of the fight.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, stay out of the fight.",
-                                        "Avoid trouble, {addressee.name}.",
-                                        "{addressee.name}, don't engage unless I change the order.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, huwag sumali sa laban.",
-                                        "Iwasan ang gulo, {addressee.name}.",
-                                        "{addressee.name}, huwag lumaban hangga't hindi ko binabago ang utos.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1479,18 +1260,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.player.attack_none.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "{addressee.name}, stay out of the fight.",
-                        "Avoid trouble, {addressee.name}.",
-                        "{addressee.name}, don't engage unless I change the order.",
-                    },
-                    ["TL"] = {
-                        "{addressee.name}, huwag sumali sa laban.",
-                        "Iwasan ang gulo, {addressee.name}.",
-                        "{addressee.name}, huwag lumaban hangga't hindi ko binabago ang utos.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -1516,18 +1285,7 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.command.player.attack_ranged.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, keep your distance.",
-                                        "Give us ranged cover, {addressee.name}.",
-                                        "{addressee.name}, engage from a safe distance.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, panatilihin ang distansya.",
-                                        "Takpan kami mula sa malayo, {addressee.name}.",
-                                        "{addressee.name}, lumaban mula sa ligtas na layo.",
-                                    },
-                                },
+                                ["variantCount"] = 3,
                             },
                         },
                     },
@@ -1541,18 +1299,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.player.attack_ranged.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "{addressee.name}, keep your distance.",
-                            "Give us ranged cover, {addressee.name}.",
-                            "{addressee.name}, engage from a safe distance.",
-                        },
-                        ["TL"] = {
-                            "{addressee.name}, panatilihin ang distansya.",
-                            "Takpan kami mula sa malayo, {addressee.name}.",
-                            "{addressee.name}, lumaban mula sa ligtas na layo.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -1607,19 +1353,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "{addressee.name}, keep your distance.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, keep your distance.",
-                                        "Give us ranged cover, {addressee.name}.",
-                                        "{addressee.name}, engage from a safe distance.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, panatilihin ang distansya.",
-                                        "Takpan kami mula sa malayo, {addressee.name}.",
-                                        "{addressee.name}, lumaban mula sa ligtas na layo.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1696,18 +1431,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.player.attack_ranged.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "{addressee.name}, keep your distance.",
-                        "Give us ranged cover, {addressee.name}.",
-                        "{addressee.name}, engage from a safe distance.",
-                    },
-                    ["TL"] = {
-                        "{addressee.name}, panatilihin ang distansya.",
-                        "Takpan kami mula sa malayo, {addressee.name}.",
-                        "{addressee.name}, lumaban mula sa ligtas na layo.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -1733,22 +1456,7 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.command.player.camp.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Make camp here, {addressee.name}.",
-                                        "Settle in here, {addressee.name}.",
-                                        "We'll camp here for now, {addressee.name}.",
-                                        "We could make camp here, {addressee.name}.",
-                                        "Let's make this our camp, {addressee.name}.",
-                                    },
-                                    ["TL"] = {
-                                        "Magkampo tayo rito, {addressee.name}.",
-                                        "Manatili tayo rito, {addressee.name}.",
-                                        "Magkakampo muna tayo rito, {addressee.name}.",
-                                        "Maaari tayong magkampo rito, {addressee.name}.",
-                                        "Gawin nating kampo ito, {addressee.name}.",
-                                    },
-                                },
+                                ["variantCount"] = 5,
                             },
                         },
                     },
@@ -1770,22 +1478,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.player.camp.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Make camp here, {addressee.name}.",
-                            "Settle in here, {addressee.name}.",
-                            "We'll camp here for now, {addressee.name}.",
-                            "We could make camp here, {addressee.name}.",
-                            "Let's make this our camp, {addressee.name}.",
-                        },
-                        ["TL"] = {
-                            "Magkampo tayo rito, {addressee.name}.",
-                            "Manatili tayo rito, {addressee.name}.",
-                            "Magkakampo muna tayo rito, {addressee.name}.",
-                            "Maaari tayong magkampo rito, {addressee.name}.",
-                            "Gawin nating kampo ito, {addressee.name}.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -1840,23 +1532,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Make camp here, {addressee.name}.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Make camp here, {addressee.name}.",
-                                        "Settle in here, {addressee.name}.",
-                                        "We'll camp here for now, {addressee.name}.",
-                                        "We could make camp here, {addressee.name}.",
-                                        "Let's make this our camp, {addressee.name}.",
-                                    },
-                                    ["TL"] = {
-                                        "Magkampo tayo rito, {addressee.name}.",
-                                        "Manatili tayo rito, {addressee.name}.",
-                                        "Magkakampo muna tayo rito, {addressee.name}.",
-                                        "Maaari tayong magkampo rito, {addressee.name}.",
-                                        "Gawin nating kampo ito, {addressee.name}.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1939,22 +1616,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.player.camp.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Make camp here, {addressee.name}.",
-                        "Settle in here, {addressee.name}.",
-                        "We'll camp here for now, {addressee.name}.",
-                        "We could make camp here, {addressee.name}.",
-                        "Let's make this our camp, {addressee.name}.",
-                    },
-                    ["TL"] = {
-                        "Magkampo tayo rito, {addressee.name}.",
-                        "Manatili tayo rito, {addressee.name}.",
-                        "Magkakampo muna tayo rito, {addressee.name}.",
-                        "Maaari tayong magkampo rito, {addressee.name}.",
-                        "Gawin nating kampo ito, {addressee.name}.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -1980,14 +1641,6 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.command.player.camp_none.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "...",
-                                    },
-                                    ["TL"] = {
-                                        "...",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2001,14 +1654,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.player.camp_none.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "...",
-                        },
-                        ["TL"] = {
-                            "...",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -2063,15 +1708,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "...",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "...",
-                                    },
-                                    ["TL"] = {
-                                        "...",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2148,14 +1786,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.player.camp_none.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "...",
-                    },
-                    ["TL"] = {
-                        "...",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -2181,18 +1811,7 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.command.player.camp_rejected.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I can't find a safe room or campfire nearby.",
-                                        "We need a nearby room or campfire before we make camp.",
-                                        "No usable camp site is visible from here.",
-                                    },
-                                    ["TL"] = {
-                                        "Wala akong makitang ligtas na silid o apoy dito.",
-                                        "Kailangan natin ng malapit na silid o apoy bago magkampo.",
-                                        "Walang angkop na lugar ng kampo rito.",
-                                    },
-                                },
+                                ["variantCount"] = 3,
                             },
                         },
                     },
@@ -2206,18 +1825,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.player.camp_rejected.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I can't find a safe room or campfire nearby.",
-                            "We need a nearby room or campfire before we make camp.",
-                            "No usable camp site is visible from here.",
-                        },
-                        ["TL"] = {
-                            "Wala akong makitang ligtas na silid o apoy dito.",
-                            "Kailangan natin ng malapit na silid o apoy bago magkampo.",
-                            "Walang angkop na lugar ng kampo rito.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -2272,19 +1879,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "I can't find a safe room or campfire nearby.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I can't find a safe room or campfire nearby.",
-                                        "We need a nearby room or campfire before we make camp.",
-                                        "No usable camp site is visible from here.",
-                                    },
-                                    ["TL"] = {
-                                        "Wala akong makitang ligtas na silid o apoy dito.",
-                                        "Kailangan natin ng malapit na silid o apoy bago magkampo.",
-                                        "Walang angkop na lugar ng kampo rito.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2361,18 +1957,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.player.camp_rejected.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I can't find a safe room or campfire nearby.",
-                        "We need a nearby room or campfire before we make camp.",
-                        "No usable camp site is visible from here.",
-                    },
-                    ["TL"] = {
-                        "Wala akong makitang ligtas na silid o apoy dito.",
-                        "Kailangan natin ng malapit na silid o apoy bago magkampo.",
-                        "Walang angkop na lugar ng kampo rito.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -2398,18 +1982,7 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.command.player.follow.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, on me.",
-                                        "Stay close, {addressee.name}.",
-                                        "{addressee.name}, let's move.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, sumunod kayo sa akin.",
-                                        "Manatili kayong malapit, {addressee.name}.",
-                                        "{addressee.name}, umalis na tayo.",
-                                    },
-                                },
+                                ["variantCount"] = 3,
                             },
                         },
                     },
@@ -2423,18 +1996,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.player.follow.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "{addressee.name}, on me.",
-                            "Stay close, {addressee.name}.",
-                            "{addressee.name}, let's move.",
-                        },
-                        ["TL"] = {
-                            "{addressee.name}, sumunod kayo sa akin.",
-                            "Manatili kayong malapit, {addressee.name}.",
-                            "{addressee.name}, umalis na tayo.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -2489,19 +2050,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "{addressee.name}, on me.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, on me.",
-                                        "Stay close, {addressee.name}.",
-                                        "{addressee.name}, let's move.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, sumunod kayo sa akin.",
-                                        "Manatili kayong malapit, {addressee.name}.",
-                                        "{addressee.name}, umalis na tayo.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2578,18 +2128,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.player.follow.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "{addressee.name}, on me.",
-                        "Stay close, {addressee.name}.",
-                        "{addressee.name}, let's move.",
-                    },
-                    ["TL"] = {
-                        "{addressee.name}, sumunod kayo sa akin.",
-                        "Manatili kayong malapit, {addressee.name}.",
-                        "{addressee.name}, umalis na tayo.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -2615,14 +2153,6 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.command.player.generic.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Understood, {addressee.name}.",
-                                    },
-                                    ["TL"] = {
-                                        "Naiintindihan ko, {addressee.name}.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2636,14 +2166,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.player.generic.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Understood, {addressee.name}.",
-                        },
-                        ["TL"] = {
-                            "Naiintindihan ko, {addressee.name}.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -2698,15 +2220,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Understood, {addressee.name}.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Understood, {addressee.name}.",
-                                    },
-                                    ["TL"] = {
-                                        "Naiintindihan ko, {addressee.name}.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2783,14 +2298,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.player.generic.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Understood, {addressee.name}.",
-                    },
-                    ["TL"] = {
-                        "Naiintindihan ko, {addressee.name}.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -2816,18 +2323,7 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.command.player.return_home.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, head home.",
-                                        "Return to the base, {addressee.name}.",
-                                        "{addressee.name}, get back home safely.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, umuwi na kayo.",
-                                        "Bumalik sa base, {addressee.name}.",
-                                        "{addressee.name}, ligtas na umuwi.",
-                                    },
-                                },
+                                ["variantCount"] = 3,
                             },
                         },
                     },
@@ -2841,18 +2337,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.player.return_home.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "{addressee.name}, head home.",
-                            "Return to the base, {addressee.name}.",
-                            "{addressee.name}, get back home safely.",
-                        },
-                        ["TL"] = {
-                            "{addressee.name}, umuwi na kayo.",
-                            "Bumalik sa base, {addressee.name}.",
-                            "{addressee.name}, ligtas na umuwi.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -2907,19 +2391,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "{addressee.name}, head home.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, head home.",
-                                        "Return to the base, {addressee.name}.",
-                                        "{addressee.name}, get back home safely.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, umuwi na kayo.",
-                                        "Bumalik sa base, {addressee.name}.",
-                                        "{addressee.name}, ligtas na umuwi.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2996,18 +2469,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.player.return_home.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "{addressee.name}, head home.",
-                        "Return to the base, {addressee.name}.",
-                        "{addressee.name}, get back home safely.",
-                    },
-                    ["TL"] = {
-                        "{addressee.name}, umuwi na kayo.",
-                        "Bumalik sa base, {addressee.name}.",
-                        "{addressee.name}, ligtas na umuwi.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -3033,18 +2494,7 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.command.player.stay.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, wait here.",
-                                        "Hold this position, {addressee.name}.",
-                                        "{addressee.name}, stay put for now.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, maghintay kayo rito.",
-                                        "Panatilihin ang posisyon, {addressee.name}.",
-                                        "{addressee.name}, manatili muna rito.",
-                                    },
-                                },
+                                ["variantCount"] = 3,
                             },
                         },
                     },
@@ -3058,18 +2508,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.command.player.stay.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "{addressee.name}, wait here.",
-                            "Hold this position, {addressee.name}.",
-                            "{addressee.name}, stay put for now.",
-                        },
-                        ["TL"] = {
-                            "{addressee.name}, maghintay kayo rito.",
-                            "Panatilihin ang posisyon, {addressee.name}.",
-                            "{addressee.name}, manatili muna rito.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -3124,19 +2562,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "{addressee.name}, wait here.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "{addressee.name}, wait here.",
-                                        "Hold this position, {addressee.name}.",
-                                        "{addressee.name}, stay put for now.",
-                                    },
-                                    ["TL"] = {
-                                        "{addressee.name}, maghintay kayo rito.",
-                                        "Panatilihin ang posisyon, {addressee.name}.",
-                                        "{addressee.name}, manatili muna rito.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -3213,18 +2640,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.command.player.stay.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "{addressee.name}, wait here.",
-                        "Hold this position, {addressee.name}.",
-                        "{addressee.name}, stay put for now.",
-                    },
-                    ["TL"] = {
-                        "{addressee.name}, maghintay kayo rito.",
-                        "Panatilihin ang posisyon, {addressee.name}.",
-                        "{addressee.name}, manatili muna rito.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },

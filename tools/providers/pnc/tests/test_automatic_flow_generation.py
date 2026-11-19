@@ -337,8 +337,8 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
             stay = worker.input("Stay here")
 
         for result, action, response_key in (
-            (follow, "follow", "conversation.content.semantic.command.follow.queued.neutral.01"),
-            (stay, "stay", "conversation.content.semantic.command.stay.queued.neutral.01"),
+            (follow, "follow", "convo.command.follow.reply.queued.say.1.neutral.1"),
+            (stay, "stay", "convo.command.stay.reply.queued.say.1.neutral.1"),
         ):
             flow = result["result"]["flow"]
             self.assertTrue(flow["generated"])
@@ -386,15 +386,15 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
 
         self.assertEqual(
             friendly["messages"][0]["payload"]["translationKey"],
-            "conversation.content.semantic.command.follow.queued.friendly.neutral.01",
+            "convo.command.follow.reply.queued.say.1.friendly.1",
         )
         self.assertEqual(
             trusted["messages"][0]["payload"]["translationKey"],
-            "conversation.content.semantic.command.follow.queued.neutral.01",
+            "convo.command.follow.reply.queued.say.1.neutral.1",
         )
         self.assertEqual(
             tagalog["messages"][0]["payload"]["translationKey"],
-            "conversation.content.semantic.command.follow.queued.friendly.neutral.01",
+            "convo.command.follow.reply.queued.say.1.friendly.1",
         )
         self.assertEqual(tagalog["messages"][0]["payload"]["text"], "Siyempre, susundan kita.")
         for result in (friendly, trusted, tagalog):
@@ -410,7 +410,7 @@ class AutomaticFlowGenerationTests(WarmWorkerTestMixin, unittest.TestCase):
 
         self.assertEqual(
             first["messages"][0]["payload"]["translationKey"],
-            "conversation.content.semantic.command.follow.queued.neutral.01",
+            "convo.command.follow.reply.queued.say.1.neutral.1",
         )
         self.assertEqual(len(first["dispatchTransport"]), 1)
         self.assertEqual(len(repeated["dispatchTransport"]), 0)

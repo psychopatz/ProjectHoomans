@@ -1,0 +1,13 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.knowledge_and_bite.responses",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": "I know about %s.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionKnowledgeKnown": "I know about %s.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionKnowledgeUnknown": "I don't have reliable information about %s.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative": "No, I don't have a recorded bite.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionMedicalBitePositive": "Yes, I've been bitten.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionMedicalBiteUnknown": "I can't confirm whether I've been bitten."
+  }
+}

@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I'm pretty shaken up right now.",
-            "My heart is pounding out of my chest.",
-            "That was way too close. Need a minute to breathe.",
-            "Trying to keep my hands from shaking.",
-            "Terrified, if I'm being honest with you.",
-            "Felt like my heart was going to stop back there.",
-            "Need to catch my breath and calm my nerves.",
-            "Adrenaline is surging. Hard to think straight.",
-            "Still feeling the panic creeping up on me.",
-            "Give me a second to get my head together."
-          ],
-          "TL": [
-            "Nanginginig pa rin ako ngayon.",
-            "Napakabilis ng tibok ng puso ko sa kaba.",
-            "Muntik na 'yon. Kailangan ko ng sandali para kumalma.",
-            "Pinipigilan ko ang panginginig ng mga kamay ko.",
-            "Natatakot ako, kung sasabihin ko ang totoo.",
-            "Pakiramdam ko hihinto na ang puso ko kanina.",
-            "Kailangang huminga nang malalim at pakalmahin ang sarili.",
-            "Mataas pa ang adrenaline ko. Hirap mag-isip nang tuwid.",
-            "Nararamdaman ko pa rin ang takot na gumagapang sa akin.",
-            "Bigyan mo ako ng ilang sandali para makabawi ng katinuan."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

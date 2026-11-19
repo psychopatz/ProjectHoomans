@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.scene.grounded_news_answer",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Iyan ang makukumpirma ko sa ngayon.",
+      "Iyan lang ang napatunayang impormasyong hawak ko.",
+      "Iyan ang kabuuan ng nalalaman ko.",
+      "Higit pa riyan, hula-hula na lang.",
+      "Iyan lang ang nagawa kong alamin.",
+      "Sasabihan kita kapag may narinig pa akong bago.",
+      "Iyan ang totoong larawan sa ngayon.",
+      "Iyan ang totoo. Tsismis na ang iba.",
+      "Nasabi ko na ang lahat ng kaya kong kumpirmahin.",
+      "Iyan ang ulat sa kasalukuyan."
+    ],
+    "say.variants.guarded": [
+      "Wala pa akong ibang mapapatunayan.",
+      "Di ako nakikipagtsismisan. Iyan lang ang kumpirmado.",
+      "Huwag kang maghanap ng detalyeng di ko mapatutunayan.",
+      "Hanggang diyan lang. Sa ating dalawa lang 'yan.",
+      "Hindi ako manghuhula. Manatili sa katotohanan.",
+      "Iyan lang ang kailangan mong malaman sa ngayon.",
+      "Anuman higit diyan ay mapanganib na haka-haka.",
+      "Iyan lang ang nakumpirma ko. Wala nang dapat sabihin pa.",
+      "Kunin ang balitang 'yan at magplano nang maayos.",
+      "Iyan lang ang tiyak. Mag-ingat ka sa hakbang mo."
+    ],
+    "say.variants.terse": [
+      "Iyan lang ang makukumpirma ko.",
+      "Iyon lang.",
+      "Lahat ng alam ko.",
+      "Kumpirmado lang.",
+      "Wala nang iba.",
+      "Iyon na ang lahat.",
+      "Buong ulat.",
+      "Diyan nagtatapos.",
+      "Tapos.",
+      "Iyan lang."
+    ],
+    "say.variants.warm": [
+      "Sana mas marami akong alam, pero iyan ang makukumpirma ko.",
+      "Iyan lang muna, kaibigan, pero patuloy akong magtatanong.",
+      "Gusto kong ibahagi ang lahat para manatili kang ligtas.",
+      "Kapag may bagong balita, ikaw ang una kong sasabihan.",
+      "Sana makatulong 'yan sa 'yo ngayong araw, kasama.",
+      "Iyan ang buong kuwento ayon sa sinabi sa akin.",
+      "Mabuti at naipasa ko sa 'yo 'yan.",
+      "Iyan ang hawak natin sa ngayon, kaibigan.",
+      "Bukas ang tainga ko para sa 'yo.",
+      "Iyan ang lahat sa ngayon. Ingatan mo ang sarili mo."
+    ]
+  }
+}

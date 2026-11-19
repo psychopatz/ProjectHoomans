@@ -1,0 +1,103 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "medical.distress.call",
+  "locale": "EN",
+  "entries": {
+    "say.variants.bandage": [
+      "I'm hurt and down! Need a bandage over here!",
+      "Deep cut... I need a bandage now!",
+      "I can't stop this wound alone! Bring a bandage!",
+      "Patch me up, please! I'm losing blood!",
+      "I'm down! Does anyone have a clean rag or bandage?!",
+      "Gash on my leg... need wrapping right now!",
+      "Help! I need these wounds dressed!",
+      "I'm on the floor, bleeding! Get a bandage over here!",
+      "Need a patch immediately! I'm grounded!",
+      "Bandage, quick! I can't get up without one!"
+    ],
+    "say.variants.bleedout": [
+      "I'm bleeding out! I need a tourniquet or bandage now!",
+      "Dying here! The blood won't stop flowing!",
+      "I'm losing too much blood... getting cold!",
+      "Hit an artery! Put pressure on this right now!",
+      "Everything's going dark... stop the bleeding, please!",
+      "I'm bleeding through my clothes! Help me!",
+      "Blood everywhere... please, I don't want to die here!",
+      "Losing consciousness... plug this wound!",
+      "Hurry! I'm bleeding out on the dirt!",
+      "Can't feel my fingers... stop the blood!"
+    ],
+    "say.variants.default": [
+      "I'm down! I need help over here!",
+      "Can't stand! Someone help me up!",
+      "I'm hit! Get over here!",
+      "Need medical attention immediately!",
+      "Down and helpless! Don't leave me!",
+      "I took a bad fall! Help me!",
+      "Can't get back on my feet! Help!",
+      "Hurt bad! Over here, please!",
+      "I'm down on the ground! Need a hand!",
+      "Injured and stranded! Come help!"
+    ],
+    "say.variants.dehydration": [
+      "So thirsty... I need water before I pass out.",
+      "Throat is completely parched... please, any water?",
+      "Drying out... can barely swallow. Water, please.",
+      "I'm too dehydrated to move my legs. Water...",
+      "Give me a sip of water... dying of thirst.",
+      "Lips are cracked and bleeding... need clean water.",
+      "Can't walk anymore... please bring a water bottle.",
+      "Head is pounding from dehydration... need a drink.",
+      "I'm collapsing... just a few drops of water.",
+      "Water... please, someone hand me water."
+    ],
+    "say.variants.exhaustion": [
+      "Pushed too far. I can't lift my arms.",
+      "Completely spent... give me a moment to recover.",
+      "Legs gave out beneath me. Need to sit.",
+      "Can't move another step. Total exhaustion.",
+      "Breathing hurts. I need rest right now.",
+      "Collapsed from fatigue... give me five minutes.",
+      "Muscles are locking up. Can't stand.",
+      "I have nothing left in the tank. Need a break.",
+      "Vision is swimming from exhaustion. Give me time.",
+      "Body won't respond... let me rest a second."
+    ],
+    "say.variants.mercy": [
+      "I'm down! Please, don't kill me!",
+      "Mercy, please! I'm completely unarmed!",
+      "Don't shoot! I'm already defeated!",
+      "Please let me live! I surrender!",
+      "Spare me, please! I have nothing left!",
+      "I beg you... don't finish me off!",
+      "I yield! Don't strike again!",
+      "Show mercy! I'm bleeding out on the floor!",
+      "Don't hurt me anymore, please!",
+      "Have a heart... let me survive this."
+    ],
+    "say.variants.rescue": [
+      "I'm trapped here! I need help over here!",
+      "Can't move on my own! Pull me out!",
+      "Pinned down and injured! Come get me!",
+      "Over here! Don't leave me stranded!",
+      "I'm stuck behind rubble! Need someone to clear it!",
+      "Can't crawl any further! Help me!",
+      "I'm over here, behind cover! Pull me back!",
+      "Rescue me, please! They're getting closer!",
+      "I need extraction! Can't walk out of here!",
+      "Help me get out! My leg is broken!"
+    ],
+    "say.variants.starvation": [
+      "Haven't eaten in days... I'm starving to death.",
+      "Too weak from hunger to stand up. Food, please.",
+      "Stomach is eating itself... any crumbs left?",
+      "Starving... can't even hold my weapon.",
+      "Please, just a bite of anything edible.",
+      "Fainting from lack of calories. I need food.",
+      "Hunger cramps are tearing me apart. Help me.",
+      "I can't go on like this without food in my belly.",
+      "Empty for days... please bring me something to eat.",
+      "Starving on the floor... spare a ration, please."
+    ]
+  }
+}

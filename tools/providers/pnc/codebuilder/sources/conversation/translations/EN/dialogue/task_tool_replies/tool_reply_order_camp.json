@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.order_camp",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "All right. We will make camp here.",
+      "Setting up camp right in this spot.",
+      "Understood. Establishing camp.",
+      "Camp order received. Pitching shelter.",
+      "Good place to bed down. Making camp.",
+      "Understood. Securing the campsite.",
+      "Right. Making camp here.",
+      "On it. Setting up our camp.",
+      "Camp routine initiated.",
+      "Copy that. We camp here."
+    ],
+    "say.2.neutral": [
+      "I will settle in here for now.",
+      "Dropping my pack and settling down.",
+      "Settling in. Let me know if anything changes.",
+      "Finding a comfortable corner right here.",
+      "I'll rest my legs and settle in.",
+      "Settling into position. Feels decent.",
+      "Unpacking light gear and settling here.",
+      "Settling in for the watch.",
+      "All right, I'll make myself at home here.",
+      "Settling down. Staying alert."
+    ],
+    "say.3.neutral": [
+      "Understood. I will stay here and take care of my needs.",
+      "I'll tend to my wounds and rest up here.",
+      "Taking care of hunger and thirst in camp.",
+      "I'll patch up my gear and eat a meal here.",
+      "Good. I needed time to sort myself out.",
+      "Handling my personal upkeep while we camp.",
+      "Resting, eating, and recovering strength.",
+      "I'll use this camp time to recover.",
+      "Taking care of myself while holding camp.",
+      "Understood. Time for self-maintenance."
+    ]
+  }
+}

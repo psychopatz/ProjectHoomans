@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Not now.",
-              "Now is not the time for games.",
-              "We have real survival to worry about. Not now.",
-              "I'm busy staying alive. Not playing games.",
-              "Not in the mood for games right now.",
-              "Save the distractions for later.",
-              "Not now. Stay focused on our safety.",
-              "Too much danger around for games.",
-              "I have to pass on that right now.",
-              "Not happening today. Focus."
-            ],
-            "TL": [
-              "Hindi ngayon.",
-              "Hindi ngayon ang oras para sa laro.",
-              "May tunay na kaligtasan tayong iniisip. Hindi ngayon.",
-              "Abala ako sa pananatiling buhay. Di ako maglalaro.",
-              "Wala ako sa mood para maglaro ngayon.",
-              "Itabi ang pampalipas-oras mamaya.",
-              "Hindi ngayon. Magpokus sa kaligtasan natin.",
-              "Masyadong maraming panganib sa paligid para maglaro.",
-              "Lalampasan ko muna 'yan ngayon.",
-              "Di mangyayari ngayon. Magpokus."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "That did not land well.",
-              "That was poorly timed.",
-              "Bad moment for that attempt.",
-              "That fell completely flat.",
-              "Wrong audience, wrong time.",
-              "That missed the mark entirely.",
-              "That did not go over the way you hoped.",
-              "Poor execution on that one.",
-              "That landed terribly. Try focusing instead.",
-              "That didn't work at all."
-            ],
-            "TL": [
-              "Hindi naging maganda ang dating niyan.",
-              "Maling-mali ang tiyempo niyan.",
-              "Masamang sandali para sa pagtatangkang 'yan.",
-              "Bumagsak lang nang walang saysay 'yon.",
-              "Maling kausap, maling oras.",
-              "Lumihis nang buo sa dapat patunguhan.",
-              "Di naging ayon sa inasahan mo ang takbo niyan.",
-              "Mahina ang pagkagawa sa isang 'yon.",
-              "Napakasama ng dating niyan. Magpokus ka na lang.",
-              "Hindi talaga umubra 'yan."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

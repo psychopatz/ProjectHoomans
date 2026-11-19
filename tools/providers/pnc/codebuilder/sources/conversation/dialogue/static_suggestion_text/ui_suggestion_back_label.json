@@ -6,22 +6,14 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.back.label",
-        "text": {
-          "EN": "Back",
-          "TL": "Bumalik"
-        }
+        "key": "suggestion.back.label"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": "Back",
-          "TL": "Bumalik"
-        }
+        "id": "neutral"
       }
     ]
   },

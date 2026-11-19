@@ -9,10 +9,6 @@
     "variants": [
       {
         "id": "question.backstory.refusal.authored",
-        "text": {
-          "EN": "I'm not ready to talk about that yet.",
-          "TL": "Hindi pa ako handang pag-usapan iyan."
-        },
         "metadata": {
           "fallback": "I'm not ready to talk about that yet.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal"

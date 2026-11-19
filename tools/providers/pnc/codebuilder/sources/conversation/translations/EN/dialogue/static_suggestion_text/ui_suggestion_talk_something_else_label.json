@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.talk_something_else.label",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": "Let's talk something else",
+    "textRows.suggestion.talk_something_else.label": "Let's talk something else"
+  }
+}

@@ -41,80 +41,40 @@
     "rejected": {
       "act": "REPLY",
       "say": {
-        "EN": [
-          "I can't set up camp there right now.",
-          "That spot is far too dangerous to sleep in.",
-          "No way. It's crawling with dead over there.",
-          "I refuse to camp in that area. Find somewhere safer.",
-          "Too exposed. We'd get ambushed in our sleep.",
-          "Can't camp there. No walls, no fire, no cover.",
-          "Not camping there. That's asking to be eaten alive.",
-          "Unable to comply. That position is totally compromised.",
-          "I won't bed down there. Pick another room.",
-          "Camping rejected. We need real security first."
-        ],
-        "TL": [
-          "Hindi ako makapag-set up ng kampo roon ngayon.",
-          "Masyadong mapanganib ang pwestong 'yon para tulugan.",
-          "Ayoko nga. Puno ng patay doon.",
-          "Tumatanggi akong magkampo roon. Maghanap ng mas ligtas.",
-          "Masyadong bukas. Matatambangan tayo habang natutulog.",
-          "Di makapagkampo roon. Walang pader, apoy, o silong.",
-          "Di ako magkakampo roon. Parang nagpapakain tayo nang buhay.",
-          "Di makasusunod. Masyadong dehado ang pwestong 'yan.",
-          "Di ako hihiga roon. Pumili ka ng ibang kwarto.",
-          "Tinatanggihan ang kampo. Kailangan natin ng tunay na kaligtasan."
+        "variants": [
+          {
+            "id": "default"
+          }
         ]
       }
     },
     "failed": {
       "act": "REPLY",
       "say": {
-        "EN": [
-          "I couldn't set up camp there.",
-          "Failed to establish camp. That spot wasn't viable.",
-          "I tried to camp there, but it didn't work out.",
-          "Couldn't secure that position for a camp.",
-          "Camp setup failed. The area is too exposed.",
-          "Unable to bed down there. Too many issues.",
-          "That campsite didn't pan out. Too dangerous.",
-          "Attempted to camp, but had to pull out.",
-          "Can't pitch camp there. Ground wasn't secure.",
-          "Camping attempt failed. Finding another spot."
-        ],
-        "TL": [
-          "Hindi ako nakapag-set up ng kampo roon.",
-          "Bigo sa pagtatayo ng kampo. Di angkop ang lugar.",
-          "Sinubukan kong magkampo roon, pero hindi umubra.",
-          "Hindi ma-secure ang pwestong 'yon para sa kampo.",
-          "Pumalpak ang pagtatayo ng kampo. Masyadong bukas ang lugar.",
-          "Di makatulog doon. Masyadong maraming aberya.",
-          "Di umubra ang kampong 'yon. Masyadong mapanganib.",
-          "Sinubukang magkampo, pero kinailangang umurong.",
-          "Di makapaglatag ng kampo roon. Di ligtas ang lupa.",
-          "Bigo ang pagtatangkang magkampo. Maghanap ng iba."
+        "variants": [
+          {
+            "id": "default"
+          }
         ]
       }
     },
     "pending": {
       "act": "REPLY",
       "say": {
-        "EN": [
-          "I'll head {camp.locationPhrase} and set up camp."
-        ],
-        "TL": [
-          "Pupunta ako {camp.locationPhrase} at magtatayo ng kampo."
+        "variants": [
+          {
+            "id": "default"
+          }
         ]
       }
     },
     "completed": {
       "act": "REPLY",
       "say": {
-        "EN": [
-          "We're set up {camp.locationPhrase}."
-        ],
-        "TL": [
-          "Nakatayo na ang kampo {camp.locationPhrase}."
+        "variants": [
+          {
+            "id": "default"
+          }
         ]
       }
     },
@@ -122,11 +82,10 @@
       "when": "result.reasonClass == \"out_of_range\"",
       "act": "REPLY",
       "say": {
-        "EN": [
-          "That camp location is too far away right now."
-        ],
-        "TL": [
-          "Masyadong malayo ang lugar ng kampo na iyon ngayon."
+        "variants": [
+          {
+            "id": "default"
+          }
         ]
       }
     },
@@ -134,11 +93,10 @@
       "when": "result.reasonClass == \"target_unavailable\"",
       "act": "REPLY",
       "say": {
-        "EN": [
-          "I don't see a safe place to camp nearby."
-        ],
-        "TL": [
-          "Wala akong makitang ligtas na lugar para magkampo sa malapit."
+        "variants": [
+          {
+            "id": "default"
+          }
         ]
       }
     }
@@ -159,14 +117,6 @@
     }
   },
   "affordance": {
-    "label": {
-      "EN": [
-        "Set up camp"
-      ],
-      "TL": [
-        "Magtayo ng kampo"
-      ]
-    },
     "consumers": [
       "player"
     ],
@@ -180,11 +130,10 @@
     }
   },
   "say": {
-    "EN": [
-      "Let's camp here."
-    ],
-    "TL": [
-      "Magkampo tayo rito."
+    "variants": [
+      {
+        "id": "default"
+      }
     ]
   },
   "execute": {
@@ -194,10 +143,6 @@
       "npcID": "$context.addressee.id"
     },
     "mode": "request_response"
-  },
-  "textSidecars": {
-    "EN": "translations/command_camp.en.json",
-    "TL": "translations/command_camp.tl.json"
   },
   "invoke": {
     "intent": "COMMAND",

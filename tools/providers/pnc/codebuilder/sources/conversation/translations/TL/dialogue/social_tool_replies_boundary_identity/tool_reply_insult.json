@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.insult",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Iniisip mo bang maaapektuhan ako riyan?",
+      "Kailangan mong galingan kaysa riyan.",
+      "Nakarining na ako ng mas masakit sa mas matitinong tao.",
+      "Ni hindi ako nagasgasan sa sinabi mo.",
+      "Huwag mong sayangin ang laway mo. Walang talab 'yan.",
+      "Iyan na ba ang pinakamagaling na kaya mong sabihin?",
+      "Mahina. Pagbutihin mo sa susunod.",
+      "Hindi nakakasakit ang salita rito. Ang bala ang nakakamatay.",
+      "Akala mo ba tatablan ako niyan? Mag-isip ka ulit.",
+      "Hindi ako humanga."
+    ],
+    "say.2.neutral": [
+      "Maling tao ang binabangga mo.",
+      "Naghahanap ka ng away na hindi mo kayang ipanalo.",
+      "Maling-mali ang taong napili mong galitin.",
+      "Mag-ingat ka. Lalaban ang binabangga mo.",
+      "Hindi mo alam kung sino ang kaharap mo.",
+      "Maling diskarte 'yan, kaibigan.",
+      "Nasa napakanipis kang yelo ngayon.",
+      "Humanap ka ng iba. Hindi ako ang papayag sa ganyan.",
+      "Napakasama ng naging desisyon mo ngayon lang.",
+      "Itinutulak mo ang taong hindi umaatras."
+    ],
+    "say.3.neutral": [
+      "Huwag mong sayangin ang laway mo.",
+      "Hindi sulit ang oras ko sa 'yo.",
+      "Tapos na akong makipag-usap sa 'yo.",
+      "Sinasayang mo lang ang oras nating dalawa.",
+      "Hindi ako magsasayang ng hangin para sa 'yo.",
+      "Umalis ka na bago ka pa makapagsalita ng mas masama.",
+      "Wala akong panahon sa pambatang laro.",
+      "Itago mo na lang sa sarili mo 'yan.",
+      "Bahala ka. Lumayas ka na.",
+      "May tunay akong kaligtasan na dapat asikasuhin. Manahimik ka."
+    ]
+  }
+}

@@ -20,14 +20,6 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.social.recruitment.offer.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Join my group.",
-                                    },
-                                    ["TL"] = {
-                                        "Sumali ka sa grupo ko.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -57,14 +49,6 @@ return {
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.recruitment.offer.reply.accepted.say.1.default",
                                         ["textRole"] = "response",
-                                        ["translations"] = {
-                                            ["EN"] = {
-                                                "Alright, I'll join you.",
-                                            },
-                                            ["TL"] = {
-                                                "Sige, sasama ako sa iyo.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -90,14 +74,6 @@ return {
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.recruitment.offer.reply.already_member.say.1.default",
                                         ["textRole"] = "response",
-                                        ["translations"] = {
-                                            ["EN"] = {
-                                                "I'm already with your group.",
-                                            },
-                                            ["TL"] = {
-                                                "Kasama na ako sa grupo mo.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -123,14 +99,6 @@ return {
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.recruitment.offer.reply.rejected.say.1.default",
                                         ["textRole"] = "response",
-                                        ["translations"] = {
-                                            ["EN"] = {
-                                                "Not a chance.",
-                                            },
-                                            ["TL"] = {
-                                                "Hindi maaari.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -146,14 +114,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.recruitment.offer.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Join my group.",
-                        },
-                        ["TL"] = {
-                            "Sumali ka sa grupo ko.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -162,14 +122,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "response",
                     ["templateID"] = "convo.social.recruitment.offer.reply.accepted.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Alright, I'll join you.",
-                        },
-                        ["TL"] = {
-                            "Sige, sasama ako sa iyo.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -178,14 +130,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "response",
                     ["templateID"] = "convo.social.recruitment.offer.reply.already_member.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'm already with your group.",
-                        },
-                        ["TL"] = {
-                            "Kasama na ako sa grupo mo.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -194,14 +138,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "response",
                     ["templateID"] = "convo.social.recruitment.offer.reply.rejected.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Not a chance.",
-                        },
-                        ["TL"] = {
-                            "Hindi maaari.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
             },
@@ -260,15 +196,8 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
+                                        ["fallback"] = "Alright, I'll join you.",
                                         ["id"] = "default",
-                                        ["text"] = {
-                                            ["EN"] = {
-                                                "Alright, I'll join you.",
-                                            },
-                                            ["TL"] = {
-                                                "Sige, sasama ako sa iyo.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -293,15 +222,8 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
+                                        ["fallback"] = "I'm already with your group.",
                                         ["id"] = "default",
-                                        ["text"] = {
-                                            ["EN"] = {
-                                                "I'm already with your group.",
-                                            },
-                                            ["TL"] = {
-                                                "Kasama na ako sa grupo mo.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -326,15 +248,8 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
+                                        ["fallback"] = "Not a chance.",
                                         ["id"] = "default",
-                                        ["text"] = {
-                                            ["EN"] = {
-                                                "Not a chance.",
-                                            },
-                                            ["TL"] = {
-                                                "Hindi maaari.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -355,15 +270,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Join my group.",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Join my group.",
-                                    },
-                                    ["TL"] = {
-                                        "Sumali ka sa grupo ko.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -473,14 +381,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.recruitment.offer.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Join my group.",
-                    },
-                    ["TL"] = {
-                        "Sumali ka sa grupo ko.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -489,14 +389,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "response",
                 ["templateID"] = "convo.social.recruitment.offer.reply.accepted.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Alright, I'll join you.",
-                    },
-                    ["TL"] = {
-                        "Sige, sasama ako sa iyo.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -505,14 +397,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "response",
                 ["templateID"] = "convo.social.recruitment.offer.reply.already_member.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'm already with your group.",
-                    },
-                    ["TL"] = {
-                        "Kasama na ako sa grupo mo.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -521,14 +405,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "response",
                 ["templateID"] = "convo.social.recruitment.offer.reply.rejected.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Not a chance.",
-                    },
-                    ["TL"] = {
-                        "Hindi maaari.",
-                    },
-                },
                 ["variantID"] = "default",
             },
         },
@@ -554,18 +430,7 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.social.settlement_admission.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Please… let me stay. We have been walking for days, and I do not know how much longer the others can keep going.",
-                                        "I am not asking for much. A roof, a meal, and a chance to be useful. Please let us join you.",
-                                        "You have a settlement. We have nothing left but each other. If there is room, I will work for it.",
-                                    },
-                                    ["TL"] = {
-                                        "Please... hayaan mo akong manatili. Ilang araw na kaming naglalakad, at hindi ko alam kung gaano katagal kayang magpatuloy ang iba.",
-                                        "Hindi ako humihingi ng marami. Isang bubong, isang pagkain, at isang pagkakataon na maging kapaki-pakinabang. Mangyaring hayaan mo kaming samahan ka.",
-                                        "You have a pamayanan. We have nothing left but each other. If there is room, I will trabaho for it.",
-                                    },
-                                },
+                                ["variantCount"] = 3,
                             },
                         },
                     },
@@ -579,18 +444,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.settlement_admission.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Please… let me stay. We have been walking for days, and I do not know how much longer the others can keep going.",
-                            "I am not asking for much. A roof, a meal, and a chance to be useful. Please let us join you.",
-                            "You have a settlement. We have nothing left but each other. If there is room, I will work for it.",
-                        },
-                        ["TL"] = {
-                            "Please... hayaan mo akong manatili. Ilang araw na kaming naglalakad, at hindi ko alam kung gaano katagal kayang magpatuloy ang iba.",
-                            "Hindi ako humihingi ng marami. Isang bubong, isang pagkain, at isang pagkakataon na maging kapaki-pakinabang. Mangyaring hayaan mo kaming samahan ka.",
-                            "You have a pamayanan. We have nothing left but each other. If there is room, I will trabaho for it.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -636,32 +489,20 @@ return {
                 ["textDomain"] = "pnc.convo.social.greetings.settlement_admission.arrival",
                 ["textRows"] = {
                     {
+                        ["fallback"] = "Please… let me stay. We have been walking for days, and I do not know how much longer the others can keep going.",
                         ["key"] = "opening.001",
-                        ["text"] = {
-                            ["EN"] = "Please… let me stay. We have been walking for days, and I do not know how much longer the others can keep going.",
-                            ["TL"] = "Please... hayaan mo akong manatili. Ilang araw na kaming naglalakad, at hindi ko alam kung gaano katagal kayang magpatuloy ang iba.",
-                        },
                     },
                     {
+                        ["fallback"] = "I am not asking for much. A roof, a meal, and a chance to be useful. Please let us join you.",
                         ["key"] = "opening.002",
-                        ["text"] = {
-                            ["EN"] = "I am not asking for much. A roof, a meal, and a chance to be useful. Please let us join you.",
-                            ["TL"] = "Hindi ako humihingi ng marami. Isang bubong, isang pagkain, at isang pagkakataon na maging kapaki-pakinabang. Mangyaring hayaan mo kaming samahan ka.",
-                        },
                     },
                     {
+                        ["fallback"] = "You have a settlement. We have nothing left but each other. If there is room, I will work for it.",
                         ["key"] = "opening.003",
-                        ["text"] = {
-                            ["EN"] = "You have a settlement. We have nothing left but each other. If there is room, I will work for it.",
-                            ["TL"] = "You have a pamayanan. We have nothing left but each other. If there is room, I will trabaho for it.",
-                        },
                     },
                     {
+                        ["fallback"] = "Thank you. I thought I would have to keep walking until there was nowhere left to go.",
                         ["key"] = "response.settlement_admission.accepted.1",
-                        ["text"] = {
-                            ["EN"] = "Thank you. I thought I would have to keep walking until there was nowhere left to go.",
-                            ["TL"] = "salamat po. Naisip ko na kailangan kong magpatuloy sa paglalakad hanggang sa wala na akong mapupuntahan.",
-                        },
                     },
                 },
                 ["textTarget"] = "convo/social/greetings/settlement_admission/arrival",
@@ -678,19 +519,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Please… let me stay. We have been walking for days, and I do not know how much longer the others can keep going.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Please… let me stay. We have been walking for days, and I do not know how much longer the others can keep going.",
-                                        "I am not asking for much. A roof, a meal, and a chance to be useful. Please let us join you.",
-                                        "You have a settlement. We have nothing left but each other. If there is room, I will work for it.",
-                                    },
-                                    ["TL"] = {
-                                        "Please... hayaan mo akong manatili. Ilang araw na kaming naglalakad, at hindi ko alam kung gaano katagal kayang magpatuloy ang iba.",
-                                        "Hindi ako humihingi ng marami. Isang bubong, isang pagkain, at isang pagkakataon na maging kapaki-pakinabang. Mangyaring hayaan mo kaming samahan ka.",
-                                        "You have a pamayanan. We have nothing left but each other. If there is room, I will trabaho for it.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -759,18 +589,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.settlement_admission.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Please… let me stay. We have been walking for days, and I do not know how much longer the others can keep going.",
-                        "I am not asking for much. A roof, a meal, and a chance to be useful. Please let us join you.",
-                        "You have a settlement. We have nothing left but each other. If there is room, I will work for it.",
-                    },
-                    ["TL"] = {
-                        "Please... hayaan mo akong manatili. Ilang araw na kaming naglalakad, at hindi ko alam kung gaano katagal kayang magpatuloy ang iba.",
-                        "Hindi ako humihingi ng marami. Isang bubong, isang pagkain, at isang pagkakataon na maging kapaki-pakinabang. Mangyaring hayaan mo kaming samahan ka.",
-                        "You have a pamayanan. We have nothing left but each other. If there is room, I will trabaho for it.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },
@@ -800,14 +618,6 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.social.territory.set.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Claim this area as our territory.",
-                                    },
-                                    ["TL"] = {
-                                        "Itakda natin ang lugar na ito bilang teritoryo natin.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -837,14 +647,6 @@ return {
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.territory.set.reply.accepted.say.1.default",
                                         ["textRole"] = "response",
-                                        ["translations"] = {
-                                            ["EN"] = {
-                                                "Territory marked.",
-                                            },
-                                            ["TL"] = {
-                                                "Naitakda na ang teritoryo.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -870,14 +672,6 @@ return {
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.territory.set.reply.blocked.say.1.default",
                                         ["textRole"] = "response",
-                                        ["translations"] = {
-                                            ["EN"] = {
-                                                "I don't belong to your settlement.",
-                                            },
-                                            ["TL"] = {
-                                                "Hindi ako kabilang sa settlement mo.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -893,14 +687,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.territory.set.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Claim this area as our territory.",
-                        },
-                        ["TL"] = {
-                            "Itakda natin ang lugar na ito bilang teritoryo natin.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -909,14 +695,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "response",
                     ["templateID"] = "convo.social.territory.set.reply.accepted.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Territory marked.",
-                        },
-                        ["TL"] = {
-                            "Naitakda na ang teritoryo.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -925,14 +703,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "response",
                     ["templateID"] = "convo.social.territory.set.reply.blocked.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I don't belong to your settlement.",
-                        },
-                        ["TL"] = {
-                            "Hindi ako kabilang sa settlement mo.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
             },
@@ -991,15 +761,8 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
+                                        ["fallback"] = "Territory marked.",
                                         ["id"] = "default",
-                                        ["text"] = {
-                                            ["EN"] = {
-                                                "Territory marked.",
-                                            },
-                                            ["TL"] = {
-                                                "Naitakda na ang teritoryo.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -1021,15 +784,8 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
+                                        ["fallback"] = "I don't belong to your settlement.",
                                         ["id"] = "default",
-                                        ["text"] = {
-                                            ["EN"] = {
-                                                "I don't belong to your settlement.",
-                                            },
-                                            ["TL"] = {
-                                                "Hindi ako kabilang sa settlement mo.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -1050,15 +806,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Claim this area as our territory.",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Claim this area as our territory.",
-                                    },
-                                    ["TL"] = {
-                                        "Itakda natin ang lugar na ito bilang teritoryo natin.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1147,14 +896,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.territory.set.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Claim this area as our territory.",
-                    },
-                    ["TL"] = {
-                        "Itakda natin ang lugar na ito bilang teritoryo natin.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -1163,14 +904,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "response",
                 ["templateID"] = "convo.social.territory.set.reply.accepted.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Territory marked.",
-                    },
-                    ["TL"] = {
-                        "Naitakda na ang teritoryo.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -1179,14 +912,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "response",
                 ["templateID"] = "convo.social.territory.set.reply.blocked.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I don't belong to your settlement.",
-                    },
-                    ["TL"] = {
-                        "Hindi ako kabilang sa settlement mo.",
-                    },
-                },
                 ["variantID"] = "default",
             },
         },

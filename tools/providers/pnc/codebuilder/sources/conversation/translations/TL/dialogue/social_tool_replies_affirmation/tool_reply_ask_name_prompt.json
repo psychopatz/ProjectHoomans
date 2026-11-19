@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.ask_name.prompt",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Sasabihin ko ang pangalan ko kapag may tiwala na tayo. Ano ang pangalan mo?",
+      "Patas lang dapat. Sabihin mo muna kung sino ka.",
+      "Hindi ko ibinibigay ang pangalan ko sa di-kilala. Anong tawag sa 'yo?",
+      "Paano kung ikaw muna ang magpakilala? Ano ang pangalan mo?",
+      "Ikaw muna. Sino ba ang kausap ko?",
+      "Mahalaga ang pangalan dito. Sabihin mo muna ang sa 'yo bago magtanong.",
+      "Magpalitan tayo ng pangalan nang patas. Ano dapat ang itawag ko sa 'yo?",
+      "Gusto ko munang malaman kung sino ang nagtatanong bago ko ibigay ang akin.",
+      "Ibigay mo muna ang pangalan mo, baka sakaling ibahagi ko rin ang akin.",
+      "Magpakilala ka muna. Pagpapakita 'yon ng galang sa panahong ito."
+    ]
+  }
+}

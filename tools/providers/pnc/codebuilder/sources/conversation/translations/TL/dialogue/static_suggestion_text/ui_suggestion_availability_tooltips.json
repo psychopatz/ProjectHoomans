@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.availability.tooltips",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": "Hindi magagamit dahil hindi makatanggap ng utos ang kasama ngayon.",
+    "textRows.suggestion.already_following.tooltip": "Sinusundan ka na.",
+    "textRows.suggestion.already_staying.tooltip": "Nananatili na sa puwesto.",
+    "textRows.suggestion.camp_site_out_of_range.tooltip": "Masyadong malayo ang lugar ng kampo sa ngayon.",
+    "textRows.suggestion.camp_site_stale.tooltip": "Hindi na available ang lugar; pumili ng bagong lokasyon.",
+    "textRows.suggestion.companion_busy.tooltip": "Hindi magagamit habang abala o nakikipaglaban ang kasama.",
+    "textRows.suggestion.companion_dead.tooltip": "Hindi magagamit dahil patay na ang kasama.",
+    "textRows.suggestion.companion_incapacitated.tooltip": "Hindi magagamit dahil walang malay o hindi makagalaw ang kasama.",
+    "textRows.suggestion.companion_unavailable.tooltip": "Hindi magagamit dahil hindi makatanggap ng utos ang kasama ngayon.",
+    "textRows.suggestion.go_home.no_base.tooltip": "Hindi magagamit ang pag-uwi dahil wala pang naitayong base.",
+    "textRows.suggestion.no_camp_site.tooltip": "Walang valid na lugar para magkampo sa ngayon.",
+    "textRows.suggestion.not_following.tooltip": "Magagamit ang paghihintay habang sinusundan ka ng kasama."
+  }
+}

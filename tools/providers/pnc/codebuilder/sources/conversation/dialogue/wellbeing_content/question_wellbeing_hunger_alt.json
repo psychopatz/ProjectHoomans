@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I'm getting hungry. Could you spare something to eat?",
-            "Could use some food soon. My energy is dipping low.",
-            "Starting to feel hollow inside. Any food left?",
-            "A small bite would go a long way right now.",
-            "Gotta find something to eat before too long.",
-            "My pack is empty of food. Got anything to share?",
-            "Thinking about food constantly. Need a meal soon.",
-            "Even a crust of bread would help me keep going.",
-            "Stomach's rumbling loud enough to draw attention. Got food?",
-            "Running low on fuel. Spare a bite if you've got extra?"
-          ],
-          "TL": [
-            "Nagugutom na ako. Maaari ba akong makahingi ng makakain?",
-            "Kailangan ko ng pagkain maya-maya. Bumababa na ang lakas ko.",
-            "Parang hungkag na ang sikmura ko. May natira pa bang pagkain?",
-            "Malaking tulong ang kahit kaunting subo ngayon.",
-            "Kailangang makahanap ng makakain sa lalong madaling panahon.",
-            "Wala nang laman ang bag ko. May maibabahagi ka ba?",
-            "Pagkain lang ang nasa isip ko. Kailangang makakain agad.",
-            "Kahit balat ng tinapay makakatulong sa akin para magpatuloy.",
-            "Baka marinig pa ng iba ang kulo ng tiyan ko. May pagkain ka?",
-            "Nauubusan na ako ng enerhiya. Pahingi naman ng konting makakain kung sobra?"
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

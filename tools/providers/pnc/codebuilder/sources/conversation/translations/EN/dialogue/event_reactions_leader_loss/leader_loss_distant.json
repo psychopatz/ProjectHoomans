@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "leader_loss.distant",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "The leader is gone. Someone needs to decide what comes next.",
+      "I barely knew them, but we still need structure.",
+      "Leader died. Life goes on. Who's in charge?",
+      "A casualty like any other. Let's elect someone new.",
+      "They're gone. We still need food and guards.",
+      "Another name scratched off. Let's sort out the command.",
+      "Doesn't change my daily tasks. Who's giving orders now?",
+      "Leader's expired. Pick a replacement and move forward.",
+      "Death is common here. Let's figure out our routine.",
+      "They're dead. What's the practical plan?"
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.stay",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Mananatili ako rito.",
+      "Hawak ko ang pwestong ito.",
+      "Magbabantay ako sa lugar na 'to.",
+      "Naiintindihan ko. Nakatayo rito nang matatag.",
+      "Hindi ako aalis sa lugar na ito.",
+      "Bantay dito hanggang sa bumalik ka.",
+      "Dito lang ako. Mag-ingat ka.",
+      "Naintindihan. Babantayan ang pwestong ito.",
+      "Dito lang ako.",
+      "Hawak ko ang pwesto. Huwag kang magtatagal."
+    ]
+  }
+}

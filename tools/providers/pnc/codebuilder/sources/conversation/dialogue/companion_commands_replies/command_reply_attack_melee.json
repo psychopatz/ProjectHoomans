@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Going in close.",
-            "Melee ready. Closing the distance.",
-            "I'll take them hand-to-hand.",
-            "Blade and blunt ready.",
-            "Saving ammo. Taking them up close.",
-            "Going in with melee.",
-            "I'll crack some skulls up front.",
-            "Melee weapon drawn.",
-            "Moving into striking range.",
-            "Understood. Close-quarters combat."
-          ],
-          "TL": [
-            "Lalapit ako.",
-            "Handa ang pambugbog. Lalapit na ako.",
-            "Lalabanan ko sila nang malapitan.",
-            "Handa ang talim at pamalo.",
-            "Magtitipid ng bala. Lalapitan ko sila.",
-            "Lulusob nang malapitan.",
-            "Babaliin ko ang bungo nila sa unahan.",
-            "Nakahugot na ang panlaban nang malapitan.",
-            "Pumupwesto na sa abot ng hampas.",
-            "Naintindihan. Malapitang bakbakan."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

@@ -1,0 +1,67 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "task.fetch",
+  "locale": "TL",
+  "entries": {
+    "reply.admitted.say.variants.default": [
+      "Kukunin ko iyon.",
+      "Naintindihan. Kukunin ko ang gamit.",
+      "Pupuntahan ko para kunin 'yan para sa 'yo.",
+      "Inaasikaso na. Kukunin ang mga kagamitan.",
+      "Agad-agad. Pupulutin ko 'yon.",
+      "Naiintindihan ko. Ibabalik ko rito.",
+      "Kukunin ko ang gamit na 'yan.",
+      "Lalabas para kunin iyon.",
+      "Nakuha ang utos. Kukunin na.",
+      "Maganda 'yan. Kukunin na ngayon."
+    ],
+    "reply.active.say.variants.default": [
+      "Inaayos ko na iyon ngayon.",
+      "Kinukuha na ang gamit ngayon.",
+      "Papunta na para pulutin iyon.",
+      "Kasalukuyang kinukuha ang mga gamit.",
+      "Papatungo sa kinaroroonan ng bagay.",
+      "Kukunin na ngayon. Mabilis lang ito.",
+      "Kinukuha ayon sa utos.",
+      "Hinahanap at kinukuha ko ang bagay na 'yan.",
+      "Kasalukuyang naglalakad para kunin ang gamit.",
+      "Kasalukuyang kinukuha."
+    ],
+    "reply.completed.say.variants.default": [
+      "Heto na.",
+      "Nakuha na ang gamit. Heto na.",
+      "Nakuha ko ang hiningi mo.",
+      "Nakuha at naihatid na.",
+      "Heto ang mga kagamitan.",
+      "Tapos na ang gawain. Nakuha ang gamit.",
+      "Nakuha na lahat. Hawak ko na nang ligtas.",
+      "Heto na. Buo pa.",
+      "Naihatid na. Ano ang susunod?",
+      "Nakuha ayon sa hiling."
+    ],
+    "reply.rejected.say.variants.default": [
+      "Hindi ko makuha iyon ngayon.",
+      "Nasa bitag ng kamatayan 'yan. Di ko kukunin.",
+      "Masyadong malayo o mapanganib. Tumatangging kunin.",
+      "Puno na ang kamay at bag ko.",
+      "Di ko isusugal ang buhay ko para sa basurang 'yan.",
+      "Di makukuha 'yan sa kasalukuyang kalagayan.",
+      "Wala na akong espasyong paglalagyan ngayon.",
+      "Tinatanggihan ang pagkuha. Pulutin mo nang kusa.",
+      "Di makasusunod. Di abot ang bagay na 'yan.",
+      "Di ko makukuha 'yan para sa 'yo."
+    ],
+    "reply.failed.say.variants.default": [
+      "Hindi ko nakuha iyon.",
+      "Bigo sa pagkuha ng gamit.",
+      "Wala roon ang gamit o kaya'y nasira na.",
+      "May harang sa daan. Di ko naabot.",
+      "Pumigil ang mga kalaban sa pagkuha ko.",
+      "Di makuha 'yon mula sa lalagyan.",
+      "Nawalan ng daan sa gamit. Bigo ang pagkuha.",
+      "Di ko nahanap ang itinuturo mo.",
+      "Puno ang bag o may harang sa daan. Bigo.",
+      "Di makarating sa puntiryang gamit."
+    ]
+  }
+}

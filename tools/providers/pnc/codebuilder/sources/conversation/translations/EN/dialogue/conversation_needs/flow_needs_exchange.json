@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "exchange",
+  "locale": "EN",
+  "entries": {
+    "say.variants.default": "Do you need anything?",
+    "reply.completed.say.variants.default": "Thanks, that helps."
+  }
+}

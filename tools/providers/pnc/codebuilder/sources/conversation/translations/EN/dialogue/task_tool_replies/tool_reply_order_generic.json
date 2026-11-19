@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.order_generic",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "All right.",
+      "Understood.",
+      "Got it.",
+      "Right.",
+      "Copy that.",
+      "On it.",
+      "Will do.",
+      "Heard.",
+      "Acknowledged.",
+      "Sure."
+    ],
+    "say.2.neutral": [
+      "Understood.",
+      "Order received loud and clear.",
+      "Understood. Moving on that now.",
+      "Clear as crystal. Executing.",
+      "Message understood.",
+      "Understood. I will comply.",
+      "Orders clear. Starting now.",
+      "Understood. No problem.",
+      "Clear. On my way to do it.",
+      "Understood completely."
+    ],
+    "say.3.neutral": [
+      "I will handle it.",
+      "Consider it done.",
+      "I'll take care of this.",
+      "Leave it to me.",
+      "I'm on the job.",
+      "I'll see to it right away.",
+      "Handling that now.",
+      "I've got this covered.",
+      "Taking care of business.",
+      "I'll get it sorted out."
+    ]
+  }
+}

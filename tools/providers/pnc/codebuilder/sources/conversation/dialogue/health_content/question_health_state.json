@@ -71,10 +71,6 @@
       }
     }
   },
-  "textSidecars": {
-    "EN": "translations/question_health_state.en.json",
-    "TL": "translations/question_health_state.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

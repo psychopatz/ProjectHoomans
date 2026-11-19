@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.reply.thumbsup",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Good.",
+      "Sounds like a plan.",
+      "Glad we agree.",
+      "Right on.",
+      "Understood. Let's make it happen.",
+      "Good to go.",
+      "Works for me.",
+      "Agreed.",
+      "All set then.",
+      "Solid."
+    ],
+    "say.variants.warm": [
+      "That's the spirit.",
+      "Awesome. Let's knock it out.",
+      "Love the energy! Let's do this.",
+      "Great minds think alike, friend.",
+      "Hell yeah. We've got this.",
+      "That's what I like to see. Full speed ahead.",
+      "Good deal. Glad you're on board.",
+      "Right there with you! Let's get it done.",
+      "That puts wind in my sails. Thank you.",
+      "Perfect. We're in sync."
+    ]
+  }
+}

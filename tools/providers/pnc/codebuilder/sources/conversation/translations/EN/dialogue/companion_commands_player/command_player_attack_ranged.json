@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.player.attack_ranged",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "{addressee.name}, keep your distance.",
+      "Give us ranged cover, {addressee.name}.",
+      "{addressee.name}, engage from a safe distance."
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "quest.clinic_supplies.offer",
+  "locale": "EN",
+  "entries": {
+    "reply.queued.say.variants.default": [
+      "I can help with the clinic supplies.",
+      "I'm ready to lend a hand with those medical goods.",
+      "Put me down for the clinic supply run.",
+      "I'm available to help gather medical gear.",
+      "I can assist with securing what the clinic needs.",
+      "Count me in for the clinic supplies.",
+      "I'll pitch in on that medical supply run.",
+      "I can offer my help for the clinic task.",
+      "Glad to help get those supplies to the clinic.",
+      "I can take on part of that clinic effort."
+    ],
+    "reply.rejected.say.variants.default": [
+      "I can't take that clinic-supplies request right now.",
+      "I have to turn down the clinic offer for now.",
+      "Not able to help with medical supplies today.",
+      "I can't sign up for that clinic mission.",
+      "Must decline the clinic supplies offer.",
+      "I can't accept the offer at this time.",
+      "Medical supply run isn't something I can do now.",
+      "I'll have to pass on this clinic offer.",
+      "Can't take on the medical task right now.",
+      "I must reject that offer for the moment."
+    ],
+    "reply.failed.say.variants.default": [
+      "I couldn't check that clinic-supplies request.",
+      "Unable to look over the clinic supply offer.",
+      "The offer couldn't be processed.",
+      "Something went wrong while checking the medical offer.",
+      "Couldn't review the supplies request just now.",
+      "I couldn't verify that clinic offer.",
+      "Failed to inspect the clinic supplies details.",
+      "I wasn't able to review that request.",
+      "Could not check the medical offer properly.",
+      "Checking that offer didn't work out."
+    ]
+  }
+}

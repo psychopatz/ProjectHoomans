@@ -3,7 +3,7 @@ return {
     ["command.camp"] = {
         ["domain"] = "companion_commands_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/CampToFollow",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
         },
         ["id"] = "command.camp",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["command.follow"] = {
         ["domain"] = "companion_commands_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/CampToFollow",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
         },
         ["id"] = "command.follow",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["command.return_home"] = {
         ["domain"] = "companion_commands_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/ReturnHomeToStay",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
         },
         ["id"] = "command.return_home",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
     ["command.stay"] = {
         ["domain"] = "companion_commands_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/ReturnHomeToStay",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
         },
         ["id"] = "command.stay",
         ["kind"] = "dialogue",
@@ -39,7 +39,7 @@ return {
     ["command.stop_following"] = {
         ["domain"] = "companion_commands_lifecycle",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle/CommandStopFollowing",
+            "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle",
         },
         ["id"] = "command.stop_following",
         ["kind"] = "dialogue",

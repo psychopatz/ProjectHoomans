@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I hear you.",
-              "Got it.",
-              "Fair enough.",
-              "Understood.",
-              "I hear what you are saying.",
-              "Message received.",
-              "Makes sense to me.",
-              "Point taken.",
-              "I am listening.",
-              "All right. I hear you."
-            ],
-            "TL": [
-              "Narinig kita.",
-              "Nakuha ko.",
-              "May punto ka.",
-              "Naiintindihan ko.",
-              "Naririnig ko ang sinasabi mo.",
-              "Malinaw, nakuha ko.",
-              "May katuturan 'yan para sa akin.",
-              "Nakuha ko ang punto mo.",
-              "Nakikinig ako sa 'yo.",
-              "Sige. Naririnig kita."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I will keep that in mind.",
-              "I will remember that.",
-              "Good to know. I will think about it.",
-              "I will note that down in my head.",
-              "Thanks for telling me. I will keep it in mind.",
-              "I will hold onto that thought.",
-              "I will factor that in.",
-              "Duly noted.",
-              "I will be mindful of that.",
-              "Right. I will keep that in mind moving forward."
-            ],
-            "TL": [
-              "Isasaisip ko iyan.",
-              "Tandaan ko iyan.",
-              "Mabuting malaman. Pag-iisipan ko.",
-              "Itatatak ko 'yan sa isip ko.",
-              "Salamat sa pagsabi. Tatandaan ko.",
-              "Isasapuso at isasaisip ko iyan.",
-              "Isasaalang-alang ko 'yan.",
-              "Tala ko na 'yan.",
-              "Magiging maingat ako tungkol diyan.",
-              "Sige. Tatandaan ko 'yan sa mga susunod."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

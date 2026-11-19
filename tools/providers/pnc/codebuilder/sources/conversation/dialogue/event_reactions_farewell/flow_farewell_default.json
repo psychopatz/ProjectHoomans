@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Take care.",
-            "Stay safe out there.",
-            "Watch yourself.",
-            "Until next time.",
-            "Keep your guard up.",
-            "Stay sharp on the road.",
-            "Catch you later.",
-            "Safe travels.",
-            "Keep breathing out there.",
-            "See you around."
-          ],
-          "TL": [
-            "Mag-ingat ka.",
-            "Maging ligtas ka sa labas.",
-            "Ingatan mo sarili mo.",
-            "Hanggang sa muli.",
-            "Panatilihing mataas ang depensa.",
-            "Magmatyag sa kalsada.",
-            "Mamaya ulit.",
-            "Ligtas na paglalakbay.",
-            "Manatiling buhay sa labas.",
-            "Magkita na lang tayo."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

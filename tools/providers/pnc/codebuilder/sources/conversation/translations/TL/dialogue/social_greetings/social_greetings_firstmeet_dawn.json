@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greetings.firstmeet.dawn",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Humawak ka dyan. Hindi kita kilala, at ang bukang-liwayway ay isang kakaibang oras para sa pagpapakilala.",
+      "Gising ka bago pa manahimik ang mga patay. Sino ka?",
+      "Madali. Bahagyang nakapatay ang ilaw, at hindi ko inaasahan ang makakasama ko.",
+      "Umaga, kumbaga. Itago ang iyong mga kamay kung saan ko sila makikita.",
+      "Unang liwanag at bagong mukha. Sabihin mo sa akin kung ano ang kailangan mo."
+    ],
+    "textRows.greeting.001": "Humawak ka dyan. Hindi kita kilala, at ang bukang-liwayway ay isang kakaibang oras para sa pagpapakilala.",
+    "textRows.greeting.002": "Gising ka bago pa manahimik ang mga patay. Sino ka?",
+    "textRows.greeting.003": "Madali. Bahagyang nakapatay ang ilaw, at hindi ko inaasahan ang makakasama ko.",
+    "textRows.greeting.004": "Umaga, kumbaga. Itago ang iyong mga kamay kung saan ko sila makikita.",
+    "textRows.greeting.005": "Unang liwanag at bagong mukha. Sabihin mo sa akin kung ano ang kailangan mo."
+  }
+}

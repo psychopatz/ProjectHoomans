@@ -20,14 +20,6 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.social.effectful.wellbeing_trust.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I appreciate you watching my back.",
-                                    },
-                                    ["TL"] = {
-                                        "Pinahahalagahan ko ang pagbabantay mo sa akin.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -53,14 +45,6 @@ return {
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.accepted.say.1.default",
                                         ["textRole"] = "response",
-                                        ["translations"] = {
-                                            ["EN"] = {
-                                                "Always.",
-                                            },
-                                            ["TL"] = {
-                                                "Palagi.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -86,14 +70,6 @@ return {
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.blocked.say.1.default",
                                         ["textRole"] = "response",
-                                        ["translations"] = {
-                                            ["EN"] = {
-                                                "Save it.",
-                                            },
-                                            ["TL"] = {
-                                                "Huwag na.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -109,14 +85,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.effectful.wellbeing_trust.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I appreciate you watching my back.",
-                        },
-                        ["TL"] = {
-                            "Pinahahalagahan ko ang pagbabantay mo sa akin.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -125,14 +93,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "response",
                     ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.accepted.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Always.",
-                        },
-                        ["TL"] = {
-                            "Palagi.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -141,14 +101,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "response",
                     ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.blocked.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Save it.",
-                        },
-                        ["TL"] = {
-                            "Huwag na.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
             },
@@ -219,15 +171,8 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
+                                        ["fallback"] = "Always.",
                                         ["id"] = "default",
-                                        ["text"] = {
-                                            ["EN"] = {
-                                                "Always.",
-                                            },
-                                            ["TL"] = {
-                                                "Palagi.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -249,15 +194,8 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
+                                        ["fallback"] = "Save it.",
                                         ["id"] = "default",
-                                        ["text"] = {
-                                            ["EN"] = {
-                                                "Save it.",
-                                            },
-                                            ["TL"] = {
-                                                "Huwag na.",
-                                            },
-                                        },
                                     },
                                 },
                             },
@@ -278,15 +216,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "I appreciate you watching my back.",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I appreciate you watching my back.",
-                                    },
-                                    ["TL"] = {
-                                        "Pinahahalagahan ko ang pagbabantay mo sa akin.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -375,14 +306,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.effectful.wellbeing_trust.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I appreciate you watching my back.",
-                    },
-                    ["TL"] = {
-                        "Pinahahalagahan ko ang pagbabantay mo sa akin.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -391,14 +314,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "response",
                 ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.accepted.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Always.",
-                    },
-                    ["TL"] = {
-                        "Palagi.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -407,14 +322,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "response",
                 ["templateID"] = "convo.social.effectful.wellbeing_trust.reply.blocked.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Save it.",
-                    },
-                    ["TL"] = {
-                        "Huwag na.",
-                    },
-                },
                 ["variantID"] = "default",
             },
         },
@@ -462,6 +369,7 @@ return {
                 ["act"] = "SMALL_TALK",
                 ["turns"] = {
                     {
+                        ["fallback"] = "A quiet conversation sounds good right now.",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -478,30 +386,13 @@ return {
                                     ["topic"] = "small_talk",
                                 },
                                 ["id"] = "weather",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Some weather we're having.",
-                                    },
-                                    ["TL"] = {
-                                        "Ilang panahon ang nararanasan natin.",
-                                    },
-                                },
+                                ["labelFallback"] = "Some weather we're having.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.weather",
                                     ["responseKey"] = "response.weather",
-                                    ["responseText"] = {
-                                        ["EN"] = "Could be worse. We've worked through worse.",
-                                        ["TL"] = "Maaaring mas masahol pa. Mas malala ang pinagdaanan namin.",
-                                    },
+                                    ["responseTextFallback"] = "Could be worse. We've worked through worse.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Some weather we're having.",
-                                    },
-                                    ["TL"] = {
-                                        "Ilang panahon ang nararanasan natin.",
-                                    },
-                                },
+                                ["utteranceFallback"] = "Some weather we're having.",
                             },
                             {
                                 ["consumers"] = {
@@ -514,43 +405,18 @@ return {
                                     ["topic"] = "small_talk",
                                 },
                                 ["id"] = "quiet_day",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Quiet day so far.",
-                                    },
-                                    ["TL"] = {
-                                        "Tahimik na araw hanggang ngayon.",
-                                    },
-                                },
+                                ["labelFallback"] = "Quiet day so far.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.quiet_day",
                                     ["responseKey"] = "response.quiet_day",
-                                    ["responseText"] = {
-                                        ["EN"] = "The crew earned one.",
-                                        ["TL"] = "Karapat-dapat iyon ng grupo.",
-                                    },
+                                    ["responseTextFallback"] = "The crew earned one.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Quiet day so far.",
-                                    },
-                                    ["TL"] = {
-                                        "Tahimik na araw hanggang ngayon.",
-                                    },
-                                },
+                                ["utteranceFallback"] = "Quiet day so far.",
                                 ["when"] = {
                                     ["op"] = "gte",
                                     ["path"] = "relationship.speakerToAddressee.familiarity",
                                     ["value"] = 1,
                                 },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "A quiet conversation sounds good right now.",
-                            },
-                            ["TL"] = {
-                                "Ang isang tahimik na pag-uusap ay pakinggan ngayon.",
                             },
                         },
                     },
@@ -693,6 +559,7 @@ return {
                 ["act"] = "SMALL_TALK",
                 ["turns"] = {
                     {
+                        ["fallback"] = "All right. We can talk for a minute.",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -709,30 +576,13 @@ return {
                                     ["topic"] = "small_talk",
                                 },
                                 ["id"] = "weather",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Some weather we're having.",
-                                    },
-                                    ["TL"] = {
-                                        "Ilang panahon ang nararanasan natin.",
-                                    },
-                                },
+                                ["labelFallback"] = "Some weather we're having.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.weather",
                                     ["responseKey"] = "response.weather",
-                                    ["responseText"] = {
-                                        ["EN"] = "At least the rain covers our footsteps.",
-                                        ["TL"] = "At least natatakpan ng ulan ang mga yapak namin.",
-                                    },
+                                    ["responseTextFallback"] = "At least the rain covers our footsteps.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Some weather we're having.",
-                                    },
-                                    ["TL"] = {
-                                        "Ilang panahon ang nararanasan natin.",
-                                    },
-                                },
+                                ["utteranceFallback"] = "Some weather we're having.",
                             },
                             {
                                 ["consumers"] = {
@@ -745,43 +595,18 @@ return {
                                     ["topic"] = "small_talk",
                                 },
                                 ["id"] = "quiet_day",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Quiet day so far.",
-                                    },
-                                    ["TL"] = {
-                                        "Tahimik na araw hanggang ngayon.",
-                                    },
-                                },
+                                ["labelFallback"] = "Quiet day so far.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.quiet_day",
                                     ["responseKey"] = "response.quiet_day",
-                                    ["responseText"] = {
-                                        ["EN"] = "Do not tempt fate, but I'll take it.",
-                                        ["TL"] = "Huwag tuksuhin ang kapalaran, ngunit kukunin ko ito.",
-                                    },
+                                    ["responseTextFallback"] = "Do not tempt fate, but I'll take it.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Quiet day so far.",
-                                    },
-                                    ["TL"] = {
-                                        "Tahimik na araw hanggang ngayon.",
-                                    },
-                                },
+                                ["utteranceFallback"] = "Quiet day so far.",
                                 ["when"] = {
                                     ["op"] = "gte",
                                     ["path"] = "relationship.speakerToAddressee.familiarity",
                                     ["value"] = 1,
                                 },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right. We can talk for a minute.",
-                            },
-                            ["TL"] = {
-                                "Sige. Maaari tayong mag-usap sandali.",
                             },
                         },
                     },
@@ -924,6 +749,7 @@ return {
                 ["act"] = "SMALL_TALK",
                 ["turns"] = {
                     {
+                        ["fallback"] = "I always have time for you, {addressee.name}.",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -940,30 +766,13 @@ return {
                                     ["topic"] = "small_talk",
                                 },
                                 ["id"] = "weather",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Some weather we're having.",
-                                    },
-                                    ["TL"] = {
-                                        "Ilang panahon ang nararanasan natin.",
-                                    },
-                                },
+                                ["labelFallback"] = "Some weather we're having.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.weather",
                                     ["responseKey"] = "response.weather",
-                                    ["responseText"] = {
-                                        ["EN"] = "I barely noticed. I was watching you.",
-                                        ["TL"] = "bahagya kong napansin. pinapanood kita.",
-                                    },
+                                    ["responseTextFallback"] = "I barely noticed. I was watching you.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Some weather we're having.",
-                                    },
-                                    ["TL"] = {
-                                        "Ilang panahon ang nararanasan natin.",
-                                    },
-                                },
+                                ["utteranceFallback"] = "Some weather we're having.",
                             },
                             {
                                 ["consumers"] = {
@@ -976,43 +785,18 @@ return {
                                     ["topic"] = "small_talk",
                                 },
                                 ["id"] = "quiet_day",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Quiet day so far.",
-                                    },
-                                    ["TL"] = {
-                                        "Tahimik na araw hanggang ngayon.",
-                                    },
-                                },
+                                ["labelFallback"] = "Quiet day so far.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.quiet_day",
                                     ["responseKey"] = "response.quiet_day",
-                                    ["responseText"] = {
-                                        ["EN"] = "Then spend part of it with me.",
-                                        ["TL"] = "Kung gayon, gugulin mo ang bahagi nito kasama ako.",
-                                    },
+                                    ["responseTextFallback"] = "Then spend part of it with me.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Quiet day so far.",
-                                    },
-                                    ["TL"] = {
-                                        "Tahimik na araw hanggang ngayon.",
-                                    },
-                                },
+                                ["utteranceFallback"] = "Quiet day so far.",
                                 ["when"] = {
                                     ["op"] = "gte",
                                     ["path"] = "relationship.speakerToAddressee.familiarity",
                                     ["value"] = 1,
                                 },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I always have time for you, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Palagi akong may oras para sa iyo, {addressee.name}.",
                             },
                         },
                     },
@@ -1155,6 +939,7 @@ return {
                 ["act"] = "CHECK_IN",
                 ["turns"] = {
                     {
+                        ["fallback"] = "Still standing. Go ahead.",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -1171,14 +956,7 @@ return {
                                     ["topic"] = "wellbeing",
                                 },
                                 ["id"] = "condition",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "How are you holding up?",
-                                    },
-                                    ["TL"] = {
-                                        "Kamusta ka na?",
-                                    },
-                                },
+                                ["labelFallback"] = "How are you holding up?",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.condition",
                                     ["effects"] = {
@@ -1189,19 +967,9 @@ return {
                                         },
                                     },
                                     ["responseKey"] = "response.condition",
-                                    ["responseText"] = {
-                                        ["EN"] = "Tired, but ready if the group needs me.",
-                                        ["TL"] = "Tired, but ready if the grupo needs me.",
-                                    },
+                                    ["responseTextFallback"] = "Tired, but ready if the group needs me.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "How are you holding up?",
-                                    },
-                                    ["TL"] = {
-                                        "Kamusta ka na?",
-                                    },
-                                },
+                                ["utteranceFallback"] = "How are you holding up?",
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -1228,14 +996,7 @@ return {
                                     ["topic"] = "wellbeing",
                                 },
                                 ["id"] = "offer_help",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Do you need any help?",
-                                    },
-                                    ["TL"] = {
-                                        "Kailangan mo ba ng anumang tulong?",
-                                    },
-                                },
+                                ["labelFallback"] = "Do you need any help?",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.offer_help",
                                     ["effects"] = {
@@ -1246,19 +1007,9 @@ return {
                                         },
                                     },
                                     ["responseKey"] = "response.offer_help",
-                                    ["responseText"] = {
-                                        ["EN"] = "A little rest would help. I appreciate you asking.",
-                                        ["TL"] = "Makakatulong ang kaunting pahinga. Pinahahalagahan ko ang pagtatanong mo.",
-                                    },
+                                    ["responseTextFallback"] = "A little rest would help. I appreciate you asking.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Do you need any help?",
-                                    },
-                                    ["TL"] = {
-                                        "Kailangan mo ba ng anumang tulong?",
-                                    },
-                                },
+                                ["utteranceFallback"] = "Do you need any help?",
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -1273,14 +1024,6 @@ return {
                                         },
                                     },
                                 },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Still standing. Go ahead.",
-                            },
-                            ["TL"] = {
-                                "Nakatayo pa rin. Sige na.",
                             },
                         },
                     },
@@ -1446,6 +1189,7 @@ return {
                 ["act"] = "CHECK_IN",
                 ["turns"] = {
                     {
+                        ["fallback"] = "I'm managing. What did you want to ask?",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -1462,14 +1206,7 @@ return {
                                     ["topic"] = "wellbeing",
                                 },
                                 ["id"] = "condition",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "How are you holding up?",
-                                    },
-                                    ["TL"] = {
-                                        "Kamusta ka na?",
-                                    },
-                                },
+                                ["labelFallback"] = "How are you holding up?",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.condition",
                                     ["effects"] = {
@@ -1480,19 +1217,9 @@ return {
                                         },
                                     },
                                     ["responseKey"] = "response.condition",
-                                    ["responseText"] = {
-                                        ["EN"] = "I'm still breathing. That's enough for now.",
-                                        ["TL"] = "humihinga pa ako. Tama na sa ngayon.",
-                                    },
+                                    ["responseTextFallback"] = "I'm still breathing. That's enough for now.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "How are you holding up?",
-                                    },
-                                    ["TL"] = {
-                                        "Kamusta ka na?",
-                                    },
-                                },
+                                ["utteranceFallback"] = "How are you holding up?",
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -1519,14 +1246,7 @@ return {
                                     ["topic"] = "wellbeing",
                                 },
                                 ["id"] = "offer_help",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Do you need any help?",
-                                    },
-                                    ["TL"] = {
-                                        "Kailangan mo ba ng anumang tulong?",
-                                    },
-                                },
+                                ["labelFallback"] = "Do you need any help?",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.offer_help",
                                     ["effects"] = {
@@ -1537,19 +1257,9 @@ return {
                                         },
                                     },
                                     ["responseKey"] = "response.offer_help",
-                                    ["responseText"] = {
-                                        ["EN"] = "I'll manage, but thanks for asking.",
-                                        ["TL"] = "Aayusin ko, pero salamat sa pagtatanong.",
-                                    },
+                                    ["responseTextFallback"] = "I'll manage, but thanks for asking.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Do you need any help?",
-                                    },
-                                    ["TL"] = {
-                                        "Kailangan mo ba ng anumang tulong?",
-                                    },
-                                },
+                                ["utteranceFallback"] = "Do you need any help?",
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -1564,14 +1274,6 @@ return {
                                         },
                                     },
                                 },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm managing. What did you want to ask?",
-                            },
-                            ["TL"] = {
-                                "pinamamahalaan ko. Ano ang gusto mong itanong?",
                             },
                         },
                     },
@@ -1737,6 +1439,7 @@ return {
                 ["act"] = "CHECK_IN",
                 ["turns"] = {
                     {
+                        ["fallback"] = "I'll be honest with you, {addressee.name}. Ask.",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -1753,14 +1456,7 @@ return {
                                     ["topic"] = "wellbeing",
                                 },
                                 ["id"] = "condition",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "How are you really doing?",
-                                    },
-                                    ["TL"] = {
-                                        "Kamusta ka na talaga?",
-                                    },
-                                },
+                                ["labelFallback"] = "How are you really doing?",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.condition",
                                     ["effects"] = {
@@ -1771,19 +1467,9 @@ return {
                                         },
                                     },
                                     ["responseKey"] = "response.condition",
-                                    ["responseText"] = {
-                                        ["EN"] = "Better now that you're here.",
-                                        ["TL"] = "Mas mabuti na ngayong nandito ka na.",
-                                    },
+                                    ["responseTextFallback"] = "Better now that you're here.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "How are you really doing?",
-                                    },
-                                    ["TL"] = {
-                                        "Kamusta ka na talaga?",
-                                    },
-                                },
+                                ["utteranceFallback"] = "How are you really doing?",
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -1810,14 +1496,7 @@ return {
                                     ["topic"] = "wellbeing",
                                 },
                                 ["id"] = "offer_help",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Let me help.",
-                                    },
-                                    ["TL"] = {
-                                        "Hayaan mo akong tumulong.",
-                                    },
-                                },
+                                ["labelFallback"] = "Let me help.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.offer_help",
                                     ["effects"] = {
@@ -1828,19 +1507,9 @@ return {
                                         },
                                     },
                                     ["responseKey"] = "response.offer_help",
-                                    ["responseText"] = {
-                                        ["EN"] = "All right. Just stay close for a minute.",
-                                        ["TL"] = "Sige. Manatiling malapit sa isang minuto.",
-                                    },
+                                    ["responseTextFallback"] = "All right. Just stay close for a minute.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Let me help.",
-                                    },
-                                    ["TL"] = {
-                                        "Hayaan mo akong tumulong.",
-                                    },
-                                },
+                                ["utteranceFallback"] = "Let me help.",
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -1855,14 +1524,6 @@ return {
                                         },
                                     },
                                 },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'll be honest with you, {addressee.name}. Ask.",
-                            },
-                            ["TL"] = {
-                                "Magiging tapat ako sa iyo, {addressee.name}. Magtanong.",
                             },
                         },
                     },

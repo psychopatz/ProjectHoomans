@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.panic",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Nanginginig pa rin ako ngayon.",
+      "Napakabilis ng tibok ng puso ko sa kaba.",
+      "Muntik na 'yon. Kailangan ko ng sandali para kumalma.",
+      "Pinipigilan ko ang panginginig ng mga kamay ko.",
+      "Natatakot ako, kung sasabihin ko ang totoo.",
+      "Pakiramdam ko hihinto na ang puso ko kanina.",
+      "Kailangang huminga nang malalim at pakalmahin ang sarili.",
+      "Mataas pa ang adrenaline ko. Hirap mag-isip nang tuwid.",
+      "Nararamdaman ko pa rin ang takot na gumagapang sa akin.",
+      "Bigyan mo ako ng ilang sandali para makabawi ng katinuan."
+    ]
+  }
+}

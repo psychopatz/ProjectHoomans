@@ -10,10 +10,6 @@
     "variants": [
       {
         "id": "default",
-        "text": {
-          "EN": "Before all this, I was %1.",
-          "TL": "Bago ang lahat ng ito, ako ay %1."
-        },
         "metadata": {
           "fallback": "Before all this, I was %1.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryKnown",
@@ -24,10 +20,6 @@
       },
       {
         "id": "education",
-        "text": {
-          "EN": "I studied %1.",
-          "TL": "Nag-aral ako ng %1."
-        },
         "metadata": {
           "fallback": "I studied %1.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryEducation",
@@ -38,10 +30,6 @@
       },
       {
         "id": "family_background",
-        "text": {
-          "EN": "My family was %1.",
-          "TL": "Ang pamilya ko ay %1."
-        },
         "metadata": {
           "fallback": "My family was %1.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFamily",
@@ -52,10 +40,6 @@
       },
       {
         "id": "fear",
-        "text": {
-          "EN": "I have always been afraid of %1.",
-          "TL": "Palagi akong natatakot sa %1."
-        },
         "metadata": {
           "fallback": "I have always been afraid of %1.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFear",
@@ -66,10 +50,6 @@
       },
       {
         "id": "former_job",
-        "text": {
-          "EN": "I worked as %1 before all this.",
-          "TL": "Nagtrabaho ako bilang %1 bago ang lahat ng ito."
-        },
         "metadata": {
           "fallback": "I worked as %1 before all this.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFormerJob",
@@ -80,10 +60,6 @@
       },
       {
         "id": "hobby",
-        "text": {
-          "EN": "I used to enjoy %1.",
-          "TL": "Mahilig ako noon sa %1."
-        },
         "metadata": {
           "fallback": "I used to enjoy %1.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryHobby",
@@ -94,10 +70,6 @@
       },
       {
         "id": "hometown",
-        "text": {
-          "EN": "I grew up in %1.",
-          "TL": "Lumaki ako sa %1."
-        },
         "metadata": {
           "fallback": "I grew up in %1.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryHometown",
@@ -108,10 +80,6 @@
       },
       {
         "id": "tragedy",
-        "text": {
-          "EN": "Something happened: %1.",
-          "TL": "May nangyari: %1."
-        },
         "metadata": {
           "fallback": "Something happened: %1.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryTragedy",

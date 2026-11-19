@@ -10,37 +10,13 @@
   "say": {
     "variants": [
       {
-        "id": "default",
-        "text": {
-          "EN": [
-            "Put your mask back on. The air is not safe."
-          ],
-          "TL": [
-            "Put your mask back on. The air is not safe."
-          ]
-        }
+        "id": "default"
       },
       {
-        "id": "hostile",
-        "text": {
-          "EN": [
-            "Put your mask back on before you become a problem."
-          ],
-          "TL": [
-            "Put your mask back on before you become a problem."
-          ]
-        }
+        "id": "hostile"
       },
       {
-        "id": "lover",
-        "text": {
-          "EN": [
-            "Please put your mask back on, love. This air is not safe."
-          ],
-          "TL": [
-            "Please put your mask back on, love. This air is not safe."
-          ]
-        }
+        "id": "lover"
       }
     ]
   },

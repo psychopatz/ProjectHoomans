@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I'll stay here.",
-            "Holding position right here.",
-            "I'll keep watch in this spot.",
-            "Understood. Standing firm.",
-            "I won't budge from this area.",
-            "Holding ground until you return.",
-            "Staying put. Keep safe.",
-            "Understood. Guarding this position.",
-            "I'll stay right here.",
-            "Holding this spot. Don't take too long."
-          ],
-          "TL": [
-            "Mananatili ako rito.",
-            "Hawak ko ang pwestong ito.",
-            "Magbabantay ako sa lugar na 'to.",
-            "Naiintindihan ko. Nakatayo rito nang matatag.",
-            "Hindi ako aalis sa lugar na ito.",
-            "Bantay dito hanggang sa bumalik ka.",
-            "Dito lang ako. Mag-ingat ka.",
-            "Naintindihan. Babantayan ang pwestong ito.",
-            "Dito lang ako.",
-            "Hawak ko ang pwesto. Huwag kang magtatagal."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

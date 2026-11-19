@@ -10,37 +10,13 @@
   "say": {
     "variants": [
       {
-        "id": "friendly",
-        "text": {
-          "EN": [
-            "Those survivors seem friendly. Keep your hands visible."
-          ],
-          "TL": [
-            "Those survivors seem friendly. Keep your hands visible."
-          ]
-        }
+        "id": "friendly"
       },
       {
-        "id": "hostile",
-        "text": {
-          "EN": [
-            "That group looks hostile. Keep cover between us and them."
-          ],
-          "TL": [
-            "That group looks hostile. Keep cover between us and them."
-          ]
-        }
+        "id": "hostile"
       },
       {
-        "id": "unknown",
-        "text": {
-          "EN": [
-            "Someone is out there. Let us watch before we approach."
-          ],
-          "TL": [
-            "Someone is out there. Let us watch before we approach."
-          ]
-        }
+        "id": "unknown"
       }
     ]
   },

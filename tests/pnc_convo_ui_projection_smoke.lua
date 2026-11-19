@@ -16,8 +16,9 @@ for index, expectedID in ipairs(expected) do
     local row = suggestions[index]
     assert(row.id == expectedID, "Hoomans ConvoEngine UI projection reordered " .. expectedID)
     assert(row.patternID and row.patternID ~= "", "ConvoEngine offer lost its semantic pattern reference")
-    assert(row.display and row.display.EN and row.display.TL, "ConvoEngine offer lost locale display data")
     assert(row.labelKey and row.utteranceKey, "Core did not generate UI translation keys")
+    assert(row.labelFallback and row.utteranceFallback, "ConvoEngine offer lost EN fallback data")
+    assert(row.display == nil, "ConvoEngine offer must not embed multi-locale display data")
 end
 
 local needs = suggestions[1]

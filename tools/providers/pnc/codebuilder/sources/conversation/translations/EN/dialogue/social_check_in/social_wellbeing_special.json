@@ -1,0 +1,14 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.wellbeing.special",
+  "locale": "EN",
+  "entries": {
+    "response.turn.opening.text": "I'll be honest with you, {addressee.name}. Ask.",
+    "response.turn.opening.offer.condition.label": "How are you really doing?",
+    "response.turn.opening.offer.condition.utterance": "How are you really doing?",
+    "response.turn.opening.offer.condition.responseText": "Better now that you're here.",
+    "response.turn.opening.offer.offer_help.label": "Let me help.",
+    "response.turn.opening.offer.offer_help.utterance": "Let me help.",
+    "response.turn.opening.offer.offer_help.responseText": "All right. Just stay close for a minute."
+  }
+}

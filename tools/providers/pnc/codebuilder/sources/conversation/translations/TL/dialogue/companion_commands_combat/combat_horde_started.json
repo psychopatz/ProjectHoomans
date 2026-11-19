@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.horde.started",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Ang dami nila. Mag-ingat tayo.",
+      "May malaking grupo na paparating. Magmatyag.",
+      "May kuyog! Tignan ang mga labasan.",
+      "Masyado silang marami sa labas. Bantayan ang paligid.",
+      "Nagsasama-sama sila. Ayusin ang hanay.",
+      "Nakaakit ng kuyog ang ingay. Humanda.",
+      "Tingnan mo ang kawan na 'yan. Dumikit ka.",
+      "Napakaraming papalapit mula sa kalsada.",
+      "Heto na sila. Huwag silang hayaang pumaligid.",
+      "Malaking grupo ang dumarating. Bantayan ang likod ng bawat isa."
+    ]
+  }
+}

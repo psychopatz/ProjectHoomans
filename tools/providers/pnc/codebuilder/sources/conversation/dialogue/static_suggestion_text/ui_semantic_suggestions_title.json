@@ -6,22 +6,14 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "semantic_suggestions.title",
-        "text": {
-          "EN": "CONTEXTUAL SUGGESTIONS",
-          "TL": "MGA MUNGKAHING PANG-USAP"
-        }
+        "key": "semantic_suggestions.title"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": "CONTEXTUAL SUGGESTIONS",
-          "TL": "MGA MUNGKAHING PANG-USAP"
-        }
+        "id": "neutral"
       }
     ]
   },

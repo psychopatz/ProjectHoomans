@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.order_follow",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "All right. I am with you.",
+      "I'm right behind you.",
+      "Following your lead.",
+      "Understood. Moving out together.",
+      "With you all the way.",
+      "Sticking close behind.",
+      "On your heels. Let's move.",
+      "Right with you, partner.",
+      "Following as ordered.",
+      "Moving in lockstep with you."
+    ],
+    "say.2.neutral": [
+      "Lead the way.",
+      "You lead, I follow.",
+      "After you. Watch our front.",
+      "Take point. I've got your rear.",
+      "Lead on. I'm ready.",
+      "Show the path. I'm right behind.",
+      "Lead the way. Eyes sharp.",
+      "You take the front, partner.",
+      "Point the direction and walk.",
+      "Lead the way out."
+    ],
+    "say.3.neutral": [
+      "I will stay close.",
+      "Won't let you out of my sight.",
+      "Sticking right by your side.",
+      "Keeping tight formation with you.",
+      "Close proximity confirmed.",
+      "I'll match your pace and stay near.",
+      "Right beside you. Don't worry.",
+      "Staying within arm's reach.",
+      "I won't lag behind.",
+      "Staying close behind you."
+    ]
+  }
+}

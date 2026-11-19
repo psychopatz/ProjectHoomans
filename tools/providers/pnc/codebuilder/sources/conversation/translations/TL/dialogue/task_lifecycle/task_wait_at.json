@@ -1,0 +1,67 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "task.wait_at",
+  "locale": "TL",
+  "entries": {
+    "reply.admitted.say.variants.default": [
+      "Sige, maghihintay ako roon.",
+      "Naintindihan. Papatungo sa pwesto ng paghihintay.",
+      "Pupunta ako roon para maghintay.",
+      "Sige, maghihintay ako sa posisyong iyon.",
+      "Papatungo sa marka para maghintay.",
+      "Naiintindihan ko. Hahawakan ko ang lupang iyon.",
+      "Sige. Mag-aayos para maghintay doon.",
+      "Maghihintay ako sa iniatas na marka.",
+      "Kikilos para maghintay ayon sa utos.",
+      "Maganda 'yan. Pupunta para maghintay doon."
+    ],
+    "reply.active.say.variants.default": [
+      "Naghihintay na ako rito ngayon.",
+      "Kasalukuyang nakapwesto at naghihintay.",
+      "Nakahanda sa itinalagang pwesto.",
+      "Naghihintay sa lugar na ito ayon sa utos.",
+      "Nagbabantay habang naghihintay dito mismo.",
+      "Hawak ang pwesto sa marka.",
+      "Naghihintay nang tahimik. Bukas ang mga mata.",
+      "Nasa pwesto at naghihintay.",
+      "Nakatigil sa posteng ito.",
+      "Naghihintay rito. Huwag magmadali."
+    ],
+    "reply.completed.say.variants.default": [
+      "Tapos na ang paghihintay.",
+      "Tapos nang maghintay. Ano ang susunod na galaw?",
+      "Tapos na ang oras ng paghihintay. Handa sa utos.",
+      "Nahawakan ang pwesto. Uurong na ngayon.",
+      "Tapos na ang gawaing maghintay.",
+      "Tapos na sa paghawak ng lupang ito.",
+      "Tapos na ang oras. Tapos nang maghintay dito.",
+      "Sasama muli sa 'yo. Tapos na ang paghihintay.",
+      "Nabantayan ang poste hangga't kinakailangan.",
+      "Natapos ang utos na maghintay."
+    ],
+    "reply.rejected.say.variants.default": [
+      "Hindi ako makapaghintay roon ngayon.",
+      "Nasa linya ng putukan ang pwestong 'yon. Di ako maghihintay doon.",
+      "Pagpapakamatay ang tumayo sa bukas na lugar nang ganoon.",
+      "Tumatangging maghintay sa di-ligtas na posisyon.",
+      "Masyadong maraming kalaban sa paligid para tumayo-tayo lang.",
+      "Kailangan kong gumalaw. Di makapaghihintay doon.",
+      "Tinatanggihan ang paghihintay. Maghanap ng mas ligtas na lugar.",
+      "Di ako maghihintay sa delikadong lugar.",
+      "Di makasusunod. Walang silong ang lugar na 'yan.",
+      "Di ako makapaghihintay sa posisyong 'yon."
+    ],
+    "reply.failed.say.variants.default": [
+      "Hindi ako nakapaghintay roon.",
+      "Pinamugaran ang pwesto. Di nakapagpatuloy maghintay.",
+      "Itinaboy ako ng kalaban mula sa pwesto ng paghihintay.",
+      "Di narating ang itinalagang lugar ng paghihintay.",
+      "Di mahawakan ang lupa roon. Masyadong mapanganib.",
+      "Pumalpak ang paghihintay. Kinailangang lumipat para sa kaligtasan.",
+      "Itinigil ang paghihintay. Naging delikado ang lugar.",
+      "Kinailangan kong iwan ang poste.",
+      "Hindi nakapanatiling nakatigil doon.",
+      "Bigo sa paghawak ng pwesto ng paghihintay."
+    ]
+  }
+}

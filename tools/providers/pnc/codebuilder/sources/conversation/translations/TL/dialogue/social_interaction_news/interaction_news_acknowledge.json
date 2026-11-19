@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.news.acknowledge",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Mabuting malaman iyan.",
+      "Salamat sa balita.",
+      "Isasaisip ko ang impormasyong iyan.",
+      "Mabuting makatanggap ng bagong balita mula sa lugar.",
+      "Salamat sa pagpasa niyan.",
+      "Naintindihan. Binabago niyan ang pananaw natin sa lugar.",
+      "Magandang impormasyon. Magpaplano tayo batay diyan.",
+      "Tala ko na. Mahirap makahanap ng maaasahang balita.",
+      "Salamat sa pagpapanatili sa aking may alam.",
+      "Nakatulong 'yan para maalis ang ilang sabi-sabi. Salamat."
+    ],
+    "say.variants.guarded": [
+      "Tatandaan ko iyan.",
+      "Saan mo narinig ang balitang 'yan?",
+      "Maniwala lang ako kapag nakita ko na ng sarili kong mata.",
+      "Ang tsismis ay nakamamatay dito. Tiyakin mo ang katotohanan.",
+      "Tala ko na, pero kumpirmahin ko muna sa sarili ko.",
+      "Baka bitag 'yan. Huwag kumilos sa sabi-sabi nang padalos-dalos.",
+      "Sinong nagbigay sa 'yo ng impormasyong 'yan?",
+      "Isasaalang-alang ko, pero magmamasid pa rin ako mula sa malayo.",
+      "Huwag mong ikalat 'yan hangga't di tiyak na totoo.",
+      "Narinig ko. Magmamasid ako ng mga patunay."
+    ],
+    "say.variants.terse": [
+      "Sige.",
+      "Tala ko na.",
+      "Narinig ko.",
+      "Magandang balita.",
+      "Naintindihan.",
+      "Malinaw.",
+      "Salamat.",
+      "Tama.",
+      "Kinikilala ko.",
+      "May silbi."
+    ],
+    "say.variants.warm": [
+      "Salamat sa pagsabi. Tatandaan ko iyan.",
+      "Napakalaking balita niyan, kaibigan! Salamat sa pagbabahagi.",
+      "Lagi akong masaya na binabantayan mo ako sa mga ganitong balita.",
+      "Napakagaling ng mga pinagkukunan mo! Maraming salamat.",
+      "Talagang pinahahalagahan ko na ako ang unang pinaalalahanan mo.",
+      "Ang magandang balita ay ginto ang halaga rito. Salamat!",
+      "Salamat sa pagbabahagi niyan sa akin. Nagbibigay ito ng pag-asa.",
+      "Nakahinga ako nang maluwag nang marinig 'yan. Salamat nang marami, kasama.",
+      "Napakagandang impormasyon. Salamat sa pag-iingat sa atin.",
+      "Salamat! Tiyakin nating marinig din ito ng iba."
+    ]
+  }
+}

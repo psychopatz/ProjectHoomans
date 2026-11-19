@@ -1,0 +1,11 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.relationship.special.affinity",
+  "locale": "TL",
+  "entries": {
+    "response.turn.opening.text": "Nakikinig ako, {addressee.name}. Sabihin ang kailangan mong sabihin.",
+    "response.turn.opening.offer.us.label": "Maaari ba nating pag-usapan ang tungkol sa atin?",
+    "response.turn.opening.offer.us.utterance": "Maaari ba nating pag-usapan ang tungkol sa atin?",
+    "response.turn.opening.offer.us.responseText": "Oo. Malamang dapat nga."
+  }
+}

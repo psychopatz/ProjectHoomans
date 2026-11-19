@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.attack_none",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Iiwas ako sa gulo.",
+      "Tigil-putok. Mananatiling tahimik.",
+      "Lalayo ako sa anumang labanan.",
+      "Naiintindihan ko. Ititigil ang lahat ng atake.",
+      "Wala akong gagalawin o pupukawin.",
+      "Nakatago ang armas ko.",
+      "Tahimik na paninindigan. Naintindihan.",
+      "Iiwas ako sa mga kalaban.",
+      "Uuurong sa laban.",
+      "Walang aatake. Nakuha ko."
+    ]
+  }
+}

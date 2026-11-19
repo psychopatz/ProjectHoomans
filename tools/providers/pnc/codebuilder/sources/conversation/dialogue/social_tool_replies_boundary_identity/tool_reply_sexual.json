@@ -10,99 +10,21 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "You are bold. I cannot say I dislike that.",
-              "Well, you certainly do not beat around the bush.",
-              "That is quite a statement out of nowhere.",
-              "You have got nerve. I will hand that to you.",
-              "Bold move. Let us see if you can back it up.",
-              "I like confidence, but do not get ahead of yourself.",
-              "You definitely know what you want.",
-              "Straight to the point. I can appreciate that.",
-              "You are playing with high stakes here.",
-              "Bold words. Do not make promises you cannot keep."
-            ],
-            "TL": [
-              "Matapang ka. Hindi ko masasabing ayaw ko niyan.",
-              "Talagang hindi ka paligoy-ligoy.",
-              "Mabigat na pahayag 'yan nang walang babala.",
-              "May lakas ka ng loob. Ibibigay ko sa 'yo 'yon.",
-              "Matapang na hakbang. Tingnan natin kung kaya mong panindigan.",
-              "Gusto ko ang tiwala sa sarili, pero huwag kang magpadalos-dalos.",
-              "Alam na alam mo talaga ang gusto mo.",
-              "Diretso sa punto. Pinahahalagahan ko 'yan.",
-              "Mataas ang pustahan mo rito.",
-              "Matatapang na salita. Huwag kang mangako ng hindi mo kayang tuparin."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "That is a very direct proposition.",
-              "You do not waste time, do you?",
-              "Straight forward and unfiltered. Noted.",
-              "That is about as clear as it gets.",
-              "No subtlety with you at all, huh?",
-              "Well, there is no mistaking what you are after.",
-              "Direct propositions require some thinking over.",
-              "I heard every word. You made yourself very clear.",
-              "At least you are honest about your intentions.",
-              "That is blunt. Let us see where this goes."
-            ],
-            "TL": [
-              "Napakadiretsang alok niyan.",
-              "Hindi ka talaga nagsasayang ng oras, 'no?",
-              "Diretso at walang paligoy-ligoy. Malinaw.",
-              "Kasing-linaw na 'yan ng tubig.",
-              "Wala talagang pahi-pahiwatig sa 'yo, ha?",
-              "Walang duda kung ano ang hinahabol mo.",
-              "Ang diretsang alok ay kailangan munang pag-isipan.",
-              "Narinig ko ang bawat salita. Naging napakalinaw mo.",
-              "Kahit paano tapat ka sa mga balak mo.",
-              "Prangka 'yon. Tingnan natin kung saan ito hahantong."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "3": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "You are moving fast, but I heard you.",
-              "Slow your roll a bit, but message received.",
-              "Pace yourself. We have got all night.",
-              "You are rushing ahead, but I am listening.",
-              "Fast moves can be exciting, but watch your footing.",
-              "I heard you loud and clear. Take a breath.",
-              "You move quick. Let us see if you have endurance.",
-              "Do not rush a good thing.",
-              "I caught your drift. Let us take it one beat at a time.",
-              "Heard you. Let us see how the evening unfolds."
-            ],
-            "TL": [
-              "Mabilis ang takbo mo, pero narinig kita.",
-              "Dahan-dahan lang muna, pero nakuha ko ang mensahe.",
-              "Huwag kang magmadali. Mahaba pa ang gabi.",
-              "Nagmamadali ka, pero nakikinig ako.",
-              "Nakareregalo ang mabilis na galaw, pero mag-ingat sa hakbang.",
-              "Narinig kita nang malakas at malinaw. Huminga ka muna.",
-              "Mabilis kang kumilos. Tingnan natin kung may tibay ka.",
-              "Huwag mong madaliin ang magandang bagay.",
-              "Nakuha ko ang ibig mong sabihin. Dahan-dahan lang muna tayo.",
-              "Narinig kita. Tingnan natin kung paano tatakbo ang gabi."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

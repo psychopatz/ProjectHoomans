@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.player.salute",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Respect, {addressee.name}.",
+      "I see you, {addressee.name}.",
+      "Stay sharp, {addressee.name}."
+    ]
+  }
+}

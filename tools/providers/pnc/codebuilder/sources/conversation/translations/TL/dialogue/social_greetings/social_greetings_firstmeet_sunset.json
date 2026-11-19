@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greetings.firstmeet.sunset",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Huli na para lumapit sa isang estranghero.",
+      "Ang ilaw ay pupunta. Sabihin mo kung ano ang gusto mong sabihin.",
+      "Hindi kita kilala, pero nakikinig ako.",
+      "Bago dumilim, sabihin mo sa akin kung sino ka.",
+      "Isa pang nakaligtas. Friendly, sana?"
+    ],
+    "textRows.greeting.001": "Huli na para lumapit sa isang estranghero.",
+    "textRows.greeting.002": "Ang ilaw ay pupunta. Sabihin mo kung ano ang gusto mong sabihin.",
+    "textRows.greeting.003": "Hindi kita kilala, pero nakikinig ako.",
+    "textRows.greeting.004": "Bago dumilim, sabihin mo sa akin kung sino ka.",
+    "textRows.greeting.005": "Isa pang nakaligtas. Friendly, sana?"
+  }
+}

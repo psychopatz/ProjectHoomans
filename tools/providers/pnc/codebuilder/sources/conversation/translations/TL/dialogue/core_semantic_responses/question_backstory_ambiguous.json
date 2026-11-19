@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.backstory.ambiguous",
+  "locale": "TL",
+  "entries": {
+    "say.variants.question.backstory.ambiguous.authored": "Aling bahagi ng nakaraan ko ang ibig mong sabihin?"
+  }
+}

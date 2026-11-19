@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.hunger_alt",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Nagugutom na ako. Maaari ba akong makahingi ng makakain?",
+      "Kailangan ko ng pagkain maya-maya. Bumababa na ang lakas ko.",
+      "Parang hungkag na ang sikmura ko. May natira pa bang pagkain?",
+      "Malaking tulong ang kahit kaunting subo ngayon.",
+      "Kailangang makahanap ng makakain sa lalong madaling panahon.",
+      "Wala nang laman ang bag ko. May maibabahagi ka ba?",
+      "Pagkain lang ang nasa isip ko. Kailangang makakain agad.",
+      "Kahit balat ng tinapay makakatulong sa akin para magpatuloy.",
+      "Baka marinig pa ng iba ang kulo ng tiyan ko. May pagkain ka?",
+      "Nauubusan na ako ng enerhiya. Pahingi naman ng konting makakain kung sobra?"
+    ]
+  }
+}

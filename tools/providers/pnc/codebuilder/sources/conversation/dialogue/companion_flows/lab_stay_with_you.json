@@ -49,10 +49,6 @@
     "variants": [
       {
         "id": "accepted",
-        "text": {
-          "EN": "Okay, I'll stay with you.",
-          "TL": "Sige, mananatili ako sa iyo."
-        },
         "metadata": {
           "templateID": "UI_PNC_Conversation_Semantic_PncLabStayWithYouAccepted"
         }

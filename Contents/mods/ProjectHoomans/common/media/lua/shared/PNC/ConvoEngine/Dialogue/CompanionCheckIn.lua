@@ -15,14 +15,6 @@ return {
                 ["labelFallback"] = "Ask about gossip",
                 ["labelKey"] = "convo.question.gossip.affordance.label",
                 ["textRole"] = "button_label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Ask about gossip",
-                    },
-                    ["TL"] = {
-                        "Magtanong tungkol sa tsismis",
-                    },
-                },
             },
             ["familyID"] = "question.gossip",
             ["initiatingSay"] = {
@@ -40,14 +32,6 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.question.gossip.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Any gossip?",
-                                    },
-                                    ["TL"] = {
-                                        "May narinig ka bang tsismis?",
-                                    },
-                                },
                             },
                         },
                     },
@@ -67,28 +51,12 @@ return {
                     ["fallback"] = "Ask about gossip",
                     ["role"] = "button_label",
                     ["templateID"] = "convo.question.gossip.affordance.label",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Ask about gossip",
-                        },
-                        ["TL"] = {
-                            "Magtanong tungkol sa tsismis",
-                        },
-                    },
                 },
                 {
                     ["fallback"] = "Any gossip?",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.gossip.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Any gossip?",
-                        },
-                        ["TL"] = {
-                            "May narinig ka bang tsismis?",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
             },
@@ -123,14 +91,7 @@ return {
                 ["groups"] = {
                     "gossip",
                 },
-                ["label"] = {
-                    ["EN"] = {
-                        "Ask about gossip",
-                    },
-                    ["TL"] = {
-                        "Magtanong tungkol sa tsismis",
-                    },
-                },
+                ["labelFallback"] = "Ask about gossip",
                 ["textRole"] = "button_label",
             },
             ["domains"] = {
@@ -176,15 +137,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Any gossip?",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Any gossip?",
-                                    },
-                                    ["TL"] = {
-                                        "May narinig ka bang tsismis?",
-                                    },
-                                },
                             },
                         },
                     },
@@ -252,28 +206,12 @@ return {
                 ["fallback"] = "Ask about gossip",
                 ["role"] = "button_label",
                 ["templateID"] = "convo.question.gossip.affordance.label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Ask about gossip",
-                    },
-                    ["TL"] = {
-                        "Magtanong tungkol sa tsismis",
-                    },
-                },
             },
             {
                 ["fallback"] = "Any gossip?",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.gossip.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Any gossip?",
-                    },
-                    ["TL"] = {
-                        "May narinig ka bang tsismis?",
-                    },
-                },
                 ["variantID"] = "default",
             },
         },
@@ -294,14 +232,6 @@ return {
                 ["labelFallback"] = "Ask about injuries",
                 ["labelKey"] = "convo.question.health.affordance.label",
                 ["textRole"] = "button_label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Ask about injuries",
-                    },
-                    ["TL"] = {
-                        "Itanong ang mga sugat",
-                    },
-                },
                 ["utility"] = {
                     ["care"] = 1.2,
                 },
@@ -322,14 +252,6 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.question.health.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Are you hurt?",
-                                    },
-                                    ["TL"] = {
-                                        "Nasaktan ka ba?",
-                                    },
-                                },
                             },
                         },
                     },
@@ -349,28 +271,12 @@ return {
                     ["fallback"] = "Ask about injuries",
                     ["role"] = "button_label",
                     ["templateID"] = "convo.question.health.affordance.label",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Ask about injuries",
-                        },
-                        ["TL"] = {
-                            "Itanong ang mga sugat",
-                        },
-                    },
                 },
                 {
                     ["fallback"] = "Are you hurt?",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.health.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Are you hurt?",
-                        },
-                        ["TL"] = {
-                            "Nasaktan ka ba?",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
             },
@@ -405,14 +311,7 @@ return {
                 ["groups"] = {
                     "medical",
                 },
-                ["label"] = {
-                    ["EN"] = {
-                        "Ask about injuries",
-                    },
-                    ["TL"] = {
-                        "Itanong ang mga sugat",
-                    },
-                },
+                ["labelFallback"] = "Ask about injuries",
                 ["textRole"] = "button_label",
                 ["utility"] = {
                     ["care"] = 1.2,
@@ -464,15 +363,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Are you hurt?",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Are you hurt?",
-                                    },
-                                    ["TL"] = {
-                                        "Nasaktan ka ba?",
-                                    },
-                                },
                             },
                         },
                     },
@@ -540,28 +432,12 @@ return {
                 ["fallback"] = "Ask about injuries",
                 ["role"] = "button_label",
                 ["templateID"] = "convo.question.health.affordance.label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Ask about injuries",
-                    },
-                    ["TL"] = {
-                        "Itanong ang mga sugat",
-                    },
-                },
             },
             {
                 ["fallback"] = "Are you hurt?",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.health.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Are you hurt?",
-                    },
-                    ["TL"] = {
-                        "Nasaktan ka ba?",
-                    },
-                },
                 ["variantID"] = "default",
             },
         },
@@ -582,14 +458,6 @@ return {
                 ["labelFallback"] = "Ask about needs",
                 ["labelKey"] = "convo.question.needs.affordance.label",
                 ["textRole"] = "button_label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Ask about needs",
-                    },
-                    ["TL"] = {
-                        "Itanong ang pangangailangan",
-                    },
-                },
                 ["utility"] = {
                     ["care"] = 1,
                 },
@@ -610,14 +478,6 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.question.needs.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Do you need anything?",
-                                    },
-                                    ["TL"] = {
-                                        "May kailangan ka ba?",
-                                    },
-                                },
                             },
                         },
                     },
@@ -637,28 +497,12 @@ return {
                     ["fallback"] = "Ask about needs",
                     ["role"] = "button_label",
                     ["templateID"] = "convo.question.needs.affordance.label",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Ask about needs",
-                        },
-                        ["TL"] = {
-                            "Itanong ang pangangailangan",
-                        },
-                    },
                 },
                 {
                     ["fallback"] = "Do you need anything?",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.needs.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Do you need anything?",
-                        },
-                        ["TL"] = {
-                            "May kailangan ka ba?",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
             },
@@ -693,14 +537,7 @@ return {
                 ["groups"] = {
                     "needs",
                 },
-                ["label"] = {
-                    ["EN"] = {
-                        "Ask about needs",
-                    },
-                    ["TL"] = {
-                        "Itanong ang pangangailangan",
-                    },
-                },
+                ["labelFallback"] = "Ask about needs",
                 ["textRole"] = "button_label",
                 ["utility"] = {
                     ["care"] = 1,
@@ -746,15 +583,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Do you need anything?",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Do you need anything?",
-                                    },
-                                    ["TL"] = {
-                                        "May kailangan ka ba?",
-                                    },
-                                },
                             },
                         },
                     },
@@ -822,28 +652,12 @@ return {
                 ["fallback"] = "Ask about needs",
                 ["role"] = "button_label",
                 ["templateID"] = "convo.question.needs.affordance.label",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Ask about needs",
-                    },
-                    ["TL"] = {
-                        "Itanong ang pangangailangan",
-                    },
-                },
             },
             {
                 ["fallback"] = "Do you need anything?",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.needs.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Do you need anything?",
-                    },
-                    ["TL"] = {
-                        "May kailangan ka ba?",
-                    },
-                },
                 ["variantID"] = "default",
             },
         },

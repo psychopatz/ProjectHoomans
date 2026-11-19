@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "leader_loss.devoted",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Nawalan tayo ng mahalagang tao. Kailangan nating magsama-sama.",
+      "Sila ang tanglaw natin. Hindi ko alam ang gagawin nang wala sila.",
+      "Ibinigay ko ang katapatan ko sa kanila. Parang walang laman ang puso ko.",
+      "Binigyan nila tayo ng lakas. Dapat nating itaguyod ang simulain nila.",
+      "Namatay na ang tanglaw natin. Diyos ko tulungan mo kami.",
+      "Susundan ko sana sila hanggang dulo. Mamahinga ka na.",
+      "Sila ang lahat para sa layuning 'to. Hindi natin hahayaang mamatay 'to.",
+      "Nayanig ang pananampalataya ko, pero mananatili ako sa ating mga kasama.",
+      "Bumagsak ang ating pinuno. Dapat nating igalang ang sakripisyo nila.",
+      "Naniwala sila sa atin. Kailangan nating patunayan na tama sila."
+    ]
+  }
+}

@@ -2,16 +2,6 @@
 return {
     {
         ["dialogueFollowUp"] = "NEEDS_QUANTITY",
-        ["display"] = {
-            ["EN"] = {
-                ["label"] = "Ask about needs",
-                ["utterance"] = "Do you need anything?",
-            },
-            ["TL"] = {
-                ["label"] = "Itanong ang pangangailangan",
-                ["utterance"] = "May kailangan ka ba?",
-            },
-        },
         ["domain"] = "needs",
         ["hubAudience"] = "owned_companion",
         ["hubID"] = "whats_up",
@@ -34,16 +24,6 @@ return {
         ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_Needs_Utterance",
     },
     {
-        ["display"] = {
-            ["EN"] = {
-                ["label"] = "Ask about injuries",
-                ["utterance"] = "Are you hurt?",
-            },
-            ["TL"] = {
-                ["label"] = "Itanong ang mga sugat",
-                ["utterance"] = "Nasaktan ka ba?",
-            },
-        },
         ["domain"] = "medical",
         ["extensions"] = {
             ["topic"] = "medical",
@@ -68,16 +48,6 @@ return {
         ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_Health_Utterance",
     },
     {
-        ["display"] = {
-            ["EN"] = {
-                ["label"] = "Ask about gossip",
-                ["utterance"] = "Any gossip?",
-            },
-            ["TL"] = {
-                ["label"] = "Magtanong tungkol sa tsismis",
-                ["utterance"] = "May narinig ka bang tsismis?",
-            },
-        },
         ["domain"] = "gossip",
         ["extensions"] = {
             ["topic"] = "gossip",

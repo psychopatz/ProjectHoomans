@@ -232,6 +232,7 @@ local function registerPlan(plan)
         return false
     end
     if type(turn) == "table" and type(turn.text) ~= "table"
+        and type(turn.fallback) ~= "string"
         and type(variants) ~= "table" and type(sayVariants) ~= "table"
     then
         return false

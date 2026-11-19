@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.horde.escalated",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "More are piling in. This is getting bad.",
+      "They keep coming! We're losing ground.",
+      "The herd just doubled. We need a plan.",
+      "Too many to push through! Fall back a step.",
+      "The swarm's thickening. Watch your flanks!",
+      "Every window is shaking. They're surrounding us.",
+      "They're pouring through the gaps. Steady!",
+      "This isn't thinning out, it's growing!",
+      "More rottens behind the first wave!",
+      "We're getting boxed in. Don't stop swinging."
+    ]
+  }
+}

@@ -10,37 +10,13 @@
   "say": {
     "variants": [
       {
-        "id": "female",
-        "text": {
-          "EN": [
-            "Who is a good girl?"
-          ],
-          "TL": [
-            "Who is a good girl?"
-          ]
-        }
+        "id": "female"
       },
       {
-        "id": "male",
-        "text": {
-          "EN": [
-            "Who is a good boy?"
-          ],
-          "TL": [
-            "Who is a good boy?"
-          ]
-        }
+        "id": "male"
       },
       {
-        "id": "unknown",
-        "text": {
-          "EN": [
-            "Who is a good dog?"
-          ],
-          "TL": [
-            "Who is a good dog?"
-          ]
-        }
+        "id": "unknown"
       }
     ]
   },

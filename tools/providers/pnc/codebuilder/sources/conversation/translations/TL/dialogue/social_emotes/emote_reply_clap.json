@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.reply.clap",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Salamat.",
+      "Salamat sa palakpak.",
+      "Ginawa lang ang kailangang gawin.",
+      "Mabuti at nagustuhan mo.",
+      "Maraming salamat.",
+      "Bahagi lang 'yan ng araw-araw na trabaho.",
+      "Salamat. Mabuting malaman na maayos ang dating.",
+      "Salamat.",
+      "Salamat. Tuloy lang natin ang sigla.",
+      "Salamat sa pampalakas ng loob."
+    ],
+    "say.variants.warm": [
+      "Napakabait mo naman.",
+      "Salamat! Napangiti talaga ako roon.",
+      "Salamat sa suporta! Matibay tayong grupo.",
+      "Salamat! Hindi ko magagawa 'yon nang walang maayos na kasama.",
+      "Haha, salamat! Mabuti at nakapagbigay ng sigla ngayong araw.",
+      "Napakasarap sa pakiramdam niyan. Salamat!",
+      "Ang galing mo. Salamat sa pagpalakpak.",
+      "Salamat sa suporta! Tuloy lang tayo sa tagumpay.",
+      "Maraming salamat! Malaking bagay 'yan sa akin.",
+      "Haha, yumuyukod na ako! Salamat, kaibigan."
+    ]
+  }
+}

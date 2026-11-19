@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.scene.grounded_news_share",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "May narinig akong mahalagang ipasa sa iyo.",
+      "May balita ako sa mga nangyayari sa paligid.",
+      "May sariwang balita mula sa kalapit na lugar.",
+      "May nakuha akong impormasyon na dapat mong malaman.",
+      "Makinig ka: may narinig akong ulat tungkol sa kalagayan sa labas.",
+      "Ipinapasa ko ang ilang impormasyong nakalap ko.",
+      "Ito ang nalaman ko mula sa ibang manlalakbay.",
+      "Baka gusto mong marinig itong pinakahuling balita.",
+      "May napatunayan akong impormasyon na ibabahagi.",
+      "Pakinggan mo itong balita bago ka lumabas."
+    ],
+    "say.variants.guarded": [
+      "May bagay akong makukumpirma.",
+      "May napatunayan akong impormasyon, pero panatilihing lihim.",
+      "Makinig nang mabuti. Ayokong marinig ito ng lahat.",
+      "Ibinabahagi ko ito dahil kailangan mong malaman ang panganib.",
+      "Balita mula sa paligid. Huwag mong ikalat kung saan-saan.",
+      "Kinumpirma ko ang balitang ito mismo. Seryosohin mo.",
+      "Mag-ingat kung kanino mo sasabihin, pero ito ang kalagayan.",
+      "May napatunayan akong katotohanan sa nangyari sa labas.",
+      "Hinaan ang boses mo. Ito ang nakumpirma ko.",
+      "Magagamit na impormasyon. Gamitin para protektahan ang sarili."
+    ],
+    "say.variants.terse": [
+      "May balita ako para sa iyo.",
+      "Balita.",
+      "Makinig.",
+      "May narinig ako.",
+      "Impormasyon para sa 'yo.",
+      "Ulat.",
+      "Ito ang balita.",
+      "Bagong balita.",
+      "Tingnan mo 'to.",
+      "Balita mula sa labas."
+    ],
+    "say.variants.warm": [
+      "Naisip kong dapat mong marinig ang nalaman ko.",
+      "Huy kaibigan, may nalaman akong makatutulong sa atin.",
+      "Gusto kong tiyakin na may alam ka sa balitang ito.",
+      "May magandang balita akong ibabahagi sa 'yo, kasama.",
+      "Lagi kitang iniisip—makinig ka sa narinig ko.",
+      "Ikaw agad ang naisip ko nang marinig ko ang balitang ito.",
+      "Halika rito, may balita ako na magpapagaan ng sitwasyon.",
+      "Masayang ibahagi ang kaunting pag-asang ito sa 'yo ngayon.",
+      "Makinig ka, kaibigan. Mas makapagpapanatiling ligtas ito sa atin.",
+      "Gusto kong sa akin mo unang marinig ito."
+    ]
+  }
+}

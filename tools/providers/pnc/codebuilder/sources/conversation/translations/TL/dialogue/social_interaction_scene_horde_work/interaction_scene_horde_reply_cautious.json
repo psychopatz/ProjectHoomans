@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.scene.horde_reply_cautious",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Sobra sila. Dapat umatras tayo.",
+      "Napakasama ng tsansa. Umatras tayo at maghanap ng ibang daan.",
+      "Kamatayan ang lumaban dito. Umatras na.",
+      "Kulang tayo sa bala at lakas para rito. Umatras.",
+      "Mas mabuting mabuhay para lumaban sa ibang araw. Umatras tayo.",
+      "Lupig tayo sa dami nila. Umatras nang maayos.",
+      "Umatras nang dahan-dahan. Huwag gumawa ng ingay.",
+      "Tumakas na tayo habang hindi pa sila nakapokus sa atin.",
+      "Masyadong mapanganib. Kailangan nating umatras agad.",
+      "Sang-ayon akong umatras. Lumingon at lumakad nang tahimik."
+    ],
+    "say.variants.guarded": [
+      "Masama ang tsansa. Lumayo tayo.",
+      "Pagpapakamatay ang labanang 'yan. Umatras nang may pormasyon.",
+      "Umatras nang tahimik. Huwag gisingin ang nasa likod.",
+      "Itaas ang armas, pero ihakbang pabalik ang paa.",
+      "Wala tayong kalamangan sa posisyon. Aatras tayo agad.",
+      "Huwag magpadala sa kaba at maging tanga. Aatras tayo.",
+      "Umatras sa dilim. Hayaang lumampas sila.",
+      "Ayokong malapa sa bukas na damuhan. Umatras.",
+      "Yumuko at umatras sa huling ligtas na gusali.",
+      "Maayos na pag-atras. Kapag may nagpanic at sumigaw, patay 'yon."
+    ],
+    "say.variants.terse": [
+      "Umatras.",
+      "Sobra sila. Takbo.",
+      "Urong.",
+      "Atras na ngayon.",
+      "Masamang tsansa. Alis.",
+      "Labas. Ngayon.",
+      "Umatras.",
+      "Huwag dito. Kilos.",
+      "Takas.",
+      "Malayo."
+    ],
+    "say.variants.warm": [
+      "Mas gusto kong makaalis tayong buhay. Umatras tayo.",
+      "Masyado kitang pinahahalagahan para isugal ito. Umatras tayo, kaibigan.",
+      "Pakiusap, sabay tayong umatras. Di natin kailangang mamatay rito.",
+      "Kailangan kitang buhay, kasama. Lumingon ka, tara na.",
+      "Itabi natin ang lakas natin para sa kasama sa kampo. Umatras.",
+      "Hawakan mo ang kamay ko kung kailangan, pero aatras na tayo ngayon.",
+      "Walang kahihiyan sa pananatiling buhay. Umatras ka kasama ko.",
+      "Umatras tayo nang marahan, nang magkasama. Hawak kita.",
+      "Makakahanap tayo ng gamit sa iba. Manatiling ligtas at tumakbo.",
+      "Di ako aalis nang wala ka, kaya umatras tayong pareho ngayon."
+    ]
+  }
+}

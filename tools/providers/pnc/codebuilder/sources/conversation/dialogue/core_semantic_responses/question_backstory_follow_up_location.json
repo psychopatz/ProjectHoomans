@@ -9,10 +9,6 @@
     "variants": [
       {
         "id": "question.backstory.follow_up.location.authored",
-        "text": {
-          "EN": "I remember that part of my life, but I don't have more detail about where it was.",
-          "TL": "Naaalala ko ang bahaging iyon ng buhay ko, pero wala akong higit na detalye kung saan iyon."
-        },
         "metadata": {
           "fallback": "I remember that part of my life, but I don't have more detail about where it was.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation"

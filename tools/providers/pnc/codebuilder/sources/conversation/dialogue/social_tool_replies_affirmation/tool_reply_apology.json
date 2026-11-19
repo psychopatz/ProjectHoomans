@@ -10,99 +10,21 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "All right. Let us move on.",
-              "No problem. Let us keep moving.",
-              "We are good. Let us get back to business.",
-              "Done. No need to dwell on it.",
-              "All right. Water under the bridge.",
-              "Let us put it behind us and focus on surviving.",
-              "Fine by me. Move forward.",
-              "Okay. We move past it.",
-              "Agreed. Let us not waste daylight on it.",
-              "Understood. We are square."
-            ],
-            "TL": [
-              "Sige. Magpatuloy na tayo.",
-              "Walang anuman. Tuloy na tayo.",
-              "Ayos na tayo. Balik na tayo sa ginagawa natin.",
-              "Tapos na 'yon. Hindi na kailangang pag-usapan pa.",
-              "Sige. Lumipas na 'yon.",
-              "Iwan na natin 'yan sa likod at magpokus sa kaligtasan.",
-              "Ayos lang sa 'kin. Abante na.",
-              "Sige. Kalimutan na 'yon.",
-              "Sang-ayon ako. Huwag nating sayangin ang oras diyan.",
-              "Naiintindihan ko. Kuwits na tayo."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I accept the apology.",
-              "Apology accepted. We are fine.",
-              "I appreciate you owning up to it.",
-              "Takes guts to say that out here. I accept.",
-              "Thank you. Apology accepted.",
-              "We all make mistakes under pressure. Accepted.",
-              "I hear you, and I accept.",
-              "Fair enough. Apology accepted.",
-              "Good. I accept your apology.",
-              "I appreciate the honesty. We are good."
-            ],
-            "TL": [
-              "Tinatanggap ko ang tawad mo.",
-              "Tanggap ko na. Ayos na tayo.",
-              "Salamat at inamin mo ang pagkakamali mo.",
-              "Kailangan ng tapang para aminin 'yan dito. Tanggap ko.",
-              "Salamat. Tanggap ko ang paumanhin.",
-              "Lahat naman nagkakamali kapag tensiyonado. Tanggap ko.",
-              "Narinig kita, at tanggap ko.",
-              "Makatwiran. Tanggap ko ang paumanhin.",
-              "Mabuti. Tinatanggap ko ang tawad mo.",
-              "Salamat sa katapatan. Ayos na tayo."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "3": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Fine. We can put it behind us.",
-              "Let it go. We have bigger problems.",
-              "It is done. No grudges.",
-              "Consider it forgotten.",
-              "We are clear. Do not sweat it.",
-              "Past is past. Watch your step next time.",
-              "I am not holding onto it. Let us move.",
-              "All right. We put it behind us.",
-              "No hard feelings. Let us keep our heads on.",
-              "Agreed. It is behind us now."
-            ],
-            "TL": [
-              "Sige. Iwan na natin sa nakaraan 'yon.",
-              "Hayaan mo na. Mas malaki ang mga problema natin.",
-              "Tapos na. Walang samaan ng loob.",
-              "Ituring mo nang limot na.",
-              "Malinaw na tayo. Huwag mo nang alalahanin.",
-              "Nakalipas na. Mag-ingat ka na lang sa susunod.",
-              "Hindi ko na 'yan itatago sa loob ko. Tara na.",
-              "Sige. Kalimutan na natin 'yan.",
-              "Walang samaan ng loob. Manatili tayong alisto.",
-              "Sige. Tapos na 'yon ngayon."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

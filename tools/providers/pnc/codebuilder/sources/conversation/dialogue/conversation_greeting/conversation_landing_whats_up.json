@@ -16,15 +16,7 @@
       "hubID": "whats_up",
       "id": "conversation.landing:whats_up",
       "kind": "player_landing_choice",
-      "route": "semantic_hub",
-      "label": {
-        "EN": "What's up",
-        "TL": "Ano ang balita"
-      },
-      "choice": {
-        "EN": "What's up?",
-        "TL": "Ano ang balita?"
-      }
+      "route": "semantic_hub"
     }
   },
   "response": {

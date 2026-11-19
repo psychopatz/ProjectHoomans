@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.relationship",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Hindi pa tayo dumarating sa puntong iyan.",
+      "Dahan-dahan lang. Kailangan pa natin ng panahon bago 'yan.",
+      "Isa-isa lang nating harapin ang mga bagay.",
+      "Ang tiwala ay pinaghihirapan dito. Hindi pa tayo nandoon.",
+      "Kinikilala pa natin ang isa't isa.",
+      "Teka muna. Mas mabilis 'yan kaysa sa kaya ko ngayon.",
+      "Bumuo muna tayo ng tiwala at pinagsamahan.",
+      "Kailangan muna kitang makilala pa bago pumunta roon.",
+      "Hindi pa ngayon. Manatili muna tayong nakatuntong sa lupa.",
+      "Magkakampi tayo sa ngayon. Manatili muna tayo roon."
+    ],
+    "say.2.neutral": [
+      "Masyado nang pamilyar 'yan para sa atin.",
+      "Nauuna ka sa kung ano lang ang ugnayan natin.",
+      "Panatilihin muna natin ang maayos na distansya.",
+      "Hindi pa natin nararating ang ganyang kalapit na samahan.",
+      "Umatras ka nang kaunti. Masyadong malapit 'yan.",
+      "Mabuti ang tingin ko sa 'yo, pero huwag mong tawirin ang hangganan.",
+      "Medyo mapangahas ang dating niyan.",
+      "Huwag nating ipagpanggap na mas malapit tayo kaysa sa totoo.",
+      "Bantayan ang hangganan. Umatras ka nang kaunti.",
+      "May mga hangganan tayo. Igalang mo ang mga 'yon."
+    ]
+  }
+}

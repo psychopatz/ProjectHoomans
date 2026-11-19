@@ -20,14 +20,6 @@ return {
                                 ["id"] = "accept.dataset.pending_started",
                                 ["templateID"] = "convo.accept.say.1.accept.dataset.pending_started",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Okay, I'll get started.",
-                                    },
-                                    ["TL"] = {
-                                        "Okay, I'll get started.",
-                                    },
-                                },
                                 ["when"] = {
                                     ["op"] = "eq",
                                     ["path"] = "conversation.hasPendingRequest",
@@ -39,14 +31,6 @@ return {
                                 ["id"] = "accept.dataset.pending_care",
                                 ["templateID"] = "convo.accept.say.1.accept.dataset.pending_care",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "All right. I can take care of that.",
-                                    },
-                                    ["TL"] = {
-                                        "All right. I can take care of that.",
-                                    },
-                                },
                                 ["when"] = {
                                     ["op"] = "eq",
                                     ["path"] = "conversation.hasPendingRequest",
@@ -64,14 +48,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.accept.say.1.accept.dataset.pending_started",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Okay, I'll get started.",
-                        },
-                        ["TL"] = {
-                            "Okay, I'll get started.",
-                        },
-                    },
                     ["variantID"] = "accept.dataset.pending_started",
                 },
                 {
@@ -79,14 +55,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.accept.say.1.accept.dataset.pending_care",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "All right. I can take care of that.",
-                        },
-                        ["TL"] = {
-                            "All right. I can take care of that.",
-                        },
-                    },
                     ["variantID"] = "accept.dataset.pending_care",
                 },
             },
@@ -132,19 +100,12 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Okay, I'll get started.",
                                 ["id"] = "accept.dataset.pending_started",
                                 ["metadata"] = {
                                     ["fallback"] = "Okay, I'll get started.",
                                     ["priority"] = 1,
                                     ["templateID"] = "accept.dataset.pending_started",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Okay, I'll get started.",
-                                    },
-                                    ["TL"] = {
-                                        "Okay, I'll get started.",
-                                    },
                                 },
                                 ["when"] = {
                                     ["op"] = "eq",
@@ -153,19 +114,12 @@ return {
                                 },
                             },
                             {
+                                ["fallback"] = "All right. I can take care of that.",
                                 ["id"] = "accept.dataset.pending_care",
                                 ["metadata"] = {
                                     ["fallback"] = "All right. I can take care of that.",
                                     ["priority"] = 1,
                                     ["templateID"] = "accept.dataset.pending_care",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "All right. I can take care of that.",
-                                    },
-                                    ["TL"] = {
-                                        "All right. I can take care of that.",
-                                    },
                                 },
                                 ["when"] = {
                                     ["op"] = "eq",
@@ -240,14 +194,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.accept.say.1.accept.dataset.pending_started",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Okay, I'll get started.",
-                    },
-                    ["TL"] = {
-                        "Okay, I'll get started.",
-                    },
-                },
                 ["variantID"] = "accept.dataset.pending_started",
             },
             {
@@ -255,14 +201,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.accept.say.1.accept.dataset.pending_care",
-                ["translations"] = {
-                    ["EN"] = {
-                        "All right. I can take care of that.",
-                    },
-                    ["TL"] = {
-                        "All right. I can take care of that.",
-                    },
-                },
                 ["variantID"] = "accept.dataset.pending_care",
             },
         },
@@ -288,28 +226,12 @@ return {
                                 ["id"] = "compliment.dataset.kind_of_you",
                                 ["templateID"] = "convo.compliment.say.1.compliment.dataset.kind_of_you",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "That's kind of you. I appreciate it.",
-                                    },
-                                    ["TL"] = {
-                                        "That's kind of you. I appreciate it.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Aw, thank you. That means a lot.",
                                 ["id"] = "compliment.dataset.means_a_lot",
                                 ["templateID"] = "convo.compliment.say.1.compliment.dataset.means_a_lot",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Aw, thank you. That means a lot.",
-                                    },
-                                    ["TL"] = {
-                                        "Aw, thank you. That means a lot.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -322,14 +244,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.compliment.say.1.compliment.dataset.kind_of_you",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "That's kind of you. I appreciate it.",
-                        },
-                        ["TL"] = {
-                            "That's kind of you. I appreciate it.",
-                        },
-                    },
                     ["variantID"] = "compliment.dataset.kind_of_you",
                 },
                 {
@@ -337,14 +251,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.compliment.say.1.compliment.dataset.means_a_lot",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Aw, thank you. That means a lot.",
-                        },
-                        ["TL"] = {
-                            "Aw, thank you. That means a lot.",
-                        },
-                    },
                     ["variantID"] = "compliment.dataset.means_a_lot",
                 },
             },
@@ -390,33 +296,19 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "That's kind of you. I appreciate it.",
                                 ["id"] = "compliment.dataset.kind_of_you",
                                 ["metadata"] = {
                                     ["fallback"] = "That's kind of you. I appreciate it.",
                                     ["templateID"] = "compliment.dataset.kind_of_you",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "That's kind of you. I appreciate it.",
-                                    },
-                                    ["TL"] = {
-                                        "That's kind of you. I appreciate it.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Aw, thank you. That means a lot.",
                                 ["id"] = "compliment.dataset.means_a_lot",
                                 ["metadata"] = {
                                     ["fallback"] = "Aw, thank you. That means a lot.",
                                     ["templateID"] = "compliment.dataset.means_a_lot",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Aw, thank you. That means a lot.",
-                                    },
-                                    ["TL"] = {
-                                        "Aw, thank you. That means a lot.",
-                                    },
                                 },
                             },
                         },
@@ -486,14 +378,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.compliment.say.1.compliment.dataset.kind_of_you",
-                ["translations"] = {
-                    ["EN"] = {
-                        "That's kind of you. I appreciate it.",
-                    },
-                    ["TL"] = {
-                        "That's kind of you. I appreciate it.",
-                    },
-                },
                 ["variantID"] = "compliment.dataset.kind_of_you",
             },
             {
@@ -501,14 +385,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.compliment.say.1.compliment.dataset.means_a_lot",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Aw, thank you. That means a lot.",
-                    },
-                    ["TL"] = {
-                        "Aw, thank you. That means a lot.",
-                    },
-                },
                 ["variantID"] = "compliment.dataset.means_a_lot",
             },
         },
@@ -534,14 +410,6 @@ return {
                                 ["id"] = "flow.weather.raining.dataset.contextual_switch",
                                 ["templateID"] = "convo.flow.weather.raining.say.1.flow.weather.raining.dataset.contextual_switch",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "It is raining right now. We can return to that proposal when you are ready.",
-                                    },
-                                    ["TL"] = {
-                                        "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na.",
-                                    },
-                                },
                                 ["when"] = {
                                     ["op"] = "eq",
                                     ["path"] = "conversation.pattern",
@@ -560,14 +428,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.flow.weather.raining.say.1.flow.weather.raining.dataset.contextual_switch",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "It is raining right now. We can return to that proposal when you are ready.",
-                        },
-                        ["TL"] = {
-                            "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na.",
-                        },
-                    },
                     ["variantID"] = "flow.weather.raining.dataset.contextual_switch",
                 },
             },
@@ -615,6 +475,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "It is raining right now. We can return to that proposal when you are ready.",
                                 ["id"] = "flow.weather.raining.dataset.contextual_switch",
                                 ["metadata"] = {
                                     ["fallback"] = "It is raining right now. We can return to that proposal when you are ready.",
@@ -636,10 +497,6 @@ return {
                                                         ["fallback"] = "It is raining right now. We can return to that proposal when you are ready.",
                                                         ["kind"] = "translation",
                                                         ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
-                                                        ["translations"] = {
-                                                            ["EN"] = "It is raining right now. We can return to that proposal when you are ready.",
-                                                            ["TL"] = "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na.",
-                                                        },
                                                     },
                                                 },
                                             },
@@ -653,14 +510,6 @@ return {
                                         "SGD",
                                     },
                                     ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "It is raining right now. We can return to that proposal when you are ready.",
-                                    },
-                                    ["TL"] = {
-                                        "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na.",
-                                    },
                                 },
                                 ["when"] = {
                                     ["op"] = "eq",
@@ -735,14 +584,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.flow.weather.raining.say.1.flow.weather.raining.dataset.contextual_switch",
-                ["translations"] = {
-                    ["EN"] = {
-                        "It is raining right now. We can return to that proposal when you are ready.",
-                    },
-                    ["TL"] = {
-                        "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na.",
-                    },
-                },
                 ["variantID"] = "flow.weather.raining.dataset.contextual_switch",
             },
         },
@@ -768,42 +609,18 @@ return {
                                 ["id"] = "greeting.dataset.holding_up",
                                 ["templateID"] = "convo.greeting.say.1.greeting.dataset.holding_up",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Hey. How are you holding up?",
-                                    },
-                                    ["TL"] = {
-                                        "Hey. How are you holding up?",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Good to see you again.",
                                 ["id"] = "greeting.dataset.good_to_see",
                                 ["templateID"] = "convo.greeting.say.1.greeting.dataset.good_to_see",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Good to see you again.",
-                                    },
-                                    ["TL"] = {
-                                        "Good to see you again.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Hey. How are things going?",
                                 ["id"] = "greeting.dataset.how_things",
                                 ["templateID"] = "convo.greeting.say.1.greeting.dataset.how_things",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Hey. How are things going?",
-                                    },
-                                    ["TL"] = {
-                                        "Hey. How are things going?",
-                                    },
-                                },
                             },
                         },
                     },
@@ -816,14 +633,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.greeting.say.1.greeting.dataset.holding_up",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Hey. How are you holding up?",
-                        },
-                        ["TL"] = {
-                            "Hey. How are you holding up?",
-                        },
-                    },
                     ["variantID"] = "greeting.dataset.holding_up",
                 },
                 {
@@ -831,14 +640,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.greeting.say.1.greeting.dataset.good_to_see",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Good to see you again.",
-                        },
-                        ["TL"] = {
-                            "Good to see you again.",
-                        },
-                    },
                     ["variantID"] = "greeting.dataset.good_to_see",
                 },
                 {
@@ -846,14 +647,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.greeting.say.1.greeting.dataset.how_things",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Hey. How are things going?",
-                        },
-                        ["TL"] = {
-                            "Hey. How are things going?",
-                        },
-                    },
                     ["variantID"] = "greeting.dataset.how_things",
                 },
             },
@@ -899,48 +692,27 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Hey. How are you holding up?",
                                 ["id"] = "greeting.dataset.holding_up",
                                 ["metadata"] = {
                                     ["fallback"] = "Hey. How are you holding up?",
                                     ["templateID"] = "greeting.dataset.holding_up",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Hey. How are you holding up?",
-                                    },
-                                    ["TL"] = {
-                                        "Hey. How are you holding up?",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Good to see you again.",
                                 ["id"] = "greeting.dataset.good_to_see",
                                 ["metadata"] = {
                                     ["fallback"] = "Good to see you again.",
                                     ["templateID"] = "greeting.dataset.good_to_see",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Good to see you again.",
-                                    },
-                                    ["TL"] = {
-                                        "Good to see you again.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Hey. How are things going?",
                                 ["id"] = "greeting.dataset.how_things",
                                 ["metadata"] = {
                                     ["fallback"] = "Hey. How are things going?",
                                     ["templateID"] = "greeting.dataset.how_things",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Hey. How are things going?",
-                                    },
-                                    ["TL"] = {
-                                        "Hey. How are things going?",
-                                    },
                                 },
                             },
                         },
@@ -1010,14 +782,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.greeting.say.1.greeting.dataset.holding_up",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Hey. How are you holding up?",
-                    },
-                    ["TL"] = {
-                        "Hey. How are you holding up?",
-                    },
-                },
                 ["variantID"] = "greeting.dataset.holding_up",
             },
             {
@@ -1025,14 +789,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.greeting.say.1.greeting.dataset.good_to_see",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Good to see you again.",
-                    },
-                    ["TL"] = {
-                        "Good to see you again.",
-                    },
-                },
                 ["variantID"] = "greeting.dataset.good_to_see",
             },
             {
@@ -1040,14 +796,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.greeting.say.1.greeting.dataset.how_things",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Hey. How are things going?",
-                    },
-                    ["TL"] = {
-                        "Hey. How are things going?",
-                    },
-                },
                 ["variantID"] = "greeting.dataset.how_things",
             },
         },
@@ -1073,14 +821,6 @@ return {
                                 ["id"] = "offer.dataset.hungry_share",
                                 ["templateID"] = "convo.offer.say.1.offer.dataset.hungry_share",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "That would help a lot. Could I have some?",
-                                    },
-                                    ["TL"] = {
-                                        "That would help a lot. Could I have some?",
-                                    },
-                                },
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -1106,14 +846,6 @@ return {
                                 ["id"] = "offer.dataset.hungry_appreciate",
                                 ["templateID"] = "convo.offer.say.1.offer.dataset.hungry_appreciate",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I'd appreciate a bite. Would you share?",
-                                    },
-                                    ["TL"] = {
-                                        "I'd appreciate a bite. Would you share?",
-                                    },
-                                },
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -1145,14 +877,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.offer.say.1.offer.dataset.hungry_share",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "That would help a lot. Could I have some?",
-                        },
-                        ["TL"] = {
-                            "That would help a lot. Could I have some?",
-                        },
-                    },
                     ["variantID"] = "offer.dataset.hungry_share",
                 },
                 {
@@ -1160,14 +884,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.offer.say.1.offer.dataset.hungry_appreciate",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'd appreciate a bite. Would you share?",
-                        },
-                        ["TL"] = {
-                            "I'd appreciate a bite. Would you share?",
-                        },
-                    },
                     ["variantID"] = "offer.dataset.hungry_appreciate",
                 },
             },
@@ -1213,19 +929,12 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "That would help a lot. Could I have some?",
                                 ["id"] = "offer.dataset.hungry_share",
                                 ["metadata"] = {
                                     ["fallback"] = "That would help a lot. Could I have some?",
                                     ["priority"] = 2,
                                     ["templateID"] = "offer.dataset.hungry_share",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "That would help a lot. Could I have some?",
-                                    },
-                                    ["TL"] = {
-                                        "That would help a lot. Could I have some?",
-                                    },
                                 },
                                 ["when"] = {
                                     ["all"] = {
@@ -1248,19 +957,12 @@ return {
                                 },
                             },
                             {
+                                ["fallback"] = "I'd appreciate a bite. Would you share?",
                                 ["id"] = "offer.dataset.hungry_appreciate",
                                 ["metadata"] = {
                                     ["fallback"] = "I'd appreciate a bite. Would you share?",
                                     ["priority"] = 2,
                                     ["templateID"] = "offer.dataset.hungry_appreciate",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I'd appreciate a bite. Would you share?",
-                                    },
-                                    ["TL"] = {
-                                        "I'd appreciate a bite. Would you share?",
-                                    },
                                 },
                                 ["when"] = {
                                     ["all"] = {
@@ -1349,14 +1051,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.offer.say.1.offer.dataset.hungry_share",
-                ["translations"] = {
-                    ["EN"] = {
-                        "That would help a lot. Could I have some?",
-                    },
-                    ["TL"] = {
-                        "That would help a lot. Could I have some?",
-                    },
-                },
                 ["variantID"] = "offer.dataset.hungry_share",
             },
             {
@@ -1364,14 +1058,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.offer.say.1.offer.dataset.hungry_appreciate",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'd appreciate a bite. Would you share?",
-                    },
-                    ["TL"] = {
-                        "I'd appreciate a bite. Would you share?",
-                    },
-                },
                 ["variantID"] = "offer.dataset.hungry_appreciate",
             },
         },
@@ -1397,42 +1083,18 @@ return {
                                 ["id"] = "question.activity.dataset.keep_moving",
                                 ["templateID"] = "convo.question.activity.say.1.question.activity.dataset.keep_moving",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Just doing what I can to keep things moving.",
-                                    },
-                                    ["TL"] = {
-                                        "Just doing what I can to keep things moving.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "A little bit of everything.",
                                 ["id"] = "question.activity.dataset.bit_of_everything",
                                 ["templateID"] = "convo.question.activity.say.1.question.activity.dataset.bit_of_everything",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "A little bit of everything.",
-                                    },
-                                    ["TL"] = {
-                                        "A little bit of everything.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Just taking care of what needs doing.",
                                 ["id"] = "question.activity.dataset.taking_care",
                                 ["templateID"] = "convo.question.activity.say.1.question.activity.dataset.taking_care",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Just taking care of what needs doing.",
-                                    },
-                                    ["TL"] = {
-                                        "Just taking care of what needs doing.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1446,14 +1108,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.activity.say.1.question.activity.dataset.keep_moving",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Just doing what I can to keep things moving.",
-                        },
-                        ["TL"] = {
-                            "Just doing what I can to keep things moving.",
-                        },
-                    },
                     ["variantID"] = "question.activity.dataset.keep_moving",
                 },
                 {
@@ -1461,14 +1115,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.activity.say.1.question.activity.dataset.bit_of_everything",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "A little bit of everything.",
-                        },
-                        ["TL"] = {
-                            "A little bit of everything.",
-                        },
-                    },
                     ["variantID"] = "question.activity.dataset.bit_of_everything",
                 },
                 {
@@ -1476,14 +1122,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.activity.say.1.question.activity.dataset.taking_care",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Just taking care of what needs doing.",
-                        },
-                        ["TL"] = {
-                            "Just taking care of what needs doing.",
-                        },
-                    },
                     ["variantID"] = "question.activity.dataset.taking_care",
                 },
             },
@@ -1531,48 +1169,27 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Just doing what I can to keep things moving.",
                                 ["id"] = "question.activity.dataset.keep_moving",
                                 ["metadata"] = {
                                     ["fallback"] = "Just doing what I can to keep things moving.",
                                     ["templateID"] = "question.activity.dataset.keep_moving",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Just doing what I can to keep things moving.",
-                                    },
-                                    ["TL"] = {
-                                        "Just doing what I can to keep things moving.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "A little bit of everything.",
                                 ["id"] = "question.activity.dataset.bit_of_everything",
                                 ["metadata"] = {
                                     ["fallback"] = "A little bit of everything.",
                                     ["templateID"] = "question.activity.dataset.bit_of_everything",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "A little bit of everything.",
-                                    },
-                                    ["TL"] = {
-                                        "A little bit of everything.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Just taking care of what needs doing.",
                                 ["id"] = "question.activity.dataset.taking_care",
                                 ["metadata"] = {
                                     ["fallback"] = "Just taking care of what needs doing.",
                                     ["templateID"] = "question.activity.dataset.taking_care",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Just taking care of what needs doing.",
-                                    },
-                                    ["TL"] = {
-                                        "Just taking care of what needs doing.",
-                                    },
                                 },
                             },
                         },
@@ -1642,14 +1259,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.activity.say.1.question.activity.dataset.keep_moving",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Just doing what I can to keep things moving.",
-                    },
-                    ["TL"] = {
-                        "Just doing what I can to keep things moving.",
-                    },
-                },
                 ["variantID"] = "question.activity.dataset.keep_moving",
             },
             {
@@ -1657,14 +1266,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.activity.say.1.question.activity.dataset.bit_of_everything",
-                ["translations"] = {
-                    ["EN"] = {
-                        "A little bit of everything.",
-                    },
-                    ["TL"] = {
-                        "A little bit of everything.",
-                    },
-                },
                 ["variantID"] = "question.activity.dataset.bit_of_everything",
             },
             {
@@ -1672,14 +1273,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.activity.say.1.question.activity.dataset.taking_care",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Just taking care of what needs doing.",
-                    },
-                    ["TL"] = {
-                        "Just taking care of what needs doing.",
-                    },
-                },
                 ["variantID"] = "question.activity.dataset.taking_care",
             },
         },
@@ -1705,14 +1298,6 @@ return {
                                 ["id"] = "question.backstory.ambiguous.authored",
                                 ["templateID"] = "convo.question.backstory.ambiguous.say.1.question.backstory.ambiguous.authored",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Which part of my past do you mean?",
-                                    },
-                                    ["TL"] = {
-                                        "Aling bahagi ng nakaraan ko ang ibig mong sabihin?",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1726,14 +1311,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.ambiguous.say.1.question.backstory.ambiguous.authored",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Which part of my past do you mean?",
-                        },
-                        ["TL"] = {
-                            "Aling bahagi ng nakaraan ko ang ibig mong sabihin?",
-                        },
-                    },
                     ["variantID"] = "question.backstory.ambiguous.authored",
                 },
             },
@@ -1787,18 +1364,11 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Which part of my past do you mean?",
                                 ["id"] = "question.backstory.ambiguous.authored",
                                 ["metadata"] = {
                                     ["fallback"] = "Which part of my past do you mean?",
                                     ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryAmbiguous",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Which part of my past do you mean?",
-                                    },
-                                    ["TL"] = {
-                                        "Aling bahagi ng nakaraan ko ang ibig mong sabihin?",
-                                    },
                                 },
                             },
                         },
@@ -1876,14 +1446,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.ambiguous.say.1.question.backstory.ambiguous.authored",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Which part of my past do you mean?",
-                    },
-                    ["TL"] = {
-                        "Aling bahagi ng nakaraan ko ang ibig mong sabihin?",
-                    },
-                },
                 ["variantID"] = "question.backstory.ambiguous.authored",
             },
         },
@@ -1909,14 +1471,6 @@ return {
                                 ["id"] = "question.backstory.follow_up.location.authored",
                                 ["templateID"] = "convo.question.backstory.follow_up.location.say.1.question.backstory.follow_up.location.authored",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I remember that part of my life, but I don't have more detail about where it was.",
-                                    },
-                                    ["TL"] = {
-                                        "Naaalala ko ang bahaging iyon ng buhay ko, pero wala akong higit na detalye kung saan iyon.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1930,14 +1484,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.follow_up.location.say.1.question.backstory.follow_up.location.authored",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I remember that part of my life, but I don't have more detail about where it was.",
-                        },
-                        ["TL"] = {
-                            "Naaalala ko ang bahaging iyon ng buhay ko, pero wala akong higit na detalye kung saan iyon.",
-                        },
-                    },
                     ["variantID"] = "question.backstory.follow_up.location.authored",
                 },
             },
@@ -1991,18 +1537,11 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "I remember that part of my life, but I don't have more detail about where it was.",
                                 ["id"] = "question.backstory.follow_up.location.authored",
                                 ["metadata"] = {
                                     ["fallback"] = "I remember that part of my life, but I don't have more detail about where it was.",
                                     ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpLocation",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I remember that part of my life, but I don't have more detail about where it was.",
-                                    },
-                                    ["TL"] = {
-                                        "Naaalala ko ang bahaging iyon ng buhay ko, pero wala akong higit na detalye kung saan iyon.",
-                                    },
                                 },
                             },
                         },
@@ -2080,14 +1619,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.follow_up.location.say.1.question.backstory.follow_up.location.authored",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I remember that part of my life, but I don't have more detail about where it was.",
-                    },
-                    ["TL"] = {
-                        "Naaalala ko ang bahaging iyon ng buhay ko, pero wala akong higit na detalye kung saan iyon.",
-                    },
-                },
                 ["variantID"] = "question.backstory.follow_up.location.authored",
             },
         },
@@ -2113,14 +1644,6 @@ return {
                                 ["id"] = "question.backstory.follow_up.miss.authored",
                                 ["templateID"] = "convo.question.backstory.follow_up.miss.say.1.question.backstory.follow_up.miss.authored",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Sometimes. I still think about that part of my life.",
-                                    },
-                                    ["TL"] = {
-                                        "Minsan. Naiisip ko pa rin ang bahaging iyon ng buhay ko.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2134,14 +1657,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.follow_up.miss.say.1.question.backstory.follow_up.miss.authored",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Sometimes. I still think about that part of my life.",
-                        },
-                        ["TL"] = {
-                            "Minsan. Naiisip ko pa rin ang bahaging iyon ng buhay ko.",
-                        },
-                    },
                     ["variantID"] = "question.backstory.follow_up.miss.authored",
                 },
             },
@@ -2195,18 +1710,11 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Sometimes. I still think about that part of my life.",
                                 ["id"] = "question.backstory.follow_up.miss.authored",
                                 ["metadata"] = {
                                     ["fallback"] = "Sometimes. I still think about that part of my life.",
                                     ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryFollowUpMiss",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Sometimes. I still think about that part of my life.",
-                                    },
-                                    ["TL"] = {
-                                        "Minsan. Naiisip ko pa rin ang bahaging iyon ng buhay ko.",
-                                    },
                                 },
                             },
                         },
@@ -2284,14 +1792,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.follow_up.miss.say.1.question.backstory.follow_up.miss.authored",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Sometimes. I still think about that part of my life.",
-                    },
-                    ["TL"] = {
-                        "Minsan. Naiisip ko pa rin ang bahaging iyon ng buhay ko.",
-                    },
-                },
                 ["variantID"] = "question.backstory.follow_up.miss.authored",
             },
         },
@@ -2317,14 +1817,6 @@ return {
                                 ["id"] = "question.backstory.refusal.authored",
                                 ["templateID"] = "convo.question.backstory.refusal.say.1.question.backstory.refusal.authored",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I'm not ready to talk about that yet.",
-                                    },
-                                    ["TL"] = {
-                                        "Hindi pa ako handang pag-usapan iyan.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2338,14 +1830,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.refusal.say.1.question.backstory.refusal.authored",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'm not ready to talk about that yet.",
-                        },
-                        ["TL"] = {
-                            "Hindi pa ako handang pag-usapan iyan.",
-                        },
-                    },
                     ["variantID"] = "question.backstory.refusal.authored",
                 },
             },
@@ -2399,18 +1883,11 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "I'm not ready to talk about that yet.",
                                 ["id"] = "question.backstory.refusal.authored",
                                 ["metadata"] = {
                                     ["fallback"] = "I'm not ready to talk about that yet.",
                                     ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstoryRefusal",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I'm not ready to talk about that yet.",
-                                    },
-                                    ["TL"] = {
-                                        "Hindi pa ako handang pag-usapan iyan.",
-                                    },
                                 },
                             },
                         },
@@ -2488,14 +1965,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.refusal.say.1.question.backstory.refusal.authored",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'm not ready to talk about that yet.",
-                    },
-                    ["TL"] = {
-                        "Hindi pa ako handang pag-usapan iyan.",
-                    },
-                },
                 ["variantID"] = "question.backstory.refusal.authored",
             },
         },
@@ -2521,14 +1990,6 @@ return {
                                 ["id"] = "question.backstory.suspected.authored",
                                 ["templateID"] = "convo.question.backstory.suspected.say.1.question.backstory.suspected.authored",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I think it was %1, but I could be mistaken.",
-                                    },
-                                    ["TL"] = {
-                                        "Sa tingin ko ay %1 iyon, pero maaaring mali ako.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2542,14 +2003,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.backstory.suspected.say.1.question.backstory.suspected.authored",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I think it was %1, but I could be mistaken.",
-                        },
-                        ["TL"] = {
-                            "Sa tingin ko ay %1 iyon, pero maaaring mali ako.",
-                        },
-                    },
                     ["variantID"] = "question.backstory.suspected.authored",
                 },
             },
@@ -2603,20 +2056,13 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "I think it was %1, but I could be mistaken.",
                                 ["id"] = "question.backstory.suspected.authored",
                                 ["metadata"] = {
                                     ["fallback"] = "I think it was %1, but I could be mistaken.",
                                     ["templateID"] = "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected",
                                     ["translationArgs"] = {
                                         ["content"] = "fact_content",
-                                    },
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I think it was %1, but I could be mistaken.",
-                                    },
-                                    ["TL"] = {
-                                        "Sa tingin ko ay %1 iyon, pero maaaring mali ako.",
                                     },
                                 },
                             },
@@ -2695,14 +2141,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.backstory.suspected.say.1.question.backstory.suspected.authored",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I think it was %1, but I could be mistaken.",
-                    },
-                    ["TL"] = {
-                        "Sa tingin ko ay %1 iyon, pero maaaring mali ako.",
-                    },
-                },
                 ["variantID"] = "question.backstory.suspected.authored",
             },
         },
@@ -2728,56 +2166,24 @@ return {
                                 ["id"] = "question.wellbeing.dataset.hanging_in",
                                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.hanging_in",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I'm hanging in there. Thanks for asking.",
-                                    },
-                                    ["TL"] = {
-                                        "I'm hanging in there. Thanks for asking.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Doing okay, all things considered.",
                                 ["id"] = "question.wellbeing.dataset.all_things_considered",
                                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.all_things_considered",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Doing okay, all things considered.",
-                                    },
-                                    ["TL"] = {
-                                        "Doing okay, all things considered.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "I'm getting by, one day at a time. How about you?",
                                 ["id"] = "question.wellbeing.dataset.getting_by",
                                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.getting_by",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I'm getting by, one day at a time. How about you?",
-                                    },
-                                    ["TL"] = {
-                                        "I'm getting by, one day at a time. How about you?",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
                                 ["id"] = "question.wellbeing.dataset.hungry",
                                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.hungry",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-                                    },
-                                    ["TL"] = {
-                                        "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-                                    },
-                                },
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -2803,14 +2209,6 @@ return {
                                 ["id"] = "question.wellbeing.dataset.thirsty",
                                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.thirsty",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I'm pretty thirsty. If you have water, could you spare some?",
-                                    },
-                                    ["TL"] = {
-                                        "I'm pretty thirsty. If you have water, could you spare some?",
-                                    },
-                                },
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -2836,14 +2234,6 @@ return {
                                 ["id"] = "question.wellbeing.dataset.tired",
                                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.tired",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I'm tired, though I can manage for now.",
-                                    },
-                                    ["TL"] = {
-                                        "I'm tired, though I can manage for now.",
-                                    },
-                                },
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -2876,14 +2266,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.hanging_in",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'm hanging in there. Thanks for asking.",
-                        },
-                        ["TL"] = {
-                            "I'm hanging in there. Thanks for asking.",
-                        },
-                    },
                     ["variantID"] = "question.wellbeing.dataset.hanging_in",
                 },
                 {
@@ -2891,14 +2273,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.all_things_considered",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Doing okay, all things considered.",
-                        },
-                        ["TL"] = {
-                            "Doing okay, all things considered.",
-                        },
-                    },
                     ["variantID"] = "question.wellbeing.dataset.all_things_considered",
                 },
                 {
@@ -2906,14 +2280,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.getting_by",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'm getting by, one day at a time. How about you?",
-                        },
-                        ["TL"] = {
-                            "I'm getting by, one day at a time. How about you?",
-                        },
-                    },
                     ["variantID"] = "question.wellbeing.dataset.getting_by",
                 },
                 {
@@ -2921,14 +2287,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.hungry",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-                        },
-                        ["TL"] = {
-                            "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-                        },
-                    },
                     ["variantID"] = "question.wellbeing.dataset.hungry",
                 },
                 {
@@ -2936,14 +2294,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.thirsty",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'm pretty thirsty. If you have water, could you spare some?",
-                        },
-                        ["TL"] = {
-                            "I'm pretty thirsty. If you have water, could you spare some?",
-                        },
-                    },
                     ["variantID"] = "question.wellbeing.dataset.thirsty",
                 },
                 {
@@ -2951,14 +2301,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.tired",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I'm tired, though I can manage for now.",
-                        },
-                        ["TL"] = {
-                            "I'm tired, though I can manage for now.",
-                        },
-                    },
                     ["variantID"] = "question.wellbeing.dataset.tired",
                 },
             },
@@ -3006,64 +2348,36 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "I'm hanging in there. Thanks for asking.",
                                 ["id"] = "question.wellbeing.dataset.hanging_in",
                                 ["metadata"] = {
                                     ["fallback"] = "I'm hanging in there. Thanks for asking.",
                                     ["templateID"] = "question.wellbeing.dataset.hanging_in",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I'm hanging in there. Thanks for asking.",
-                                    },
-                                    ["TL"] = {
-                                        "I'm hanging in there. Thanks for asking.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Doing okay, all things considered.",
                                 ["id"] = "question.wellbeing.dataset.all_things_considered",
                                 ["metadata"] = {
                                     ["fallback"] = "Doing okay, all things considered.",
                                     ["templateID"] = "question.wellbeing.dataset.all_things_considered",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Doing okay, all things considered.",
-                                    },
-                                    ["TL"] = {
-                                        "Doing okay, all things considered.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "I'm getting by, one day at a time. How about you?",
                                 ["id"] = "question.wellbeing.dataset.getting_by",
                                 ["metadata"] = {
                                     ["fallback"] = "I'm getting by, one day at a time. How about you?",
                                     ["templateID"] = "question.wellbeing.dataset.getting_by",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I'm getting by, one day at a time. How about you?",
-                                    },
-                                    ["TL"] = {
-                                        "I'm getting by, one day at a time. How about you?",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
                                 ["id"] = "question.wellbeing.dataset.hungry",
                                 ["metadata"] = {
                                     ["fallback"] = "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
                                     ["priority"] = 2,
                                     ["templateID"] = "question.wellbeing.dataset.hungry",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-                                    },
-                                    ["TL"] = {
-                                        "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-                                    },
                                 },
                                 ["when"] = {
                                     ["all"] = {
@@ -3086,19 +2400,12 @@ return {
                                 },
                             },
                             {
+                                ["fallback"] = "I'm pretty thirsty. If you have water, could you spare some?",
                                 ["id"] = "question.wellbeing.dataset.thirsty",
                                 ["metadata"] = {
                                     ["fallback"] = "I'm pretty thirsty. If you have water, could you spare some?",
                                     ["priority"] = 3,
                                     ["templateID"] = "question.wellbeing.dataset.thirsty",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I'm pretty thirsty. If you have water, could you spare some?",
-                                    },
-                                    ["TL"] = {
-                                        "I'm pretty thirsty. If you have water, could you spare some?",
-                                    },
                                 },
                                 ["when"] = {
                                     ["all"] = {
@@ -3121,19 +2428,12 @@ return {
                                 },
                             },
                             {
+                                ["fallback"] = "I'm tired, though I can manage for now.",
                                 ["id"] = "question.wellbeing.dataset.tired",
                                 ["metadata"] = {
                                     ["fallback"] = "I'm tired, though I can manage for now.",
                                     ["priority"] = 2,
                                     ["templateID"] = "question.wellbeing.dataset.tired",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I'm tired, though I can manage for now.",
-                                    },
-                                    ["TL"] = {
-                                        "I'm tired, though I can manage for now.",
-                                    },
                                 },
                                 ["when"] = {
                                     ["all"] = {
@@ -3222,14 +2522,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.hanging_in",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'm hanging in there. Thanks for asking.",
-                    },
-                    ["TL"] = {
-                        "I'm hanging in there. Thanks for asking.",
-                    },
-                },
                 ["variantID"] = "question.wellbeing.dataset.hanging_in",
             },
             {
@@ -3237,14 +2529,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.all_things_considered",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Doing okay, all things considered.",
-                    },
-                    ["TL"] = {
-                        "Doing okay, all things considered.",
-                    },
-                },
                 ["variantID"] = "question.wellbeing.dataset.all_things_considered",
             },
             {
@@ -3252,14 +2536,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.getting_by",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'm getting by, one day at a time. How about you?",
-                    },
-                    ["TL"] = {
-                        "I'm getting by, one day at a time. How about you?",
-                    },
-                },
                 ["variantID"] = "question.wellbeing.dataset.getting_by",
             },
             {
@@ -3267,14 +2543,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.hungry",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-                    },
-                    ["TL"] = {
-                        "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
-                    },
-                },
                 ["variantID"] = "question.wellbeing.dataset.hungry",
             },
             {
@@ -3282,14 +2550,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.thirsty",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'm pretty thirsty. If you have water, could you spare some?",
-                    },
-                    ["TL"] = {
-                        "I'm pretty thirsty. If you have water, could you spare some?",
-                    },
-                },
                 ["variantID"] = "question.wellbeing.dataset.thirsty",
             },
             {
@@ -3297,14 +2557,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.wellbeing.say.1.question.wellbeing.dataset.tired",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I'm tired, though I can manage for now.",
-                    },
-                    ["TL"] = {
-                        "I'm tired, though I can manage for now.",
-                    },
-                },
                 ["variantID"] = "question.wellbeing.dataset.tired",
             },
         },
@@ -3330,14 +2582,6 @@ return {
                                 ["id"] = "question.wellbeing.unknown.dataset.causal_followup",
                                 ["templateID"] = "convo.question.wellbeing.unknown.say.1.question.wellbeing.unknown.dataset.causal_followup",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I can tell something is off, but I do not know what caused it yet.",
-                                    },
-                                    ["TL"] = {
-                                        "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito.",
-                                    },
-                                },
                                 ["when"] = {
                                     ["all"] = {
                                         {
@@ -3365,14 +2609,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.wellbeing.unknown.say.1.question.wellbeing.unknown.dataset.causal_followup",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I can tell something is off, but I do not know what caused it yet.",
-                        },
-                        ["TL"] = {
-                            "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito.",
-                        },
-                    },
                     ["variantID"] = "question.wellbeing.unknown.dataset.causal_followup",
                 },
             },
@@ -3420,6 +2656,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "I can tell something is off, but I do not know what caused it yet.",
                                 ["id"] = "question.wellbeing.unknown.dataset.causal_followup",
                                 ["metadata"] = {
                                     ["fallback"] = "I can tell something is off, but I do not know what caused it yet.",
@@ -3440,10 +2677,6 @@ return {
                                                         ["fallback"] = "I can tell something is off, but I do not know what caused it yet.",
                                                         ["kind"] = "translation",
                                                         ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown",
-                                                        ["translations"] = {
-                                                            ["EN"] = "I can tell something is off, but I do not know what caused it yet.",
-                                                            ["TL"] = "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito.",
-                                                        },
                                                     },
                                                 },
                                             },
@@ -3457,14 +2690,6 @@ return {
                                         "SGD",
                                     },
                                     ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I can tell something is off, but I do not know what caused it yet.",
-                                    },
-                                    ["TL"] = {
-                                        "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito.",
-                                    },
                                 },
                                 ["when"] = {
                                     ["all"] = {
@@ -3548,14 +2773,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.wellbeing.unknown.say.1.question.wellbeing.unknown.dataset.causal_followup",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I can tell something is off, but I do not know what caused it yet.",
-                    },
-                    ["TL"] = {
-                        "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito.",
-                    },
-                },
                 ["variantID"] = "question.wellbeing.unknown.dataset.causal_followup",
             },
         },
@@ -3581,14 +2798,6 @@ return {
                                 ["id"] = "refuse.dataset.pending_unavailable",
                                 ["templateID"] = "convo.refuse.say.1.refuse.dataset.pending_unavailable",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I can't take that on right now.",
-                                    },
-                                    ["TL"] = {
-                                        "I can't take that on right now.",
-                                    },
-                                },
                                 ["when"] = {
                                     ["op"] = "eq",
                                     ["path"] = "conversation.hasPendingRequest",
@@ -3600,14 +2809,6 @@ return {
                                 ["id"] = "refuse.dataset.pending_enough",
                                 ["templateID"] = "convo.refuse.say.1.refuse.dataset.pending_enough",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Not this time. I have enough to manage.",
-                                    },
-                                    ["TL"] = {
-                                        "Not this time. I have enough to manage.",
-                                    },
-                                },
                                 ["when"] = {
                                     ["op"] = "eq",
                                     ["path"] = "conversation.hasPendingRequest",
@@ -3625,14 +2826,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.refuse.say.1.refuse.dataset.pending_unavailable",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I can't take that on right now.",
-                        },
-                        ["TL"] = {
-                            "I can't take that on right now.",
-                        },
-                    },
                     ["variantID"] = "refuse.dataset.pending_unavailable",
                 },
                 {
@@ -3640,14 +2833,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.refuse.say.1.refuse.dataset.pending_enough",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Not this time. I have enough to manage.",
-                        },
-                        ["TL"] = {
-                            "Not this time. I have enough to manage.",
-                        },
-                    },
                     ["variantID"] = "refuse.dataset.pending_enough",
                 },
             },
@@ -3693,19 +2878,12 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "I can't take that on right now.",
                                 ["id"] = "refuse.dataset.pending_unavailable",
                                 ["metadata"] = {
                                     ["fallback"] = "I can't take that on right now.",
                                     ["priority"] = 1,
                                     ["templateID"] = "refuse.dataset.pending_unavailable",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I can't take that on right now.",
-                                    },
-                                    ["TL"] = {
-                                        "I can't take that on right now.",
-                                    },
                                 },
                                 ["when"] = {
                                     ["op"] = "eq",
@@ -3714,19 +2892,12 @@ return {
                                 },
                             },
                             {
+                                ["fallback"] = "Not this time. I have enough to manage.",
                                 ["id"] = "refuse.dataset.pending_enough",
                                 ["metadata"] = {
                                     ["fallback"] = "Not this time. I have enough to manage.",
                                     ["priority"] = 1,
                                     ["templateID"] = "refuse.dataset.pending_enough",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Not this time. I have enough to manage.",
-                                    },
-                                    ["TL"] = {
-                                        "Not this time. I have enough to manage.",
-                                    },
                                 },
                                 ["when"] = {
                                     ["op"] = "eq",
@@ -3801,14 +2972,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.refuse.say.1.refuse.dataset.pending_unavailable",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I can't take that on right now.",
-                    },
-                    ["TL"] = {
-                        "I can't take that on right now.",
-                    },
-                },
                 ["variantID"] = "refuse.dataset.pending_unavailable",
             },
             {
@@ -3816,14 +2979,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.refuse.say.1.refuse.dataset.pending_enough",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Not this time. I have enough to manage.",
-                    },
-                    ["TL"] = {
-                        "Not this time. I have enough to manage.",
-                    },
-                },
                 ["variantID"] = "refuse.dataset.pending_enough",
             },
         },
@@ -3849,42 +3004,18 @@ return {
                                 ["id"] = "question.identity.dataset.stranger_alt_1",
                                 ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.stranger_alt_1",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I keep my name to myself until I know someone better. What should I call you?",
-                                    },
-                                    ["TL"] = {
-                                        "I keep my name to myself until I know someone better. What should I call you?",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Let's get to know each other first. What do people call you?",
                                 ["id"] = "question.identity.dataset.stranger_alt_2",
                                 ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.stranger_alt_2",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Let's get to know each other first. What do people call you?",
-                                    },
-                                    ["TL"] = {
-                                        "Let's get to know each other first. What do people call you?",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "I don't trust you enough to share my name. Who are you, really?",
                                 ["id"] = "question.identity.dataset.wary_alt_1",
                                 ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.wary_alt_1",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I don't trust you enough to share my name. Who are you, really?",
-                                    },
-                                    ["TL"] = {
-                                        "I don't trust you enough to share my name. Who are you, really?",
-                                    },
-                                },
                                 ["when"] = {
                                     ["op"] = "eq",
                                     ["path"] = "conversation.identityTrust",
@@ -3896,14 +3027,6 @@ return {
                                 ["id"] = "question.identity.dataset.wary_alt_2",
                                 ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.wary_alt_2",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-                                    },
-                                    ["TL"] = {
-                                        "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-                                    },
-                                },
                                 ["when"] = {
                                     ["op"] = "eq",
                                     ["path"] = "conversation.identityTrust",
@@ -3922,14 +3045,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.stranger_alt_1",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I keep my name to myself until I know someone better. What should I call you?",
-                        },
-                        ["TL"] = {
-                            "I keep my name to myself until I know someone better. What should I call you?",
-                        },
-                    },
                     ["variantID"] = "question.identity.dataset.stranger_alt_1",
                 },
                 {
@@ -3937,14 +3052,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.stranger_alt_2",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Let's get to know each other first. What do people call you?",
-                        },
-                        ["TL"] = {
-                            "Let's get to know each other first. What do people call you?",
-                        },
-                    },
                     ["variantID"] = "question.identity.dataset.stranger_alt_2",
                 },
                 {
@@ -3952,14 +3059,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.wary_alt_1",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I don't trust you enough to share my name. Who are you, really?",
-                        },
-                        ["TL"] = {
-                            "I don't trust you enough to share my name. Who are you, really?",
-                        },
-                    },
                     ["variantID"] = "question.identity.dataset.wary_alt_1",
                 },
                 {
@@ -3967,14 +3066,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.wary_alt_2",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-                        },
-                        ["TL"] = {
-                            "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-                        },
-                    },
                     ["variantID"] = "question.identity.dataset.wary_alt_2",
                 },
             },
@@ -4022,49 +3113,28 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "I keep my name to myself until I know someone better. What should I call you?",
                                 ["id"] = "question.identity.dataset.stranger_alt_1",
                                 ["metadata"] = {
                                     ["fallback"] = "I keep my name to myself until I know someone better. What should I call you?",
                                     ["templateID"] = "question.identity.stranger_alt_1",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I keep my name to myself until I know someone better. What should I call you?",
-                                    },
-                                    ["TL"] = {
-                                        "I keep my name to myself until I know someone better. What should I call you?",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Let's get to know each other first. What do people call you?",
                                 ["id"] = "question.identity.dataset.stranger_alt_2",
                                 ["metadata"] = {
                                     ["fallback"] = "Let's get to know each other first. What do people call you?",
                                     ["templateID"] = "question.identity.stranger_alt_2",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Let's get to know each other first. What do people call you?",
-                                    },
-                                    ["TL"] = {
-                                        "Let's get to know each other first. What do people call you?",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "I don't trust you enough to share my name. Who are you, really?",
                                 ["id"] = "question.identity.dataset.wary_alt_1",
                                 ["metadata"] = {
                                     ["fallback"] = "I don't trust you enough to share my name. Who are you, really?",
                                     ["priority"] = 2,
                                     ["templateID"] = "question.identity.wary_alt_1",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I don't trust you enough to share my name. Who are you, really?",
-                                    },
-                                    ["TL"] = {
-                                        "I don't trust you enough to share my name. Who are you, really?",
-                                    },
                                 },
                                 ["when"] = {
                                     ["op"] = "eq",
@@ -4073,19 +3143,12 @@ return {
                                 },
                             },
                             {
+                                ["fallback"] = "After that lie, I'm not telling you my name. Tell me the truth about yours.",
                                 ["id"] = "question.identity.dataset.wary_alt_2",
                                 ["metadata"] = {
                                     ["fallback"] = "After that lie, I'm not telling you my name. Tell me the truth about yours.",
                                     ["priority"] = 2,
                                     ["templateID"] = "question.identity.wary_alt_2",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-                                    },
-                                    ["TL"] = {
-                                        "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-                                    },
                                 },
                                 ["when"] = {
                                     ["op"] = "eq",
@@ -4160,14 +3223,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.stranger_alt_1",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I keep my name to myself until I know someone better. What should I call you?",
-                    },
-                    ["TL"] = {
-                        "I keep my name to myself until I know someone better. What should I call you?",
-                    },
-                },
                 ["variantID"] = "question.identity.dataset.stranger_alt_1",
             },
             {
@@ -4175,14 +3230,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.stranger_alt_2",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Let's get to know each other first. What do people call you?",
-                    },
-                    ["TL"] = {
-                        "Let's get to know each other first. What do people call you?",
-                    },
-                },
                 ["variantID"] = "question.identity.dataset.stranger_alt_2",
             },
             {
@@ -4190,14 +3237,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.wary_alt_1",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I don't trust you enough to share my name. Who are you, really?",
-                    },
-                    ["TL"] = {
-                        "I don't trust you enough to share my name. Who are you, really?",
-                    },
-                },
                 ["variantID"] = "question.identity.dataset.wary_alt_1",
             },
             {
@@ -4205,14 +3244,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.response_pool.question.identity.say.1.question.identity.dataset.wary_alt_2",
-                ["translations"] = {
-                    ["EN"] = {
-                        "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-                    },
-                    ["TL"] = {
-                        "After that lie, I'm not telling you my name. Tell me the truth about yours.",
-                    },
-                },
                 ["variantID"] = "question.identity.dataset.wary_alt_2",
             },
         },
@@ -4238,42 +3269,18 @@ return {
                                 ["id"] = "thanks.dataset.no_problem",
                                 ["templateID"] = "convo.thanks.say.1.thanks.dataset.no_problem",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "No problem at all.",
-                                    },
-                                    ["TL"] = {
-                                        "No problem at all.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Anytime.",
                                 ["id"] = "thanks.dataset.anytime",
                                 ["templateID"] = "convo.thanks.say.1.thanks.dataset.anytime",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Anytime.",
-                                    },
-                                    ["TL"] = {
-                                        "Anytime.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Glad I could help.",
                                 ["id"] = "thanks.dataset.glady",
                                 ["templateID"] = "convo.thanks.say.1.thanks.dataset.glady",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Glad I could help.",
-                                    },
-                                    ["TL"] = {
-                                        "Glad I could help.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -4286,14 +3293,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.thanks.say.1.thanks.dataset.no_problem",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "No problem at all.",
-                        },
-                        ["TL"] = {
-                            "No problem at all.",
-                        },
-                    },
                     ["variantID"] = "thanks.dataset.no_problem",
                 },
                 {
@@ -4301,14 +3300,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.thanks.say.1.thanks.dataset.anytime",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Anytime.",
-                        },
-                        ["TL"] = {
-                            "Anytime.",
-                        },
-                    },
                     ["variantID"] = "thanks.dataset.anytime",
                 },
                 {
@@ -4316,14 +3307,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.thanks.say.1.thanks.dataset.glady",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Glad I could help.",
-                        },
-                        ["TL"] = {
-                            "Glad I could help.",
-                        },
-                    },
                     ["variantID"] = "thanks.dataset.glady",
                 },
             },
@@ -4369,48 +3352,27 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "No problem at all.",
                                 ["id"] = "thanks.dataset.no_problem",
                                 ["metadata"] = {
                                     ["fallback"] = "No problem at all.",
                                     ["templateID"] = "thanks.dataset.no_problem",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "No problem at all.",
-                                    },
-                                    ["TL"] = {
-                                        "No problem at all.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Anytime.",
                                 ["id"] = "thanks.dataset.anytime",
                                 ["metadata"] = {
                                     ["fallback"] = "Anytime.",
                                     ["templateID"] = "thanks.dataset.anytime",
                                 },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Anytime.",
-                                    },
-                                    ["TL"] = {
-                                        "Anytime.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Glad I could help.",
                                 ["id"] = "thanks.dataset.glady",
                                 ["metadata"] = {
                                     ["fallback"] = "Glad I could help.",
                                     ["templateID"] = "thanks.dataset.glady",
-                                },
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Glad I could help.",
-                                    },
-                                    ["TL"] = {
-                                        "Glad I could help.",
-                                    },
                                 },
                             },
                         },
@@ -4480,14 +3442,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.thanks.say.1.thanks.dataset.no_problem",
-                ["translations"] = {
-                    ["EN"] = {
-                        "No problem at all.",
-                    },
-                    ["TL"] = {
-                        "No problem at all.",
-                    },
-                },
                 ["variantID"] = "thanks.dataset.no_problem",
             },
             {
@@ -4495,14 +3449,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.thanks.say.1.thanks.dataset.anytime",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Anytime.",
-                    },
-                    ["TL"] = {
-                        "Anytime.",
-                    },
-                },
                 ["variantID"] = "thanks.dataset.anytime",
             },
             {
@@ -4510,14 +3456,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.thanks.say.1.thanks.dataset.glady",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Glad I could help.",
-                    },
-                    ["TL"] = {
-                        "Glad I could help.",
-                    },
-                },
                 ["variantID"] = "thanks.dataset.glady",
             },
         },

@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.player.attack_none",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "{addressee.name}, stay out of the fight.",
+      "Avoid trouble, {addressee.name}.",
+      "{addressee.name}, don't engage unless I change the order."
+    ]
+  }
+}

@@ -9,62 +9,10 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Good.",
-            "Sounds like a plan.",
-            "Glad we agree.",
-            "Right on.",
-            "Understood. Let's make it happen.",
-            "Good to go.",
-            "Works for me.",
-            "Agreed.",
-            "All set then.",
-            "Solid."
-          ],
-          "TL": [
-            "Mabuti.",
-            "Magandang plano 'yan.",
-            "Mabuti at nagkasundo tayo.",
-            "Tama 'yan.",
-            "Naintindihan. Isakatuparan na natin.",
-            "Handa na.",
-            "Ayos 'yan sa akin.",
-            "Sang-ayon ako.",
-            "Handa na ang lahat kung ganoon.",
-            "Matibay."
-          ]
-        }
+        "id": "neutral"
       },
       {
-        "id": "warm",
-        "text": {
-          "EN": [
-            "That's the spirit.",
-            "Awesome. Let's knock it out.",
-            "Love the energy! Let's do this.",
-            "Great minds think alike, friend.",
-            "Hell yeah. We've got this.",
-            "That's what I like to see. Full speed ahead.",
-            "Good deal. Glad you're on board.",
-            "Right there with you! Let's get it done.",
-            "That puts wind in my sails. Thank you.",
-            "Perfect. We're in sync."
-          ],
-          "TL": [
-            "Iyan ang magandang sigla.",
-            "Napakaganda. Tapusin na natin ito.",
-            "Gusto ko ang sigla mo! Tara na.",
-            "Pareho tayo ng magandang takbo ng isip, kaibigan.",
-            "Oo naman. Kayang-kaya natin ito.",
-            "Iyan ang gusto kong makita. Tuloy-tuloy lang.",
-            "Magandang usapan. Mabuti at kasama ka rito.",
-            "Kasama mo ako riyan! Tapusin na natin.",
-            "Nagbigay 'yan ng lakas sa akin. Salamat.",
-            "Perpekto. Tugma ang takbo natin."
-          ]
-        }
+        "id": "warm"
       }
     ]
   },

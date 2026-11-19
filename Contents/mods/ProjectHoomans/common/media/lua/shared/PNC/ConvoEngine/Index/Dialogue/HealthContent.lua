@@ -3,7 +3,7 @@ return {
     ["question.health_state"] = {
         ["domain"] = "health_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/HealthContent/QuestionHealthState",
+            "PNC/ConvoEngine/Dialogue/HealthContent",
         },
         ["id"] = "question.health_state",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["question.medical_bite"] = {
         ["domain"] = "health_content",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/HealthContent/QuestionMedicalBite",
+            "PNC/ConvoEngine/Dialogue/HealthContent",
         },
         ["id"] = "question.medical_bite",
         ["kind"] = "dialogue",

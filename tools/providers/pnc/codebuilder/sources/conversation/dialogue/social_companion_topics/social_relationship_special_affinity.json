@@ -19,21 +19,9 @@
         "metadata": {
           "textKey": "opening"
         },
-        "text": {
-          "EN": "I'm listening, {addressee.name}. Say what you need to say.",
-          "TL": "Nakikinig ako, {addressee.name}. Sabihin ang kailangan mong sabihin."
-        },
         "offers": [
           {
             "id": "us",
-            "label": {
-              "EN": "Can we talk about us?",
-              "TL": "Maaari ba nating pag-usapan ang tungkol sa atin?"
-            },
-            "utterance": {
-              "EN": "Can we talk about us?",
-              "TL": "Maaari ba nating pag-usapan ang tungkol sa atin?"
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -43,10 +31,6 @@
             "metadata": {
               "choiceKey": "choice.us",
               "responseKey": "response.us",
-              "responseText": {
-                "EN": "Yes. We probably should.",
-                "TL": "Oo. Malamang dapat nga."
-              },
               "effects": [
                 {
                   "type": "pnc:relationship",

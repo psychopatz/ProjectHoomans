@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I'll cover you.",
-            "Ranged weapon ready. Watching the distance.",
-            "Providing covering fire.",
-            "I'll pick them off from here.",
-            "Sights aligned. Firing at range.",
-            "Keeping my distance and shooting.",
-            "Understood. Overwatching with ranged fire.",
-            "Ready on the trigger. Staying back.",
-            "Covering the field from back here.",
-            "Ranged attack stance confirmed."
-          ],
-          "TL": [
-            "Bibigyan kita ng takip.",
-            "Handa ang baril. Binabantayan ang malayo.",
-            "Magbibigay ng suportang putok.",
-            "Isa-isa ko silang titirahin mula rito.",
-            "Nakatutok na ang paningin. Babaril sa malayo.",
-            "Lalayo ako at magpapaputok.",
-            "Naintindihan. Magbabantay gamit ang baril.",
-            "Nasa gatilyo ang daliri. Mananatili sa likod.",
-            "Tatakpan ko ang lugar mula rito.",
-            "Kumpirmado ang malayuang pag-atake."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

@@ -9,10 +9,6 @@
     "variants": [
       {
         "id": "question.backstory.suspected.authored",
-        "text": {
-          "EN": "I think it was %1, but I could be mistaken.",
-          "TL": "Sa tingin ko ay %1 iyon, pero maaaring mali ako."
-        },
         "metadata": {
           "fallback": "I think it was %1, but I could be mistaken.",
           "templateID": "UI_PNC_Conversation_Semantic_QuestionBackstorySuspected",

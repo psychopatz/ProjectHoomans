@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Good work, {addressee.name}.",
-            "That's what I like to see, {addressee.name}.",
-            "Keep it up, {addressee.name}."
-          ],
-          "TL": [
-            "Mahusay, {addressee.name}.",
-            "Iyan ang gusto kong makita, {addressee.name}.",
-            "Ipagpatuloy mo, {addressee.name}."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

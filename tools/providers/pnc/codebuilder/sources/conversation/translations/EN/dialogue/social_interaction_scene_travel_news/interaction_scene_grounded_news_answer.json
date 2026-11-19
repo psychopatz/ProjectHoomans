@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.scene.grounded_news_answer",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "That is what I can confirm right now.",
+      "That's all the verified information I have.",
+      "That covers the extent of what I know.",
+      "Beyond that, it's just guesswork.",
+      "That's as much as I was able to find out.",
+      "I'll let you know if I hear anything more.",
+      "That's the factual picture for now.",
+      "That's what's solid. The rest is rumor.",
+      "I've told you everything I can verify.",
+      "That's the report as it stands."
+    ],
+    "say.variants.guarded": [
+      "Nothing else I can verify yet.",
+      "I don't deal in rumors. That's the only confirmed piece.",
+      "Don't press for details I can't back up.",
+      "That's the extent of it. Keep it between us.",
+      "I won't guess about the rest. Stick to the facts.",
+      "That is all you need to know for now.",
+      "Anything beyond that is dangerous speculation.",
+      "I've verified that much. Nothing more to say.",
+      "Take that information and plan accordingly.",
+      "That's all that's confirmed. Watch your step."
+    ],
+    "say.variants.terse": [
+      "That is all I can confirm.",
+      "That's it.",
+      "All I know.",
+      "Confirmed only.",
+      "Nothing more.",
+      "That's all.",
+      "Full report.",
+      "End of it.",
+      "Done.",
+      "All there is."
+    ],
+    "say.variants.warm": [
+      "I wish I knew more, but that is what I can confirm.",
+      "That's all I have for you right now, friend, but I'll keep asking.",
+      "I wanted to share everything I knew to keep you safe.",
+      "If any more news comes my way, you'll be the first I tell.",
+      "Hope that helps you out today, partner.",
+      "That's the whole story as far as I've been told.",
+      "I'm glad I could pass that along to you.",
+      "That's what we have to work with for now, friend.",
+      "I'll keep my ears open for you.",
+      "That's everything for now. Take good care of yourself."
+    ]
+  }
+}

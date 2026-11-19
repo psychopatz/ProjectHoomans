@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.memory.acknowledge_flavor",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "The listener gives a small acknowledging nod.",
+      "The listener listens thoughtfully and nods.",
+      "A steady nod shows the listener remembers.",
+      "The listener absorbs the words and dips their head.",
+      "The listener acknowledges the shared recollection quietly.",
+      "A quiet look of recognition passes over the listener's face.",
+      "The listener blinks slowly, recalling the moment.",
+      "The listener gives a calm, measured gesture of understanding.",
+      "A brief pause precedes an acknowledging nod.",
+      "The listener tilts their head in silent agreement."
+    ],
+    "say.variants.guarded": [
+      "The listener gives a guarded nod.",
+      "The listener watches closely without revealing their thoughts.",
+      "A cautious look crosses the listener's eyes.",
+      "The listener stiffens slightly as the past is mentioned.",
+      "A slow, guarded nod shows the words were registered.",
+      "The listener's hand rests near their belt during the pause.",
+      "The listener narrows their eyes, weighing the intent behind the words.",
+      "A tight, reserved expression settles on the listener's face.",
+      "The listener gives nothing away, nodding once carefully.",
+      "The listener keeps their guard up while acknowledging the memory."
+    ],
+    "say.variants.terse": [
+      "A brief nod follows.",
+      "A curt dip of the chin confirms it.",
+      "The listener grunts in assent.",
+      "A sharp single nod.",
+      "The listener barely shifts.",
+      "Eyes narrow briefly in recognition.",
+      "A quick jerk of the head acknowledges it.",
+      "The listener's jaw sets firmly.",
+      "A momentary pause, nothing more.",
+      "A flat nod ends the topic."
+    ],
+    "say.variants.warm": [
+      "The listener softens and nods with quiet understanding.",
+      "A faint, gentle smile touches the listener's lips.",
+      "The listener's eyes warm as the memory settles in.",
+      "The listener gives a warm, reassuring nod.",
+      "A fond look washes over the listener's tired features.",
+      "The listener reaches out slightly, comforted by the recollection.",
+      "A soft breath escapes the listener as they remember.",
+      "The listener's shoulders relax with affectionate recognition.",
+      "The listener nods warmly, visibly moved by the memory.",
+      "A quiet sense of camaraderie passes between them."
+    ]
+  }
+}

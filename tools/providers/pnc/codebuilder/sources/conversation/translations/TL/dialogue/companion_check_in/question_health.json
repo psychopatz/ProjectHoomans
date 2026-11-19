@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.health",
+  "locale": "TL",
+  "entries": {
+    "affordance.label": "Itanong ang mga sugat",
+    "say.variants.default": "Nasaktan ka ba?"
+  }
+}

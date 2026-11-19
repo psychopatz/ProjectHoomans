@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.unavailable.tooltip",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": "Hindi magagamit sa kasalukuyang sitwasyon.",
+    "textRows.suggestion.unavailable.tooltip": "Hindi magagamit sa kasalukuyang sitwasyon."
+  }
+}

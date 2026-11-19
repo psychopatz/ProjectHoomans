@@ -106,7 +106,7 @@ class SemanticDialogueFlowTests(WarmWorkerTestMixin, unittest.TestCase):
                 )
                 self.assertEqual(
                     payloads[1]["translationKey"],
-                    "conversation.content.semantic.flow.greeting.opening.question.default.neutral.01",
+                    "convo.flow.greeting.opening.say.1.question.default.1",
                 )
                 self.assertEqual(
                     payloads[0]["plan"]["sourcePoolID"],

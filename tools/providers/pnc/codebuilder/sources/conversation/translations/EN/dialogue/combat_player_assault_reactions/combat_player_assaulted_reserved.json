@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.player_assaulted.reserved",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Back off. Now.",
+      "Enough. Stay away from me.",
+      "Step back.",
+      "Do not do that again.",
+      "Don't touch me.",
+      "Last warning.",
+      "Stay back.",
+      "Drop it.",
+      "Keep your distance.",
+      "One step back. Right now."
+    ]
+  }
+}

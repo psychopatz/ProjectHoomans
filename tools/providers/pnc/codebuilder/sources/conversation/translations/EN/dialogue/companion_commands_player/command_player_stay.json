@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.player.stay",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "{addressee.name}, wait here.",
+      "Hold this position, {addressee.name}.",
+      "{addressee.name}, stay put for now."
+    ]
+  }
+}

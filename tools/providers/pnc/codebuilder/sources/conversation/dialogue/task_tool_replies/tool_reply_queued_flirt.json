@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I heard you.",
-              "I heard that little remark.",
-              "Caught that.",
-              "I heard what you whispered.",
-              "Message heard.",
-              "I hear where your head is at.",
-              "Got that loud and clear.",
-              "I heard you just fine.",
-              "Heard you. Don't think I missed it.",
-              "I caught that flirt."
-            ],
-            "TL": [
-              "Narinig kita.",
-              "Narinig ko ang maikling linyang 'yon.",
-              "Nahuli ko 'yon.",
-              "Narinig ko ang ibinulong mo.",
-              "Narinig ang mensahe.",
-              "Naririnig ko kung ano ang iniisip mo.",
-              "Nakuha 'yon nang malakas at malinaw.",
-              "Narinig kita nang maayos.",
-              "Narinig kita. Huwag mong isiping pinalampas ko.",
-              "Nakuha ko ang pambobolang 'yon."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "You are bold, I will give you that.",
-              "You certainly don't lack nerve.",
-              "Bold move talking like that out here.",
-              "You have plenty of confidence, I'll say that.",
-              "That's quite a forward thing to say.",
-              "You certainly know how to shoot your shot.",
-              "Bold words for someone in danger.",
-              "I admire the guts, if nothing else.",
-              "You're definitely not shy.",
-              "You like living dangerously, don't you?"
-            ],
-            "TL": [
-              "Matapang ka, aaminin ko iyan.",
-              "Talagang hindi ka kulang sa lakas ng loob.",
-              "Matapang na hakbang ang magsalita nang ganyan dito.",
-              "Marami kang tiwala sa sarili, aaminin ko.",
-              "Medyo mapangahas ang linyang 'yan.",
-              "Marunong ka talagang sumubok ng diskarte mo.",
-              "Matatapang na salita para sa taong nasa panganib.",
-              "Hanga ako sa tapang mo, kahit 'yon man lang.",
-              "Talagang hindi ka mahiyain.",
-              "Gusto mo talagang sumugal sa delikado, 'no?"
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

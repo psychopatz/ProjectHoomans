@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.thirst_alt",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Kailangan ko talaga ng maiinom. May tubig ka ba?",
+      "Gusto ko na talagang makainom ng tubig dito sa init.",
+      "Makati na ang lalamunan ko sa uhaw. May botelya ka ba?",
+      "Kahit ano ibibigay ko para sa malamig na lagok ng tubig ngayon.",
+      "Naghahanap ako ng malinis na tubig kung saan-saan. May sobra ka?",
+      "Inaabutan na ako ng dehydration. Malaking tulong ang tubig.",
+      "May sobra ka bang lalagyan ng tubig? Parang liha na ang dila ko.",
+      "Hindi na ako makakalayo kapag walang maiinom.",
+      "Kahit isang lagok lang ng tubig makakatulong na sa akin.",
+      "Bitak-bitak na ang labi ko sa uhaw. Pahingi naman ng tubig?"
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.insult",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "Is that supposed to bother me?",
+      "You will have to do better than that.",
+      "I have heard worse from better people.",
+      "That did not even scratch me.",
+      "Save your breath. It does not work.",
+      "Is that the best you can come up with?",
+      "Weak. Try harder next time.",
+      "Words do not hurt out here. Bullets do.",
+      "You think that gets under my skin? Think again.",
+      "Not impressed."
+    ],
+    "say.2.neutral": [
+      "You are barking up the wrong tree.",
+      "You are picking a fight you cannot win.",
+      "You really picked the wrong person to cross.",
+      "Careful. You are playing with someone who will bite back.",
+      "You do not know who you are dealing with.",
+      "Wrong move, friend.",
+      "You are treading on thin ice.",
+      "Pick on someone else. I am not the one.",
+      "You made a very bad choice just now.",
+      "You are pushing someone who does not back down."
+    ],
+    "say.3.neutral": [
+      "Save your breath.",
+      "Not worth my time.",
+      "Done talking to you.",
+      "You are wasting both our time.",
+      "I am not wasting oxygen on you.",
+      "Walk away before you say something worse.",
+      "I do not have time for childish games.",
+      "Keep it to yourself.",
+      "Whatever. Get lost.",
+      "I have real survival to worry about. Shut up."
+    ]
+  }
+}

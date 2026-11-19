@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.scene.post_combat_clear",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Mukhang malinaw na. Naging delikado sandali.",
+      "Ligtas na ang lugar. Tingnan niyo kung may mga sugat kayo.",
+      "Tumba na silang lahat. Huminga at magkarga ng bala.",
+      "Tapos na ang laban. Magandang pagpigil sa linya.",
+      "Mukhang naasikaso na ang agarang banta.",
+      "Malinaw. Buo pa ba ang lahat?",
+      "Nalipol ang banta. Bawiin natin ang lakas natin.",
+      "Tahimik na ulit. Magbantay sa mga naiwan.",
+      "Tapos na ang bakbakan. Magkarga at magbenda.",
+      "Naitaboy natin sila. Mukhang malinis na ang lugar."
+    ],
+    "say.variants.guarded": [
+      "Huwag munang magpakampante. Maghanap ng mga naiwan.",
+      "Tumba na, pero ihanda ang armas. Baka may paparating pa.",
+      "Suriin ang paligid bago magdiwang.",
+      "Tingnan ang bawat bangkay. Tiyaking hindi na gagalaw.",
+      "Nakahahatak ng iba ang putok. Maging handa tayong umalis.",
+      "Punasan ang talim at magkarga agad ng bala.",
+      "Kinagat ka ba? Sagutin mo ako ngayon din.",
+      "Patay ang banta, pero mabilis kumalat ang ingay dito.",
+      "Yumuko ka. Huwag mong i-expose ang sarili mo sa pinto.",
+      "Malinis sa ngayon. Maghanda sa pangalawang bugso."
+    ],
+    "say.variants.terse": [
+      "Malinaw.",
+      "Tumba lahat.",
+      "Magkarga.",
+      "Tingnan ang sugat.",
+      "Ligtas.",
+      "Tapos.",
+      "Tahimik na.",
+      "Manatili sa pwesto.",
+      "Huminga.",
+      "Wala nang banta."
+    ],
+    "say.variants.warm": [
+      "Nakalusot tayo! Ayos lang ba ang lahat?",
+      "Salamat sa Diyos at buhay ka. Napakatindi noon.",
+      "Napakagaling mong lumaban, kasama! Masayang-masaya ako't nakaligtas tayo.",
+      "Halika rito, titingnan ko kung may kagat o gasgas ka.",
+      "Nagawa natin nang magkasama. Walang naiwan sa atin.",
+      "Huminga ka muna, kaibigan. Naipagtanggol natin ang pwesto.",
+      "Nag-alala ako nang sandali, pero buong tapang kang lumaban.",
+      "Ipinagmamalaki kong tumabi sa 'yo sa laban. Ligtas na tayo ngayon.",
+      "Magpahinga ka muna. Karapat-dapat ka roon pagkatapos ng gulo.",
+      "Malinis na! Napakalaking ginhawa na nakatayo pa tayong pareho."
+    ]
+  }
+}

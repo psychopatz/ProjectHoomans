@@ -10,99 +10,21 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "One down.",
-              "Down.",
-              "Hit.",
-              "Dropped.",
-              "Eliminated.",
-              "Dead.",
-              "Finished.",
-              "Ceased.",
-              "One less.",
-              "Target down."
-            ],
-            "TL": [
-              "Isa na.",
-              "Bagsak.",
-              "Tinamaan.",
-              "Naitumba.",
-              "Naalis.",
-              "Patay.",
-              "Tapos.",
-              "Tumigil.",
-              "Bawas isa.",
-              "Target bagsak."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Good.",
-              "Clean.",
-              "Handled.",
-              "Solid.",
-              "Done.",
-              "Fine.",
-              "Alright.",
-              "Resolved.",
-              "Effective.",
-              "Cleared."
-            ],
-            "TL": [
-              "Ayos.",
-              "Malinis.",
-              "Naasikaso.",
-              "Solido.",
-              "Yari.",
-              "Sige.",
-              "Mabuti.",
-              "Tapos.",
-              "Mabisa.",
-              "Nalinis."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "3": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Keep moving.",
-              "Move.",
-              "Forward.",
-              "Next.",
-              "Walk.",
-              "Proceed.",
-              "Step through.",
-              "Push.",
-              "Don't stop.",
-              "Keep going."
-            ],
-            "TL": [
-              "Tuloy.",
-              "Galaw.",
-              "Sulong.",
-              "Sunod.",
-              "Lakad.",
-              "Abante.",
-              "Lusot.",
-              "Paspas.",
-              "Huwag hinto.",
-              "Tuloy lang."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

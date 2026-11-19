@@ -5,33 +5,24 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.check_in.label",
-        "text": {
-          "EN": "Check in with them",
-          "TL": "Kumusta tayo"
-        }
+        "key": "suggestion.check_in.label"
       },
       {
-        "key": "suggestion.check_in.utterance",
-        "text": {
-          "EN": "How are we doing?",
-          "TL": "Kumusta tayo?"
-        }
+        "key": "suggestion.check_in.utterance"
       }
     ]
   },
   "affordance": {
-    "label": {
-      "EN": "Check in with them",
-      "TL": "Kumusta tayo"
-    },
     "consumers": [
       "player"
     ]
   },
   "say": {
-    "EN": "How are we doing?",
-    "TL": "Kumusta tayo?"
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

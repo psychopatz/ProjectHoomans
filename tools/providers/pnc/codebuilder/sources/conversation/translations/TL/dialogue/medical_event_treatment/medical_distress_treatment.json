@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "medical.distress.treatment",
+  "locale": "TL",
+  "entries": {
+    "say.variants.bandage": [
+      "Nagamot na ang sugat. Makakakilos na ako kapag handa ka na.",
+      "Nabendahan nang mahigpit. Handa nang umalis kapag handa ka na.",
+      "Tumigil na ang dugo. Handa nang lumabas.",
+      "Ligtas na ang benda. Makakalakad na ako ngayon.",
+      "Bumisa 'yon. Nakatayo na ulit ako.",
+      "Nabalot na nang maayos. Manguna ka na.",
+      "Maayos na ang sugat. Handa sa utos mo.",
+      "Kumakapit ang benda. Kilos na tayo.",
+      "Malinis na nabalutan. Handa na akong sumunod.",
+      "Maayos na ang lahat. Tara na sa daan."
+    ],
+    "say.variants.default": [
+      "Salamat. Malaking tulong ang panggagamot na 'yon.",
+      "Medyo maayos na pakiramdam ko. Salamat sa tulong.",
+      "Mas maayos na ngayon. Salamat sa paggamot sa akin.",
+      "Humuhupa na ang sakit. Salamat sa pag-asikaso no'n.",
+      "Magaling ang panggagamot mo. May utang na loob ako sa'yo.",
+      "Nabawasan ang kirot. Salamat sa'yo.",
+      "Makakagalaw na ulit ako. Salamat sa mabilis na lunas.",
+      "Salamat sa tulong medikal. May utang ako sa'yo.",
+      "Salamat, malaking tulong 'yon. Handa nang kumilos.",
+      "Iniligtas mo ang buhay ko sa lunas na 'yon. Maraming salamat."
+    ]
+  }
+}

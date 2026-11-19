@@ -6,22 +6,14 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.needs_destination.tooltip",
-        "text": {
-          "EN": "Choose a destination first.",
-          "TL": "Pumili muna ng pupuntahan."
-        }
+        "key": "suggestion.needs_destination.tooltip"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": "Choose a destination first.",
-          "TL": "Pumili muna ng pupuntahan."
-        }
+        "id": "neutral"
       }
     ]
   },

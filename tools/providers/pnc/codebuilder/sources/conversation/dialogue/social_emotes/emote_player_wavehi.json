@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Hey, {addressee.name}.",
-            "Good to see you, {addressee.name}.",
-            "Morning, {addressee.name}."
-          ],
-          "TL": [
-            "Uy, {addressee.name}.",
-            "Mabuti at nakita kita, {addressee.name}.",
-            "Magandang umaga, {addressee.name}."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

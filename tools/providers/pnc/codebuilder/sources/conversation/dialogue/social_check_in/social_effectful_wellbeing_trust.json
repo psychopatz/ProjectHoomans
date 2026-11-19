@@ -49,20 +49,29 @@
     }
   ],
   "say": {
-    "EN": "I appreciate you watching my back.",
-    "TL": "Pinahahalagahan ko ang pagbabantay mo sa akin."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "reply": {
     "blocked": {
       "say": {
-        "EN": "Save it.",
-        "TL": "Huwag na."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     },
     "accepted": {
       "say": {
-        "EN": "Always.",
-        "TL": "Palagi."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     }
   },

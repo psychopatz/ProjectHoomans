@@ -22,10 +22,6 @@
       }
     ]
   },
-  "textSidecars": {
-    "EN": "translations/social_threat_boundary.en.json",
-    "TL": "translations/social_threat_boundary.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

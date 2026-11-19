@@ -125,6 +125,14 @@ class InteractionDialogueContentEditingContractTests(WarmWorkerTestMixin, unitte
                 repos["hoomans"] / source_dir_rel,
                 dirs_exist_ok=True,
             )
+            for loc in ("EN", "TL"):
+                tr_rel = Path(f"tools/providers/pnc/codebuilder/sources/conversation/translations/{loc}/dialogue/social_interaction_argument")
+                if (REPOSITORY / tr_rel).is_dir():
+                    shutil.copytree(
+                        REPOSITORY / tr_rel,
+                        repos["hoomans"] / tr_rel,
+                        dirs_exist_ok=True,
+                    )
             dest_path = (
                 repos["hoomans"] / source_dir_rel / "interaction_argument_retaliate.json"
             )
@@ -188,7 +196,12 @@ class InteractionDialogueContentEditingContractTests(WarmWorkerTestMixin, unitte
                 path.read_text(encoding="utf-8") for path in target_paths
             )
             self.assertIn("You are really pushing me now.", generated_module)
-            self.assertIn("Talagang sinusubok mo ako ngayon.", generated_module)
+            self.assertNotIn("Talagang sinusubok mo ako ngayon.", generated_module)
+            tl_catalog = (
+                repos["hoomans"]
+                / "Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Text/convo/ConvoEngine_interaction.json"
+            ).read_text(encoding="utf-8")
+            self.assertIn("Talagang sinusubok mo ako ngayon.", tl_catalog)
 
     def test_real_worker_uses_one_response_authority_and_content_realization(self) -> None:
         scenario = deepcopy(DEFAULT_SCENARIO)

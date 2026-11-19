@@ -1,0 +1,11 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.relationship.special.affinity",
+  "locale": "EN",
+  "entries": {
+    "response.turn.opening.text": "I'm listening, {addressee.name}. Say what you need to say.",
+    "response.turn.opening.offer.us.label": "Can we talk about us?",
+    "response.turn.opening.offer.us.utterance": "Can we talk about us?",
+    "response.turn.opening.offer.us.responseText": "Yes. We probably should."
+  }
+}

@@ -5,33 +5,24 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.trade.label",
-        "text": {
-          "EN": "Open trading",
-          "TL": "Buksan ang kalakalan"
-        }
+        "key": "suggestion.trade.label"
       },
       {
-        "key": "suggestion.trade.utterance",
-        "text": {
-          "EN": "Let's trade.",
-          "TL": "Magpalitan tayo."
-        }
+        "key": "suggestion.trade.utterance"
       }
     ]
   },
   "affordance": {
-    "label": {
-      "EN": "Open trading",
-      "TL": "Buksan ang kalakalan"
-    },
     "consumers": [
       "player"
     ]
   },
   "say": {
-    "EN": "Let's trade.",
-    "TL": "Magpalitan tayo."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

@@ -1,0 +1,30 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "identity.exchange.responses",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": "Ang bastos naman ng sagot mo.",
+    "textRows.UI_PNC_Conversation_Identity_Evasion_Rude_1": "Ang bastos naman ng sagot mo.",
+    "textRows.UI_PNC_Conversation_Identity_Evasion_Rude_2": "Kung gusto mo ng tulong ko, magpakita ka ng kaunting paggalang.",
+    "textRows.UI_PNC_Conversation_Identity_Evasion_Rude_3": "Sige. Sarili mo na lang ang pangalan mo.",
+    "textRows.UI_PNC_Conversation_Identity_FalseName": "Hindi ako naniniwala sa iyo.",
+    "textRows.UI_PNC_Conversation_Semantic_IdentityEvasionDefault": "Iniwasan mo ang tanong ko. Nagmumukha kang hindi mapagkakatiwalaan.",
+    "textRows.UI_PNC_Conversation_Semantic_IdentityEvasionFriendly": "Tinanong ko ang pangalan mo. Dahil binago mo ang paksa, nagdududa ako sa katapatan mo.",
+    "textRows.UI_PNC_Conversation_Semantic_IdentityEvasionUntrustworthy": "Iniwasan mo ang tanong ko. Hindi kita mapagkakatiwalaan sa pangalan ko.",
+    "textRows.UI_PNC_Conversation_Semantic_IdentityEvasionWithdrawn": "Sige na. Itago mo ang pangalan mo; hindi ako nagtitiwala sa mga umiiwas.",
+    "textRows.UI_PNC_Conversation_Semantic_IdentityExchange": "Ikinagagalak kitang makilala. Ano ang pangalan mo?",
+    "textRows.UI_PNC_Conversation_Semantic_IdentityExchangeConfirmed": "Sige, %s. Ikinagagalak kitang makilala. Ako si %s.",
+    "textRows.UI_PNC_Conversation_Semantic_IdentityExchangeConfirmedUnnamed": "Sige, %s. Ikinagagalak kitang makilala.",
+    "textRows.UI_PNC_Conversation_Semantic_IdentityExchangeUnavailable": "Hindi ko makumpirma ang pangalan mo sa ngayon. Maaari mo bang sabihin itong muli?",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionIdentity": "Sasabihin ko ang pangalan ko kapag may tiwala na tayo. Ano ang pangalan mo?",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionIdentityKnown": "Ako si %s. Kilala na natin ang isa't isa.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionIdentityKnownGuarded": "Ako si %s. Dapat kilala mo na ako.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionIdentityKnownTerse": "Kilala mo ako. Ako si %s.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionIdentityKnownWarm": "Ako si %s. Mabuti at nakita kita ulit.",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionIdentityStrangerAlt1": "Hindi ko muna sasabihin ang pangalan ko hangga't hindi pa kita lubos na kilala. Ano ang itatawag ko sa iyo?",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionIdentityStrangerAlt2": "Kilalanin muna natin ang isa't isa. Ano ang tawag sa iyo?",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionIdentityWary": "Hindi ko ibinabahagi ang pangalan ko sa mga sinungaling. Ano ang tunay mong pangalan?",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionIdentityWaryAlt1": "Hindi pa kita pinagkakatiwalaan para sabihin ang pangalan ko. Sino ka ba talaga?",
+    "textRows.UI_PNC_Conversation_Semantic_QuestionIdentityWaryAlt2": "Pagkatapos mong magsinungaling, hindi ko sasabihin ang pangalan ko. Sabihin mo muna ang totoo tungkol sa iyo."
+  }
+}

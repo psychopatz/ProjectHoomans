@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "integration.bandits.hooman_hurt",
+  "locale": "EN",
+  "entries": {
+    "say.variants.colonist": [
+      "Bandit fire! Pull back and cover the wounded colonist."
+    ],
+    "say.variants.default": [
+      "Bandit fire! Stay with the wounded survivor and watch the flank."
+    ],
+    "say.variants.family": [
+      "Bandit fire! Stay together and cover the wounded family member."
+    ],
+    "say.variants.lover": [
+      "Bandit fire. Stay close; I have got you."
+    ]
+  }
+}

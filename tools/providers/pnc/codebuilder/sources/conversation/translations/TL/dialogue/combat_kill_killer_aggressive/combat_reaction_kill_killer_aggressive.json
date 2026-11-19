@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_killer_aggressive",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Isa na. Sino'ng susunod?",
+      "Bagsak ang isa. Ihanay ang susunod.",
+      "Patay ang isang 'yon. Magpadala pa ng isa.",
+      "Ibinagsak ko na. Sino pa may gusto?",
+      "Unang bagsak. Dalhin ang iba.",
+      "Durog ang bungo. Susunod na target.",
+      "Manatili ka sa lupa. Sunod!",
+      "Burado na 'yon. Lilipat sa susunod.",
+      "Bawas ang isang bulok. Sino susunod?",
+      "Ibinagsak nang malupit. Lumapit ang may tapang."
+    ],
+    "say.2.neutral": [
+      "Patay. May kasunod pa ba?",
+      "Bagsak. Dalhin niyo rito.",
+      "Patay na. Sino'ng lalapit?",
+      "Tinapos ko 'yon. Ipadala ang kasunod.",
+      "Bagsak. Iharap niyo lang sa akin.",
+      "Basag na. Susunod sa pila.",
+      "Tapos na ang isang 'yon. Bigyan pa ako ng target.",
+      "Patay sa lupa. Susunod lumapit.",
+      "Pinitpit. Sino susunod na mamamatay?",
+      "Isang bagsak. Hindi man lang ako hinihingal."
+    ],
+    "say.3.neutral": [
+      "Isa na. Sige, lapit pa.",
+      "Bawas ang isang bulok. Lapit lang.",
+      "Unang tama. Ihanay niyo sila.",
+      "Isang bagsak na 'yan. Kaya ko 'to buong araw.",
+      "Puntos sa atin. Tuloy ang sugod.",
+      "Bilangin ang isang patay. Halika rito.",
+      "Bawas ang isang kakain. Sunod.",
+      "Durog ang isa. Papuntahin niyo rito.",
+      "Nagpabagsak ng isa. Sino may gusto ng gano'n din?",
+      "Isa sa hukay. Sige, tuloy lang."
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.order_rejected",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "I cannot do that right now.",
+      "That's not something I can pull off here.",
+      "Unable to execute that request at this time.",
+      "I have to decline that order.",
+      "Not possible under current circumstances.",
+      "I can't carry that out right now.",
+      "Unable to comply with that command.",
+      "I can't do that. Find another solution.",
+      "Order declined. Conditions won't allow it.",
+      "I cannot perform that action right now."
+    ],
+    "say.2.neutral": [
+      "That order is not going to work.",
+      "That's a bad plan and it won't succeed.",
+      "That order makes no sense in this situation.",
+      "That won't work. We need a different approach.",
+      "I'm not following an order that leads to failure.",
+      "That command will only get us killed.",
+      "Not going to work out. Try another idea.",
+      "Flawed order. I won't execute it.",
+      "That plan is dead in the water.",
+      "That won't work out here. Give a better order."
+    ]
+  }
+}

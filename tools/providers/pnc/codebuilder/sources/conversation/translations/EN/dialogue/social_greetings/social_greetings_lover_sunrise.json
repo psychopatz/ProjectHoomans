@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greetings.lover.sunrise",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Morning, love. You sleep all right?",
+      "There you are. I was starting to miss you.",
+      "Good morning. Stay close today, okay?",
+      "Seeing you first thing still makes this place feel almost normal.",
+      "Morning. Whatever happens today, we handle it together."
+    ],
+    "textRows.greeting.001": "Morning, love. You sleep all right?",
+    "textRows.greeting.002": "There you are. I was starting to miss you.",
+    "textRows.greeting.003": "Good morning. Stay close today, okay?",
+    "textRows.greeting.004": "Seeing you first thing still makes this place feel almost normal.",
+    "textRows.greeting.005": "Morning. Whatever happens today, we handle it together."
+  }
+}

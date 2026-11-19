@@ -10,37 +10,13 @@
   "say": {
     "variants": [
       {
-        "id": "hostile",
-        "text": {
-          "EN": [
-            "That faction may be hostile toward us now. Stay alert."
-          ],
-          "TL": [
-            "That faction may be hostile toward us now. Stay alert."
-          ]
-        }
+        "id": "hostile"
       },
       {
-        "id": "incoming",
-        "text": {
-          "EN": [
-            "They just opened fire on us. Stay close."
-          ],
-          "TL": [
-            "They just opened fire on us. Stay close."
-          ]
-        }
+        "id": "incoming"
       },
       {
-        "id": "outgoing",
-        "text": {
-          "EN": [
-            "We hit them. They may retaliate soon."
-          ],
-          "TL": [
-            "We hit them. They may retaliate soon."
-          ]
-        }
+        "id": "outgoing"
       }
     ]
   },

@@ -1,0 +1,67 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "task.fetch",
+  "locale": "EN",
+  "entries": {
+    "reply.admitted.say.variants.default": [
+      "I'll fetch that.",
+      "Understood. I will retrieve the item.",
+      "I'll go grab that for you.",
+      "On it. Fetching the supplies.",
+      "Right away. Going to pick it up.",
+      "Understood. I'll bring it back.",
+      "I'll secure that item.",
+      "Heading out to fetch it.",
+      "Got the order. Fetching.",
+      "Sounds good. Retrieving it now."
+    ],
+    "reply.active.say.variants.default": [
+      "I'm working on that now.",
+      "Retrieving the item now.",
+      "On my way to pick that up.",
+      "Currently fetching the supplies.",
+      "Moving toward the item.",
+      "Grabbing it now. Won't take long.",
+      "Fetching as ordered.",
+      "I'm searching for and grabbing that item.",
+      "In transit to fetch the goods.",
+      "Retrieval in progress."
+    ],
+    "reply.completed.say.variants.default": [
+      "Here you go.",
+      "Retrieved the item. Here it is.",
+      "Got what you asked for.",
+      "Fetched and delivered.",
+      "Here are the goods.",
+      "Task completed. Item secured.",
+      "All fetched. Safe in hand.",
+      "Here it is. One piece.",
+      "Delivery made. What's next?",
+      "Retrieved as requested."
+    ],
+    "reply.rejected.say.variants.default": [
+      "I can't fetch that right now.",
+      "That's in a death trap. I'm not fetching it.",
+      "Too far or too dangerous. Refusing to fetch.",
+      "My hands and pack are completely full.",
+      "I won't risk my neck for that junk.",
+      "Can't retrieve that under current conditions.",
+      "I don't have the carrying capacity right now.",
+      "Fetch order rejected. Pick it up yourself.",
+      "Unable to comply. Item is out of bounds.",
+      "I can't fetch that for you."
+    ],
+    "reply.failed.say.variants.default": [
+      "I couldn't fetch that.",
+      "Failed to retrieve the item.",
+      "The item wasn't there or was destroyed.",
+      "Way was blocked. Couldn't reach it.",
+      "Hostiles prevented me from grabbing it.",
+      "Unable to fetch that from that container.",
+      "Lost access to the item. Fetch failed.",
+      "I couldn't find what you were pointing to.",
+      "Inventory full or path obstructed. Failed.",
+      "Couldn't get to the target item."
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.queued_praise",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "I hear you.",
+      "I hear your praise.",
+      "Heard and appreciated.",
+      "I hear what you said about my work.",
+      "Got that positive feedback.",
+      "I hear you clearly. Thanks.",
+      "Praise heard. Good to know.",
+      "I hear the support.",
+      "Heard. Glad to help.",
+      "I hear you. We did good."
+    ],
+    "say.2.neutral": [
+      "I will remember that.",
+      "I'll keep that positive note in mind.",
+      "I won't forget that you recognized my effort.",
+      "That will stay with me. Thanks.",
+      "I'll remember you said that when times get tough.",
+      "Remembered and valued.",
+      "I will hold onto that praise.",
+      "That sticks in my memory. Thank you.",
+      "I'll remember your good words.",
+      "Noted in my heart. Thanks."
+    ]
+  }
+}

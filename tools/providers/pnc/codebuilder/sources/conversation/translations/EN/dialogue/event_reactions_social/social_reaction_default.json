@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.reaction.default",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "I hear you.",
+      "Understood.",
+      "Got it.",
+      "I'm listening.",
+      "Fair enough.",
+      "Sounds good.",
+      "Copy that.",
+      "Noted.",
+      "Makes sense.",
+      "I agree."
+    ]
+  }
+}

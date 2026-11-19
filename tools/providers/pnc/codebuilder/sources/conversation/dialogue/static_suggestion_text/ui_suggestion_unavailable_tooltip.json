@@ -6,22 +6,14 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.unavailable.tooltip",
-        "text": {
-          "EN": "Unavailable in the current situation.",
-          "TL": "Hindi magagamit sa kasalukuyang sitwasyon."
-        }
+        "key": "suggestion.unavailable.tooltip"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": "Unavailable in the current situation.",
-          "TL": "Hindi magagamit sa kasalukuyang sitwasyon."
-        }
+        "id": "neutral"
       }
     ]
   },

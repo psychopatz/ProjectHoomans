@@ -16,21 +16,9 @@
         "metadata": {
           "textKey": "opening"
         },
-        "text": {
-          "EN": "All right. We can talk for a minute.",
-          "TL": "Sige. Maaari tayong mag-usap sandali."
-        },
         "offers": [
           {
             "id": "weather",
-            "label": {
-              "EN": "Some weather we're having.",
-              "TL": "Ilang panahon ang nararanasan natin."
-            },
-            "utterance": {
-              "EN": "Some weather we're having.",
-              "TL": "Ilang panahon ang nararanasan natin."
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -39,23 +27,11 @@
             },
             "metadata": {
               "choiceKey": "choice.weather",
-              "responseKey": "response.weather",
-              "responseText": {
-                "EN": "At least the rain covers our footsteps.",
-                "TL": "At least natatakpan ng ulan ang mga yapak namin."
-              }
+              "responseKey": "response.weather"
             }
           },
           {
             "id": "quiet_day",
-            "label": {
-              "EN": "Quiet day so far.",
-              "TL": "Tahimik na araw hanggang ngayon."
-            },
-            "utterance": {
-              "EN": "Quiet day so far.",
-              "TL": "Tahimik na araw hanggang ngayon."
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -69,11 +45,7 @@
             },
             "metadata": {
               "choiceKey": "choice.quiet_day",
-              "responseKey": "response.quiet_day",
-              "responseText": {
-                "EN": "Do not tempt fate, but I'll take it.",
-                "TL": "Huwag tuksuhin ang kapalaran, ngunit kukunin ko ito."
-              }
+              "responseKey": "response.quiet_day"
             }
           }
         ]

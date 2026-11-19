@@ -1,0 +1,45 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.needs.proposal",
+  "locale": "TL",
+  "entries": {
+    "say.variants.hunger": [
+      "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+      "Mukhang magandang ideya para sa pagkain, pero tiyakin muna natin kung ano at gaano karami.",
+      "Interesado ako sa alok na pagkain, pero linawin natin ang mga detalye.",
+      "Puwede tayong magkasundo sa pagkain, sabihin mo lang ang mga detalye.",
+      "Mukhang maganda ang palitan ng pagkain. Anong rasyon ba eksakto ang tinitingnan natin?",
+      "Narinig ko ang alok mo sa pagkain. Magkasundo muna tayo sa dami bago natin pagtibayin.",
+      "Puwede sa pagkain, pero kailangan nating tiyakin ang detalye muna.",
+      "Bukas ako sa pakikipagpalitan ng pagkain. Sabihin mo lang anong gamit ang nasa isip mo.",
+      "Maganda ang kasunduan sa pagkain. Tiyakin natin kung ano ang iaalok.",
+      "Ayos sa akin ang alok sa pagkain kapag naitama na natin ang dami."
+    ],
+    "say.variants.thirst": [
+      "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+      "Mukhang maayos na plano para sa tubig, pero tiyakin muna natin ang botelya at dami.",
+      "Bukas ako sa alok na tubig. Sabihin mo lang kung gaano karami ang ibibigay mo.",
+      "Puwede tayong magkasundo sa tubig, pero ayusin muna natin ang detalye.",
+      "Maganda ang palitan ng tubig. Anong lalagyan ba ang pinag-uusapan natin?",
+      "Narinig ko ang alok mong tubig. Magkasundo muna tayo sa dami bago tapusin.",
+      "Mahalaga palagi ang tubig. Sabihin mo ang eksaktong dami na nais mong ipagpalit.",
+      "Tatanggapin ko ang kasunduan sa tubig kapag nalinaw na kung gaano karami ang ibibigay mo.",
+      "Magandang alok para sa tubig. Siguraduhin nating malinaw ang detalye sa ating dalawa.",
+      "Handa akong sumang-ayon sa tubig, tukuyin mo lang kung ilang botelya o lagok."
+    ],
+    "say.variants.unknown": [
+      "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako.",
+      "Mukhang kawili-wiling ideya, pero tukuyin muna natin ang gamit at dami.",
+      "Bukas ako sa pag-uusap, pero kailangan kong malaman kung ano talaga ang iaalok mo.",
+      "Puwede tayong gumawa ng kasunduan kapag malinaw na ang mga gamit at dami.",
+      "Narinig ko ang alok, pero maglagay tayo ng tiyak na bilang.",
+      "Masayang pag-isipan ang palitan, sabihin mo lang nang malinaw ang ihahain mo.",
+      "Linawin muna natin kung anong gamit ang tinutukoy bago mangako.",
+      "Nakikinig ako, pero kailangan ko ng partikular na suplay at bilang para pumayag.",
+      "Maayos ang panukala, pero kailangan natin ng malinaw na kondisyon bago pagkasunduan.",
+      "Sabihin mo kung anong gamit at ilan, at titingnan natin kung magkakasundo tayo."
+    ],
+    "say.variants.default": "Maaari ko iyong ituring na panukala, pero kailangan ko pa ang item at dami bago ako magtala ng pangako.",
+    "say.variants.default.plan.turn.dataset_proposal_acknowledged.segment.0": "Maaari ko iyong ituring na panukala, pero kailangan ko pa ang item at dami bago ako magtala ng pangako."
+  }
+}

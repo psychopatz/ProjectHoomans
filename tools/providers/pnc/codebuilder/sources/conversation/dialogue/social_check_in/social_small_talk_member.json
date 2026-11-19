@@ -16,21 +16,9 @@
         "metadata": {
           "textKey": "opening"
         },
-        "text": {
-          "EN": "A quiet conversation sounds good right now.",
-          "TL": "Ang isang tahimik na pag-uusap ay pakinggan ngayon."
-        },
         "offers": [
           {
             "id": "weather",
-            "label": {
-              "EN": "Some weather we're having.",
-              "TL": "Ilang panahon ang nararanasan natin."
-            },
-            "utterance": {
-              "EN": "Some weather we're having.",
-              "TL": "Ilang panahon ang nararanasan natin."
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -39,23 +27,11 @@
             },
             "metadata": {
               "choiceKey": "choice.weather",
-              "responseKey": "response.weather",
-              "responseText": {
-                "EN": "Could be worse. We've worked through worse.",
-                "TL": "Maaaring mas masahol pa. Mas malala ang pinagdaanan namin."
-              }
+              "responseKey": "response.weather"
             }
           },
           {
             "id": "quiet_day",
-            "label": {
-              "EN": "Quiet day so far.",
-              "TL": "Tahimik na araw hanggang ngayon."
-            },
-            "utterance": {
-              "EN": "Quiet day so far.",
-              "TL": "Tahimik na araw hanggang ngayon."
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -69,11 +45,7 @@
             },
             "metadata": {
               "choiceKey": "choice.quiet_day",
-              "responseKey": "response.quiet_day",
-              "responseText": {
-                "EN": "The crew earned one.",
-                "TL": "Karapat-dapat iyon ng grupo."
-              }
+              "responseKey": "response.quiet_day"
             }
           }
         ]

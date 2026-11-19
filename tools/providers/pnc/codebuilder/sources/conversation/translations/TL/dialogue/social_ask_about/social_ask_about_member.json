@@ -1,0 +1,14 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.ask_about.member",
+  "locale": "TL",
+  "entries": {
+    "response.turn.opening.text": "Sige, {addressee.name}. Ano ang gusto mong itanong?",
+    "response.turn.opening.offer.background.label": "Sabihin mo sa akin ang tungkol sa iyong lumang buhay.",
+    "response.turn.opening.offer.background.utterance": "Sabihin mo sa akin ang tungkol sa iyong lumang buhay.",
+    "response.turn.opening.offer.background.responseText": "Parang may buhay ng iba ngayon.",
+    "response.turn.opening.offer.skills.label": "What can you teach the grupo?",
+    "response.turn.opening.offer.skills.utterance": "What can you teach the grupo?",
+    "response.turn.opening.offer.skills.responseText": "Bigyan mo ako ng trabaho at ipapakita ko sa iyo."
+  }
+}

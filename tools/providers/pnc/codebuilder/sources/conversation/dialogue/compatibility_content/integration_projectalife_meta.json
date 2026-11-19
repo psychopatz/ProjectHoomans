@@ -10,59 +10,19 @@
   "say": {
     "variants": [
       {
-        "id": "aircraft.heli",
-        "text": {
-          "EN": [
-            "Something is flying over us. Keep listening."
-          ],
-          "TL": [
-            "Something is flying over us. Keep listening."
-          ]
-        }
+        "id": "aircraft.heli"
       },
       {
-        "id": "aircraft.military",
-        "text": {
-          "EN": [
-            "That aircraft sounds close. Stay sharp."
-          ],
-          "TL": [
-            "That aircraft sounds close. Stay sharp."
-          ]
-        }
+        "id": "aircraft.military"
       },
       {
-        "id": "ambience",
-        "text": {
-          "EN": [
-            "I do not like that sound. Stay close."
-          ],
-          "TL": [
-            "I do not like that sound. Stay close."
-          ]
-        }
+        "id": "ambience"
       },
       {
-        "id": "crash",
-        "text": {
-          "EN": [
-            "That crash sounded close. Keep your eyes open."
-          ],
-          "TL": [
-            "That crash sounded close. Keep your eyes open."
-          ]
-        }
+        "id": "crash"
       },
       {
-        "id": "gunfire",
-        "text": {
-          "EN": [
-            "Someone is shooting nearby. Keep your head down."
-          ],
-          "TL": [
-            "Someone is shooting nearby. Keep your head down."
-          ]
-        }
+        "id": "gunfire"
       }
     ]
   },

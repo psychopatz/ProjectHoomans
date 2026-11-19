@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "{addressee.name}, keep it close.",
-            "Take the front line, {addressee.name}.",
-            "{addressee.name}, save your ammunition."
-          ],
-          "TL": [
-            "{addressee.name}, lumaban nang malapitan.",
-            "Ikaw sa unahan, {addressee.name}.",
-            "{addressee.name}, itabi ang bala."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

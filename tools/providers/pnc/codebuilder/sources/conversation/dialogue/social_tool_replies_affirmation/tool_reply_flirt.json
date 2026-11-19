@@ -10,99 +10,21 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Careful. You are making me smile.",
-              "Watch it. You might actually make me blush.",
-              "You are playing with fire, you know that?",
-              "Do not start something you cannot finish.",
-              "You certainly know how to talk.",
-              "Is that your charm talking or the apocalypse?",
-              "You are smooth. I will give you that.",
-              "Save some of that charm for later.",
-              "Careful now. People are watching.",
-              "You have a way with words."
-            ],
-            "TL": [
-              "Dahan-dahan. Napapangiti mo ako.",
-              "Mag-ingat ka. Baka mamula ako niyan.",
-              "Naglalaro ka sa apoy, alam mo ba 'yon?",
-              "Huwag kang magsimula ng hindi mo kayang tapusin.",
-              "Marunong ka talagang magsalita.",
-              "Diskarte mo ba 'yan o dahil sa katapusan ng mundo?",
-              "Malaman kang bumanat, aaminin ko.",
-              "Itabi mo ang ilan sa mga pambobola mo mamaya.",
-              "Dahan-dahan. May mga nakatingin.",
-              "May galing ka talaga sa pananalita."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "You always know how to get my attention.",
-              "Well, you definitely have my full attention now.",
-              "You do that on purpose, do you not?",
-              "You know exactly what you are doing.",
-              "I was trying to focus, but you made that hard.",
-              "You caught my ear with that one.",
-              "You never miss a chance to turn heads, do you?",
-              "I am listening. What else do you have?",
-              "You always manage to pull my focus your way.",
-              "All right, you got my eyes on you."
-            ],
-            "TL": [
-              "Alam mo talaga kung paano kukunin ang pansin ko.",
-              "Nakuha mo nang buo ang atensyon ko.",
-              "Sinasadya mo 'yan, hindi ba?",
-              "Alam na alam mo ang ginagawa mo.",
-              "Sinisikap kong magpokus, pero pinapahirapan mo ako.",
-              "Nakuha mo ako sa linyang 'yon.",
-              "Hindi mo pinapalampas ang pagkakataong magpapansin, 'no?",
-              "Nakikinig ako. Ano pa ang sasabihin mo?",
-              "Lagi mong nahahatak ang tingin ko papunta sa 'yo.",
-              "Sige na, nasa sa 'yo na ang tingin ko."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "3": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "That is a dangerous thing to say to me.",
-              "You are taking a big risk talking like that.",
-              "Be careful what you wish for.",
-              "You like living on the edge, do not you?",
-              "Do not tease me unless you mean it.",
-              "That kind of talk gets people into trouble.",
-              "Bold words for someone within arm's reach.",
-              "Keep talking like that and we will see.",
-              "You are walking a very thin line.",
-              "Dangerous words. But I like the confidence."
-            ],
-            "TL": [
-              "Mapanganib na bagay ang sabihin 'yan sa akin.",
-              "Malaking sugal ang magsalita ka nang ganyan.",
-              "Mag-ingat ka sa mga hinihiling mo.",
-              "Gusto mo talagang sumugal sa delikado, 'no?",
-              "Huwag mo akong biruin kung hindi mo kayang panindigan.",
-              "Ang ganyang salitaan ay nagdadala ng gulo.",
-              "Matapang na salita para sa taong abot-kamay lang.",
-              "Ipagpatuloy mo 'yan at tingnan natin.",
-              "Napakakitid ng nilalakaran mong linya.",
-              "Delikadong salita. Pero gusto ko ang lakas ng loob mo."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Good. Let's keep moving on this.",
-            "Right. Back to work.",
-            "Understood. Stay on task.",
-            "Good. Let's get this finished up.",
-            "Agreed. Pushing forward now.",
-            "Moving along. Keep your eyes peeled.",
-            "Right. Making progress.",
-            "Good to know. Sticking to the objective.",
-            "Understood. No slowing down now.",
-            "On it. Keeping our momentum."
-          ],
-          "TL": [
-            "Mabuti. Ipagpatuloy natin ang pagkilos dito.",
-            "Sige. Balik sa trabaho.",
-            "Naintindihan. Manatili sa gawain.",
-            "Mabuti. Tapusin na natin ito.",
-            "Sang-ayon. Umuusad na ngayon.",
-            "Tuloy ang lakad. Maging mapagmatyag.",
-            "Tama. May nararating na tayo.",
-            "Mabuting malaman. Manatili sa layunin.",
-            "Naintindihan. Walang magbabagal ngayon.",
-            "Inaasikaso na. Tuloy ang bilis."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

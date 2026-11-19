@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.scene.horde_reply_brave",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Kaya natin sila.",
+      "Nakalusot na tayo sa mas malala. Ubusin natin sila.",
+      "Tumayo nang matatag. Lalabanan natin sila.",
+      "Nasa atin ang armas. Patumbahin natin sila.",
+      "Humanda ka. Hindi natin tatakbuhan ito.",
+      "Sasalubungin natin sila. Maging alerto.",
+      "Pilahin sila. Kayang-kaya natin ito.",
+      "Walang atrasan. Babasagin natin 'to.",
+      "Dito tayo tatayo at aalisin ang banta.",
+      "Handa na ako. Tiyaking may tama ang bawat palo."
+    ],
+    "say.variants.guarded": [
+      "Kung lalaban tayo, sabay at todo ang tira.",
+      "Walang magpapakabayani. Ipitin sila sa sikip at tapusin.",
+      "Bantayan ang lakas. Huwag magwala para di kapusin ng hangin.",
+      "Higpitan ang pormasyon. Kapag may bumagsak, patay tayong dalawa.",
+      "Unahin ang mga nasa harap. Ubusin nang may sistema.",
+      "Lalaban tayo, pero tiyaking may takasan sa likod natin.",
+      "Bawat tama dapat nakamamatay. Walang sayang na lakas.",
+      "Huwag magpapaligid sa kanila. Sumulong kapag sumulong ako.",
+      "Mananalo tayo kung mananatiling malamig ang ulo at matatag ang kamay.",
+      "Sang-ayon. Patumbahin ang unahan at hawakan ang pinto."
+    ],
+    "say.variants.terse": [
+      "Tumayo at lumaban.",
+      "Kaya natin sila.",
+      "Walang urungan.",
+      "Bunot ng armas.",
+      "Ubusin sila.",
+      "Lumaban pasulong.",
+      "Handa.",
+      "Hawak ang pwesto.",
+      "Gawin na natin.",
+      "Ilabas sila."
+    ],
+    "say.variants.warm": [
+      "Kasama mo ako. Kaya natin sila.",
+      "Kapag magkasama tayo, walang makapipigil sa atin! Tara na.",
+      "Hawak ko ang likod mo, kaibigan. Iisang laban tayo.",
+      "Sabay tayong nabubuhay, sabay tayong lalaban. Ubusin natin sila!",
+      "Dahil katabi kita, hindi ako natatakot. Patumbahin natin sila.",
+      "Ipakita natin sa kanila kung ano ang tunay na nakaligtas!",
+      "Nasa tabi mo lang ako, kasama. Hindi tayo matatalo ngayon.",
+      "Tiwala ako sa atin. Tumindig tayo at lumaban.",
+      "Kayang-kaya natin, kaibigan. Bantayan ang isa't isa.",
+      "Manatiling dikit at humampas nang malakas! Magdiriwang tayo mamaya."
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.reply.thumbsup.active",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Good. Let's keep moving on this.",
+      "Right. Back to work.",
+      "Understood. Stay on task.",
+      "Good. Let's get this finished up.",
+      "Agreed. Pushing forward now.",
+      "Moving along. Keep your eyes peeled.",
+      "Right. Making progress.",
+      "Good to know. Sticking to the objective.",
+      "Understood. No slowing down now.",
+      "On it. Keeping our momentum."
+    ]
+  }
+}

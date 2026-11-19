@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.context.clarify",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "What are you referring to?",
+      "Can you clarify what you mean?",
+      "What specifically are you talking about?",
+      "I'm not following. Explain what you mean.",
+      "Give me some more context on that.",
+      "What do you mean by that exactly?",
+      "Which situation are you talking about?",
+      "Could you break that down for me?",
+      "I need more details before I understand.",
+      "What are you getting at?"
+    ]
+  }
+}

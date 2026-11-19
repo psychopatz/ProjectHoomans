@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.player_assaulted.aggressive",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "You just made a big mistake.",
+      "All right. You want a fight, you've got one.",
+      "You hit me? You're going to regret that.",
+      "Try that again and see what happens.",
+      "Wrong person to mess with.",
+      "You want some of this?! Come on then!",
+      "That was your last free shot.",
+      "I'll put you in the ground for that.",
+      "You swung at me? Big mistake.",
+      "You really want to do this? Let's go."
+    ]
+  }
+}

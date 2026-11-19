@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.horde.prompt",
+  "locale": "EN",
+  "entries": {
+    "say.variants.default": [
+      "That's a lot of them. We fighting or going around?",
+      "Big swarm ahead. What's the plan?",
+      "Whole herd in our way. Do we push through or find another path?",
+      "Look at the street. Are we engaging or avoiding?",
+      "Infected group is large. How do you want to handle this?",
+      "Crowd ahead of us. Should we fight or sneak past?",
+      "There's quite a crowd. What are we doing?",
+      "They're blocking the lane. Do we clear them or detour?",
+      "Horde right in front. What do you want to do?",
+      "That's more than a few. Engage or back off?"
+    ],
+    "say.variants.eager": [
+      "That's a hell of a crowd. We taking them?",
+      "Big group ahead. Let's carve right through them.",
+      "Look at all those targets. You ready to swing?",
+      "We can take this pack. What's the call?",
+      "I say we clear them out right here. Ready?",
+      "They're packed together nicely. Time to strike.",
+      "I've got plenty of energy. Let's drop them.",
+      "Crowd of dead ahead. Give the word and I charge.",
+      "We've got weapons and room. Let's do this.",
+      "Let's crack some skulls. We fighting or what?"
+    ],
+    "say.variants.reserved": [
+      "Horde ahead. Engage or go around?",
+      "Crowd spotted. Call it.",
+      "Massed dead. Fight or bypass?",
+      "Swarm blocking route. Your call.",
+      "Large group. Stand and fight or slip past?",
+      "Herd ahead. Make a choice.",
+      "Horde present. Direct us.",
+      "Too many in the open. Do we push or turn?",
+      "Mass contacts. Decision?",
+      "Herd in path. Fight or avoid?"
+    ],
+    "say.variants.shaken": [
+      "God... that's a lot. Are we really fighting all of them?",
+      "Look at the size of that crowd... can we go around?",
+      "They'll swarm us if we step out there. Please, let's retreat.",
+      "There are way too many... my hands are shaking.",
+      "We can't handle this many at once. Can we slip away?",
+      "Jesus, don't shoot... they'll tear us apart.",
+      "Are we seriously thinking of fighting that horde?",
+      "I don't think we survive that fight. Let's run.",
+      "Too many rottens... what do you want to do?",
+      "That swarm is terrifying. Tell me we're bypassing it."
+    ]
+  }
+}

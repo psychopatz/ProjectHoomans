@@ -1,0 +1,151 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.health_state",
+  "locale": "EN",
+  "entries": {
+    "reply.healthy.say.1.neutral": [
+      "I'm doing okay.",
+      "Healthy as can be expected out here.",
+      "No wounds or sickness bothering me right now.",
+      "Feeling solid. No injuries to speak of.",
+      "I'm in good health today, all things considered.",
+      "Everything's working the way it should.",
+      "No complaints on the physical side today.",
+      "Feeling intact and steady. No wounds on me.",
+      "Health is holding up fine. Ready for work.",
+      "Not carrying any injuries right now."
+    ],
+    "reply.healthy.say.1.guarded": [
+      "I'm fine. Don't make a thing of it.",
+      "Nothing wrong with me. Keep your eyes on the road.",
+      "No injuries to report. Step back.",
+      "I'm in fighting shape. Don't worry about me.",
+      "Not a scratch on me. That's all you get.",
+      "I'm completely healthy. Leave it alone.",
+      "Body's holding up just fine. Mind your own health.",
+      "Clean bill of health. You don't need to inspect me.",
+      "I'm intact and able-bodied. Let's move on.",
+      "No wounds, no sickness. Keep your distance."
+    ],
+    "reply.healthy.say.1.terse": [
+      "I'm okay.",
+      "Healthy.",
+      "No injuries.",
+      "All clear.",
+      "Fine.",
+      "Uninjured.",
+      "Doing fine.",
+      "No wounds.",
+      "Good shape.",
+      "Solid."
+    ],
+    "reply.healthy.say.1.warm": [
+      "I'm doing okay. Thanks for checking in.",
+      "Healthy and feeling good today. Truly appreciate you asking.",
+      "Not a scratch on me. Glad you're keeping an eye out.",
+      "Feeling strong and healthy, friend. Hope you are too.",
+      "All intact on my side. Thank you for looking after me.",
+      "Doing wonderfully, thank you. It's comforting that you asked.",
+      "In great health today. Ready to face whatever comes our way.",
+      "Feeling well rested and sound. Appreciate the kind check-in.",
+      "No bumps or scrapes today. Thank you for caring.",
+      "I'm doing great, honestly. Let's make sure we both stay that way."
+    ],
+    "reply.injured.say.1.neutral": [
+      "I'm hurt, but I'm managing.",
+      "Took a beating earlier. Bandages are holding for now.",
+      "Nursing a wound here. Trying not to reopen it.",
+      "I've been injured, but nothing that'll take me down.",
+      "Got caught in a bad spot. Dealing with the damage.",
+      "Bleeding is mostly stopped, but movement is painful.",
+      "Stung pretty bad by an attack earlier.",
+      "Injuries are slowing me down, but I can keep moving.",
+      "Could use some medical supplies when we find them.",
+      "I'm hurting right now, but taking it step by step."
+    ],
+    "reply.injured.say.1.guarded": [
+      "I'm hurt. Give me space.",
+      "Took some damage. I don't need your pity.",
+      "Got injured, but I'm still dangerous. Step back.",
+      "Bleeding, but it's under control. Don't hover.",
+      "I'm wounded. That doesn't mean I'm helpless.",
+      "I can bandage my own wounds, thank you.",
+      "It hurts, but you don't need to pry into it.",
+      "Just a bad cut. Keep your hands where I can see them.",
+      "I'm dealing with the pain. Leave me be.",
+      "Injured, yes. Vulnerable, no. Back off."
+    ],
+    "reply.injured.say.1.terse": [
+      "I'm hurt.",
+      "Wounded.",
+      "Need stitches.",
+      "Bleeding.",
+      "Hurts bad.",
+      "Bandaged up.",
+      "Still bleeding.",
+      "Took damage.",
+      "Slowed down.",
+      "Managing pain."
+    ],
+    "reply.injured.say.1.warm": [
+      "I'm hurt, but I'm managing. Thanks for asking.",
+      "Took a hit out there, but knowing you're here helps a lot.",
+      "It hurts, friend, but I promise I'm holding together.",
+      "Got banged up a little. Thank you for your care and concern.",
+      "Nursing a wound, but seeing you safe gives me strength.",
+      "I'll pull through with some rest. Thanks for checking on me.",
+      "It's painful, but we'll patch it up together, right?",
+      "Appreciate the check-in. Don't worry too much about me.",
+      "Got scratched up bad, but I'm glad you're by my side.",
+      "Hurts like hell, but having good folks around keeps me going."
+    ],
+    "reply.unknown.say.1.neutral": [
+      "I can't confirm my health status right now.",
+      "Haven't had a chance to inspect myself thoroughly.",
+      "Not entirely sure how bad it is under the gear.",
+      "Could be bleeding, could just be a bruise. Hard to tell.",
+      "Need a quiet moment to check over my condition.",
+      "Uncertain right now. Adrenaline is masking the pain.",
+      "Hard to tell without a mirror or better light.",
+      "I feel sore all over, but can't verify the specifics.",
+      "Can't confirm if anything is broken or sprained yet.",
+      "My condition is uncertain at the moment."
+    ],
+    "reply.unknown.say.1.guarded": [
+      "I can't confirm that.",
+      "Haven't checked properly yet. Mind your own business.",
+      "Can't tell right now, and I'm not stripping down to check.",
+      "Unsure. I'll evaluate my own condition later.",
+      "No idea. Too chaotic out here to be certain.",
+      "I don't have that information right now. Stand back.",
+      "Hard to tell through the layers. Let it go.",
+      "Can't be certain. Focus on your own status.",
+      "Not clear yet. Don't crowd me.",
+      "Status unknown. I'll deal with it when I'm safe."
+    ],
+    "reply.unknown.say.1.terse": [
+      "Can't confirm.",
+      "Unsure.",
+      "Not sure yet.",
+      "Need to check.",
+      "Unknown.",
+      "Hard to say.",
+      "Can't tell.",
+      "Need a look.",
+      "Unchecked.",
+      "Too early to tell."
+    ],
+    "reply.unknown.say.1.warm": [
+      "I can't confirm it right now, but thanks for asking.",
+      "Not sure how bad it is yet, but I appreciate your concern.",
+      "Haven't checked properly, but I'll let you know once I do.",
+      "Hard to tell right now, friend. Thanks for watching over me.",
+      "I need to check under the bandages, but I'm grateful you asked.",
+      "Uncertain for now, but your support means everything to me.",
+      "Could be fine, could be bruised. Thanks for caring enough to check.",
+      "I'll do a proper check when we're safe. Thank you, truly.",
+      "Can't say for sure, but I feel safer with you here.",
+      "Not sure yet, but don't worry yourself sick over me."
+    ]
+  }
+}

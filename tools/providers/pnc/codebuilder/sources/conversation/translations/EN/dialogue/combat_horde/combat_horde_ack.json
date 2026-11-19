@@ -1,0 +1,115 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.horde.ack",
+  "locale": "EN",
+  "entries": {
+    "say.variants.avoid_default": [
+      "Copy. We go around.",
+      "Understood. Avoiding the swarm.",
+      "Bypassing the horde.",
+      "Taking the side path. Quietly.",
+      "Copy that. Staying out of their sight line.",
+      "We'll detour around them.",
+      "Understood. No engagement.",
+      "Steering clear of the horde.",
+      "Copy. Slipping past the dead.",
+      "Avoiding contact. Lead the way."
+    ],
+    "say.variants.avoid_relief": [
+      "Good. Let's go around.",
+      "Thank goodness. That pack was massive.",
+      "Glad you made that call. Slipping away.",
+      "Smart move. We live to fight another hour.",
+      "Relieved to hear that. Detouring now.",
+      "Good choice. Keep it quiet as we skirt past.",
+      "Much better than dying out here. Moving around.",
+      "Sigh of relief. Let's keep our heads down.",
+      "Glad we're avoiding that bloodbath. Lead on.",
+      "Safe decision. Taking the alternate route."
+    ],
+    "say.variants.engage_default": [
+      "I'm with you. Let's go.",
+      "Engaging now. Watch your side.",
+      "Right behind you into the fight.",
+      "Understood. We fight together.",
+      "Moving in to strike.",
+      "Let's clear the way.",
+      "Ready for combat. Let's do this.",
+      "On it. Target locked.",
+      "Moving forward to engage.",
+      "With you all the way. Let's strike."
+    ],
+    "say.variants.engage_eager": [
+      "Ready to strike! Let's take them down.",
+      "Let's go! I've got your back.",
+      "Ready when you are! Charge!",
+      "Line them up! We can clear this whole pack.",
+      "Eager and armed. Let's do some damage.",
+      "I'm ready to fight! Moving in!",
+      "Let's smash through them together!",
+      "Weapon's ready. Let's take the field!",
+      "Full speed ahead! They won't know what hit them.",
+      "Hell yeah! Let's wipe them out."
+    ],
+    "say.variants.engage_hesitant": [
+      "If you say so... alright. I'm with you.",
+      "This is reckless, but I won't abandon you.",
+      "I have a bad feeling about this, but I'm in.",
+      "Watch my back... here we go.",
+      "I hope you know what you're doing. Moving in.",
+      "Not loving these odds, but I'll fight beside you.",
+      "Hesitant, but committed. Stay close.",
+      "Alright... just don't let them flank us.",
+      "Stepping into the meat grinder. Let's make it out alive.",
+      "Okay... I trust your blade. Let's go."
+    ],
+    "say.variants.engage_reserved": [
+      "Alright. Moving.",
+      "Advancing cautiously.",
+      "Understood. Engaging the horde.",
+      "In position. Moving to attack.",
+      "Weapon drawn. Advancing in formation.",
+      "Calculated engagement. Let's do this clean.",
+      "Order received. Stepping up to fight.",
+      "Keeping rhythm. Engaging targets.",
+      "Moving into range. Weapons up.",
+      "Understood. Entering the fray."
+    ],
+    "say.variants.hold_default": [
+      "Holding for now.",
+      "Holding position. Watching the herd.",
+      "Staying put until you signal.",
+      "Understood. Standing by.",
+      "Holding ground right here.",
+      "Position held. Awaiting order.",
+      "Holding. Observing threat movement.",
+      "Steady in place.",
+      "Maintaining position.",
+      "Holding. Let's see what they do."
+    ],
+    "say.variants.hold_eager": [
+      "Holding. Say when.",
+      "Ready on your mark! Holding position.",
+      "Coiled like a spring. Just give the word.",
+      "Holding fire, but twitching to go.",
+      "Ready to pounce. Standing by.",
+      "I'm locked on! Say the word and I strike.",
+      "Holding here. Don't make me wait too long!",
+      "Ready and waiting! Give the signal.",
+      "Poised to attack. Holding ground.",
+      "Just say the word. I'm ready."
+    ],
+    "say.variants.hold_hesitant": [
+      "Okay. Holding here.",
+      "Staying put. I hope they don't see us.",
+      "Holding position... please be quiet.",
+      "Holding ground. Heart's pounding.",
+      "I'll wait here, but let's be careful.",
+      "Staying still. Don't make a sound.",
+      "Holding... waiting for your call.",
+      "Keeping low. I hope this works.",
+      "Holding here. Watching their claws.",
+      "Understood... staying frozen right here."
+    ]
+  }
+}

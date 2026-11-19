@@ -42,6 +42,7 @@ return {
                 ["act"] = "ASK_ABOUT",
                 ["turns"] = {
                     {
+                        ["fallback"] = "Go ahead, {addressee.name}. What do you want to ask about?",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -58,30 +59,13 @@ return {
                                     ["topic"] = "ask_about",
                                 },
                                 ["id"] = "background",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Tell me about your old life.",
-                                    },
-                                    ["TL"] = {
-                                        "Sabihin mo sa akin ang tungkol sa iyong lumang buhay.",
-                                    },
-                                },
+                                ["labelFallback"] = "Tell me about your old life.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.background",
                                     ["responseKey"] = "response.background",
-                                    ["responseText"] = {
-                                        ["EN"] = "It feels like someone else's life now.",
-                                        ["TL"] = "Parang may buhay ng iba ngayon.",
-                                    },
+                                    ["responseTextFallback"] = "It feels like someone else's life now.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Tell me about your old life.",
-                                    },
-                                    ["TL"] = {
-                                        "Sabihin mo sa akin ang tungkol sa iyong lumang buhay.",
-                                    },
-                                },
+                                ["utteranceFallback"] = "Tell me about your old life.",
                             },
                             {
                                 ["consumers"] = {
@@ -94,38 +78,13 @@ return {
                                     ["topic"] = "ask_about",
                                 },
                                 ["id"] = "skills",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "What can you teach the group?",
-                                    },
-                                    ["TL"] = {
-                                        "What can you teach the grupo?",
-                                    },
-                                },
+                                ["labelFallback"] = "What can you teach the group?",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.skills",
                                     ["responseKey"] = "response.skills",
-                                    ["responseText"] = {
-                                        ["EN"] = "Give me a job and I'll show you.",
-                                        ["TL"] = "Bigyan mo ako ng trabaho at ipapakita ko sa iyo.",
-                                    },
+                                    ["responseTextFallback"] = "Give me a job and I'll show you.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "What can you teach the group?",
-                                    },
-                                    ["TL"] = {
-                                        "What can you teach the grupo?",
-                                    },
-                                },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "Go ahead, {addressee.name}. What do you want to ask about?",
-                            },
-                            ["TL"] = {
-                                "Sige, {addressee.name}. Ano ang gusto mong itanong?",
+                                ["utteranceFallback"] = "What can you teach the group?",
                             },
                         },
                     },
@@ -263,6 +222,7 @@ return {
                 ["act"] = "ASK_ABOUT",
                 ["turns"] = {
                     {
+                        ["fallback"] = "What do you want to know?",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -279,30 +239,13 @@ return {
                                     ["topic"] = "ask_about",
                                 },
                                 ["id"] = "background",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "What did you do before all this?",
-                                    },
-                                    ["TL"] = {
-                                        "Ano ang ginawa mo bago ang lahat ng ito?",
-                                    },
-                                },
+                                ["labelFallback"] = "What did you do before all this?",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.background",
                                     ["responseKey"] = "response.background",
-                                    ["responseText"] = {
-                                        ["EN"] = "That's a long story. Maybe one worth telling.",
-                                        ["TL"] = "mahabang kwento yan. Siguro isa na dapat sabihin.",
-                                    },
+                                    ["responseTextFallback"] = "That's a long story. Maybe one worth telling.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "What did you do before all this?",
-                                    },
-                                    ["TL"] = {
-                                        "Ano ang ginawa mo bago ang lahat ng ito?",
-                                    },
-                                },
+                                ["utteranceFallback"] = "What did you do before all this?",
                             },
                             {
                                 ["consumers"] = {
@@ -315,38 +258,13 @@ return {
                                     ["topic"] = "ask_about",
                                 },
                                 ["id"] = "skills",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "What are you good at?",
-                                    },
-                                    ["TL"] = {
-                                        "Ano ang kaya mong gawin?",
-                                    },
-                                },
+                                ["labelFallback"] = "What are you good at?",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.skills",
                                     ["responseKey"] = "response.skills",
-                                    ["responseText"] = {
-                                        ["EN"] = "Enough things to have survived this long.",
-                                        ["TL"] = "Sapat na ang mga bagay para mabuhay ng ganito katagal.",
-                                    },
+                                    ["responseTextFallback"] = "Enough things to have survived this long.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "What are you good at?",
-                                    },
-                                    ["TL"] = {
-                                        "Ano ang kaya mong gawin?",
-                                    },
-                                },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "What do you want to know?",
-                            },
-                            ["TL"] = {
-                                "Ano ang gusto mong malaman?",
+                                ["utteranceFallback"] = "What are you good at?",
                             },
                         },
                     },
@@ -484,6 +402,7 @@ return {
                 ["act"] = "ASK_ABOUT",
                 ["turns"] = {
                     {
+                        ["fallback"] = "You can ask me anything, {addressee.name}.",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -500,30 +419,13 @@ return {
                                     ["topic"] = "ask_about",
                                 },
                                 ["id"] = "background",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Tell me something about your old life.",
-                                    },
-                                    ["TL"] = {
-                                        "Sabihin mo sa akin ang tungkol sa iyong dating buhay.",
-                                    },
-                                },
+                                ["labelFallback"] = "Tell me something about your old life.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.background",
                                     ["responseKey"] = "response.background",
-                                    ["responseText"] = {
-                                        ["EN"] = "Only if you tell me something about yours afterward.",
-                                        ["TL"] = "Kung sasabihin mo lang sa akin ang tungkol sa iyo pagkatapos.",
-                                    },
+                                    ["responseTextFallback"] = "Only if you tell me something about yours afterward.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Tell me something about your old life.",
-                                    },
-                                    ["TL"] = {
-                                        "Sabihin mo sa akin ang tungkol sa iyong dating buhay.",
-                                    },
-                                },
+                                ["utteranceFallback"] = "Tell me something about your old life.",
                             },
                             {
                                 ["consumers"] = {
@@ -536,38 +438,13 @@ return {
                                     ["topic"] = "ask_about",
                                 },
                                 ["id"] = "skills",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "What are you proud of?",
-                                    },
-                                    ["TL"] = {
-                                        "Ano ang ipinagmamalaki mo?",
-                                    },
-                                },
+                                ["labelFallback"] = "What are you proud of?",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.skills",
                                     ["responseKey"] = "response.skills",
-                                    ["responseText"] = {
-                                        ["EN"] = "Surviving long enough to meet you.",
-                                        ["TL"] = "Nakaligtas nang sapat upang makilala ka.",
-                                    },
+                                    ["responseTextFallback"] = "Surviving long enough to meet you.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "What are you proud of?",
-                                    },
-                                    ["TL"] = {
-                                        "Ano ang ipinagmamalaki mo?",
-                                    },
-                                },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "You can ask me anything, {addressee.name}.",
-                            },
-                            ["TL"] = {
-                                "Maaari mo akong tanungin tungkol sa kahit ano, {addressee.name}.",
+                                ["utteranceFallback"] = "What are you proud of?",
                             },
                         },
                     },

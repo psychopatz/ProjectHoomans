@@ -6,22 +6,14 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.talk_again_about.label",
-        "text": {
-          "EN": "Talk again about",
-          "TL": "Pag-usapan muli ang"
-        }
+        "key": "suggestion.talk_again_about.label"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": "Talk again about",
-          "TL": "Pag-usapan muli ang"
-        }
+        "id": "neutral"
       }
     ]
   },

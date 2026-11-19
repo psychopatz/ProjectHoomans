@@ -20,14 +20,6 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.question.residence.responses.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "That's all I can confirm about where I live right now.",
-                                    },
-                                    ["TL"] = {
-                                        "Iyan lang ang makukumpirma ko tungkol sa tinitirhan ko sa ngayon.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -41,14 +33,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.residence.responses.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "That's all I can confirm about where I live right now.",
-                        },
-                        ["TL"] = {
-                            "Iyan lang ang makukumpirma ko tungkol sa tinitirhan ko sa ngayon.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -84,25 +68,16 @@ return {
             ["metadata"] = {
                 ["textRows"] = {
                     {
+                        ["fallback"] = "That's all I can confirm about where I live right now.",
                         ["key"] = "UI_PNC_Conversation_Semantic_ConversationContinuationResidence",
-                        ["text"] = {
-                            ["EN"] = "That's all I can confirm about where I live right now.",
-                            ["TL"] = "Iyan lang ang makukumpirma ko tungkol sa tinitirhan ko sa ngayon.",
-                        },
                     },
                     {
+                        ["fallback"] = "I live at %s.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionResidenceKnown",
-                        ["text"] = {
-                            ["EN"] = "I live at %s.",
-                            ["TL"] = "Nakatira ako sa %s.",
-                        },
                     },
                     {
+                        ["fallback"] = "I don't have a confirmed home to tell you about.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionResidenceUnknown",
-                        ["text"] = {
-                            ["EN"] = "I don't have a confirmed home to tell you about.",
-                            ["TL"] = "Wala akong makumpirmang tirahan na maibabahagi.",
-                        },
                     },
                 },
                 ["textTarget"] = "convo/SemanticResponses",
@@ -118,15 +93,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "That's all I can confirm about where I live right now.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "That's all I can confirm about where I live right now.",
-                                    },
-                                    ["TL"] = {
-                                        "Iyan lang ang makukumpirma ko tungkol sa tinitirhan ko sa ngayon.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -195,14 +163,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.residence.responses.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "That's all I can confirm about where I live right now.",
-                    },
-                    ["TL"] = {
-                        "Iyan lang ang makukumpirma ko tungkol sa tinitirhan ko sa ngayon.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },

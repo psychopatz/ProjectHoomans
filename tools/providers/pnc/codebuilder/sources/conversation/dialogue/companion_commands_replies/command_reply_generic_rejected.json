@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I can't do that right now.",
-            "That's not possible in this situation.",
-            "Unable to comply with that order.",
-            "I can't carry that out.",
-            "Not going to happen right now.",
-            "I don't have the means to do that.",
-            "That order doesn't make sense right now.",
-            "Can't do it. Find another way.",
-            "I'm tied up or unable to fulfill that.",
-            "Negative on that request."
-          ],
-          "TL": [
-            "Hindi ko iyan magagawa ngayon.",
-            "Hindi 'yan posible sa sitwasyong ito.",
-            "Hindi makakasunod sa utos na 'yan.",
-            "Hindi ko kayang isakatuparan 'yan.",
-            "Hindi mangyayari 'yan sa ngayon.",
-            "Wala akong kakayahan para gawin 'yan.",
-            "Walang saysay ang utos na 'yan sa ngayon.",
-            "Di kaya. Humanap ng ibang paraan.",
-            "Abala ako o hindi ko magagawa 'yan.",
-            "Hindi maaari ang hiling na 'yan."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

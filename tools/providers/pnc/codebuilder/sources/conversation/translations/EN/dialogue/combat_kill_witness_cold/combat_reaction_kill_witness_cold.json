@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_witness_cold",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "Don't expect applause.",
+      "Basic survival. Nothing to celebrate.",
+      "You did what was expected. Move.",
+      "One kill doesn't earn a trophy.",
+      "A child could swing that weapon. Walk.",
+      "Don't smirk. Keep walking.",
+      "That was the minimum requirement.",
+      "You hit it. Congratulations on living.",
+      "Save the pride for when we're safe.",
+      "Routine takedown. Move on."
+    ],
+    "say.2.neutral": [
+      "You killed one. So what?",
+      "One corpse among millions. Step over.",
+      "That was one. There are thousands more.",
+      "Do not admire your work. Advance.",
+      "A rotten corpse fell. Big deal.",
+      "Don't pause over it. Keep moving.",
+      "One less dead body standing. Next.",
+      "You survived a contact. Keep walking.",
+      "It was in the way. It fell. Move.",
+      "Hardly impressive. Keep your weapon ready."
+    ],
+    "say.3.neutral": [
+      "Fine. One less.",
+      "Acceptable. Keep moving.",
+      "One obstacle eliminated.",
+      "Target down. Sufficient.",
+      "Threat neutralized. Proceed.",
+      "One down. March on.",
+      "Handled. Next sector.",
+      "Done. Do not linger.",
+      "Adequate strike. Keep the pace.",
+      "Casualty verified. Step forward."
+    ]
+  }
+}

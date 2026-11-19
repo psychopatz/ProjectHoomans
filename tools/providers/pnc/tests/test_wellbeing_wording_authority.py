@@ -163,22 +163,22 @@ class WellbeingWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
         expected = {
             ("EN", "normal"): (
                 "question.wellbeing.default",
-                "conversation.content.semantic.question.wellbeing.default.neutral.01",
+                "convo.question.wellbeing.default.say.1.neutral.1",
                 "I'm okay. How about you?",
             ),
             ("TL", "normal"): (
                 "question.wellbeing.default",
-                "conversation.content.semantic.question.wellbeing.default.neutral.01",
+                "convo.question.wellbeing.default.say.1.neutral.1",
                 "Okay naman ako. Ikaw, kumusta?",
             ),
             ("EN", "injured"): (
                 "question.wellbeing.injured",
-                "conversation.content.semantic.question.wellbeing.injured.neutral.01",
+                "convo.question.wellbeing.injured.say.1.neutral.1",
                 "A little banged up, but I'll manage.",
             ),
             ("TL", "injured"): (
                 "question.wellbeing.injured",
-                "conversation.content.semantic.question.wellbeing.injured.neutral.01",
+                "convo.question.wellbeing.injured.say.1.neutral.1",
                 "Medyo may tama ako, pero kakayanin ko.",
             ),
         }

@@ -67,7 +67,7 @@ class SemanticTranslationIntegrationTests(WarmWorkerTestMixin, unittest.TestCase
                 ]
                 self.assertTrue(
                     greeting_payloads[0]["translationKey"].startswith(
-                        "conversation.content.semantic.flow.greeting.opening.default.neutral."
+                        "convo.flow.greeting.opening.say.1.default."
                     )
                 )
                 self.assertEqual(
@@ -76,7 +76,7 @@ class SemanticTranslationIntegrationTests(WarmWorkerTestMixin, unittest.TestCase
                 )
                 self.assertTrue(
                     greeting_payloads[1]["translationKey"].startswith(
-                        "conversation.content.semantic.flow.greeting.opening.question.default.neutral."
+                        "convo.flow.greeting.opening.say.1.question.default."
                     )
                 )
                 self.assertEqual(
@@ -90,7 +90,7 @@ class SemanticTranslationIntegrationTests(WarmWorkerTestMixin, unittest.TestCase
                 identity_payload = identity["messages"][0]["payload"]
                 self.assertTrue(
                     identity_payload["translationKey"].startswith(
-                        "conversation.content.semantic.question.identity."
+                        "convo.question.identity."
                     )
                     or identity_payload["translationKey"].startswith(
                         "UI_PNC_Conversation_Semantic_QuestionIdentity"
@@ -112,7 +112,7 @@ class SemanticTranslationIntegrationTests(WarmWorkerTestMixin, unittest.TestCase
                 wellbeing_payload = wellbeing["messages"][0]["payload"]
                 self.assertTrue(
                     wellbeing_payload["translationKey"].startswith(
-                        "conversation.content.semantic.question.wellbeing."
+                        "convo.question.wellbeing."
                     )
                 )
                 self.assertTrue(

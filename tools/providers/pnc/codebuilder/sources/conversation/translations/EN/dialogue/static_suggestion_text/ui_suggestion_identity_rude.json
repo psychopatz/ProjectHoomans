@@ -1,0 +1,20 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.identity.rude",
+  "locale": "EN",
+  "entries": {
+    "affordance.label": "Don't tell your name",
+    "say.1.neutral": [
+      "That's none of your business.",
+      "You don't need my name.",
+      "I'm not giving you my name.",
+      "Keep walking. You're not getting my name.",
+      "None of your concern.",
+      "Forget it. You don't need to know who I am.",
+      "My name isn't for you to know.",
+      "I don't owe you my name."
+    ],
+    "textRows.suggestion.identity.rude.label": "Don't tell your name",
+    "textRows.suggestion.identity.rude.utterance": "That's none of your business."
+  }
+}

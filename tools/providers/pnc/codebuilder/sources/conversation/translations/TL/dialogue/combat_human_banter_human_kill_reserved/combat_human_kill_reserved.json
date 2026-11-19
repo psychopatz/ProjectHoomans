@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.human_kill.reserved",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Bagsak na siya.",
+      "Kalaban bagsak.",
+      "Bumaril naalis.",
+      "Patay.",
+      "Banta naalis.",
+      "Tapos na.",
+      "Naitumba.",
+      "Wala nang putok mula sa kanya.",
+      "Target bagsak.",
+      "Tumigil."
+    ],
+    "say.2.neutral": [
+      "Tapos.",
+      "Yari.",
+      "Kumpirmado.",
+      "Naasikaso.",
+      "Nalutas.",
+      "Wala na.",
+      "Naalis.",
+      "Tinapos na.",
+      "Tapos na 'to.",
+      "Naayos."
+    ],
+    "say.3.neutral": [
+      "Malinis.",
+      "Ligtas ang paligid.",
+      "Banta tinanggal.",
+      "Malinis ang parte na 'to.",
+      "Walang galaw.",
+      "Tahimik.",
+      "Malinis lahat dito.",
+      "Ligtas pansamantala.",
+      "Bukas na daan.",
+      "Walang gumagalaw."
+    ]
+  }
+}

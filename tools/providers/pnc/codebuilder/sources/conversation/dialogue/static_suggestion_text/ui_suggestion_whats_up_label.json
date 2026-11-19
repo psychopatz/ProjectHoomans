@@ -6,22 +6,14 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.whats_up.label",
-        "text": {
-          "EN": "What's up?",
-          "TL": "Ano ang balita?"
-        }
+        "key": "suggestion.whats_up.label"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": "What's up?",
-          "TL": "Ano ang balita?"
-        }
+        "id": "neutral"
       }
     ]
   },

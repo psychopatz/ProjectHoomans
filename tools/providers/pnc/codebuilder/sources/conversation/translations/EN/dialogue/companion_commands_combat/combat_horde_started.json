@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.horde.started",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "That's a lot of them. Stay sharp.",
+      "We've got a whole crowd moving in. Eyes open.",
+      "Horde spotted! Check your exits.",
+      "Too many bodies out there. Watch the perimeter.",
+      "They're grouping up. Form a line.",
+      "Sound drew a swarm. Get ready.",
+      "Look at that herd. Stay close.",
+      "Mass contacts coming from down the street.",
+      "Here they come. Don't let them flank us.",
+      "Big group incoming. Watch each other's backs."
+    ]
+  }
+}

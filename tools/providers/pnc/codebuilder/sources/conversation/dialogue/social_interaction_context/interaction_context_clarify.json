@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "What are you referring to?",
-            "Can you clarify what you mean?",
-            "What specifically are you talking about?",
-            "I'm not following. Explain what you mean.",
-            "Give me some more context on that.",
-            "What do you mean by that exactly?",
-            "Which situation are you talking about?",
-            "Could you break that down for me?",
-            "I need more details before I understand.",
-            "What are you getting at?"
-          ],
-          "TL": [
-            "Ano ang tinutukoy mo?",
-            "Pwede mo bang linawin ang ibig mong sabihin?",
-            "Tungkol saan ba partikular ang sinasabi mo?",
-            "Hindi kita masundan. Ipaliwanag mo ang ibig mong sabihin.",
-            "Bigyan mo ako ng karagdagang konteksto tungkol diyan.",
-            "Ano nga ba ang ibig mong sabihin doon?",
-            "Aling sitwasyon ba ang tinutukoy mo?",
-            "Pwede mo bang himayin 'yan para sa akin?",
-            "Kailangan ko ng dagdag na detalye bago ko maintindihan.",
-            "Saan ba patungo ang sinasabi mo?"
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

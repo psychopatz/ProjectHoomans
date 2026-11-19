@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.horde.default",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "May kuyog na malapit. Magmatyag tayo.",
+      "Malaking grupo sa paligid. Huwag gumawa ng ingay.",
+      "May kuyog sa lugar na 'to. Mag-ingat.",
+      "May naririnig akong maraming yabag sa labas. Mag-ingat.",
+      "Grupo ng infected malapit dito. Maging alerto.",
+      "Malapit tayo sa palakad-lakad na kuyog. Yumuko.",
+      "Masyadong maraming kaluskos sa labas. Ihanda ang sandata.",
+      "Nagtitipon ang mga patay malapit dito. Maging handa.",
+      "May kuyog sa paligid. Piliin nang maigi ang bawat hakbang.",
+      "Malapit ang kuyog ng infected. Huwag gumawa ng ingay."
+    ]
+  }
+}

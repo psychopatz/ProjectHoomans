@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.player.thumbsup",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Good work, {addressee.name}.",
+      "That's what I like to see, {addressee.name}.",
+      "Keep it up, {addressee.name}."
+    ]
+  }
+}

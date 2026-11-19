@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.compliment",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "That is kind of you to say.",
+      "Thank you. That is very nice of you.",
+      "I appreciate the kind words.",
+      "That is generous of you. Thanks.",
+      "Thanks. It is rare to get compliments out here.",
+      "That puts a smile on my face. Thank you.",
+      "You are too kind.",
+      "I appreciate that. Truly.",
+      "Thanks. I will take all the good words I can get.",
+      "Thank you. That brightens things up a bit."
+    ],
+    "say.2.neutral": [
+      "I appreciate the compliment.",
+      "Thanks for the compliment.",
+      "I will take the compliment. Thank you.",
+      "Much obliged for the kind thought.",
+      "Thanks. I work hard at what I do.",
+      "That is good feedback to hear.",
+      "Appreciated. I try to stay sharp.",
+      "Thank you. It means something coming from you.",
+      "I am flattered. Thank you.",
+      "Thanks. That boost is welcome."
+    ],
+    "say.3.neutral": [
+      "You noticed. Thank you.",
+      "Glad somebody noticed.",
+      "I was wondering if anyone would catch that. Thanks.",
+      "Good eye. Thanks for noticing.",
+      "I put some effort into that. Good to see it showed.",
+      "Thanks. Nice to know it did not go unseen.",
+      "You have sharp observation skills. Thank you.",
+      "Appreciate you noticing that detail.",
+      "I try my best. Thank you for noticing.",
+      "Thanks. That was worth the effort then."
+    ]
+  }
+}

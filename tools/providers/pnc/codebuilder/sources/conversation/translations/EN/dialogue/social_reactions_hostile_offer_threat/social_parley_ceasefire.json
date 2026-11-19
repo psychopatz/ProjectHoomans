@@ -1,0 +1,10 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ceasefire",
+  "locale": "EN",
+  "entries": {
+    "say.variants.default": "Let's call a ceasefire.",
+    "reply.already_peaceful.say.variants.default": "We aren't fighting.",
+    "reply.accepted.say.variants.default": "Fine. Stand down."
+  }
+}

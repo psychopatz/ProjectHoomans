@@ -8,19 +8,11 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.identity.lie.label",
-        "text": {
-          "EN": "Lie about your name",
-          "TL": "Magsinungaling tungkol sa pangalan"
-        }
+        "key": "suggestion.identity.lie.label"
       }
     ]
   },
   "affordance": {
-    "label": {
-      "EN": "Lie about your name",
-      "TL": "Magsinungaling tungkol sa pangalan"
-    },
     "consumers": [
       "player"
     ]
@@ -29,37 +21,7 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I'm {slot.identity_claim.name}.",
-              "Name's {slot.identity_claim.name}.",
-              "You can call me {slot.identity_claim.name}.",
-              "My name's {slot.identity_claim.name}.",
-              "It's {slot.identity_claim.name}.",
-              "Call me {slot.identity_claim.name}.",
-              "I go by {slot.identity_claim.name}.",
-              "They call me {slot.identity_claim.name}.",
-              "The name's {slot.identity_claim.name}.",
-              "Just call me {slot.identity_claim.name}.",
-              "{slot.identity_claim.name}. That's what I go by.",
-              "I'll go by {slot.identity_claim.name}."
-            ],
-            "TL": [
-              "Ako si {slot.identity_claim.name}.",
-              "{slot.identity_claim.name} ang pangalan ko.",
-              "Tawagin mo akong {slot.identity_claim.name}.",
-              "Ang pangalan ko ay {slot.identity_claim.name}.",
-              "Si {slot.identity_claim.name} ito.",
-              "Tawagin mo na lang akong {slot.identity_claim.name}.",
-              "{slot.identity_claim.name} ang gamit kong pangalan.",
-              "{slot.identity_claim.name} ang tawag nila sa akin.",
-              "Ako nga pala si {slot.identity_claim.name}.",
-              "Sabihin na nating {slot.identity_claim.name}.",
-              "{slot.identity_claim.name}. Iyan ang tawag sa akin.",
-              "Magpapakilala akong si {slot.identity_claim.name}."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.player_assaulted.default",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Why did you do that?!",
+      "What the hell is wrong with you?!",
+      "Hey! Watch what you're doing!",
+      "Did you just swing at me?!",
+      "Are you trying to kill me?!",
+      "What are you thinking?! Stop it!",
+      "Whoa! Back off!",
+      "Don't hit me! What's wrong with you?!",
+      "Stop swinging at me!",
+      "Back away from me!"
+    ]
+  }
+}

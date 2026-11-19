@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.whats_up.default_alt",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Gaya ng dati. Nanatiling buhay at binabantayan ang daan.",
+      "Ginagawa kung anong kailangan para makita ang bukas.",
+      "Dahan-dahang naglalakad. Tahimik naman ang kalsada.",
+      "Umiiwas sa gulo at inaasikaso ang mga kailangan.",
+      "Laging nagmamasid dito sa labas. Kumusta ka na?",
+      "Binabantayan ang kakahuyan. Karaniwang gawain lang.",
+      "Nasa ibabaw pa rin ng lupa. Sapat na 'yon.",
+      "Bawat oras kinakaya. Ikaw, kumusta ka?",
+      "Buhay at gising. Sana magtagal ang katahimikan.",
+      "Binabantayan ang paligid para masigurong ligtas tayo."
+    ],
+    "say.variants.guarded": [
+      "Basta buhay. Maging mapagmatyag.",
+      "Binabantayan ang daan. Huwag kang humarang sa tingin ko.",
+      "Buhay, pero maingat. Dapat ganoon ka rin.",
+      "Laging alerto. Walang bakasyon ang panganib.",
+      "Nakatutok sa pananatiling tago. Tabi muna.",
+      "Binabantayan ang bakod. Walang kailangan dito.",
+      "Buhay, at mananatiling ganito kung hindi makikipagtsismisan.",
+      "Nakatitig sa abot-tanaw. Huwag gumawa ng ingay.",
+      "Buhay pa. Kailangan 'yan ng pag-iingat, hindi ng daldalan.",
+      "Pinoprotektahan lang ang sarili ko. Gawin mo rin 'yan."
+    ],
+    "say.variants.terse": [
+      "Basta buhay.",
+      "Bantay sa daan.",
+      "Ganoon pa rin.",
+      "Alerto.",
+      "Naka-duty.",
+      "Nakatayo pa.",
+      "Ligtas ang daan.",
+      "Matalas pa.",
+      "Walang bago.",
+      "Huminga pa."
+    ],
+    "say.variants.warm": [
+      "Gaya ng dati. Nanatiling buhay at binabantayan ang daan. Ikaw, kumusta?",
+      "Nandito pa rin, lumalaban pa. Gumagaan ang bantay kapag nakikita kita.",
+      "Nagbabantay sa paligid, pero laging masayang makausap ka kahit saglit.",
+      "Sinisigurong ligtas ang daan para sa ating lahat. Sana maayos ka.",
+      "Buhay at maayos, kaibigan. Masaya talaga akong nakasalubong kita ngayon.",
+      "Nilalasap ang liwanag ng araw. Masaya akong naglalakad kang ligtas.",
+      "Isa pang araw na magkasama tayong nakatayo. Ano pa bang mas maganda roon?",
+      "Nagmamasid lang para sa kapakanan ng lahat. Salamat sa pangangamusta.",
+      "Nagbabantay nang may magaan na loob ngayon. Kumusta sa parte mo?",
+      "Nandito pa rin, nagpapasalamat sa mabubuting kasama tulad mo. Mag-ingat ka."
+    ]
+  }
+}

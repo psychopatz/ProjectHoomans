@@ -10,99 +10,21 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Just doing what had to be done.",
-              "Anyone else would have done the same.",
-              "Just doing my part to keep us alive.",
-              "Glad I could pull it off.",
-              "It was what the situation called for.",
-              "No big deal. Just handling business.",
-              "Happy to help. We are in this together.",
-              "Just glad it worked out in the end.",
-              "I did what I could. Thanks for noticing.",
-              "All part of surviving another day."
-            ],
-            "TL": [
-              "Ginawa ko lang kung ano ang kailangang gawin.",
-              "Kahit sino gagawin din ang ganoon.",
-              "Tungkulin ko lang para mapanatili tayong buhay.",
-              "Mabuti at nagawa ko nang maayos.",
-              "Iyon ang hiningi ng sitwasyon.",
-              "Wala 'yon. Ginagawa lang ang trabaho.",
-              "Masayang tumulong. Magkasama tayo rito.",
-              "Mabuti na lang at naging maayos ang kinahinatnan.",
-              "Ginawa ko ang kaya ko. Salamat sa pagpansin.",
-              "Parte lang 'yan ng pagsisikap na mabuhay pa ng isang araw."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Good. I was hoping you noticed.",
-              "Glad to know the effort did not go overlooked.",
-              "It feels good to have that acknowledged.",
-              "I put sweat into that. Glad you caught it.",
-              "Thanks. It means a lot that you saw the work.",
-              "Nice to have your approval on that.",
-              "I wanted to make sure it was done right.",
-              "Thanks. Recognition goes a long way.",
-              "Glad my efforts are paying off for us.",
-              "Good to hear. I will keep at it."
-            ],
-            "TL": [
-              "Mabuti. Umasa nga akong mapapansin mo.",
-              "Mabuti at hindi nawalang-bisa ang pagod ko.",
-              "Masarap sa pakiramdam na kinikilala 'yon.",
-              "Pinagpawisan ko 'yon. Mabuti at nakita mo.",
-              "Salamat. Malaking bagay na nakita mo ang pinaghirapan ko.",
-              "Mabuting makuha ang pagsang-ayon mo roon.",
-              "Gusto kong matiyak na tama ang pagkakagawa.",
-              "Salamat. Malaking pampalakas ng loob ang pagkilala.",
-              "Mabuti at nagbubunga ang pagod ko para sa atin.",
-              "Magandang marinig. Ipagpapatuloy ko 'yan."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "3": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "That is nice to hear from you.",
-              "Thank you. Coming from you, that carries weight.",
-              "I respect your opinion, so thanks.",
-              "That gives me a solid boost. Thank you.",
-              "I appreciate hearing that today.",
-              "Always good to know where I stand with you.",
-              "Thanks. That takes some of the strain off.",
-              "I am grateful for the praise.",
-              "Thank you. It is encouraging.",
-              "Much appreciated. Let us keep winning."
-            ],
-            "TL": [
-              "Masarap marinig 'yan galing sa 'yo.",
-              "Salamat. Dahil galing sa 'yo, may bigat 'yan.",
-              "Iginagalang ko ang opinyon mo, kaya salamat.",
-              "Nakapagbigay 'yan ng lakas sa akin. Salamat.",
-              "Salamat at narinig ko 'yan ngayong araw.",
-              "Laging magandang malaman kung ano ang tingin mo sa akin.",
-              "Salamat. Nabawasan ang pagod ko riyan.",
-              "Nagpapasalamat ako sa papuri.",
-              "Salamat. Nakakapagpalakas ng loob.",
-              "Maraming salamat. Tuloy lang tayo sa tagumpay."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

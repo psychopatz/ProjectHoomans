@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.panic",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "I'm pretty shaken up right now.",
+      "My heart is pounding out of my chest.",
+      "That was way too close. Need a minute to breathe.",
+      "Trying to keep my hands from shaking.",
+      "Terrified, if I'm being honest with you.",
+      "Felt like my heart was going to stop back there.",
+      "Need to catch my breath and calm my nerves.",
+      "Adrenaline is surging. Hard to think straight.",
+      "Still feeling the panic creeping up on me.",
+      "Give me a second to get my head together."
+    ]
+  }
+}

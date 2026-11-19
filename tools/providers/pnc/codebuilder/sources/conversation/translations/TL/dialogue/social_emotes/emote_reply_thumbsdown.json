@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "emote.reply.thumbsdown",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Nakuha ko ang mensahe. Sabihin mo kung anong problema.",
+      "Hindi ka sang-ayon? Ano ang opinyon mo?",
+      "Naiintindihan ko. Hindi ka sang-ayon.",
+      "Nakuha ko ang pahiwatig. Pwede nating pag-isipan ulit.",
+      "Naintindihan. Hindi maganda ang kutob mo rito.",
+      "Makatwiran. Ano ang alternatibo?",
+      "Naririnig ko ang pagtutol mo. Mag-ayos tayo.",
+      "Tala ko na. Hindi na natin dadaanan ang rutang 'yan.",
+      "Naintindihan. Nakuha ko ang punto mo.",
+      "Sige, maghanap tayo ng mas magandang paraan."
+    ]
+  }
+}

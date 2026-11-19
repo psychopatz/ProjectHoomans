@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I can't find a safe room or campfire nearby.",
-            "We need a nearby room or campfire before we make camp.",
-            "No usable camp site is visible from here."
-          ],
-          "TL": [
-            "Wala akong makitang ligtas na silid o apoy dito.",
-            "Kailangan natin ng malapit na silid o apoy bago magkampo.",
-            "Walang angkop na lugar ng kampo rito."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

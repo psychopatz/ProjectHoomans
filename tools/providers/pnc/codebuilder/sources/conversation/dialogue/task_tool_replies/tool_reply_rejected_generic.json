@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "That did not land well.",
-              "That went over poorly.",
-              "That didn't work out.",
-              "That was not well received.",
-              "You miscalculated that one.",
-              "That completely backfired.",
-              "Not a good approach.",
-              "That fell flat on its face.",
-              "That missed completely.",
-              "That was a mistake."
-            ],
-            "TL": [
-              "Hindi naging maganda ang dating niyan.",
-              "Pangit ang naging dating niyan.",
-              "Hindi naging maayos 'yan.",
-              "Hindi maganda ang pagtanggap diyan.",
-              "Nagkamali ka sa kalkulasyon doon.",
-              "Bumalik sa 'yo ang epekto niyan.",
-              "Hindi magandang paraan 'yan.",
-              "Bumagsak lang 'yan nang kusa.",
-              "Sumablay nang buo.",
-              "Isang pagkakamali 'yon."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I am not taking that from you right now.",
-              "I'm not in the mood for that kind of talk.",
-              "I'm rejecting that completely.",
-              "You can keep that nonsense to yourself.",
-              "I'm not putting up with that today.",
-              "Not taking that. Walk it back.",
-              "I refuse to engage with that.",
-              "I'm shutting that down immediately.",
-              "Not tolerating that right now.",
-              "I'm not accepting that from you."
-            ],
-            "TL": [
-              "Hindi ko tatanggapin iyan mula sa iyo ngayon.",
-              "Wala ako sa mood para sa ganyang usapan.",
-              "Tinatanggihan ko 'yan nang buo.",
-              "Itago mo sa sarili mo ang kalokohang 'yan.",
-              "Di ko pagtitiisan 'yan ngayong araw.",
-              "Di tatanggapin 'yan. Bawiin mo.",
-              "Tumatanggi akong makipag-usap tungkol diyan.",
-              "Papatayin ko agad ang usapang 'yan.",
-              "Di ko palalampasin 'yan ngayon.",
-              "Hindi ko tatanggapin 'yan galing sa 'yo."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

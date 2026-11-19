@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.player.attack_melee",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "{addressee.name}, lumaban nang malapitan.",
+      "Ikaw sa unahan, {addressee.name}.",
+      "{addressee.name}, itabi ang bala."
+    ]
+  }
+}

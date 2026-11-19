@@ -1,0 +1,11 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.greeting_thank",
+  "locale": "TL",
+  "entries": {
+    "affordance.label": "Pasalamatan siya",
+    "say.variants.default": "Salamat.",
+    "textRows.suggestion.greeting_thank.label": "Pasalamatan siya",
+    "textRows.suggestion.greeting_thank.utterance": "Salamat."
+  }
+}

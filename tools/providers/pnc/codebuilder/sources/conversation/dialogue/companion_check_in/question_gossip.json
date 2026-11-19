@@ -28,10 +28,6 @@
     "topic": "gossip"
   },
   "affordance": {
-    "label": {
-      "EN": "Ask about gossip",
-      "TL": "Magtanong tungkol sa tsismis"
-    },
     "consumers": [
       "player",
       "npc"
@@ -41,8 +37,11 @@
     ]
   },
   "say": {
-    "EN": "Any gossip?",
-    "TL": "May narinig ka bang tsismis?"
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

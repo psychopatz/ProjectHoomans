@@ -6,7 +6,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork/HordePromptToPostCombatClear",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
         ["id"] = "interaction.scene.horde_prompt",
         ["kind"] = "dialogue",
@@ -18,7 +18,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork/HordePromptToPostCombatClear",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
         ["id"] = "interaction.scene.horde_reply_brave",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork/HordePromptToPostCombatClear",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
         ["id"] = "interaction.scene.horde_reply_cautious",
         ["kind"] = "dialogue",
@@ -42,7 +42,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork/HordePromptToPostCombatClear",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
         ["id"] = "interaction.scene.horde_reply_steady",
         ["kind"] = "dialogue",
@@ -54,7 +54,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork/HordePromptToPostCombatClear",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
         ["id"] = "interaction.scene.post_combat_clear",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork/TaskWorkAssignedToTaskWorkCompleted",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
         ["id"] = "interaction.scene.task_work_assigned",
         ["kind"] = "dialogue",
@@ -78,7 +78,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_horde_work",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork/TaskWorkAssignedToTaskWorkCompleted",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneHordeWork",
         },
         ["id"] = "interaction.scene.task_work_completed",
         ["kind"] = "dialogue",

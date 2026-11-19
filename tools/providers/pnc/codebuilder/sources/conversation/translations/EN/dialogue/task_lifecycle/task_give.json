@@ -1,0 +1,67 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "task.give",
+  "locale": "EN",
+  "entries": {
+    "reply.admitted.say.variants.default": [
+      "I'll give that to you.",
+      "Understood. Handing it over.",
+      "Here, I'll pass that to you.",
+      "All right. I'll give you the item.",
+      "Sure thing. Passing it over.",
+      "Understood. You can have it.",
+      "I'll transfer that to your pack.",
+      "Right. Handing it over.",
+      "I'll give you what you requested.",
+      "Sounds good. Giving it now."
+    ],
+    "reply.active.say.variants.default": [
+      "Handing that over now.",
+      "Passing the item to you right now.",
+      "Transferring the supplies.",
+      "Giving this to you now.",
+      "Currently handing it over.",
+      "Reaching out to give you the item.",
+      "Giving you what was asked.",
+      "In the middle of the handoff.",
+      "Handing it off now. Take hold.",
+      "Giving it as ordered."
+    ],
+    "reply.completed.say.variants.default": [
+      "There you go.",
+      "Handed over safely.",
+      "It's yours now.",
+      "Transfer complete.",
+      "All given. Take good care of it.",
+      "Done. It's in your hands.",
+      "Handoff finished.",
+      "Given as requested.",
+      "Item is officially yours.",
+      "Completed the handoff."
+    ],
+    "reply.rejected.say.variants.default": [
+      "I can't give that to you right now.",
+      "I need that item to survive. Can't spare it.",
+      "That is vital to my loadout. I won't give it away.",
+      "Refusing to hand that over.",
+      "I don't have that item to give.",
+      "Can't give that up under these circumstances.",
+      "That's not something I can part with.",
+      "Give order rejected. I'm keeping this.",
+      "I won't give that item away.",
+      "Not giving that. Ask for something else."
+    ],
+    "reply.failed.say.variants.default": [
+      "I couldn't give that to you.",
+      "Handoff failed. You were out of reach.",
+      "Your hands or pack were full. Couldn't give it.",
+      "Action interrupted. Item not given.",
+      "Unable to transfer the item to you.",
+      "Failed to hand it over. Something got in the way.",
+      "I couldn't complete the give action.",
+      "Dropped it during the exchange.",
+      "Give task failed.",
+      "Could not give that item."
+    ]
+  }
+}

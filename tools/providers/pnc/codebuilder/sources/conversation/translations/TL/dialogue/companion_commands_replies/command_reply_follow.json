@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.follow",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Susunod ako sa iyo.",
+      "Sumusunod sa pangunguna mo.",
+      "Kasama mo ako. Mauna ka na.",
+      "Nasa likod mo lang ako.",
+      "Naintindihan. Didikit ako.",
+      "Sumusunod na. Bantayan ang unahan natin.",
+      "Sasabay ako sa bilis mo.",
+      "Kasabay mo na ako.",
+      "Kumikilos na kasabay mo ngayon.",
+      "Ituro ang daan. Kasunod mo lang ako."
+    ]
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.player_assaulted.brave",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Tama na. Tapos ka na.",
+      "Maling desisyon. Ipagtanggol mo ang sarili mo.",
+      "Hindi mo dapat ginawa 'yon.",
+      "Binigyan kita ng puwang. Ipagtanggol mo sarili mo ngayon.",
+      "Diyan na nagtatapos 'to.",
+      "Pumili ka na ng kahihinatnan mo.",
+      "Hindi kita hahayaang saktan ako. Sumuko ka o lumaban.",
+      "Hindi katanggap-tanggap. Ibaba mo ang sandata mo.",
+      "Lumagpas ka sa linya.",
+      "Tumigil ka ngayon din, o tatapusin ko 'to."
+    ]
+  }
+}

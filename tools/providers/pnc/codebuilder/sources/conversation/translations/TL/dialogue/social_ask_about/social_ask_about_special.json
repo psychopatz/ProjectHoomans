@@ -1,0 +1,14 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.ask_about.special",
+  "locale": "TL",
+  "entries": {
+    "response.turn.opening.text": "Maaari mo akong tanungin tungkol sa kahit ano, {addressee.name}.",
+    "response.turn.opening.offer.background.label": "Sabihin mo sa akin ang tungkol sa iyong dating buhay.",
+    "response.turn.opening.offer.background.utterance": "Sabihin mo sa akin ang tungkol sa iyong dating buhay.",
+    "response.turn.opening.offer.background.responseText": "Kung sasabihin mo lang sa akin ang tungkol sa iyo pagkatapos.",
+    "response.turn.opening.offer.skills.label": "Ano ang ipinagmamalaki mo?",
+    "response.turn.opening.offer.skills.utterance": "Ano ang ipinagmamalaki mo?",
+    "response.turn.opening.offer.skills.responseText": "Nakaligtas nang sapat upang makilala ka."
+  }
+}

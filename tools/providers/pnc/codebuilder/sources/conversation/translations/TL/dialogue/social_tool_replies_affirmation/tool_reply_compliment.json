@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.compliment",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Mabait sa 'yo ang magsabi niyan.",
+      "Salamat. Napakabait mo naman.",
+      "Salamat sa magagandang salita.",
+      "Mabuti ang puso mo. Salamat.",
+      "Salamat. Bihira ang papuri sa panahong ito.",
+      "Napangiti mo ako roon. Salamat.",
+      "Napakabait mo talaga.",
+      "Pinahahalagahan ko talaga 'yan.",
+      "Salamat. Tatanggapin ko ang anumang magandang salita ngayon.",
+      "Salamat. Nabigyan mo ng kaunting liwanag ang araw ko."
+    ],
+    "say.2.neutral": [
+      "Salamat sa papuri.",
+      "Salamat sa magandang sinabi mo.",
+      "Tatanggapin ko ang papuri. Maraming salamat.",
+      "Maraming salamat sa magandang kaisipan.",
+      "Salamat. Pinagsisikapan ko talaga ang ginagawa ko.",
+      "Magandang marinig ang ganitong puna.",
+      "Salamat. Sinisikap kong manatiling alerto.",
+      "Salamat. May halaga 'yan galing sa 'yo.",
+      "Natutuwa ako sa sinabi mo. Salamat.",
+      "Salamat. Nakakapagpalakas ng loob 'yan."
+    ],
+    "say.3.neutral": [
+      "Napansin mo pala. Salamat.",
+      "Mabuti naman at may nakapansin.",
+      "Iniisip ko nga kung may makakapansin niyan. Salamat.",
+      "Matalas ang paningin mo. Salamat sa pagpansin.",
+      "Pinaghirapan ko 'yon. Mabuti at lumitaw.",
+      "Salamat. Masarap malaman na hindi 'yon nabalewala.",
+      "Alesto ka magmasid. Salamat.",
+      "Salamat at napansin mo ang detalyeng 'yon.",
+      "Ginagawa ko ang buong makakaya ko. Salamat sa pagpansin.",
+      "Salamat. Naging sulit ang pagod ko dahil diyan."
+    ]
+  }
+}

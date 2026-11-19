@@ -10,37 +10,13 @@
   "say": {
     "variants": [
       {
-        "id": "colonist",
-        "text": {
-          "EN": [
-            "Mask up. We keep the camp safe together."
-          ],
-          "TL": [
-            "Mask up. We keep the camp safe together."
-          ]
-        }
+        "id": "colonist"
       },
       {
-        "id": "default",
-        "text": {
-          "EN": [
-            "Put your mask back on. Knox is airborne."
-          ],
-          "TL": [
-            "Put your mask back on. Knox is airborne."
-          ]
-        }
+        "id": "default"
       },
       {
-        "id": "family",
-        "text": {
-          "EN": [
-            "Put your mask on, family. I am not losing you to the air."
-          ],
-          "TL": [
-            "Put your mask on, family. I am not losing you to the air."
-          ]
-        }
+        "id": "family"
       }
     ]
   },

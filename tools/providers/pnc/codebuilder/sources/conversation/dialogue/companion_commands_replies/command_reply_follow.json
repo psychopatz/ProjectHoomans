@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Right behind you.",
-            "Following your lead.",
-            "I'm with you. Lead on.",
-            "Right on your heels.",
-            "Understood. Sticking close.",
-            "Following. Watch our front.",
-            "I'll follow your pace.",
-            "Right with you.",
-            "Moving with you now.",
-            "Lead the way. I'm right behind."
-          ],
-          "TL": [
-            "Susunod ako sa iyo.",
-            "Sumusunod sa pangunguna mo.",
-            "Kasama mo ako. Mauna ka na.",
-            "Nasa likod mo lang ako.",
-            "Naintindihan. Didikit ako.",
-            "Sumusunod na. Bantayan ang unahan natin.",
-            "Sasabay ako sa bilis mo.",
-            "Kasabay mo na ako.",
-            "Kumikilos na kasabay mo ngayon.",
-            "Ituro ang daan. Kasunod mo lang ako."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

@@ -9,91 +9,13 @@
   "say": {
     "variants": [
       {
-        "id": "default",
-        "text": {
-          "EN": [
-            "I need help with this wound.",
-            "Hurting pretty badly here. Need aid.",
-            "Got injured. Can someone look at this?",
-            "Need medical attention before this gets worse.",
-            "Wound is throbbing. I need a hand.",
-            "Took some damage. Could use first aid.",
-            "This cut is nasty. Help me clean it.",
-            "I'm in pain here. Need medical supplies.",
-            "Injured and slowing down. Need treatment.",
-            "Got banged up pretty good. Help me patch up."
-          ],
-          "TL": [
-            "Kailangan ko ng tulong sa sugat na 'to.",
-            "Medyo malala ang tama ko rito. Kailangan ng gamot.",
-            "Nasugatan ako. May makakatingin ba nito?",
-            "Kailangan ng panggagamot bago lumala 'to.",
-            "Pumipintig ang sugat. Kailangan ko ng saklolo.",
-            "Nasaktan ako. Kailangan ko ng first aid.",
-            "Marumi ang hiwa na 'to. Tulungan mo akong linisin.",
-            "Nasasaktan ako rito. Kailangan ko ng gamot.",
-            "Sugatan at bumabagal na. Kailangan ng lunas.",
-            "Nabugbog ako nang husto. Tulungan mo akong magbenda."
-          ]
-        }
+        "id": "default"
       },
       {
-        "id": "mercy",
-        "text": {
-          "EN": [
-            "Please. I need help with this wound, don't let me die.",
-            "Have mercy on me... patch me up, please.",
-            "I won't survive this cut without your mercy.",
-            "Please help... I'm begging for aid.",
-            "Don't leave me to bleed out like an animal.",
-            "Show some kindness. This wound is killing me.",
-            "Please, just dress the wound. That's all I ask.",
-            "I'm at your mercy. Help stop this pain.",
-            "Spare my life and treat this injury, please.",
-            "I have so much to live for... please help me."
-          ],
-          "TL": [
-            "Pakiusap. Tulungan mo ako sa sugat na 'to, huwag mo akong hayaang mamatay.",
-            "Maawa ka sa akin... bendahan mo ako, pakiusap.",
-            "Hindi ako mabubuhay sa hiwang 'to kung wala ang awa mo.",
-            "Pakiusap tulungan mo ako... nagmamakaawa ako sa lunas.",
-            "Huwag mo akong iwang maubusan ng dugo na parang hayop.",
-            "Magpakita ka ng kabutihan. Pinapatay ako ng sugat na 'to.",
-            "Pakiusap, gamutin lang ang sugat. 'Yon lang ang hinihiling ko.",
-            "Nasa awa mo ako. Tulungan mong matigil ang sakit.",
-            "Iligtas mo ang buhay ko at gamutin 'tong pinsala, pakiusap.",
-            "Marami pa akong dahilan para mabuhay... tulungan mo ako."
-          ]
-        }
+        "id": "mercy"
       },
       {
-        "id": "urgent",
-        "text": {
-          "EN": [
-            "I am hurt! I need help now!",
-            "Emergency! I need immediate medical attention!",
-            "Hit bad! Come over here right now!",
-            "Urgent! I'm bleeding and falling down!",
-            "I need aid this second! Hurry!",
-            "Severe injury! Drop what you're doing and help me!",
-            "I won't last long without treatment! Now!",
-            "Critical wound! Bandage me now!",
-            "I'm going down hard! Medic, help me!",
-            "Urgent distress! Someone patch me up right now!"
-          ],
-          "TL": [
-            "Sugatan ako! Kailangan ko ng tulong ngayon na!",
-            "Kagipitan! Kailangan ko ng agarang gamot ngayon din!",
-            "Grabe ang tama ko! Halika rito ngayon din!",
-            "Apurahan! Dumurugo ako at bumabagsak!",
-            "Kailangan ko ng gamot sa segundong ito! Bilis!",
-            "Malubhang pinsala! Bitawan ang ginagawa mo at tulungan mo ako!",
-            "Hindi ako magtatagal nang walang gamot! Ngayon na!",
-            "Kritikal na sugat! Bendahan mo ako ngayon din!",
-            "Bumabagsak na ako! Saklolo, tulungan mo ako!",
-            "Apurahang saklolo! May magbenda sa akin ngayon din!"
-          ]
-        }
+        "id": "urgent"
       }
     ]
   },

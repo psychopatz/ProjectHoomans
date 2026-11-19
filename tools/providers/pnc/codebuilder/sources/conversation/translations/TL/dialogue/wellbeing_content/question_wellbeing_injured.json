@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.injured",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Medyo may tama ako, pero kakayanin ko.",
+      "Tinamaan ako noong huling laban. Kailangan kong bendahan ito.",
+      "May iniinda akong ilang sugat, pero hindi naman nakamamatay.",
+      "Masakit kumilos nang mabilis, pero nakakalakad pa ako.",
+      "Tinamaan ako sa labas. Binabantayan ko ang pagdurugo.",
+      "Pasa-pasa at masakit ang buong katawan, pero makakaraos din.",
+      "Medyo malala ang gasgas ko, pero nakatayo pa rin sa dalawang paa.",
+      "Kailangan ko ng malinis na benda agad, pero maayos pa naman.",
+      "Medyo napasama ang bagsak ko kanina. Kumikirot pa rin.",
+      "Hindi ako nasa pinakamagandang kondisyon, pero kaya pang ituloy."
+    ],
+    "say.variants.guarded": [
+      "Nasaktan ako. Iyon lang ang masasabi ko.",
+      "Tinamaan ako. Ako na ang gagamot dito, huwag kang mag-alala.",
+      "Dumudugo nang kaunti, pero kaya ko pa ring lumaban.",
+      "Daplis lang ito. Lumayo ka muna.",
+      "May sugat ako, pero hindi ko kailangan ng awa.",
+      "Sobrang sakit, pero hindi ako aatras.",
+      "Nagasgasan lang. Asikasuhin mo ang sarili mong sugat.",
+      "Huwag mong titigan ang benda ko. Kaya ko pang kumilos.",
+      "Medyo magulo ang engkuwentro, pero nakaligtas ako. Umatras ka.",
+      "Kakayanin ko ang sakit mag-isa, salamat."
+    ],
+    "say.variants.terse": [
+      "Nasaktan ako. Kaya ko.",
+      "Dumudugo.",
+      "Tinamaan ako.",
+      "May pasa.",
+      "Masakit.",
+      "Kailangan ng benda.",
+      "Nakakalakad pa.",
+      "Maliit na sugat lang.",
+      "Napakasakit.",
+      "Tinitiis ang sakit."
+    ],
+    "say.variants.warm": [
+      "Nasaktan ako, pero kaya ko pang magpatuloy.",
+      "Salamat sa pag-alala. Kumikirot, pero magiging maayos din ako.",
+      "Medyo nasugatan ako. Mas gumaan ang loob ko dahil nandito ka.",
+      "Huwag kang masyadong mag-alala. Magagamot ko rin ito agad.",
+      "Tinamaan ako nang bahagya, pero nakakabawas ng sakit na ligtas ka.",
+      "Kakayanin ko ito, kaibigan. Salamat sa pagbabantay sa akin.",
+      "Kaya nating gamutin ito nang magkasama. Salamat sa malasakit.",
+      "Malalim na gasgas lang ito. Babalik din ang buong lakas ko agad.",
+      "Masakit, pero alam kong nagtutulungan tayo.",
+      "Pasa-pasa ako, pero malaking bagay sa akin ang pag-aalala mo."
+    ]
+  }
+}

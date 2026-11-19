@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "No. That's not good enough, {addressee.name}.",
-            "I don't like that, {addressee.name}.",
-            "Try again, {addressee.name}."
-          ],
-          "TL": [
-            "Hindi. Hindi sapat iyan, {addressee.name}.",
-            "Hindi ko gusto iyan, {addressee.name}.",
-            "Subukan muli, {addressee.name}."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

@@ -23,7 +23,9 @@ local function semanticTranslationKey(response)
     if string.sub(templateID, 1, 7) == "UI_PNC_" then
         return templateID
     end
-    if string.sub(templateID, 1, 21) == "conversation.content." then
+    if string.sub(templateID, 1, 6) == "convo."
+        or string.sub(templateID, 1, 21) == "conversation.content."
+    then
         return templateID
     end
     if templateID == "question.identity"

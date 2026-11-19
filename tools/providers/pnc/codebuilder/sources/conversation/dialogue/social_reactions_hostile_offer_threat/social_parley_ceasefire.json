@@ -37,20 +37,29 @@
     }
   ],
   "say": {
-    "EN": "Let's call a ceasefire.",
-    "TL": "Itigil na natin ang away."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "reply": {
     "already_peaceful": {
       "say": {
-        "EN": "We aren't fighting.",
-        "TL": "Hindi naman tayo nag-aaway."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     },
     "accepted": {
       "say": {
-        "EN": "Fine. Stand down.",
-        "TL": "Sige. Tigil-putukan."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     }
   },

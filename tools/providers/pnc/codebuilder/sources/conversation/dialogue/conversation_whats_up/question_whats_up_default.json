@@ -22,10 +22,6 @@
       }
     ]
   },
-  "textSidecars": {
-    "EN": "translations/question_whats_up_default.en.json",
-    "TL": "translations/question_whats_up_default.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

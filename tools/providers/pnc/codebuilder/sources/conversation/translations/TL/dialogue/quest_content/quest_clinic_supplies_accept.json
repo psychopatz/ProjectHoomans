@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "quest.clinic_supplies.accept",
+  "locale": "TL",
+  "entries": {
+    "reply.queued.say.variants.default": [
+      "Dadalahin ko ang mga suplay ng klinika.",
+      "Nasa listahan ko na ang pagkuha ng suplay para sa klinika.",
+      "Kukunin ko ang mga gamot sa lalong madaling panahon.",
+      "Asahan mo ako sa mga suplay ng klinika.",
+      "Hahanapin ko ang mga gamot na 'yon para sa'yo.",
+      "Nakalista na. Kukunin ko ang mga suplay sa klinika.",
+      "Ako na bahala. Ihahatid ko ang mga suplay ng klinika.",
+      "Nakatala na ang mga medikal na suplay. Kukunin ko.",
+      "Kukunin ko kung ano ang kailangan ng klinika.",
+      "Tinanggap ko na. Dadalhin ko pabalik ang mga suplay sa klinika."
+    ],
+    "reply.rejected.say.variants.default": [
+      "Hindi ko matatanggap ang kahilingang iyon ngayon.",
+      "Wala ako sa posisyong balikatin 'yan.",
+      "Masyado akong maraming ginagawa. Hindi ko matatanggap ang klinika.",
+      "Hindi muna ngayon. Tatanggihan ko muna ang kahilingang 'yan.",
+      "Hindi ako makakapangakong mag-ipon ng suplay sa klinika ngayon.",
+      "Kailangan ko munang tanggihan 'yan sa ngayon.",
+      "Hindi makakatulong sa klinika sa ngayon.",
+      "Hindi ko tatanggapin ang kahilingang 'yan.",
+      "Pasensya na, hindi ako makakapayag diyan ngayon.",
+      "Kailangan kong tanggihan ang gawaing medikal na 'yan."
+    ],
+    "reply.failed.say.variants.default": [
+      "Hindi ko matanggap ang kahilingang iyon.",
+      "May nagkaproblema. Hindi ko magawang tanggapin 'yan.",
+      "Hindi ko nagawang tanggapin ang pagkuha ng suplay sa klinika.",
+      "Hindi makakapangako sa medikal na gawaing 'yan ngayon.",
+      "Hindi pumasok ang kahilingan sa panig ko.",
+      "Hindi ko maitalaga ang misyong 'yan sa klinika.",
+      "Hindi makumpirma ang kahilingang 'yan. Subukan ulit mamaya.",
+      "Hindi nagtagumpay ang pagtanggap sa gawaing 'yan.",
+      "Hindi ko kayang balikatin ang gawain sa suplay ngayon.",
+      "Hindi natanggap ang kahilingang iyon."
+    ]
+  }
+}

@@ -36,62 +36,26 @@
     "responseAct": "GREETING",
     "textRows": [
       {
-        "key": "greeting.001",
-        "text": {
-          "EN": "Morning. Good to see a familiar face.",
-          "TL": "Umaga. Ang sarap makakita ng pamilyar na mukha."
-        }
+        "key": "greeting.001"
       },
       {
-        "key": "greeting.002",
-        "text": {
-          "EN": "Hey. How's the day treating you?",
-          "TL": "Hey. Kumusta ang pagtrato sa iyo ng araw?"
-        }
+        "key": "greeting.002"
       },
       {
-        "key": "greeting.003",
-        "text": {
-          "EN": "There you are. Need a minute?",
-          "TL": "Narito ka pala. Kailangan mo ba ng sandali?"
-        }
+        "key": "greeting.003"
       },
       {
-        "key": "greeting.004",
-        "text": {
-          "EN": "Morning. You look like you have something on your mind.",
-          "TL": "Umaga. Parang may iniisip ka."
-        }
+        "key": "greeting.004"
       },
       {
-        "key": "greeting.005",
-        "text": {
-          "EN": "Nice to see you made it through another night.",
-          "TL": "Natutuwa akong makita kang nagtagumpay sa isa pang gabi."
-        }
+        "key": "greeting.005"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Morning. Good to see a familiar face.",
-            "Hey. How's the day treating you?",
-            "There you are. Need a minute?",
-            "Morning. You look like you have something on your mind.",
-            "Nice to see you made it through another night."
-          ],
-          "TL": [
-            "Umaga. Ang sarap makakita ng pamilyar na mukha.",
-            "Hey. Kumusta ang pagtrato sa iyo ng araw?",
-            "Narito ka pala. Kailangan mo ba ng sandali?",
-            "Umaga. Parang may iniisip ka.",
-            "Natutuwa akong makita kang nagtagumpay sa isa pang gabi."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

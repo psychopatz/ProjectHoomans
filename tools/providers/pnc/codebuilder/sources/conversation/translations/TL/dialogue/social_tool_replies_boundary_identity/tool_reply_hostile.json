@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.hostile",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Ingatan mo ang bibig mo.",
+      "Ayusin mo ang tono mo.",
+      "Huwag mo akong kakausapin nang ganyan.",
+      "Mag-ingat ka sa pagsasalita mo sa akin.",
+      "Hinaan mo ang boses mo at bantayan ang dila mo.",
+      "Sumusobra ka na sa mga sinasabi mo.",
+      "Kagatin mo ang dila mo bago maubos ang pasensya ko.",
+      "Mag-ingat ka.",
+      "Ipapahamak ka ng bibig mong 'yan.",
+      "Bantayan mo ang susunod na lalabas sa bibig mo."
+    ],
+    "say.2.neutral": [
+      "Ulitin mo 'yan at tingnan natin ang mangyayari.",
+      "Subukan mong sabihin 'yan ulit. Hinahamon kita.",
+      "Itulak mo pa ako at nang malaman mo.",
+      "Huwag mong subukan ang pasensya ko.",
+      "Sige, magpumilit ka pa. Tingnan natin kung saan ka pupulutin.",
+      "Isa pang maling kilos mo at magkakaproblema tayo.",
+      "Gusto mo ba talagang daanan ang landas na 'to?",
+      "Sige, subukan mo. Tingnan natin kung gaano kabilis magkakagulo.",
+      "Isinusugal mo ang kaligtasan mo ngayon.",
+      "Huling babala. Lumayo ka."
+    ],
+    "say.3.neutral": [
+      "Kailangan mong lumayo ngayon din.",
+      "Umatras ka.",
+      "Bigyan mo ako ng puwang bago magkagulo rito.",
+      "Lumayo ka sa akin.",
+      "Sabi ko umatras ka.",
+      "Panatilihin mo ang distansya mo.",
+      "Umalis ka sa harap ko.",
+      "May dalawang segundo ka para umatras.",
+      "Umatras ka habang kaya mo pa.",
+      "Umatras ka. Hindi ko na uulitin ito."
+    ]
+  }
+}

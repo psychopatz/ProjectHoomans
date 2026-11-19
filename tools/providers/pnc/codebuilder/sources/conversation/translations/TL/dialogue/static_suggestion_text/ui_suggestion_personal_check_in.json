@@ -1,0 +1,11 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.personal_check_in",
+  "locale": "TL",
+  "entries": {
+    "affordance.label": "Alamin kung may bumabagabag sa kanya",
+    "say.variants.default": "May bumabagabag ba sa'yo?",
+    "textRows.suggestion.personal_check_in.label": "Alamin kung may bumabagabag sa kanya",
+    "textRows.suggestion.personal_check_in.utterance": "May bumabagabag ba sa'yo?"
+  }
+}

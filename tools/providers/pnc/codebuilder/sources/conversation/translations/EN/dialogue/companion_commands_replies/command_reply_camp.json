@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.camp",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "We'll make camp here.",
+      "Setting up camp in this spot.",
+      "Understood. Resting here.",
+      "This place works for a camp. Securing it.",
+      "Making camp. Let's get comfortable.",
+      "Good spot to bed down.",
+      "Camp established. I'll settle in.",
+      "Understood. Dropping gear and resting.",
+      "Setting watches and bedding down here.",
+      "Camp confirmed. Staying put."
+    ]
+  }
+}

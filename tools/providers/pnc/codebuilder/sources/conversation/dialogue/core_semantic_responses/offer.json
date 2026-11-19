@@ -10,10 +10,6 @@
     "variants": [
       {
         "id": "offer.dataset.hungry_share",
-        "text": {
-          "EN": "That would help a lot. Could I have some?",
-          "TL": "That would help a lot. Could I have some?"
-        },
         "when": "conversation.needType == \"hunger\" && conversation.needUrgency in [\"moderate\", \"severe\", \"emergency\", \"critical\"]",
         "metadata": {
           "fallback": "That would help a lot. Could I have some?",
@@ -23,10 +19,6 @@
       },
       {
         "id": "offer.dataset.hungry_appreciate",
-        "text": {
-          "EN": "I'd appreciate a bite. Would you share?",
-          "TL": "I'd appreciate a bite. Would you share?"
-        },
         "when": "conversation.needType == \"hunger\" && conversation.needUrgency in [\"moderate\", \"severe\", \"emergency\", \"critical\"]",
         "metadata": {
           "fallback": "I'd appreciate a bite. Would you share?",

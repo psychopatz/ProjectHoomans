@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_killer_reserved",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "Down.",
+      "Eliminated.",
+      "Dead.",
+      "Handled.",
+      "Dropped.",
+      "Target down.",
+      "Neutralized.",
+      "Done.",
+      "Fell.",
+      "Ceased."
+    ],
+    "say.2.neutral": [
+      "Got it.",
+      "Took it.",
+      "Hit.",
+      "Finished.",
+      "Cleared.",
+      "Taken care of.",
+      "Struck.",
+      "Resolved.",
+      "Dealt with.",
+      "Connected."
+    ],
+    "say.3.neutral": [
+      "Clear.",
+      "Path open.",
+      "Secure.",
+      "Nothing here.",
+      "Clean.",
+      "No contacts.",
+      "Lane clear.",
+      "Safe.",
+      "Open.",
+      "Quiet now."
+    ]
+  }
+}

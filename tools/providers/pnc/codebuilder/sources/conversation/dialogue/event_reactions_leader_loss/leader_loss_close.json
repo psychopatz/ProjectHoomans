@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "We lost someone close to us. We need to stay together.",
-            "I can't believe they're gone... we have to hold each other up.",
-            "They were family to us. Don't let our grief break us apart.",
-            "It hurts so much, but we have to keep going for them.",
-            "They protected us. Now we protect each other.",
-            "Losing them leaves a hole in my heart. Stay close, everyone.",
-            "We honor their memory by surviving. Stick together.",
-            "I will miss them terribly. We can't scatter now.",
-            "They gave everything for this group. We stay united.",
-            "Rest in peace. We'll hold the line for you."
-          ],
-          "TL": [
-            "Nawalan tayo ng taong malapit sa atin. Kailangan nating magsama-sama.",
-            "Hindi ako makapaniwalang wala na sila... kailangan nating magtulungan.",
-            "Pamilya na ang turing natin sa kanila. Huwag nating hayaang wasakin tayo ng lungkot.",
-            "Masakit sobra, pero kailangan nating magpatuloy para sa kanila.",
-            "Pinrotektahan nila tayo. Ngayon tayo naman ang magpoprotekta sa isa't isa.",
-            "Naiwang sugatan ang puso ko sa pagkawala nila. Magdikit-dikit tayo.",
-            "Igalang natin ang alaala nila sa pamamagitan ng pamumuhay. Magsama tayo.",
-            "Mamimiss ko sila nang husto. Hindi tayo dapat maghiwa-hiwalay ngayon.",
-            "Ibinigay nila ang lahat para sa grupong 'to. Manatili tayong nagkakaisa.",
-            "Mamahinga ka na. Hahawakan namin ang linya para sa'yo."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

@@ -1,0 +1,11 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.greeting_report_fine",
+  "locale": "TL",
+  "entries": {
+    "affordance.label": "Sabihing ayos ka lang",
+    "say.variants.default": "Ayos lang ako, salamat.",
+    "textRows.suggestion.greeting_report_fine.label": "Sabihing ayos ka lang",
+    "textRows.suggestion.greeting_report_fine.utterance": "Ayos lang ako, salamat."
+  }
+}

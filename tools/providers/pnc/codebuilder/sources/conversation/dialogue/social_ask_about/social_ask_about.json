@@ -16,21 +16,9 @@
         "metadata": {
           "textKey": "opening"
         },
-        "text": {
-          "EN": "What do you want to know?",
-          "TL": "Ano ang gusto mong malaman?"
-        },
         "offers": [
           {
             "id": "background",
-            "label": {
-              "EN": "What did you do before all this?",
-              "TL": "Ano ang ginawa mo bago ang lahat ng ito?"
-            },
-            "utterance": {
-              "EN": "What did you do before all this?",
-              "TL": "Ano ang ginawa mo bago ang lahat ng ito?"
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -39,23 +27,11 @@
             },
             "metadata": {
               "choiceKey": "choice.background",
-              "responseKey": "response.background",
-              "responseText": {
-                "EN": "That's a long story. Maybe one worth telling.",
-                "TL": "mahabang kwento yan. Siguro isa na dapat sabihin."
-              }
+              "responseKey": "response.background"
             }
           },
           {
             "id": "skills",
-            "label": {
-              "EN": "What are you good at?",
-              "TL": "Ano ang kaya mong gawin?"
-            },
-            "utterance": {
-              "EN": "What are you good at?",
-              "TL": "Ano ang kaya mong gawin?"
-            },
             "frame": {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
@@ -64,11 +40,7 @@
             },
             "metadata": {
               "choiceKey": "choice.skills",
-              "responseKey": "response.skills",
-              "responseText": {
-                "EN": "Enough things to have survived this long.",
-                "TL": "Sapat na ang mga bagay para mabuhay ng ganito katagal."
-              }
+              "responseKey": "response.skills"
             }
           }
         ]

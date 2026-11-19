@@ -14,62 +14,26 @@
     "responseAct": "GREETING",
     "textRows": [
       {
-        "key": "greeting.001",
-        "text": {
-          "EN": "Can't sleep? Neither can I.",
-          "TL": "Hindi makatulog? Hindi ko rin kaya."
-        }
+        "key": "greeting.001"
       },
       {
-        "key": "greeting.002",
-        "text": {
-          "EN": "It's all right. I'm here.",
-          "TL": "ayos lang. nandito ako."
-        }
+        "key": "greeting.002"
       },
       {
-        "key": "greeting.003",
-        "text": {
-          "EN": "Come sit with me. We can keep watch together.",
-          "TL": "Halika upo sa akin. Maaari tayong magbantay nang magkasama."
-        }
+        "key": "greeting.003"
       },
       {
-        "key": "greeting.004",
-        "text": {
-          "EN": "You scared me walking around this late.",
-          "TL": "Tinakot mo ako sa paglalakad nang ganito kagabi."
-        }
+        "key": "greeting.004"
       },
       {
-        "key": "greeting.005",
-        "text": {
-          "EN": "Stay close tonight. I mean it.",
-          "TL": "Manatili kang malapit ngayong gabi. Seryoso ako."
-        }
+        "key": "greeting.005"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Can't sleep? Neither can I.",
-            "It's all right. I'm here.",
-            "Come sit with me. We can keep watch together.",
-            "You scared me walking around this late.",
-            "Stay close tonight. I mean it."
-          ],
-          "TL": [
-            "Hindi makatulog? Hindi ko rin kaya.",
-            "ayos lang. nandito ako.",
-            "Halika upo sa akin. Maaari tayong magbantay nang magkasama.",
-            "Tinakot mo ako sa paglalakad nang ganito kagabi.",
-            "Manatili kang malapit ngayong gabi. Seryoso ako."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

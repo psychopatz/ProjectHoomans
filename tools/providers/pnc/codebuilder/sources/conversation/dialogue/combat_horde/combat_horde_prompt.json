@@ -10,120 +10,16 @@
   "say": {
     "variants": [
       {
-        "id": "default",
-        "text": {
-          "EN": [
-            "That's a lot of them. We fighting or going around?",
-            "Big swarm ahead. What's the plan?",
-            "Whole herd in our way. Do we push through or find another path?",
-            "Look at the street. Are we engaging or avoiding?",
-            "Infected group is large. How do you want to handle this?",
-            "Crowd ahead of us. Should we fight or sneak past?",
-            "There's quite a crowd. What are we doing?",
-            "They're blocking the lane. Do we clear them or detour?",
-            "Horde right in front. What do you want to do?",
-            "That's more than a few. Engage or back off?"
-          ],
-          "TL": [
-            "Ang dami nila. Lalaban ba tayo o iiwas?",
-            "Malaking kuyog sa unahan. Ano'ng plano?",
-            "Buong kawan ang nakaharang. Susugod ba tayo o maghahanap ng ibang daan?",
-            "Tingnan mo ang kalsada. Lalabanan ba natin o iiwasan?",
-            "Malaki ang grupo ng infected. Paano mo gustong harapin 'to?",
-            "May mga patay sa harap natin. Lalaban ba tayo o lulusot nang tahimik?",
-            "Medyo marami sila. Ano'ng gagawin natin?",
-            "Harang sila sa daan. Lilinisin ba natin o iikot tayo?",
-            "Kuyog mismo sa harap. Ano'ng gusto mong gawin?",
-            "Higit pa sa iilan 'yan. Susugod o aatras?"
-          ]
-        }
+        "id": "default"
       },
       {
-        "id": "eager",
-        "text": {
-          "EN": [
-            "That's a hell of a crowd. We taking them?",
-            "Big group ahead. Let's carve right through them.",
-            "Look at all those targets. You ready to swing?",
-            "We can take this pack. What's the call?",
-            "I say we clear them out right here. Ready?",
-            "They're packed together nicely. Time to strike.",
-            "I've got plenty of energy. Let's drop them.",
-            "Crowd of dead ahead. Give the word and I charge.",
-            "We've got weapons and room. Let's do this.",
-            "Let's crack some skulls. We fighting or what?"
-          ],
-          "TL": [
-            "Ang dami nila. Susugod ba tayo?",
-            "Malaking grupo sa unahan. Biyakin na natin sila.",
-            "Tingnan mo ang dami ng target. Handa ka na bang humataw?",
-            "Kaya natin ang grupong 'to. Ano'ng desisyon?",
-            "Linisin na natin sila rito mismo. Handa ka na?",
-            "Magkakadikit sila nang maayos. Oras na para sumugod.",
-            "Marami pa akong lakas. Itumba na natin sila.",
-            "Kuyog ng mga patay sa unahan. Sabihin mo lang at susugod ako.",
-            "May sandata at espasyo tayo. Labanan na natin.",
-            "Magbasag tayo ng bungo. Lalaban ba tayo o ano?"
-          ]
-        }
+        "id": "eager"
       },
       {
-        "id": "reserved",
-        "text": {
-          "EN": [
-            "Horde ahead. Engage or go around?",
-            "Crowd spotted. Call it.",
-            "Massed dead. Fight or bypass?",
-            "Swarm blocking route. Your call.",
-            "Large group. Stand and fight or slip past?",
-            "Herd ahead. Make a choice.",
-            "Horde present. Direct us.",
-            "Too many in the open. Do we push or turn?",
-            "Mass contacts. Decision?",
-            "Herd in path. Fight or avoid?"
-          ],
-          "TL": [
-            "May kuyog sa unahan. Lalaban o iiwas?",
-            "May nakitang grupo. Desisyunan mo.",
-            "Nagtitipong mga patay. Lalabanan o lalagpasan?",
-            "Harang ang kuyog sa daan. Ikaw ang masusunod.",
-            "Malaking grupo. Tatayo at lalaban o lulusot?",
-            "Kawan sa harap. Pumili ka.",
-            "May kuyog dito. Pangunahan mo kami.",
-            "Masyadong marami sa bukas na lugar. Susulong o liliko?",
-            "Maraming kalaban. Ano'ng pasya?",
-            "May kuyog sa dinaraanan. Laban o iwas?"
-          ]
-        }
+        "id": "reserved"
       },
       {
-        "id": "shaken",
-        "text": {
-          "EN": [
-            "God... that's a lot. Are we really fighting all of them?",
-            "Look at the size of that crowd... can we go around?",
-            "They'll swarm us if we step out there. Please, let's retreat.",
-            "There are way too many... my hands are shaking.",
-            "We can't handle this many at once. Can we slip away?",
-            "Jesus, don't shoot... they'll tear us apart.",
-            "Are we seriously thinking of fighting that horde?",
-            "I don't think we survive that fight. Let's run.",
-            "Too many rottens... what do you want to do?",
-            "That swarm is terrifying. Tell me we're bypassing it."
-          ],
-          "TL": [
-            "Diyos ko... ang dami nila. Lalabanan talaga natin lahat 'yan?",
-            "Tingnan mo ang laki ng kuyog... pwede ba tayong umikot?",
-            "Kukuyugin nila tayo kapag lumabas tayo. Pakiusap, umatras tayo.",
-            "Masyado silang marami... nanginginig ang mga kamay ko.",
-            "Hindi natin kaya ang ganyan karami nang sabay. Pwede bang tumakas?",
-            "Diyos ko, huwag kang puputok... pupunitin nila tayo.",
-            "Seryoso ba tayong lalabanan ang kuyog na 'yan?",
-            "Sa tingin ko hindi tayo mabubuhay sa laban na 'yan. Tumakbo na tayo.",
-            "Masyadong maraming bulok... ano'ng gusto mong gawin?",
-            "Nakakatakot ang kuyog na 'yan. Sabihin mong iiwasan natin."
-          ]
-        }
+        "id": "shaken"
       }
     ]
   },

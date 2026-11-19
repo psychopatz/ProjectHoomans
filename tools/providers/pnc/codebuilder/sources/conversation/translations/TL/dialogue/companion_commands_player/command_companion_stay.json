@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "stay",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": "Dito ka lang."
+  }
+}

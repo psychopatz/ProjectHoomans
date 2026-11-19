@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "tool_reply.queued_apology",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Narinig kita.",
+      "Naririnig ko ang paumanhin mo.",
+      "Narinig ang mensahe.",
+      "Narinig ko ang kailangan mong sabihin.",
+      "Nakuha ko. Narinig kita.",
+      "Naririnig kong inaamin mo.",
+      "Naintindihan. Narinig.",
+      "Narinig ko ang mga salita mo riyan.",
+      "Tala ko na. Nakikinig ako.",
+      "Narinig ang pahayag mo."
+    ],
+    "say.2.neutral": [
+      "Pag-uusapan natin iyan.",
+      "Pag-uusapan natin kapag kumalma na ang lahat.",
+      "Aayusin natin ito mamaya.",
+      "Babalikan natin 'yan kapag may tahimik na oras.",
+      "Pag-uusapan natin 'yan sa lalong madaling panahon.",
+      "Kakausapin kita tungkol diyan mamaya.",
+      "Aayusin natin 'yan kapag ligtas na tayo.",
+      "Lilinawin natin ang lahat mamaya.",
+      "Mag-uusap tayo nang masinsinan tungkol diyan.",
+      "Pag-usapan natin kapag nakarating sa kampo."
+    ]
+  }
+}

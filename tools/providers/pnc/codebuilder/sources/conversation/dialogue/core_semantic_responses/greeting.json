@@ -31,10 +31,6 @@
       }
     ]
   },
-  "textSidecars": {
-    "EN": "translations/greeting.en.json",
-    "TL": "translations/greeting.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

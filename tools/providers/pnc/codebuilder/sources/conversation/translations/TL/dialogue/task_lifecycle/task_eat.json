@@ -1,0 +1,67 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "task.eat",
+  "locale": "TL",
+  "entries": {
+    "reply.admitted.say.variants.default": [
+      "Kakainin ko iyon.",
+      "Naintindihan. Kukuha ng makakain.",
+      "Magandang paalala. Kumakalam na ang tiyan ko.",
+      "Sige, kakain ako ng pagkain.",
+      "Kakain para mapanatili ang lakas.",
+      "Naiintindihan ko. Kakain na.",
+      "Kakainin ko ang mga rasyong 'yan.",
+      "Sige. Oras na para kumain.",
+      "Kakainin ko ang tinukoy mo.",
+      "Maganda 'yan. Kukuha ng pagkain."
+    ],
+    "reply.active.say.variants.default": [
+      "Kumakain na ako ngayon.",
+      "Kumakain ng kaunti ngayon.",
+      "Kumakain ng pagkain. Sandali lang.",
+      "Kasalukuyang kumakain.",
+      "Nagpapasok ng lakas sa katawan.",
+      "Kinakain ang baong pagkain ngayon.",
+      "Kumakain ayon sa utos.",
+      "Kumakain. Kailangan ko ng lakas.",
+      "Kumakain na ngayon.",
+      "Kumakain nang tahimik. Saglit lang ito."
+    ],
+    "reply.completed.say.variants.default": [
+      "Tapos nang kumain. Mas maayos na ang pakiramdam.",
+      "Nakatulong nang malaki ang pagkain. Tapos na.",
+      "Tapos nang kumain. Bumalik na ang lakas.",
+      "Busog na ang tiyan. Handa nang kumilos.",
+      "Natapos na ang pagkain.",
+      "Naubos na. Maayos na para magpatuloy.",
+      "Tapos na. Mas masarap kaysa inasahan ko.",
+      "Kumpleto na ang pagkain.",
+      "Tapos nang kumain. Balik sa trabaho.",
+      "Naubos ang rasyon. Nagbalik ang lakas."
+    ],
+    "reply.rejected.say.variants.default": [
+      "Hindi ako nagugutom ngayon.",
+      "Di ko kailangan ng pagkain sa sandaling ito.",
+      "Busog na busog pa ako.",
+      "Itabi ang pagkain. Di ko pa kailangang kumain.",
+      "Tumatangging kainin 'yan. Mukhang marumi.",
+      "Di makakain ngayon. Masyadong tensiyonado.",
+      "May sapat pa akong lakas. Itatabi ang rasyon.",
+      "Wala pang pangangailangan sa pagkain.",
+      "Tinatanggihan ang utos na kumain. Busog ang tiyan.",
+      "Di ko makakain 'yan ngayon."
+    ],
+    "reply.failed.say.variants.default": [
+      "Hindi ko nakain iyon.",
+      "Bigo sa pagkain. Bulok o panis ang pagkain.",
+      "Di makain 'yon. Amoy delikado.",
+      "Naabala ako habang sumusubok kumain.",
+      "Di makakain ngayon. May banta sa lugar.",
+      "Pumalpak ang pagkain. Nasira ang pagkain.",
+      "Di matunawan sa bagay na 'yan.",
+      "Nahulog o nawala ang pagkain bago nakain.",
+      "Bigo ang kilos. Gutom pa rin.",
+      "Bigo sa pagtapos ng pagkain."
+    ]
+  }
+}

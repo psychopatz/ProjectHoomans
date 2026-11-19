@@ -10,265 +10,31 @@
   "say": {
     "variants": [
       {
-        "id": "avoid_default",
-        "text": {
-          "EN": [
-            "Copy. We go around.",
-            "Understood. Avoiding the swarm.",
-            "Bypassing the horde.",
-            "Taking the side path. Quietly.",
-            "Copy that. Staying out of their sight line.",
-            "We'll detour around them.",
-            "Understood. No engagement.",
-            "Steering clear of the horde.",
-            "Copy. Slipping past the dead.",
-            "Avoiding contact. Lead the way."
-          ],
-          "TL": [
-            "Sige. Iikot tayo.",
-            "Naintindihan. Iiwasan ang kawan.",
-            "Lalampasan ang kawan sa malayo.",
-            "Dadaan sa gilid. Nang tahimik.",
-            "Kopyado. Lalayo sa paningin nila.",
-            "Iikot tayo sa paligid nila.",
-            "Naiintindihan ko. Walang labanang magaganap.",
-            "Lalayo sa kawan.",
-            "Sige. Papalusot sa mga patay.",
-            "Iiwas sa engkwentro. Ituro ang daan."
-          ]
-        }
+        "id": "avoid_default"
       },
       {
-        "id": "avoid_relief",
-        "text": {
-          "EN": [
-            "Good. Let's go around.",
-            "Thank goodness. That pack was massive.",
-            "Glad you made that call. Slipping away.",
-            "Smart move. We live to fight another hour.",
-            "Relieved to hear that. Detouring now.",
-            "Good choice. Keep it quiet as we skirt past.",
-            "Much better than dying out here. Moving around.",
-            "Sigh of relief. Let's keep our heads down.",
-            "Glad we're avoiding that bloodbath. Lead on.",
-            "Safe decision. Taking the alternate route."
-          ],
-          "TL": [
-            "Mabuti. Umikot tayo.",
-            "Salamat sa Diyos. Napakalaki ng kawang 'yon.",
-            "Mabuti at nagpasya ka ng ganoon. Tatakas na tayo.",
-            "Matalinong desisyon. Mabubuhay pa tayo sa susunod na oras.",
-            "Gumaan ang loob ko nang marinig 'yan. Iikot na ngayon.",
-            "Magandang pasya. Manahimik habang lumalampas.",
-            "Mas maganda kaysa mamatay dito. Iikot na tayo.",
-            "Nakahinga nang maluwag. Yumuko tayo.",
-            "Mabuti at iniwasan natin ang katayang 'yon. Mauna ka na.",
-            "Ligtas na pasya. Dadaan sa ibang ruta."
-          ]
-        }
+        "id": "avoid_relief"
       },
       {
-        "id": "engage_default",
-        "text": {
-          "EN": [
-            "I'm with you. Let's go.",
-            "Engaging now. Watch your side.",
-            "Right behind you into the fight.",
-            "Understood. We fight together.",
-            "Moving in to strike.",
-            "Let's clear the way.",
-            "Ready for combat. Let's do this.",
-            "On it. Target locked.",
-            "Moving forward to engage.",
-            "With you all the way. Let's strike."
-          ],
-          "TL": [
-            "Kasama mo ako. Tara.",
-            "Lalaban na ngayon. Bantayan ang tagiliran.",
-            "Nasa likod mo papunta sa laban.",
-            "Naintindihan. Sabay tayong lalaban.",
-            "Lalapit para humampas.",
-            "Hawiin natin ang daan.",
-            "Handa sa laban. Gawin na natin ito.",
-            "Inaasikaso na. Nakatutok sa kalaban.",
-            "Susulong para lumaban.",
-            "Kasama mo sa buong laban. Sumugod na tayo."
-          ]
-        }
+        "id": "engage_default"
       },
       {
-        "id": "engage_eager",
-        "text": {
-          "EN": [
-            "Ready to strike! Let's take them down.",
-            "Let's go! I've got your back.",
-            "Ready when you are! Charge!",
-            "Line them up! We can clear this whole pack.",
-            "Eager and armed. Let's do some damage.",
-            "I'm ready to fight! Moving in!",
-            "Let's smash through them together!",
-            "Weapon's ready. Let's take the field!",
-            "Full speed ahead! They won't know what hit them.",
-            "Hell yeah! Let's wipe them out."
-          ],
-          "TL": [
-            "Handa nang humampas! Patumbahin natin sila.",
-            "Tara na! Hawak ko ang likod mo.",
-            "Handa na ako kapag handa ka na! Sugod!",
-            "Pilahin sila! Kaya nating ubusin ang buong kawan.",
-            "Sabik at armado. Manalanta na tayo.",
-            "Handa na akong lumaban! Susulong na!",
-            "Durogin natin sila nang sabay!",
-            "Handa ang armas. Angkinin natin ang labanan!",
-            "Buong bilis pasulong! Di nila malalaman ang tumama sa kanila.",
-            "Oo naman! Ubusin natin sila."
-          ]
-        }
+        "id": "engage_eager"
       },
       {
-        "id": "engage_hesitant",
-        "text": {
-          "EN": [
-            "If you say so... alright. I'm with you.",
-            "This is reckless, but I won't abandon you.",
-            "I have a bad feeling about this, but I'm in.",
-            "Watch my back... here we go.",
-            "I hope you know what you're doing. Moving in.",
-            "Not loving these odds, but I'll fight beside you.",
-            "Hesitant, but committed. Stay close.",
-            "Alright... just don't let them flank us.",
-            "Stepping into the meat grinder. Let's make it out alive.",
-            "Okay... I trust your blade. Let's go."
-          ],
-          "TL": [
-            "Kung sinasabi mo... sige. Kasama mo ako.",
-            "Kapusukan ito, pero hindi kita iiwan.",
-            "Masama ang kutob ko rito, pero sasama ako.",
-            "Bantayan mo ang likod ko... heto na tayo.",
-            "Sana alam mo ang ginagawa mo. Susulong na.",
-            "Di maganda ang tsansa, pero lalaban ako sa tabi mo.",
-            "Nag-aalangan, pero sasabak. Dumikit ka.",
-            "Sige... huwag mo lang silang hayaang pumaligid.",
-            "Papasok sa gilingan ng karne. Tiyakin nating makalabas nang buhay.",
-            "Sige... tiwala ako sa talim mo. Tara."
-          ]
-        }
+        "id": "engage_hesitant"
       },
       {
-        "id": "engage_reserved",
-        "text": {
-          "EN": [
-            "Alright. Moving.",
-            "Advancing cautiously.",
-            "Understood. Engaging the horde.",
-            "In position. Moving to attack.",
-            "Weapon drawn. Advancing in formation.",
-            "Calculated engagement. Let's do this clean.",
-            "Order received. Stepping up to fight.",
-            "Keeping rhythm. Engaging targets.",
-            "Moving into range. Weapons up.",
-            "Understood. Entering the fray."
-          ],
-          "TL": [
-            "Sige. Galaw.",
-            "Susulong nang maingat.",
-            "Naintindihan. Lalabanan ang kawan.",
-            "Nasa pwesto. Kikilos para umatake.",
-            "Nakahugot ang armas. Susulong sa pormasyon.",
-            "Planadong paglusob. Gawin nating malinis.",
-            "Utos natanggap. Tatayo para lumaban.",
-            "Panatilihin ang ritmo. Lalabanan ang puntirya.",
-            "Pumapasok sa sakop. Itaas ang armas.",
-            "Naiintindihan ko. Papatungo na sa bakbakan."
-          ]
-        }
+        "id": "engage_reserved"
       },
       {
-        "id": "hold_default",
-        "text": {
-          "EN": [
-            "Holding for now.",
-            "Holding position. Watching the herd.",
-            "Staying put until you signal.",
-            "Understood. Standing by.",
-            "Holding ground right here.",
-            "Position held. Awaiting order.",
-            "Holding. Observing threat movement.",
-            "Steady in place.",
-            "Maintaining position.",
-            "Holding. Let's see what they do."
-          ],
-          "TL": [
-            "Hinto muna tayo.",
-            "Hawak ang pwesto. Binabantayan ang kawan.",
-            "Dito lang hanggang sumenyas ka.",
-            "Naiintindihan ko. Nakahanda.",
-            "Hawak ang lupa dito mismo.",
-            "Nasa pwesto. Naghihintay ng utos.",
-            "Hawak muna. Minamasid ang galaw ng banta.",
-            "Matatag sa pwesto.",
-            "Pinananatili ang posisyon.",
-            "Tigil muna. Tingnan natin ang gagawin nila."
-          ]
-        }
+        "id": "hold_default"
       },
       {
-        "id": "hold_eager",
-        "text": {
-          "EN": [
-            "Holding. Say when.",
-            "Ready on your mark! Holding position.",
-            "Coiled like a spring. Just give the word.",
-            "Holding fire, but twitching to go.",
-            "Ready to pounce. Standing by.",
-            "I'm locked on! Say the word and I strike.",
-            "Holding here. Don't make me wait too long!",
-            "Ready and waiting! Give the signal.",
-            "Poised to attack. Holding ground.",
-            "Just say the word. I'm ready."
-          ],
-          "TL": [
-            "Hawak muna. Sabihin mo kung kailan.",
-            "Handa sa hudyat mo! Hawak ang pwesto.",
-            "Nakahandang sumugod. Sabihin mo lang.",
-            "Tigil-putok, pero sabik nang sumugod.",
-            "Handang lumundag. Naghihintay.",
-            "Nakatutok na! Sabihin mo lang at aatake ako.",
-            "Dito muna. Huwag mo akong paghintayin nang matagal!",
-            "Handa at naghihintay! Ibigay ang senyas.",
-            "Handang sumugod. Hawak ang lupa.",
-            "Sabihin mo lang. Handa na ako."
-          ]
-        }
+        "id": "hold_eager"
       },
       {
-        "id": "hold_hesitant",
-        "text": {
-          "EN": [
-            "Okay. Holding here.",
-            "Staying put. I hope they don't see us.",
-            "Holding position... please be quiet.",
-            "Holding ground. Heart's pounding.",
-            "I'll wait here, but let's be careful.",
-            "Staying still. Don't make a sound.",
-            "Holding... waiting for your call.",
-            "Keeping low. I hope this works.",
-            "Holding here. Watching their claws.",
-            "Understood... staying frozen right here."
-          ],
-          "TL": [
-            "Sige. Dito muna ako.",
-            "Dito lang ako. Sana di nila tayo makita.",
-            "Hawak ang pwesto... pakiusap tumahimik.",
-            "Hawak ang pwesto. Lumalakas ang tibok ng puso ko.",
-            "Maghihintay ako rito, pero mag-ingat tayo.",
-            "Walang kikilos. Huwag gagawa ng tunog.",
-            "Hawak muna... naghihintay sa utos mo.",
-            "Nakayuko. Sana magtagumpay ito.",
-            "Hawak dito. Binabantayan ang kuko nila.",
-            "Naintindihan... di gagalaw dito mismo."
-          ]
-        }
+        "id": "hold_hesitant"
       }
     ]
   },

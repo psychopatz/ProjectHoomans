@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.greeting.opening.rain",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Hey there. Wet one today.",
+      "Rain's not letting up anytime soon.",
+      "Keep dry if you can out there.",
+      "Miserable weather, but we're still kicking.",
+      "Ground's completely soaked out there.",
+      "Cold rain like this makes everything harder.",
+      "Watch your footing in this mud.",
+      "Rain makes it hard to hear them coming. Stay alert.",
+      "Good day to stay under a solid roof if you've got one.",
+      "At least the rain washes away the tracks. Stay dry."
+    ]
+  }
+}

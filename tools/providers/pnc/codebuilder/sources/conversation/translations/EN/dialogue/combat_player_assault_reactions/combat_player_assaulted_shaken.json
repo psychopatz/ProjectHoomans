@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.player_assaulted.shaken",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "What the hell?! Stay back!",
+      "Why are you attacking me?! Get back!",
+      "Stop! What are you doing?!",
+      "Don't touch me! Are you crazy?!",
+      "Get away from me right now!",
+      "Jesus, back off! Put that away!",
+      "Why would you hit me?! Get back!",
+      "Stay away from me! Don't do this!",
+      "Are you out of your mind?! Stop!",
+      "Back off! Don't come any closer!"
+    ]
+  }
+}

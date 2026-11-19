@@ -6,7 +6,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews/ExcursionDepartingToExcursionReturning",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
         },
         ["id"] = "interaction.scene.excursion_departing",
         ["kind"] = "dialogue",
@@ -18,7 +18,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews/ExcursionDepartingToExcursionReturning",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
         },
         ["id"] = "interaction.scene.excursion_failed",
         ["kind"] = "dialogue",
@@ -30,7 +30,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews/ExcursionDepartingToExcursionReturning",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
         },
         ["id"] = "interaction.scene.excursion_home",
         ["kind"] = "dialogue",
@@ -42,7 +42,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews/ExcursionDepartingToExcursionReturning",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
         },
         ["id"] = "interaction.scene.excursion_preparing",
         ["kind"] = "dialogue",
@@ -54,7 +54,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews/ExcursionDepartingToExcursionReturning",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
         },
         ["id"] = "interaction.scene.excursion_returning",
         ["kind"] = "dialogue",
@@ -66,7 +66,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews/GroundedNewsAnswerToGroundedNewsShare",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
         },
         ["id"] = "interaction.scene.grounded_news_answer",
         ["kind"] = "dialogue",
@@ -78,7 +78,7 @@ return {
         },
         ["domain"] = "social_interaction_scene_travel_news",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews/GroundedNewsAnswerToGroundedNewsShare",
+            "PNC/ConvoEngine/Dialogue/SocialInteractionSceneTravelNews",
         },
         ["id"] = "interaction.scene.grounded_news_share",
         ["kind"] = "dialogue",

@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.reply.attack_melee",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Going in close.",
+      "Melee ready. Closing the distance.",
+      "I'll take them hand-to-hand.",
+      "Blade and blunt ready.",
+      "Saving ammo. Taking them up close.",
+      "Going in with melee.",
+      "I'll crack some skulls up front.",
+      "Melee weapon drawn.",
+      "Moving into striking range.",
+      "Understood. Close-quarters combat."
+    ]
+  }
+}

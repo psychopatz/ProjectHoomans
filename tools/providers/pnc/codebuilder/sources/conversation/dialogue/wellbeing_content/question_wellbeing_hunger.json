@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I'm pretty hungry, if I'm honest. Do you have anything to eat?",
-            "My stomach has been growling for hours. Got any food to spare?",
-            "Really feeling the hunger right now. Could use a bite.",
-            "Haven't had a proper meal in a while. Any rations on you?",
-            "Need some calories before my strength fades. Got anything?",
-            "I'm starving out here. Even stale crackers would do.",
-            "Food is getting urgent for me. Anything in your pack?",
-            "Hard to focus when your stomach is this empty. Spare any food?",
-            "I could really use a snack or some canned goods right now.",
-            "Getting weak from hunger. Do you have any rations to share?"
-          ],
-          "TL": [
-            "Medyo gutom ako, kung tutuusin. May makakain ka ba?",
-            "Kanina pa kumakalam ang sikmura ko. May maibibigay ka bang pagkain?",
-            "Ramdam na ramdam ko ang gutom ngayon. Kailangan ko ng makakain.",
-            "Medyo matagal na mula noong huli akong kumain. May rasyon ka ba?",
-            "Kailangan ko ng lakas bago ako manghina. Mayroon ka ba riyan?",
-            "Gutom na gutom na ako rito. Kahit lumang biskwit tatanggapin ko.",
-            "Kailangan ko na talagang kumain. May laman ba ang bag mo?",
-            "Mahirap mag-isip kapag walang laman ang tiyan. Penge namang makakain?",
-            "Kailangan ko talaga ng meryenda o de-lata ngayon.",
-            "Nanghihina na ako sa gutom. May maibabahagi ka bang rasyon?"
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

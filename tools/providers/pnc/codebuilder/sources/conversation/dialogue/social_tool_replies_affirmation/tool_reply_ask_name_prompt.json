@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I'll tell you my name once we've established some trust. What's your name?",
-            "Fair is fair. Tell me who you are first.",
-            "I don't hand my name to strangers. What do they call you?",
-            "How about introductions on your side first? What's your name?",
-            "You first. Who am I speaking with?",
-            "Names carry weight out here. Tell me yours before asking mine.",
-            "Let's trade names fairly. What should I call you?",
-            "I'd like to know who's asking before I give up my name.",
-            "Give me your name first, then maybe I'll share mine.",
-            "Introduce yourself first. It's only polite in these times."
-          ],
-          "TL": [
-            "Sasabihin ko ang pangalan ko kapag may tiwala na tayo. Ano ang pangalan mo?",
-            "Patas lang dapat. Sabihin mo muna kung sino ka.",
-            "Hindi ko ibinibigay ang pangalan ko sa di-kilala. Anong tawag sa 'yo?",
-            "Paano kung ikaw muna ang magpakilala? Ano ang pangalan mo?",
-            "Ikaw muna. Sino ba ang kausap ko?",
-            "Mahalaga ang pangalan dito. Sabihin mo muna ang sa 'yo bago magtanong.",
-            "Magpalitan tayo ng pangalan nang patas. Ano dapat ang itawag ko sa 'yo?",
-            "Gusto ko munang malaman kung sino ang nagtatanong bago ko ibigay ang akin.",
-            "Ibigay mo muna ang pangalan mo, baka sakaling ibahagi ko rin ang akin.",
-            "Magpakilala ka muna. Pagpapakita 'yon ng galang sa panahong ito."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

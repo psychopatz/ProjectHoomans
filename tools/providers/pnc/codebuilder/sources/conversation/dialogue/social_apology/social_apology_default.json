@@ -21,10 +21,6 @@
       }
     ]
   },
-  "textSidecars": {
-    "EN": "translations/social_apology_default.en.json",
-    "TL": "translations/social_apology_default.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

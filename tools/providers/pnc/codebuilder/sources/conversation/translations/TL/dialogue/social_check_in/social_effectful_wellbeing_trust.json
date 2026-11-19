@@ -1,0 +1,10 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "wellbeing_trust",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": "Pinahahalagahan ko ang pagbabantay mo sa akin.",
+    "reply.blocked.say.variants.default": "Huwag na.",
+    "reply.accepted.say.variants.default": "Palagi."
+  }
+}

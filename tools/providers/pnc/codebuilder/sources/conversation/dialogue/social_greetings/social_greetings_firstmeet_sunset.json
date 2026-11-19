@@ -36,62 +36,26 @@
     "responseAct": "GREETING",
     "textRows": [
       {
-        "key": "greeting.001",
-        "text": {
-          "EN": "You picked a late hour to approach a stranger.",
-          "TL": "Huli na para lumapit sa isang estranghero."
-        }
+        "key": "greeting.001"
       },
       {
-        "key": "greeting.002",
-        "text": {
-          "EN": "The light is going. Say what you came to say.",
-          "TL": "Ang ilaw ay pupunta. Sabihin mo kung ano ang gusto mong sabihin."
-        }
+        "key": "greeting.002"
       },
       {
-        "key": "greeting.003",
-        "text": {
-          "EN": "I don't know you, but I'm listening.",
-          "TL": "Hindi kita kilala, pero nakikinig ako."
-        }
+        "key": "greeting.003"
       },
       {
-        "key": "greeting.004",
-        "text": {
-          "EN": "Before it gets dark, tell me who you are.",
-          "TL": "Bago dumilim, sabihin mo sa akin kung sino ka."
-        }
+        "key": "greeting.004"
       },
       {
-        "key": "greeting.005",
-        "text": {
-          "EN": "Another survivor. Friendly, I hope?",
-          "TL": "Isa pang nakaligtas. Friendly, sana?"
-        }
+        "key": "greeting.005"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "You picked a late hour to approach a stranger.",
-            "The light is going. Say what you came to say.",
-            "I don't know you, but I'm listening.",
-            "Before it gets dark, tell me who you are.",
-            "Another survivor. Friendly, I hope?"
-          ],
-          "TL": [
-            "Huli na para lumapit sa isang estranghero.",
-            "Ang ilaw ay pupunta. Sabihin mo kung ano ang gusto mong sabihin.",
-            "Hindi kita kilala, pero nakikinig ako.",
-            "Bago dumilim, sabihin mo sa akin kung sino ka.",
-            "Isa pang nakaligtas. Friendly, sana?"
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

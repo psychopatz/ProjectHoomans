@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I hear you.",
-            "Got it.",
-            "Understood.",
-            "Fair enough.",
-            "I see you.",
-            "Right back at you.",
-            "Acknowledged.",
-            "Noted.",
-            "All right.",
-            "Message received."
-          ],
-          "TL": [
-            "Narinig kita.",
-            "Nakuha ko.",
-            "Naiintindihan ko.",
-            "May punto ka.",
-            "Nakikita kita.",
-            "Pabalik din sa 'yo.",
-            "Kinikilala ko.",
-            "Tala ko na.",
-            "Sige.",
-            "Mensahe nakuha."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

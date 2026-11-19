@@ -1,0 +1,10 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.activity",
+  "locale": "TL",
+  "entries": {
+    "say.variants.question.activity.dataset.keep_moving": "Just doing what I can to keep things moving.",
+    "say.variants.question.activity.dataset.bit_of_everything": "A little bit of everything.",
+    "say.variants.question.activity.dataset.taking_care": "Just taking care of what needs doing."
+  }
+}

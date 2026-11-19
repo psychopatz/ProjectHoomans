@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_witness_reserved",
+  "locale": "TL",
+  "entries": {
+    "say.1.neutral": [
+      "Isa na.",
+      "Bagsak.",
+      "Tinamaan.",
+      "Naitumba.",
+      "Naalis.",
+      "Patay.",
+      "Tapos.",
+      "Tumigil.",
+      "Bawas isa.",
+      "Target bagsak."
+    ],
+    "say.2.neutral": [
+      "Ayos.",
+      "Malinis.",
+      "Naasikaso.",
+      "Solido.",
+      "Yari.",
+      "Sige.",
+      "Mabuti.",
+      "Tapos.",
+      "Mabisa.",
+      "Nalinis."
+    ],
+    "say.3.neutral": [
+      "Tuloy.",
+      "Galaw.",
+      "Sulong.",
+      "Sunod.",
+      "Lakad.",
+      "Abante.",
+      "Lusot.",
+      "Paspas.",
+      "Huwag hinto.",
+      "Tuloy lang."
+    ]
+  }
+}

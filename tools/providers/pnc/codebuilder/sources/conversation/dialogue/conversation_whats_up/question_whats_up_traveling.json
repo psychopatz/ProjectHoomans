@@ -22,10 +22,6 @@
       }
     ]
   },
-  "textSidecars": {
-    "EN": "translations/question_whats_up_traveling.en.json",
-    "TL": "translations/question_whats_up_traveling.tl.json"
-  },
   "roles": {
     "speaker": {
       "cardinality": "ONE",

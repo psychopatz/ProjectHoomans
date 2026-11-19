@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.backstory.refusal",
+  "locale": "EN",
+  "entries": {
+    "say.variants.question.backstory.refusal.authored": "I'm not ready to talk about that yet."
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.medical_bite",
+  "locale": "TL",
+  "entries": {
+    "reply.positive.say.1.neutral": [
+      "Oo, nakagat ako.",
+      "Nabaon ng isa sa kanila ang ngipin sa akin. Masama ito.",
+      "Nakagat ako habang nagpupumiglas. Hindi maikakaila.",
+      "May bakas ng kagat sa balikat ko. Nahawaan ako.",
+      "Bumaon sa balat. Alam ko kung ano ang kahihinatnan.",
+      "Oo, sa kasamaang-palad. Nakagat ako.",
+      "Lumusot sa manggas ko. Kagat nga.",
+      "Nakagat ako. Kailangan nating pag-isipan ang susunod na gagawin.",
+      "Nakita ko ang marka kanina. Nakagat talaga ako.",
+      "Nahawaan na ako. Kinagat ako ng patay."
+    ],
+    "reply.positive.say.1.guarded": [
+      "Oo. Nakagat ako. Tama na.",
+      "Nakuha nila ako. Huwag kang magsisigaw.",
+      "Nakagat ako. Ihanda mo ang baril mo kung kinakailangan.",
+      "Oo, nangyari. Lumayo ka sa akin.",
+      "May kagat sa braso ko. Alam ko ang ibig sabihin niyan.",
+      "Nakagat. Huwag mo akong hawakan.",
+      "Totoo. Hindi ko kailangan ang awa mo.",
+      "Kinagat ako ng isa sa kanila. Umatras ka.",
+      "May marka na ako. Gawin mo ang dapat mong gawin.",
+      "Oo. Hindi ko hahayaang maging panganib ako sa 'yo."
+    ],
+    "reply.positive.say.1.terse": [
+      "Oo. Nakagat ako.",
+      "Nakagat.",
+      "Nakuha ako.",
+      "Kagat ito.",
+      "Nahawaan.",
+      "Mamamatay ako.",
+      "Bakas ng kagat.",
+      "Oo.",
+      "Bumaon.",
+      "Tapos na."
+    ],
+    "reply.positive.say.1.warm": [
+      "Oo. Nakagat ako, at salamat sa pagsuri.",
+      "Nakuha nila ako, kaibigan. Pasensya na sa masamang balita.",
+      "Nakagat ako. Salamat sa pagtatanong nang diretso sa akin.",
+      "Nangyari na. Masaya akong nakilala kita bago ang lahat.",
+      "Nakagat ako. Pakiusap, protektahan mo ang sarili mo pagdating ng oras.",
+      "Oo, kinagat nila ako. Salamat sa pananatili sa tabi ko.",
+      "Hindi ko itatago sa 'yo. Nakagat ako. Alagaan mo ang sarili mo.",
+      "Kagat nga, kaibigan. Salamat sa lahat ng pinagsamahan natin.",
+      "Nahawaan na ako. Salamat sa pagtrato sa akin bilang kapwa tao.",
+      "Kinagat nila ako. Huwag kang malungkot; lumaban tayo nang buong husay."
+    ],
+    "reply.negative.say.1.neutral": [
+      "Hindi, wala akong naitalang kagat.",
+      "Sinuri ko ang sarili ko. Walang kagat kahit saan.",
+      "Malinis ako. Walang nakakagat sa akin sa kanila.",
+      "Walang anumang bakas ng kagat, salamat sa Diyos.",
+      "Buo ang balat ko. Walang kagat mula sa mga patay.",
+      "Tiningnan ko bawat gasgas. Walang kagat.",
+      "Ligtas at malinis ako sa anumang sugat ng kagat.",
+      "Hindi nakagat. Nakatulong ang proteksyon.",
+      "Walang kagat sa akin, makakasiguro ka.",
+      "Sinuri kong mabuti. Walang kagat, gasgas lang."
+    ],
+    "reply.negative.say.1.guarded": [
+      "Walang kagat. Tama na.",
+      "Malinis ako. Huwag mo akong tingnan nang ganyan.",
+      "Hindi nakagat. Itigil mo ang pagsusuri sa akin.",
+      "Walang ngiping tumama sa balat ko. Lumayo ka.",
+      "Sinuri ko nang maayos. Hindi ako infected.",
+      "Walang bakas ng kagat kahit saan. Ibaba mo ang armas mo.",
+      "Alam ko ang patakaran. Wala akong kagat.",
+      "Malinis ang balat ko. Huwag kang magbintang agad.",
+      "Kahit isang bakas ng kagat wala. Lumayo ka pa rin.",
+      "Hindi ako magiging isa sa kanila. Itigil ang pagtatanong."
+    ],
+    "reply.negative.say.1.terse": [
+      "Walang kagat.",
+      "Malinis.",
+      "Hindi nakagat.",
+      "Walang bakas.",
+      "Buo ang balat.",
+      "Ligtas ako.",
+      "Negatibo.",
+      "Lahat malinis.",
+      "Walang impeksyon.",
+      "Hindi magbabago."
+    ],
+    "reply.negative.say.1.warm": [
+      "Hindi, wala akong naitalang kagat. Salamat sa pagsuri.",
+      "Malinis ako, kaibigan. Walang nakalusot sa depensa ko.",
+      "Walang kagat sa akin. Mabuti at nagbabantay ka para sa kampo.",
+      "Ligtas sa anumang kagat, salamat sa Diyos. Salamat sa pagsuri.",
+      "Sinuri ko nang maayos, walang dapat ikatakot. Ligtas tayo.",
+      "Walang kagat! Masaya akong sabihing ligtas na ligtas ako.",
+      "Malinis ang balat ko. Salamat sa pagsasagawa ng mahigpit na pagsusuri.",
+      "Makakahinga ka nang maluwag, walang kagat sa akin.",
+      "Walang anumang kagat. Salamat sa pag-aalala mo.",
+      "Hinding-hindi nakagat, kaibigan. Mananatili ako rito kasama mo."
+    ],
+    "reply.unknown.say.1.neutral": [
+      "Hindi ko makumpirma kung nakagat ako.",
+      "Hindi pa ako nagkakaroon ng oras para maghubad at suriin.",
+      "Masyadong maraming humawak sa akin para makasiguro.",
+      "Naramdaman ko ang ngipin, pero hindi kita kung bumaon.",
+      "Kailangan ng may maayos na ilaw para tingnan ang likod ko.",
+      "Hindi pa sigurado. Balot ng dumi at dugo ang sugat.",
+      "Pwedeng gasgas, pwedeng ngipin. Hindi pa masabi.",
+      "Hindi ko pa nasusuri ang bawat parte. Bigyan mo ako ng sandali.",
+      "Punit ang damit, pero hindi sigurado kung bumaon sa balat.",
+      "Hindi pa alam kung nakagat. Naghihintay masuri."
+    ],
+    "reply.unknown.say.1.guarded": [
+      "Hindi ko makumpirma. Huwag mo nang ipilit.",
+      "Hindi pa ako nakakatingin. Lumayo ka muna hangga't hindi pa.",
+      "Hindi ako sigurado. Umatras ka at hayaan mo akong tingnan.",
+      "Hindi masabi dahil sa suot ko. Huwag kang magbintang.",
+      "Masyadong maraming dugo para malaman kung kanino. Umatras ka.",
+      "Kailangan ko ng salamin muna. Huwag mo akong titigan.",
+      "Hindi sigurado. Magsusuri ako nang mag-isa.",
+      "Hindi makumpirma. Huwag mong ilabas ang armas mo.",
+      "Hindi ko pa alam. Huwag mo akong itrato na parang infected.",
+      "Hindi alam. Diyan ka lang hangga't hindi ko nasisiguro."
+    ],
+    "reply.unknown.say.1.terse": [
+      "Hindi makumpirma.",
+      "Hindi sigurado.",
+      "Hindi pa nasusuri.",
+      "Hindi alam.",
+      "Kailangang tingnan.",
+      "Mahirap sabihin.",
+      "Punit na damit.",
+      "Hindi tiyak.",
+      "Hindi ko makita.",
+      "Titingnan pa."
+    ],
+    "reply.unknown.say.1.warm": [
+      "Hindi ko makumpirma, pero salamat sa pagsuri.",
+      "Hindi pa ako sigurado, kaibigan. Titingnan ko nang maayos sa ligtas na lugar.",
+      "Hindi ko pa natingnan nang maigi, pero salamat sa pagbabantay sa akin.",
+      "Mahirap makita sa likod. Pwede mo ba akong tulungang tingnan mamaya?",
+      "Hindi sigurado ngayon, pero nangangako akong magiging tapat ako sa 'yo.",
+      "Sana punit lang sa jacket. Salamat sa maingat na pagtatanong.",
+      "Hindi pa tiyak, pero maghanap muna tayo ng masisilungan bago sumuri.",
+      "Pwedeng wala lang, pwedeng masama. Salamat sa pananatiling kalmado.",
+      "Hindi ko pa nasusuri ang bawat gasgas, pero nagpapasalamat ako sa pag-alala mo.",
+      "Sasabihin ko agad pagkatapos kong masuri. Salamat sa malasakit mo."
+    ]
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.follow",
+  "locale": "TL",
+  "entries": {
+    "reply.queued.say.1.neutral": [
+      "Sige, susundan kita.",
+      "Nasa likod mo lang ako.",
+      "Sumusunod na ngayon. Mauna ka.",
+      "Naintindihan. Didikit sa likod mo.",
+      "Kumikilos kasabay mo. Mauna na.",
+      "Kasama mo ako. Kilos na.",
+      "Nasa buntot mo lang. Binabantayan ang likod.",
+      "Sasabay sa bilis mo. Tuloy lang.",
+      "Naiintindihan ko. Papatabi sa likod mo.",
+      "Nakuha ko. Lalakad kasabay mo."
+    ],
+    "reply.queued.say.1.friendly": [
+      "Siyempre, susundan kita.",
+      "Malugod, kaibigan! Ituro ang daan.",
+      "Laging masayang maglakbay kasama ka. Tara na!",
+      "Nasa likod mo lang ako, kasama. Gawin na natin ito.",
+      "Kasabay mo ako, kaibigan! Mag-ingat sa hakbang.",
+      "Wala nang ibang gugustuhin kong sundan kundi ikaw.",
+      "Mauna ka! Hawak ko ang likod mo.",
+      "Walang anuman! Didikit na parang pandikit sa 'yo, kaibigan.",
+      "Masayang sumunod. Panatilihin tayong ligtas!",
+      "Nasa likod mo lang, kasama. Pasulong!"
+    ],
+    "reply.queued.say.1.repeated": [
+      "Sinusundan pa rin kita.",
+      "Nakasunod na ako mismo sa likod mo.",
+      "Nasa likod mo pa rin. Di na kailangang ulitin.",
+      "Wala akong pinuntahan. Narito pa rin ako.",
+      "Sumusunod na sa 'yo. Magpatuloy ka lang sa paglalakad.",
+      "Nasa likod mo lang ako! Lumingon ka sa balikat mo.",
+      "Kasama mo pa rin ako. Huwag kang mag-alala.",
+      "Nakasunod na. Mauna ka na.",
+      "Sumusunod sa 'yo habang nagsasalita ka.",
+      "Sumusunod na ako. Tuloy lang sa paglakad."
+    ],
+    "reply.queued.say.1.trusted": [
+      "Kilala kita. Susunod ako.",
+      "Lubos akong nagtitiwala sa pangunguna mo. Susunod sa 'yo.",
+      "Ituro ang daan, kasama. Kasama mo ako hanggang dulo.",
+      "Napatunayan mo na ang galing mo. Susunod ako kahit saan.",
+      "Naintindihan. Tiwala akong bubuhayin mo tayo.",
+      "Nasa likod mo lang. Nagbabantayan tayo sa isa't isa.",
+      "Nasa tabi mo ako, kaibigan. Mauna ka.",
+      "Ikaw ang magpasya, susuportahan kita. Sumusunod.",
+      "Alam kong hawak mo ang likod ko. Sumusunod sa pangunguna mo.",
+      "Naiintindihan ko, kasama. Nasa likod mo lang."
+    ],
+    "reply.queued.say.1.withdrawn": [
+      "Susunod ako.",
+      "Sige. Lalakad sa likod mo.",
+      "Sumusunod. Kahit ano pa.",
+      "Naintindihan. Kumikilos.",
+      "Nasa likod lang. Huwag hihinto nang bigla.",
+      "Sasabay ako.",
+      "Sumusunod. Tuloy lang.",
+      "Sige. Tara na.",
+      "Nasa likod mo.",
+      "Sumasabay."
+    ],
+    "reply.rejected.say.variants.default": [
+      "Hindi kita masusundan ngayon.",
+      "Kailangan kong manatili rito. Di makasusunod.",
+      "Tumatangging sumunod sa panganib na 'yan.",
+      "Masyadong pagod o sugatan para sumabay. Di makasusunod.",
+      "May inaasikaso ako rito. Mauna ka na.",
+      "Di makasusunod. Marami akong ginagawa.",
+      "Di kita susundan sa gulong 'yan.",
+      "Hindi kita susundan sa ngayon.",
+      "Umatras ka, di ako susunod.",
+      "Tinatanggihan ang utos na sumunod. Hawak ko ang pwesto."
+    ],
+    "reply.failed.say.variants.default": [
+      "Hindi ko masimulan ang pagsunod sa iyo.",
+      "Bigo sa pagsunod. May harang sa daan.",
+      "Sinubukan kong sumunod, pero naipit ako sa kung saan.",
+      "Nawala ang bakas mo. Di nakasunod.",
+      "Di makasunod sa lagusang 'yan.",
+      "Pumalpak ang utos na sumunod. Barado ang daan.",
+      "Hindi ko nasabayan ang ruta mo.",
+      "May harang. Di makasunod sa daang 'yan.",
+      "Sinubukang sumunod, pero nawala sa paningin.",
+      "Di kita maabot para sumunod. Hawiin ang daan."
+    ]
+  }
+}

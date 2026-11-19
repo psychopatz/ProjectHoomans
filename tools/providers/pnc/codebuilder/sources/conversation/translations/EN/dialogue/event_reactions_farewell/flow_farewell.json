@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.friendly",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Take care. I will see you soon.",
+      "Stay safe, my friend. Come back in one piece.",
+      "Look after yourself. Don't be a stranger.",
+      "Good luck out there. See you soon.",
+      "Keep your head down and stay safe. Talk soon.",
+      "It was good seeing you. Safe travels.",
+      "Take care of yourself. I'll be waiting.",
+      "Watch your back out there, friend.",
+      "Stay alive. We'll share a drink next time.",
+      "Be careful out there. See you shortly."
+    ]
+  }
+}

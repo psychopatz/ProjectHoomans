@@ -1,0 +1,11 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "proposal",
+  "locale": "EN",
+  "entries": {
+    "say.variants.default": "Be my partner.",
+    "reply.already_partner.say.variants.default": "We're already together.",
+    "reply.accepted.say.variants.default": "Yes, I want that too.",
+    "reply.rejected.say.variants.default": "I'm not ready for that."
+  }
+}

@@ -34,14 +34,20 @@
     }
   ],
   "say": {
-    "EN": "Do you need anything?",
-    "TL": "May kailangan ka ba?"
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "reply": {
     "completed": {
       "say": {
-        "EN": "Thanks, that helps.",
-        "TL": "Salamat, malaking tulong iyan."
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
       }
     }
   },

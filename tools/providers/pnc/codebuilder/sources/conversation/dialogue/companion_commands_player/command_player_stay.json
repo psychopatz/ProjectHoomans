@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "{addressee.name}, wait here.",
-            "Hold this position, {addressee.name}.",
-            "{addressee.name}, stay put for now."
-          ],
-          "TL": [
-            "{addressee.name}, maghintay kayo rito.",
-            "Panatilihin ang posisyon, {addressee.name}.",
-            "{addressee.name}, manatili muna rito."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

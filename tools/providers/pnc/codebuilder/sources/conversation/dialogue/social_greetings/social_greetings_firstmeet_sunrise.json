@@ -36,62 +36,26 @@
     "responseAct": "GREETING",
     "textRows": [
       {
-        "key": "greeting.001",
-        "text": {
-          "EN": "Morning. I haven't seen you around before.",
-          "TL": "Umaga. Hindi pa kita nakikita kanina."
-        }
+        "key": "greeting.001"
       },
       {
-        "key": "greeting.002",
-        "text": {
-          "EN": "That's close enough. Start with your name.",
-          "TL": "Malapit na yun. Magsimula sa iyong pangalan."
-        }
+        "key": "greeting.002"
       },
       {
-        "key": "greeting.003",
-        "text": {
-          "EN": "New face. Are you passing through or looking for something?",
-          "TL": "Bagong mukha. Ikaw ba ay dumadaan o may hinahanap?"
-        }
+        "key": "greeting.003"
       },
       {
-        "key": "greeting.004",
-        "text": {
-          "EN": "Daylight makes this easier. Who are you?",
-          "TL": "Pinapadali ito ng liwanag ng araw. sino ka ba"
-        }
+        "key": "greeting.004"
       },
       {
-        "key": "greeting.005",
-        "text": {
-          "EN": "I don't recognize you. Talk, and keep it calm.",
-          "TL": "hindi kita kilala. Mag-usap, at panatilihin itong kalmado."
-        }
+        "key": "greeting.005"
       }
     ]
   },
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Morning. I haven't seen you around before.",
-            "That's close enough. Start with your name.",
-            "New face. Are you passing through or looking for something?",
-            "Daylight makes this easier. Who are you?",
-            "I don't recognize you. Talk, and keep it calm."
-          ],
-          "TL": [
-            "Umaga. Hindi pa kita nakikita kanina.",
-            "Malapit na yun. Magsimula sa iyong pangalan.",
-            "Bagong mukha. Ikaw ba ay dumadaan o may hinahanap?",
-            "Pinapadali ito ng liwanag ng araw. sino ka ba",
-            "hindi kita kilala. Mag-usap, at panatilihin itong kalmado."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

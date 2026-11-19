@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "navigation.orders",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Sige. Ano ang kailangan mo?",
+      "Ano ang mga utos mo?",
+      "Handa na ako sa tagubilin. Ano'ng dapat kong gawin?",
+      "Ano ang kailangan mong asikasuhin ko?",
+      "Ibigay mo sa akin ang gawain.",
+      "Ano ang susunod nating mga hakbang?",
+      "Nakaabang sa mga utos.",
+      "Ano ang gusto mong gawin ko susunod?",
+      "Sabihin mo kung ano ang kailangang gawin.",
+      "Naghihintay sa tagubilin mo."
+    ],
+    "say.variants.guarded": [
+      "Sige. Ano iyon?",
+      "Anong utos? Siguraduhing makatwiran.",
+      "Ano'ng gusto mong gawin ko? Huwag mapusok.",
+      "Ibigay ang utos, pero bantayan mo likod ko.",
+      "Ano'ng direktiba? Gawing may kabuluhan.",
+      "Nakikinig ako sa utos, pero ako ang humahatol sa kaligtasan.",
+      "Ano'ng kailangang gawin? Huwag sayangin ang oras ko.",
+      "Sabihin ang utos agad.",
+      "Ano'ng plano? Huwag tayong ipitin.",
+      "Ano ang mga utos mo?"
+    ],
+    "say.variants.terse": [
+      "Ano ang kailangan mo?",
+      "Mga utos?",
+      "Utos?",
+      "Tagubilin?",
+      "Ano'ng susunod?",
+      "Gawain?",
+      "Sabihin mo lang.",
+      "Ano ngayon?",
+      "Mga bilin?",
+      "Mag-utos ka."
+    ],
+    "say.variants.warm": [
+      "Sige. Ano ang kailangan mo?",
+      "Kahit ano'ng kailangan mo, masaya akong tumulong.",
+      "Sabihin mo lang kung ano'ng gagawin at ako na ang bahala.",
+      "Handang magtulungan. Ano'ng plano?",
+      "Ano ang gusto mong asikasuhin ko?",
+      "Laging handang tumulong. Ano'ng gawain?",
+      "Sabihin mo kung paano ako makakatulong sa'yo ngayon.",
+      "Kasama mo ako sa lahat. Ano'ng kailangan mo?",
+      "Masayang sumunod sa pamumuno mo. Ano'ng susunod?",
+      "Bigyan mo ako ng gawain at gagawin ko ang makakaya ko."
+    ]
+  }
+}

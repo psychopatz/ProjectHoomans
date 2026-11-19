@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "We are not there yet.",
-              "Slow down. We need more time before that.",
-              "Let us take things one step at a time.",
-              "Trust takes time out here. We are not there yet.",
-              "We are still figuring each other out.",
-              "Hold on. That is moving faster than I am ready for.",
-              "Let us build some history first.",
-              "I need to know you better before we go there.",
-              "Not yet. Let us keep our feet on the ground.",
-              "We are allies right now. Let us leave it at that."
-            ],
-            "TL": [
-              "Hindi pa tayo dumarating sa puntong iyan.",
-              "Dahan-dahan lang. Kailangan pa natin ng panahon bago 'yan.",
-              "Isa-isa lang nating harapin ang mga bagay.",
-              "Ang tiwala ay pinaghihirapan dito. Hindi pa tayo nandoon.",
-              "Kinikilala pa natin ang isa't isa.",
-              "Teka muna. Mas mabilis 'yan kaysa sa kaya ko ngayon.",
-              "Bumuo muna tayo ng tiwala at pinagsamahan.",
-              "Kailangan muna kitang makilala pa bago pumunta roon.",
-              "Hindi pa ngayon. Manatili muna tayong nakatuntong sa lupa.",
-              "Magkakampi tayo sa ngayon. Manatili muna tayo roon."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "That is a little too familiar for us.",
-              "You are getting ahead of where we stand.",
-              "Let us keep a professional distance for now.",
-              "We have not earned that kind of closeness yet.",
-              "Pull back a step. That is too close for comfort.",
-              "I like you, but do not push the boundaries.",
-              "That feels a bit presumptuous.",
-              "Let us not pretend we are closer than we actually are.",
-              "Boundary check. Step it back.",
-              "We have boundaries. Respect them."
-            ],
-            "TL": [
-              "Masyado nang pamilyar 'yan para sa atin.",
-              "Nauuna ka sa kung ano lang ang ugnayan natin.",
-              "Panatilihin muna natin ang maayos na distansya.",
-              "Hindi pa natin nararating ang ganyang kalapit na samahan.",
-              "Umatras ka nang kaunti. Masyadong malapit 'yan.",
-              "Mabuti ang tingin ko sa 'yo, pero huwag mong tawirin ang hangganan.",
-              "Medyo mapangahas ang dating niyan.",
-              "Huwag nating ipagpanggap na mas malapit tayo kaysa sa totoo.",
-              "Bantayan ang hangganan. Umatras ka nang kaunti.",
-              "May mga hangganan tayo. Igalang mo ang mga 'yon."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

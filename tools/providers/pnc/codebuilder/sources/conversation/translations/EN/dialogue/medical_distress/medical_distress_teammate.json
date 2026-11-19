@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "medical.distress.teammate",
+  "locale": "EN",
+  "entries": {
+    "say.variants.default": [
+      "They are hurt! Stay with them while I cover you.",
+      "Our companion is down! Tend to them, I've got guard.",
+      "They're injured! Get them patched up while I watch.",
+      "Check on them right now! I'll hold off the threats.",
+      "They took a hit! See to their wounds, I'm watching.",
+      "Partner is wounded! Apply first aid, I've got your back.",
+      "They're bleeding! Patch them while I keep perimeter.",
+      "Help them up! I'll keep the lane clear.",
+      "They need attention! Administer aid, I'll protect you both.",
+      "Our friend is hurt! Help them, I'm standing sentry."
+    ],
+    "say.variants.found": [
+      "I found a bandage for them. Hold still while I patch them up.",
+      "Got a dressing right here. Wrapping the wound now.",
+      "Found medical supplies! Hold on, I'm dressing the injury.",
+      "I've got clean cloth. Hold steady while I bind it.",
+      "Located a bandage. Applying pressure to their cut now.",
+      "I've got medical wrap. Don't squirm, I'm securing it.",
+      "Found supplies for them. Wrapping it up tightly now.",
+      "Got the bandage ready. Applying it to the laceration.",
+      "I have aid gear. Hold still, you'll be stable in a minute.",
+      "Bandage in hand! Dressing their wounds right now."
+    ],
+    "say.variants.missing": [
+      "I am out of bandages! Can someone spare one for them?",
+      "No more medical cloth! Does anyone have a bandage?!",
+      "My pack is empty of dressings! Help them, quick!",
+      "I can't treat this wound without supplies! Check your packs!",
+      "We're out of first aid! Who has a clean rag?!",
+      "I don't have what I need to stop their bleeding! Find supplies!",
+      "Zero bandages left! Someone hand me medical gear!",
+      "I'm empty-handed! We need bandages for our friend now!",
+      "No antiseptic, no bandages. Search the drawers, fast!",
+      "I can't patch them up alone! Who has medical tools?!"
+    ]
+  }
+}

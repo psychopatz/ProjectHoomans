@@ -19,21 +19,9 @@
         "metadata": {
           "textKey": "opening"
         },
-        "text": {
-          "EN": "All right, {addressee.name}. We can talk about us.",
-          "TL": "Sige, {addressee.name}. Maaari naming pag-usapan ang tungkol sa amin."
-        },
         "offers": [
           {
             "id": "trust",
-            "label": {
-              "EN": "You can trust me.",
-              "TL": "Maaari kang magtiwala sa akin."
-            },
-            "utterance": {
-              "EN": "You can trust me.",
-              "TL": "Maaari kang magtiwala sa akin."
-            },
             "frame": {
               "intent": "REQUEST",
               "speechAct": "REQUEST",
@@ -43,10 +31,6 @@
             "metadata": {
               "choiceKey": "choice.trust",
               "responseKey": "response.trust",
-              "responseText": {
-                "EN": "I know. That still means more than I can say.",
-                "TL": "alam ko. Nangangahulugan pa rin iyon ng higit pa sa masasabi ko."
-              },
               "effects": [
                 {
                   "type": "pnc:relationship",

@@ -1,0 +1,11 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "ui.suggestion.personal_check_in",
+  "locale": "EN",
+  "entries": {
+    "affordance.label": "Ask what's on their mind",
+    "say.variants.default": "Anything bothering you?",
+    "textRows.suggestion.personal_check_in.label": "Ask what's on their mind",
+    "textRows.suggestion.personal_check_in.utterance": "Anything bothering you?"
+  }
+}

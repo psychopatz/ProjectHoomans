@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "You have had your turn with the compliments today.",
-              "Save some of those kind words for tomorrow.",
-              "You already flattered me enough for one day.",
-              "Praise limit reached. Let's get back to surviving.",
-              "I heard you the first few times. Let it rest.",
-              "We've traded enough compliments for today.",
-              "Easy on the flattery. Don't overdo it.",
-              "Give it a rest until tomorrow.",
-              "One compliment per day is plenty out here.",
-              "Save your breath. You've hit the limit for now."
-            ],
-            "TL": [
-              "Nakaubos ka na ng papuri para sa araw na ito.",
-              "Itabi mo ang ilan sa magagandang salita para bukas.",
-              "Sobra-sobra na ang pambobola mo para sa isang araw.",
-              "Sapat na ang papuri. Balik na tayo sa pagligtas.",
-              "Narinig na kita kanina pa. Ipahinga mo muna.",
-              "Sapat na ang palitan natin ng papuri ngayong araw.",
-              "Dahan-dahan sa pambobola. Huwag mong sobrahan.",
-              "Ipahinga mo muna hanggang bukas.",
-              "Ang isang papuri kada araw ay marami na rito.",
-              "Itabi mo ang laway mo. Naabot mo na ang hangganan sa ngayon."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Save the sweet talk for tomorrow.",
-              "Hold your charm for another time.",
-              "Too much sweet talk for one afternoon.",
-              "We've got work to do. Charm me later.",
-              "Save the smooth lines. Focus on survival.",
-              "You're pouring on the charm too thick right now.",
-              "Let's take a break from the flirting.",
-              "Charm cooldown. Let's get back to reality.",
-              "I've had my fill of sweet words for today.",
-              "Hold that thought until tomorrow morning."
-            ],
-            "TL": [
-              "Itabi mo ang matatamis na salita para bukas.",
-              "Itago mo muna ang diskarte mo sa ibang araw.",
-              "Masyadong maraming pambobola para sa isang hapon.",
-              "May trabaho pa tayo. Paamuhin mo ako mamaya.",
-              "Itabi ang magagandang linya. Magpokus sa kaligtasan.",
-              "Masyadong makapal ang pambobola mo ngayon.",
-              "Magpahinga muna tayo sa paglalandian.",
-              "Palamig muna sa pambobola. Balik tayo sa realidad.",
-              "Busog na ako sa matatamis na salita para sa araw na ito.",
-              "Hawakan mo ang linyang 'yan hanggang bukas ng umaga."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

@@ -59,10 +59,6 @@
     "variants": [
       {
         "id": "accepted",
-        "text": {
-          "EN": "Okay, I'll come with you.",
-          "TL": "Sige, sasama ako sa iyo."
-        },
         "metadata": {
           "templateID": "UI_PNC_Conversation_Semantic_AuthoredFollowAccepted"
         }

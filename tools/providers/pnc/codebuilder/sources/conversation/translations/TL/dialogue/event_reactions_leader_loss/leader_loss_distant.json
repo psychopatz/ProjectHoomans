@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "leader_loss.distant",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Wala na ang pinuno. May kailangang magpasya sa susunod.",
+      "Halos hindi ko sila kilala, pero kailangan pa rin natin ng kaayusan.",
+      "Namatay ang pinuno. Tuloy ang buhay. Sino'ng mamumuno?",
+      "Biktima tulad ng iba. Pumili tayo ng bago.",
+      "Wala na sila. Kailangan pa rin natin ng pagkain at bantay.",
+      "Isa na namang pangalan ang nabura. Ayusin natin ang pamumuno.",
+      "Hindi nababago ang gawain ko. Sino na ang mag-uutos ngayon?",
+      "Pumanaw na ang lider. Pumili ng kapalit at magpatuloy.",
+      "Pangkaraniwan ang kamatayan dito. Ayusin natin ang patakaran.",
+      "Patay na sila. Ano ang praktikal na plano?"
+    ]
+  }
+}

@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I can't find a safe room or campfire nearby.",
-            "Not safe enough to camp here.",
-            "We need walls or fire before we can camp.",
-            "Too exposed. Find better shelter first.",
-            "I refuse to sleep in the open like this.",
-            "Can't camp here. It's crawling with danger.",
-            "Find a secure room before we bed down.",
-            "No cover, no heat. We can't camp here.",
-            "Invalid camping spot. We need real shelter.",
-            "We'd get killed sleeping here. Find a safer building."
-          ],
-          "TL": [
-            "Wala akong makitang ligtas na silid o apoy dito.",
-            "Hindi sapat ang ligtas ng lugar para magkampo rito.",
-            "Kailangan natin ng pader o apoy bago magkampo.",
-            "Masyadong bukas. Humanap muna ng mas maayos na silungan.",
-            "Ayokong matulog sa bukas na lugar nang ganito.",
-            "Hindi pwedeng magkampo rito. Napakaraming panganib.",
-            "Maghanap ng ligtas na kwarto bago tayo matulog.",
-            "Walang silong, walang init. Di tayo pwedeng magkampo rito.",
-            "Maling pwesto para magkampo. Kailangan natin ng tunay na silungan.",
-            "Mapapatay tayo kapag natulog dito. Humanap ng mas ligtas na bahay."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

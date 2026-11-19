@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.reaction.kill_witness_practical",
+  "locale": "EN",
+  "entries": {
+    "say.1.neutral": [
+      "Good. Check the area.",
+      "Nice kill. Scan before moving in.",
+      "Target down. Clear your corners.",
+      "Good takedown. Check for flankers.",
+      "Downed. Watch the shadows.",
+      "Solid strike. Secure the room first.",
+      "Well handled. Don't step out without scanning.",
+      "Threat cleared. Look all around.",
+      "Clean hit. Ensure the perimeter is safe.",
+      "Dropped it. Scan before continuing."
+    ],
+    "say.2.neutral": [
+      "One down. Watch for more.",
+      "Good hit. Expect stragglers.",
+      "That's one. Don't assume the area is clear.",
+      "Downed. Listen for more footsteps.",
+      "One eliminated. Watch the windows.",
+      "Threat dead. Stay alert for secondary threats.",
+      "Handled that one. Watch the hallway.",
+      "One in the dirt. Keep your guard raised.",
+      "Good takedown. More could be nearby.",
+      "Down. Keep your ears open."
+    ],
+    "say.3.neutral": [
+      "Nice. Let's make sure it's clear.",
+      "Clean drop. Verify the whole sector.",
+      "Good hit. Check behind all doors.",
+      "Target down. Confirm no further movement.",
+      "Well done. Let's sweep the rest of the room.",
+      "Threat neutralized. Methodical check next.",
+      "Solid kill. Sweep the perimeter together.",
+      "Downed cleanly. Verify our exit is open.",
+      "Handled. Make sure nothing is creeping up.",
+      "Good work. Let's make certain the coast is clear."
+    ]
+  }
+}

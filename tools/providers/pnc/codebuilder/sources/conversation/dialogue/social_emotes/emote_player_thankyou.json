@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Thanks, {addressee.name}.",
-            "I appreciate that, {addressee.name}.",
-            "You have my thanks, {addressee.name}."
-          ],
-          "TL": [
-            "Salamat, {addressee.name}.",
-            "Pinahahalagahan ko iyan, {addressee.name}.",
-            "Salamat sa iyo, {addressee.name}."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

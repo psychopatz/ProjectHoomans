@@ -1,0 +1,16 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "integration.companion_dogs.feed",
+  "locale": "EN",
+  "entries": {
+    "say.variants.female": [
+      "Here you go, good girl."
+    ],
+    "say.variants.male": [
+      "Here you go, good boy."
+    ],
+    "say.variants.unknown": [
+      "Here you go, good dog."
+    ]
+  }
+}

@@ -5,33 +5,24 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.greeting_report_fine.label",
-        "text": {
-          "EN": "Say you're doing fine",
-          "TL": "Sabihing ayos ka lang"
-        }
+        "key": "suggestion.greeting_report_fine.label"
       },
       {
-        "key": "suggestion.greeting_report_fine.utterance",
-        "text": {
-          "EN": "I'm fine, thank you.",
-          "TL": "Ayos lang ako, salamat."
-        }
+        "key": "suggestion.greeting_report_fine.utterance"
       }
     ]
   },
   "affordance": {
-    "label": {
-      "EN": "Say you're doing fine",
-      "TL": "Sabihing ayos ka lang"
-    },
     "consumers": [
       "player"
     ]
   },
   "say": {
-    "EN": "I'm fine, thank you.",
-    "TL": "Ayos lang ako, salamat."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

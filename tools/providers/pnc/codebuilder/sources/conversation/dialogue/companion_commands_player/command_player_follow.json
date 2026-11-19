@@ -9,19 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "{addressee.name}, on me.",
-            "Stay close, {addressee.name}.",
-            "{addressee.name}, let's move."
-          ],
-          "TL": [
-            "{addressee.name}, sumunod kayo sa akin.",
-            "Manatili kayong malapit, {addressee.name}.",
-            "{addressee.name}, umalis na tayo."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

@@ -9,15 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "..."
-          ],
-          "TL": [
-            "..."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

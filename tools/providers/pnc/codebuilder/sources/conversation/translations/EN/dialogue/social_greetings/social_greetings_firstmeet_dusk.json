@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greetings.firstmeet.dusk",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Stop there. Dusk makes strangers hard to read.",
+      "Not much light left. Introduce yourself.",
+      "You surprised me. What do you want?",
+      "Keep your voice down and tell me why you're here.",
+      "I can't make out your face. Come no closer."
+    ],
+    "textRows.greeting.001": "Stop there. Dusk makes strangers hard to read.",
+    "textRows.greeting.002": "Not much light left. Introduce yourself.",
+    "textRows.greeting.003": "You surprised me. What do you want?",
+    "textRows.greeting.004": "Keep your voice down and tell me why you're here.",
+    "textRows.greeting.005": "I can't make out your face. Come no closer."
+  }
+}

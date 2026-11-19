@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.horde.choice",
+  "locale": "TL",
+  "entries": {
+    "say.variants.avoid": [
+      "Umikot tayo.",
+      "Lalagpasan natin sila. Huwag mag-ingay.",
+      "Maghanap ng ibang ruta. Huwag silang akitin.",
+      "Umikot nang malayo. Manatili sa dilim.",
+      "Sayang ang bala. Umiwas na lang.",
+      "Daan tayo sa eskinita. Nang tahimik.",
+      "Lulusot tayo nang lihim. Yumuko at lumakad.",
+      "Hayaan sila roon. Daan tayo sa likod.",
+      "Iwasan ang engkwentro. Mag-ingat sa bawat hakbang.",
+      "Atras muna at dumaan sa kabilang kalsada."
+    ],
+    "say.variants.engage": [
+      "Sugurin natin.",
+      "Lalaban tayo. Itaas ang sandata.",
+      "Sugod. Ubusin silang lahat.",
+      "Tumayo at lumaban. Huwag sirain ang linya.",
+      "Itumba na natin sila rito mismo.",
+      "Tira na ngayon. Bantayan ang gilid ng isa't isa.",
+      "Lilinisin natin ang kuyog na 'to. Tara.",
+      "Hiwain sila isa-isa.",
+      "Lusubin natin sila. Pasulong.",
+      "Harapin natin ang laban."
+    ],
+    "say.variants.hold": [
+      "Hinto muna.",
+      "Diyan lang. Bantayan ang galaw nila.",
+      "Hawakan ang pwesto at hayaang lumampas sila.",
+      "Maghintay rito. Huwag gagawa ng tunog.",
+      "Tigil muna. Tignan kung saan sila papunta.",
+      "Huwag gagalaw. Huwag ilantad ang pwesto natin.",
+      "Yumuko at manatili rito.",
+      "Manatili sa kublihan sandali.",
+      "Hawakan ang linya. Hintayin ang senyas.",
+      "Maghintay at magmasid bago kumilos."
+    ]
+  }
+}

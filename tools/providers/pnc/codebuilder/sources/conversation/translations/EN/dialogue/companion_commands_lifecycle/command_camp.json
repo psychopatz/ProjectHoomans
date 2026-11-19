@@ -1,0 +1,109 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.camp",
+  "locale": "EN",
+  "entries": {
+    "reply.queued.say.1.neutral": [
+      "Okay, I'll set up camp there.",
+      "Understood. Setting up our camp now.",
+      "I'll go get the camp established.",
+      "On my way to set up camp.",
+      "Making camp in that spot. Understood.",
+      "Right. Setting up shelter over there.",
+      "I'll secure the camp site now.",
+      "Moving to establish camp as ordered.",
+      "Got it. Pitching camp.",
+      "Understood. Heading over to make camp."
+    ],
+    "reply.queued.say.1.friendly": [
+      "Sure, I'll set up camp there. Sounds cozy.",
+      "Happy to! Let's get a good fire going.",
+      "Good call, friend. I'll get our camp ready.",
+      "Leave it to me! I'll make sure it's safe and comfortable.",
+      "Great idea. I'll go set up camp for us.",
+      "Right on! Time to get off our feet. Setting up now.",
+      "Gladly. I'll have the beds laid out shortly.",
+      "Sounds wonderful. I'll get our shelter squared away.",
+      "Sure thing, partner! Camp will be ready in no time.",
+      "On it, friend! Rest easy, I'll handle camp."
+    ],
+    "reply.queued.say.1.repeated": [
+      "I'm still setting up camp there.",
+      "Already working on the camp. Give me a minute.",
+      "Still on it. Setting up takes a little time.",
+      "I'm already pitching the camp there.",
+      "Working as fast as I can on that camp.",
+      "Yeah, I heard you the first time. Still making camp.",
+      "I'm already in the middle of setting up.",
+      "Camp setup is already in progress.",
+      "Still securing the campsite. Hold tight.",
+      "Almost done with the camp. Don't rush me."
+    ],
+    "reply.queued.say.1.trusted": [
+      "All right, I'll make camp there.",
+      "I trust your eye for good ground. Setting up camp.",
+      "You picked the spot, I'll build the shelter.",
+      "Understood. I'll make sure our campsite is locked down tight.",
+      "I know you've got our safety in mind. Making camp.",
+      "Right away. We'll be secure there together.",
+      "I'll get it ready for both of us.",
+      "Trust your judgment completely. Camp is going up.",
+      "Setting up camp. We earned this rest.",
+      "Good call, partner. I'll secure the camp perimeter."
+    ],
+    "reply.queued.say.1.withdrawn": [
+      "I'll set up camp there.",
+      "Fine. Heading over to camp.",
+      "Understood. Camping.",
+      "If you say so. I'll make camp.",
+      "Going to set it up now.",
+      "All right. Pitching shelter.",
+      "I'll do it.",
+      "Making camp. Leave me to it.",
+      "Fine. Camping there.",
+      "Heard. Setting up."
+    ],
+    "affordance.label": [
+      "Set up camp"
+    ],
+    "say.variants.default": [
+      "Let's camp here."
+    ],
+    "reply.rejected.say.variants.default": [
+      "I can't set up camp there right now.",
+      "That spot is far too dangerous to sleep in.",
+      "No way. It's crawling with dead over there.",
+      "I refuse to camp in that area. Find somewhere safer.",
+      "Too exposed. We'd get ambushed in our sleep.",
+      "Can't camp there. No walls, no fire, no cover.",
+      "Not camping there. That's asking to be eaten alive.",
+      "Unable to comply. That position is totally compromised.",
+      "I won't bed down there. Pick another room.",
+      "Camping rejected. We need real security first."
+    ],
+    "reply.failed.say.variants.default": [
+      "I couldn't set up camp there.",
+      "Failed to establish camp. That spot wasn't viable.",
+      "I tried to camp there, but it didn't work out.",
+      "Couldn't secure that position for a camp.",
+      "Camp setup failed. The area is too exposed.",
+      "Unable to bed down there. Too many issues.",
+      "That campsite didn't pan out. Too dangerous.",
+      "Attempted to camp, but had to pull out.",
+      "Can't pitch camp there. Ground wasn't secure.",
+      "Camping attempt failed. Finding another spot."
+    ],
+    "reply.pending.say.variants.default": [
+      "I'll head {camp.locationPhrase} and set up camp."
+    ],
+    "reply.completed.say.variants.default": [
+      "We're set up {camp.locationPhrase}."
+    ],
+    "reply.rejected_out_of_range.say.variants.default": [
+      "That camp location is too far away right now."
+    ],
+    "reply.rejected_no_site.say.variants.default": [
+      "I don't see a safe place to camp nearby."
+    ]
+  }
+}

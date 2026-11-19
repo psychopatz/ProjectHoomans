@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Our leader is gone. We keep the group together.",
-            "The leader fell, but the colony endures.",
-            "We must maintain order. The group cannot collapse.",
-            "Our founder is dead, but our camp will survive.",
-            "Stay organized. We carry on their work.",
-            "A terrible loss, but our community must stand firm.",
-            "Don't panic. We keep rations and duties moving.",
-            "The colony needs everyone focused right now.",
-            "We built this together. We keep it standing together.",
-            "Leadership may change, but the settlement survives."
-          ],
-          "TL": [
-            "Wala na ang pinuno natin. Panatilihin nating buo ang grupo.",
-            "Bumagsak ang pinuno, pero mananatili ang kolonya.",
-            "Kailangan nating panatilihin ang kaayusan. Hindi dapat bumagsak ang grupo.",
-            "Patay na ang nagtatag sa atin, pero mabubuhay ang kampo natin.",
-            "Manatiling organisado. Ipagpatuloy natin ang nasimulan nila.",
-            "Matinding kawalan, pero kailangang tumindig ang komunidad natin.",
-            "Huwag mag-panic. Tuloy ang rasyon at mga tungkulin.",
-            "Kailangan ng kolonya ang pokus ng lahat ngayon din.",
-            "Sabay natin 'tong binuo. Sabay natin 'tong pananatilihing nakatayo.",
-            "Maaaring magbago ang pamumuno, pero mabubuhay ang paninirahan."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

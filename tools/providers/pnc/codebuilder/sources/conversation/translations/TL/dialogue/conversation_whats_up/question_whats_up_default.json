@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.whats_up.default",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Wala naman. Sinusubukan ko lang na panatilihing maayos ang lahat.",
+      "Isa na namang araw sa pagsubok na manatiling buhay at buo.",
+      "Tinatanggap ang bawat araw. May bago ba o kawili-wili?",
+      "Wala masyado. Binabantayan lang ang kapaligiran.",
+      "Nagmamasid lang kung anong mangyayari ngayong hapon.",
+      "Karaniwang araw dito, kung matatawag mong karaniwan ito.",
+      "Sinusubukang umabot sa takip-silim nang walang aberya.",
+      "Binabantayan ang pwesto. Kumusta naman sa iyo?",
+      "Tahimik sa ngayon. Biyaya na ang ganoon.",
+      "Walang masyadong balita. Umiiwas lang sa kapahamakan."
+    ],
+    "say.variants.guarded": [
+      "Walang mahalagang pag-usapan. Manatiling alerto.",
+      "Ganoon pa rin. Huwag kang magpapabaya.",
+      "Binabantayan lang ang paligid. Dapat ganoon ka rin.",
+      "Walang bago, at ang katahimikan ay kadalasang may dalang gulo.",
+      "Walang dapat ibahagi. Magpatuloy ka lang.",
+      "Nabubuhay pa ng isa pang araw. Iyon lang.",
+      "Itinatago ko ang iniisip ko sa sarili ko rito.",
+      "Tahimik sa bantay ko. Lumayo ka.",
+      "Wala naman, at gusto kong manatiling ganoon.",
+      "Walang dapat mong alalahanin."
+    ],
+    "say.variants.terse": [
+      "Kinakaya lang.",
+      "Wala naman.",
+      "Tahimik.",
+      "Gaya ng dati.",
+      "Nandito pa.",
+      "Walang bago.",
+      "Payapa.",
+      "Nabubuhay.",
+      "Kumakapit.",
+      "Dahan-dahan lang."
+    ],
+    "say.variants.warm": [
+      "Wala naman. Sinusubukan ko lang na panatilihing maayos ang lahat. Mabuti at nakita kita.",
+      "Nagpapasalamat lang sa panibagong bukang-liwayway. Masayang nandito ka.",
+      "Walang gaanong kaganapan, pero gumaganda ang araw kapag may mabubuting kasama.",
+      "Nagpapahinga lang sandali. Masaya talaga akong huminto ka para makipag-usap.",
+      "Payapa ang araw ngayon, salamat sa Diyos. Kumusta naman ang araw mo?",
+      "Walang kakaiba, pero laging nakakapagpagaan ng loob ang makita ka.",
+      "Matatag pa rin at nakangiti. Sana maayos ang lahat sa panig mo.",
+      "Nilalasap ang kapayapaan habang nariyan pa. Mabuti at nakita kita, kaibigan.",
+      "Nagbibilang ng mga biyaya. Ang magkaroon ng maaasahang kasama ang una roon.",
+      "Wala namang malaki, masaya lang akong pareho tayong nakatayo. Kumusta ka?"
+    ]
+  }
+}

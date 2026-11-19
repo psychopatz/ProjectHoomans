@@ -1,0 +1,103 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "medical.distress.repeat",
+  "locale": "TL",
+  "entries": {
+    "say.variants.bandage": [
+      "Kailangan ko pa ring mabendahan ang sugat na 'to! Bilis!",
+      "Nasaan na 'yung benda?! Dumurugo pa rin ako rito!",
+      "Huwag niyo akong kalimutan! Kailangan ko ng benda ngayon!",
+      "Naghihintay pa rin ako sa benda! Bumababad na ang dugo!",
+      "Pakiusap, bilisan ang benda! Nanghihina na ako!",
+      "Humihingi ako ng benda! May nahanap ka ba?!",
+      "Bukas pa rin ang sugat! Dalhin mo na ang pambenda!",
+      "May magbe-benda ba sa akin ngayon din?!",
+      "Nag-iipon pa rin ang dugo! Ilagay mo na ang benda sa akin!",
+      "Dumurugo pa rin ako rito! Bilisan mo ang tela!"
+    ],
+    "say.variants.bleedout": [
+      "Nauubusan pa rin ako ng dugo! Pakiusap, tulungan mo ako!",
+      "Hindi gumagana ang diin! Ayaw tumigil ng pagdurugo!",
+      "Wala na akong gaanong oras... bumubuhos ang dugo!",
+      "Bilisan mo naman! Mamamatay na ako sa pagdurugo!",
+      "Humihina na ang pulso ko... patigilin ang pagdurugo!",
+      "Nauubusan pa rin ng dugo! Huwag mo akong hayaang mamatay sa sahig!",
+      "Giniginaw na ako sa nawalang dugo... bilisan mo!",
+      "Ayaw mamuo ng dugo! Kailangan ko ng agarang tulong!",
+      "Naglalaho ang lahat... patigilin mo ang dugo, pakiusap!",
+      "Bilisan mo! Hindi ko kayang pigilin ang ugat ko nang mag-isa!"
+    ],
+    "say.variants.default": [
+      "Hindi pa ako nakakabangon. Pakiusap tulungan mo ako.",
+      "Nandito pa rin ako sa sahig! Huwag mo akong iwan!",
+      "Kailangan ko pa rin ng tulong para makatayo.",
+      "May tutulong ba sa aking tumayo? Bagsak pa rin ako.",
+      "Hindi pa rin ako makakilos! Pumunta ka rito!",
+      "Masakit pa rin, naipit pa rin. Tulungan mo ako.",
+      "Hindi pa ako nakakagalaw kahit kaunti. Kailangan ng tulong.",
+      "Pakiusap, nasa lupa pa rin ako at naghihintay.",
+      "Hindi pa rin makatayo. Huwag mong kalimutang bagsak ako.",
+      "Nandito pa rin ako! Tulungan mo na akong tumayo!"
+    ],
+    "say.variants.dehydration": [
+      "Kailangan ko pa rin ng tubig para makabawi. Parang may apoy sa lalamunan ko.",
+      "Mamamatay pa rin sa uhaw... may nahanap ka bang bote?",
+      "Tubig, pakiusap! Hindi ko na makayanan ang matinding uhaw.",
+      "Humihingi ako ng tubig... sabihin mong may dala ka.",
+      "Parang liha ang dila ko. Magdala ka ng tubig agad.",
+      "Dehydrated pa rin ako. Hindi ako makakatayo nang ganito.",
+      "Tubig... nagmamakaawa ako, kahit isang baso lang.",
+      "Tuyot pa rin ako. Pakiusap dalhan mo ako ng tubig.",
+      "Hindi ako makakabawi nang walang inumin. Tulong.",
+      "Naghihintay pa rin ng maiinom... sumasakit ang ulo ko."
+    ],
+    "say.variants.exhaustion": [
+      "Kailangan ko pa ng kaunting oras para makabawi.",
+      "Hindi pwedeng madaliin. Patay na ang lakas ng kalamnan ko.",
+      "Hinihingal pa rin ako. Bigyan mo pa ako ng isang minuto.",
+      "Ayaw pang gumalaw ng katawan ko. Kaunting pahinga pa.",
+      "Ubos pa rin ako. Huwag mo muna akong piliting tumayo.",
+      "Mabilis pa rin ang kabog ng dibdib ko. Kailangan pang umupo.",
+      "Hindi pa handang kumilos. Masyadong mabigat ang pagod.",
+      "Bigyan mo pa ako ng tatlumpung segundo... malapit na.",
+      "Sagad pa rin ang pagod. Pahingahin mo muna ang mga binti ko.",
+      "Hindi pa makakatakbo. Kailangan pa ng kaunting lakas."
+    ],
+    "say.variants.mercy": [
+      "Hinihiling ko pa rin na buhayin mo ako. Pakiusap.",
+      "Pakiusap huwag magbago ang isip mo... hayaan mo akong mabuhay.",
+      "Nagmamakaawa pa rin ako sa awa. Huwag kang bumaril.",
+      "Maawa ka pa ulit. Wala akong masamang balak sa'yo.",
+      "Wala akong laban. Pakiusap ibaba mo ang sandata mo.",
+      "Huwag mo akong tapusin. Sumusuko ako nang buo.",
+      "Nagmamakaawa pa rin para sa buhay ko. Kaawaan mo ako.",
+      "Pakiusap... gusto ko lang mabuhay.",
+      "Nasa paanan mo na ako. Huwag mo akong patayin, nagmamakaawa ako.",
+      "Huwag mo akong patayin. Hayaan mo akong gumapang palayo."
+    ],
+    "say.variants.rescue": [
+      "Nandito pa rin ako sa sahig! Huwag niyo akong iwan!",
+      "Huwag niyo akong iwanan! Bumalik kayo at hilahin ako palabas!",
+      "Naipit pa rin sa pwestong 'to! Kailangan ko ng tao rito!",
+      "Saan ka pupunta?! Hindi ako makalakad!",
+      "Pakiusap bumalik ka! Nastranded ako nang buo!",
+      "Huwag mong talikuran ang tawag ko! Tulungan mo ako!",
+      "Naipit pa rin sa bigat na 'to! Buhatin mo 'to!",
+      "Nandito pa rin ako! Ilabas mo ako bago nila ako makita!",
+      "Saklolohan mo ako! Hindi ko kayang kaladkarin ang sarili ko!",
+      "Huwag mo akong iwang mabulok dito! Bumalik ka!"
+    ],
+    "say.variants.starvation": [
+      "Kailangan ko pa rin ng makakain. Mabilis akong nanghihina.",
+      "Gutom na gutom pa rin... kahit anong de-lata, kahit ano?",
+      "Hindi makakabawi nang walang laman ang tiyan. Magdala ka ng pagkain.",
+      "Ayaw tumigil ng sakit ng tiyan ko. Kailangan ko ng pagkain.",
+      "Gutom na gutom pa rin hanggang buto. May nahanap ka bang rasyon?",
+      "Pakiusap bilisan ang pagkain. Nahihilo na ako para makatayo.",
+      "Hindi na makayanan ang gutom. Tulungan mo ako.",
+      "Wala pa ring kinakain. Huwag mo akong hayaang magutom sa sahig.",
+      "Kailangan ko ng makakain para makatayo ulit.",
+      "Walang laman pa rin... kahit biskwit o kaunting beans lang."
+    ]
+  }
+}

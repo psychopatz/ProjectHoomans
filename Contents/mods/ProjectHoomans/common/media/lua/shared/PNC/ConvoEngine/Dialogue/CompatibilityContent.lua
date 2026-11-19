@@ -20,56 +20,24 @@ return {
                                 ["id"] = "colonist",
                                 ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.colonist",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Bandit fire! Pull back and cover the wounded colonist.",
-                                    },
-                                    ["TL"] = {
-                                        "Bandit fire! Pull back and cover the wounded colonist.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Bandit fire! Stay with the wounded survivor and watch the flank.",
                                 ["id"] = "default",
                                 ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Bandit fire! Stay with the wounded survivor and watch the flank.",
-                                    },
-                                    ["TL"] = {
-                                        "Bandit fire! Stay with the wounded survivor and watch the flank.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Bandit fire! Stay together and cover the wounded family member.",
                                 ["id"] = "family",
                                 ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.family",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Bandit fire! Stay together and cover the wounded family member.",
-                                    },
-                                    ["TL"] = {
-                                        "Bandit fire! Stay together and cover the wounded family member.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Bandit fire. Stay close; I have got you.",
                                 ["id"] = "lover",
                                 ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.lover",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Bandit fire. Stay close; I have got you.",
-                                    },
-                                    ["TL"] = {
-                                        "Bandit fire. Stay close; I have got you.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -91,14 +59,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.colonist",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Bandit fire! Pull back and cover the wounded colonist.",
-                        },
-                        ["TL"] = {
-                            "Bandit fire! Pull back and cover the wounded colonist.",
-                        },
-                    },
                     ["variantID"] = "colonist",
                 },
                 {
@@ -106,14 +66,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Bandit fire! Stay with the wounded survivor and watch the flank.",
-                        },
-                        ["TL"] = {
-                            "Bandit fire! Stay with the wounded survivor and watch the flank.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -121,14 +73,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.family",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Bandit fire! Stay together and cover the wounded family member.",
-                        },
-                        ["TL"] = {
-                            "Bandit fire! Stay together and cover the wounded family member.",
-                        },
-                    },
                     ["variantID"] = "family",
                 },
                 {
@@ -136,14 +80,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.lover",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Bandit fire. Stay close; I have got you.",
-                        },
-                        ["TL"] = {
-                            "Bandit fire. Stay close; I have got you.",
-                        },
-                    },
                     ["variantID"] = "lover",
                 },
             },
@@ -192,48 +128,20 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Bandit fire! Pull back and cover the wounded colonist.",
                                 ["id"] = "colonist",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Bandit fire! Pull back and cover the wounded colonist.",
-                                    },
-                                    ["TL"] = {
-                                        "Bandit fire! Pull back and cover the wounded colonist.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Bandit fire! Stay with the wounded survivor and watch the flank.",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Bandit fire! Stay with the wounded survivor and watch the flank.",
-                                    },
-                                    ["TL"] = {
-                                        "Bandit fire! Stay with the wounded survivor and watch the flank.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Bandit fire! Stay together and cover the wounded family member.",
                                 ["id"] = "family",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Bandit fire! Stay together and cover the wounded family member.",
-                                    },
-                                    ["TL"] = {
-                                        "Bandit fire! Stay together and cover the wounded family member.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Bandit fire. Stay close; I have got you.",
                                 ["id"] = "lover",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Bandit fire. Stay close; I have got you.",
-                                    },
-                                    ["TL"] = {
-                                        "Bandit fire. Stay close; I have got you.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -316,14 +224,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.colonist",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Bandit fire! Pull back and cover the wounded colonist.",
-                    },
-                    ["TL"] = {
-                        "Bandit fire! Pull back and cover the wounded colonist.",
-                    },
-                },
                 ["variantID"] = "colonist",
             },
             {
@@ -331,14 +231,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Bandit fire! Stay with the wounded survivor and watch the flank.",
-                    },
-                    ["TL"] = {
-                        "Bandit fire! Stay with the wounded survivor and watch the flank.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -346,14 +238,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.family",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Bandit fire! Stay together and cover the wounded family member.",
-                    },
-                    ["TL"] = {
-                        "Bandit fire! Stay together and cover the wounded family member.",
-                    },
-                },
                 ["variantID"] = "family",
             },
             {
@@ -361,14 +245,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.bandits.hooman_hurt.say.1.lover",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Bandit fire. Stay close; I have got you.",
-                    },
-                    ["TL"] = {
-                        "Bandit fire. Stay close; I have got you.",
-                    },
-                },
                 ["variantID"] = "lover",
             },
         },
@@ -394,42 +270,18 @@ return {
                                 ["id"] = "female",
                                 ["templateID"] = "convo.integration.companion_dogs.feed.say.1.female",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Here you go, good girl.",
-                                    },
-                                    ["TL"] = {
-                                        "Here you go, good girl.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Here you go, good boy.",
                                 ["id"] = "male",
                                 ["templateID"] = "convo.integration.companion_dogs.feed.say.1.male",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Here you go, good boy.",
-                                    },
-                                    ["TL"] = {
-                                        "Here you go, good boy.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Here you go, good dog.",
                                 ["id"] = "unknown",
                                 ["templateID"] = "convo.integration.companion_dogs.feed.say.1.unknown",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Here you go, good dog.",
-                                    },
-                                    ["TL"] = {
-                                        "Here you go, good dog.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -451,14 +303,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.companion_dogs.feed.say.1.female",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Here you go, good girl.",
-                        },
-                        ["TL"] = {
-                            "Here you go, good girl.",
-                        },
-                    },
                     ["variantID"] = "female",
                 },
                 {
@@ -466,14 +310,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.companion_dogs.feed.say.1.male",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Here you go, good boy.",
-                        },
-                        ["TL"] = {
-                            "Here you go, good boy.",
-                        },
-                    },
                     ["variantID"] = "male",
                 },
                 {
@@ -481,14 +317,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.companion_dogs.feed.say.1.unknown",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Here you go, good dog.",
-                        },
-                        ["TL"] = {
-                            "Here you go, good dog.",
-                        },
-                    },
                     ["variantID"] = "unknown",
                 },
             },
@@ -537,37 +365,16 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Here you go, good girl.",
                                 ["id"] = "female",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Here you go, good girl.",
-                                    },
-                                    ["TL"] = {
-                                        "Here you go, good girl.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Here you go, good boy.",
                                 ["id"] = "male",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Here you go, good boy.",
-                                    },
-                                    ["TL"] = {
-                                        "Here you go, good boy.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Here you go, good dog.",
                                 ["id"] = "unknown",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Here you go, good dog.",
-                                    },
-                                    ["TL"] = {
-                                        "Here you go, good dog.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -650,14 +457,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.companion_dogs.feed.say.1.female",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Here you go, good girl.",
-                    },
-                    ["TL"] = {
-                        "Here you go, good girl.",
-                    },
-                },
                 ["variantID"] = "female",
             },
             {
@@ -665,14 +464,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.companion_dogs.feed.say.1.male",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Here you go, good boy.",
-                    },
-                    ["TL"] = {
-                        "Here you go, good boy.",
-                    },
-                },
                 ["variantID"] = "male",
             },
             {
@@ -680,14 +471,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.companion_dogs.feed.say.1.unknown",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Here you go, good dog.",
-                    },
-                    ["TL"] = {
-                        "Here you go, good dog.",
-                    },
-                },
                 ["variantID"] = "unknown",
             },
         },
@@ -713,42 +496,18 @@ return {
                                 ["id"] = "female",
                                 ["templateID"] = "convo.integration.companion_dogs.greeting.say.1.female",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Who is a good girl?",
-                                    },
-                                    ["TL"] = {
-                                        "Who is a good girl?",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Who is a good boy?",
                                 ["id"] = "male",
                                 ["templateID"] = "convo.integration.companion_dogs.greeting.say.1.male",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Who is a good boy?",
-                                    },
-                                    ["TL"] = {
-                                        "Who is a good boy?",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Who is a good dog?",
                                 ["id"] = "unknown",
                                 ["templateID"] = "convo.integration.companion_dogs.greeting.say.1.unknown",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Who is a good dog?",
-                                    },
-                                    ["TL"] = {
-                                        "Who is a good dog?",
-                                    },
-                                },
                             },
                         },
                     },
@@ -770,14 +529,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.companion_dogs.greeting.say.1.female",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Who is a good girl?",
-                        },
-                        ["TL"] = {
-                            "Who is a good girl?",
-                        },
-                    },
                     ["variantID"] = "female",
                 },
                 {
@@ -785,14 +536,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.companion_dogs.greeting.say.1.male",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Who is a good boy?",
-                        },
-                        ["TL"] = {
-                            "Who is a good boy?",
-                        },
-                    },
                     ["variantID"] = "male",
                 },
                 {
@@ -800,14 +543,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.companion_dogs.greeting.say.1.unknown",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Who is a good dog?",
-                        },
-                        ["TL"] = {
-                            "Who is a good dog?",
-                        },
-                    },
                     ["variantID"] = "unknown",
                 },
             },
@@ -856,37 +591,16 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Who is a good girl?",
                                 ["id"] = "female",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Who is a good girl?",
-                                    },
-                                    ["TL"] = {
-                                        "Who is a good girl?",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Who is a good boy?",
                                 ["id"] = "male",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Who is a good boy?",
-                                    },
-                                    ["TL"] = {
-                                        "Who is a good boy?",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Who is a good dog?",
                                 ["id"] = "unknown",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Who is a good dog?",
-                                    },
-                                    ["TL"] = {
-                                        "Who is a good dog?",
-                                    },
-                                },
                             },
                         },
                     },
@@ -969,14 +683,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.companion_dogs.greeting.say.1.female",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Who is a good girl?",
-                    },
-                    ["TL"] = {
-                        "Who is a good girl?",
-                    },
-                },
                 ["variantID"] = "female",
             },
             {
@@ -984,14 +690,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.companion_dogs.greeting.say.1.male",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Who is a good boy?",
-                    },
-                    ["TL"] = {
-                        "Who is a good boy?",
-                    },
-                },
                 ["variantID"] = "male",
             },
             {
@@ -999,14 +697,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.companion_dogs.greeting.say.1.unknown",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Who is a good dog?",
-                    },
-                    ["TL"] = {
-                        "Who is a good dog?",
-                    },
-                },
                 ["variantID"] = "unknown",
             },
         },
@@ -1032,42 +722,18 @@ return {
                                 ["id"] = "colonist",
                                 ["templateID"] = "convo.integration.necroa.mask_warning.say.1.colonist",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Mask up. We keep the camp safe together.",
-                                    },
-                                    ["TL"] = {
-                                        "Mask up. We keep the camp safe together.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Put your mask back on. Knox is airborne.",
                                 ["id"] = "default",
                                 ["templateID"] = "convo.integration.necroa.mask_warning.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Put your mask back on. Knox is airborne.",
-                                    },
-                                    ["TL"] = {
-                                        "Put your mask back on. Knox is airborne.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Put your mask on, family. I am not losing you to the air.",
                                 ["id"] = "family",
                                 ["templateID"] = "convo.integration.necroa.mask_warning.say.1.family",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Put your mask on, family. I am not losing you to the air.",
-                                    },
-                                    ["TL"] = {
-                                        "Put your mask on, family. I am not losing you to the air.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1089,14 +755,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.necroa.mask_warning.say.1.colonist",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Mask up. We keep the camp safe together.",
-                        },
-                        ["TL"] = {
-                            "Mask up. We keep the camp safe together.",
-                        },
-                    },
                     ["variantID"] = "colonist",
                 },
                 {
@@ -1104,14 +762,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.necroa.mask_warning.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Put your mask back on. Knox is airborne.",
-                        },
-                        ["TL"] = {
-                            "Put your mask back on. Knox is airborne.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -1119,14 +769,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.necroa.mask_warning.say.1.family",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Put your mask on, family. I am not losing you to the air.",
-                        },
-                        ["TL"] = {
-                            "Put your mask on, family. I am not losing you to the air.",
-                        },
-                    },
                     ["variantID"] = "family",
                 },
             },
@@ -1175,37 +817,16 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Mask up. We keep the camp safe together.",
                                 ["id"] = "colonist",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Mask up. We keep the camp safe together.",
-                                    },
-                                    ["TL"] = {
-                                        "Mask up. We keep the camp safe together.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Put your mask back on. Knox is airborne.",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Put your mask back on. Knox is airborne.",
-                                    },
-                                    ["TL"] = {
-                                        "Put your mask back on. Knox is airborne.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Put your mask on, family. I am not losing you to the air.",
                                 ["id"] = "family",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Put your mask on, family. I am not losing you to the air.",
-                                    },
-                                    ["TL"] = {
-                                        "Put your mask on, family. I am not losing you to the air.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1280,14 +901,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.necroa.mask_warning.say.1.colonist",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Mask up. We keep the camp safe together.",
-                    },
-                    ["TL"] = {
-                        "Mask up. We keep the camp safe together.",
-                    },
-                },
                 ["variantID"] = "colonist",
             },
             {
@@ -1295,14 +908,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.necroa.mask_warning.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Put your mask back on. Knox is airborne.",
-                    },
-                    ["TL"] = {
-                        "Put your mask back on. Knox is airborne.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -1310,14 +915,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.necroa.mask_warning.say.1.family",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Put your mask on, family. I am not losing you to the air.",
-                    },
-                    ["TL"] = {
-                        "Put your mask on, family. I am not losing you to the air.",
-                    },
-                },
                 ["variantID"] = "family",
             },
         },
@@ -1343,42 +940,18 @@ return {
                                 ["id"] = "default",
                                 ["templateID"] = "convo.integration.necroa.player_mask_removed.say.1.default",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Put your mask back on. The air is not safe.",
-                                    },
-                                    ["TL"] = {
-                                        "Put your mask back on. The air is not safe.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Put your mask back on before you become a problem.",
                                 ["id"] = "hostile",
                                 ["templateID"] = "convo.integration.necroa.player_mask_removed.say.1.hostile",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Put your mask back on before you become a problem.",
-                                    },
-                                    ["TL"] = {
-                                        "Put your mask back on before you become a problem.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Please put your mask back on, love. This air is not safe.",
                                 ["id"] = "lover",
                                 ["templateID"] = "convo.integration.necroa.player_mask_removed.say.1.lover",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Please put your mask back on, love. This air is not safe.",
-                                    },
-                                    ["TL"] = {
-                                        "Please put your mask back on, love. This air is not safe.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1400,14 +973,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.necroa.player_mask_removed.say.1.default",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Put your mask back on. The air is not safe.",
-                        },
-                        ["TL"] = {
-                            "Put your mask back on. The air is not safe.",
-                        },
-                    },
                     ["variantID"] = "default",
                 },
                 {
@@ -1415,14 +980,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.necroa.player_mask_removed.say.1.hostile",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Put your mask back on before you become a problem.",
-                        },
-                        ["TL"] = {
-                            "Put your mask back on before you become a problem.",
-                        },
-                    },
                     ["variantID"] = "hostile",
                 },
                 {
@@ -1430,14 +987,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.necroa.player_mask_removed.say.1.lover",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Please put your mask back on, love. This air is not safe.",
-                        },
-                        ["TL"] = {
-                            "Please put your mask back on, love. This air is not safe.",
-                        },
-                    },
                     ["variantID"] = "lover",
                 },
             },
@@ -1486,37 +1035,16 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Put your mask back on. The air is not safe.",
                                 ["id"] = "default",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Put your mask back on. The air is not safe.",
-                                    },
-                                    ["TL"] = {
-                                        "Put your mask back on. The air is not safe.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Put your mask back on before you become a problem.",
                                 ["id"] = "hostile",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Put your mask back on before you become a problem.",
-                                    },
-                                    ["TL"] = {
-                                        "Put your mask back on before you become a problem.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Please put your mask back on, love. This air is not safe.",
                                 ["id"] = "lover",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Please put your mask back on, love. This air is not safe.",
-                                    },
-                                    ["TL"] = {
-                                        "Please put your mask back on, love. This air is not safe.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1591,14 +1119,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.necroa.player_mask_removed.say.1.default",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Put your mask back on. The air is not safe.",
-                    },
-                    ["TL"] = {
-                        "Put your mask back on. The air is not safe.",
-                    },
-                },
                 ["variantID"] = "default",
             },
             {
@@ -1606,14 +1126,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.necroa.player_mask_removed.say.1.hostile",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Put your mask back on before you become a problem.",
-                    },
-                    ["TL"] = {
-                        "Put your mask back on before you become a problem.",
-                    },
-                },
                 ["variantID"] = "hostile",
             },
             {
@@ -1621,14 +1133,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.necroa.player_mask_removed.say.1.lover",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Please put your mask back on, love. This air is not safe.",
-                    },
-                    ["TL"] = {
-                        "Please put your mask back on, love. This air is not safe.",
-                    },
-                },
                 ["variantID"] = "lover",
             },
         },
@@ -1654,42 +1158,18 @@ return {
                                 ["id"] = "friendly",
                                 ["templateID"] = "convo.integration.projectalife.encounter.say.1.friendly",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Those survivors seem friendly. Keep your hands visible.",
-                                    },
-                                    ["TL"] = {
-                                        "Those survivors seem friendly. Keep your hands visible.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "That group looks hostile. Keep cover between us and them.",
                                 ["id"] = "hostile",
                                 ["templateID"] = "convo.integration.projectalife.encounter.say.1.hostile",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "That group looks hostile. Keep cover between us and them.",
-                                    },
-                                    ["TL"] = {
-                                        "That group looks hostile. Keep cover between us and them.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Someone is out there. Let us watch before we approach.",
                                 ["id"] = "unknown",
                                 ["templateID"] = "convo.integration.projectalife.encounter.say.1.unknown",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Someone is out there. Let us watch before we approach.",
-                                    },
-                                    ["TL"] = {
-                                        "Someone is out there. Let us watch before we approach.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1703,14 +1183,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.projectalife.encounter.say.1.friendly",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Those survivors seem friendly. Keep your hands visible.",
-                        },
-                        ["TL"] = {
-                            "Those survivors seem friendly. Keep your hands visible.",
-                        },
-                    },
                     ["variantID"] = "friendly",
                 },
                 {
@@ -1718,14 +1190,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.projectalife.encounter.say.1.hostile",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "That group looks hostile. Keep cover between us and them.",
-                        },
-                        ["TL"] = {
-                            "That group looks hostile. Keep cover between us and them.",
-                        },
-                    },
                     ["variantID"] = "hostile",
                 },
                 {
@@ -1733,14 +1197,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.projectalife.encounter.say.1.unknown",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Someone is out there. Let us watch before we approach.",
-                        },
-                        ["TL"] = {
-                            "Someone is out there. Let us watch before we approach.",
-                        },
-                    },
                     ["variantID"] = "unknown",
                 },
             },
@@ -1789,37 +1245,16 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Those survivors seem friendly. Keep your hands visible.",
                                 ["id"] = "friendly",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Those survivors seem friendly. Keep your hands visible.",
-                                    },
-                                    ["TL"] = {
-                                        "Those survivors seem friendly. Keep your hands visible.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "That group looks hostile. Keep cover between us and them.",
                                 ["id"] = "hostile",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "That group looks hostile. Keep cover between us and them.",
-                                    },
-                                    ["TL"] = {
-                                        "That group looks hostile. Keep cover between us and them.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Someone is out there. Let us watch before we approach.",
                                 ["id"] = "unknown",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Someone is out there. Let us watch before we approach.",
-                                    },
-                                    ["TL"] = {
-                                        "Someone is out there. Let us watch before we approach.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -1888,14 +1323,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.projectalife.encounter.say.1.friendly",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Those survivors seem friendly. Keep your hands visible.",
-                    },
-                    ["TL"] = {
-                        "Those survivors seem friendly. Keep your hands visible.",
-                    },
-                },
                 ["variantID"] = "friendly",
             },
             {
@@ -1903,14 +1330,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.projectalife.encounter.say.1.hostile",
-                ["translations"] = {
-                    ["EN"] = {
-                        "That group looks hostile. Keep cover between us and them.",
-                    },
-                    ["TL"] = {
-                        "That group looks hostile. Keep cover between us and them.",
-                    },
-                },
                 ["variantID"] = "hostile",
             },
             {
@@ -1918,14 +1337,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.projectalife.encounter.say.1.unknown",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Someone is out there. Let us watch before we approach.",
-                    },
-                    ["TL"] = {
-                        "Someone is out there. Let us watch before we approach.",
-                    },
-                },
                 ["variantID"] = "unknown",
             },
         },
@@ -1951,42 +1362,18 @@ return {
                                 ["id"] = "hostile",
                                 ["templateID"] = "convo.integration.projectalife.faction.say.1.hostile",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "That faction may be hostile toward us now. Stay alert.",
-                                    },
-                                    ["TL"] = {
-                                        "That faction may be hostile toward us now. Stay alert.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "They just opened fire on us. Stay close.",
                                 ["id"] = "incoming",
                                 ["templateID"] = "convo.integration.projectalife.faction.say.1.incoming",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "They just opened fire on us. Stay close.",
-                                    },
-                                    ["TL"] = {
-                                        "They just opened fire on us. Stay close.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "We hit them. They may retaliate soon.",
                                 ["id"] = "outgoing",
                                 ["templateID"] = "convo.integration.projectalife.faction.say.1.outgoing",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "We hit them. They may retaliate soon.",
-                                    },
-                                    ["TL"] = {
-                                        "We hit them. They may retaliate soon.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2000,14 +1387,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.projectalife.faction.say.1.hostile",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "That faction may be hostile toward us now. Stay alert.",
-                        },
-                        ["TL"] = {
-                            "That faction may be hostile toward us now. Stay alert.",
-                        },
-                    },
                     ["variantID"] = "hostile",
                 },
                 {
@@ -2015,14 +1394,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.projectalife.faction.say.1.incoming",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "They just opened fire on us. Stay close.",
-                        },
-                        ["TL"] = {
-                            "They just opened fire on us. Stay close.",
-                        },
-                    },
                     ["variantID"] = "incoming",
                 },
                 {
@@ -2030,14 +1401,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.projectalife.faction.say.1.outgoing",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "We hit them. They may retaliate soon.",
-                        },
-                        ["TL"] = {
-                            "We hit them. They may retaliate soon.",
-                        },
-                    },
                     ["variantID"] = "outgoing",
                 },
             },
@@ -2086,37 +1449,16 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "That faction may be hostile toward us now. Stay alert.",
                                 ["id"] = "hostile",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "That faction may be hostile toward us now. Stay alert.",
-                                    },
-                                    ["TL"] = {
-                                        "That faction may be hostile toward us now. Stay alert.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "They just opened fire on us. Stay close.",
                                 ["id"] = "incoming",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "They just opened fire on us. Stay close.",
-                                    },
-                                    ["TL"] = {
-                                        "They just opened fire on us. Stay close.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "We hit them. They may retaliate soon.",
                                 ["id"] = "outgoing",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "We hit them. They may retaliate soon.",
-                                    },
-                                    ["TL"] = {
-                                        "We hit them. They may retaliate soon.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2185,14 +1527,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.projectalife.faction.say.1.hostile",
-                ["translations"] = {
-                    ["EN"] = {
-                        "That faction may be hostile toward us now. Stay alert.",
-                    },
-                    ["TL"] = {
-                        "That faction may be hostile toward us now. Stay alert.",
-                    },
-                },
                 ["variantID"] = "hostile",
             },
             {
@@ -2200,14 +1534,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.projectalife.faction.say.1.incoming",
-                ["translations"] = {
-                    ["EN"] = {
-                        "They just opened fire on us. Stay close.",
-                    },
-                    ["TL"] = {
-                        "They just opened fire on us. Stay close.",
-                    },
-                },
                 ["variantID"] = "incoming",
             },
             {
@@ -2215,14 +1541,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.projectalife.faction.say.1.outgoing",
-                ["translations"] = {
-                    ["EN"] = {
-                        "We hit them. They may retaliate soon.",
-                    },
-                    ["TL"] = {
-                        "We hit them. They may retaliate soon.",
-                    },
-                },
                 ["variantID"] = "outgoing",
             },
         },
@@ -2248,70 +1566,30 @@ return {
                                 ["id"] = "aircraft.heli",
                                 ["templateID"] = "convo.integration.projectalife.meta.say.1.aircraft.heli",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Something is flying over us. Keep listening.",
-                                    },
-                                    ["TL"] = {
-                                        "Something is flying over us. Keep listening.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "That aircraft sounds close. Stay sharp.",
                                 ["id"] = "aircraft.military",
                                 ["templateID"] = "convo.integration.projectalife.meta.say.1.aircraft.military",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "That aircraft sounds close. Stay sharp.",
-                                    },
-                                    ["TL"] = {
-                                        "That aircraft sounds close. Stay sharp.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "I do not like that sound. Stay close.",
                                 ["id"] = "ambience",
                                 ["templateID"] = "convo.integration.projectalife.meta.say.1.ambience",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I do not like that sound. Stay close.",
-                                    },
-                                    ["TL"] = {
-                                        "I do not like that sound. Stay close.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "That crash sounded close. Keep your eyes open.",
                                 ["id"] = "crash",
                                 ["templateID"] = "convo.integration.projectalife.meta.say.1.crash",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "That crash sounded close. Keep your eyes open.",
-                                    },
-                                    ["TL"] = {
-                                        "That crash sounded close. Keep your eyes open.",
-                                    },
-                                },
                             },
                             {
                                 ["fallback"] = "Someone is shooting nearby. Keep your head down.",
                                 ["id"] = "gunfire",
                                 ["templateID"] = "convo.integration.projectalife.meta.say.1.gunfire",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "Someone is shooting nearby. Keep your head down.",
-                                    },
-                                    ["TL"] = {
-                                        "Someone is shooting nearby. Keep your head down.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2325,14 +1603,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.projectalife.meta.say.1.aircraft.heli",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Something is flying over us. Keep listening.",
-                        },
-                        ["TL"] = {
-                            "Something is flying over us. Keep listening.",
-                        },
-                    },
                     ["variantID"] = "aircraft.heli",
                 },
                 {
@@ -2340,14 +1610,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.projectalife.meta.say.1.aircraft.military",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "That aircraft sounds close. Stay sharp.",
-                        },
-                        ["TL"] = {
-                            "That aircraft sounds close. Stay sharp.",
-                        },
-                    },
                     ["variantID"] = "aircraft.military",
                 },
                 {
@@ -2355,14 +1617,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.projectalife.meta.say.1.ambience",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I do not like that sound. Stay close.",
-                        },
-                        ["TL"] = {
-                            "I do not like that sound. Stay close.",
-                        },
-                    },
                     ["variantID"] = "ambience",
                 },
                 {
@@ -2370,14 +1624,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.projectalife.meta.say.1.crash",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "That crash sounded close. Keep your eyes open.",
-                        },
-                        ["TL"] = {
-                            "That crash sounded close. Keep your eyes open.",
-                        },
-                    },
                     ["variantID"] = "crash",
                 },
                 {
@@ -2385,14 +1631,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.integration.projectalife.meta.say.1.gunfire",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "Someone is shooting nearby. Keep your head down.",
-                        },
-                        ["TL"] = {
-                            "Someone is shooting nearby. Keep your head down.",
-                        },
-                    },
                     ["variantID"] = "gunfire",
                 },
             },
@@ -2441,59 +1679,24 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "Something is flying over us. Keep listening.",
                                 ["id"] = "aircraft.heli",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Something is flying over us. Keep listening.",
-                                    },
-                                    ["TL"] = {
-                                        "Something is flying over us. Keep listening.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "That aircraft sounds close. Stay sharp.",
                                 ["id"] = "aircraft.military",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "That aircraft sounds close. Stay sharp.",
-                                    },
-                                    ["TL"] = {
-                                        "That aircraft sounds close. Stay sharp.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "I do not like that sound. Stay close.",
                                 ["id"] = "ambience",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I do not like that sound. Stay close.",
-                                    },
-                                    ["TL"] = {
-                                        "I do not like that sound. Stay close.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "That crash sounded close. Keep your eyes open.",
                                 ["id"] = "crash",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "That crash sounded close. Keep your eyes open.",
-                                    },
-                                    ["TL"] = {
-                                        "That crash sounded close. Keep your eyes open.",
-                                    },
-                                },
                             },
                             {
+                                ["fallback"] = "Someone is shooting nearby. Keep your head down.",
                                 ["id"] = "gunfire",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "Someone is shooting nearby. Keep your head down.",
-                                    },
-                                    ["TL"] = {
-                                        "Someone is shooting nearby. Keep your head down.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -2562,14 +1765,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.projectalife.meta.say.1.aircraft.heli",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Something is flying over us. Keep listening.",
-                    },
-                    ["TL"] = {
-                        "Something is flying over us. Keep listening.",
-                    },
-                },
                 ["variantID"] = "aircraft.heli",
             },
             {
@@ -2577,14 +1772,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.projectalife.meta.say.1.aircraft.military",
-                ["translations"] = {
-                    ["EN"] = {
-                        "That aircraft sounds close. Stay sharp.",
-                    },
-                    ["TL"] = {
-                        "That aircraft sounds close. Stay sharp.",
-                    },
-                },
                 ["variantID"] = "aircraft.military",
             },
             {
@@ -2592,14 +1779,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.projectalife.meta.say.1.ambience",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I do not like that sound. Stay close.",
-                    },
-                    ["TL"] = {
-                        "I do not like that sound. Stay close.",
-                    },
-                },
                 ["variantID"] = "ambience",
             },
             {
@@ -2607,14 +1786,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.projectalife.meta.say.1.crash",
-                ["translations"] = {
-                    ["EN"] = {
-                        "That crash sounded close. Keep your eyes open.",
-                    },
-                    ["TL"] = {
-                        "That crash sounded close. Keep your eyes open.",
-                    },
-                },
                 ["variantID"] = "crash",
             },
             {
@@ -2622,14 +1793,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.integration.projectalife.meta.say.1.gunfire",
-                ["translations"] = {
-                    ["EN"] = {
-                        "Someone is shooting nearby. Keep your head down.",
-                    },
-                    ["TL"] = {
-                        "Someone is shooting nearby. Keep your head down.",
-                    },
-                },
                 ["variantID"] = "gunfire",
             },
         },

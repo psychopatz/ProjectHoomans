@@ -1,0 +1,103 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "medical.distress.call",
+  "locale": "TL",
+  "entries": {
+    "say.variants.bandage": [
+      "Sugatan ako at nakahandusay! Kailangan ko ng benda rito!",
+      "Malalim ang sugat... kailangan ko ng benda ngayon din!",
+      "Hindi ko mapatigil ang sugat nang mag-isa! Magdala ka ng benda!",
+      "Bendahan mo ako, pakiusap! Nauubusan ako ng dugo!",
+      "Bagsak ako! May malinis ba kayong basahan o benda?!",
+      "May hiwa sa binti ko... kailangang balutin ngayon din!",
+      "Tulong! Kailangang gamutin ang mga sugat na 'to!",
+      "Nasa sahig ako, dumurugo! Dalhan mo ako ng benda rito!",
+      "Kailangan ng panapal agad! Hindi ako makatayo!",
+      "Benda, bilis! Hindi ako makakabangon kung wala 'yan!"
+    ],
+    "say.variants.bleedout": [
+      "Nauubusan ako ng dugo! Kailangan ko ng benda ngayon din!",
+      "Nalalagutan ako ng hininga! Ayaw tumigil ng agos ng dugo!",
+      "Masyadong maraming dugo ang nawawala... nilalamig na ako!",
+      "Tinamaan ang ugat! Diinan mo 'to ngayon din!",
+      "Dumidilim ang paningin ko... patigilin mo ang dugo, pakiusap!",
+      "Bumabaon ang dugo sa damit ko! Tulungan mo ako!",
+      "Nagkalat ang dugo... pakiusap, ayaw kong mamatay rito!",
+      "Nawawalan ako ng malay... tapalan mo ang sugat na 'to!",
+      "Bilis! Nauubusan ako ng dugo sa lupa!",
+      "Hindi ko na maramdaman ang daliri ko... patigilin ang dugo!"
+    ],
+    "say.variants.default": [
+      "Bagsak ako! Kailangan ko ng tulong dito!",
+      "Hindi ako makatayo! Tulungan niyo akong makatayo!",
+      "Tinamaan ako! Halika rito!",
+      "Kailangan ko ng agarang panggagamot!",
+      "Bagsak at walang laban! Huwag niyo akong iwan!",
+      "Napasama ang bagsak ko! Tulungan mo ako!",
+      "Hindi ako makabangon! Tulong!",
+      "Malubha ang tama ko! Dito, pakiusap!",
+      "Nasa sahig ako! Pasaklolo naman!",
+      "Sugatan at nastranded! Tulungan niyo ako!"
+    ],
+    "say.variants.dehydration": [
+      "Uhaw na uhaw na ako... kailangan ko ng tubig bago ako mahimatay.",
+      "Tuyong-tuyo na ang lalamunan ko... pakiusap, may tubig ba?",
+      "Nanghihina sa uhaw... halos hindi makalunok. Tubig, pakiusap.",
+      "Masyado akong dehydrated para maigalaw ang binti ko. Tubig...",
+      "Pahingi ng kahit kaunting tubig... mamamatay na ako sa uhaw.",
+      "Nangangapal at nagdurugo ang labi ko... kailangan ng malinis na tubig.",
+      "Hindi na makalakad... pakiusap dalhan mo ako ng tubig.",
+      "Pumipintig ang ulo ko sa uhaw... kailangang uminom.",
+      "Bumabagsak na ako... kahit ilang patak lang ng tubig.",
+      "Tubig... pakiusap, bigyan niyo ako ng tubig."
+    ],
+    "say.variants.exhaustion": [
+      "Nasobrahan ako. Hindi ko na maitaas ang mga braso ko.",
+      "Ubos na ubos na ang lakas ko... bigyan mo ako ng saglit para makabawi.",
+      "Bumigay ang mga binti ko. Kailangan kong umupo.",
+      "Hindi na makakahakbang pa. Sagad na pagod na.",
+      "Masakit huminga. Kailangan ko ng pahinga ngayon din.",
+      "Bumagsak sa matinding pagod... bigyan mo ako ng limang minuto.",
+      "Naninigas na ang kalamnan ko. Hindi makatayo.",
+      "Wala nang natitirang lakas. Kailangan ng pahinga.",
+      "Umiikot ang paningin ko sa pagod. Bigyan mo ako ng oras.",
+      "Ayaw nang gumalaw ng katawan ko... pahingahin mo muna ako."
+    ],
+    "say.variants.mercy": [
+      "Bagsak na ako! Pakiusap, huwag mo akong patayin!",
+      "Maawa ka, pakiusap! Wala akong sandata!",
+      "Huwag kang puputok! Talo na ako!",
+      "Pakiusap buhayin mo ako! Sumusuko na ako!",
+      "Patawarin mo ako, pakiusap! Wala nang natira sa akin!",
+      "Nagmamakaawa ako sa'yo... huwag mo akong tapusin!",
+      "Suko na ako! Huwag ka nang humataw ulit!",
+      "Maawa ka! Nauubusan na ako ng dugo sa sahig!",
+      "Huwag mo na akong saktan pa, pakiusap!",
+      "Maawa ka naman... hayaan mo akong mabuhay."
+    ],
+    "say.variants.rescue": [
+      "Naipit ako rito! Kailangan ko ng tulong dito!",
+      "Hindi ako makagalaw mag-isa! Hilahin mo ako palabas!",
+      "Naiipit at sugatan! Halika kunin mo ako!",
+      "Dito! Huwag niyo akong iwang nastranded!",
+      "Naipit ako sa likod ng guho! May kailangang mag-alis nito!",
+      "Hindi na ako makagapang pa! Tulungan mo ako!",
+      "Nandito ako sa kublihan! Hilahin mo ako pabalik!",
+      "Saklolohan mo ako, pakiusap! Papalapit na sila!",
+      "Kailangan ko ng tulong makalabas! Hindi ako makakalakad!",
+      "Tulungan mo akong makalabas! Bali ang binti ko!"
+    ],
+    "say.variants.starvation": [
+      "Ilang araw nang hindi kumakain... namamatay na ako sa gutom.",
+      "Masyadong nanghihina sa gutom para makatayo. Pagkain, pakiusap.",
+      "Kumakalam na ang sikmura ko... may natira pa bang mumo?",
+      "Gutom na gutom... hindi ko man lang mahawakan ang sandata ko.",
+      "Pakiusap, kahit isang kagat lang ng anumang makakain.",
+      "Nahihiya sa kawalan ng pagkain. Kailangan ko ng makakain.",
+      "Pinupulikat ang tiyan ko sa gutom. Tulungan mo ako.",
+      "Hindi ko na kayang magpatuloy nang walang laman ang tiyan.",
+      "Ilang araw nang walang laman... dalhan mo ako ng makakain.",
+      "Nagugutom sa sahig... magbahagi naman ng rasyon, pakiusap."
+    ]
+  }
+}

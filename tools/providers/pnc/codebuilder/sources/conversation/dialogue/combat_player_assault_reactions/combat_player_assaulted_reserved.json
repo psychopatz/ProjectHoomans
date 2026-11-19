@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "Back off. Now.",
-            "Enough. Stay away from me.",
-            "Step back.",
-            "Do not do that again.",
-            "Don't touch me.",
-            "Last warning.",
-            "Stay back.",
-            "Drop it.",
-            "Keep your distance.",
-            "One step back. Right now."
-          ],
-          "TL": [
-            "Lumayo ka. Ngayon na.",
-            "Tama na. Lumayo ka sa akin.",
-            "Umatras ka.",
-            "Huwag mong uulitin 'yon.",
-            "Huwag mo akong hahawakan.",
-            "Huling babala.",
-            "Diyan ka lang sa malayo.",
-            "Ibaba mo 'yan.",
-            "Dumistansya ka.",
-            "Isang hakbang pabalik. Ngayon na."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

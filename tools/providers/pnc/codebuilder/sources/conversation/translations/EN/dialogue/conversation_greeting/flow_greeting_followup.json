@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.greeting.followup",
+  "locale": "EN",
+  "entries": {
+    "say.variants.friendly": [
+      "You're welcome. It's good to see you too.",
+      "Anytime. Glad you're here.",
+      "Always glad to talk. Stay safe out there.",
+      "No problem. Holler if you need a hand.",
+      "Anytime, friend. Take care of yourself.",
+      "Glad we caught up. Catch you in a bit.",
+      "No trouble at all. Good to have you around.",
+      "Sure thing. Watch yourself out there, alright?",
+      "Take care. We'll talk again soon.",
+      "Always. Glad to see you on your feet."
+    ],
+    "say.variants.default": [
+      "You're welcome. Take care.",
+      "No trouble. Stay safe.",
+      "Anytime. Watch your back out there.",
+      "Don't mention it. See you around.",
+      "Glad to help. Take it easy.",
+      "All right. Stay alert today.",
+      "No problem at all. Be careful.",
+      "Sure thing. Keep your eyes open.",
+      "Take care of yourself out there.",
+      "Until next time. Stay safe."
+    ]
+  }
+}

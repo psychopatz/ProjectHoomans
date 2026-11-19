@@ -1,0 +1,15 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "companion.action.responses",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": "I can't follow you right now.",
+    "textRows.UI_PNC_Conversation_Semantic_ActionFollowUnavailable": "I can't follow you right now.",
+    "textRows.UI_PNC_Conversation_Semantic_ActionStayUnavailable": "I can't stay right now.",
+    "textRows.UI_PNC_Conversation_Semantic_ActionStopUnavailable": "I can't stop right now.",
+    "textRows.UI_PNC_Conversation_Semantic_RealizationCompanionFollowGuarded": "I'll follow. Stay close.",
+    "textRows.UI_PNC_Conversation_Semantic_RealizationCompanionFollowNeutral": "Of course, I'll follow.",
+    "textRows.UI_PNC_Conversation_Semantic_RealizationCompanionFollowTerse": "I'll follow.",
+    "textRows.UI_PNC_Conversation_Semantic_RealizationCompanionFollowWarm": "Of course, I'll follow you."
+  }
+}

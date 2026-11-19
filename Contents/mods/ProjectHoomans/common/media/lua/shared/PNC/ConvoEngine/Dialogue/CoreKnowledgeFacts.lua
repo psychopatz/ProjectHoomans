@@ -20,14 +20,6 @@ return {
                                 ["id"] = "neutral",
                                 ["templateID"] = "convo.question.knowledge_and_bite.responses.say.1.neutral",
                                 ["textRole"] = "spoken_action",
-                                ["translations"] = {
-                                    ["EN"] = {
-                                        "I know about %s.",
-                                    },
-                                    ["TL"] = {
-                                        "May alam ako tungkol sa %s.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -41,14 +33,6 @@ return {
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.question.knowledge_and_bite.responses.say.1.neutral",
-                    ["translations"] = {
-                        ["EN"] = {
-                            "I know about %s.",
-                        },
-                        ["TL"] = {
-                            "May alam ako tungkol sa %s.",
-                        },
-                    },
                     ["variantID"] = "neutral",
                 },
             },
@@ -84,39 +68,24 @@ return {
             ["metadata"] = {
                 ["textRows"] = {
                     {
+                        ["fallback"] = "I know about %s.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionKnowledgeKnown",
-                        ["text"] = {
-                            ["EN"] = "I know about %s.",
-                            ["TL"] = "May alam ako tungkol sa %s.",
-                        },
                     },
                     {
+                        ["fallback"] = "I don't have reliable information about %s.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionKnowledgeUnknown",
-                        ["text"] = {
-                            ["EN"] = "I don't have reliable information about %s.",
-                            ["TL"] = "Wala akong mapagkakatiwalaang impormasyon tungkol sa %s.",
-                        },
                     },
                     {
+                        ["fallback"] = "No, I don't have a recorded bite.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative",
-                        ["text"] = {
-                            ["EN"] = "No, I don't have a recorded bite.",
-                            ["TL"] = "Wala akong naitalang kagat.",
-                        },
                     },
                     {
+                        ["fallback"] = "Yes, I've been bitten.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionMedicalBitePositive",
-                        ["text"] = {
-                            ["EN"] = "Yes, I've been bitten.",
-                            ["TL"] = "Oo, nakagat na ako.",
-                        },
                     },
                     {
+                        ["fallback"] = "I can't confirm whether I've been bitten.",
                         ["key"] = "UI_PNC_Conversation_Semantic_QuestionMedicalBiteUnknown",
-                        ["text"] = {
-                            ["EN"] = "I can't confirm whether I've been bitten.",
-                            ["TL"] = "Hindi ko makumpirma kung nakagat na ako.",
-                        },
                     },
                 },
                 ["textTarget"] = "convo/SemanticResponses",
@@ -132,15 +101,8 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
+                                ["fallback"] = "I know about %s.",
                                 ["id"] = "neutral",
-                                ["text"] = {
-                                    ["EN"] = {
-                                        "I know about %s.",
-                                    },
-                                    ["TL"] = {
-                                        "May alam ako tungkol sa %s.",
-                                    },
-                                },
                             },
                         },
                     },
@@ -209,14 +171,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.question.knowledge_and_bite.responses.say.1.neutral",
-                ["translations"] = {
-                    ["EN"] = {
-                        "I know about %s.",
-                    },
-                    ["TL"] = {
-                        "May alam ako tungkol sa %s.",
-                    },
-                },
                 ["variantID"] = "neutral",
             },
         },

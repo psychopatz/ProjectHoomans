@@ -10,37 +10,13 @@
   "say": {
     "variants": [
       {
-        "id": "female",
-        "text": {
-          "EN": [
-            "Here you go, good girl."
-          ],
-          "TL": [
-            "Here you go, good girl."
-          ]
-        }
+        "id": "female"
       },
       {
-        "id": "male",
-        "text": {
-          "EN": [
-            "Here you go, good boy."
-          ],
-          "TL": [
-            "Here you go, good boy."
-          ]
-        }
+        "id": "male"
       },
       {
-        "id": "unknown",
-        "text": {
-          "EN": [
-            "Here you go, good dog."
-          ],
-          "TL": [
-            "Here you go, good dog."
-          ]
-        }
+        "id": "unknown"
       }
     ]
   },

@@ -1,0 +1,14 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "command.player.camp",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Make camp here, {addressee.name}.",
+      "Settle in here, {addressee.name}.",
+      "We'll camp here for now, {addressee.name}.",
+      "We could make camp here, {addressee.name}.",
+      "Let's make this our camp, {addressee.name}."
+    ]
+  }
+}

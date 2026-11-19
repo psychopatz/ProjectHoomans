@@ -5,33 +5,24 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.stay.label",
-        "text": {
-          "EN": "Wait here.",
-          "TL": "Dito ka maghintay."
-        }
+        "key": "suggestion.stay.label"
       },
       {
-        "key": "suggestion.stay.utterance",
-        "text": {
-          "EN": "Wait here.",
-          "TL": "Dito ka maghintay."
-        }
+        "key": "suggestion.stay.utterance"
       }
     ]
   },
   "affordance": {
-    "label": {
-      "EN": "Wait here.",
-      "TL": "Dito ka maghintay."
-    },
     "consumers": [
       "player"
     ]
   },
   "say": {
-    "EN": "Wait here.",
-    "TL": "Dito ka maghintay."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

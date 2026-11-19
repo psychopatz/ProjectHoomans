@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.injured",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "A little banged up, but I'll manage.",
+      "Took a hit during the last scrap. Need to bandage up.",
+      "I'm nursing a couple wounds, but nothing fatal.",
+      "Hurts to move quickly, but I can still walk.",
+      "Got tagged out there. Keeping an eye on the bleeding.",
+      "Bruised and aching all over, but I'll pull through.",
+      "Scraped up pretty bad, but still on two feet.",
+      "Need some clean bandages soon, but I'm holding together.",
+      "Took a rough fall earlier. Still feeling the sting.",
+      "Not in peak shape right now, but I can carry on."
+    ],
+    "say.variants.guarded": [
+      "I'm hurt. That's all I can say.",
+      "Took some damage. I'll patch it myself, don't worry.",
+      "Bleeding a little, but I can still defend myself.",
+      "It's just a flesh wound. Keep your distance.",
+      "I'm wounded, but I don't need charity.",
+      "Hurts like hell, but I'm holding my ground.",
+      "Got scraped up. Mind your own injuries.",
+      "Don't stare at the bandages. I'm still functional.",
+      "A rough encounter, but I survived it. Back off.",
+      "I'll manage the pain on my own, thanks."
+    ],
+    "say.variants.terse": [
+      "I'm hurt. I can manage.",
+      "Bleeding.",
+      "Took a hit.",
+      "Bruised up.",
+      "Hurts.",
+      "Need bandages.",
+      "Still walking.",
+      "Minor wound.",
+      "Stings like hell.",
+      "Managing the pain."
+    ],
+    "say.variants.warm": [
+      "I took a hit, but I'm steady enough to keep going.",
+      "Appreciate you checking. It stings, but I'll be fine.",
+      "Got banged up a bit. Having you around makes it easier.",
+      "Don't worry too much. I'll get this patched up in no time.",
+      "Took a knock, but seeing you safe helps take the edge off.",
+      "I'll pull through, friend. Thanks for watching out for me.",
+      "Nothing we can't patch up together. Appreciate the concern.",
+      "Just a bad scratch. I'll be back at full strength soon.",
+      "It hurts, but I know we've got each other's backs.",
+      "A bit bruised, but your concern means the world to me."
+    ]
+  }
+}

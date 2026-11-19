@@ -1,0 +1,29 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "needs.special.support",
+  "locale": "EN",
+  "entries": {
+    "response.turn.opening.text": "Since it's you, I'll tell you what I need.",
+    "response.turn.opening.offer.supplies.label": "What can I bring you?",
+    "response.turn.opening.offer.supplies.utterance": "What can I bring you?",
+    "response.turn.opening.offer.supplies.responseText": "Just come back safely. Anything else is extra.",
+    "response.turn.opening.offer.medical.label": "Are you hurt?",
+    "response.turn.opening.offer.medical.utterance": "Are you hurt?",
+    "response.turn.opening.offer.medical.responseText": "No. I would tell you if I was.",
+    "response.turn.opening.offer.gift.label": "I have something you might need.",
+    "response.turn.opening.offer.gift.utterance": "I have something you might need.",
+    "response.turn.opening.offer.gift.responseText": "Let me see what you can spare.",
+    "response.turn.gift.text": "Choose something to give me, then return to the conversation.",
+    "response.turn.gift.offer.gift_return.label": "I will hold on to the rest.",
+    "response.turn.gift.offer.gift_return.utterance": "I will hold on to the rest.",
+    "response.turn.gift.offer.gift_return.responseText": "Understood.",
+    "textRows.gift.offer.multiple": "I brought {giftItemSummary} for you.",
+    "textRows.gift.offer.multiple.alt": "These are yours if you need them: {giftItemSummary}.",
+    "textRows.gift.offer.single": "Here's {giftItemName}. I thought you could use it.",
+    "textRows.gift.offer.single.alt": "This is for you: {giftItemName}.",
+    "textRows.gift.received.equipment": "Useful, deliberate, and well chosen. You are learning how I think.",
+    "textRows.gift.received.food": "You remembered me. I will enjoy this, and I will remember the gesture.",
+    "textRows.gift.received.general": "That is thoughtful of you. Thank you.",
+    "textRows.gift.received.medical": "You noticed what I needed before I had to ask. That means more than the medicine itself."
+  }
+}

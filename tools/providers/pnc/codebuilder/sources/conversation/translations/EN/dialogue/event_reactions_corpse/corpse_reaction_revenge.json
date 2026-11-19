@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "corpse.reaction.revenge",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Someone is going to answer for this.",
+      "They didn't deserve this. Whoever did it will pay.",
+      "This wasn't rottens, this was murder. They'll bleed for it.",
+      "I'll find whoever did this and make them regret it.",
+      "They slaughtered them. There's no forgiving this.",
+      "Mark my words, retribution is coming for them.",
+      "Whoever left this body won't walk away clean.",
+      "Cold-blooded. I won't forget this sight.",
+      "Blood demands blood. We settle this score.",
+      "They butchered one of our own. They will pay."
+    ]
+  }
+}

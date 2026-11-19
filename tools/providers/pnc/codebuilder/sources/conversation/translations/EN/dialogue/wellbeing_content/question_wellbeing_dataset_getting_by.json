@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "question.wellbeing.dataset.getting_by",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "I'm getting by, one day at a time. How about you?",
+      "Managing as best as anyone can out here. You?",
+      "Can't complain too much. Taking things as they come.",
+      "Still on my feet. That's a win these days.",
+      "Holding up okay. How are things on your side?",
+      "Getting through the hours. What about yourself?",
+      "Doing alright, all things considered.",
+      "Pushing forward. How's the road treating you?",
+      "Hanging in there. Hopefully you are too.",
+      "Alive and kicking. What more can we ask for?"
+    ],
+    "say.variants.guarded": [
+      "I'm getting by. Leave it there.",
+      "Surviving. That's all you need to know.",
+      "I manage on my own. Don't worry about it.",
+      "Still upright. Let's keep it to business.",
+      "I'm coping fine. No need to pry.",
+      "Doing what I have to do. That's enough.",
+      "Still breathing. Nothing more to say about it.",
+      "I'm alright on my own, thanks.",
+      "Managing well enough without interference.",
+      "Getting by just fine. Let's drop it."
+    ],
+    "say.variants.terse": [
+      "Getting by.",
+      "Managing.",
+      "Still standing.",
+      "Holding.",
+      "Surviving.",
+      "Fine for now.",
+      "Still breathing.",
+      "Could be worse.",
+      "Doing fine.",
+      "One day at a time."
+    ],
+    "say.variants.warm": [
+      "I'm getting by. Thanks for asking.",
+      "Doing okay, especially with good company around.",
+      "Managing well enough. Truly appreciate you checking in.",
+      "Holding steady. Knowing people care makes it easier.",
+      "Doing alright today. Hope you're feeling good too.",
+      "I'm hanging in there. Thank you for thinking of me.",
+      "Feeling decent today, thank you. How are you holding up?",
+      "Getting through it together. That's what counts.",
+      "Still smiling through it all. Glad to see you around.",
+      "I'm doing well, friend. Thanks for taking the time to ask."
+    ]
+  }
+}

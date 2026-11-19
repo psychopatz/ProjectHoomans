@@ -10,66 +10,14 @@
     "1": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "I heard you. Watch yourself.",
-              "Heard that tone. Mind your step.",
-              "I heard the anger. Keep it in check.",
-              "I hear you, but don't cross the line.",
-              "Message heard. Control yourself.",
-              "Heard that loud and clear. Back off.",
-              "I heard you. Don't make a mistake you can't undo.",
-              "I heard the threat. Tread lightly.",
-              "Noted. Don't let your temper get you killed.",
-              "I hear you. Watch your back."
-            ],
-            "TL": [
-              "Narinig kita. Mag-ingat ka sa sarili mo.",
-              "Narinig ko ang tonong 'yan. Mag-ingat sa hakbang.",
-              "Narinig ko ang galit. Kontrolin mo 'yan.",
-              "Narinig kita, pero huwag mong tawirin ang hangganan.",
-              "Narinig ang mensahe. Magpigil ka.",
-              "Narinig nang malakas at malinaw. Umatras ka.",
-              "Narinig kita. Huwag kang gumawa ng pagkakamaling di mo mababawi.",
-              "Narinig ko ang banta. Mag-ingat sa pagtapak.",
-              "Tala ko na. Huwag mong hayaang mapatay ka ng galit mo.",
-              "Narinig kita. Bantayan mo ang likod mo."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     },
     "2": {
       "variants": [
         {
-          "id": "neutral",
-          "text": {
-            "EN": [
-              "Noted. Choose your next words carefully.",
-              "Be very careful what comes out of your mouth next.",
-              "You're walking on thin ice with that talk.",
-              "Think twice before repeating that.",
-              "Choose your next move with extreme caution.",
-              "You're testing boundaries that have teeth.",
-              "Careful now. Words have consequences out here.",
-              "Watch what you say next.",
-              "One wrong word and this conversation ends badly.",
-              "Noted. Mind your tongue."
-            ],
-            "TL": [
-              "Tala ko na. Piliin mong mabuti ang susunod mong sasabihin.",
-              "Maging maingat sa susunod na lalabas sa bibig mo.",
-              "Nasa manipis kang yelo sa salitang 'yan.",
-              "Mag-isip ka nang dalawang beses bago ulitin 'yan.",
-              "Piliin ang susunod mong hakbang nang buong pag-iingat.",
-              "Sinusubukan mo ang mga hangganang may bangil.",
-              "Mag-ingat ka. May kapalit ang salita dito.",
-              "Bantayan mo ang susunod mong sasabihin.",
-              "Isang maling salita at magtatapos sa masama ang usapang ito.",
-              "Tala ko na. Ingatan ang dila mo."
-            ]
-          }
+          "id": "neutral"
         }
       ]
     }

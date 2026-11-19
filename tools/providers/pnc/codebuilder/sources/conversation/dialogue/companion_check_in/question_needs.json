@@ -25,10 +25,6 @@
     "topic": "needs"
   },
   "affordance": {
-    "label": {
-      "EN": "Ask about needs",
-      "TL": "Itanong ang pangangailangan"
-    },
     "consumers": [
       "player",
       "npc"
@@ -41,8 +37,11 @@
     }
   },
   "say": {
-    "EN": "Do you need anything?",
-    "TL": "May kailangan ka ba?"
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

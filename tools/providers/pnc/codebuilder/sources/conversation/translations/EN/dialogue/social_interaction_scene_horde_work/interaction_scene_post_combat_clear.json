@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "interaction.scene.post_combat_clear",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Looks clear now. That got rough for a minute.",
+      "Area is secure. Check yourselves for injuries.",
+      "They're all down. Take a breath and reload.",
+      "Fight's over. Good work holding the line.",
+      "Looks like the immediate threat is dealt with.",
+      "Clear. Everyone still in one piece?",
+      "Threat neutralized. Let's recover our stamina.",
+      "It's quiet again. Stay alert for stragglers.",
+      "Combat is finished. Reload and bandage up.",
+      "We held them off. Area appears clear."
+    ],
+    "say.variants.guarded": [
+      "Don't relax yet. Scan for stragglers.",
+      "Down, but keep your weapon ready. More could be coming.",
+      "Check your perimeter before you start celebrating.",
+      "Check every corpse. Make sure they stay down.",
+      "Gunfire brings more of them. We need to be ready to move.",
+      "Wipe your blade and reload immediately.",
+      "Are you bitten? Answer me right now.",
+      "Threat is dead, but noise travels fast out here.",
+      "Keep low. Don't silhouette yourself in the doorway.",
+      "Clear for now. Expect a second wave."
+    ],
+    "say.variants.terse": [
+      "Clear.",
+      "All down.",
+      "Reload.",
+      "Check wounds.",
+      "Secure.",
+      "Done.",
+      "Quiet now.",
+      "Hold positions.",
+      "Breathe.",
+      "Threat gone."
+    ],
+    "say.variants.warm": [
+      "We made it through! Is everyone okay?",
+      "Thank goodness you're alive. That was terrifying.",
+      "Great fighting, partner! I'm so glad we survived that.",
+      "Come here, let me check you over for bites or scratches.",
+      "We did it together. Nobody got left behind.",
+      "Take a breath, friend. We held the line.",
+      "I was worried for a second there, but you fought bravely.",
+      "Proud to stand beside you in that fight. We're safe now.",
+      "Rest for a minute. You earned it after that mess.",
+      "All clear! Hugely relieved we're both standing."
+    ]
+  }
+}

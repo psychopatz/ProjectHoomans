@@ -5,33 +5,24 @@
     "textTarget": "UI_PNC_Conversation",
     "textRows": [
       {
-        "key": "suggestion.wait_at.label",
-        "text": {
-          "EN": "Ask them to wait there",
-          "TL": "Sabihing maghintay siya roon"
-        }
+        "key": "suggestion.wait_at.label"
       },
       {
-        "key": "suggestion.wait_at.utterance",
-        "text": {
-          "EN": "Wait there.",
-          "TL": "Maghintay ka roon."
-        }
+        "key": "suggestion.wait_at.utterance"
       }
     ]
   },
   "affordance": {
-    "label": {
-      "EN": "Ask them to wait there",
-      "TL": "Sabihing maghintay siya roon"
-    },
     "consumers": [
       "player"
     ]
   },
   "say": {
-    "EN": "Wait there.",
-    "TL": "Maghintay ka roon."
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
   },
   "roles": {
     "speaker": {

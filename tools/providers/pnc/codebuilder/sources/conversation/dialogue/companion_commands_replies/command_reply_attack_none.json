@@ -9,33 +9,7 @@
   "say": {
     "variants": [
       {
-        "id": "neutral",
-        "text": {
-          "EN": [
-            "I'll avoid trouble.",
-            "Holding fire. Keeping passive.",
-            "Staying out of fights.",
-            "Understood. Ceasing all attacks.",
-            "I won't provoke anything.",
-            "Keeping my weapon stowed.",
-            "Pacifist stance. Understood.",
-            "I'll steer clear of hostiles.",
-            "Standing down from combat.",
-            "No attacking. Got it."
-          ],
-          "TL": [
-            "Iiwas ako sa gulo.",
-            "Tigil-putok. Mananatiling tahimik.",
-            "Lalayo ako sa anumang labanan.",
-            "Naiintindihan ko. Ititigil ang lahat ng atake.",
-            "Wala akong gagalawin o pupukawin.",
-            "Nakatago ang armas ko.",
-            "Tahimik na paninindigan. Naintindihan.",
-            "Iiwas ako sa mga kalaban.",
-            "Uuurong sa laban.",
-            "Walang aatake. Nakuha ko."
-          ]
-        }
+        "id": "neutral"
       }
     ]
   },

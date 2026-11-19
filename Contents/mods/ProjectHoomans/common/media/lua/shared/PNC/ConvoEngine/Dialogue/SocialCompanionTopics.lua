@@ -44,6 +44,7 @@ return {
                 ["act"] = "PERSONAL_TOPIC",
                 ["turns"] = {
                     {
+                        ["fallback"] = "All right, {addressee.name}. We can talk about us.",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -60,14 +61,7 @@ return {
                                     ["topic"] = "personal",
                                 },
                                 ["id"] = "trust",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "You can trust me.",
-                                    },
-                                    ["TL"] = {
-                                        "Maaari kang magtiwala sa akin.",
-                                    },
-                                },
+                                ["labelFallback"] = "You can trust me.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.trust",
                                     ["effects"] = {
@@ -78,27 +72,9 @@ return {
                                         },
                                     },
                                     ["responseKey"] = "response.trust",
-                                    ["responseText"] = {
-                                        ["EN"] = "I know. That still means more than I can say.",
-                                        ["TL"] = "alam ko. Nangangahulugan pa rin iyon ng higit pa sa masasabi ko.",
-                                    },
+                                    ["responseTextFallback"] = "I know. That still means more than I can say.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "You can trust me.",
-                                    },
-                                    ["TL"] = {
-                                        "Maaari kang magtiwala sa akin.",
-                                    },
-                                },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "All right, {addressee.name}. We can talk about us.",
-                            },
-                            ["TL"] = {
-                                "Sige, {addressee.name}. Maaari naming pag-usapan ang tungkol sa amin.",
+                                ["utteranceFallback"] = "You can trust me.",
                             },
                         },
                     },
@@ -226,6 +202,7 @@ return {
                 ["act"] = "RELATIONSHIP_TOPIC",
                 ["turns"] = {
                     {
+                        ["fallback"] = "I'm listening, {addressee.name}. Say what you need to say.",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -242,14 +219,7 @@ return {
                                     ["topic"] = "relationship",
                                 },
                                 ["id"] = "us",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Can we talk about us?",
-                                    },
-                                    ["TL"] = {
-                                        "Maaari ba nating pag-usapan ang tungkol sa atin?",
-                                    },
-                                },
+                                ["labelFallback"] = "Can we talk about us?",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.us",
                                     ["effects"] = {
@@ -260,27 +230,9 @@ return {
                                         },
                                     },
                                     ["responseKey"] = "response.us",
-                                    ["responseText"] = {
-                                        ["EN"] = "Yes. We probably should.",
-                                        ["TL"] = "Oo. Malamang dapat nga.",
-                                    },
+                                    ["responseTextFallback"] = "Yes. We probably should.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Can we talk about us?",
-                                    },
-                                    ["TL"] = {
-                                        "Maaari ba nating pag-usapan ang tungkol sa atin?",
-                                    },
-                                },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm listening, {addressee.name}. Say what you need to say.",
-                            },
-                            ["TL"] = {
-                                "Nakikinig ako, {addressee.name}. Sabihin ang kailangan mong sabihin.",
+                                ["utteranceFallback"] = "Can we talk about us?",
                             },
                         },
                     },
@@ -405,11 +357,8 @@ return {
                 ["textDomain"] = "pnc.convo.social.territory.member.claim",
                 ["textRows"] = {
                     {
+                        ["fallback"] = "Our territory is already established.",
                         ["key"] = "locked.base_established",
-                        ["text"] = {
-                            ["EN"] = "Our territory is already established.",
-                            ["TL"] = "Ang aming teritoryo ay naitatag na.",
-                        },
                     },
                 },
                 ["textTarget"] = "convo/social/territory/member/claim",
@@ -418,6 +367,7 @@ return {
                 ["act"] = "SET_TERRITORY",
                 ["turns"] = {
                     {
+                        ["fallback"] = "We have enough people to stop surviving from one night to the next. Pick a place, mark it as ours, and we can start building something that lasts.",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -434,14 +384,7 @@ return {
                                     ["topic"] = "territory",
                                 },
                                 ["id"] = "set_territory",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Set Territory",
-                                    },
-                                    ["TL"] = {
-                                        "Itakda ang Teritoryo",
-                                    },
-                                },
+                                ["labelFallback"] = "Set Territory",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.set_territory",
                                     ["close"] = true,
@@ -451,27 +394,9 @@ return {
                                         },
                                     },
                                     ["responseKey"] = "response.set_territory",
-                                    ["responseText"] = {
-                                        ["EN"] = "Then let us find ground worth defending. I will help turn it into home.",
-                                        ["TL"] = "Then let us find ground worth defending. I will tulong turn it into home.",
-                                    },
+                                    ["responseTextFallback"] = "Then let us find ground worth defending. I will help turn it into home.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Set Territory",
-                                    },
-                                    ["TL"] = {
-                                        "Itakda ang Teritoryo",
-                                    },
-                                },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "We have enough people to stop surviving from one night to the next. Pick a place, mark it as ours, and we can start building something that lasts.",
-                            },
-                            ["TL"] = {
-                                "We have enough people to stop surviving from one night to the next. Pick a place, mark it as ours, and we can simulan gusali something that lasts.",
+                                ["utteranceFallback"] = "Set Territory",
                             },
                         },
                     },
@@ -608,6 +533,7 @@ return {
                 ["act"] = "WORK_ORDERS",
                 ["turns"] = {
                     {
+                        ["fallback"] = "I'm ready. What needs doing?",
                         ["id"] = "opening",
                         ["metadata"] = {
                             ["textKey"] = "opening",
@@ -624,30 +550,13 @@ return {
                                     ["topic"] = "work_orders",
                                 },
                                 ["id"] = "orders",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "I have work for you.",
-                                    },
-                                    ["TL"] = {
-                                        "may trabaho ako sayo.",
-                                    },
-                                },
+                                ["labelFallback"] = "I have work for you.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.orders",
                                     ["responseKey"] = "response.orders",
-                                    ["responseText"] = {
-                                        ["EN"] = "Tell me what needs doing.",
-                                        ["TL"] = "Sabihin mo sa akin kung ano ang kailangang gawin.",
-                                    },
+                                    ["responseTextFallback"] = "Tell me what needs doing.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "I have work for you.",
-                                    },
-                                    ["TL"] = {
-                                        "may trabaho ako sayo.",
-                                    },
-                                },
+                                ["utteranceFallback"] = "I have work for you.",
                             },
                             {
                                 ["consumers"] = {
@@ -660,38 +569,13 @@ return {
                                     ["topic"] = "work_orders",
                                 },
                                 ["id"] = "status",
-                                ["label"] = {
-                                    ["EN"] = {
-                                        "Report on your current work.",
-                                    },
-                                    ["TL"] = {
-                                        "Mag-ulat sa iyong kasalukuyang gawain.",
-                                    },
-                                },
+                                ["labelFallback"] = "Report on your current work.",
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.status",
                                     ["responseKey"] = "response.status",
-                                    ["responseText"] = {
-                                        ["EN"] = "Everything is on track for now.",
-                                        ["TL"] = "Ang lahat ay nasa track sa ngayon.",
-                                    },
+                                    ["responseTextFallback"] = "Everything is on track for now.",
                                 },
-                                ["utterance"] = {
-                                    ["EN"] = {
-                                        "Report on your current work.",
-                                    },
-                                    ["TL"] = {
-                                        "Mag-ulat sa iyong kasalukuyang gawain.",
-                                    },
-                                },
-                            },
-                        },
-                        ["text"] = {
-                            ["EN"] = {
-                                "I'm ready. What needs doing?",
-                            },
-                            ["TL"] = {
-                                "handa na ako. Ano ang kailangang gawin?",
+                                ["utteranceFallback"] = "Report on your current work.",
                             },
                         },
                     },
