@@ -1,6 +1,6 @@
 # Roadmap — Project Hoomans Portable Social State Adoption
 
-**Status:** PLANNED participant work.
+**Status:** READY FOR USER LIVE TEST (H0–H6 Accepted under Core P0–P9).
 **Canonical parent:** PsychopatzCore Docs/portable_social_state/ P0-P9.
 **Participant completion:** H0-H6 does not complete the parent goal by itself.
 
@@ -60,7 +60,7 @@ Clients cannot author relationship/memory outcomes.
 
 **Gate:** protocol/harness cases pass with bounded projections.
 
-## H6 — Scale and participant acceptance (Next)
+## H6 — Scale and participant acceptance (Accepted)
 
 Stress sparse contacts, repeated events, anchor/retention pressure, many abstract/non-live actors and long world time.
 

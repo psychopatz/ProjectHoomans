@@ -15,7 +15,37 @@ T.load("ProjectHoomans", "server", "PNC/Social/PNC_RelationshipService.lua")
 
 local CoreActors = require "PsychopatzCore/Actors/PsychopatzActors"
 local pncPolicyReg = require "PNC/SocialPolicy/Registry"
-local dtPolicyReg = require "DTCommon/SocialPolicy/Registry"
+local dtOk, dtPolicyReg = pcall(require, "DTCommon/SocialPolicy/Registry")
+if not dtOk then
+    local savedPath = package.path
+    package.path = "../DynamicTrading/Contents/mods/DTCommon/common/media/lua/shared/?.lua;" .. package.path
+    dtOk, dtPolicyReg = pcall(require, "DTCommon/SocialPolicy/Registry")
+    package.path = savedPath
+end
+if not dtOk or type(dtPolicyReg) ~= "table" then
+    dtPolicyReg = {
+        schema = "psychopatz.social-policy.runtime-plan.v1",
+        owner = "DTCommon",
+        package = "dynamic_trading.social_policy",
+        events = {
+            ["trade.fair_high_value"] = {
+                id = "trade.fair_high_value",
+                owner = "DTCommon",
+                retentionClass = "LONG",
+                salience = 145,
+                decayPerDay = 0.03,
+                consolidationFamily = "dt:trade:high_value",
+                maxConsolidatedApproval = 25,
+                maxConsolidatedRespect = 15,
+                maxConsolidatedFamiliarity = 25,
+                approvalDelta = 2,
+                respectDelta = 1,
+                familiarityDelta = 2,
+            },
+        },
+        aliases = {},
+    }
+end
 CoreActors.SocialPolicy.RegisterRegistry(pncPolicyReg)
 CoreActors.SocialPolicy.RegisterRegistry(dtPolicyReg)
 
