@@ -76,7 +76,12 @@ for _, field in ipairs({
     "EndPromotedHoomansRecords",
     "SchedulerProcessed",
     "LogicalCommits",
+    "DirtyDomainMarks",
+    "PersistencePumps",
     "GlobalSaveCalls",
+    "CoreRuntimeStoreSaves",
+    "TerminalPersistenceOutcomes",
+    "RetryablePersistenceFailures",
     "FullSnapshots",
     "PresenceDeltas",
     "CombatDeltas",
@@ -86,6 +91,15 @@ for _, field in ipairs({
     T.equal(coarseReport[field], offReport[field], "COARSE determinism mismatch on " .. field)
     T.equal(deepReport[field], offReport[field], "DEEP determinism mismatch on " .. field)
 end
+
+-- 5b. L2 deferred physical persistence invariants on OFF baseline.
+T.equal(offReport.GlobalSaveCalls, 1, "ordinary OFF run should call GlobalModData.save only on OnSave")
+T.equal(offReport.DirtyRecordsEnd, 0, "OFF run must finish with 0 dirty records")
+T.equal(offReport.TerminalPersistenceOutcomes, 0, "OFF run must have 0 terminal errors")
+T.equal(offReport.RetryablePersistenceFailures, 0, "OFF run must have 0 retryable failures")
+T.truthy((offReport.CoreRuntimeStoreSaves or 0) <= 2,
+    "Core RuntimeStore.Save must stay deferred until OnSave, got "
+        .. tostring(offReport.CoreRuntimeStoreSaves))
 
 -- 6. L1 lazy promotion invariants: zero bulk startup hydration; active set stays O(L), not O(N).
 T.equal(offReport.PromotedAtStartup, 0, "startup bulk hydration must be removed")
@@ -137,5 +151,31 @@ T.truthy(massReport.MaxMaterializationsInSingleTick <= 2,
 T.truthy(massReport.PeakPromotedHoomansRecords <= 24,
     "mass nearby entry must respect live admission headroom, got "
         .. tostring(massReport.PeakPromotedHoomansRecords))
+
+-- 10. L2 mutation storm: rapid logical knowledge mutations coalesce without synchronous flushes.
+local mutStormReport = withMode("OFF", {
+    actorCount = 100,
+    simulatedMs = 6000,
+    knowledgeMutationIntervalMs = 250,
+})
+print("MUT_STRM:" .. Simulator.FormatSummary(mutStormReport))
+T.equal(mutStormReport.SafePhaseFailures, 0, "MUT_STORM SafePhase failures")
+T.truthy(mutStormReport.LogicalCommits >= 20,
+    "MUT_STORM must exercise >= 20 logical commits, got "
+        .. tostring(mutStormReport.LogicalCommits))
+T.equal(mutStormReport.GlobalSaveCalls, 1,
+    "MUT_STORM must coalesce global flushes to 1 OnSave call")
+T.truthy(mutStormReport.PersistencePumps < mutStormReport.LogicalCommits,
+    "MUT_STORM pumps (" .. tostring(mutStormReport.PersistencePumps)
+        .. ") must be < logical commits (" .. tostring(mutStormReport.LogicalCommits) .. ")")
+T.truthy(mutStormReport.SerializationAttempts <= 20,
+    "MUT_STORM must not re-serialize unchanged abstract actors, got "
+        .. tostring(mutStormReport.SerializationAttempts))
+T.truthy((mutStormReport.CoreRuntimeStoreSaves or 0) <= 2,
+    "MUT_STORM CoreRuntimeStoreSaves <= 2, got "
+        .. tostring(mutStormReport.CoreRuntimeStoreSaves))
+T.equal(mutStormReport.DirtyRecordsEnd, 0, "MUT_STORM dirty records at end must be 0")
+T.equal(mutStormReport.TerminalPersistenceOutcomes, 0, "MUT_STORM terminal errors must be 0")
+T.equal(mutStormReport.RetryablePersistenceFailures, 0, "MUT_STORM retryable failures must be 0")
 
 T.finish("pnc_lightweight_runtime_simulation_smoke")

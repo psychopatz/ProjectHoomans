@@ -15,6 +15,7 @@ local COARSE_METRICS = {
     ["ProjectHoomans.Network.Snapshot.PresenceDelta"] = true,
     ["ProjectHoomans.Server.Update.Network.FlushRosterDeltas"] = true,
     ["ProjectHoomans.Persistence.Commit"] = true,
+    ["ProjectHoomans.Persistence.Pump"] = true,
     ["ProjectHoomans.Persistence.NPCRecords"] = true,
     ["ProjectHoomans.Server.Update.NPC.Materialize"] = true,
 }
@@ -143,6 +144,7 @@ function Simulator.New(options)
         clientCount = math.max(1, math.floor(tonumber(options.clientCount) or 1)),
         simulatedMs = math.max(100, math.floor(tonumber(options.simulatedMs) or 15000)),
         stepMs = math.max(10, math.floor(tonumber(options.stepMs) or 50)),
+        knowledgeMutationIntervalMs = math.max(50, math.floor(tonumber(options.knowledgeMutationIntervalMs) or 4000)),
         departAtMs = tonumber(options.departAtMs),
         massInterestActors = tonumber(options.massInterestActors),
         profilerMode = string.upper(tostring(options.profilerMode or "OFF")),
@@ -188,9 +190,7 @@ function Simulator:Run()
     local metrics = {
         globalSaveCalls = 0,
         physicalWrites = 0,
-        logicalCommits = 0,
-        persistencePumps = 0,
-        serializationAttempts = 0,
+        coreRuntimeStoreSaves = 0,
         materializationAttempts = 0,
         presenceDeltas = 0,
         combatDeltas = 0,
@@ -555,6 +555,17 @@ function Simulator:Run()
     require "PNC/00_PNC_Init"
     require "PNC/Composition/PNC_ServerComposition"
 
+    local runtimeStore = PsychopatzCore
+        and PsychopatzCore.Actors
+        and PsychopatzCore.Actors.RuntimeStore
+    if runtimeStore and type(runtimeStore.Save) == "function" then
+        local origRuntimeStoreSave = runtimeStore.Save
+        runtimeStore.Save = function(...)
+            metrics.coreRuntimeStoreSaves = metrics.coreRuntimeStoreSaves + 1
+            return origRuntimeStoreSave(...)
+        end
+    end
+
     local rawServerOnTick = PNC.Server.OnTick
     if PNC.ProfilerIntegration and PNC.ProfilerIntegration._serverTickHook then
         rawServerOnTick = PNC.ProfilerIntegration._serverTickHook.original
@@ -581,25 +592,12 @@ function Simulator:Run()
 
     local censusGenerationStart = PNC.WorldCensus and tonumber(PNC.WorldCensus.Generation) or 0
 
-    local function countPersistentDirty()
-        local dirty = 0
-        for id, _ in pairs(PNC.Registry and PNC.Registry.DirtyByID or {}) do
-            local rec = PNC.Registry.Data[id]
-            if rec and rec.persist ~= false then
-                dirty = dirty + 1
-            end
-        end
-        return dirty
-    end
+    local coordMetrics = PNC.PersistenceCoordinator
+        and PNC.PersistenceCoordinator.Metrics or {}
+    local observedPumpRuns = tonumber(coordMetrics.pumpRuns) or 0
 
     local function driveCommit(reason)
-        metrics.logicalCommits = metrics.logicalCommits + 1
-        metrics.persistencePumps = metrics.persistencePumps + 1
         PNC.PersistenceCoordinator.Commit(reason)
-        metrics.serializationAttempts = metrics.serializationAttempts
-            + (tonumber(PNC.Registry.LastFlushCount) or 0)
-            + countPersistentDirty()
-        snapshotStoreWrites()
     end
 
     local mutationEvents = {
@@ -670,30 +668,35 @@ function Simulator:Run()
                 PNC.Network.BroadcastRecord(targetRecord, evName)
             end
         end
-        if nowMs % 4000 == 0 then
-            if PNC.NPCKnowledge and PNC.NPCKnowledge.RecordImpression then
-                PNC.NPCKnowledge.RecordImpression("player_uuid_sim", "sim_actor_1", {
-                    trustDelta = 1,
-                    reason = "sim_tick",
-                }, nowMs)
+        if nowMs % cfg.knowledgeMutationIntervalMs == 0 then
+            if PNC.NPCKnowledge and PNC.NPCKnowledge.RecordGiftPreferences then
+                local stepBucket = math.floor(nowMs / cfg.knowledgeMutationIntervalMs)
+                local ok = PNC.NPCKnowledge.RecordGiftPreferences(
+                    "player_uuid_sim",
+                    "sim_actor_1",
+                    { ["Base.TinCan"] = (stepBucket % 2 == 0) and "like" or "dislike" },
+                    "gift_reaction",
+                    "sim_gift_" .. tostring(nowMs),
+                    math.floor(nowMs / 1000)
+                )
+                if not ok then PNC.NPCKnowledge.Dirty = true end
             elseif PNC.NPCKnowledge then
                 PNC.NPCKnowledge.Dirty = true
             end
             driveCommit("sim_knowledge_mutation")
+        end
+        if (tonumber(coordMetrics.pumpRuns) or 0) > observedPumpRuns then
+            observedPumpRuns = tonumber(coordMetrics.pumpRuns) or 0
+            snapshotStoreWrites()
         end
     end
     local tickLoopCpuMs = (os.clock() - tickCpuStart) * 1000
     metrics.inTickPhase = false
 
     -- Fire OnSave (real pre-save body retirement + Coordinator.Commit("world_save")).
-    metrics.logicalCommits = metrics.logicalCommits + 1
-    metrics.persistencePumps = metrics.persistencePumps + 1
     for _, fn in ipairs(events.OnSave or {}) do
         fn()
     end
-    metrics.serializationAttempts = metrics.serializationAttempts
-        + (tonumber(PNC.Registry.LastFlushCount) or 0)
-        + countPersistentDirty()
     snapshotStoreWrites()
 
     local endWrapperCounts = Integration
@@ -754,6 +757,13 @@ function Simulator:Run()
 
     local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
     local coreMetrics = coreProvider and coreProvider.Metrics or {}
+    local finalCoordMetrics = PNC.PersistenceCoordinator
+        and PNC.PersistenceCoordinator.Metrics or {}
+    local finalRegMetrics = PNC.Registry
+        and PNC.Registry.PersistenceMetrics or {}
+    local serAttempts = (tonumber(finalRegMetrics.written) or 0)
+        + (tonumber(finalRegMetrics.terminal) or 0)
+        + (tonumber(finalRegMetrics.retryable) or 0)
     local endPromotedHoomansRecords = countMap(PNC.Registry and PNC.Registry.Data)
     local schedulerMembersAtEnd = countMap(PNC.Scheduler and PNC.Scheduler.SlotByID)
     local spatialMembersAtEnd = countMap(PNC.SpatialIndex and PNC.SpatialIndex.NPCMembership)
@@ -785,13 +795,19 @@ function Simulator:Run()
         CoreExtensionsAttached = coreExtensionsAttached,
         MaterializationAttempts = metrics.materializationAttempts,
         Materializations = countMap(PNC.Registry and PNC.Registry.LiveByID),
-        LogicalCommits = metrics.logicalCommits,
-        PersistencePumps = metrics.persistencePumps,
-        SerializationAttempts = metrics.serializationAttempts,
+        LogicalCommits = tonumber(finalCoordMetrics.logicalCommits) or 0,
+        DirtyDomainMarks = tonumber(finalCoordMetrics.dirtyDomainMarks) or 0,
+        PersistencePumps = tonumber(finalCoordMetrics.pumpRuns) or 0,
+        ImmediateFlushes = tonumber(finalCoordMetrics.immediateFlushes) or 0,
+        CoalescedCommits = tonumber(finalCoordMetrics.coalescedCommits) or 0,
+        SerializationAttempts = serAttempts,
         PhysicalWrites = metrics.physicalWrites,
         GlobalSaveCalls = metrics.globalSaveCalls,
-        RetryablePersistenceFailures = 0,
-        TerminalPersistenceOutcomes = 0,
+        CoreRuntimeStoreSaves = metrics.coreRuntimeStoreSaves,
+        CheckpointScans = tonumber(finalRegMetrics.checkpointScans) or 0,
+        RetryablePersistenceFailures = tonumber(finalRegMetrics.retryable) or 0,
+        RetryAttemptsScheduled = tonumber(finalRegMetrics.retriesScheduled) or 0,
+        TerminalPersistenceOutcomes = tonumber(finalRegMetrics.terminal) or 0,
         DirtyRecordsEnd = countMap(PNC.Registry and PNC.Registry.DirtyByID),
         PresenceDeltas = metrics.presenceDeltas,
         CombatDeltas = metrics.combatDeltas,
@@ -836,7 +852,7 @@ end
 
 function Simulator.FormatSummary(report)
     return string.format(
-        "mode=%s core=%d startProm=%d peakProm=%d endProm=%d demoted=%d schedEnd=%d spatialEnd=%d live=%d schedProc=%d schedDef=%d commits=%d serAttempts=%d physWrites=%d globalSaves=%d dirtyEnd=%d presD=%d combatD=%d fullSnap=%d census=%d extraZScans=%d coarseCalls=%d deepCalls=%d tickCpuMs=%.2f",
+        "mode=%s core=%d startProm=%d peakProm=%d endProm=%d demoted=%d schedEnd=%d spatialEnd=%d live=%d schedProc=%d schedDef=%d commits=%d pumps=%d serAttempts=%d physWrites=%d globalSaves=%d coreSaves=%d term=%d retry=%d dirtyEnd=%d presD=%d combatD=%d fullSnap=%d census=%d extraZScans=%d coarseCalls=%d deepCalls=%d tickCpuMs=%.2f",
         tostring(report.ProfilerMode),
         report.CoreActors,
         report.PromotedAtStartup or 0,
@@ -849,9 +865,13 @@ function Simulator.FormatSummary(report)
         report.SchedulerProcessed,
         report.SchedulerDeferred,
         report.LogicalCommits,
+        report.PersistencePumps or 0,
         report.SerializationAttempts,
         report.PhysicalWrites,
         report.GlobalSaveCalls,
+        report.CoreRuntimeStoreSaves or 0,
+        report.TerminalPersistenceOutcomes or 0,
+        report.RetryablePersistenceFailures or 0,
         report.DirtyRecordsEnd,
         report.PresenceDeltas,
         report.CombatDeltas,

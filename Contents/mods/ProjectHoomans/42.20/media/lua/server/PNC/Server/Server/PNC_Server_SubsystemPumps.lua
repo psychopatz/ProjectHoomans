@@ -202,6 +202,8 @@ function H.FinishTick(now)
     safeOptional("server_finish.core_demotions",
         PNC.Persistence and PNC.Persistence.CoreProvider,
         "PumpDemotions", nil, now, PsychopatzCore)
+    safeOptional("server_finish.persistence_pump",
+        PNC.PersistenceCoordinator, "Pump", nil, now)
     safeOptional("server_finish.zombie_aggro", ZombieAggro, "Pump", nil, now)
     safeOptional(
         "server_finish.stealth_discovery",

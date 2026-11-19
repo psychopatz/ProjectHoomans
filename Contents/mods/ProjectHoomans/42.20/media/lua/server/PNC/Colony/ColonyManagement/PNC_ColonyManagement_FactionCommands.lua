@@ -70,7 +70,9 @@ function Management.RenameForPlayer(player, args)
     )
     if ok == true and PNC.Communities.Commit then
         PNC.Communities.Commit()
-        if GlobalModData and GlobalModData.save then
+        if PNC.PersistenceCoordinator and PNC.PersistenceCoordinator.Commit then
+            PNC.PersistenceCoordinator.Commit("colony_management_rename")
+        elseif GlobalModData and GlobalModData.save then
             GlobalModData.save()
         end
     end

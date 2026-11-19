@@ -2,7 +2,7 @@
 
 ## Current state
 
-**IN PROGRESS — L0, L1 COMPLETE; L2 NEXT.**
+**IN PROGRESS — L0, L1, L2 COMPLETE; L3 NEXT.**
 
 Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded deep profiling (`coarse` vs `deep`), and the deterministic integrated headless runtime simulator foundation before optimizing downstream phases.
 
@@ -39,6 +39,18 @@ Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded dee
     - `N=500`: `Promoted=9` (was 500), `DirtyEnd=0` (was 500), `serAttempts=18` (was 3000), `FullSnap=205` (was 216), `TickCpuMs=3340.07ms` (was 4004.86ms).
 - **L1 verification:** `luac -p` pass & `pz_verify.py --kahlua --severity WARNING` 0 errors/0 warnings on all modified/created runtime Lua files in both repos; Core spatial/extension smoke + 44/44 related Core actor/survivor_world tests pass (leaving the 2 pre-existing unrelated Core baseline failures untouched); ProjectHoomans focused suites pass (`core_actor` 4/4, `survivor_world` 8/8, `lightweight` 2/2, `presence` 119/119, `persistence` 13/13, `registry` 10/10, `replication` 3/3, `starting_companion` 12/12, `unique_npc` 7/7, `profiler` 10/10).
 
+## L2 — Single-authority persistence and deferred physical flush (COMPLETE)
+
+- **Explicit outcome classification & zero duplicate Core serialization:** `PNC.Persistence.SerializeRecord` returns `(payload, outcome, reason)` with canonical `WRITTEN` / `TERMINAL_OR_NOT_APPLICABLE` / `RETRYABLE_FAILURE`; rejects `coreBacked`/`core_extension` (`owned_by_core_extension`) and Core appearance envelopes (`core_appearance_authority_mismatch`) as terminal without down-converting to legacy `schemaVersion == 2`. `CoreProvider.SyncPromotedCoreActorToCore` returns explicit `WRITTEN` / `TERMINAL_OR_NOT_APPLICABLE` / `RETRYABLE_FAILURE` and sets `Registry.CoreStoreDirty = true` on Core commit.
+- **Bounded retry/backoff & terminal quarantine:** `PNC_Registry_LoadDirty.lua` clears terminal outcomes on attempt 1 with structured warning + `PersistenceDiagnostics.terminalEvents`; tracks retryable failures in `Registry.RetryState` with exponential backoff (`PERSISTENCE_RETRY_BASE_MS = 1000` .. `PERSISTENCE_RETRY_MAX_MS = 30000`) and quarantines after `PERSISTENCE_RETRY_MAX_ATTEMPTS = 5` (cleared on fresh gameplay `MarkDirty`), eliminating infinite dirty retry loops.
+- **Decoupled logical commit, coalescing pump & bounded physical checkpoints:** Refactored `PNC_PersistenceCoordinator.lua` into ordered `DOMAINS` with `Commit()` (default deferred enqueue/coalesce; zero synchronous `service.Save`, `Registry.FlushDirty`, `RuntimeStore.Save`, or `GlobalModData.save()`), `Pump()` (wired into `PNC_Server_SubsystemPumps.lua:H.FinishTick` at `PERSISTENCE_PUMP_INTERVAL_MS = 2000`, `PERSISTENCE_PUMP_MAX_RECORDS = 8`, no `GlobalModData.save()`, no `RuntimeStore.Save()`), and complete synchronous `FlushNow()` on `OnSave` (`"world_save"`), shutdown (`OnServerShutdown` / `OnGameEnd`), or `{ immediate = true }`. Added bounded round-robin `Registry.PumpPhysicalCheckpoints` (`5000ms` cadence, max `8` promoted records/pass) instead of scanning all records on unrelated commits. Routed direct gameplay `GlobalModData.save()` callers (`PNC_ColonyManagement_FactionCommands`, `PNC_ProvisionPolicyService`, `PNC_DebugCompanionRecruit_Persistence`) through `PersistenceCoordinator`, exposed `Persistence.Pump` as a coarse profiler boundary, and updated the 36 native restart fixtures in `tests/native/*_native_write_smoke.lua` to pass `{ immediate = true }`.
+- **HEADLESS LUA SIMULATOR (NON-NATIVE) L2 results vs L0/L1:**
+  - Smoke (`N=100, Z=40, 15s`, `OFF`): `globalSaves=1` (was 5), `coreSaves=2`, `term=0`, `retry=0`, `dirtyEnd=0`, `SafePhaseFailures=0`, `tickCpuMs=957.84ms`; `OFF_300` (`N=300`): `tickCpuMs=813.71ms` (was `1950.67ms` in L1), bit-identical op counts vs `N=100`; `MUT_STORM` (25 rapid knowledge commits over 6s): coalesced to `pumps=3`, `serAttempts=5`, `globalSaves=1`, `coreSaves=2`, `dirtyEnd=0`.
+  - Benchmark (`Z=64, 20s`, `OFF`):
+    - `N=100`: `Promoted=9, DirtyEnd=0, globalSaves=1` (was 6), `TickCpuMs=1613.59ms` (L1: `2094.12ms`, L0: `2001.45ms`).
+    - `N=500`: `Promoted=9, DirtyEnd=0, globalSaves=1` (was 6), `TickCpuMs=1836.38ms` (L1: `3340.07ms`, L0: `4004.86ms`).
+- **L2 verification:** `luac -p` pass & `pz_verify.py --kahlua --severity WARNING` 0 errors/0 warnings on all 12 modified runtime Lua files (zero `next()` calls); `luac -p` pass on all 36 updated native write tests; new `pnc_lightweight_persistence_authority_smoke.lua` pass; all 14 focused suites pass (`persistence` 14/14, `registry` 10/10, `presence` 119/119, `lightweight` 3/3, `profiler` 10/10, `core_actor` 4/4, `survivor_world` 8/8, `knowledge` 17/17, `starting_companion` 12/12, `provision` 5/5, `colony` 21/21, `recruit` 2/2, `world_save` 3/3, `companion` 28/28); full `tests/run_tests.py` sweep 1076/1080 pass (4 pre-existing unrelated failures untouched: `pnc_animation_scene_debug_routes_smoke`, `pnc_context_debug_smoke`, `pnc_population_director_smoke`, `pz_custom_translation_manager_smoke`).
+
 ## Accepted dependencies
 
 Do not reopen:
@@ -51,4 +63,4 @@ This job corrects Hoomans runtime adoption so it actually obeys those accepted c
 
 ## Next Chunk
 
-**L2 — single-authority persistence and deferred physical flush.**
+**L3 — domain-delta replication.**

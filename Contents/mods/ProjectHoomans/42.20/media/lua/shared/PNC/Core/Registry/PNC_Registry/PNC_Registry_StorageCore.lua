@@ -20,9 +20,51 @@ Registry.LiveByID = Registry.LiveByID or {}
 Registry.DirtyByID = Registry.DirtyByID or {}
 Registry.DirtyDomains = Registry.DirtyDomains or {}
 Registry.SavedSnapshots = Registry.SavedSnapshots or {}
+Registry.RetryState = Registry.RetryState or {}
 Registry.Loaded = Registry.Loaded or false
 Registry.DirectoryDirty = Registry.DirectoryDirty or false
+Registry.CoreStoreDirty = Registry.CoreStoreDirty == true
 Registry.LastFlushCount = Registry.LastFlushCount or 0
+Registry.LastCheckpointAt = tonumber(Registry.LastCheckpointAt) or 0
+Registry._checkpointCursor = tonumber(Registry._checkpointCursor) or 0
+Registry.PersistenceMetrics = Registry.PersistenceMetrics or {
+    written = 0,
+    terminal = 0,
+    retryable = 0,
+    retriesScheduled = 0,
+    retriesExhausted = 0,
+    checkpointScans = 0,
+    checkpointDirtyMarks = 0,
+    flushCalls = 0,
+}
+Registry.PersistenceDiagnostics = Registry.PersistenceDiagnostics or {
+    terminalEvents = {},
+    retryEvents = {},
+    maxEntries = 32,
+}
+
+local function hasEntries(tbl)
+    if type(tbl) ~= "table" then return false end
+    for _ in pairs(tbl) do
+        return true
+    end
+    return false
+end
+
+local function recordPersistenceEvent(bucket, entry)
+    local diag = Registry.PersistenceDiagnostics
+    if type(diag) ~= "table" then return end
+    local list = diag[bucket]
+    if type(list) ~= "table" then
+        list = {}
+        diag[bucket] = list
+    end
+    list[#list + 1] = entry
+    local limit = tonumber(diag.maxEntries) or 32
+    while #list > limit do
+        table.remove(list, 1)
+    end
+end
 
 local function storageKeyForID(id)
     local prefix = tostring(Const.MODDATA_NPC_PREFIX or "PNC_npc")
@@ -81,6 +123,77 @@ local function markSnapshotChanges()
             end
         end
     end
+end
+
+function Registry.PumpPhysicalCheckpoints(now, options)
+    if not Core or not Core.IsAuthority or not Core.IsAuthority() then
+        return 0, 0
+    end
+    options = type(options) == "table" and options or {}
+    now = tonumber(now) or (Core.Now and Core.Now()) or 0
+    local intervalMs = tonumber(
+        Const and Const.PERSISTENCE_CHECKPOINT_INTERVAL_MS
+    ) or 5000
+    if options.force ~= true
+        and (now - (tonumber(Registry.LastCheckpointAt) or 0)) < intervalMs
+    then
+        return 0, 0
+    end
+    Registry.LastCheckpointAt = now
+
+    if type(Registry.RefreshLivePositions) == "function" then
+        Registry.RefreshLivePositions(false)
+    end
+
+    local ids = {}
+    for id, record in pairs(Registry.Data or {}) do
+        if record and record.persist ~= false then
+            ids[#ids + 1] = tostring(id)
+        end
+    end
+    local total = #ids
+    local metrics = Registry.PersistenceMetrics
+    if total == 0 then
+        if metrics then
+            metrics.checkpointScans = (tonumber(metrics.checkpointScans) or 0) + 1
+        end
+        return 0, 0
+    end
+    table.sort(ids)
+
+    local budget = math.max(1, math.floor(tonumber(
+        options.maxRecords
+            or (Const and Const.PERSISTENCE_CHECKPOINT_MAX_RECORDS)
+            or 8
+    )))
+    local scanLimit = math.min(total, budget)
+    local startCursor = (tonumber(Registry._checkpointCursor) or 0) % total
+    local scanned = 0
+    local dirtyMarked = 0
+
+    for offset = 0, scanLimit - 1 do
+        local idx = ((startCursor + offset) % total) + 1
+        local id = ids[idx]
+        local record = Registry.Data[id]
+        scanned = scanned + 1
+        if record and record.persist ~= false
+            and not (Registry.DirtyByID and Registry.DirtyByID[id])
+        then
+            local current = captureSnapshot(record)
+            if snapshotChanged(Registry.SavedSnapshots[id], current) then
+                Registry.MarkDirty(record, "physical_checkpoint")
+                dirtyMarked = dirtyMarked + 1
+            end
+        end
+    end
+
+    Registry._checkpointCursor = (startCursor + scanned) % total
+    if metrics then
+        metrics.checkpointScans = (tonumber(metrics.checkpointScans) or 0) + 1
+        metrics.checkpointDirtyMarks =
+            (tonumber(metrics.checkpointDirtyMarks) or 0) + dirtyMarked
+    end
+    return dirtyMarked, scanned
 end
 
 Registry.StorageKeyForID = storageKeyForID
@@ -142,6 +255,8 @@ local function putPointer(directory, record, key)
     }
 end
 
+Internal.HasEntries = hasEntries
+Internal.RecordPersistenceEvent = recordPersistenceEvent
 Internal.StorageKeyForID = storageKeyForID
 Internal.CaptureSnapshot = captureSnapshot
 Internal.NumberChanged = numberChanged

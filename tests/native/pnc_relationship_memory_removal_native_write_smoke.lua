@@ -169,7 +169,8 @@ PZHarnessNativeTest = function()
 
     local commitOK, committed, commitReason, commitDetails = pcall(
         PNC.PersistenceCoordinator.Commit,
-        "native_harness_relationship_memory_removal_restart"
+        "native_harness_relationship_memory_removal_restart",
+        { immediate = true }
     )
     PZHarness.assertTrue(
         commitOK and committed,

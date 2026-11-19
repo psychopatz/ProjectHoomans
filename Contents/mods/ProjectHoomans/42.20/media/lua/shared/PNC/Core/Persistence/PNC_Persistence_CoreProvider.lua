@@ -16,6 +16,12 @@ local CoreActorExtension =
     require "PNC/Core/Persistence/PNC_CoreActorExtension"
 local Json = require "PsychopatzCore/Serialization/PsychopatzJson"
 
+local OUTCOME_WRITTEN = Persistence.OUTCOME_WRITTEN or "WRITTEN"
+local OUTCOME_TERMINAL =
+    Persistence.OUTCOME_TERMINAL or "TERMINAL_OR_NOT_APPLICABLE"
+local OUTCOME_RETRYABLE =
+    Persistence.OUTCOME_RETRYABLE or "RETRYABLE_FAILURE"
+
 Adapter.Metrics = Adapter.Metrics or {
     promotions = 0,
     demotions = 0,
@@ -872,19 +878,28 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
     core = core or PsychopatzCore
     options = type(options) == "table" and options or {}
     if type(record) ~= "table" or type(core) ~= "table" then
-        return false, "record_and_core_required"
+        return false, "record_and_core_required", OUTCOME_TERMINAL
+    end
+    if record.coreBacked ~= true then
+        return false, "not_core_backed", OUTCOME_TERMINAL
     end
     local reg = coreRegistry(core)
-    if not reg then return false, "core_registry_unavailable" end
+    if not reg then
+        return false, "core_registry_unavailable", OUTCOME_RETRYABLE
+    end
     local actorID = tostring(
         record.coreActorID
             or (type(record.runtime) == "table" and record.runtime.coreActorID)
             or record.id
             or ""
     )
-    if actorID == "" then return false, "actor_id_required" end
+    if actorID == "" then
+        return false, "actor_id_required", OUTCOME_TERMINAL
+    end
     local actor = reg:Get(actorID)
-    if not actor then return false, "core_actor_not_found" end
+    if not actor then
+        return false, "core_actor_not_found", OUTCOME_TERMINAL
+    end
 
     local coreSocialAdapter = PNC.Persistence and PNC.Persistence.CoreSocial or nil
     if type(record.social) == "table"
@@ -903,13 +918,17 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
         if needsSocialSync then
             local ok, reason = coreSocialAdapter.SyncToCore(record, core)
             if not ok then
-                return false, reason or "core_social_sync_failed"
+                return false,
+                    reason or "core_social_sync_failed",
+                    OUTCOME_RETRYABLE
             end
             if type(record.runtime) == "table" then
                 record.runtime.coreSocialDirty = nil
             end
             actor = reg:Get(actorID)
-            if not actor then return false, "core_actor_not_found" end
+            if not actor then
+                return false, "core_actor_not_found", OUTCOME_TERMINAL
+            end
         end
     end
 
@@ -939,7 +958,9 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
             record, actor
         )
         if not captured then
-            return false, captureErr or "core_inventory_capture_failed"
+            return false,
+                captureErr or "core_inventory_capture_failed",
+                OUTCOME_RETRYABLE
         end
         if Json.Encode(captured) ~= Json.Encode(actor.personalInventory) then
             patch.personalInventory = captured
@@ -974,22 +995,27 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
     if hasPatch then
         local committed, commitErr = reg:Commit(actorID, patch, actor.revision)
         if not committed then
-            return false, commitErr or "core_actor_commit_failed"
+            return false,
+                commitErr or "core_actor_commit_failed",
+                OUTCOME_RETRYABLE
         end
         Adapter.Metrics.syncs = (tonumber(Adapter.Metrics.syncs) or 0) + 1
         record.coreRevision = committed.revision
+        if PNC.Registry then
+            PNC.Registry.CoreStoreDirty = true
+        end
         return true, {
             committed = true,
             actor = committed,
             extensionPersisted = nextExt ~= nil,
-        }
+        }, OUTCOME_WRITTEN
     end
 
     return true, {
         committed = false,
         actor = actor,
         extensionPersisted = nextExt ~= nil,
-    }
+    }, OUTCOME_WRITTEN
 end
 
 function Adapter.SyncAllPromotedCoreActors(core)

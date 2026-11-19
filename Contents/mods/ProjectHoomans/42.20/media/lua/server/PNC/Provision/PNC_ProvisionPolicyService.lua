@@ -62,7 +62,11 @@ function Service.Apply(player, submission)
     ok, reason = PNC.Factions.SetProvisionPolicy(faction.id, current)
     if not ok then return false, reason end
     PNC.Factions.Commit()
-    if GlobalModData and GlobalModData.save then GlobalModData.save() end
+    if PNC.PersistenceCoordinator and PNC.PersistenceCoordinator.Commit then
+        PNC.PersistenceCoordinator.Commit("provision_policy_update")
+    elseif GlobalModData and GlobalModData.save then
+        GlobalModData.save()
+    end
     if PNC.ProvisionScheduler then
         PNC.ProvisionScheduler.MarkFactionDirty(faction.id)
     end

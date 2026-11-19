@@ -13,12 +13,25 @@ local CompanionRecordRepository = require "PNC/Core/Commands/PNC_CompanionRecord
 local CombatRecordRepository = require "PNC/Core/Combat/PNC_CombatRecordRepository"
 local BodyRepository = require "PNC/Core/Presence/PNC_BodyRepository"
 local Persistence = PNC.Persistence
+Persistence.OUTCOME_WRITTEN = Persistence.OUTCOME_WRITTEN or "WRITTEN"
+Persistence.OUTCOME_TERMINAL =
+    Persistence.OUTCOME_TERMINAL or "TERMINAL_OR_NOT_APPLICABLE"
+Persistence.OUTCOME_RETRYABLE =
+    Persistence.OUTCOME_RETRYABLE or "RETRYABLE_FAILURE"
+
 local Core = PNC.Core
 local Const = PNC.Const
 local Identity = PNC.Identity
 local Types = PNC.Types
 local Inventory = PNC.Inventory
 local FactionTypes = PNC.FactionTypes
+
+local function isCoreAppearanceEnvelope(appearance)
+    if type(appearance) ~= "table" then return false end
+    return appearance.policySchemaVersion ~= nil
+        or type(appearance.resolved) == "table"
+        or type(appearance.contract) == "table"
+end
 local function serializeAuthoredTraits(record, field, authoredField, normalize)
     local traits
     if type(record) ~= "table" or record[authoredField] ~= true then
@@ -72,16 +85,33 @@ function Persistence.SerializeRecord(record)
     local payload
     local inventoryPayload
     local recipeKnowledge
-    if not record or record.persist == false then
-        return nil
+    if not record then
+        return nil, Persistence.OUTCOME_TERMINAL, "missing_record"
     end
-    if type(record.appearance) == "table"
-        and (tonumber(record.appearance.schemaVersion) ~= 2
-            or PNC.Identity.Appearance
+    if record.persist == false or record.runtimeView == true then
+        return nil, Persistence.OUTCOME_TERMINAL, "non_persistent"
+    end
+    if record.coreBacked == true
+        or tostring(record.persistenceAuthority or "") == "core_extension"
+    then
+        return nil, Persistence.OUTCOME_TERMINAL, "owned_by_core_extension"
+    end
+    if type(record.appearance) == "table" then
+        if isCoreAppearanceEnvelope(record.appearance) then
+            return nil,
+                Persistence.OUTCOME_TERMINAL,
+                "core_appearance_authority_mismatch"
+        end
+        if tonumber(record.appearance.schemaVersion) ~= 2
+            or (PNC.Identity
+                and PNC.Identity.Appearance
                 and PNC.Identity.Appearance.Validate
                 and not PNC.Identity.Appearance.Validate(record.appearance))
-    then
-        return nil
+        then
+            return nil,
+                Persistence.OUTCOME_TERMINAL,
+                "invalid_legacy_appearance_schema"
+        end
     end
     MemoryRepository.PrepareRecord(record)
     identity = IdentityRepository.Normalize(record.identity, record)
@@ -225,5 +255,5 @@ function Persistence.SerializeRecord(record)
             and PNC.Journals.ExportNPC(record) or nil,
     }
     payload.bodyHint = BodyRepository.BuildHint(record)
-    return payload
+    return payload, Persistence.OUTCOME_WRITTEN, "serialized"
 end

@@ -81,6 +81,9 @@ function Registry.ReleasePromotedRecord(id)
     Registry.DirtyByID[id] = nil
     Registry.DirtyDomains[id] = nil
     Registry.SavedSnapshots[id] = nil
+    if Registry.RetryState then
+        Registry.RetryState[id] = nil
+    end
     if PNC.Scheduler and PNC.Scheduler.Remove then
         PNC.Scheduler.Remove(id)
     end
@@ -117,6 +120,9 @@ function Registry.RemoveRecord(id)
     Registry.DirtyByID[id] = nil
     Registry.DirtyDomains[id] = nil
     Registry.SavedSnapshots[id] = nil
+    if Registry.RetryState then
+        Registry.RetryState[id] = nil
+    end
     directory.records[id] = nil
     if ModData.remove then
         ModData.remove(entry and entry.storageKey or Internal.StorageKeyForID(id))

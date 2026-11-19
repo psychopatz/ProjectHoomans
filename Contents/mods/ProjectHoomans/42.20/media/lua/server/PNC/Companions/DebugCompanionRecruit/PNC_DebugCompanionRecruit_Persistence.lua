@@ -35,12 +35,16 @@ end
 -- boundary so a restart cannot expose a half-recruited NPC or recreate the
 -- first-colony naming prompt from stale ModData.
 function H.SaveRecruitment()
-    if Registry and Registry.Save then Registry.Save() end
     if Factions and Factions.Commit then Factions.Commit() end
     if PNC.Communities and PNC.Communities.Commit then
         PNC.Communities.Commit()
     end
-    if GlobalModData and GlobalModData.save then GlobalModData.save() end
+    if PNC.PersistenceCoordinator and PNC.PersistenceCoordinator.Commit then
+        PNC.PersistenceCoordinator.Commit("recruitment")
+    else
+        if Registry and Registry.Save then Registry.Save() end
+        if GlobalModData and GlobalModData.save then GlobalModData.save() end
+    end
 end
 
 

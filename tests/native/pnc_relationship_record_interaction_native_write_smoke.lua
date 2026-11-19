@@ -177,7 +177,8 @@ PZHarnessNativeTest = function()
 
     local commitOK, committed, commitReason, commitDetails = pcall(
         PNC.PersistenceCoordinator.Commit,
-        "native_harness_relationship_record_interaction_restart"
+        "native_harness_relationship_record_interaction_restart",
+        { immediate = true }
     )
     PZHarness.assertTrue(
         commitOK and committed,

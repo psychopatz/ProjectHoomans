@@ -25,6 +25,7 @@ function Integration.InstallServer()
             Internal.Wrap(owner, key, "ProjectHoomans." .. metric, "coarse")
         end
         wrapCoarse(PNC.PersistenceCoordinator, "Commit", "Persistence.Commit")
+        wrapCoarse(PNC.PersistenceCoordinator, "Pump", "Persistence.Pump")
         wrapCoarse(PNC.Registry, "FlushDirty", "Persistence.NPCRecords")
         wrapCoarse(PNC.Presence, "Materialize",
             "Server.Update.NPC.Materialize")

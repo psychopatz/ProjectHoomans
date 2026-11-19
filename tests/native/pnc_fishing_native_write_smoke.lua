@@ -104,7 +104,8 @@ PZHarnessNativeTest = function()
     )
     local commitOK, committed, commitReason, commitDetails = pcall(
         PNC.PersistenceCoordinator.Commit,
-        "native_harness_fishing_restart"
+        "native_harness_fishing_restart",
+        { immediate = true }
     )
     PZHarness.assertTrue(
         commitOK and committed,
