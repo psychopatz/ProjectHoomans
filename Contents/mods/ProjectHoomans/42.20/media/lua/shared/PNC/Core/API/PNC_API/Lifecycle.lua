@@ -196,14 +196,35 @@ function API.Spawn(definition)
     return finalizeNewRecord(record, def)
 end
 
-function API.Despawn(npcId)
+function API.Despawn(npcId, options)
     local record = Registry.Get(npcId)
     if not Core.IsAuthority() or not record then
         return false
     end
+    options = type(options) == "table" and options or nil
     Presence.Abstract(record, "despawn")
     Registry.RemoveRecord(npcId)
     Network.BroadcastRemoval(npcId, "despawn")
+    local coreLifecycle = PNC.Persistence and PNC.Persistence.CoreLifecycle
+    local isDTProjection = type(record.runtime) == "table"
+        and record.runtime.dtProviderProjection == true
+    if not isDTProjection and coreLifecycle then
+        if options and options.retire == true
+            and type(coreLifecycle.RetireActor) == "function"
+        then
+            coreLifecycle.RetireActor(
+                record,
+                options.reason or "departed",
+                options
+            )
+        elseif type(coreLifecycle.HardDeleteRollback) == "function" then
+            coreLifecycle.HardDeleteRollback(
+                record,
+                (options and options.reason) or "rollback",
+                options
+            )
+        end
+    end
     return true
 end
 

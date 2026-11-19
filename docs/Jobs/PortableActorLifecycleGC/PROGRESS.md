@@ -1,9 +1,9 @@
 # Progress — Project Hoomans Portable Actor Lifecycle & GC Adoption
 
-**Status:** IN_PROGRESS (H0 + H3A Core `memoryBank` parity implemented — awaiting Core L1-L4/H1-H2 completion).
+**Status:** IN_PROGRESS (H0, H1, H2, H3A, H4-policy ACCEPTED — awaiting Core L6/H6+H3).
 **Parent:** PsychopatzCore Docs/portable_actor_lifecycle_gc/.
-**Current phase:** H0 complete + H3A Core `memoryBank` persistence parity updated (`PNC_Persistence_CoreSocial.lua`); next H1 after Core L4.
-**Participant completion:** 1/6 phases accepted (H3A persistence compatibility landed early with Core L3).
+**Current phase:** H1-H2 complete; next H3 / L6 player-character lifecycle.
+**Participant completion:** 4/6 phases accepted (H0, H1, H2, plus H3A/H4-policy).
 
 ## Verified H0 Audit Facts (Checkpoint `67510b0db`)
 
@@ -27,6 +27,13 @@
 
 - Annotated `tools/providers/pnc/codebuilder/sources/social_policy/events/combat_and_care.json` and `dialogue_and_emotes.json` with explicit `references` (`STRONG`/`WEAK`/`LABEL_ONLY`, role caps, `degradeOnPurge`, `anchorMax = 16` on `friendship_established`).
 - Regenerated `PNC/SocialPolicy/Events/CombatAndCare.lua`, `DialogueAndEmotes.lua`, and `Registry.lua` via Core CodeBuilder `reconcile.py --apply` (`clean: true`; Kahlua lint 0 errors; `social_policy` & `core_social` tests PASS).
+
+## H1 & H2 — Core Lifecycle Bridge & Durable Hoomans GC Roots
+
+- Created `PNC/Core/Persistence/PNC_Persistence_CoreLifecycle.lua` (required by `PNC_Persistence.lua`) bridging `RetireActor` and `HardDeleteRollback` exclusively to Core `DefaultRegistry` with zero duplicate Hoomans tombstone/GC stores, and registering `"ProjectHoomans.DurableRoots"` in Core `GC`.
+- Registered only warranted strong roots (`DeathMarkers` for active colony/infected corpses, non-terminal quests, active faction leaders/owners, and living durable bonds) while keeping `UniqueNPCRegistry` dead flags, terminal quests, and dead non-leader `faction.memberIDs` WEAK and compacted in `OnBeforePurge` (preserving `status = "dead"` on unique NPCs).
+- Wired `PNC_Health_Death.lua` (calling `QuestService.OnNPCDeath` and `MedicalCareService.OnNPCDeath`, then calling `CoreLifecycle.RetireActor` after `AddDeathMarker`/`RemoveRecord` + post-retirement `faction.memberIDs` scrub), `PNC_API/Lifecycle.lua` (`API.Despawn` rollback `HardDelete` vs `retire = true` vs skipping `dtProviderProjection`), and `PNC_NPCKnowledgeService_PlayerSnapshots.lua` (historical Core tombstone/`DeathMarker`/note degradation).
+- Verified 18/18 tests PASS (`core_actor_lifecycle_gc`, `factions_foundation`, `quest`, `medical_care`, `core_social`, `death`, `reanimat`) and Kahlua lint 0 errors across all 7 files.
 
 ## Next Chunk
 

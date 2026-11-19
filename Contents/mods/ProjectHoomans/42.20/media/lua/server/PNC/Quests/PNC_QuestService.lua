@@ -573,6 +573,43 @@ function Service.ObserveInventoryTransfer(_, event)
     return Service.ApplyObjectiveEvent(event)
 end
 
+function Service.OnNPCDeath(npcID, worldAgeHours)
+    local key = text(npcID)
+    if not key or type(Repository.State) ~= "table"
+        or type(Repository.State.byKey) ~= "table"
+    then
+        return 0
+    end
+    local at = tonumber(worldAgeHours) or now()
+    local scopeKeys = {}
+    for sKey in pairs(Repository.State.byKey) do
+        scopeKeys[#scopeKeys + 1] = sKey
+    end
+    table.sort(scopeKeys)
+    local failedCount = 0
+    for _, sKey in ipairs(scopeKeys) do
+        local instance = Repository.State.byKey[sKey]
+        if type(instance) == "table"
+            and not Repository.TERMINAL[instance.status]
+            and tostring(instance.giverNPCID or "") == key
+        then
+            local def = definitionFor(instance.questID)
+            if not (def and def.keepAliveOnGiverDeath == true) then
+                instance.status = Status.FAILED
+                instance.failureReason = "giver_died"
+                instance.updatedAt = at
+                instance.revision = (tonumber(instance.revision) or 0) + 1
+                local stored = save(instance)
+                if stored then
+                    emit("QUEST_FAILED", stored, { reason = "giver_died" })
+                    failedCount = failedCount + 1
+                end
+            end
+        end
+    end
+    return failedCount
+end
+
 local taskEvents = PNC.Tasking and PNC.Tasking.Events
 if taskEvents and type(taskEvents.Subscribe) == "function"
     and not Service.EventHookRegistered

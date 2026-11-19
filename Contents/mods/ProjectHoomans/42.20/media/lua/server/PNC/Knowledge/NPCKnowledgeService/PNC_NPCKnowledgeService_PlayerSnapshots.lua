@@ -65,13 +65,33 @@ function Knowledge.BuildPlayerSnapshotForPlayer(player, npcID)
     )
     if not characterUUID then return nil, identityReason end
     local snapshot = Knowledge.BuildPlayerSnapshot(characterUUID, npcID)
-    local record = Registry and Registry.Get and Registry.Get(tostring(npcID or "")) or nil
-    if not record then return nil, "npc_not_found" end
-    local identity = PNC.Identity and PNC.Identity.GetCharacterSummary
+    local targetID = tostring(npcID or "")
+    local record = Registry and Registry.Get and Registry.Get(targetID) or nil
+    local deathMarker = (not record) and Registry and Registry.GetDeathMarker
+        and Registry.GetDeathMarker(targetID) or nil
+    local coreActors = PsychopatzCore and PsychopatzCore.Actors or nil
+    local coreLifecycleProj = nil
+    if not record and coreActors and coreActors.DefaultRegistry
+        and type(coreActors.DefaultRegistry.ProjectIdentity) == "function"
+    then
+        coreLifecycleProj = coreActors.DefaultRegistry:ProjectIdentity(targetID)
+    end
+    local hasHistoricalNote = #(snapshot.categories or {}) > 0
+        or snapshot.firstMetAt ~= nil
+    local isHistoricalTombstone = coreLifecycleProj ~= nil
+        and coreLifecycleProj.status == "RETIRED"
+    if not record and not deathMarker and not isHistoricalTombstone
+        and not hasHistoricalNote
+    then
+        return nil, "npc_not_found"
+    end
+    local identity = record and PNC.Identity and PNC.Identity.GetCharacterSummary
         and PNC.Identity.GetCharacterSummary(record) or {}
-    local faction = record.affiliation and PNC.Factions
+    local factionID = record and record.affiliation and record.affiliation.factionID
+        or (deathMarker and deathMarker.factionID) or nil
+    local faction = factionID and PNC.Factions
         and PNC.Factions.GetPresentation
-        and PNC.Factions.GetPresentation(record.affiliation.factionID) or nil
+        and PNC.Factions.GetPresentation(factionID) or nil
     local knownName = Knowledge.GetDescriptor(characterUUID, npcID, "identity.name")
     local knownFullName = Knowledge.GetDescriptor(
         characterUUID, npcID, "identity.full_name"
@@ -89,20 +109,38 @@ function Knowledge.BuildPlayerSnapshotForPlayer(player, npcID)
         characterUUID, npcID, "identity.archetype"
     )
     local knownFaction = Knowledge.GetDescriptor(characterUUID, npcID, "faction.identity")
+    local fallbackName = (coreLifecycleProj and coreLifecycleProj.displayName)
+        or (deathMarker and deathMarker.name) or nil
     snapshot.identity = {
         displayName = knownName and knownName.value
-            or knownFullName and knownFullName.value or nil,
+            or knownFullName and knownFullName.value
+            or (not record and fallbackName) or nil,
         nickname = knownNickname and knownNickname.value or nil,
         forename = knownForename and knownForename.value or nil,
         surname = knownSurname and knownSurname.value or nil,
         archetypeLabel = knownArchetype and identity.archetypeLabel or nil,
-        factionName = knownFaction and faction and faction.name or nil,
-        factionRole = knownFaction and record.affiliation and record.affiliation.role or nil,
+        factionName = knownFaction and faction and faction.name
+            or (deathMarker and deathMarker.factionName) or nil,
+        factionRole = knownFaction and record and record.affiliation
+            and record.affiliation.role or nil,
         firstMetAt = snapshot.firstMetAt,
         lastInteractionAt = snapshot.lastInteractionAt,
     }
-    snapshot.portrait = PNC.Identity and PNC.Identity.BuildPortraitSummary
-        and PNC.Identity.BuildPortraitSummary(record) or nil
+    if not record then
+        snapshot.historical = true
+        snapshot.lifecycleStatus = coreLifecycleProj and coreLifecycleProj.status
+            or (deathMarker and "RETIRED" or "FORGOTTEN")
+        snapshot.lifecycleRevision = coreLifecycleProj and coreLifecycleProj.lifecycleRevision or 0
+        snapshot.retiredAt = coreLifecycleProj and coreLifecycleProj.retiredAt or nil
+    elseif coreLifecycleProj then
+        snapshot.lifecycleStatus = coreLifecycleProj.status
+        snapshot.lifecycleRevision = coreLifecycleProj.lifecycleRevision
+    else
+        snapshot.lifecycleStatus = "LIVE"
+    end
+    snapshot.portrait = (record and PNC.Identity and PNC.Identity.BuildPortraitSummary
+        and PNC.Identity.BuildPortraitSummary(record))
+        or (deathMarker and deathMarker.portrait) or nil
     if snapshot.portrait then
         snapshot.portrait.preferDescriptor = true
         snapshot.portrait.faceOnly = true

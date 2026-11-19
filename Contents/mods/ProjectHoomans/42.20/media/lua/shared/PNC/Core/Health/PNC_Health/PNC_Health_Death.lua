@@ -52,8 +52,18 @@ local function markDeadState(record, health, reason)
 end
 
 local function notifyDeathSystems(record)
+    local at = PNC.SocialEventHooks and PNC.SocialEventHooks.WorldAgeHours
+        and PNC.SocialEventHooks.WorldAgeHours() or Core.Now()
     if PNC.Factions and PNC.Factions.OnNPCDeath then
         PNC.Factions.OnNPCDeath(record.id)
+    end
+    if PNC.QuestService and type(PNC.QuestService.OnNPCDeath) == "function" then
+        PNC.QuestService.OnNPCDeath(record.id, at)
+    end
+    if PNC.MedicalCareService
+        and type(PNC.MedicalCareService.OnNPCDeath) == "function"
+    then
+        PNC.MedicalCareService.OnNPCDeath(record.id)
     end
     if not PNC.SocialEventHooks then return end
     if PNC.SocialEventHooks.DiscardRescueContributions then
@@ -176,6 +186,12 @@ local function retireDeadRecord(record)
         end
     elseif Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "health")
+    end
+    local coreLifecycle = PNC.Persistence and PNC.Persistence.CoreLifecycle
+    if coreLifecycle and type(coreLifecycle.RetireActor) == "function" then
+        coreLifecycle.RetireActor(record, record.deathReason or "death", {
+            deathMarker = deathMarker,
+        })
     end
     return deathMarker, retired
 end

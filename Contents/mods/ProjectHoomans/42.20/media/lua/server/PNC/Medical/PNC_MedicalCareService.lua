@@ -441,4 +441,36 @@ function Service.Requeue(id, reason)
     return true, copy(task)
 end
 
+function Service.OnNPCDeath(npcID)
+    local key = tostring(npcID or "")
+    if key == "" or type(Repository.State) ~= "table"
+        or type(Repository.State.byId) ~= "table"
+    then
+        return 0
+    end
+    local ids = {}
+    for id in pairs(Repository.State.byId) do
+        ids[#ids + 1] = id
+    end
+    table.sort(ids)
+    local affected = 0
+    for _, id in ipairs(ids) do
+        local task = Repository.State.byId[id]
+        if task and not Service.TERMINAL[task.status] then
+            if task.patientKind == "npc" and tostring(task.patientId) == key then
+                if Service.Cancel(id, "patient_died") then
+                    affected = affected + 1
+                end
+            elseif tostring(task.actorId or "") == key
+                or tostring(task.supplyRequesterId or "") == key
+            then
+                if Service.Requeue(id, "doctor_died") then
+                    affected = affected + 1
+                end
+            end
+        end
+    end
+    return affected
+end
+
 return Service
