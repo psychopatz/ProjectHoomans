@@ -153,7 +153,90 @@ local function collectCandidates(radius, useRegistryFallback)
         end
         return left.distSq < right.distSq
     end)
-    return ordered, #players, indexedCount
+    return ordered, #players, indexedCount, players
+end
+
+local function promoteNearbyCoreCandidates(
+    seen,
+    ordered,
+    players,
+    radius,
+    now
+)
+    local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
+    if not coreProvider
+        or type(coreProvider.QueryPromotionCandidates) ~= "function"
+        or type(coreProvider.PromoteCoreActor) ~= "function"
+        or type(players) ~= "table"
+        or #players == 0
+    then
+        return 0
+    end
+
+    local maxPerRefresh = math.max(
+        1,
+        math.floor(tonumber(Const.CORE_PROMOTE_MAX_PER_REFRESH) or 4)
+    )
+    local globalMax = math.max(
+        1,
+        math.floor(tonumber(Const.LIVE_BODY_MAX_GLOBAL) or 32)
+    )
+    local playerMax = math.max(
+        1,
+        math.floor(tonumber(Const.LIVE_BODY_MAX_PER_PLAYER) or 20)
+    )
+    local liveTotal = 0
+    if Registry and type(Registry.ForEachLive) == "function" then
+        Registry.ForEachLive(function()
+            liveTotal = liveTotal + 1
+        end)
+    end
+    local capLimit = math.min(globalMax, playerMax * math.max(1, #players))
+    local headroom = math.max(0, capLimit - liveTotal - #ordered)
+    local budget = math.min(maxPerRefresh, headroom)
+    if budget <= 0 then
+        return 0
+    end
+
+    local candidates = coreProvider.QueryPromotionCandidates(
+        players, radius, now, PsychopatzCore
+    )
+    if type(candidates) ~= "table" or #candidates == 0 then
+        return 0
+    end
+
+    local promoted = 0
+    for i = 1, #candidates do
+        if promoted >= budget then break end
+        local entry = candidates[i]
+        if entry and entry.actorId and not seen[entry.actorId] then
+            local record = coreProvider.PromoteCoreActor(
+                entry.actorId,
+                PsychopatzCore,
+                { reason = "presence_interest" }
+            )
+            if record then
+                local candidateEntry = {
+                    record = record,
+                    distSq = entry.distSq,
+                    source = "core_spatial",
+                }
+                seen[record.id] = candidateEntry
+                ordered[#ordered + 1] = candidateEntry
+                promoted = promoted + 1
+            end
+        end
+    end
+
+    if promoted > 0 then
+        table.sort(ordered, function(left, right)
+            if left.distSq == right.distSq then
+                return tostring(left.record.id) < tostring(right.record.id)
+            end
+            return left.distSq < right.distSq
+        end)
+    end
+    return promoted
 end
 
 local function wakeCandidates(ordered, now)
@@ -186,10 +269,13 @@ function Presence.RefreshMaterializationCandidates(now, force)
     local count
     local playerCount
     local indexedCount
+    local players
     local useRegistryFallback
     local indexWasReady
+    local promotedCount = 0
     local radius = tonumber(Const.MATERIALIZE_DISTANCE) or 28
     now = tonumber(now) or Core.Now()
+    Internal.lastRefreshPromotions = 0
     if force ~= true
         and now - (tonumber(Internal.LastInterestRefreshAt) or 0)
             < (tonumber(Const.PRESENCE_INTEREST_REFRESH_MS) or 250)
@@ -208,13 +294,23 @@ function Presence.RefreshMaterializationCandidates(now, force)
     useRegistryFallback = not indexWasReady
         or Spatial.NPCInitialized ~= true
         or now - (tonumber(Internal.LastRegistryFallbackAt) or 0) >= 1000
-    ordered, playerCount, indexedCount = collectCandidates(
+    ordered, playerCount, indexedCount, players = collectCandidates(
         radius,
         useRegistryFallback
     )
     if useRegistryFallback then
         Internal.LastRegistryFallbackAt = now
     end
+    local seen = {}
+    for i = 1, #ordered do
+        if ordered[i] and ordered[i].record and ordered[i].record.id then
+            seen[ordered[i].record.id] = ordered[i]
+        end
+    end
+    promotedCount = promoteNearbyCoreCandidates(
+        seen, ordered, players, radius, now
+    )
+    Internal.lastRefreshPromotions = promotedCount
     count = #ordered
     Internal.lastInterestIndexed = indexedCount
     Internal.lastInterestUsedRegistryFallback = useRegistryFallback

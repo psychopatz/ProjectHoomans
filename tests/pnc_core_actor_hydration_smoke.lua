@@ -28,6 +28,7 @@ local records = {}
 local dirty = 0
 local previousRegistry = PNC.Registry
 PNC.Registry = {
+    Data = records,
     Get = function(id) return records[tostring(id)] end,
     AddRecord = function(record)
         records[tostring(record.id)] = record
@@ -37,37 +38,44 @@ PNC.Registry = {
 }
 
 T.load("ProjectHoomans", "shared",
+    "PNC/Core/Persistence/PNC_CoreActorExtension.lua")
+T.load("ProjectHoomans", "shared",
     "PNC/Core/Persistence/PNC_Persistence_CoreProvider.lua")
 
 local Adapter = PNC.Persistence.CoreProvider
-local record, status = Adapter.HydrateCoreActor(
+T.equal(Adapter.HydrateCoreActors, nil,
+    "bulk HydrateCoreActors must be removed")
+
+local record, status = Adapter.PromoteCoreActor(
     actor,
-    PsychopatzCore
+    PsychopatzCore,
+    { reason = "smoke_test" }
 )
 T.truthy(record, status)
-T.equal(status, "created", "Core actor hydration status")
-T.equal(record.id, actor.actorId, "hydrated record ID")
-T.equal(record.coreActorID, actor.actorId, "hydrated Core actor ID")
-T.equal(record.x, 101, "hydrated x position")
-T.equal(record.y, 202, "hydrated y position")
+T.equal(status, "created", "Core actor promotion status")
+T.equal(record.coreBacked, true, "promoted record must be coreBacked")
+T.equal(record.id, actor.actorId, "promoted record ID")
+T.equal(record.coreActorID, actor.actorId, "promoted Core actor ID")
+T.equal(record.x, 101, "promoted x position")
+T.equal(record.y, 202, "promoted y position")
 T.equal(record.factionID, "faction:hydration",
-    "hydrated faction affiliation")
+    "promoted faction affiliation")
 T.equal(record.communityID, "community:hydration",
-    "hydrated community affiliation")
+    "promoted community affiliation")
 T.equal(record.groupID, "group:hydration",
-    "hydrated group affiliation")
+    "promoted group affiliation")
 T.equal(record.presenceState, PNC.Const.PRESENCE_ABSTRACT,
     "Core-only actor enters Hoomans as abstract")
-T.truthy(dirty > 0, "hydration did not mark the runtime record dirty")
+T.equal(dirty, 0, "clean lazy promotion must not falsely mark record dirty")
 
 local second, secondStatus = Adapter.HydrateCoreActor(
     actor,
     PsychopatzCore
 )
 T.truthy(second, secondStatus)
-T.equal(secondStatus, "existing", "repeated hydration status")
+T.equal(secondStatus, "existing", "repeated promotion must be idempotent")
 T.equal(records[actor.actorId], second,
-    "repeated hydration replaced the record identity")
+    "repeated promotion must preserve record identity")
 
 PNC.Registry = previousRegistry
 Actors.DefaultRegistry = previousDefaultRegistry

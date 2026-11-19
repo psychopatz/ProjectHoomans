@@ -212,6 +212,13 @@ function Presence.Abstract(record, reason)
     end
     notifyAbstraction(record, reason)
     record.presenceState = Const.PRESENCE_ABSTRACT
+    record.runtime = record.runtime or {}
+    local abstractNow = Core.Now()
+    record.runtime.abstractedAt = abstractNow
+    if tostring(reason or "") == "range_exit" then
+        local graceMs = tonumber(Const.CORE_DEMOTE_GRACE_MS) or 2000
+        record.runtime.demoteEligibleAt = abstractNow + graceMs
+    end
     logFollowerTransition(
         record,
         Const.PRESENCE_LIVE,

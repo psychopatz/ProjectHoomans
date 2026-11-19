@@ -26,9 +26,15 @@ function Groups.ReconcileMembers(groupOrID, faction)
         ids = {}
         local community = PNC.Communities and PNC.Communities.Get
             and PNC.Communities.Get(group.homeCommunityId) or nil
+        local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
         for _, npcID in ipairs(group.memberIds or {}) do
             local record = PNC.Registry and PNC.Registry.Get(npcID) or nil
-            if record and record.alive ~= false and community
+            local isAlive = (record and record.alive ~= false)
+                or (not record
+                    and coreProvider
+                    and type(coreProvider.IsAliveCoreActor) == "function"
+                    and coreProvider.IsAliveCoreActor(npcID, PsychopatzCore))
+            if isAlive and community
                 and community.memberIDs and community.memberIDs[npcID] == true then
                 ids[#ids + 1] = npcID
             end

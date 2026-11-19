@@ -2,7 +2,7 @@
 
 ## Current state
 
-**IN PROGRESS — L0 COMPLETE; L1 NEXT.**
+**IN PROGRESS — L0, L1 COMPLETE; L2 NEXT.**
 
 Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded deep profiling (`coarse` vs `deep`), and the deterministic integrated headless runtime simulator foundation before optimizing downstream phases.
 
@@ -24,6 +24,21 @@ Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded dee
 - **Pre-existing unrelated Core baseline failures left untouched:** `psychopatz_profiler_client_composition_smoke.lua` (`module 'TimedActions/ISAttachItemHotbar' not found` in headless env) and `psychopatz_profiler_server_composition_smoke.lua` (`OnClientCommand` count `2` vs `1`).
 - **L0 verification:** `luac -p` pass, `pz_verify.py --kahlua` 0 errors/0 warnings, Core Lua profiler tests 5/5 pass, Core Python profiler tests 54/54 pass, Hoomans profiler tests 10/10 pass, simulator smoke 1/1 pass.
 
+## L1 — Lazy Core -> Hoomans promotion/demotion (COMPLETE)
+
+- **Single bounded Hoomans durable extension authority:** `actor.extensions["ProjectHoomans.ActorExtension"]` (`schemaVersion = 1`) via `PNC_CoreActorExtension.lua`. Never duplicates Core-owned identity, appearance, `personalInventory`, social/persona/knowledge, SurvivorWorld affiliation/world/journey, or `providerLease`. Unmodified bystanders encode to `nil` (0 bytes); Core-backed promoted records never write legacy `PNC_npc_<id>` ModData or dirty the legacy Hoomans directory.
+- **Core spatial & extension index (`psychopatzCore`):** Added lazy incremental 32-tile `_spatialIndex` and `QueryNearPosition` / `HasActiveActor` / `GetExtension` / `ListWithExtension` / `ListMaterialized` to `PsychopatzActorRegistry` & `PsychopatzActors`; skipped $O(N)$ identity index rebuild in `Commit()` when identity fields are unchanged.
+- **Lazy promotion & reversible demotion (`ProjectHoomans`):** Removed bulk startup/refresh `HydrateCoreActors()`; added `RestoreActiveCoreActors`, bounded interest promotion (`CORE_PROMOTE_MAX_PER_REFRESH = 4`, respecting `PresenceAdmission` headroom), single idempotent `PromoteCoreActor`, `HasActiveHoomansResponsibility` (treating default standby jobs `GuardAnchor` and `HuntNearestPlayer` as non-blocking unless an explicit order/target/combat/facility is active), `SyncPromotedCoreActorToCore`, `DemoteCoreActor`, and bounded `PumpDemotions` (`CORE_DEMOTE_GRACE_MS = 2000`, `CORE_DEMOTE_PUMP_MS = 1000`, `CORE_DEMOTE_MAX_PER_PUMP = 8`) backed by non-destructive `Registry.ReleasePromotedRecord`.
+- **Consumer identity preservation:** Updated `PNC_CorePresenceAdapter` (lazy promotion on `DebugForceLive`, rollback on failure, demotion on `DebugRelease`), `PNC_UniqueNPCRegistry_{Maintenance,Diagnostics}`, `PNC_AbstractGroupManager_Membership`, `PNC_MobileGroupDirector_Members`, and `PNC_StartingCompanionService_{Ensure,Grant}` to preserve canonical Core actor IDs without eager hydration or duplication.
+- **HEADLESS LUA SIMULATOR (NON-NATIVE) L1 results vs L0:**
+  - Smoke (`N=100, Z=40, 15s`, `OFF`): `startProm=0` (was 100), `peakProm=9`, `endProm=9`, `schedEnd=9`, `spatialEnd=9`, `serAttempts=18` (was 500), `dirtyEnd=0` (was 100), `fullSnap=157` (was 168), `SafePhaseFailures=0`, `tickCpuMs=1147.10ms`; exact bit-for-bit operational invariance across `OFF` / `COARSE` / `DEEP` and `OFF_300` (`N=300` vs `N=100`).
+  - Departure (`DEPART`): `peakProm=9 -> endProm=0, demoted=9, schedEnd=0, spatialEnd=0, CoreActors=100, SafePhaseFailures=0`.
+  - Crowd burst (`MASS40`): `peakProm=20 <= 24`, `MaxPromotionsInSingleRefresh <= 4`, `MaxMaterializationsInSingleTick <= 2`, `SafePhaseFailures=0`.
+  - Benchmark (`Z=64, 20s`, `OFF`):
+    - `N=100`: `Promoted=9` (was 100), `DirtyEnd=0` (was 100), `serAttempts=18` (was 600), `FullSnap=205` (was 216), `TickCpuMs=2094.12ms`.
+    - `N=500`: `Promoted=9` (was 500), `DirtyEnd=0` (was 500), `serAttempts=18` (was 3000), `FullSnap=205` (was 216), `TickCpuMs=3340.07ms` (was 4004.86ms).
+- **L1 verification:** `luac -p` pass & `pz_verify.py --kahlua --severity WARNING` 0 errors/0 warnings on all modified/created runtime Lua files in both repos; Core spatial/extension smoke + 44/44 related Core actor/survivor_world tests pass (leaving the 2 pre-existing unrelated Core baseline failures untouched); ProjectHoomans focused suites pass (`core_actor` 4/4, `survivor_world` 8/8, `lightweight` 2/2, `presence` 119/119, `persistence` 13/13, `registry` 10/10, `replication` 3/3, `starting_companion` 12/12, `unique_npc` 7/7, `profiler` 10/10).
+
 ## Accepted dependencies
 
 Do not reopen:
@@ -36,4 +51,4 @@ This job corrects Hoomans runtime adoption so it actually obeys those accepted c
 
 ## Next Chunk
 
-**L1 — lazy Core -> Hoomans promotion/demotion.**
+**L2 — single-authority persistence and deferred physical flush.**

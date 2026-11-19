@@ -199,6 +199,9 @@ function H.FinishTick(now)
     H.TimingSample = timerName ~= nil
     safeOptional("server_finish.network_flush", Network, "FlushRosterDeltas",
         nil, now, false)
+    safeOptional("server_finish.core_demotions",
+        PNC.Persistence and PNC.Persistence.CoreProvider,
+        "PumpDemotions", nil, now, PsychopatzCore)
     safeOptional("server_finish.zombie_aggro", ZombieAggro, "Pump", nil, now)
     safeOptional(
         "server_finish.stealth_discovery",

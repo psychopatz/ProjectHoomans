@@ -300,20 +300,6 @@ local function refreshGeneratedViews()
     end
     local refreshed, reason = extensions.RefreshFromCore()
     if not refreshed then return nil, reason end
-
-    local provider = PNC.Persistence and PNC.Persistence.CoreProvider
-    if provider and type(provider.HydrateCoreActors) == "function"
-        and PsychopatzCore
-    then
-        local hydrated, hydrationReason =
-            provider.HydrateCoreActors(PsychopatzCore)
-        if type(hydrationReason) == "table" then
-            return nil, "core_actor_hydration_partial"
-        end
-        if hydrated == nil then
-            return nil, hydrationReason
-        end
-    end
     return true
 end
 

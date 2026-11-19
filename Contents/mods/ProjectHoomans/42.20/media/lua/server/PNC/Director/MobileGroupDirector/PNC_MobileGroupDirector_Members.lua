@@ -16,6 +16,7 @@ local Const = PNC.Const
 
 function H.FactionMembersAreAbstract(faction)
     local hasMember = false
+    local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
     for npcID, _ in pairs(faction.memberIDs or {}) do
         local record = PNC.Registry and PNC.Registry.Get
             and PNC.Registry.Get(npcID) or nil
@@ -26,6 +27,12 @@ function H.FactionMembersAreAbstract(faction)
             if live or record.presenceState == Const.PRESENCE_LIVE then
                 return false, "mobile_group_live"
             end
+        elseif not record
+            and coreProvider
+            and type(coreProvider.IsAliveCoreActor) == "function"
+            and coreProvider.IsAliveCoreActor(npcID, PsychopatzCore)
+        then
+            hasMember = true
         end
     end
     return hasMember, hasMember and "abstract" or "no_members"

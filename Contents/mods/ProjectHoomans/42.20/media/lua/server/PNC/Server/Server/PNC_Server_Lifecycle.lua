@@ -58,15 +58,15 @@ function H.OnServerStarted()
     end
     if PNC.Persistence
         and PNC.Persistence.CoreProvider
-        and type(PNC.Persistence.CoreProvider.HydrateCoreActors) == "function"
+        and type(PNC.Persistence.CoreProvider.RestoreActiveCoreActors) == "function"
         and PsychopatzCore
     then
-        local hydrated, hydrationStatus =
-            PNC.Persistence.CoreProvider.HydrateCoreActors(PsychopatzCore)
+        local restored, restoreStatus =
+            PNC.Persistence.CoreProvider.RestoreActiveCoreActors(PsychopatzCore)
         if PNC.Core and PNC.Core.LogInfo then
             PNC.Core.LogInfo(
-                "PNC Core actor hydration count=" .. tostring(hydrated)
-                    .. " status=" .. tostring(hydrationStatus)
+                "PNC Core active actor restore count=" .. tostring(restored)
+                    .. " status=" .. tostring(restoreStatus)
             )
         end
     end

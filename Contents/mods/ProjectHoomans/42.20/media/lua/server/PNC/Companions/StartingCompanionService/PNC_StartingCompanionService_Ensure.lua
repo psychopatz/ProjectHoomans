@@ -65,10 +65,24 @@ function Starting.Ensure(player, characterUUID, at, options)
     if #selections == 0 then return false, "none" end
 
     local needsWork = false
+    local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
     for index = 1, #selections do
         local grant = state.grants[selections[index].id]
         local existing = grant and grant.npcID
             and Registry.Get(grant.npcID) or nil
+        if not existing
+            and grant and grant.npcID
+            and coreProvider
+            and type(coreProvider.IsAliveCoreActor) == "function"
+            and type(coreProvider.PromoteCoreActor) == "function"
+            and coreProvider.IsAliveCoreActor(grant.npcID, PsychopatzCore)
+        then
+            existing = coreProvider.PromoteCoreActor(
+                grant.npcID,
+                PsychopatzCore,
+                { reason = "starting_companion_ensure" }
+            )
+        end
         if not grant or grant.status ~= "granted"
             or (tonumber(grant.enrichmentVersion) or 0)
                 < Starting.ENRICHMENT_VERSION

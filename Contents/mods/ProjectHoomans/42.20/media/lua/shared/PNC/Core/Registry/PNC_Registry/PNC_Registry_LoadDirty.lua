@@ -178,6 +178,9 @@ function Registry.FlushDirty()
     local err
     local finished
     local count = 0
+    local legacyWriteCount = 0
+    local coreSyncedCount = 0
+    local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
     if not Core.IsAuthority() then
         return 0
     end
@@ -188,7 +191,41 @@ function Registry.FlushDirty()
     for id, _ in pairs(Registry.DirtyByID) do
         record = Registry.Data[id]
         finished = not record or record.persist == false
-        if not finished then
+        if not finished and record.coreBacked == true then
+            if coreProvider
+                and type(coreProvider.SyncPromotedCoreActorToCore) == "function"
+            then
+                local synced, syncResult = coreProvider.SyncPromotedCoreActorToCore(
+                    record,
+                    PsychopatzCore
+                )
+                if synced then
+                    Registry.SavedSnapshots[id] = Internal.CaptureSnapshot(record)
+                    if directory.records[id] then
+                        local legacyKey = directory.records[id].storageKey
+                            or Internal.StorageKeyForID(id)
+                        directory.records[id] = nil
+                        if ModData and ModData.remove then
+                            ModData.remove(legacyKey)
+                        end
+                        Registry.DirectoryDirty = true
+                    end
+                    if type(syncResult) == "table"
+                        and syncResult.committed == true
+                    then
+                        coreSyncedCount = coreSyncedCount + 1
+                    end
+                    count = count + 1
+                    finished = true
+                else
+                    Core.LogWarn("PNC Core-backed actor sync failed id="
+                        .. tostring(id) .. " reason=" .. tostring(syncResult))
+                end
+            else
+                Core.LogWarn("PNC CoreProvider unavailable for core-backed id="
+                    .. tostring(id))
+            end
+        elseif not finished then
             ok, payload = pcall(Persistence.SerializeRecord, record)
             if ok and payload then
                 key = directory.records[id] and directory.records[id].storageKey or Internal.StorageKeyForID(id)
@@ -198,6 +235,7 @@ function Registry.FlushDirty()
                     record.persistenceSourceVersion =
                         tonumber(Const.PERSISTENCE_VERSION)
                     Registry.SavedSnapshots[id] = Internal.CaptureSnapshot(record)
+                    legacyWriteCount = legacyWriteCount + 1
                     count = count + 1
                     finished = true
                 else
@@ -216,7 +254,16 @@ function Registry.FlushDirty()
             Registry.DirtyDomains[id] = nil
         end
     end
-    if count > 0 then
+    if coreSyncedCount > 0
+        and PsychopatzCore
+        and PsychopatzCore.Actors
+        and PsychopatzCore.Actors.RuntimeStore
+        and PsychopatzCore.Actors.RuntimeStore.Registry
+        and type(PsychopatzCore.Actors.RuntimeStore.Save) == "function"
+    then
+        PsychopatzCore.Actors.RuntimeStore.Save()
+    end
+    if legacyWriteCount > 0 then
         Registry.DirectoryDirty = true
     end
     if Registry.DirectoryDirty then
@@ -239,11 +286,29 @@ function Registry.FlushDirty()
         end
     end
     Registry.LastFlushCount = count
+    Registry.LastCoreSyncCount = coreSyncedCount
     return count
 end
 
 function Registry.Save()
     Registry.FlushDirty()
+    local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
+    if coreProvider
+        and type(coreProvider.SyncAllPromotedCoreActors) == "function"
+    then
+        local extraSynced = tonumber(
+            coreProvider.SyncAllPromotedCoreActors(PsychopatzCore)
+        ) or 0
+        if extraSynced > 0
+            and PsychopatzCore
+            and PsychopatzCore.Actors
+            and PsychopatzCore.Actors.RuntimeStore
+            and PsychopatzCore.Actors.RuntimeStore.Registry
+            and type(PsychopatzCore.Actors.RuntimeStore.Save) == "function"
+        then
+            PsychopatzCore.Actors.RuntimeStore.Save()
+        end
+    end
     if GlobalModData and GlobalModData.save then
         GlobalModData.save()
     end

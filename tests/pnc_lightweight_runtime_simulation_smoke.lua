@@ -15,9 +15,10 @@ local baseOptions = {
     quiet = true,
 }
 
-local function withMode(mode)
+local function withMode(mode, overrides)
     local opts = {}
     for k, v in pairs(baseOptions) do opts[k] = v end
+    for k, v in pairs(overrides or {}) do opts[k] = v end
     opts.profilerMode = mode
     return Simulator.New(opts):Run()
 end
@@ -70,7 +71,9 @@ T.equal(deepReport.RestoredCleanly, true, "DEEP clean restore on Disable")
 -- 5. Deterministic operation equivalence across OFF, COARSE, and DEEP.
 for _, field in ipairs({
     "CoreActors",
-    "PromotedHoomansRecords",
+    "PromotedAtStartup",
+    "PeakPromotedHoomansRecords",
+    "EndPromotedHoomansRecords",
     "SchedulerProcessed",
     "LogicalCommits",
     "GlobalSaveCalls",
@@ -83,5 +86,56 @@ for _, field in ipairs({
     T.equal(coarseReport[field], offReport[field], "COARSE determinism mismatch on " .. field)
     T.equal(deepReport[field], offReport[field], "DEEP determinism mismatch on " .. field)
 end
+
+-- 6. L1 lazy promotion invariants: zero bulk startup hydration; active set stays O(L), not O(N).
+T.equal(offReport.PromotedAtStartup, 0, "startup bulk hydration must be removed")
+T.truthy(offReport.PeakPromotedHoomansRecords <= baseOptions.expectedPromotedActors + 6,
+    "promoted Hoomans records must stay bounded to active nearby set L, not N=100; got "
+        .. tostring(offReport.PeakPromotedHoomansRecords))
+
+-- 7. L1 scale invariance: growing compact Core actors from N=100 to N=300 leaves Hoomans work unchanged.
+local scale300Report = withMode("OFF", { actorCount = 300 })
+print("OFF_300: " .. Simulator.FormatSummary(scale300Report))
+T.equal(scale300Report.PromotedAtStartup, 0, "N=300 startup must remain 0 promoted")
+T.equal(scale300Report.PeakPromotedHoomansRecords, offReport.PeakPromotedHoomansRecords,
+    "peak promoted records must be invariant across N=100 vs N=300")
+T.equal(scale300Report.EndPromotedHoomansRecords, offReport.EndPromotedHoomansRecords,
+    "end promoted records must be invariant across N=100 vs N=300")
+T.equal(scale300Report.SchedulerMembersAtEnd, offReport.SchedulerMembersAtEnd,
+    "scheduler membership must be invariant across N=100 vs N=300")
+T.equal(scale300Report.SpatialMembersAtEnd, offReport.SpatialMembersAtEnd,
+    "spatial membership must be invariant across N=100 vs N=300")
+T.equal(scale300Report.SchedulerProcessed, offReport.SchedulerProcessed,
+    "scheduler work processed must be invariant across N=100 vs N=300")
+
+-- 8. L1 departure & reversible demotion: leaving range abstracts & demotes cleanly without losing Core actors.
+local departReport = withMode("OFF", { departAtMs = 6000, simulatedMs = 15000 })
+print("DEPART:  " .. Simulator.FormatSummary(departReport))
+T.equal(departReport.SafePhaseFailures, 0, "DEPART mode SafePhase failures")
+T.truthy(departReport.DemotionsCount > 0, "departure must trigger reversible demotions")
+T.equal(departReport.EndPromotedHoomansRecords, 0, "all departed bystanders must demote")
+T.equal(departReport.SchedulerMembersAtEnd, 0, "demoted actors must leave scheduler")
+T.equal(departReport.SpatialMembersAtEnd, 0, "demoted actors must leave spatial index")
+T.equal(departReport.CoreActors, baseOptions.actorCount, "demotion must preserve canonical Core actors")
+
+-- 9. L1 mass interest entry obeys bounded per-refresh promotion & per-tick materialization budgets.
+local massReport = withMode("OFF", {
+    actorCount = 100,
+    nearbyActors = 0,
+    expectedPromotedActors = 40,
+    massInterestActors = 40,
+    simulatedMs = 5000,
+})
+print("MASS40:  " .. Simulator.FormatSummary(massReport))
+T.equal(massReport.SafePhaseFailures, 0, "MASS40 SafePhase failures")
+T.truthy(massReport.MaxPromotionsInSingleRefresh <= 4,
+    "single interest refresh must respect CORE_PROMOTE_MAX_PER_REFRESH=4, got "
+        .. tostring(massReport.MaxPromotionsInSingleRefresh))
+T.truthy(massReport.MaxMaterializationsInSingleTick <= 2,
+    "single tick must respect MATERIALIZE_MAX_PER_TICK=2, got "
+        .. tostring(massReport.MaxMaterializationsInSingleTick))
+T.truthy(massReport.PeakPromotedHoomansRecords <= 24,
+    "mass nearby entry must respect live admission headroom, got "
+        .. tostring(massReport.PeakPromotedHoomansRecords))
 
 T.finish("pnc_lightweight_runtime_simulation_smoke")

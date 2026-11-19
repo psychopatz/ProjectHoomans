@@ -33,6 +33,20 @@ function H.EnsureOne(player, character, state, spec, index, at, options)
     if not grant then return false, "starting_companion_grant_missing" end
     npcID = grant.npcID
     record = npcID and Registry.Get(npcID) or nil
+    local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
+    if not record
+        and npcID
+        and coreProvider
+        and type(coreProvider.IsAliveCoreActor) == "function"
+        and type(coreProvider.PromoteCoreActor) == "function"
+        and coreProvider.IsAliveCoreActor(npcID, PsychopatzCore)
+    then
+        record = coreProvider.PromoteCoreActor(
+            npcID,
+            PsychopatzCore,
+            { reason = "starting_companion_ensure" }
+        )
+    end
     if grant and grant.status == "granted"
         and (tonumber(grant.enrichmentVersion) or 0)
             >= Starting.ENRICHMENT_VERSION

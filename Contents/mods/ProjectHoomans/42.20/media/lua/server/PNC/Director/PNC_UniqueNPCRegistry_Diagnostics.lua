@@ -127,11 +127,64 @@ local function runtimeSummary(record)
     return summary
 end
 
+local function buildCoreRuntimeSummary(npcID, definitionID)
+    npcID = tostring(npcID or "")
+    if npcID == "" then return nil, nil end
+    local coreActors = PsychopatzCore and PsychopatzCore.Actors or nil
+    local defaultReg = coreActors and coreActors.DefaultRegistry or nil
+    if not defaultReg or type(defaultReg.Get) ~= "function" then
+        return nil, nil
+    end
+    local actor = defaultReg:Get(npcID)
+    if type(actor) ~= "table" then return nil, nil end
+    local exts = type(actor.extensions) == "table" and actor.extensions or {}
+    local ext = exts["ProjectHoomans.ActorExtension"]
+    if type(ext) ~= "table" then return nil, nil end
+    local identity = type(actor.identity) == "table" and actor.identity or {}
+    local world = type(actor.world) == "table" and actor.world or {}
+    local loc = type(world.location) == "table" and world.location or {}
+    local pt = type(loc.position) == "table" and loc.position or {}
+    local aff = exts["PsychopatzCore.SurvivorWorld"] or {}
+    local lease = type(actor.providerLease) == "table"
+        and actor.providerLease or {}
+    local hp = type(ext.health) == "table" and ext.health or {}
+    return {
+        runtimeNpcId = npcID,
+        name = identity.displayName or npcID,
+        alive = ext.alive ~= false,
+        presenceState = PNC.Const and PNC.Const.PRESENCE_ABSTRACT or "abstract",
+        tacticalClass = ext.tacticalClass or "neutral",
+        bodyLease = lease.leaseID,
+        position = {
+            x = tonumber(pt.x) or 0,
+            y = tonumber(pt.y) or 0,
+            z = tonumber(pt.z) or 0,
+        },
+        x = tonumber(pt.x),
+        y = tonumber(pt.y),
+        z = tonumber(pt.z),
+        hpCurrent = hp.current,
+        hpMax = hp.max,
+        healthState = hp.state or "normal",
+        skillLevels = copy(ext.skillBaseLevels or {}),
+        skillBaseLevels = copy(ext.skillBaseLevels or {}),
+        vanillaTraits = copy(ext.vanillaTraits or {}),
+        dynamicTraits = copy(ext.dynamicTraits or {}),
+        npcTraits = copy(ext.npcTraits or {}),
+        equipment = {},
+        affiliation = aff.factionID and { factionID = aff.factionID } or nil,
+        community = aff.communityID and { communityID = aff.communityID } or nil,
+        coreBacked = true,
+        demoted = true,
+    }, ext.uniqueDefinitionId
+end
+
 local function buildDefinitionDiagnostic(definition, entry, errors)
     local record
     local runtime
     local status = entry and entry.status or "unseen"
     local integrity
+    local coreDefID
     local definitionID = definition and definition.id
         or entry and entry.definitionId or ""
     if entry and entry.runtimeNpcId and PNC.Registry
@@ -140,11 +193,17 @@ local function buildDefinitionDiagnostic(definition, entry, errors)
         record = PNC.Registry.Get(entry.runtimeNpcId)
     end
     runtime = runtimeSummary(record)
+    if not runtime and entry and entry.runtimeNpcId then
+        runtime, coreDefID = buildCoreRuntimeSummary(
+            entry.runtimeNpcId,
+            definitionID
+        )
+    end
     if status == "alive" and not runtime then
         integrity = "alive_record_missing"
     elseif runtime
         and tostring(runtime.runtimeNpcId or "") ~= ""
-        and tostring(record.uniqueDefinitionId or "")
+        and tostring((record and record.uniqueDefinitionId) or coreDefID or "")
             ~= tostring(definitionID)
     then
         integrity = "runtime_definition_mismatch"

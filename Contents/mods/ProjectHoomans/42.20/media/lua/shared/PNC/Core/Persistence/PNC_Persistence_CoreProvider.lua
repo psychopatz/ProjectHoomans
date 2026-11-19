@@ -12,6 +12,18 @@ local Types = PNC.Types
 local OptionalPolicy = PNC.OptionalProviderPolicy
 local ActorInventoryBridge =
     require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_ActorBridge"
+local CoreActorExtension =
+    require "PNC/Core/Persistence/PNC_CoreActorExtension"
+local Json = require "PsychopatzCore/Serialization/PsychopatzJson"
+
+Adapter.Metrics = Adapter.Metrics or {
+    promotions = 0,
+    demotions = 0,
+    syncs = 0,
+    startupRestores = 0,
+    demotePumps = 0,
+}
+Adapter.LastDemotePumpAt = tonumber(Adapter.LastDemotePumpAt) or 0
 
 local function actors(core)
     return core and core.Actors
@@ -420,9 +432,13 @@ local function coreActorDefinition(actor, projected)
     }
 end
 
-local function applyCoreActorProjection(record, actor, projected)
+local function applyCoreActorProjection(record, actor, projected, options)
+    options = type(options) == "table" and options or {}
     local definition = coreActorDefinition(actor, projected)
     local changed = false
+    local isLive = record.presenceState == (PNC.Const and PNC.Const.PRESENCE_LIVE or "live")
+        or (PNC.Registry and PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(definition.id) ~= nil)
     local function assign(key, value)
         if value ~= nil and record[key] ~= value then
             record[key] = value
@@ -437,9 +453,11 @@ local function applyCoreActorProjection(record, actor, projected)
     assign("appearance", definition.appearance)
     assign("personalInventory", definition.personalInventory)
     assign("archetypeID", definition.archetypeID)
-    assign("x", definition.x)
-    assign("y", definition.y)
-    assign("z", definition.z)
+    if not isLive then
+        assign("x", definition.x)
+        assign("y", definition.y)
+        assign("z", definition.z)
+    end
     assign("coreActorID", definition.coreActorID)
     assign("factionID", definition.factionID)
     assign("factionName", definition.factionName)
@@ -447,6 +465,14 @@ local function applyCoreActorProjection(record, actor, projected)
     assign("factionRole", definition.factionRole)
     assign("communityID", definition.communityID)
     assign("groupID", definition.groupID)
+    if record.coreBacked ~= true then
+        record.coreBacked = true
+        changed = true
+    end
+    if record.persistenceAuthority ~= "core_extension" then
+        record.persistenceAuthority = "core_extension"
+        changed = true
+    end
 
     record.runtime = record.runtime or {}
     for key, value in pairs(definition.runtime) do
@@ -455,6 +481,7 @@ local function applyCoreActorProjection(record, actor, projected)
             changed = true
         end
     end
+    record.coreRevision = tonumber(actor.revision) or tonumber(record.coreRevision) or 1
     local expectedPresence = definition.runtime.coreProviderState
         == "materialized"
         and PNC.Const.PRESENCE_LIVE
@@ -469,7 +496,7 @@ local function applyCoreActorProjection(record, actor, projected)
                 and "live" or "abstract",
             bodyState = expectedPresence == PNC.Const.PRESENCE_LIVE
                 and "bound" or "missing",
-            lastReason = "core_actor_hydrated",
+            lastReason = "core_actor_promoted",
             lastTransitionAt = PNC.Core.Now(),
             lastAuditAt = 0,
             lastError = nil,
@@ -477,7 +504,9 @@ local function applyCoreActorProjection(record, actor, projected)
         }
         changed = true
     end
-    if changed and PNC.Registry
+    if options.markDirty == true
+        and changed
+        and PNC.Registry
         and type(PNC.Registry.MarkDirty) == "function"
     then
         PNC.Registry.MarkDirty(record, "core_actor_hydration")
@@ -485,15 +514,126 @@ local function applyCoreActorProjection(record, actor, projected)
     return record, changed
 end
 
-function Adapter.HydrateCoreActor(actor, core)
-    if type(actor) ~= "table" or type(core) ~= "table" then
+local function coreRegistry(core)
+    local service = actors(core or PsychopatzCore)
+    return service and service.DefaultRegistry or nil
+end
+
+local function resolveCanonicalActor(actorOrID, core)
+    local reg = coreRegistry(core)
+    local api = actors(core or PsychopatzCore)
+    if type(actorOrID) == "table" then
+        local id = tostring(actorOrID.actorId or actorOrID.actorID or "")
+        if id == "" then return nil, "core_actor_id_missing" end
+        if reg and type(reg.Get) == "function" then
+            local live = reg:Get(id)
+            if live then return live, id end
+        end
+        return actorOrID, id
+    end
+    local id = actorOrID ~= nil and tostring(actorOrID) or ""
+    if id == "" then return nil, "actor_id_required" end
+    local actor = reg and type(reg.Get) == "function" and reg:Get(id) or nil
+    if not actor and api and type(api.Resolve) == "function" then
+        actor = api.Resolve(id)
+        if actor then
+            id = tostring(actor.actorId or actor.actorID or id)
+        end
+    end
+    if not actor then return nil, "core_actor_not_found" end
+    return actor, id
+end
+
+local function hasInventoryBridgeDeps()
+    return PNC.Inventory
+        and PNC.Inventory.Internal
+        and type(PNC.Inventory.Internal.createBaseInventory) == "function"
+end
+
+local function cloneTable(value)
+    if PNC.Core and type(PNC.Core.DeepCopy) == "function" then
+        return PNC.Core.DeepCopy(value)
+    end
+    if type(value) ~= "table" then return value end
+    local out = {}
+    for k, v in pairs(value) do
+        out[k] = cloneTable(v)
+    end
+    return out
+end
+
+local function tablesEqual(left, right)
+    if left == right then return true end
+    if type(left) ~= type(right) then return false end
+    if type(left) ~= "table" then return false end
+    for k, v in pairs(left) do
+        if not tablesEqual(v, right[k]) then return false end
+    end
+    for k, _ in pairs(right) do
+        if left[k] == nil then return false end
+    end
+    return true
+end
+
+function Adapter.IsAliveCoreActor(actorID, core)
+    if actorID == nil or tostring(actorID) == "" then return false end
+    local reg = coreRegistry(core)
+    if not reg then return false end
+    local id = tostring(actorID)
+    if type(reg.HasActiveActor) == "function" then
+        return reg:HasActiveActor(id) == true
+    end
+    if type(reg.Has) == "function" then
+        return reg:Has(id) == true
+    end
+    return type(reg.Get) == "function" and reg:Get(id) ~= nil
+end
+
+function Adapter.GetCoreActorExtension(actorID, core)
+    if actorID == nil or tostring(actorID) == "" then return nil end
+    local reg = coreRegistry(core)
+    if not reg then return nil end
+    local id = tostring(actorID)
+    if type(reg.GetExtension) == "function" then
+        return reg:GetExtension(id, CoreActorExtension.EXTENSION_ID)
+    end
+    local actor = type(reg.Get) == "function" and reg:Get(id) or nil
+    local exts = actor and type(actor.extensions) == "table"
+        and actor.extensions or nil
+    return exts and cloneTable(exts[CoreActorExtension.EXTENSION_ID]) or nil
+end
+
+function Adapter.CanPromoteCoreActor(actorOrID, core)
+    core = core or PsychopatzCore
+    local actor = resolveCanonicalActor(actorOrID, core)
+    if type(actor) ~= "table" then
+        return false, "core_actor_not_found"
+    end
+    if OptionalPolicy and not OptionalPolicy.ShouldProject(actor) then
+        return false, "optional_provider_unavailable"
+    end
+    local exts = type(actor.extensions) == "table" and actor.extensions or {}
+    local lease = type(actor.providerLease) == "table" and actor.providerLease or {}
+    if survivorWorldAffiliation(actor)
+        or exts[CoreActorExtension.EXTENSION_ID] ~= nil
+        or lease.state == "abstract"
+        or lease.state == "materialized"
+    then
+        return true
+    end
+    return false, "not_survivor_world_actor"
+end
+
+function Adapter.PromoteCoreActor(actorOrID, core, options)
+    core = core or PsychopatzCore
+    options = type(options) == "table" and options or {}
+    if type(core) ~= "table" then
         return nil, "actor_and_core_required"
     end
-    local actorID = tostring(actor.actorId or "")
-    if actorID == "" then return nil, "core_actor_id_missing" end
-    if OptionalPolicy
-        and not OptionalPolicy.ShouldProject(actor)
-    then
+    local actor, actorID = resolveCanonicalActor(actorOrID, core)
+    if not actor then return nil, actorID end
+
+    if OptionalPolicy and not OptionalPolicy.ShouldProject(actor) then
         local unavailable = PNC.Registry
             and type(PNC.Registry.Get) == "function"
             and PNC.Registry.Get(actorID) or nil
@@ -503,9 +643,18 @@ function Adapter.HydrateCoreActor(actor, core)
         end
         return nil, "optional_provider_unavailable"
     end
-    if not survivorWorldAffiliation(actor) then
+
+    local exts = type(actor.extensions) == "table" and actor.extensions or {}
+    local lease = type(actor.providerLease) == "table" and actor.providerLease or {}
+    if not survivorWorldAffiliation(actor)
+        and exts[CoreActorExtension.EXTENSION_ID] == nil
+        and lease.state ~= "abstract"
+        and lease.state ~= "materialized"
+        and options.allowUnscoped ~= true
+    then
         return nil, "not_survivor_world_actor"
     end
+
     if not PNC.Registry or type(PNC.Registry.Get) ~= "function"
         or type(PNC.Registry.AddRecord) ~= "function"
     then
@@ -514,49 +663,607 @@ function Adapter.HydrateCoreActor(actor, core)
 
     local projected, reason = Adapter.Project(actor, core)
     if not projected then return nil, reason end
-    local record = PNC.Registry.Get(actorID)
-    if record then
-        applyCoreActorProjection(record, actor, projected)
-        return record, "existing"
+
+    local existing = PNC.Registry.Data and PNC.Registry.Data[actorID] or nil
+    if existing then
+        applyCoreActorProjection(existing, actor, projected, {
+            markDirty = options.markDirty == true,
+        })
+        return existing, "existing"
+    end
+
+    if PNC.Registry.RemoveRuntimeView then
+        PNC.Registry.RemoveRuntimeView(actorID)
     end
 
     if not Types or type(Types.NewRecord) ~= "function" then
         return nil, "pnc_record_types_unavailable"
     end
+    local record
     record, reason = Types.NewRecord(
         coreActorDefinition(actor, projected)
     )
     if not record then return nil, reason end
-    applyCoreActorProjection(record, actor, projected)
+    record.coreBacked = true
+    record.coreActorID = actorID
+    record.persistenceAuthority = "core_extension"
+
+    applyCoreActorProjection(record, actor, projected, { markDirty = false })
+
+    if PNC.Persistence and PNC.Persistence.CoreSocial
+        and type(PNC.Persistence.CoreSocial.FromCoreSocial) == "function"
+        and type(actor.social) == "table"
+    then
+        local coreSocial = PNC.Persistence.CoreSocial.FromCoreSocial(
+            actor.social,
+            record.social
+        )
+        if type(coreSocial) == "table" then
+            record.social = coreSocial
+        end
+    end
+    if type(actor.persona) == "table" then
+        record.persona = cloneTable(actor.persona)
+    end
+    if type(actor.knowledge) == "table" then
+        record.knowledge = cloneTable(actor.knowledge)
+    end
+
+    if hasInventoryBridgeDeps() and type(actor.personalInventory) == "table" then
+        local inv, invErr = ActorInventoryBridge.HydrateRecord(record, projected)
+        if not inv then
+            return nil, invErr or "core_inventory_hydration_failed"
+        end
+    end
+
+    local hoomansExt = exts[CoreActorExtension.EXTENSION_ID]
+    if type(hoomansExt) == "table" then
+        CoreActorExtension.Apply(record, hoomansExt)
+    end
+
+    record.runtime = record.runtime or {}
+    local nowMs = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    record.runtime.promotedAt = nowMs
+    record.runtime.promotionReason = tostring(options.reason or "demand")
+
     if not PNC.Registry.AddRecord(record) then
         return nil, "pnc_core_actor_record_add_failed"
     end
+    Adapter.Metrics.promotions = (tonumber(Adapter.Metrics.promotions) or 0) + 1
     return record, "created"
 end
 
-function Adapter.HydrateCoreActors(core)
-    if type(core) ~= "table" then return 0, "core_required" end
-    local service = actors(core)
-    local registry = service and service.DefaultRegistry
-    if not registry or type(registry.List) ~= "function" then
-        return 0, "core_actor_registry_unavailable"
+function Adapter.HydrateCoreActor(actor, core)
+    if type(actor) ~= "table" or type(core) ~= "table" then
+        return nil, "actor_and_core_required"
     end
-    local hydrated = 0
-    local failures = {}
-    for _, actor in ipairs(registry:List()) do
-        local record, reason = Adapter.HydrateCoreActor(actor, core)
-        if record then
-            hydrated = hydrated + 1
-        elseif reason ~= "not_survivor_world_actor"
-            and reason ~= "optional_provider_unavailable"
+    return Adapter.PromoteCoreActor(actor, core, { reason = "explicit_hydrate" })
+end
+
+local ACTIVE_ORDER_KINDS = {
+    follow = true,
+    patrol = true,
+    guard = true,
+    work = true,
+    facility = true,
+    facility_activity = true,
+    escort = true,
+    travel = true,
+}
+
+function Adapter.HasActiveHoomansResponsibility(record, now, options)
+    if type(record) ~= "table" then
+        return false, "invalid_record"
+    end
+    options = type(options) == "table" and options or {}
+    now = tonumber(now) or (PNC.Core and PNC.Core.Now and PNC.Core.Now()) or 0
+    local runtime = type(record.runtime) == "table" and record.runtime or {}
+    local lifecycle = type(runtime.lifecycle) == "table"
+        and runtime.lifecycle or {}
+
+    local liveState = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
+    if record.presenceState == liveState
+        or (PNC.Registry and PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(record.id) ~= nil)
+    then
+        return true, "live_body"
+    end
+    if lifecycle.phase == "materializing" or lifecycle.phase == "releasing"
+        or runtime.bodyLease ~= nil
+    then
+        return true, "body_transition"
+    end
+    if runtime.forceLive == true
+        or runtime.debugPresenceOverride == true
+        or runtime.abstractFollowMaterializeRequested == true
+        or runtime.presenceHandoffRequested == true
+        or (type(runtime.vehiclePassenger) == "table"
+            and runtime.vehiclePassenger.active == true)
+        or (type(runtime.conversationScene) == "table"
+            and runtime.conversationScene.active == true)
+    then
+        return true, "explicit_runtime_hold"
+    end
+    if record.recruited == true
+        or (record.ownerUsername ~= nil and tostring(record.ownerUsername) ~= "")
+        or (record.ownerCharacterUUID ~= nil
+            and tostring(record.ownerCharacterUUID) ~= "")
+        or (type(record.generation) == "table"
+            and tostring(record.generation.source or "")
+                == "starting_companion_trait")
+    then
+        return true, "companion_owner"
+    end
+    if runtime.target ~= nil
+        or runtime.attackAction ~= nil
+        or (tonumber(runtime.inCombatUntil) or 0) > now
+    then
+        return true, "active_combat"
+    end
+    if type(record.health) == "table"
+        and (record.health.state == "incapacitated"
+            or record.health.state == "downed")
+    then
+        return true, "incapacitated"
+    end
+    local activeJob = tostring(record.activeJob or "")
+    if activeJob ~= ""
+        and activeJob ~= "Idle"
+        and activeJob ~= "None"
+        and activeJob ~= "GuardAnchor"
+        and activeJob ~= "HuntNearestPlayer"
+    then
+        return true, "active_job"
+    end
+    local orderKind = type(record.orderSpec) == "table"
+        and tostring(record.orderSpec.kind or "") or ""
+    if ACTIVE_ORDER_KINDS[orderKind] then
+        return true, "active_order:" .. orderKind
+    end
+    if type(record.travel) == "table" and record.travel.active == true then
+        return true, "active_travel"
+    end
+    if record.alive == false then
+        return true, "dead_pending_retirement"
+    end
+
+    if options.ignoreGrace ~= true then
+        local graceMs = tonumber(
+            PNC.Const and PNC.Const.CORE_DEMOTE_GRACE_MS
+        ) or 2000
+        local promotedAt = tonumber(runtime.promotedAt) or 0
+        local abstractedAt = tonumber(runtime.abstractedAt) or 0
+        local eligibleAt = tonumber(runtime.demoteEligibleAt) or 0
+        if now < promotedAt + graceMs
+            or (abstractedAt > 0 and now < abstractedAt + graceMs)
+            or (eligibleAt > 0 and now < eligibleAt)
         then
-            failures[#failures + 1] = {
-                actorID = tostring(actor.actorId or ""),
-                reason = tostring(reason or "hydration_failed"),
-            }
+            return true, "demote_grace_window"
         end
     end
-    return hydrated, #failures == 0 and "hydrated" or failures
+
+    if options.ignoreProximity ~= true
+        and PNC.Core and type(PNC.Core.ForEachPlayer) == "function"
+    then
+        local keepRadius = tonumber(
+            PNC.Const and PNC.Const.ABSTRACT_DISTANCE
+        ) or 40
+        local keepRadiusSq = keepRadius * keepRadius
+        local nearPlayer = false
+        PNC.Core.ForEachPlayer(function(player)
+            if nearPlayer or not player or type(player.getX) ~= "function" then
+                return
+            end
+            local dx = (tonumber(record.x) or 0) - tonumber(player:getX())
+            local dy = (tonumber(record.y) or 0) - tonumber(player:getY())
+            if (dx * dx + dy * dy) <= keepRadiusSq then
+                nearPlayer = true
+            end
+        end)
+        if nearPlayer then
+            return true, "near_player"
+        end
+    end
+
+    return false, "eligible_for_demotion"
+end
+
+function Adapter.SyncPromotedCoreActorToCore(record, core, options)
+    core = core or PsychopatzCore
+    options = type(options) == "table" and options or {}
+    if type(record) ~= "table" or type(core) ~= "table" then
+        return false, "record_and_core_required"
+    end
+    local reg = coreRegistry(core)
+    if not reg then return false, "core_registry_unavailable" end
+    local actorID = tostring(
+        record.coreActorID
+            or (type(record.runtime) == "table" and record.runtime.coreActorID)
+            or record.id
+            or ""
+    )
+    if actorID == "" then return false, "actor_id_required" end
+    local actor = reg:Get(actorID)
+    if not actor then return false, "core_actor_not_found" end
+
+    local coreSocialAdapter = PNC.Persistence and PNC.Persistence.CoreSocial or nil
+    if type(record.social) == "table"
+        and coreSocialAdapter
+        and type(coreSocialAdapter.SyncToCore) == "function"
+    then
+        local localRev = tonumber(record.social.revision) or 0
+        local coreRev = tonumber(actor.social and actor.social.revision) or 0
+        local needsSocialSync = (
+                record.social.authority ~= "core"
+                and type(coreSocialAdapter.HasGenericSocialPayload) == "function"
+                and coreSocialAdapter.HasGenericSocialPayload(record.social)
+            )
+            or localRev > coreRev
+            or (type(record.runtime) == "table" and record.runtime.coreSocialDirty == true)
+        if needsSocialSync then
+            local ok, reason = coreSocialAdapter.SyncToCore(record, core)
+            if not ok then
+                return false, reason or "core_social_sync_failed"
+            end
+            if type(record.runtime) == "table" then
+                record.runtime.coreSocialDirty = nil
+            end
+            actor = reg:Get(actorID)
+            if not actor then return false, "core_actor_not_found" end
+        end
+    end
+
+    local patch = {}
+    local hasPatch = false
+
+    local curPos = position(actor)
+    local rx = tonumber(record.x)
+    local ry = tonumber(record.y)
+    local rz = tonumber(record.z) or 0
+    if rx ~= nil and ry ~= nil and rx == rx and ry == ry then
+        if math.abs(rx - curPos.x) > 0.001
+            or math.abs(ry - curPos.y) > 0.001
+            or math.abs(rz - curPos.z) > 0.001
+        then
+            local nextWorld = cloneTable(type(actor.world) == "table" and actor.world or {})
+            nextWorld.location = type(nextWorld.location) == "table"
+                and nextWorld.location or {}
+            nextWorld.location.position = { x = rx, y = ry, z = rz }
+            patch.world = nextWorld
+            hasPatch = true
+        end
+    end
+
+    if type(record.inventory) == "table" and hasInventoryBridgeDeps() then
+        local captured, _, captureErr = ActorInventoryBridge.CaptureRecord(
+            record, actor
+        )
+        if not captured then
+            return false, captureErr or "core_inventory_capture_failed"
+        end
+        if Json.Encode(captured) ~= Json.Encode(actor.personalInventory) then
+            patch.personalInventory = captured
+            hasPatch = true
+        end
+    end
+
+    local extensionActorView = actor
+    if patch.world then
+        extensionActorView = { world = patch.world }
+    end
+    local nextExt = CoreActorExtension.Encode(record, extensionActorView)
+    local oldExts = type(actor.extensions) == "table" and actor.extensions or {}
+    local oldExt = oldExts[CoreActorExtension.EXTENSION_ID]
+    local extChanged = not tablesEqual(oldExt, nextExt)
+
+    local affiliation = recordAffiliation(record)
+    local curAff = type(oldExts[AFFILIATION_EXTENSION]) == "table"
+        and oldExts[AFFILIATION_EXTENSION] or {}
+    local affChanged = affiliation ~= nil and affiliationChanged(curAff, affiliation)
+
+    if extChanged or affChanged then
+        local nextExts = cloneTable(oldExts)
+        nextExts[CoreActorExtension.EXTENSION_ID] = nextExt
+        if affChanged then
+            nextExts[AFFILIATION_EXTENSION] = affiliation
+        end
+        patch.extensions = nextExts
+        hasPatch = true
+    end
+
+    if hasPatch then
+        local committed, commitErr = reg:Commit(actorID, patch, actor.revision)
+        if not committed then
+            return false, commitErr or "core_actor_commit_failed"
+        end
+        Adapter.Metrics.syncs = (tonumber(Adapter.Metrics.syncs) or 0) + 1
+        record.coreRevision = committed.revision
+        return true, {
+            committed = true,
+            actor = committed,
+            extensionPersisted = nextExt ~= nil,
+        }
+    end
+
+    return true, {
+        committed = false,
+        actor = actor,
+        extensionPersisted = nextExt ~= nil,
+    }
+end
+
+function Adapter.SyncAllPromotedCoreActors(core)
+    core = core or PsychopatzCore
+    if not PNC.Registry or type(PNC.Registry.Data) ~= "table" then
+        return 0
+    end
+    local synced = 0
+    for _, record in pairs(PNC.Registry.Data) do
+        if type(record) == "table" and record.coreBacked == true then
+            local ok, res = Adapter.SyncPromotedCoreActorToCore(record, core)
+            if ok and type(res) == "table" and res.committed == true then
+                synced = synced + 1
+            end
+        end
+    end
+    return synced
+end
+
+function Adapter.DemoteCoreActor(recordOrID, core, options)
+    core = core or PsychopatzCore
+    options = type(options) == "table" and options or {}
+    if not PNC.Registry then
+        return false, "pnc_registry_unavailable"
+    end
+    local id = type(recordOrID) == "table" and tostring(recordOrID.id or "")
+        or tostring(recordOrID or "")
+    local record = PNC.Registry.Data and PNC.Registry.Data[id] or nil
+    if not record then
+        return false, "promoted_record_not_found"
+    end
+    if record.coreBacked ~= true then
+        return false, "not_core_backed"
+    end
+    local liveState = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
+    if record.presenceState == liveState
+        or (PNC.Registry.GetLiveZombie and PNC.Registry.GetLiveZombie(id) ~= nil)
+    then
+        return false, "live_body_active"
+    end
+    if options.force ~= true then
+        local active, reason = Adapter.HasActiveHoomansResponsibility(
+            record,
+            options.now,
+            options
+        )
+        if active then
+            return false, reason
+        end
+    end
+
+    local synced, syncResult = Adapter.SyncPromotedCoreActorToCore(
+        record, core, options
+    )
+    if not synced then
+        return false, syncResult
+    end
+
+    PNC.Registry.ReleasePromotedRecord(id)
+    Adapter.Metrics.demotions = (tonumber(Adapter.Metrics.demotions) or 0) + 1
+    return true, {
+        actorId = id,
+        committed = type(syncResult) == "table" and syncResult.committed == true,
+        extensionPersisted = type(syncResult) == "table"
+            and syncResult.extensionPersisted == true,
+    }
+end
+
+function Adapter.RestoreActiveCoreActors(core)
+    core = core or PsychopatzCore
+    if type(core) ~= "table" then return 0, "core_required" end
+    local reg = coreRegistry(core)
+    if not reg then return 0, "core_actor_registry_unavailable" end
+
+    local candidatesByID = {}
+    local orderedIDs = {}
+    local function addCandidate(actor)
+        if type(actor) ~= "table" or not actor.actorId then return end
+        local id = tostring(actor.actorId)
+        if not candidatesByID[id] then
+            candidatesByID[id] = actor
+            orderedIDs[#orderedIDs + 1] = id
+        end
+    end
+
+    if type(reg.ListWithExtension) == "function" then
+        for _, actor in ipairs(reg:ListWithExtension(CoreActorExtension.EXTENSION_ID)) do
+            addCandidate(actor)
+        end
+    end
+    if type(reg.ListMaterialized) == "function" then
+        for _, actor in ipairs(reg:ListMaterialized()) do
+            addCandidate(actor)
+        end
+    end
+
+    table.sort(orderedIDs)
+    local restored = 0
+    for _, id in ipairs(orderedIDs) do
+        local actor = candidatesByID[id]
+        local exts = type(actor.extensions) == "table" and actor.extensions or {}
+        local ext = exts[CoreActorExtension.EXTENSION_ID]
+        if CoreActorExtension.RequiresStartupPromotion(ext, actor) then
+            local rec = Adapter.PromoteCoreActor(actor, core, {
+                reason = "startup_restore",
+            })
+            if rec then
+                restored = restored + 1
+            end
+        end
+    end
+    Adapter.Metrics.startupRestores =
+        (tonumber(Adapter.Metrics.startupRestores) or 0) + restored
+    return restored, "restored"
+end
+
+function Adapter.QueryPromotionCandidates(players, radius, now, core)
+    core = core or PsychopatzCore
+    local reg = coreRegistry(core)
+    if not reg or type(players) ~= "table" or #players == 0 then
+        return {}
+    end
+    radius = math.max(0, tonumber(radius) or 0)
+    local radiusSq = radius * radius
+    local promotedData = PNC.Registry and PNC.Registry.Data or {}
+    local byID = {}
+
+    local function considerActor(actor, distSq)
+        if type(actor) ~= "table" or not actor.actorId then return end
+        local id = tostring(actor.actorId)
+        if promotedData[id] then return end
+        if OptionalPolicy and not OptionalPolicy.ShouldProject(actor) then
+            return
+        end
+        local exts = type(actor.extensions) == "table" and actor.extensions or {}
+        local lease = type(actor.providerLease) == "table"
+            and actor.providerLease or {}
+        if not survivorWorldAffiliation(actor)
+            and exts[CoreActorExtension.EXTENSION_ID] == nil
+            and lease.state ~= "abstract"
+            and lease.state ~= "materialized"
+        then
+            return
+        end
+        local existing = byID[id]
+        if not existing or distSq < existing.distSq then
+            byID[id] = { actorId = id, distSq = distSq }
+        end
+    end
+
+    if type(reg.QueryNearPosition) == "function" then
+        for _, player in ipairs(players) do
+            if player and type(player.getX) == "function" then
+                local hits = reg:QueryNearPosition(
+                    player:getX(), player:getY(), radius
+                )
+                for i = 1, #hits do
+                    local hit = hits[i]
+                    if not promotedData[hit.actorId] then
+                        local actor = reg.records and reg.records[hit.actorId]
+                            or (type(reg.Get) == "function" and reg:Get(hit.actorId))
+                        considerActor(actor, hit.distSq)
+                    end
+                end
+            end
+        end
+    end
+
+    local worldAuthority = PNC.CoreSurvivorWorldAuthority
+    local worldRegistry = worldAuthority and worldAuthority.Registry or nil
+    if worldRegistry and type(worldRegistry.ListGroups) == "function"
+        and type(worldRegistry.ProjectGroupMemberPosition) == "function"
+    then
+        local groupRadiusSq = (radius + 24) * (radius + 24)
+        for _, group in ipairs(worldRegistry:ListGroups()) do
+            if type(group.journey) == "table"
+                and type(group.memberActorIDs) == "table"
+                and #group.memberActorIDs > 0
+            then
+                local nearAnyPlayer = false
+                for _, memberID in ipairs(group.memberActorIDs) do
+                    local id = tostring(memberID)
+                    if not promotedData[id] then
+                        local actor = reg.records and reg.records[id]
+                            or (type(reg.Get) == "function" and reg:Get(id))
+                        if actor then
+                            local projectedPos = worldRegistry:ProjectGroupMemberPosition(
+                                group.id, id, actor.world, now
+                            )
+                            if type(projectedPos) == "table"
+                                and tonumber(projectedPos.x)
+                                and tonumber(projectedPos.y)
+                            then
+                                for _, player in ipairs(players) do
+                                    local dx = tonumber(projectedPos.x) - player:getX()
+                                    local dy = tonumber(projectedPos.y) - player:getY()
+                                    local d2 = dx * dx + dy * dy
+                                    if d2 <= groupRadiusSq then
+                                        nearAnyPlayer = true
+                                    end
+                                    if d2 <= radiusSq then
+                                        considerActor(actor, d2)
+                                    end
+                                end
+                                if not nearAnyPlayer then
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    local ordered = {}
+    for _, entry in pairs(byID) do
+        ordered[#ordered + 1] = entry
+    end
+    table.sort(ordered, function(left, right)
+        if left.distSq == right.distSq then
+            return left.actorId < right.actorId
+        end
+        return left.distSq < right.distSq
+    end)
+    return ordered
+end
+
+function Adapter.PumpDemotions(now, core, options)
+    options = type(options) == "table" and options or {}
+    core = core or PsychopatzCore
+    now = tonumber(now) or (PNC.Core and PNC.Core.Now and PNC.Core.Now()) or 0
+    if not PNC.Registry or type(PNC.Registry.Data) ~= "table" then
+        return 0
+    end
+    local intervalMs = tonumber(
+        PNC.Const and PNC.Const.CORE_DEMOTE_PUMP_MS
+    ) or 1000
+    if options.force ~= true
+        and now - (tonumber(Adapter.LastDemotePumpAt) or 0) < intervalMs
+    then
+        return 0
+    end
+    Adapter.LastDemotePumpAt = now
+    Adapter.Metrics.demotePumps = (tonumber(Adapter.Metrics.demotePumps) or 0) + 1
+
+    local maxPerPump = math.max(1, math.floor(tonumber(
+        options.max or (PNC.Const and PNC.Const.CORE_DEMOTE_MAX_PER_PUMP) or 8
+    )))
+    local ids = {}
+    for id, record in pairs(PNC.Registry.Data) do
+        if type(record) == "table" and record.coreBacked == true then
+            ids[#ids + 1] = tostring(id)
+        end
+    end
+    if #ids == 0 then return 0 end
+    table.sort(ids)
+
+    local demoted = 0
+    for i = 1, #ids do
+        if demoted >= maxPerPump then break end
+        local record = PNC.Registry.Data[ids[i]]
+        if record and not Adapter.HasActiveHoomansResponsibility(record, now, options) then
+            local ok = Adapter.DemoteCoreActor(record, core, {
+                now = now,
+                ignoreProximity = options.ignoreProximity,
+                ignoreGrace = options.ignoreGrace,
+            })
+            if ok then
+                demoted = demoted + 1
+            end
+        end
+    end
+    return demoted
 end
 
 local function bodyID(body, spec)

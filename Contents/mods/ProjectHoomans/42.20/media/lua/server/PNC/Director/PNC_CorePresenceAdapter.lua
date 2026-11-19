@@ -101,23 +101,47 @@ end
 
 local function hydrate(actor, core)
     local record = recordFor(actorID(actor))
-    if record then return record end
-    if CoreProvider and type(CoreProvider.HydrateCoreActor) == "function" then
-        record = CoreProvider.HydrateCoreActor(actor, core)
-        return record
+    if record then return record, "existing" end
+    if CoreProvider and type(CoreProvider.PromoteCoreActor) == "function" then
+        return CoreProvider.PromoteCoreActor(actor, core, {
+            reason = "core_debug_force_live",
+        })
     end
-    return nil
+    if CoreProvider and type(CoreProvider.HydrateCoreActor) == "function" then
+        return CoreProvider.HydrateCoreActor(actor, core)
+    end
+    return nil, "core_provider_unavailable"
 end
 
-local function canForceLive(actor)
-    return recordFor(actorID(actor)) ~= nil
+local function canForceLive(actor, core)
+    if recordFor(actorID(actor)) ~= nil then return true end
+    if CoreProvider and type(CoreProvider.CanPromoteCoreActor) == "function" then
+        return CoreProvider.CanPromoteCoreActor(actor, core) == true
+    end
+    return false
+end
+
+local function rollbackDebugPromotion(record, promoteStatus, core, reason)
+    if promoteStatus == "created"
+        and record
+        and record.coreBacked == true
+        and CoreProvider
+        and type(CoreProvider.DemoteCoreActor) == "function"
+    then
+        CoreProvider.DemoteCoreActor(record, core, {
+            force = true,
+            reason = reason or "core_debug_force_live_rollback",
+        })
+    end
 end
 
 local function forceLive(actor, core, spec)
+    spec = type(spec) == "table" and spec or {}
     local reg = registry(core)
     local original = actor and actor.providerLease
     local current
     local record
+    local promoteStatus
     local body
     local reason
     local id = actorID(actor)
@@ -125,10 +149,10 @@ local function forceLive(actor, core, spec)
 
     current, reason = switchToProvider(reg, actor, spec)
     if not current then return nil, reason end
-    record = hydrate(current, core)
+    record, promoteStatus = hydrate(current, core)
     if not record then
-        restoreLease(reg, current, original)
-        return nil, "hoomans_record_unavailable"
+        restoreLease(reg, reg:Get(id) or current, original)
+        return nil, promoteStatus or "hoomans_record_unavailable"
     end
     record.runtime = record.runtime or {}
     record.runtime.forceLive = true
@@ -148,7 +172,8 @@ local function forceLive(actor, core, spec)
     end
     if not body then
         clearDebugFlags(record)
-        restoreLease(reg, current, original)
+        rollbackDebugPromotion(record, promoteStatus, core, "core_debug_materialize_failed")
+        restoreLease(reg, reg:Get(id) or current, original)
         return nil, reason or "hoomans_materialize_failed"
     end
 
@@ -156,7 +181,8 @@ local function forceLive(actor, core, spec)
     if not idValue then
         PNC.Presence.Abstract(record, "core_debug_body_id_missing")
         clearDebugFlags(record)
-        restoreLease(reg, current, original)
+        rollbackDebugPromotion(record, promoteStatus, core, "core_debug_body_id_missing")
+        restoreLease(reg, reg:Get(id) or current, original)
         return nil, "hoomans_body_id_missing"
     end
 
@@ -171,7 +197,8 @@ local function forceLive(actor, core, spec)
     if not committed then
         PNC.Presence.Abstract(record, "core_debug_lease_commit_failed")
         clearDebugFlags(record)
-        restoreLease(reg, current, original)
+        rollbackDebugPromotion(record, promoteStatus, core, "core_debug_lease_commit_failed")
+        restoreLease(reg, reg:Get(id) or current, original)
         return nil, reason or "hoomans_provider_commit_failed"
     end
     return {
@@ -183,6 +210,7 @@ local function forceLive(actor, core, spec)
 end
 
 local function release(actor, core, spec)
+    spec = type(spec) == "table" and spec or {}
     local reg = registry(core)
     local id = actorID(actor)
     local record = recordFor(id)
@@ -225,7 +253,29 @@ local function release(actor, core, spec)
         if not updated then return nil, reason end
         dematerialized = updated
     end
-    return { actor = dematerialized, record = record }
+
+    local demoted = false
+    if record.coreBacked == true
+        and CoreProvider
+        and type(CoreProvider.HasActiveHoomansResponsibility) == "function"
+        and type(CoreProvider.DemoteCoreActor) == "function"
+    then
+        local nowMs = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+        if not CoreProvider.HasActiveHoomansResponsibility(
+            record, nowMs, { ignoreGrace = true }
+        ) then
+            demoted = CoreProvider.DemoteCoreActor(record, core, {
+                force = true,
+                reason = spec.reason or "core_presence_release",
+            }) == true
+        end
+    end
+
+    return {
+        actor = reg:Get(id) or dematerialized,
+        record = demoted and nil or record,
+        demoted = demoted,
+    }
 end
 
 Presence.RegisterProvider(PROVIDER_ID, {

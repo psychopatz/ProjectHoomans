@@ -43,7 +43,11 @@ function Registry.AddRecord(record)
         PNC.Network.ForgetPortraitRecord(previous)
     end
     Registry.Data[record.id] = record
-    if record.persist ~= false then
+    if record.coreBacked == true then
+        if Internal and Internal.CaptureSnapshot then
+            Registry.SavedSnapshots[record.id] = Internal.CaptureSnapshot(record)
+        end
+    elseif record.persist ~= false then
         directory = Internal.GetDirectory()
         Internal.PutPointer(directory, record, Internal.StorageKeyForID(record.id))
         Registry.DirectoryDirty = true
@@ -56,6 +60,43 @@ function Registry.AddRecord(record)
         PNC.SpatialIndex.UpdateNPC(record)
     end
     return true
+end
+
+function Registry.ReleasePromotedRecord(id)
+    local directory
+    local entry
+    local existing
+    Registry.EnsureLoaded()
+    if id == nil then return false end
+    id = tostring(id)
+    existing = Registry.Data[id]
+    if PNC.NeedsRepository and PNC.NeedsRepository.Remove then
+        PNC.NeedsRepository.Remove(id)
+    end
+    Registry.LiveByID[id] = nil
+    if existing and PNC.Network and PNC.Network.ForgetPortraitRecord then
+        PNC.Network.ForgetPortraitRecord(existing)
+    end
+    Registry.Data[id] = nil
+    Registry.DirtyByID[id] = nil
+    Registry.DirtyDomains[id] = nil
+    Registry.SavedSnapshots[id] = nil
+    if PNC.Scheduler and PNC.Scheduler.Remove then
+        PNC.Scheduler.Remove(id)
+    end
+    if PNC.SpatialIndex and PNC.SpatialIndex.RemoveNPC then
+        PNC.SpatialIndex.RemoveNPC(id)
+    end
+    directory = Internal.GetDirectory and Internal.GetDirectory() or nil
+    entry = directory and directory.records and directory.records[id] or nil
+    if entry then
+        directory.records[id] = nil
+        if ModData and ModData.remove then
+            ModData.remove(entry.storageKey or Internal.StorageKeyForID(id))
+        end
+        Registry.DirectoryDirty = true
+    end
+    return existing ~= nil
 end
 
 function Registry.RemoveRecord(id)

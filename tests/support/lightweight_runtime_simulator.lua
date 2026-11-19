@@ -143,6 +143,8 @@ function Simulator.New(options)
         clientCount = math.max(1, math.floor(tonumber(options.clientCount) or 1)),
         simulatedMs = math.max(100, math.floor(tonumber(options.simulatedMs) or 15000)),
         stepMs = math.max(10, math.floor(tonumber(options.stepMs) or 50)),
+        departAtMs = tonumber(options.departAtMs),
+        massInterestActors = tonumber(options.massInterestActors),
         profilerMode = string.upper(tostring(options.profilerMode or "OFF")),
         deepDurationMs = math.floor(tonumber(options.deepDurationMs) or 10000),
         quiet = options.quiet ~= false,
@@ -327,6 +329,7 @@ function Simulator:Run()
             getX = function() return px end,
             _setX = function(v) px = v end,
             getY = function() return py end,
+            _setY = function(v) py = v end,
             getZ = function() return pz end,
             getAccessLevel = function() return "admin" end,
             isDead = function() return false end,
@@ -360,7 +363,13 @@ function Simulator:Run()
             getHairModel = function() return "Short" end,
             getBeardModel = function() return "" end,
         }
-        local pfb = { setTarget = function() end, reset = function() end, clearTarget = function() end }
+        local pfb = {
+            cancel = function() end,
+            setTarget = function() end,
+            reset = function() end,
+            clearTarget = function() end,
+        }
+        local removed = false
         local zObj
         zObj = {
             __class = "IsoZombie",
@@ -379,8 +388,15 @@ function Simulator:Run()
             getVariableString = function(_, k) return vars[k] or "" end,
             setVariable = function(_, k, v) vars[k] = v end,
             clearVariable = function(_, k) vars[k] = nil end,
-            getCurrentSquare = function() return getSquare(zx, zy, zz) end,
-            getSquare = function() return getSquare(zx, zy, zz) end,
+            getCurrentSquare = function()
+                if removed then return nil end
+                return getSquare(zx, zy, zz)
+            end,
+            getSquare = function()
+                if removed then return nil end
+                return getSquare(zx, zy, zz)
+            end,
+            isExistInTheWorld = function() return not removed end,
             getInventory = function() return inv end,
             getHumanVisual = function() return vis end,
             getItemVisuals = function() return makeJavaList({}) end,
@@ -396,6 +412,9 @@ function Simulator:Run()
             setOnFire = function() end,
             setTarget = function() end,
             getTarget = function() return nil end,
+            setPath2 = function() end,
+            clearAggroList = function() end,
+            setRunning = function() end,
             getPathFindBehavior2 = function() return pfb end,
             getHealth = function() return 1.0 end,
             setHealth = function() end,
@@ -410,11 +429,14 @@ function Simulator:Run()
             setForceEatingAnimation = function() end,
             setAttackOutcome = function() end,
             removeFromWorld = function()
+                removed = true
                 for i = #zombies, 1, -1 do
                     if zombies[i] == zObj then table.remove(zombies, i) end
                 end
             end,
-            removeFromSquare = function() end,
+            removeFromSquare = function()
+                removed = true
+            end,
             getWornItems = function() return makeJavaList({}) end,
             clearWornItems = function() end,
             setPrimaryHandItem = function() end,
@@ -498,9 +520,13 @@ function Simulator:Run()
     local actorRegistry = Actors.DefaultRegistry or Actors.NewRegistry()
     Actors.DefaultRegistry = actorRegistry
 
+    local massInterestCount = cfg.massInterestActors and math.floor(cfg.massInterestActors) or nil
     for i = 1, cfg.actorCount do
         local x, y
-        if i <= cfg.expectedPromotedActors then
+        if massInterestCount and i <= massInterestCount then
+            x = 10002 + ((i - 1) % 8)
+            y = 10000 + math.floor((i - 1) / 8)
+        elseif i <= cfg.expectedPromotedActors then
             x = 10002 + i
             y = 10000
         elseif i <= cfg.expectedPromotedActors + cfg.nearbyActors then
@@ -539,6 +565,11 @@ function Simulator:Run()
     for _, fn in ipairs(events.OnServerStarted or {}) do fn() end
     local startupCpuMs = (os.clock() - startupCpuStart) * 1000
     snapshotStoreWrites()
+    local promotedAtStartup = countMap(PNC.Registry and PNC.Registry.Data)
+    local peakPromotedHoomansRecords = promotedAtStartup
+    local maxPromotionsInSingleRefresh = 0
+    local maxMaterializationsInSingleTick = 0
+    local departed = false
 
     local Integration = PNC.ProfilerIntegration
     local initialWrapperCounts = Integration
@@ -582,14 +613,40 @@ function Simulator:Run()
     metrics.inTickPhase = true
     local tickCpuStart = os.clock()
     local totalTicks = math.floor(cfg.simulatedMs / cfg.stepMs)
+    local startMs = nowMs
     for tick = 1, totalTicks do
         nowMs = nowMs + cfg.stepMs
+        local elapsedMs = nowMs - startMs
+        if cfg.departAtMs and not departed and elapsedMs >= cfg.departAtMs then
+            departed = true
+            local p1 = players[1]
+            if p1 and p1._setX then
+                p1._setX(12000)
+                if p1._setY then p1._setY(12000) end
+            end
+        end
+        local matBeforeTick = metrics.materializationAttempts
         for _, fn in ipairs(events.OnTick or {}) do
             fn()
         end
+        local matDelta = metrics.materializationAttempts - matBeforeTick
+        if matDelta > maxMaterializationsInSingleTick then
+            maxMaterializationsInSingleTick = matDelta
+        end
+        local refreshPromos = tonumber(
+            PNC.Presence and PNC.Presence.Internal
+                and PNC.Presence.Internal.lastRefreshPromotions
+        ) or 0
+        if refreshPromos > maxPromotionsInSingleRefresh then
+            maxPromotionsInSingleRefresh = refreshPromos
+        end
+        local promotedNow = countMap(PNC.Registry and PNC.Registry.Data)
+        if promotedNow > peakPromotedHoomansRecords then
+            peakPromotedHoomansRecords = promotedNow
+        end
         if nowMs % 1000 == 0 then
             local p1 = players[1]
-            if p1 and p1._setX then
+            if p1 and p1._setX and not departed then
                 p1._setX(10000 + ((math.floor(tick / 20)) % 4))
             end
             for _, fn in ipairs(events.EveryOneSecond or {}) do
@@ -695,15 +752,37 @@ function Simulator:Run()
         - censusGenerationStart
     local extraZombieListQueries = math.max(0, metrics.zombieListQueriesTick - censusScans)
 
+    local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
+    local coreMetrics = coreProvider and coreProvider.Metrics or {}
+    local endPromotedHoomansRecords = countMap(PNC.Registry and PNC.Registry.Data)
+    local schedulerMembersAtEnd = countMap(PNC.Scheduler and PNC.Scheduler.SlotByID)
+    local spatialMembersAtEnd = countMap(PNC.SpatialIndex and PNC.SpatialIndex.NPCMembership)
+    local promotionsCount = tonumber(coreMetrics.promotions) or 0
+    local demotionsCount = tonumber(coreMetrics.demotions) or 0
+    local coreExtensionsAttached = 0
+    if type(actorRegistry.ListWithExtension) == "function" then
+        coreExtensionsAttached = #actorRegistry:ListWithExtension("ProjectHoomans.ActorExtension")
+    end
+
     local report = {
         CoreActors = actorRegistry:Count(),
-        PromotedHoomansRecords = countMap(PNC.Registry and PNC.Registry.Data),
+        PromotedAtStartup = promotedAtStartup,
+        PromotedHoomansRecords = endPromotedHoomansRecords,
+        PeakPromotedHoomansRecords = peakPromotedHoomansRecords,
+        EndPromotedHoomansRecords = endPromotedHoomansRecords,
+        SchedulerMembersAtEnd = schedulerMembersAtEnd,
+        SpatialMembersAtEnd = spatialMembersAtEnd,
         LiveBodies = countMap(PNC.Registry and PNC.Registry.LiveByID),
         SchedulerProcessed = tonumber(diagCounters["Scheduler.DueProcessed"]) or 0,
         SchedulerDeferred = tonumber(diagCounters["Scheduler.Deferred"]) or 0,
-        PromotionAttempts = countMap(PNC.Registry and PNC.Registry.Data),
-        Promotions = countMap(PNC.Registry and PNC.Registry.Data),
-        Demotions = 0,
+        PromotionAttempts = promotionsCount,
+        Promotions = promotionsCount,
+        PromotionsCount = promotionsCount,
+        Demotions = demotionsCount,
+        DemotionsCount = demotionsCount,
+        MaxPromotionsInSingleRefresh = maxPromotionsInSingleRefresh,
+        MaxMaterializationsInSingleTick = maxMaterializationsInSingleTick,
+        CoreExtensionsAttached = coreExtensionsAttached,
         MaterializationAttempts = metrics.materializationAttempts,
         Materializations = countMap(PNC.Registry and PNC.Registry.LiveByID),
         LogicalCommits = metrics.logicalCommits,
@@ -757,10 +836,15 @@ end
 
 function Simulator.FormatSummary(report)
     return string.format(
-        "mode=%s core=%d promoted=%d live=%d schedProc=%d schedDef=%d commits=%d serAttempts=%d physWrites=%d globalSaves=%d dirtyEnd=%d presD=%d combatD=%d fullSnap=%d census=%d extraZScans=%d coarseCalls=%d deepCalls=%d tickCpuMs=%.2f",
+        "mode=%s core=%d startProm=%d peakProm=%d endProm=%d demoted=%d schedEnd=%d spatialEnd=%d live=%d schedProc=%d schedDef=%d commits=%d serAttempts=%d physWrites=%d globalSaves=%d dirtyEnd=%d presD=%d combatD=%d fullSnap=%d census=%d extraZScans=%d coarseCalls=%d deepCalls=%d tickCpuMs=%.2f",
         tostring(report.ProfilerMode),
         report.CoreActors,
-        report.PromotedHoomansRecords,
+        report.PromotedAtStartup or 0,
+        report.PeakPromotedHoomansRecords or report.PromotedHoomansRecords or 0,
+        report.EndPromotedHoomansRecords or report.PromotedHoomansRecords or 0,
+        report.DemotionsCount or 0,
+        report.SchedulerMembersAtEnd or 0,
+        report.SpatialMembersAtEnd or 0,
         report.LiveBodies,
         report.SchedulerProcessed,
         report.SchedulerDeferred,

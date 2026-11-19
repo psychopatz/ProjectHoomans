@@ -114,15 +114,38 @@ function Registry.Reconcile()
     for definitionID, entry in pairs(states) do
         if entry.status == "reserved" or entry.status == "alive" then
             record = nil
-            if tostring(entry.runtimeNpcId or "") ~= ""
-                and PNC.Registry
-                and PNC.Registry.Get
-            then
-                record = PNC.Registry.Get(entry.runtimeNpcId)
+            local aliveCore = false
+            if tostring(entry.runtimeNpcId or "") ~= "" then
+                if PNC.Registry and PNC.Registry.Get then
+                    record = PNC.Registry.Get(entry.runtimeNpcId)
+                end
+                if not record
+                    and PNC.Persistence
+                    and PNC.Persistence.CoreProvider
+                    and type(PNC.Persistence.CoreProvider.IsAliveCoreActor) == "function"
+                    and PNC.Persistence.CoreProvider.IsAliveCoreActor(
+                        entry.runtimeNpcId,
+                        PsychopatzCore
+                    )
+                then
+                    local coreExt = type(PNC.Persistence.CoreProvider.GetCoreActorExtension) == "function"
+                        and PNC.Persistence.CoreProvider.GetCoreActorExtension(
+                            entry.runtimeNpcId,
+                            PsychopatzCore
+                        )
+                        or nil
+                    if type(coreExt) == "table"
+                        and tostring(coreExt.uniqueDefinitionId or "")
+                            == tostring(definitionID)
+                    then
+                        aliveCore = true
+                    end
+                end
             end
-            if record
+            if (record
                 and tostring(record.uniqueDefinitionId or "")
-                    == tostring(definitionID)
+                    == tostring(definitionID))
+                or aliveCore
             then
                 if entry.status == "reserved" then
                     entry.status = "alive"
