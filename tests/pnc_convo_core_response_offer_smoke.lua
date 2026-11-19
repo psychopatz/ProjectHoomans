@@ -75,4 +75,4 @@ truthy(rendered, renderReason)
 truthy(rendered == "Alice tells One about the old mill.",
     "actor-neutral presentation bindings")
 
-print("pnc_psdl_core_response_offer_smoke: PASS")
+print("pnc_convo_core_response_offer_smoke: PASS")

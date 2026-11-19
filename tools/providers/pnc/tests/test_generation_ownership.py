@@ -38,15 +38,15 @@ from tools.semantic_harness.codebuilder.generation_ownership import (
 
 REPOSITORY = Path(__file__).resolve().parents[4]
 CORE_REPOSITORY = REPOSITORY.parent / "psychopatzCore"
-PNC_PSDL_DIALOGUE_RELATIVE = Path(
+PNC_CONVO_DIALOGUE_RELATIVE = Path(
     "tools/providers/pnc/codebuilder/sources/conversation/dialogue"
 )
 
 
-def copy_pnc_psdl_sources(repository: Path) -> None:
-    target = repository / PNC_PSDL_DIALOGUE_RELATIVE
+def copy_pnc_convo_sources(repository: Path) -> None:
+    target = repository / PNC_CONVO_DIALOGUE_RELATIVE
     target.mkdir(parents=True, exist_ok=True)
-    source_root = REPOSITORY / PNC_PSDL_DIALOGUE_RELATIVE
+    source_root = REPOSITORY / PNC_CONVO_DIALOGUE_RELATIVE
     shutil.copytree(source_root, target, dirs_exist_ok=True)
 
 
@@ -206,7 +206,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             dynamic_trading = root / "DynamicTrading"
             source_root = hoomans / CONVERSATION_SOURCE_RELATIVE
             shutil.copytree(CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE, source_root)
-            copy_pnc_psdl_sources(hoomans)
+            copy_pnc_convo_sources(hoomans)
 
             manifest_path = source_root / "manifest.json"
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
@@ -348,7 +348,7 @@ class GenerationOwnershipTests(unittest.TestCase):
                 CORE_REPOSITORY / CONVERSATION_SOURCE_RELATIVE,
                 hoomans / CONVERSATION_SOURCE_RELATIVE,
             )
-            copy_pnc_psdl_sources(hoomans)
+            copy_pnc_convo_sources(hoomans)
             model = compile_conversation_sources(
                 hoomans,
                 runtime_root=REPOSITORY,

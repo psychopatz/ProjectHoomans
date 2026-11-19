@@ -1,20 +1,20 @@
 # Conversation Block Extension API
 
 Project Hoomans conversations separate reusable content from the Project
-Zomboid Build 42.20 implementation. The reusable PSDL mechanism remains in
+Zomboid Build 42.20 implementation. The reusable ConvoEngine mechanism remains in
 PsychopatzCore; this repository owns adopter records, generated package output,
 and gameplay-specific projection only.
 
-PSDL authoring lives under
-`tools/providers/pnc/codebuilder/sources/conversation/psdl/dialogue/`, the
+ConvoEngine authoring lives under
+`tools/providers/pnc/codebuilder/sources/conversation/dialogue/`, the
 adopter projection is
-`PNC/Conversation/PSDL/PNC_ConversationPSDLBlocks.lua`, and generated plans
+`PNC/ConvoEngine/DialogueBlocks.lua`, and generated plans
 and text live under
-`common/media/lua/shared/PNC/Semantics/Generated/Conversation/` and
-`common/media/translation/{EN,TL}/Conversation/Text/psdl/`. `EN` is mandatory
+`common/media/lua/shared/PNC/ConvoEngine/` and
+`common/media/translation/{EN,TL}/Conversation/Text/convo/`. `EN` is mandatory
 and additional languages are data-driven with English fallback. The Build
 42 runtime continues to own registry, validation, selection, authority,
-persistence, UI, networking, text loading, and debugging; the PSDL projection
+persistence, UI, networking, text loading, and debugging; the ConvoEngine projection
 feeds those existing authorities.
 
 ## Runtime composition and authority
@@ -38,22 +38,22 @@ compatibility.
 
 ## Built-in module layout
 
-Migrated conversation families are authored as PSDL records and must not
+Migrated conversation families are authored as ConvoEngine records and must not
 receive new legacy registration modules:
 
 ```text
-tools/providers/pnc/codebuilder/sources/conversation/psdl/dialogue/
-├── social_ask_about.json
-├── social_companion_topics.json
-├── social_greetings.json
-├── social_settlement_admission.json
+tools/providers/pnc/codebuilder/sources/conversation/dialogue/
+├── social_ask_about/
+├── social_companion_topics/
+├── social_greetings/
+├── social_settlement_admission/
 └── ...
 ```
 
 Do not put a migrated family back into the legacy manifest or create a second
 compiler/runtime. The special `What's your name?` action remains isolated in
 its Build 42.20 adapter because it calls the authoritative knowledge service.
-New adopter content must be authored as PSDL and routed through the Core
+New adopter content must be authored as ConvoEngine records and routed through the Core
 compiler.
 
 ## Add a conversation from another mod

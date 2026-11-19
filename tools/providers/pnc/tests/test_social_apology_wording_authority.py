@@ -126,7 +126,7 @@ class SocialApologyWordingShardTests(WarmWorkerTestMixin, unittest.TestCase):
                 self.assertEqual(len(role["translations"]["EN"]), 10)
                 self.assertEqual(len(role["translations"]["TL"]), 10)
 
-    def test_generated_apology_psdl_source_is_complete_and_legacy_fixed_keys_retired(
+    def test_generated_apology_convo_source_is_complete_and_legacy_fixed_keys_retired(
         self,
     ) -> None:
         from tools.semantic_harness.codebuilder.convo_engine_compiler import compile_convo_engine_document

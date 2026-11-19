@@ -5,7 +5,7 @@
   "cases": [
     {
       "id": "compiler.pipeline_and_beat_linkage.command_camp_end_to_end",
-      "description": "Trace command.camp from authored PSDL source through canonical IR, Portable Dialogue Plan, PZ backend projection, source lineage, and live Lua runtime.",
+      "description": "Trace command.camp from authored ConvoEngine source through canonical IR, Portable Dialogue Plan, PZ backend projection, source lineage, and live Lua runtime.",
       "tags": [
         "compiler",
         "actions",
@@ -109,7 +109,7 @@
     },
     {
       "id": "compiler.pipeline_and_beat_linkage.beat_argument_escalation_linkage",
-      "description": "Verify PSDL inspection and lineage for beat.argument_escalation.",
+      "description": "Verify ConvoEngine inspection and lineage for beat.argument_escalation.",
       "tags": [
         "compiler",
         "beats"

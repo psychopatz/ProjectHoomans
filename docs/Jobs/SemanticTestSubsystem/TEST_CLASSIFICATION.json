@@ -175,7 +175,7 @@
           "name": "test_real_worker_backstory_navigation_and_cli_inspect_interaction_history",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: real worker backstory navigation and cli inspect interaction history"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: real worker backstory navigation and cli inspect interaction history"
         }
       ]
     },
@@ -1130,49 +1130,49 @@
           "name": "test_hostility_generates_semantically_diverse_affordances_and_keeps_authored",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: hostility generates semantically diverse affordances and keeps authored"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: hostility generates semantically diverse affordances and keeps authored"
         },
         {
           "name": "test_trait_lane_uses_player_trait_only_and_exposes_bounded_provenance",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: trait lane uses player trait only and exposes bounded provenance"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: trait lane uses player trait only and exposes bounded provenance"
         },
         {
           "name": "test_generated_affordance_follows_current_pending_question",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: generated affordance follows current pending question"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: generated affordance follows current pending question"
         },
         {
           "name": "test_generated_click_and_typed_apology_converge_downstream",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: generated click and typed apology converge downstream"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: generated click and typed apology converge downstream"
         },
         {
           "name": "test_generated_buttons_are_locale_realizations_not_nlu_inputs",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: generated buttons are locale realizations not nlu inputs"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: generated buttons are locale realizations not nlu inputs"
         },
         {
           "name": "test_runtime_retaliation_uses_canonical_microplan_en_and_tl",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: runtime retaliation uses canonical microplan en and tl"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: runtime retaliation uses canonical microplan en and tl"
         },
         {
           "name": "test_non_owned_interaction_response_falls_back_to_dialogue_content",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: non owned interaction response falls back to dialogue content"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: non owned interaction response falls back to dialogue content"
         },
         {
           "name": "test_realization_records_are_compiler_owned_and_routable",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: realization records are compiler owned and routable"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: realization records are compiler owned and routable"
         }
       ]
     },
@@ -1842,19 +1842,19 @@
           "name": "test_compiler_owns_health_families_by_health_shard",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: compiler owns health families by health shard"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: compiler owns health families by health shard"
         },
         {
           "name": "test_generated_health_translation_is_complete_and_legacy_keys_are_retired",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: generated health translation is complete and legacy keys are retired"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: generated health translation is complete and legacy keys are retired"
         },
         {
           "name": "test_real_worker_preserves_health_identity_and_no_effects_in_en_tl",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: real worker preserves health identity and no effects in en tl"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: real worker preserves health identity and no effects in en tl"
         }
       ]
     },
@@ -1869,7 +1869,7 @@
           "name": "test_common_patterns_compile_and_heldout_worker_scores_perfect",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: common patterns compile and heldout worker scores perfect"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: common patterns compile and heldout worker scores perfect"
         }
       ]
     },
@@ -1977,19 +1977,19 @@
           "name": "test_behaviors_reference_dialogue_content_not_response_pools",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: behaviors reference dialogue content not response pools"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: behaviors reference dialogue content not response pools"
         },
         {
           "name": "test_existing_dialogue_content_authoring_edits_interaction_wording",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: existing dialogue content authoring edits interaction wording"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: existing dialogue content authoring edits interaction wording"
         },
         {
           "name": "test_real_worker_uses_one_response_authority_and_content_realization",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: real worker uses one response authority and content realization"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: real worker uses one response authority and content realization"
         }
       ]
     },
@@ -2368,19 +2368,19 @@
           "name": "test_compiler_owns_needs_families_by_needs_shard",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: compiler owns needs families by needs shard"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: compiler owns needs families by needs shard"
         },
         {
           "name": "test_generated_needs_translation_is_complete_and_legacy_keys_are_retired",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: generated needs translation is complete and legacy keys are retired"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: generated needs translation is complete and legacy keys are retired"
         },
         {
           "name": "test_real_worker_preserves_needs_identity_and_no_effects_in_en_tl",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: real worker preserves needs identity and no effects in en tl"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: real worker preserves needs identity and no effects in en tl"
         }
       ]
     },
@@ -4312,25 +4312,25 @@
           "name": "test_apology_without_an_antecedent_requests_context_without_dispatch",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: apology without an antecedent requests context without dispatch"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: apology without an antecedent requests context without dispatch"
         },
         {
           "name": "test_compiler_owns_fixed_apology_families_by_apology_shard",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: compiler owns fixed apology families by apology shard"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: compiler owns fixed apology families by apology shard"
         },
         {
-          "name": "test_generated_apology_psdl_source_is_complete_and_legacy_fixed_keys_retired",
+          "name": "test_generated_apology_convo_source_is_complete_and_legacy_fixed_keys_retired",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: generated apology psdl source is complete and legacy fixed keys retired"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: generated apology convo source is complete and legacy fixed keys retired"
         },
         {
           "name": "test_real_worker_preserves_apology_identity_and_no_effects_in_en_tl",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: real worker preserves apology identity and no effects in en tl"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: real worker preserves apology identity and no effects in en tl"
         }
       ]
     },
@@ -5148,19 +5148,19 @@
           "name": "test_compiler_owns_wellbeing_families_by_wellbeing_shard",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: compiler owns wellbeing families by wellbeing shard"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: compiler owns wellbeing families by wellbeing shard"
         },
         {
           "name": "test_generated_wellbeing_translation_is_complete_and_legacy_keys_are_retired",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: generated wellbeing translation is complete and legacy keys are retired"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: generated wellbeing translation is complete and legacy keys are retired"
         },
         {
           "name": "test_real_worker_preserves_wellbeing_identity_and_no_effects_in_en_tl",
           "category": "COMPILER_CONTRACT",
           "usesDirectWorker": true,
-          "reason": "PSDL/CodeBuilder compiler and generation contract: real worker preserves wellbeing identity and no effects in en tl"
+          "reason": "ConvoEngine/CodeBuilder compiler and generation contract: real worker preserves wellbeing identity and no effects in en tl"
         }
       ]
     },

@@ -103,18 +103,18 @@ T.equal(#Registry.ListBlocks({ includeInvalid = true }), 38,
 
 local migratedWellbeing = Registry.GetBlock("projecthoomans:wellbeing_neutral")
 T.equal(migratedWellbeing.textSource.modID, "ProjectHoomans",
-    "PSDL wellbeing keeps adopter-owned text routing")
+    "ConvoEngine wellbeing keeps adopter-owned text routing")
 T.equal(migratedWellbeing.textSource.domain,
     "pnc.convo.social.wellbeing.neutral",
     "ConvoEngine wellbeing keeps its declared text domain")
 T.equal(migratedWellbeing.nodes.opening.textKey, "opening",
-    "PSDL wellbeing preserves the opening turn")
+    "ConvoEngine wellbeing preserves the opening turn")
 T.equal(migratedWellbeing.nodes.opening.choices[1].textKey,
     "choice.condition",
-    "PSDL wellbeing preserves semantic choice text")
+    "ConvoEngine wellbeing preserves semantic choice text")
 T.equal(migratedWellbeing.nodes.opening.choices[1].outcomes[1].responseKey,
     "response.condition",
-    "PSDL wellbeing preserves response routing")
+    "ConvoEngine wellbeing preserves response routing")
 
 local migratedPersonal = Registry.GetBlock("projecthoomans:personal_special")
 T.equal(migratedPersonal.textSource.domain,
@@ -122,66 +122,66 @@ T.equal(migratedPersonal.textSource.domain,
     "ConvoEngine personal topic keeps its declared text domain")
 T.equal(migratedPersonal.nodes.opening.choices[1].textKey,
     "choice.trust",
-    "PSDL personal topic preserves semantic choice text")
+    "ConvoEngine personal topic preserves semantic choice text")
 T.equal(migratedPersonal.gates[1].type,
     "pnc:relationship",
-    "PSDL personal topic preserves relationship eligibility")
+    "ConvoEngine personal topic preserves relationship eligibility")
 
 local migratedRelationship = Registry.GetBlock(
     "projecthoomans:relationship_special"
 )
 T.equal(migratedRelationship.nodes.opening.choices[1].outcomes[1].responseKey,
     "response.us",
-    "PSDL relationship topic preserves response routing")
+    "ConvoEngine relationship topic preserves response routing")
 
 local migratedTerritory = Registry.GetBlock(
     "projecthoomans:set_territory_member"
 )
 T.equal(migratedTerritory.priority, 1000,
-    "PSDL territory topic preserves priority")
+    "ConvoEngine territory topic preserves priority")
 T.equal(migratedTerritory.gates[2].reasonKey,
     "locked.base_established",
-    "PSDL territory topic preserves base lock diagnostics")
+    "ConvoEngine territory topic preserves base lock diagnostics")
 T.equal(migratedTerritory.nodes.opening.choices[1].outcomes[1].effects[1].type,
     "pnc:open_territory_claim",
-    "PSDL territory topic preserves gameplay effect")
+    "ConvoEngine territory topic preserves gameplay effect")
 
 local migratedWorkOrders = Registry.GetBlock(
     "projecthoomans:work_orders_member"
 )
 T.equal(#migratedWorkOrders.nodes.opening.choices, 2,
-    "PSDL work-orders topic preserves both offers")
+    "ConvoEngine work-orders topic preserves both offers")
 
 local migratedNeeds = Registry.GetBlock("projecthoomans:needs_member")
 T.equal(migratedNeeds.textSource.modID, "ProjectHoomans",
-    "PSDL needs routes adopter-owned text")
+    "ConvoEngine needs routes adopter-owned text")
 T.equal(#migratedNeeds.nodes.opening.choices, 3,
-    "PSDL needs preserves its three opening offers")
+    "ConvoEngine needs preserves its three opening offers")
 T.equal(migratedNeeds.nodes.opening.choices[3].outcomes[1].next,
     "gift",
-    "PSDL needs preserves the gift continuation transition")
+    "ConvoEngine needs preserves the gift continuation transition")
 T.equal(migratedNeeds.nodes.gift.textKey, "gift.opening",
-    "PSDL needs preserves the gift continuation turn")
+    "ConvoEngine needs preserves the gift continuation turn")
 T.equal(migratedNeeds.nodes.gift.choices[1].outcomes[1].next,
     "$root",
-    "PSDL needs preserves return to the conversation root")
+    "ConvoEngine needs preserves return to the conversation root")
 
 local migratedGreeting = Registry.GetBlock(
     "projecthoomans:greeting_firstmeet_dawn"
 )
 T.equal(#migratedGreeting.nodes.opening.textKeys, 5,
-    "PSDL greeting preserves all randomized variants")
+    "ConvoEngine greeting preserves all randomized variants")
 T.equal(migratedGreeting.nodes.opening.portraitAnimation, "greeting.wavehi",
-    "PSDL greeting preserves portrait realization")
+    "ConvoEngine greeting preserves portrait realization")
 T.equal(migratedGreeting.gates[1].type, "pnc:time",
-    "PSDL greeting preserves time gate")
+    "ConvoEngine greeting preserves time gate")
 T.equal(migratedGreeting.gates[2].type, "pnc:relationship_state",
-    "PSDL greeting preserves relationship gate")
+    "ConvoEngine greeting preserves relationship gate")
 local migratedParley = Registry.GetBlock("projecthoomans:hostile_parley")
 T.truthy(migratedParley.nodes.opening.choices[1].outcomes[1].close,
-    "PSDL parley preserves ceasefire close behavior")
+    "ConvoEngine parley preserves ceasefire close behavior")
 T.equal(migratedParley.nodes.opening.choices[1].outcomes[1].next, nil,
-    "PSDL parley does not navigate after close")
+    "ConvoEngine parley does not navigate after close")
 
 local legacyWhatsUpID = "projecthoomans:" .. "whats_up"
 local legacyWhatsUpPrefix = legacyWhatsUpID .. "_"
@@ -250,12 +250,12 @@ T.truthy(Rules.CheckRepeat({ oncePerDay = true }, {
     lastUsedWorldHour = 26,
 }, 48), "once-per-day resets at the next world day")
 
-local psdlAdapter = T.read(
+local convoAdapter = T.read(
     "ProjectHoomans", "common_lua",
     "PNC/ConvoEngine/DialogueBlocks.lua"
 )
-T.truthy(string.find(psdlAdapter, "Generated.ConvoPlan", 1, true),
-    "PNC blocks are projected from Core-generated PSDL plans")
+T.truthy(string.find(convoAdapter, "Generated.ConvoPlan", 1, true),
+    "PNC blocks are projected from Core-generated ConvoEngine plans")
 
 T.truthy(Rules.EvaluateGate({
     type = "pnc:skill", actor = "player", skill = "Aiming",
@@ -426,7 +426,7 @@ T.equal(visitGreeting.textSource.domain,
     "pnc.convo.social.greetings.settlement_admission.arrival",
     "settlement admission uses adopter-owned ConvoEngine text routing")
 T.equal(#visitGreeting.nodes.opening.textKeys, 3,
-    "settlement admission preserves all authored PSDL variants")
+    "settlement admission preserves all authored ConvoEngine variants")
 T.equal(visitGreeting.gates[1].type, "pnc:settlement_visit",
     "settlement admission preserves its semantic eligibility gate")
 local admissionChoice

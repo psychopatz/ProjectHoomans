@@ -10,13 +10,13 @@ local expected = {
     "question.gossip",
 }
 
-assert(type(suggestions) == "table", "Hoomans PSDL UI projection did not return a table")
+assert(type(suggestions) == "table", "Hoomans ConvoEngine UI projection did not return a table")
 assert(#suggestions == #expected, "Hoomans companion check-in offer count changed")
 for index, expectedID in ipairs(expected) do
     local row = suggestions[index]
-    assert(row.id == expectedID, "Hoomans PSDL UI projection reordered " .. expectedID)
-    assert(row.patternID and row.patternID ~= "", "PSDL offer lost its semantic pattern reference")
-    assert(row.display and row.display.EN and row.display.TL, "PSDL offer lost locale display data")
+    assert(row.id == expectedID, "Hoomans ConvoEngine UI projection reordered " .. expectedID)
+    assert(row.patternID and row.patternID ~= "", "ConvoEngine offer lost its semantic pattern reference")
+    assert(row.display and row.display.EN and row.display.TL, "ConvoEngine offer lost locale display data")
     assert(row.labelKey and row.utteranceKey, "Core did not generate UI translation keys")
 end
 
@@ -33,4 +33,4 @@ local gossip = suggestions[3]
 assert(gossip.hubOnly == true, "Gossip hub-only constraint changed")
 assert(gossip.hubRequiresSafeGossip == true, "Gossip safety constraint changed")
 
-print("pnc_psdl_ui_projection_smoke: PASS")
+print("pnc_convo_ui_projection_smoke: PASS")
