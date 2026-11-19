@@ -10,4 +10,6 @@ Project Hoomans needs responsive roster browsing and nearby NPC presentation wit
 - [Progress](PROGRESS.md) records verified work and exactly one starting Next Chunk.
 - [Handoff](HANDOFF.md) records the resumable workspace checkpoint.
 
+The P1-P4 replication objective is developer-complete. Broader runtime CPU/persistence/hydration work discovered during native play is owned by the [Lightweight NPC Runtime job](../LightweightNPCRuntime/README.md); that follow-up must preserve this job's accepted protocol and must not reopen it as a parallel replication system.
+
 The [starting companion job](../UnifiedStartingCompanionAuthoring/ROADMAP.md) owns authoring and spawn fidelity. The [population job](../UnifiedNPCPopulationExpansionArchitecture/ARCHITECTURE.md) owns NPC population generation and activation. This replication job **consumes their server-resolved NPCs**; it does not replace preset schemas, authority, saved appearance, or inventory replication.

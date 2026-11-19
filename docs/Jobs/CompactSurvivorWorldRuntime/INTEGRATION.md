@@ -4,6 +4,8 @@ Authoritative parent goal: PsychopatzCore `Docs/survivor_world_runtime/`.
 
 ProjectHoomans is an adopter, not the canonical owner.
 
+A compact Core actor must not be bulk-hydrated into a persistent/scheduled Hoomans record merely because the actor exists. Map/portrait/discovery projection may remain Core-owned; create rich Hoomans runtime lazily for physical/gameplay responsibility and discard it again after safe dehydration.
+
 ## Hoomans responsibilities retained
 
 - live body lifecycle;

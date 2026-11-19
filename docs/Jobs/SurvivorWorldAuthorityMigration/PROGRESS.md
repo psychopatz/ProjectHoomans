@@ -54,6 +54,10 @@
 - New Core abstract-lease, released-map-ghost, Hoomans adoption, and
   DTAbstract provider-handoff regressions pass.
 
+## Superseded runtime detail
+
+The earlier "hydrate Core actors into abstract PNC records" implementation was transitional and is no longer a compactness invariant. The Compact Survivor World architecture requires far abstract actors to remain Core-only until Hoomans physical/gameplay responsibility needs promotion. [Lightweight NPC Runtime](../LightweightNPCRuntime/README.md) owns removal of eager bulk hydration while preserving the same canonical actor/provider identity.
+
 ## Pending
 
 - Live new-save and restart validation in Project Zomboid.

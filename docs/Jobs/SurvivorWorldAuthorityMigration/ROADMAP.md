@@ -25,6 +25,12 @@ those actors through provider-specific compatibility/physical lifecycle views.
    materialization, debug release rollback, and provider hotswap behavior in
    the live game.
 
+## Superseded implementation detail — eager Hoomans hydration
+
+Gate 3 recorded the transition-era requirement that Hoomans could project Core actors before Hoomans consumers inspected them. It must **not** be interpreted as a permanent requirement to bulk-create one full PNC record for every Core actor. The accepted Compact Survivor World contract is newer and authoritative: abstract Core actors stay compact, while Hoomans rich runtime is promoted lazily when physical/gameplay responsibility requires it. The active remediation is documented in [Lightweight NPC Runtime](../LightweightNPCRuntime/README.md).
+
+Do not preserve `HydrateCoreActors()` startup/full-registry behavior merely to satisfy this historical gate. Preserve actor identity/provider parity while replacing eager hydration with lazy projection/promotion.
+
 ## Current phase
 
 Source implementation and focused harness tests are complete. The remaining
