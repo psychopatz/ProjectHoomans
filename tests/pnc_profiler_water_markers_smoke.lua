@@ -104,6 +104,24 @@ local Integration = require "PNC/Integrations/PNC_PsychopatzProfiler"
 Integration.InstallServer()
 
 for index = 1, #targets do
+    T.equal(targets[index][1][targets[index][2]], originals[index].callback,
+        targets[index][3] .. " must remain unwrapped in default coarse mode")
+end
+Profiler.Stop()
+
+now = 0
+Profiler.Start("BASIC", {
+    nowMs = function() return now end,
+    sourceType = function() return "test" end,
+}, {
+    performanceDepth = "deep",
+    deepDurationMs = 20000,
+    capture = { performance = true },
+})
+Integration.ApplyCaptureConfig({ mode = "BASIC" })
+Integration.InstallServer()
+
+for index = 1, #targets do
     local owner = targets[index][1]
     local key = targets[index][2]
     local metric = targets[index][3]
@@ -136,6 +154,13 @@ T.truthy(seenGauges["ProjectHoomans.NPC.Water.RefillActive"],
     "refill activity gauge was not registered")
 T.truthy(seenGauges["ProjectHoomans.NPC.Water.ManualOverrides"],
     "manual water override gauge was not registered")
+
+now = 20000
+Profiler.Sample(1000)
+for index = 1, #targets do
+    T.equal(targets[index][1][targets[index][2]], originals[index].callback,
+        targets[index][3] .. " was not restored on deep expiry")
+end
 
 Profiler.Stop()
 for index = 1, #targets do

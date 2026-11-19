@@ -28,9 +28,17 @@ function Integration.ApplyCaptureConfig(config)
         if NPCProfiler.Register then NPCProfiler.Register(config) end
     end
     if Profiler.IsSectionEnabled("performance") then
+        if not (Profiler.IsDeepPerformanceEnabled
+            and Profiler.IsDeepPerformanceEnabled())
+        then
+            Integration.RestoreDeep()
+        end
         Internal.InstallSharedPerformance()
         Integration.InstallServer()
-        if PNC.Server and type(PNC.Server.OnTick) == "function" then
+        if PNC.Server and type(PNC.Server.OnTick) == "function"
+            and not (Integration._serverTickHook
+                and Integration._serverTickHook.wrapped == PNC.Server.OnTick)
+        then
             local original = PNC.Server.OnTick
             local wrapped = Integration.WrapServerTick(original)
             if wrapped ~= original then
@@ -43,6 +51,8 @@ function Integration.ApplyCaptureConfig(config)
                 PNC.Server.OnTick = wrapped
             end
         end
+    else
+        Integration.Restore()
     end
     return true
 end

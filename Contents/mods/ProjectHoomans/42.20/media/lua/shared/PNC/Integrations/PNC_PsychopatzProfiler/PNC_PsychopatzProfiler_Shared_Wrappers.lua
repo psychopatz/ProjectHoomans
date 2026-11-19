@@ -6,17 +6,50 @@ end
 local Internal = Integration.Internal
 if type(Internal) ~= "table" then return Integration end
 
-function Internal.InstallSharedPerformanceWrappers()
+function Internal.InstallCoarseSharedPerformanceWrappers()
     local Profiler = Internal.Profiler
-    local Profiler = Internal.Profiler
+    if not Profiler or Integration.coarseInstalled then return false end
     Profiler.RegisterNamespace("ProjectHoomans", {
         displayName = "Project Hoomans",
     })
     Profiler.RegisterStopHook("ProjectHoomans.restore", Integration.Restore)
     Internal.Wrap(PNC.SpatialIndex, "Rebuild",
-        "ProjectHoomans.Server.Update.Spatial.Rebuild")
+        "ProjectHoomans.Server.Update.Spatial.Rebuild", "coarse")
     Internal.Wrap(PNC.WorldCensus, "Refresh",
-        "ProjectHoomans.WorldCensus.Refresh")
+        "ProjectHoomans.WorldCensus.Refresh", "coarse")
+    Internal.Wrap(PNC.Network, "BroadcastRecord",
+        "ProjectHoomans.Network.BroadcastRecord", "coarse")
+    Internal.Wrap(PNC.Network, "BuildSnapshot",
+        "ProjectHoomans.Network.Snapshot.Full", "coarse")
+    Internal.Wrap(PNC.Network, "BuildCombatDamageDelta",
+        "ProjectHoomans.Network.Snapshot.CombatDamageDelta", "coarse")
+    Internal.Wrap(PNC.Network, "BuildPresenceDelta",
+        "ProjectHoomans.Network.Snapshot.PresenceDelta", "coarse")
+    Internal.Wrap(PNC.Network, "FlushRosterDeltas",
+        "ProjectHoomans.Server.Update.Network.FlushRosterDeltas", "coarse")
+    Integration.coarseInstalled = true
+    return true
+end
+
+function Internal.InstallDeepSharedPerformanceWrappers()
+    local Profiler = Internal.Profiler
+    if not Profiler
+        or type(Profiler.IsDeepPerformanceEnabled) ~= "function"
+        or not Profiler.IsDeepPerformanceEnabled()
+        or Integration.sharedDeepInstalled
+    then
+        return false
+    end
+    Profiler.RegisterNamespace("ProjectHoomans", {
+        displayName = "Project Hoomans",
+    })
+    Profiler.RegisterStopHook("ProjectHoomans.restore", Integration.Restore)
+    if Profiler.RegisterDeepStopHook then
+        Profiler.RegisterDeepStopHook(
+            "ProjectHoomans.restoreDeep",
+            Integration.RestoreDeep
+        )
+    end
     Internal.Wrap(PNC.Perception, "GetZombieFrame",
         "ProjectHoomans.Server.Update.NPC.Perception")
     Internal.Wrap(PNC.BehaviorSystem, "Tick",
@@ -28,17 +61,9 @@ function Internal.InstallSharedPerformanceWrappers()
     Internal.Wrap(PNC.Scheduler, "PumpJobs",
         "ProjectHoomans.Server.Update.Director.ScheduledJobs")
     Internal.InstallScheduledJobPerformance()
-    Internal.Wrap(PNC.Network, "BroadcastRecord",
-        "ProjectHoomans.Network.BroadcastRecord")
     -- Keep the network event envelope separate from the snapshot builders.
     -- BuildRecordPayload selects the detailed, combat-damage, or presence
     -- path so captures can attribute each payload cost correctly.
-    Internal.Wrap(PNC.Network, "BuildSnapshot",
-        "ProjectHoomans.Network.Snapshot.Full")
-    Internal.Wrap(PNC.Network, "BuildCombatDamageDelta",
-        "ProjectHoomans.Network.Snapshot.CombatDamageDelta")
-    Internal.Wrap(PNC.Network, "BuildPresenceDelta",
-        "ProjectHoomans.Network.Snapshot.PresenceDelta")
     Internal.Wrap(PNC.Equipment, "Describe",
         "ProjectHoomans.Network.Snapshot.Equipment")
     Internal.Wrap(PNC.Inventory, "BuildSummaryPayload",
@@ -55,13 +80,11 @@ function Internal.InstallSharedPerformanceWrappers()
         "ProjectHoomans.Network.Snapshot.Treatment")
     Internal.Wrap(PNC.Treatment, "BuildMedicalCareSnapshot",
         "ProjectHoomans.Network.Snapshot.Medical")
-    Internal.Wrap(PNC.Network, "FlushRosterDeltas",
-        "ProjectHoomans.Server.Update.Network.FlushRosterDeltas")
 
     -- Companion-follow phases are intentionally exposed below the broad
     -- BehaviorSystem.Tick marker. These wrappers are diagnostic-only and are
-    -- installed only while the performance section is active, so the normal
-    -- gameplay path keeps its existing call graph and state transitions.
+    -- installed only while explicit time-bounded deep capture is active, so
+    -- normal gameplay keeps its existing call graph and state transitions.
     local companion = PNC.BehaviorCompanion
     Internal.Wrap(companion, "Tick",
         "ProjectHoomans.Server.Update.NPC.Companion.Dispatch")
@@ -99,8 +122,8 @@ function Internal.InstallSharedPerformanceWrappers()
     Internal.Wrap(PNC.RoamingSeat, "TryStart",
         "ProjectHoomans.Server.Update.NPC.Roaming.Seat.TryStart")
 
-    -- Combat orchestration markers. These are installed only while the
-    -- performance section is enabled and are restored with the other wrappers.
+    -- Combat orchestration markers. These are installed only while explicit
+    -- time-bounded deep capture is enabled and restore on expiry or stop.
     Internal.Wrap(PNC.BehaviorHostile, "Tick",
         "ProjectHoomans.Server.Update.NPC.Combat.Hostile")
     Internal.Wrap(PNC.BehaviorCombat, "TickCommittedAction",
@@ -155,6 +178,14 @@ function Internal.InstallSharedPerformanceWrappers()
     Internal.Wrap(PNC.Stamina, "SpendAttack",
         "ProjectHoomans.Server.Update.NPC.Stamina.AttackSpend")
 
+    Integration.sharedDeepInstalled = true
+    Integration.deepInstalled = true
+    return true
+end
+
+function Internal.InstallSharedPerformanceWrappers()
+    Internal.InstallCoarseSharedPerformanceWrappers()
+    Internal.InstallDeepSharedPerformanceWrappers()
 end
 
 return Integration

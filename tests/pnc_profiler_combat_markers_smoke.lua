@@ -151,6 +151,10 @@ local targets = {
 }
 
 local originals = {}
+local coarseMetrics = {
+    ["ProjectHoomans.Network.Snapshot.Full"] = true,
+    ["ProjectHoomans.Network.Snapshot.PresenceDelta"] = true,
+}
 local i
 for i = 1, #targets do
     originals[i] = {
@@ -160,6 +164,35 @@ for i = 1, #targets do
 end
 
 local Integration = require "PNC/Integrations/PNC_PsychopatzProfiler"
+Integration.InstallServer()
+
+-- Default coarse mode must not wrap deep combat/stamina/snapshot-detail functions.
+for i = 1, #targets do
+    local owner = targets[i][1]
+    local key = targets[i][2]
+    local metric = targets[i][3]
+    if coarseMetrics[metric] then
+        T.truthy(owner[key] ~= originals[i].callback, metric .. " coarse target not installed")
+    else
+        T.equal(owner[key], originals[i].callback, metric .. " wrapped in default coarse mode")
+    end
+end
+Profiler.Stop()
+for i = 1, #targets do
+    T.equal(targets[i][1][targets[i][2]], originals[i].callback, targets[i][3] .. " coarse stop restore")
+end
+
+-- Explicit deep mode installs all deep combat markers and restores on expiry and stop.
+now = 0
+Profiler.Start("BASIC", {
+    nowMs = function() return now end,
+    sourceType = function() return "test" end,
+}, {
+    performanceDepth = "deep",
+    deepDurationMs = 20000,
+    capture = { performance = true },
+})
+Integration.ApplyCaptureConfig({ mode = "BASIC" })
 Integration.InstallServer()
 
 for i = 1, #targets do
@@ -178,6 +211,16 @@ local seen = {}
 for i = 1, #metrics do seen[metrics[i].name] = true end
 for i = 1, #targets do
     T.truthy(seen[targets[i][3]], targets[i][3] .. " was not recorded")
+end
+
+now = 20000
+Profiler.Sample(1000)
+for i = 1, #targets do
+    local metric = targets[i][3]
+    if not coarseMetrics[metric] then
+        T.equal(targets[i][1][targets[i][2]], originals[i].callback,
+            metric .. " was not restored on deep expiry")
+    end
 end
 
 Profiler.Stop()

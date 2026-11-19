@@ -186,6 +186,24 @@ local Integration = require "PNC/Integrations/PNC_PsychopatzProfiler"
 Integration.InstallServer()
 
 for i = 1, #targets do
+    T.equal(targets[i][1][targets[i][2]], originals[i].callback,
+        targets[i][3] .. " must remain unwrapped in default coarse mode")
+end
+Profiler.Stop()
+
+now = 0
+Profiler.Start("BASIC", {
+    nowMs = function() return now end,
+    sourceType = function() return "test" end,
+}, {
+    performanceDepth = "deep",
+    deepDurationMs = 20000,
+    capture = { performance = true },
+})
+Integration.ApplyCaptureConfig({ mode = "BASIC" })
+Integration.InstallServer()
+
+for i = 1, #targets do
     local owner = targets[i][1]
     local key = targets[i][2]
     local metric = targets[i][3]
@@ -202,6 +220,13 @@ local seen = {}
 for i = 1, #metrics do seen[metrics[i].name] = true end
 for i = 1, #targets do
     T.truthy(seen[targets[i][3]], targets[i][3] .. " was not recorded")
+end
+
+now = 20000
+Profiler.Sample(1000)
+for i = 1, #targets do
+    T.equal(targets[i][1][targets[i][2]], originals[i].callback,
+        targets[i][3] .. " was not restored on deep expiry")
 end
 
 Profiler.Stop()

@@ -10,7 +10,13 @@ require "PNC/Integrations/PNC_PsychopatzProfiler/PNC_PsychopatzProfiler_Shared_W
 require "PNC/Integrations/PNC_PsychopatzProfiler/PNC_PsychopatzProfiler_Shared_Sampler"
 
 function Internal.InstallSharedPerformance()
-    Internal.InstallSharedPerformanceWrappers()
+    Internal.InstallCoarseSharedPerformanceWrappers()
+    local Profiler = Internal.Profiler
+    if Profiler and Profiler.IsDeepPerformanceEnabled
+        and Profiler.IsDeepPerformanceEnabled()
+    then
+        Internal.InstallDeepSharedPerformanceWrappers()
+    end
     Internal.InstallSharedPerformanceSampler()
 end
 

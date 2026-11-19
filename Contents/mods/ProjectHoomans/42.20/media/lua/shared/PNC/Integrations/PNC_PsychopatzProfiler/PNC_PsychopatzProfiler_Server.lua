@@ -14,111 +14,142 @@ function Integration.InstallServer()
     then
         return false
     end
-    if Integration.serverInstalled then return false end
-    local function wrap(owner, key, metric)
-        Internal.Wrap(owner, key, "ProjectHoomans." .. metric)
+    local deepEnabled = Profiler.IsDeepPerformanceEnabled
+        and Profiler.IsDeepPerformanceEnabled() == true
+    local changed = false
+    if Profiler.RegisterStopHook then
+        Profiler.RegisterStopHook("ProjectHoomans.restore", Integration.Restore)
     end
-    wrap(PNC.WorldDirector, "Pump", "Server.Update.Director")
-    wrap(PNC.PopulationDirector, "Pump", "Server.Update.Director.Population")
-    wrap(PNC.PersistenceCoordinator, "Commit", "Persistence.Commit")
-    wrap(PNC.PlayerCharacters, "Save", "Persistence.PlayerCharacters")
-    wrap(PNC.NPCKnowledge, "Save", "Persistence.NPCKnowledge")
-    wrap(PNC.Factions, "Commit", "Persistence.Factions")
-    wrap(PNC.Communities, "Commit", "Persistence.Communities")
-    wrap(PNC.ColonyStorageRepository, "Save", "Persistence.ColonyStorage")
-    wrap(PNC.WorldDiscovery, "Save", "Persistence.WorldDiscovery")
-    wrap(PNC.Conversation and PNC.Conversation.History, "Save",
-        "Persistence.ConversationHistory")
-    wrap(PNC.Registry, "FlushDirty", "Persistence.NPCRecords")
-    wrap(PNC.PlayerCharacterLifecycle, "Pump",
-        "Server.Update.PlayerCharacters")
-    wrap(PNC.FactionBehavior, "PumpReconciliation",
-        "Server.Update.FactionReconciliation")
-    wrap(PNC.FactionIncidentService, "PumpRuntime",
-        "Server.Update.FactionIncidents")
-    wrap(PNC.FactionTolls, "Pump", "Server.Update.FactionTolls")
-    wrap(PNC.NeedsScheduler, "Pump", "Server.Update.Needs")
-    wrap(PNC.EnginePathPlanner, "PumpServerFrame",
-        "Server.Update.EnginePathPlanner")
-    wrap(PNC.BodyLifecycle, "PumpStartupBodyCleanup",
-        "Server.Update.BodyCleanup")
-    wrap(PNC.BodyLifecycle, "AuditLoadedBodies", "Server.Update.BodyAudit")
-    wrap(PNC.CompanionVehicle, "AuditLoadedReservations",
-        "Server.Update.VehicleAudit")
-    wrap(PNC.Presence, "RefreshMaterializationCandidates",
-        "Server.Update.MaterializationCandidates")
-    wrap(PNC.Presence, "Materialize", "Server.Update.NPC.Materialize")
-    if PNC.Server and PNC.Server.InstallProfilerWrappers then
-        PNC.Server.InstallProfilerWrappers(wrap)
-    end
-    wrap(PNC.Network, "RefreshInterestSets",
-        "Server.Update.Network.RefreshInterestSets")
-    wrap(PNC.ZombieAggro, "Pump", "Server.Update.ZombieAggro")
-    wrap(PNC.SocialEncounterTracker, "Pump",
-        "Server.Update.SocialEncounters")
-    wrap(PNC.Presence, "Reconcile", "Server.Update.NPC.Presence")
-    wrap(PNC.Health, "Update", "Server.Update.NPC.Health")
-    wrap(PNC.Stamina, "Update", "Server.Update.NPC.Stamina")
-    wrap(PNC.Animation, "SyncLocomotion", "Server.Update.NPC.Animation")
-    wrap(PNC.SpatialIndex, "UpdateNPC", "Server.Update.NPC.SpatialUpdate")
-    wrap(PNC.Network, "QueuePeriodicRoster",
-        "Server.Update.NPC.QueueRoster")
-    wrap(PNC.Scheduler, "Schedule", "Server.Update.NPC.Schedule")
-    -- Hydration is split into planning, source movement, the delayed scene
-    -- effect, and the inventory transaction. Keep each boundary separate so
-    -- a refill spike can be attributed without guessing from the broad NPC
-    -- decision/path markers.
-    wrap(PNC.NeedFacilityTriggers, "GetCandidates",
-        "Server.Update.NPC.Needs.Candidates")
-    wrap(PNC.NeedFacilityTriggers, "Assign",
-        "Server.Update.NPC.Needs.Assignment")
-    wrap(PNC.NeedFacilityTriggers, "Start",
-        "Server.Update.NPC.Needs.Start")
-    wrap(PNC.NeedFacilityEffects, "Tick",
-        "Server.Update.NPC.Needs.EffectTick")
-    wrap(PNC.NearbyWaterService, "ResolveHydrationPlan",
-        "Server.Update.NPC.Water.Plan")
-    wrap(PNC.NearbyWaterService, "FindSource",
-        "Server.Update.NPC.Water.SourceSearch")
-    wrap(PNC.NearbyWaterService, "BuildApproach",
-        "Server.Update.NPC.Water.Approach")
-    wrap(PNC.NearbyWaterService, "Consume",
-        "Server.Update.NPC.Water.DrinkCommit")
-    wrap(PNC.WaterContainerService, "CanRefill",
-        "Server.Update.NPC.Water.RefillAdmission")
-    wrap(PNC.WaterContainerService, "Refill",
-        "Server.Update.NPC.Water.RefillTransaction")
-    wrap(PNC.FacilityJobsBehaviorInternal, "Tick",
-        "Server.Update.NPC.FacilityActivity.Tick")
-    wrap(PNC.FacilityJobsBehaviorInternal, "OnSceneTick",
-        "Server.Update.NPC.FacilityActivity.SceneTick")
-    if PNC.Network and PNC.Network.InstallServerProfilerWrappers then
-        PNC.Network.InstallServerProfilerWrappers(wrap)
-    end
-    Internal.Profiler.RegisterSampler("ProjectHoomans.server", function(api)
-        local groups = PNC.AbstractGroups and PNC.AbstractGroups.List
-            and PNC.AbstractGroups.List() or {}
-        local sites = PNC.Communities and PNC.Communities.ListSites
-            and PNC.Communities.ListSites() or {}
-        local dirty = Internal.CountMap(PNC.Registry and PNC.Registry.DirtyByID)
-        local blockedPaths = 0
-        local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
-        for _, record in pairs(PNC.Registry and PNC.Registry.Data or {}) do
-            local lane = record and record.runtime
-                and record.runtime.pathing or nil
-            if lane and lane.nativeBlockedGoalX ~= nil
-                and now < (tonumber(lane.nativeBlockedUntil) or 0)
-            then
-                blockedPaths = blockedPaths + 1
-            end
+    if not Integration.serverCoarseInstalled then
+        local function wrapCoarse(owner, key, metric)
+            Internal.Wrap(owner, key, "ProjectHoomans." .. metric, "coarse")
         end
-        api.SetGauge("ProjectHoomans.Groups.Total", #groups)
-        api.SetGauge("ProjectHoomans.Settlements.Total", #sites)
-        api.SetGauge("ProjectHoomans.Persistence.DirtyRecords", dirty)
-        api.SetGauge("ProjectHoomans.Pathing.BlockedGoals", blockedPaths)
-    end)
-    Integration.serverInstalled = true
-    return true
+        wrapCoarse(PNC.PersistenceCoordinator, "Commit", "Persistence.Commit")
+        wrapCoarse(PNC.Registry, "FlushDirty", "Persistence.NPCRecords")
+        wrapCoarse(PNC.Presence, "Materialize",
+            "Server.Update.NPC.Materialize")
+        Internal.Profiler.RegisterSampler("ProjectHoomans.server", function(api)
+            local groups = PNC.AbstractGroups and PNC.AbstractGroups.List
+                and PNC.AbstractGroups.List() or {}
+            local sites = PNC.Communities and PNC.Communities.ListSites
+                and PNC.Communities.ListSites() or {}
+            local dirty = Internal.CountMap(
+                PNC.Registry and PNC.Registry.DirtyByID)
+            local blockedPaths = 0
+            local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+            for _, record in pairs(PNC.Registry and PNC.Registry.Data or {}) do
+                local lane = record and record.runtime
+                    and record.runtime.pathing or nil
+                if lane and lane.nativeBlockedGoalX ~= nil
+                    and now < (tonumber(lane.nativeBlockedUntil) or 0)
+                then
+                    blockedPaths = blockedPaths + 1
+                end
+            end
+            api.SetGauge("ProjectHoomans.Groups.Total", #groups)
+            api.SetGauge("ProjectHoomans.Settlements.Total", #sites)
+            api.SetGauge("ProjectHoomans.Persistence.DirtyRecords", dirty)
+            api.SetGauge("ProjectHoomans.Pathing.BlockedGoals", blockedPaths)
+        end)
+        Integration.serverCoarseInstalled = true
+        Integration.serverInstalled = true
+        changed = true
+    end
+
+    if deepEnabled and not Integration.serverDeepInstalled then
+        if Profiler.RegisterDeepStopHook then
+            Profiler.RegisterDeepStopHook(
+                "ProjectHoomans.restoreDeep",
+                Integration.RestoreDeep
+            )
+        end
+        local function wrap(owner, key, metric)
+            Internal.Wrap(owner, key, "ProjectHoomans." .. metric, "deep")
+        end
+        wrap(PNC.WorldDirector, "Pump", "Server.Update.Director")
+        wrap(PNC.PopulationDirector, "Pump",
+            "Server.Update.Director.Population")
+        wrap(PNC.PlayerCharacters, "Save", "Persistence.PlayerCharacters")
+        wrap(PNC.NPCKnowledge, "Save", "Persistence.NPCKnowledge")
+        wrap(PNC.Factions, "Commit", "Persistence.Factions")
+        wrap(PNC.Communities, "Commit", "Persistence.Communities")
+        wrap(PNC.ColonyStorageRepository, "Save",
+            "Persistence.ColonyStorage")
+        wrap(PNC.WorldDiscovery, "Save", "Persistence.WorldDiscovery")
+        wrap(PNC.Conversation and PNC.Conversation.History, "Save",
+            "Persistence.ConversationHistory")
+        wrap(PNC.PlayerCharacterLifecycle, "Pump",
+            "Server.Update.PlayerCharacters")
+        wrap(PNC.FactionBehavior, "PumpReconciliation",
+            "Server.Update.FactionReconciliation")
+        wrap(PNC.FactionIncidentService, "PumpRuntime",
+            "Server.Update.FactionIncidents")
+        wrap(PNC.FactionTolls, "Pump", "Server.Update.FactionTolls")
+        wrap(PNC.NeedsScheduler, "Pump", "Server.Update.Needs")
+        wrap(PNC.EnginePathPlanner, "PumpServerFrame",
+            "Server.Update.EnginePathPlanner")
+        wrap(PNC.BodyLifecycle, "PumpStartupBodyCleanup",
+            "Server.Update.BodyCleanup")
+        wrap(PNC.BodyLifecycle, "AuditLoadedBodies", "Server.Update.BodyAudit")
+        wrap(PNC.CompanionVehicle, "AuditLoadedReservations",
+            "Server.Update.VehicleAudit")
+        wrap(PNC.Presence, "RefreshMaterializationCandidates",
+            "Server.Update.MaterializationCandidates")
+        if PNC.Server and PNC.Server.InstallProfilerWrappers then
+            PNC.Server.InstallProfilerWrappers(wrap)
+        end
+        wrap(PNC.Network, "RefreshInterestSets",
+            "Server.Update.Network.RefreshInterestSets")
+        wrap(PNC.ZombieAggro, "Pump", "Server.Update.ZombieAggro")
+        wrap(PNC.SocialEncounterTracker, "Pump",
+            "Server.Update.SocialEncounters")
+        wrap(PNC.Presence, "Reconcile", "Server.Update.NPC.Presence")
+        wrap(PNC.Health, "Update", "Server.Update.NPC.Health")
+        wrap(PNC.Stamina, "Update", "Server.Update.NPC.Stamina")
+        wrap(PNC.Animation, "SyncLocomotion",
+            "Server.Update.NPC.Animation")
+        wrap(PNC.SpatialIndex, "UpdateNPC",
+            "Server.Update.NPC.SpatialUpdate")
+        wrap(PNC.Network, "QueuePeriodicRoster",
+            "Server.Update.NPC.QueueRoster")
+        wrap(PNC.Scheduler, "Schedule", "Server.Update.NPC.Schedule")
+        -- Hydration is split into planning, source movement, the delayed scene
+        -- effect, and the inventory transaction. Keep each boundary separate so
+        -- a refill spike can be attributed without guessing from the broad NPC
+        -- decision/path markers.
+        wrap(PNC.NeedFacilityTriggers, "GetCandidates",
+            "Server.Update.NPC.Needs.Candidates")
+        wrap(PNC.NeedFacilityTriggers, "Assign",
+            "Server.Update.NPC.Needs.Assignment")
+        wrap(PNC.NeedFacilityTriggers, "Start",
+            "Server.Update.NPC.Needs.Start")
+        wrap(PNC.NeedFacilityEffects, "Tick",
+            "Server.Update.NPC.Needs.EffectTick")
+        wrap(PNC.NearbyWaterService, "ResolveHydrationPlan",
+            "Server.Update.NPC.Water.Plan")
+        wrap(PNC.NearbyWaterService, "FindSource",
+            "Server.Update.NPC.Water.SourceSearch")
+        wrap(PNC.NearbyWaterService, "BuildApproach",
+            "Server.Update.NPC.Water.Approach")
+        wrap(PNC.NearbyWaterService, "Consume",
+            "Server.Update.NPC.Water.DrinkCommit")
+        wrap(PNC.WaterContainerService, "CanRefill",
+            "Server.Update.NPC.Water.RefillAdmission")
+        wrap(PNC.WaterContainerService, "Refill",
+            "Server.Update.NPC.Water.RefillTransaction")
+        wrap(PNC.FacilityJobsBehaviorInternal, "Tick",
+            "Server.Update.NPC.FacilityActivity.Tick")
+        wrap(PNC.FacilityJobsBehaviorInternal, "OnSceneTick",
+            "Server.Update.NPC.FacilityActivity.SceneTick")
+        if PNC.Network and PNC.Network.InstallServerProfilerWrappers then
+            PNC.Network.InstallServerProfilerWrappers(wrap)
+        end
+        Integration.serverDeepInstalled = true
+        Integration.deepInstalled = true
+        Integration.serverInstalled = true
+        changed = true
+    end
+    return changed
 end
 
 function Integration.WrapServerTick(callback)
@@ -130,18 +161,26 @@ function Integration.WrapServerTick(callback)
     then
         return callback
     end
+    if Integration._serverTickHook then
+        if Integration._serverTickHook.wrapped == callback
+            or Integration._serverTickHook.original == callback
+        then
+            return Integration._serverTickHook.wrapped
+        end
+    end
     local wrapped = Internal.Profiler.Wrap(
         "ProjectHoomans.Server.Update",
         callback,
-        { protectErrors = true }
+        { protectErrors = true, depth = "coarse" }
     )
-    Internal.Profiler.RegisterStopHook("ProjectHoomans.serverTick", function()
-        if Events and Events.OnTick and Events.OnTick.Remove then
-            Events.OnTick.Remove(wrapped)
-            Events.OnTick.Add(callback)
-        end
-        if PNC.Server then PNC.Server.OnTick = callback end
-    end)
+    Integration._serverTickHook = {
+        original = callback,
+        wrapped = wrapped,
+    }
+    Internal.Profiler.RegisterStopHook(
+        "ProjectHoomans.serverTick",
+        Integration.RestoreServerTick
+    )
     return wrapped
 end
 

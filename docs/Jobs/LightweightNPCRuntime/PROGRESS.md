@@ -2,22 +2,27 @@
 
 ## Current state
 
-**PLAN READY — implementation not started.**
+**IN PROGRESS — L0 COMPLETE; L1 NEXT.**
 
-The 2026-11-20 new-save audit established a credible runtime/architecture problem set, but the current performance timing was collected with deep PsychopatzProfiler performance wrappers active. The first implementation phase must establish a clean profiler-OFF baseline and make profiler overhead safe before individual AI timings are used for optimization decisions.
+Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded deep profiling (`coarse` vs `deep`), and the deterministic integrated headless runtime simulator foundation before optimizing downstream phases.
 
-Verified source findings that do not depend on timing accuracy:
+## L0 — Clean baseline and profiler safety (COMPLETE)
 
-- server startup and generated-view refresh bulk-call `HydrateCoreActors()`;
-- bulk hydration creates full Hoomans records for Core actors that may remain abstract;
-- Core actor projection places the Core appearance envelope in `record.appearance`;
-- the Hoomans serializer rejects non-`schemaVersion == 2` appearance tables;
-- nil record serialization leaves the record dirty;
-- `PersistenceCoordinator.Commit()` reaches `Registry.FlushDirty()` and `GlobalModData.save()`;
-- `FlushDirty()` performs broad save-snapshot discovery;
-- many mutation events still fall back to full `Network.BuildSnapshot()`;
-- performance capture installs deep Project Hoomans wrappers while the `performance` section is active.
-- existing scale/scheduler/persistence/provider/network tests already provide reusable production seams for a deterministic integrated headless runtime simulator, but that simulator does not yet exist.
+- **Persisted config trace:** `~/Zomboid/Lua/PsychopatzCore_Profiler.txt` is loaded by `PsychopatzProfilerBootstrap.Initialize() -> readConfiguredConfig()`. Persisted `performance_depth=deep` is automatically downgraded to `"coarse"` (`persistedDeepDowngraded = true`), and `serializeConfig` / `profiler_config.py` never persist `"deep"`.
+- **Shared Core profiler safety:** Explicit `performance_depth = "coarse" | "deep"` with clamped time-bounding (`5000ms..300000ms`, default `60000ms`), automatic expiry checks in `Begin`/`Wrap`/`Sample`, deterministic deep-hook restoration on expiry and full restoration on `Stop()` / `Bootstrap.Disable()`, and explicit snapshot/report labels (`deep_instrumented_diagnostic_only` vs `coarse_sampled` vs `no_performance_timers`).
+- **Hoomans profiler split:** 10 coarse top-level boundaries (`0` deep wrappers in `COARSE`, `0` total wrappers in `OFF`) vs 97 explicit time-bounded deep wrappers (`RestoreDeep()`, idempotent `RestoreServerTick()`).
+- **Integrated deterministic headless runtime simulator:** Created `tests/support/lightweight_runtime_simulator.lua`, `tests/pnc_lightweight_runtime_simulation_smoke.lua`, and `tests/benchmarks/lightweight_npc_runtime.lua`.
+- **HEADLESS LUA SIMULATOR (NON-NATIVE) L0 baselines:**
+  - Smoke (`N=100, Z=40, 15s`):
+    - `OFF`: `coarseWr=0, deepWr=0, deepCalls=0, tickCpuMs=1188.04ms`
+    - `COARSE`: `coarseWr=10, deepWr=0, coarseCalls=1598, deepCalls=0, tickCpuMs=1247.94ms`
+    - `DEEP (5s expiry)`: `DeepExpired=true, EndDeepWrappersInstalled=0, coarseCalls=1605, deepCalls=2941, tickCpuMs=1340.43ms`
+    - Identical gameplay/persistence/network op counts across all three modes: `core=100, promoted=100, live=9, schedProc=231, commits=5, serAttempts=500, globalSaves=5, dirtyEnd=100, fullSnap=168, census=129, extraZScans=102, SafePhaseFailures=0`
+  - Benchmark (`Z=64, 20s`):
+    - `N=100`: `OFF 2001.45ms` (`CoarseWr=0, DeepWr=0`), `COARSE 2066.12ms` (`+64.67ms`), `DEEP 2382.27ms` (`+380.82ms`, `10781` deepCalls); `promoted=100, dirtyEnd=100, serAttempts=600, globalSaves=6, fullSnap=216`
+    - `N=500`: `OFF 4004.86ms`, `COARSE 4002.27ms` (`-2.58ms`), `DEEP 4289.13ms` (`+284.28ms`, `12392` deepCalls); `promoted=500, dirtyEnd=500, serAttempts=3000, globalSaves=6, fullSnap=216`
+- **Pre-existing unrelated Core baseline failures left untouched:** `psychopatz_profiler_client_composition_smoke.lua` (`module 'TimedActions/ISAttachItemHotbar' not found` in headless env) and `psychopatz_profiler_server_composition_smoke.lua` (`OnClientCommand` count `2` vs `1`).
+- **L0 verification:** `luac -p` pass, `pz_verify.py --kahlua` 0 errors/0 warnings, Core Lua profiler tests 5/5 pass, Core Python profiler tests 54/54 pass, Hoomans profiler tests 10/10 pass, simulator smoke 1/1 pass.
 
 ## Accepted dependencies
 
@@ -31,13 +36,4 @@ This job corrects Hoomans runtime adoption so it actually obeys those accepted c
 
 ## Next Chunk
 
-**L0 — establish a clean profiler-OFF baseline and make deep profiler capture explicit/bounded.**
-
-Immediate evidence required:
-
-1. current source/config path that enables persisted performance capture;
-2. tests proving profiler OFF restores/no-ops every ProjectHoomans deep wrapper;
-3. create the integrated deterministic headless runtime simulator foundation and run an identical simulator workload with OFF vs current deep capture, clearly separated;
-4. assert profiler OFF installs/calls zero deep wrappers and print useful runtime counters;
-5. coarse top-level sampling design/implementation if needed so later phases can measure server/persistence/network cost without wrapping hot helpers;
-6. updated `PROGRESS.md`/`HANDOFF.md` and local accepted-phase commits before L1.
+**L1 — lazy Core -> Hoomans promotion/demotion.**

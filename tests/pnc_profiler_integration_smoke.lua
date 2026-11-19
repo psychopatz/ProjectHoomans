@@ -35,21 +35,53 @@ PNC = {
 }
 
 local Integration = require "PNC/Integrations/PNC_PsychopatzProfiler"
-if PNC.SpatialIndex.Rebuild == originalSpatial then error("active integration did not wrap") end
+if PNC.SpatialIndex.Rebuild == originalSpatial then error("active integration did not wrap coarse") end
 T.equal(PNC.SpatialIndex.Rebuild(), "spatial", "wrapper changed return")
 Integration.InstallServer()
-if PNC.Network.Internal.BuildRecordPayload == originalBuildPayload then
-    error("server network phase was not wrapped")
-end
-T.equal(PNC.Network.Internal.BuildRecordPayload(), "payload", "network phase wrapper changed return")
+-- Default BASIC mode installs coarse wrappers only; deep Network.Internal wrappers remain off.
+T.equal(PNC.Network.Internal.BuildRecordPayload, originalBuildPayload,
+    "default BASIC coarse mode must not wrap deep server internals")
+local counts = Integration.GetInstalledWrapperCounts()
+T.truthy(counts.coarse >= 1, "coarse wrapper count missing")
+T.equal(counts.deep, 0, "default coarse mode installed deep wrappers")
 now = 1000
 Profiler.Sample(1000)
 local gauges = Profiler.GetMetrics("gauge", "ProjectHoomans")
 if #gauges < 6 then error("Project Hoomans samplers were not registered") end
 Profiler.Stop()
 T.equal(PNC.SpatialIndex.Rebuild, originalSpatial, "stop did not restore original hot function")
-T.equal(PNC.Network.Internal.BuildRecordPayload, originalBuildPayload, "network phase did not restore")
+T.equal(PNC.Network.Internal.BuildRecordPayload, originalBuildPayload, "network phase did not stay restored")
 T.equal(callback, nil, "profiler callback survived stop")
+
+-- Explicit time-bounded deep capture wraps both coarse and deep functions and expires cleanly.
+now = 2000
+Profiler.Start("DETAILED", {
+    nowMs = function() return now end,
+    sourceType = function() return "test" end,
+    addSampleCallback = function(value) callback = value end,
+    removeSampleCallback = function(value) if callback == value then callback = nil end end,
+}, {
+    snapshotEnabled = false,
+    performanceDepth = "deep",
+    deepDurationMs = 15000,
+    capture = { performance = true },
+})
+Integration.ApplyCaptureConfig({ mode = "DETAILED" })
+Integration.InstallServer()
+T.truthy(PNC.SpatialIndex.Rebuild ~= originalSpatial, "deep capture missing coarse wrapper")
+T.truthy(PNC.Network.Internal.BuildRecordPayload ~= originalBuildPayload,
+    "explicit deep capture did not wrap server network phase")
+T.equal(PNC.Network.Internal.BuildRecordPayload(), "payload", "network phase wrapper changed return")
+now = 17000
+Profiler.Sample(1000)
+T.equal(Profiler.GetPerformanceDepth(), "coarse", "deep capture did not expire back to coarse")
+T.equal(PNC.Network.Internal.BuildRecordPayload, originalBuildPayload,
+    "deep expiry did not restore deep network wrapper")
+T.truthy(PNC.SpatialIndex.Rebuild ~= originalSpatial,
+    "deep expiry unexpectedly removed coarse wrapper")
+Profiler.Stop()
+T.equal(PNC.SpatialIndex.Rebuild, originalSpatial, "stop did not restore coarse wrapper after expiry")
+T.equal(callback, nil, "profiler callback survived stop after deep expiry")
 
 Bootstrap.mode = "OFF"
 package.loaded["PNC/Integrations/PNC_PsychopatzProfiler"] = nil
