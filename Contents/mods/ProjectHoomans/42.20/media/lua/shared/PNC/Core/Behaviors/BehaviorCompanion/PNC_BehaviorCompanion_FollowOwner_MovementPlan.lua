@@ -27,7 +27,8 @@ function H.Run(record, zombie, owner, ownerDist, followState, hazard, now)
         record,
         owner,
         slotTarget,
-        ownerDist
+        ownerDist,
+        followState.ownerMoving == true
     )
     local slotDist = slotTarget
         and Core.Distance(

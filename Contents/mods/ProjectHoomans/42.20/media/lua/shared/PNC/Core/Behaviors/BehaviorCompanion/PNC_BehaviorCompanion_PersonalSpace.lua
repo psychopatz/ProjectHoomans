@@ -46,7 +46,13 @@ local function isOwnerSpaceCandidate(owner, x, y, z)
         and (ownerBuilding == nil or ownerRoom == candidateRoom)
 end
 
-function Internal.EnforceOwnerPersonalSpace(record, owner, target, ownerDist)
+function Internal.EnforceOwnerPersonalSpace(
+    record,
+    owner,
+    target,
+    ownerDist,
+    ownerMoving
+)
     local minimum = tonumber(Const.FOLLOW_PERSONAL_SPACE_MIN) or 1.25
     local radius = tonumber(Const.FOLLOW_SLOT_DISTANCE) or 2.25
     local dx
@@ -58,7 +64,13 @@ function Internal.EnforceOwnerPersonalSpace(record, owner, target, ownerDist)
     local x
     local y
     local i
-    if not record or not owner or not target or ownerDist >= minimum then
+    -- While the owner is actively moving/turning, do not shove nearby
+    -- followers backward with CanOccupy/getGridSquare probes; the owner is
+    -- already moving clear and overriding the slot forces conflicting path
+    -- reversals and spikes on direction changes.
+    if ownerMoving == true
+        or not record or not owner or not target or ownerDist >= minimum
+    then
         return target
     end
     dx, dy = Internal.NormalizeDirection(

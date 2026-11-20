@@ -52,7 +52,7 @@ local function sortFollowerRecords(a, b)
     return tostring(a and a.id or "") < tostring(b and b.id or "")
 end
 
-local function buildFollowFormation(record, owner, now, ownerMoving)
+local function buildFollowFormation(record, owner, now, ownerMoving, previous)
     local followers = {}
     local slots = {}
     local fx
@@ -74,10 +74,32 @@ local function buildFollowFormation(record, owner, now, ownerMoving)
     else
         fx, fy = Internal.ResolveOwnerForward(owner)
     end
+    -- Dampen rapid direction reversals while moving so all followers' slots do
+    -- not whip 180 degrees across the player (and into fences/obstacles) in a
+    -- single frame.
+    if ownerMoving == true
+        and previous
+        and previous.ownerMoving == true
+        and tonumber(previous.forwardX)
+        and tonumber(previous.forwardY)
+    then
+        local prevX = tonumber(previous.forwardX)
+        local prevY = tonumber(previous.forwardY)
+        local dot = (prevX * fx) + (prevY * fy)
+        if dot < 0.7 and dot > -0.95 then
+            local bx = (prevX * 0.65) + (fx * 0.35)
+            local by = (prevY * 0.65) + (fy * 0.35)
+            local blen = math.sqrt((bx * bx) + (by * by))
+            if blen > 0.001 then
+                fx, fy = bx / blen, by / blen
+            end
+        end
+    end
     return {
         expiresAt = now + (
             ownerMoving
-                and (
+                and math.max(
+                    450,
                     tonumber(Const.FOLLOW_FORMATION_MOVING_CACHE_MS) or 200
                 )
                 or (
@@ -121,7 +143,7 @@ function Internal.ResolveFollowSlot(record, owner, ownerMoving)
         or cache.slots[tostring(record.id)] == nil
         or ownerMoving == true and cache.ownerMoving ~= true
     then
-        cache = buildFollowFormation(record, owner, now, ownerMoving)
+        cache = buildFollowFormation(record, owner, now, ownerMoving, cache)
         FollowFormationCache[ownerKey] = cache
     end
     slotIndex = tonumber(cache.slots[tostring(record.id)]) or 0

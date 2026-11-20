@@ -246,7 +246,21 @@ function LiveBodyControl.OnZombieUpdate(zombie)
                 or not ActorControl.IsPuppetOwned(record)
                 or ActorControl.CanPump(record)
             if canPump then
-                PNC.EnginePathPlanner.PumpFrame(record, zombie)
+                -- Guard vanilla fence/vault entry BEFORE PumpFrame invokes
+                -- PathFindBehavior2:update(), because Behavior2 can otherwise
+                -- enter player-only ClimbOverFenceState and throw an NPE on
+                -- an IsoZombie before the post-pump guard runs.
+                local prePassageBlocked = false
+                if LiveBodyControl.BlockVanillaPassage then
+                    prePassageBlocked = LiveBodyControl.BlockVanillaPassage(
+                        zombie,
+                        nil,
+                        Core and Core.Now and Core.Now() or 0
+                    ) == true
+                end
+                if not prePassageBlocked then
+                    PNC.EnginePathPlanner.PumpFrame(record, zombie)
+                end
                 if PNC.EnginePathPlanner.ReconcileNativeMovementOwner then
                     PNC.EnginePathPlanner.ReconcileNativeMovementOwner(
                         zombie,

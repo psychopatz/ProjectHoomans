@@ -66,7 +66,7 @@ function H.Resolve(record, slotTarget, slotDist, hazard, now)
     target.avoidance = true
     target.hazardCount = hazard.count
     target.expiresAt = now
-        + (tonumber(Const.FOLLOW_HORDE_STEER_MS) or 350)
+        + math.max(600, tonumber(Const.FOLLOW_HORDE_STEER_MS) or 350)
     return target
 end
 
