@@ -29,10 +29,113 @@ local function actorID(entry)
     ) or "")
 end
 
+local function resolveHoomansContext(entry)
+    if type(entry) ~= "table" then return entry end
+    local id = actorID(entry)
+    if id == "" then return entry end
+
+    local snapshot = entry.snapshot
+    if type(snapshot) ~= "table"
+        and PNC.ClientState
+        and type(PNC.ClientState.snapshots) == "table"
+    then
+        snapshot = PNC.ClientState.snapshots[id]
+    end
+
+    local record = entry.record
+    local isClientOnly = PNC.Core
+        and type(PNC.Core.IsClientOnly) == "function"
+        and PNC.Core.IsClientOnly() == true
+    if type(record) ~= "table"
+        and not isClientOnly
+        and PNC.Registry
+        and type(PNC.Registry.Get) == "function"
+    then
+        record = PNC.Registry.Get(id)
+    end
+
+    if type(snapshot) ~= "table" and type(record) ~= "table" then
+        return entry
+    end
+
+    local enriched = {}
+    for key, value in pairs(entry) do
+        enriched[key] = value
+    end
+    enriched.id = enriched.id or id
+    enriched.npcId = enriched.npcId or id
+    if type(snapshot) == "table" then
+        enriched.snapshot = snapshot
+        if enriched.tacticalClass == nil then
+            enriched.tacticalClass = snapshot.tacticalClass
+        end
+        if enriched.recruited == nil then
+            enriched.recruited = snapshot.recruited
+        end
+        if enriched.colonyOwned == nil then
+            enriched.colonyOwned = snapshot.colonyOwned
+        end
+        if enriched.orderKind == nil then
+            enriched.orderKind = snapshot.orderKind
+        end
+        if enriched.alive == nil then
+            enriched.alive = snapshot.alive
+        end
+        if enriched.deathMarker == nil then
+            enriched.deathMarker = snapshot.deathMarker
+        end
+        if enriched.iconID == nil then
+            enriched.iconID = snapshot.iconID
+        end
+        if enriched.affiliation == nil then
+            enriched.affiliation = snapshot.affiliation
+        end
+        if enriched.ownerUsername == nil then
+            enriched.ownerUsername = snapshot.ownerUsername
+        end
+        if enriched.ownerCharacterUUID == nil then
+            enriched.ownerCharacterUUID = snapshot.ownerCharacterUUID
+        end
+    end
+    if type(record) == "table" then
+        enriched.record = record
+        if enriched.tacticalClass == nil then
+            enriched.tacticalClass = record.tacticalClass
+        end
+        if enriched.recruited == nil then
+            enriched.recruited = record.recruited
+        end
+        if enriched.colonyOwned == nil then
+            enriched.colonyOwned = record.colonyOwned
+        end
+        if enriched.orderKind == nil
+            and type(record.orderSpec) == "table"
+        then
+            enriched.orderKind = record.orderSpec.kind
+        end
+        if enriched.alive == nil then
+            enriched.alive = record.alive
+        end
+        if enriched.affiliation == nil then
+            enriched.affiliation = record.affiliation
+        end
+        if enriched.ownerUsername == nil then
+            enriched.ownerUsername = record.ownerUsername
+        end
+        if enriched.ownerCharacterUUID == nil then
+            enriched.ownerCharacterUUID = record.ownerCharacterUUID
+        end
+    end
+    return enriched
+end
+
 local function displayLabel(entry)
     local id = actorID(entry)
+    local roleTag = entry and (entry.role or entry.roleTag) or ""
+    local rev = tostring(entry and entry.revision or "")
+    local cacheKey = id .. "|" .. rev .. "|" .. tostring(roleTag)
     Presentation.LabelCache = Presentation.LabelCache or {}
-    local cached = Presentation.LabelCache[id]
+    local cached = Presentation.LabelCache[cacheKey]
     if cached ~= nil then return cached end
 
     local known = true
@@ -40,7 +143,7 @@ local function displayLabel(entry)
         known = Identity.IsNameKnown(entry) == true
     end
     if not known then
-        Presentation.LabelCache[id] = ""
+        Presentation.LabelCache[cacheKey] = ""
         return ""
     end
 
@@ -56,16 +159,14 @@ local function displayLabel(entry)
     end
     name = tostring(name or "")
     if name == "" then
-        Presentation.LabelCache[id] = ""
+        Presentation.LabelCache[cacheKey] = ""
         return ""
     end
 
-    local roleTag = entry and entry.role
-        or entry and entry.roleTag or nil
-    if roleTag ~= nil and tostring(roleTag) ~= "" then
+    if roleTag ~= "" then
         name = name .. " [" .. tostring(roleTag) .. "]"
     end
-    Presentation.LabelCache[id] = name
+    Presentation.LabelCache[cacheKey] = name
     return name
 end
 
@@ -146,10 +247,11 @@ if CoreActorMap and type(CoreActorMap.RegisterDecorator) == "function" then
                 return style
             end
 
-            style.label = displayLabel(entry)
-            style.color = Palette.Resolve(entry)
+            local enriched = resolveHoomansContext(entry)
+            style.label = displayLabel(enriched)
+            style.color = Palette.Resolve(enriched)
             style.size = 9
-            style.icon = iconFor(entry, style.color)
+            style.icon = iconFor(enriched, style.color)
             style.hoverMetadata = style.hoverMetadata or {}
             style.hoverMetadata.provider = entry and entry.provider
             style.hoverMetadata.providerState =
