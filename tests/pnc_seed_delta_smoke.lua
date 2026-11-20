@@ -649,6 +649,37 @@ function liveContainer:DoRemoveItem(item)
     for i = #liveItems, 1, -1 do if liveItems[i] == item then table.remove(liveItems, i) return end end
 end
 local body = { getInventory = function() return liveContainer end }
+do
+    local rollAppearance = PNC.Identity.RollAppearance
+    local areExclusive = PNC.Identity.Appearance.AreExclusive
+    PNC.Identity.RollAppearance = function()
+        return { outfitItemSpecs = {
+            { type = "Base.Hat_BaseballCap", wornSlot = "Hat" },
+            { type = "Base.HoodieUP_WhiteTINT", wornSlot = "SweaterHat" },
+        } }
+    end
+    PNC.Identity.Appearance.AreExclusive = function(first, second)
+        return first == "SweaterHat" and second == "Hat"
+    end
+    local npc = { id = "npc_wardrobe", identitySeed = 42, archetypeID = "Test" }
+    local wardrobe = assert(PNC.Inventory.CreateFromTemplate(npc))
+    PNC.Identity.RollAppearance = rollAppearance
+    PNC.Identity.Appearance.AreExclusive = areExclusive
+    T.falsy(wardrobe.worn.Hat, "conflicting hat has no worn slot")
+    T.truthy(wardrobe.worn.SweaterHat, "compatible hood is worn")
+    T.truthy(PNC.Inventory.MaterializeLooseInventory(npc, body),
+        "wardrobe projects into the live inventory")
+    local carried = 0
+    for _, item in ipairs(liveItems) do
+        if item.fullType == "Base.Hat_BaseballCap" then
+            carried = carried + 1
+        end
+        T.falsy(item.fullType == "Base.HoodieUP_WhiteTINT",
+            "worn hoodie uses the separate equipment projection")
+    end
+    T.equal(carried, 1, "conflicting hat is physically carried exactly once")
+    liveItems = {}
+end
 T.truthy(PNC.Inventory.MaterializeLooseInventory(reloaded, body),
     "abstract inventory did not materialize")
 local physicalLoot = false

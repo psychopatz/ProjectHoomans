@@ -1,7 +1,5 @@
--- Prepare a compatible generated wardrobe before creating inventory items.
--- Native WornItems evicts exclusive garments; doing so here keeps UI, stored
--- inventory and the portrait in agreement. Later outfit entries win.
-require 'PNC/Core/Identity/PNC_Identity_Appearance'
+-- Later outfit entries win conflicting slots. The displaced items stay loose.
+local Appearance = require 'PNC/Core/Identity/PNC_Identity_Appearance'
 local Prepared = {}
 function Prepared.Build(template)
     local appearance = template.appearance or {}
@@ -22,8 +20,9 @@ function Prepared.Build(template)
         if location then
             for previous = #output, 1, -1 do
                 local worn = output[previous].wornSlot
-                if worn and (worn == location or PNC.Identity.Appearance.AreExclusive(location, worn)
-                    or PNC.Identity.Appearance.AreExclusive(worn, location)) then table.remove(output, previous) end
+                if worn and Appearance.WornSlotsConflict(location, worn) then
+                    output[previous].wornSlot = nil
+                end
             end
         end
         output[#output + 1] = { type = fullType, wornSlot = location, itemState = source.itemState, legacyIndex = index }

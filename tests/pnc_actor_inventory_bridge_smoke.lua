@@ -55,6 +55,8 @@ T.equal(record.runtime.coreInventoryHydrated, true,
     "Core inventory hydration marker")
 T.equal(PNC.Inventory.Internal.countMapEntries(record.inventory.items), 3,
     "deterministic Core baseline hydrated into Hoomans inventory")
+T.equal(record.equipment.worn.Torso_Upper, "Base.Tshirt_DefaultTEXTURE_TINT",
+    "untouched generated NPC retains its starter shirt")
 
 local unchanged, unchangedMode, unchangedReason =
     Bridge.CaptureRecord(record, actor)
@@ -112,5 +114,32 @@ local firstBytes = #assert(Json.Encode(changed))
 local repeatedBytes = #assert(Json.Encode(repeated))
 T.truthy(repeatedBytes <= firstBytes + 64,
     "repeated capture does not accumulate historical delta bloat")
+
+local appearance = PNC.Identity.Appearance
+local exclusive = appearance.AreExclusive
+appearance.AreExclusive = function(first, second)
+    return first == "SweaterHat" and second == "Hat"
+end
+local ledger = assert(ActorInventory.CreateBaselineFromPayload(actor.personalInventory))
+local hat = assert(ledger:Add({ itemId = "a:hat", fullType = "Base.Hat_BaseballCap" }))
+local hood = assert(ledger:Add({ itemId = "b:hood", fullType = "Base.HoodieUP_WhiteTINT" }))
+assert(ledger:SetEquipmentState({ worn = { Hat = hat.itemId, SweaterHat = hood.itemId } }))
+local conflictingActor = { personalInventory = assert(ledger:ToPayload("BASELINE_DELTA")) }
+local inventory = assert(Bridge.HydrateRecord(rehydratedRecord, conflictingActor))
+T.truthy(inventory.items[hat.itemId], "exclusive hat survives reload")
+T.equal(inventory.items[hat.itemId].wornSlot, nil, "hat is carried loose after reload")
+T.equal(inventory.worn.SweaterHat, hood.itemId, "hood stays worn")
+local revision = inventory.revision
+local worn, reason = PNC.Inventory.SetWorn(rehydratedRecord, hat.itemId, "Hat")
+T.falsy(worn, "a manual wear request respects the current outfit")
+T.equal(reason, "worn_slot_conflict")
+T.equal(inventory.revision, revision, "a conflicting action produces no inventory mutation")
+local repaired, mode = Bridge.CaptureRecord(rehydratedRecord, conflictingActor)
+T.equal(mode, "BASELINE_DELTA", "conflict resolution retains compact persistence")
+local restored = assert(ActorInventory.Decode(repaired))
+T.truthy(restored:Get(hat.itemId), "unequipped item is saved with its inventory ID")
+T.equal(restored.equipment.worn.Hat, nil, "unequipped item has no saved wear assignment")
+T.equal(restored.equipment.worn.SweaterHat, hood.itemId, "compatible outfit state is saved")
+appearance.AreExclusive = exclusive
 
 T.finish("pnc_actor_inventory_bridge_smoke")

@@ -15,11 +15,15 @@ The key correction is architectural:
 - Logical gameplay commits mark/coalesce dirty state; they do not synchronously scan every NPC and flush all GlobalModData during ordinary mutations.
 - Full network snapshots are repair/detail tools, not the default response to every mutation event.
 - Profiling is observational and bounded. Deep hot-path wrapping must never be a normal-play tax.
-- A deterministic integrated headless runtime simulator is the mandatory developer feedback loop for L0-L5; native Project Zomboid is reserved for engine-specific/final acceptance rather than every implementation iteration.
+- A deterministic integrated headless runtime simulator is the mandatory developer feedback loop for L0-L6; native Project Zomboid is reserved for engine-specific/final acceptance rather than every implementation iteration.
 
-## Implementation status (L0–L5)
+## Implementation status (L0–L6)
 
-All architectural fixes (L0–L4) and full developer-side headless acceptance benchmarks and regression sweeps (L5) are implemented and verified. See [PROGRESS.md](PROGRESS.md) and [HANDOFF.md](HANDOFF.md) for current metrics, commit checkpoints, and remaining user-owned native SP/MP acceptance scope.
+L0–L5 and the Core-backed recruitment/authority repair are implemented and developer-verified. User-owned native acceptance then exposed a remaining ordinary-play gap: continuous player walking with several live companions can still produce severe stutter, while the integrated headless simulator does not reproduce that sustained `FollowOwner` workload.
+
+**L6 — Live Follow, Combat-Hit, Abstract-Travel Handoff, and Inventory/ModData Scale Harness / Root-Cause Optimization is active.** Native acceptance exposed continuous-follow stutter and massive combat-contact spikes; the same phase now also verifies compact mobile-group route progression and deterministic proximity materialization. See [FOLLOW_WALK_STUTTER.md](FOLLOW_WALK_STUTTER.md), [COMBAT_HIT_STUTTER.md](COMBAT_HIT_STUTTER.md), [ABSTRACT_TRAVEL_HANDOFF_STUTTER.md](ABSTRACT_TRAVEL_HANDOFF_STUTTER.md), [INVENTORY_MODDATA_STRESS.md](INVENTORY_MODDATA_STRESS.md), [RUNTIME_SIMULATOR.md](RUNTIME_SIMULATOR.md), [PROGRESS.md](PROGRESS.md), and [HANDOFF.md](HANDOFF.md).
+
+L6 reopens developer work; native SP/MP acceptance resumes only after **all four** deterministic workload families—continuous follow, combat impact, abstract-travel/materialization handoff, and inventory/ModData scale—pass their evidence-driven gates **and** the mandatory cross-system stress matrix proves those fixes compose under save/reload, materialize-then-combat, death/handoff, arrival storms, observation load, fast player interest jumps, provider handoff, and long-world endurance.
 
 ## Why this goal exists
 
@@ -34,7 +38,7 @@ The audit found four high-confidence architectural problems:
 
 Detailed performance capture also installed more than one hundred Project Hoomans timer wrappers and recorded tens of thousands of wrapped calls. That capture is useful evidence, but it is not a clean normal-play baseline.
 
-See [AUDIT.md](AUDIT.md), [ARCHITECTURE.md](ARCHITECTURE.md), [RUNTIME_SIMULATOR.md](RUNTIME_SIMULATOR.md), [ROADMAP.md](ROADMAP.md), [AGENT_RUNBOOK.md](AGENT_RUNBOOK.md), [PROGRESS.md](PROGRESS.md), and [HANDOFF.md](HANDOFF.md).
+See [AUDIT.md](AUDIT.md), [ARCHITECTURE.md](ARCHITECTURE.md), [RUNTIME_SIMULATOR.md](RUNTIME_SIMULATOR.md), [FOLLOW_WALK_STUTTER.md](FOLLOW_WALK_STUTTER.md), [COMBAT_HIT_STUTTER.md](COMBAT_HIT_STUTTER.md), [ABSTRACT_TRAVEL_HANDOFF_STUTTER.md](ABSTRACT_TRAVEL_HANDOFF_STUTTER.md), [INVENTORY_MODDATA_STRESS.md](INVENTORY_MODDATA_STRESS.md), [ROADMAP.md](ROADMAP.md), [AGENT_RUNBOOK.md](AGENT_RUNBOOK.md), [PROGRESS.md](PROGRESS.md), and [HANDOFF.md](HANDOFF.md).
 
 ## Scope
 
@@ -55,5 +59,5 @@ DynamicTrading is not an automatic edit target. Verify it only when a changed Co
 - Do not add compatibility shims, permanent dual writes, legacy serializers, or a second actor/world authority.
 - Do not move Hoomans physical AI/combat/pathing into Core.
 - Do not make far abstract actors run Hoomans needs/combat/pathing merely to keep their map/portrait representation available.
-- Do not micro-optimize FollowOwner, stamina, or individual AI helpers from a profiler-contaminated capture before a clean profiler-OFF baseline exists.
+- Do not micro-optimize FollowOwner/pathing from a profiler-contaminated native capture. L6 must first reproduce continuous walking in the integrated profiler-OFF harness and isolate the responsible operation counts.
 - Do not launch native Project Zomboid unless the user explicitly assigns live acceptance; complete every developer-side gate first.

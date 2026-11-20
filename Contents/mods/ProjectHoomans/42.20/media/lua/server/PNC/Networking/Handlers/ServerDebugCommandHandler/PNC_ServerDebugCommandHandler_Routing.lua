@@ -28,7 +28,7 @@ Router.Register(Const.CMD_DEBUG, function(player, normalizedArgs, rawArgs)
         return
     end
     if args.action == "spawn" then
-        H.HandleDebugSpawn(player, args)
+        Handler.Spawn(player, args)
         return
     end
     if args.action == "spawn_unique_test" then

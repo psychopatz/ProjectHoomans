@@ -24,6 +24,7 @@ local diagnosticCalls = {}
 local knowledgeDisclosure
 local knowledgeSnapshot
 local spawned
+local recruited
 local teleported
 local audited
 
@@ -60,9 +61,12 @@ PNC = {
         GetColonistDefaults = function() return { "General" } end,
         GetHostileDefaults = function() return { "Scavenger" } end,
     },
-    Factions = {
-        EnsurePlayerFaction = function()
-            return true, nil, { id = "faction_debug" }
+    Recruitment = {
+        Assign = function(receivedPlayer, record, options)
+            recruited = record
+            T.equal(receivedPlayer, player, "debug recruitment receives command player")
+            T.equal(options.source, "debug_companion_spawn")
+            return true
         end,
     },
     PlayerCharacters = {
@@ -86,9 +90,14 @@ PNC = {
         end,
     },
     API = {
-        Spawn = function(spec)
+        Spawn = function(spec, prepare)
             spawned = spec
-            return { id = "spawned-1" }
+            local record = { id = "spawned-1" }
+            if prepare then
+                local ok, reason = prepare(record)
+                if not ok then return nil, reason end
+            end
+            return record
         end,
         DebugCommand = function(id, action, args)
             apiCalls[#apiCalls + 1] = {
@@ -250,10 +259,8 @@ Router.Handle("DebugCommand", player, {
     action = "spawn", variant = "companion",
     tacticalClass = "colonist", x = 6, y = 7, z = 0,
 })
-T.equal(spawned.tacticalClass, "colonist", "debug companion tactical class")
-T.equal(spawned.factionID, "faction_debug",
-    "debug companion resolves the player faction ID")
-T.equal(spawned.recruited, true, "debug companion recruited state")
+T.equal(spawned.tacticalClass, "neutral", "debug companion starts with a normal NPC definition")
+T.equal(recruited.id, "spawned-1", "MP routes the spawned NPC through recruitment")
 T.equal(companionBaseline.npcID, "spawned-1",
     "debug companion initializes the spawned NPC relationship")
 T.equal(companionBaseline.targetKey, "player:DebugAdmin:character-debug",

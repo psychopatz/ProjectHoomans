@@ -1,5 +1,6 @@
 local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
+local Appearance = require "PNC/Core/Identity/PNC_Identity_Appearance"
 
 local function preserveWornItemVisual(record, inv, wornSlot)
     local itemID = wornSlot and inv and inv.worn
@@ -211,6 +212,13 @@ function Inventory.SetWorn(record, itemID, wornSlot, reason)
     item = itemID and inv.items[itemID] or nil
     if itemID and not item then return false, "item_not_found" end
     if itemID and not wornSlot then return false, "worn_slot_missing" end
+    if item then
+        for slot, wornID in pairs(inv.worn) do
+            if wornID ~= itemID and Appearance.WornSlotsConflict(wornSlot, slot) then
+                return false, "worn_slot_conflict"
+            end
+        end
+    end
 
     preserveWornItemVisual(record, inv, wornSlot)
 

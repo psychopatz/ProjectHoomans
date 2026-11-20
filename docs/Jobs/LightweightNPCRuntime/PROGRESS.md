@@ -2,7 +2,7 @@
 
 ## Current state
 
-**DEVELOPER COMPLETE — L0–L5 PASSED; READY FOR USER-OWNED NATIVE SP/MP ACCEPTANCE.**
+**IN PROGRESS — L0–L5 and Core-backed recruitment remain accepted; L6 LIVE FOLLOW + COMBAT-HIT + ABSTRACT-TRAVEL + INVENTORY/MODDATA SCALE HARNESS / ROOT-CAUSE OPTIMIZATION is active after native user feedback.**
 
 Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded deep profiling (`coarse` vs `deep`), and the deterministic integrated headless runtime simulator foundation before optimizing downstream phases.
 
@@ -90,6 +90,50 @@ Phase L0 established clean profiler-OFF behavior, safe explicit time-bounded dee
   - `ProjectHoomans` full sweep (`python3 tests/run_tests.py`): `1078/1082` pass (4 pre-existing unrelated baseline failures left untouched: `pnc_animation_scene_debug_routes_smoke.lua`, `pnc_context_debug_smoke.lua`, `pnc_population_director_smoke.lua`, `pz_custom_translation_manager_smoke.lua`).
   - `psychopatzCore` (unchanged since L1 `2fc8e5e8c237caa9507a93272896cf87b75e295a`): Python profiler suite `54/54` pass; relevant Lua smoke suite (`profiler`/`actor`/`survivor_world`/`social`/`npc`) `65/69` pass (4 pre-existing unrelated headless baseline failures left untouched: `psychopatz_profiler_client_composition_smoke.lua`, `psychopatz_profiler_server_composition_smoke.lua`, `psychopatz_survivor_world_client_knowledge_smoke.lua`, `psychopatz_survivor_world_generation_smoke.lua`); full Core Lua sweep `192/202` pass (only pre-existing unrelated headless UI/translation/semantic failures).
 
+
+## L6 — Live Follow, Combat-Hit, Abstract-Travel & Inventory/ModData Scale Harness / Root-Cause Optimization (ACTIVE)
+
+### CODE_VERIFIED coverage gap
+
+- `tests/support/lightweight_runtime_simulator.lua` currently changes the first fake player's X only on the one-second boundary (`nowMs % 1000 == 0`) and does not expose the complete continuous moving-player contract used by live FollowOwner.
+- Existing focused follow tests cover MP heading stability, formation caching, stable hold behavior, move modes, combat interaction, and profiler markers, but the integrated runtime simulator does not drive sustained live `FollowOwner` work for a continuously moving owner.
+- Current cadence constants are `FOLLOW_DECISION_INTERVAL_MS=200`, `FOLLOW_TICK_INTERVAL_MS=100`, `FOLLOW_RETARGET_OWNER_DISTANCE=0.75`, `FOLLOW_RETARGET_MAX_MS=800`, `FOLLOW_MOVE_INTENT_EPSILON=0.35`, `ENGINE_PATH_REQUEST_BUDGET_WINDOW_MS=100`, `ENGINE_PATH_REQUEST_BUDGET_PER_WINDOW=1`, `ENGINE_PATH_REPLAN_MS=1000`, and `ENGINE_PATH_TARGET_REPLAN_DISTANCE=1.5`. These are audit facts, not tuning instructions.
+- The integrated simulator therefore proves interest/promotion/runtime scaling but does not yet prove the ordinary-play case "player continuously walks while a multi-companion live follow group continually updates targets and native paths."
+
+### NATIVE_EVIDENCE / not yet developer root-cause proof
+
+- The native session that reopened this job showed six live recruited followers under one owner and the profiler reached peaks of six moving followers and six active follow paths.
+- The captured session also showed repeated native progress timeouts, stall recovery, and fence/window traversal churn while following. That makes path/moving-target work a strong candidate, not a proven sole cause.
+- The latest profiler snapshot is `DETAILED`; deep instrumentation is not a clean timing baseline. L6 must use profiler `OFF` for before/after performance evidence.
+- User native testing additionally reports massive lag spikes specifically when live NPC attacks **land** against zombies, other NPCs, and players.
+- CODE_VERIFIED: accepted hits fan out through `CombatResolution.ApplyTargetDamage` into target-specific work. Zombie hits can trigger engine/reaction, aggro, zombie-reaction networking, social encounter activity, and kill semantics; NPC hits can trigger health/wounds/recalculation, medical requests, faction/social consequences, combat-damage replication and kill semantics; player hits can trigger body damage update, player-stats synchronization, faction handling and social witness scanning.
+- Existing combat smoke coverage is broad for correctness but the integrated lightweight simulator does not yet compare pre-impact miss/control workloads against successful-hit fan-out at 1/3/6/12 attackers or synchronized contact.
+- CODE_VERIFIED: ProjectHoomans abstract group travel delegates to `PNC_CoreGroupTraversalBridge`, which uses PsychopatzCore `GroupJourney`/SurvivorWorld traversal for canonical elapsed-world-time route projection. Core can cross segments/waits in one large time step.
+- CODE_VERIFIED: ProjectHoomans Presence materializes by the actor's current position/interest, Travel `OnMaterialized` advances then syncs live position, and `OnAbstracted` captures live progress before returning the journey controller to abstract.
+- Existing mobile-group, Core journey persistence, presence-interest, and materialization tests cover individual contracts, but the integrated runtime simulator does not yet prove the end-to-end far-route -> projected player intercept -> materialize -> live travel -> abstract -> continue -> arrive lifecycle or its scale behavior.
+- CODE_VERIFIED: NPC durable personal inventory is Core `ActorInventory` with `SEED_ONLY` / `BASELINE_DELTA` / `FULL` payload modes; ProjectHoomans hydrates/captures richer inventory state through the actor bridge only when gameplay requires it.
+- Existing persistence-scale, actor-inventory-bridge, replication, UI-cache, hydration, and transfer tests cover individual inventory contracts, but the integrated runtime simulator does not yet measure large player-native inventory scans plus many NPC compact inventory payloads, transfer fan-out, total/per-actor encoded bytes, subset hydration, or inventory-scale save/reload.
+
+### L6 planned acceptance
+
+- Extend the existing simulator with continuous step-wise player motion and real FollowOwner production seams.
+- Add deterministic NPC -> zombie, NPC -> NPC, and NPC -> player combat miss/hit controls that drive real impact/damage seams.
+- Add canonical Core/mobile-group journey workloads for far abstract travel, large time leaps, projected player intercept, live exit, arrival, live-stall handoff, and overlapping MP interest.
+- Add large player-native inventory and compact multi-NPC inventory workloads, including player -> many NPC / reverse transfers, mutation storms, subset materialization, save/reload, replication scale, compact-mode counts, and encoded-byte reporting.
+- Add 1/3/6/12 follower cases plus `FOLLOW_WALK_OPEN`, `FOLLOW_WALK_TURN_STOP`, `FOLLOW_WALK_OBSTACLE`, and `FOLLOW_WALK_STALL`.
+- Expose follow/formation/move-intent/path/replan/budget/traversal/presence/census counters and maximum same-frame route pressure.
+- Expose attack/hit, zombie reaction/aggro, health/wound/medical, player body/stats, faction/social/witness, semantic, network, persistence, and maximum same-frame impact fan-out counters.
+- Expose Core journey advances/projections, segment/wait transitions, promotions, materialization attempts, live bodies, abstractions/demotions, live travel stalls/handoffs, spatial/network/persistence work, and same-frame materialization pressure.
+- Add an off-by-default bounded stutter ring trace for later native correlation without deep wrappers.
+- Record the pre-fix operation baseline before runtime tuning.
+- Optimize only measured dominant churn. Follow candidates such as owner-group pursuit-corridor caching/stable route targets/replan staggering and combat candidates such as bounded witness queries, same-frame coalescing, narrow delta deduplication, or deferred noncritical semantic/social work remain conditional on evidence.
+- Do not raise the global engine path request budget without proving request starvation rather than synchronous path cost.
+- After isolated fixes, run the mandatory cross-system matrix: `COMBINED_SAVE_RELOAD_PRESSURE`, `COMBINED_MATERIALIZE_COMBAT`, `TRAVEL_MEMBER_DEATH_HANDOFF`, `TRAVEL_ARRIVAL_STORM`, `OBSERVATION_PROJECTION_LOAD`, `PLAYER_FAST_INTEREST_JUMP`, `PROVIDER_HANDOFF_TRAVEL`, `LONG_WORLD_ENDURANCE`, `COMBINED_INVENTORY_FOLLOW`, `COMBINED_INVENTORY_COMBAT`, `COMBINED_INVENTORY_MATERIALIZATION`, and `COMBINED_INVENTORY_SAVE_RELOAD`.
+- Require the fast smoke to include materialization -> immediate combat and a short fast-interest-jump case; keep multi-day leak/backlog and broader compound pressure in the heavier benchmark.
+- Rerun L0-L5 matrices, follow/path focused tests, mobile-group/Core journey/presence/travel tests, NPCReplicationScaling regressions, and full ProjectHoomans tests after evidence-backed fixes.
+
+Full workload and gates: [FOLLOW_WALK_STUTTER.md](FOLLOW_WALK_STUTTER.md), [COMBAT_HIT_STUTTER.md](COMBAT_HIT_STUTTER.md), [ABSTRACT_TRAVEL_HANDOFF_STUTTER.md](ABSTRACT_TRAVEL_HANDOFF_STUTTER.md), and [INVENTORY_MODDATA_STRESS.md](INVENTORY_MODDATA_STRESS.md).
+
 ## Accepted dependencies
 
 Do not reopen:
@@ -111,4 +155,4 @@ This job corrects Hoomans runtime adoption so it actually obeys those accepted c
 
 ## Next Chunk
 
-**User-owned native SP/MP feel and capacity acceptance** (all developer-side L0–L5 gates complete and locally committed; native Project Zomboid intentionally not launched).
+**L6 four-family reproduction baselines.** Extend the existing integrated simulator before changing runtime behavior: (a) continuously walk/turn/stop a deterministic player while 1/3/6/12 live companions execute the real FollowOwner -> formation -> move-intent -> PathService chain; (b) run NPC -> zombie, NPC -> NPC, and NPC -> player miss-vs-hit combat controls with repeated, synchronized-contact, and kill/incapacitation cases; (c) run canonical Core/mobile-group journeys through far abstract progression, large time leaps, projected player intercept/materialization, live exit/abstraction, arrival, stall handoff, save/reload, and overlapping MP interest; and (d) stress large player-native inventories plus many compact NPC inventories with transfer/mutation/materialization/save-reload/replication cases while reporting compact modes and encoded bytes. Record profiler-OFF pre-fix operation/size baselines for all four workload families before optimizing any of them.

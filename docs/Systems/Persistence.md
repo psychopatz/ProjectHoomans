@@ -6,7 +6,7 @@
 
 ## Owned Data
 - Core-backed SurvivorWorld actors keep canonical identity, appearance, personal inventory, social/persona state, affiliation/world/journey, and provider lease in `PsychopatzCore` (`ActorExtension` storage on `actor.extensions["ProjectHoomans.ActorExtension"]`, `schemaVersion = 1`, encoded as `nil` / 0 bytes for unmodified bystanders); Core-backed records do not duplicate legacy `PNC_NPC_<id>` ModData
-- versioned per-NPC persisted schema for non-Core legacy/local records, with exact-version reset semantics
+- versioned per-NPC persisted schema for non-Core local records, with exact-version reset semantics. Persisted local records stay under local authority when loaded or saved.
 - `PNC_Core_Global.records` directory pointers
 - isolated `PNC_NPC_<id>` record tables (non-Core records only)
 - canonical persisted fields only
@@ -76,6 +76,9 @@
 - equipment and inventory summaries are explicitly retained as lazy-hydration
   caches. Inventory item/delta state remains authoritative and repairs those
   caches when hydrated
+- Core actor inventory restores item slots from the final worn, held, and
+  attached maps during decode. Equipment-only updates stay compact in the
+  ledger and require no duplicate item records.
 - continuous live movement and passive stamina recovery update runtime records
   without calling `MarkDirty` every tick. Ordinary logical
   `PersistenceCoordinator.Commit(reason)` calls enqueue/coalesce dirty domains

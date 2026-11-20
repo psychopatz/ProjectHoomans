@@ -1,8 +1,5 @@
--- Shared initialization for debug-spawned companions.
---
--- The debug menu has two execution paths: the server command in multiplayer
--- and the in-process client action in single-player. Keep the companion
--- contract in one place so both paths match the Has-a-friend starter grant.
+-- Initialize debug companions with the same standing and disclosure as
+-- the Has-a-friend starter grant.
 
 PNC = PNC or {}
 PNC.DebugCompanionInitialization =

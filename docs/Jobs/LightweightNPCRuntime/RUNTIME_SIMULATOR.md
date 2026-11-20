@@ -231,5 +231,93 @@ These remain native acceptance items. Do not mislabel the simulator as native pe
 - **L3:** simulator must prove ordinary mutations use domain deltas while repair/fallback converges.
 - **L4:** simulator becomes the repeatable identical workload used before/after measured cadence/allocation changes.
 - **L5:** fast smoke + scale benchmark + focused/full suites are mandatory developer acceptance evidence before user-owned native testing.
+- **L6:** continuous moving-player + 1/3/6/12 live `FollowOwner` companions, NPC combat-contact workloads (NPC -> zombie/NPC/player), compact abstract/mobile-group journey handoff workloads, **and** large player/multi-NPC inventory/ModData workloads, with operation-count baselines and bounded stutter-correlation diagnostics, are mandatory before returning to native acceptance.
 
-Every L1-L4 change must extend the simulator when it introduces or changes a runtime contract. A phase is not complete if its main optimization can only be tested by manually launching Project Zomboid.
+Every L1-L4 and L6 change must extend the simulator when it introduces or changes a runtime contract. A phase is not complete if its main optimization can only be tested by manually launching Project Zomboid.
+
+## L6 follow-walk extension
+
+The canonical smoke scenario's generic `player movement and interest change` is not sufficient evidence for sustained companion following.
+
+L6 adds a dedicated moving-player workload described in [FOLLOW_WALK_STUTTER.md](FOLLOW_WALK_STUTTER.md). The simulator must update the fake player's position every simulation step during walking/running intervals and expose the player methods consumed by production follow logic, including `isPlayerMoving`, running/sprinting state, and forward direction.
+
+The workload must exercise the real scheduler/SimulationLOD -> `TickFollowOwner` -> formation -> move-intent -> PathService chain. Only the native engine path computation/progress boundary may be deterministic/fake.
+
+The fast smoke must include a bounded six-follower open/turn-stop case. The slower benchmark must cover 1/3/6/12 followers and the obstacle/stall cases.
+
+Operation counters, not machine-specific milliseconds, are the primary regression gate. Profiler-OFF average/p95/max tick timing is supporting evidence. A clean healthy open-field fake provider must not create synthetic native timeout/stall/traversal events.
+
+## L6 combat-hit extension
+
+The simulator must also exercise successful attack impacts, not merely "combat active" ticks.
+
+See [COMBAT_HIT_STUTTER.md](COMBAT_HIT_STUTTER.md). At minimum provide deterministic:
+
+- `COMBAT_NPC_ZOMBIE_MISS` / `COMBAT_NPC_ZOMBIE_HIT`
+- `COMBAT_NPC_NPC_MISS` / `COMBAT_NPC_NPC_HIT`
+- `COMBAT_NPC_PLAYER_MISS` / `COMBAT_NPC_PLAYER_HIT`
+
+The miss/control cases must run the same attack decision/action timing without accepted target damage. This establishes the incremental cost of the impact boundary.
+
+The hit cases must drive production `BuildHitEvent` / `ApplyTargetDamage` and target-specific services as far as engine-independent code permits. Fake only narrow native body/reaction/stats/socket boundaries and count every invocation.
+
+The slower benchmark must include 1/3/6/12 NPC attackers with controlled contact spacing plus one synchronized-contact stress case. Include repeated nonlethal hits and deterministic kill/incapacitation transitions.
+
+Primary correctness gates are operation counts and bounded same-frame fan-out. Profiler-OFF average/p95/max tick time is supporting evidence. Native Project Zomboid remains the final authority for Java/engine body-hit and frame-time cost.
+
+## L6 abstract-travel/materialization extension
+
+See [ABSTRACT_TRAVEL_HANDOFF_STUTTER.md](ABSTRACT_TRAVEL_HANDOFF_STUTTER.md).
+
+The simulator must exercise the canonical Core group journey across representation transitions rather than mocking "teleport every N hours."
+
+Required scenarios:
+
+- `ABSTRACT_ROUTE_FAR`
+- `ABSTRACT_ROUTE_TIME_LEAP`
+- `ABSTRACT_ROUTE_PLAYER_INTERCEPT`
+- `ABSTRACT_ROUTE_PLAYER_EXIT`
+- `ABSTRACT_ROUTE_ARRIVAL`
+- `ABSTRACT_ROUTE_LIVE_STALL_HANDOFF`
+- `ABSTRACT_ROUTE_MP_INTEREST`
+
+Use the real Core `GroupJourney` / group traversal projection and the real ProjectHoomans bridge/presence/travel handoff seams. Only engine body spawning/path progress is a narrow deterministic fake.
+
+The scale benchmark must cover 1/10/50/100 simultaneous travelling groups and 1/3/6/12 group members while proving that distant groups remain compact/bodyless and only the nearby subset incurs promotion/materialization/live-body work.
+
+A large world-hour jump must be tested against equivalent small-step advancement and reach equivalent canonical journey state without replaying intermediate server frames.
+
+## L6 required cross-system stress matrix
+
+The three isolated workload families are necessary for attribution but are not sufficient for L6 acceptance. After their pre-fix baselines and evidence-driven fixes, run these compound scenarios through the same integrated simulator:
+
+- `COMBINED_SAVE_RELOAD_PRESSURE`
+- `COMBINED_MATERIALIZE_COMBAT`
+- `TRAVEL_MEMBER_DEATH_HANDOFF`
+- `TRAVEL_ARRIVAL_STORM`
+- `OBSERVATION_PROJECTION_LOAD`
+- `PLAYER_FAST_INTEREST_JUMP`
+- `PROVIDER_HANDOFF_TRAVEL`
+- `LONG_WORLD_ENDURANCE`
+
+`COMBINED_MATERIALIZE_COMBAT` must be in the fast smoke: a travelling hostile group crosses into projected player interest, materializes through production presence/promotion seams, begins combat, lands deterministic hits, and later remains safe to abstract. Count promotion/materialization, targeting/pathing, accepted hits, reaction/social/faction/network work, dirty-domain/persistence work, and maximum same-frame fan-out.
+
+`PLAYER_FAST_INTEREST_JUMP` must also have a short smoke fixture so teleport/fast travel cannot strand stale projected positions or bypass materialization budgets.
+
+The heavier benchmark owns save/reload-under-pressure, travel-member death/handoff, arrival storms, observation load, provider handoff, and long-world endurance. Endurance should advance many simulated days without replaying every frame and report bounded high-water marks for dirty queues, live bodies, promoted Hoomans records, provider leases, tombstones, runtime indexes, transient diagnostic structures, and sparse durable extensions.
+
+These scenarios must compose the same production paths already exercised by the isolated fixtures. Do not write a second combined-lifecycle implementation inside the test harness.
+
+## L6 inventory/ModData scale extension
+
+See [INVENTORY_MODDATA_STRESS.md](INVENTORY_MODDATA_STRESS.md).
+
+The integrated simulator must support large deterministic player-native inventories, many compact Core actor inventories without live bodies, player -> many NPC and many NPC -> player transfers, inventory mutation storms, inventory-bearing subset materialization/abstraction, save/reload at inventory scale, and multi-client inventory replication pressure.
+
+Report compact mode counts (`SEED_ONLY`, `BASELINE_DELTA`, `FULL`), logical item counts, total and per-actor encoded bytes, hydrate/capture/decode operations, dirty/persistence/network work, and same-frame high-water marks.
+
+Selected scale points should include 100/500/1000/2000 player items and 10/50/100/500 NPC actors with representative item-count tiers, without constructing a wasteful full Cartesian matrix.
+
+The mandatory composition matrix also includes `COMBINED_INVENTORY_FOLLOW`, `COMBINED_INVENTORY_COMBAT`, `COMBINED_INVENTORY_MATERIALIZATION`, and `COMBINED_INVENTORY_SAVE_RELOAD`.
+
+These scenarios must prove inventory size does not accidentally make unrelated follow/combat/travel hot paths proportional to total carried item count.

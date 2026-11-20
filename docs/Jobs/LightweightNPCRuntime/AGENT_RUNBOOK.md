@@ -86,3 +86,91 @@ Do not delete or weaken unrelated failing tests to make the new goal green. Labe
 At an accepted developer-side phase: reconcile ROADMAP/PROGRESS/HANDOFF, stage only exact phase-owned paths, commit participant repository changes first, commit ProjectHoomans primary/job docs last with HANDOFF, verify the committed vector and remaining unrelated work, then continue automatically to the next mandatory phase.
 
 Never push, create PRs/tags/releases, amend/rebase/force-update, or publish Steam Workshop content without explicit authorization.
+
+## L6 — follow-walk stutter procedure
+
+When native acceptance reports stutter while a player moves with followers:
+
+1. Keep every repository/test/profiler command under the `psychopatz` user when remote tooling runs as root. Verify no new root-owned workspace/bridge artifacts.
+2. Read [FOLLOW_WALK_STUTTER.md](FOLLOW_WALK_STUTTER.md), then inspect the exact current simulator, FollowOwner, formation, move-intent, PathService, and EnginePathPlanner source before editing.
+3. Run existing focused follow/path tests first. Preserve failures as evidence; do not weaken assertions.
+4. Implement the continuous player-motion fixture in the existing lightweight runtime simulator. The fixture must call production follow seams, not a duplicate follow algorithm.
+5. Record profiler-OFF operation counts for 1/3/6/12 followers and all required L6 scenarios **before** changing runtime behavior.
+6. Use bounded coarse/deep diagnostics only after the clean workload points to a lane. Never optimize from deep timing alone.
+7. Classify the root cause: follow/formation target churn, move-intent churn, native request/replan churn, passage/traversal recovery, another shared runtime lane, or native-only engine cost not reproducible headlessly.
+8. Apply the smallest evidence-backed fix. Shared owner-group pursuit caching or replan staggering is allowed only when the baseline proves it addresses the implicated work.
+9. Rerun the exact pre-fix workload and compare operation counts plus profiler-OFF timing. Do not accept a speedup that breaks follow responsiveness or obstacle correctness.
+10. Run focused follow/path, lightweight simulator, scale benchmark, NPC replication, and relevant full regression suites. Update ROADMAP/PROGRESS/HANDOFF with exact evidence.
+11. Close L6 with an exact-path local commit only after its gate passes. Do not push.
+12. Return to user-owned native SP/MP verification using profiler `OFF` first and the bounded stutter trace only if another hitch remains.
+
+A headless failure to reproduce Java pathfinder cost is not permission to invent a fake fix. If operation counts are healthy but native stutter remains, preserve the developer evidence and use the low-overhead native trace to localize the engine-facing boundary.
+
+### L6 combat-hit addition
+
+The L6 phase is not closed by fixing FollowOwner alone.
+
+After establishing the follow baseline, or in the same baseline pass when practical, extend the integrated simulator with the combat-contact matrix from [COMBAT_HIT_STUTTER.md](COMBAT_HIT_STUTTER.md).
+
+Before changing combat runtime behavior:
+
+1. run the existing combat-resolution, attack-commit, player-damage, NPC-wounds, social-damage, faction-attack, zombie-reaction, and profiler-combat focused tests
+2. record profiler-OFF miss-vs-hit baselines for NPC -> zombie, NPC -> NPC, and NPC -> player
+3. record repeated-hit, synchronized-contact, and kill/incapacitation transition counters
+4. classify whether the spike is common impact work, zombie reaction/aggro/network, NPC wound/medical/faction/social, player BodyDamage/stats/witness work, kill-only work, or same-frame fan-out
+5. fix only the measured cause while keeping authoritative damage immediate
+6. rerun the identical workload plus focused and full regressions
+
+Do not "fix" combat spikes by skipping damage, removing consequences, reducing attacker counts, hiding work behind deep profiler mode, or merely increasing combat cadence.
+
+### L6 abstract-travel/materialization addition
+
+The L6 phase is also not closed by follow and combat fixes alone.
+
+Read [ABSTRACT_TRAVEL_HANDOFF_STUTTER.md](ABSTRACT_TRAVEL_HANDOFF_STUTTER.md), `PNC_AbstractTraversal_Travel.lua`, `PNC_CoreGroupTraversalBridge.lua`, PsychopatzCore GroupJourney/SurvivorWorld traversal, Presence decisions/reconcile, and Travel `OnMaterialized`/`OnAbstracted` before editing.
+
+Before runtime changes:
+
+1. establish a fully abstract A -> B Core group journey baseline
+2. prove large world-time leaps match equivalent small-step canonical outcomes
+3. intercept the projected route with a player and measure promotion/materialization
+4. leave range and prove live progress is captured before abstract progression resumes
+5. test repeated enter/exit, arrival, save/reload, live-stall handoff, and overlapping MP interest
+6. scale to 1/10/50/100 travelling groups while keeping distant actors bodyless
+7. record profiler-OFF Core journey, promotion/materialization, spatial, network, persistence, and same-frame handoff counters before optimizing
+
+Do not optimize abstract travel by keeping bodies alive, bulk-hydrating Core actors, polling every route every frame, or sending every projected coordinate over the network.
+
+### L6 cross-system composition pass
+
+Passing the three isolated workload families is not the L6 stop condition.
+
+After isolated profiler-OFF baselines identify root causes and their fixes pass the identical workloads:
+
+1. run `COMBINED_MATERIALIZE_COMBAT` in the fast smoke and prove materialization + targeting + accepted hit + reaction/social/network/persistence fan-out stays bounded;
+2. run a short `PLAYER_FAST_INTEREST_JUMP` smoke case;
+3. run the heavier `COMBINED_SAVE_RELOAD_PRESSURE`, `TRAVEL_MEMBER_DEATH_HANDOFF`, `TRAVEL_ARRIVAL_STORM`, `OBSERVATION_PROJECTION_LOAD`, `PROVIDER_HANDOFF_TRAVEL`, and `LONG_WORLD_ENDURANCE` cases;
+4. compare high-water marks for bodies, promoted records, provider leases, dirty queues, tombstones, runtime indexes, transient diagnostics, and sparse extension state;
+5. verify transition hooks remain exactly-once and no combined case creates duplicate actor/body/journey/network/persistence authority;
+6. only after these compound gates pass may L6 advance to the user-owned native SP/MP acceptance boundary.
+
+Do not hide a compound regression by weakening an isolated threshold. If a combined case exposes a new synchronous fan-out, return to evidence collection for that lane and fix the production cause.
+
+### L6 inventory/ModData scale addition
+
+The L6 phase is not closed until the inventory scale gate passes.
+
+Read [INVENTORY_MODDATA_STRESS.md](INVENTORY_MODDATA_STRESS.md), the Core actor-inventory codec/bridge, ProjectHoomans inventory bridge, server transfer authority, inventory replication, UI cache tests, and persistence-scale tests before changing inventory code.
+
+Before optimization:
+
+1. establish large player-native inventory scan/UI baselines;
+2. establish 10/50/100/500 compact NPC inventory byte/mode baselines while actors remain abstract;
+3. stress player -> many NPC and many NPC -> player transfers;
+4. run mutation storms and measure dirty/persistence/network coalescing;
+5. materialize only a small inventory-bearing subset and measure hydration/capture;
+6. save/reload and report exact compact mode and byte distributions;
+7. run inventory replication scale with mixed recipient interest;
+8. preserve profiler-OFF pre-fix counts/bytes before changing compaction, serialization, lookup, hydration, or replication behavior.
+
+Do not optimize by dropping item identity/state, converting inventory to count summaries, hydrating every actor, or imposing smaller supported inventories. Fix measured redundant work/representation.

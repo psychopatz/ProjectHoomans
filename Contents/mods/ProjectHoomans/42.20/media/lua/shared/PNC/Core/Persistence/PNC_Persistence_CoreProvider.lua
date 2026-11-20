@@ -266,6 +266,9 @@ function Adapter.EnsureActor(record, core)
     if not record.id or tostring(record.id) == "" then
         return nil, "record_id_required"
     end
+    if record.coreBacked ~= true and record.persistenceSourceVersion ~= nil then
+        return nil, "local_record_already_persisted"
+    end
 
     local api = actors(core)
     if not api then return nil, "core_actor_api_unavailable" end
@@ -1021,22 +1024,6 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
         actor = actor,
         extensionPersisted = nextExt ~= nil,
     }, OUTCOME_WRITTEN
-end
-
-function Adapter.VerifyMigratedActor(record, actor, core)
-    local codec = core and core.ActorPersistence
-    if not codec or not actor then return false, "core_actor_codec_unavailable" end
-    local encoded, reason = codec.SerializeActor(actor)
-    if not encoded then return false, reason end
-    local restored
-    restored, reason = codec.DecodeActor(encoded)
-    if not restored then return false, reason end
-    if restored.actorId ~= record.coreActorID
-        or not tablesEqual(restored.extensions, actor.extensions)
-    then
-        return false, "legacy_core_roundtrip_mismatch"
-    end
-    return true
 end
 
 function Adapter.SyncAllPromotedCoreActors(core)

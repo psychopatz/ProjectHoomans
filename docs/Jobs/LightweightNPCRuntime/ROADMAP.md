@@ -4,7 +4,7 @@
 
 Project Hoomans ordinary gameplay is lightweight because total compact Core population no longer implies equal Hoomans runtime/persistence/scheduler work. Core-backed NPCs use one canonical durable authority, Hoomans rich state is lazy and reversible, logical commits do not synchronously flush broad state, network mutations use domain deltas, and profiling can diagnose performance without becoming the normal workload.
 
-Do not declare the parent goal complete after one hot-path optimization. All L0-L5 developer gates must pass.
+Do not declare the parent goal complete after one hot-path optimization. All L0-L6 developer gates must pass.
 
 ## Invariants
 
@@ -84,6 +84,44 @@ Report Core actor count, Hoomans promoted-record count, live-body count, schedul
 **Gate:** the integrated smoke simulator and scale benchmark pass; developer-side tests/benchmarks pass; current architecture/system docs match implementation; no obsolete eager-hydration or duplicate-persistence instruction remains; accepted phases are locally committed with participant repos first and ProjectHoomans docs/HANDOFF last. Do not push.
 
 Native SP/MP feel/capacity acceptance remains user-owned unless explicitly assigned.
+
+## L6 — live FollowOwner, combat-hit, abstract-travel/materialization, and inventory/ModData scale reproduction / root-cause optimization
+
+Native acceptance after L5 exposed severe remaining stutter while the player walks with a multi-companion follow group. Treat that as a developer-side regression gap, not as a reason to discard the accepted L0-L5 architecture.
+
+1. Extend the **existing** integrated runtime simulator with a continuous moving-player contract; do not create a separate benchmark framework.
+2. Drive real `FollowOwner` decision/formation/move-intent/PathService seams behind a narrow deterministic native-path adapter.
+3. Exercise deterministic 1/3/6/12-follower workloads with at least open-field, turn/stop, obstacle/traversal, and injected-stall scenarios. The six-follower case is the primary reproduction target.
+4. Collect profiler-OFF operation counters for follow decisions, formation sampling/cache behavior, move-intent requests/suppression, path requests, engine requests, replans, budget deferrals, retries, timeouts, active routes, traversal events, presence deltas, census refreshes, and per-frame bursts.
+5. Add an off-by-default bounded stutter ring trace that can correlate native top-level spikes with those counters without requiring deep wrappers.
+6. Record the pre-fix baseline before changing follow/path behavior. Deep profiler timings are diagnostic only and cannot serve as the clean baseline.
+7. Identify the dominant source before optimizing. Candidate fixes such as owner-group pursuit-corridor caching, stable route targets, or deterministic replan staggering are conditional on measured evidence.
+8. Do not blindly raise the global engine path request budget; prove queue starvation before increasing synchronous path work.
+9. Preserve follow responsiveness, MP owner-travel heading, formation spacing, combat preemption, obstacle correctness, and existing L0-L5 scaling/authority contracts.
+10. Rerun the full lightweight-runtime matrix, follow/path focused suites, NPC replication benchmark, and relevant full regression after the fix.
+11. Extend the same integrated simulator with deterministic combat-contact controls for NPC -> zombie, NPC -> Hoomans NPC, and NPC -> player.
+12. For every combat target type, compare a pre-impact miss/control workload with accepted hits so attack orchestration can be separated from impact fan-out.
+13. Cover repeated nonlethal hits, synchronized multi-attacker contact, and deterministic kill/incapacitation transitions.
+14. Count hit-resolution, engine reaction, health/wound, medical, faction, social/witness, semantic, network, persistence, and same-frame fan-out operations before changing combat code.
+15. Identify the dominant target-specific or shared impact cost, apply the smallest evidence-backed fix, then rerun identical combat workloads plus the existing combat/wound/social/faction regressions.
+16. Authoritative damage and combat outcomes remain immediate. Performance work may coalesce/defer only noncritical downstream work whose semantics permit it.
+17. Add compact mobile-group/Core journey workloads that advance from world time while remaining bodyless and avoid rich Hoomans promotion while no player is relevant.
+18. Verify deterministic projected-position materialization when players intercept a route, then live -> abstract handoff and continued progress without journey reset or rewind.
+19. Cover time leaps, mid-route save/reload, repeated range enter/exit, abstract/live arrival convergence, live-stall handoff, multiplayer overlapping interest, and 1/10/50/100 simultaneous travelling groups.
+20. Track Core journey advances/projections, promotions, materialization attempts, live bodies, abstractions/demotions, spatial/network/persistence work, and maximum same-frame handoff pressure.
+21. Preserve the Core canonical group journey. Map/debug/discovery observation must remain side-effect-free and cannot promote/materialize distant actors.
+22. After isolated baselines/fixes, run the mandatory cross-system stress matrix: `COMBINED_SAVE_RELOAD_PRESSURE`, `COMBINED_MATERIALIZE_COMBAT`, `TRAVEL_MEMBER_DEATH_HANDOFF`, `TRAVEL_ARRIVAL_STORM`, `OBSERVATION_PROJECTION_LOAD`, `PLAYER_FAST_INTEREST_JUMP`, `PROVIDER_HANDOFF_TRAVEL`, and `LONG_WORLD_ENDURANCE`.
+23. Treat `COMBINED_MATERIALIZE_COMBAT` as a primary gameplay spike case: a projected hostile group becomes relevant, materializes under budget, acquires combat work, lands hits, then can later abstract without duplicate faction/social/network/persistence state.
+24. Treat `LONG_WORLD_ENDURANCE` as the leak/backlog gate: advance many simulated days while tracking dirty queues, runtime indexes, tombstones, extension sizes, bodies, provider leases, arrival/death state, and transient diagnostics.
+25. Compound scenarios must reuse real production seams and the existing simulator. They must not become a parallel test-only lifecycle.
+26. Add a fourth isolated workload family for large player inventory + many NPC compact inventories. Exercise 100/500/1000/2000 player-item scale, 10/50/100/500 NPC inventory scale, player -> many NPC and many NPC -> player transfers, mutation storms, subset materialization, save/reload, and inventory replication.
+27. Report Core actor inventory compact modes (`SEED_ONLY`, `BASELINE_DELTA`, `FULL`), total/per-actor encoded bytes, logical item counts, persistence/network operation counts, and hydration/capture counts so ModData optimization is evidence-driven.
+28. Preserve Core as the durable NPC inventory authority. Distant NPCs with items remain compact/bodyless; only relevant live actors hydrate richer/native inventory state.
+29. Extend the mandatory composition matrix with `COMBINED_INVENTORY_FOLLOW`, `COMBINED_INVENTORY_COMBAT`, `COMBINED_INVENTORY_MATERIALIZATION`, and `COMBINED_INVENTORY_SAVE_RELOAD`.
+
+See [FOLLOW_WALK_STUTTER.md](FOLLOW_WALK_STUTTER.md), [COMBAT_HIT_STUTTER.md](COMBAT_HIT_STUTTER.md), [ABSTRACT_TRAVEL_HANDOFF_STUTTER.md](ABSTRACT_TRAVEL_HANDOFF_STUTTER.md), and [INVENTORY_MODDATA_STRESS.md](INVENTORY_MODDATA_STRESS.md).
+
+**Gate:** all four isolated L6 workload families **and the mandatory cross-system stress matrix** pass. The simulator reproduces sustained moving-player follow work, NPC combat impact work, compact abstract/mobile-group travel through deterministic proximity materialization/abstraction, and large player/multi-NPC inventory pressure with measurable compact ModData growth; then proves those systems compose under save/reload, immediate combat after materialization, death during travel/handoff, arrival storms, heavy observation, player teleports, provider handoff, and long-world endurance. Profiler-OFF pre-fix baselines identify developer-reproducible churn before optimization; accepted fixes reduce implicated work on identical workloads without correctness regressions; distant groups remain compact/bodyless, time leaps are bounded elapsed-time calculations rather than replayed ticks, handoffs never duplicate or rewind actors/journeys, transition hooks remain idempotent, combat fan-out stays bounded, long-run transient state does not leak monotonically, and the low-overhead trace is suitable for subsequent user-owned native profiler-OFF verification.
 
 
 ## Core-backed recruitment acceptance

@@ -179,6 +179,8 @@ Actions.Register({
     execute = function(_, record, item)
         local slot = resolveWornSlot(item)
         if not slot then return false, "not_wearable" end
+        local worn, reason = Inventory.SetWorn(record, item.id, slot, "inventory_action_wear")
+        if not worn then return false, reason end
         if item.equipSlot then
             if item.equipSlot == "waterContainer" then
                 Inventory.ClearWaterContainer(record,
@@ -188,7 +190,7 @@ Actions.Register({
                     "inventory_action_wear_clear_hand")
             end
         end
-        return Inventory.SetWorn(record, item.id, slot, "inventory_action_wear")
+        return true, reason
     end,
 })
 

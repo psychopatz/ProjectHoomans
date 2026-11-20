@@ -204,6 +204,20 @@ function Appearance.AreExclusive(first, second)
     return success and result == true
 end
 
+local function bodyLocationKey(location)
+    local key = string.lower(location)
+    if not string.find(key, ":", 1, true) then
+        return "base:" .. key
+    end
+    return key
+end
+
+function Appearance.WornSlotsConflict(first, second)
+    return bodyLocationKey(first) == bodyLocationKey(second)
+        or Appearance.AreExclusive(first, second)
+        or Appearance.AreExclusive(second, first)
+end
+
 function Appearance.Validate(source)
     local policy = Appearance.Normalize(source)
     local selected = {}

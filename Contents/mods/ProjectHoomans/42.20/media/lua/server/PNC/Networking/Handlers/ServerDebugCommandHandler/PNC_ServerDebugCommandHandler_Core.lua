@@ -2,7 +2,6 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 local Handler = PNC.ServerDebugCommandHandler
-local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
 local H = Handler.Internal
 
@@ -54,7 +53,7 @@ function H.HandleUniqueNPCTestSpawn(player, args)
     return record, "spawned"
 end
 
-function H.HandleDebugSpawn(player, args)
+function Handler.Spawn(player, args)
     local x = tonumber(args and args.x) or (player and player:getX()) or 0
     local y = tonumber(args and args.y) or (player and player:getY()) or 0
     local z = tonumber(args and args.z) or (player and player:getZ()) or 0
@@ -66,10 +65,6 @@ function H.HandleDebugSpawn(player, args)
     )
     local colonist = tacticalClass == "colonist"
     local hostile = tacticalClass == "hostile"
-    local playerFaction
-    local playerFactionID
-    local factionOK
-    local factionReason
     local gameTime = getGameTime and getGameTime() or nil
     local worldAgeHours = gameTime
         and gameTime.getWorldAgeHours
@@ -80,33 +75,10 @@ function H.HandleDebugSpawn(player, args)
         PNC.Core.LogWarn(
             "PNC debug spawn rejected invalid tactical class=" .. tacticalClass
         )
-        return nil
+        return nil, "invalid_tactical_class"
     end
-    if colonist and PNC.Factions
-        and PNC.Factions.EnsurePlayerFaction
-    then
-        factionOK, factionReason, playerFaction =
-            PNC.Factions.EnsurePlayerFaction(player, {
-                worldAgeHours = worldAgeHours,
-            })
-        if not factionOK or not playerFaction then
-            PNC.Core.LogWarn(
-                "PNC debug colonist spawn could not resolve player faction: "
-                    .. tostring(factionReason or "unknown")
-            )
-            return nil
-        end
-        playerFactionID = playerFaction.id
-    end
-    local ownerUsername = colonist and player and player:getUsername() or nil
-    local ownerOnlineID = colonist and player and player:getOnlineID() or nil
     local orderSpec = hostile
         and { kind = Const.ORDER_HOSTILE_HUNT, x = x, y = y, z = z }
-        or colonist and {
-            kind = Const.ORDER_FOLLOW,
-            ownerUsername = ownerUsername,
-            ownerOnlineID = ownerOnlineID,
-        }
         or {
             kind = Const.ORDER_ROAM,
             roamMode = Const.ROAM_MODE_AREA,
@@ -115,8 +87,21 @@ function H.HandleDebugSpawn(player, args)
             z = z,
             radius = Const.ROAM_DEFAULT_RADIUS,
         }
-    local record = PNC.API.Spawn({
-        tacticalClass = tacticalClass,
+    local prepare
+    if colonist then
+        local recruitment = PNC.Recruitment
+        if not recruitment or not recruitment.Assign then
+            return nil, "recruitment_unavailable"
+        end
+        prepare = function(created)
+            return recruitment.Assign(player, created, {
+                source = "debug_companion_spawn",
+                endConversation = false,
+            })
+        end
+    end
+    local record, reason = PNC.API.Spawn({
+        tacticalClass = colonist and "neutral" or tacticalClass,
         archetypeID = H.ResolveDebugArchetype(
             args,
             tacticalClass,
@@ -125,18 +110,11 @@ function H.HandleDebugSpawn(player, args)
         x = x,
         y = y,
         z = z,
-        ownerUsername = ownerUsername,
-        ownerOnlineID = ownerOnlineID,
-        recruited = colonist,
-        factionID = playerFactionID,
-        membershipStatus = colonist and "member" or nil,
-        factionRole = colonist and "civilian" or nil,
-        factionRank = colonist and "member" or nil,
         orderSpec = orderSpec,
         forceLive = true,
         equipmentSpawnMode = equipmentSpawnMode,
         debug = true,
-    })
+    }, prepare)
     if colonist and record then
         local initialized, initializationResult =
             CompanionInitialization.ApplyKnownCompanion(
@@ -170,8 +148,9 @@ function H.HandleDebugSpawn(player, args)
     PNC.Core.LogInfo("PNC debug spawn variant=" .. variant
         .. " tacticalClass=" .. tacticalClass
         .. " equipment=" .. tostring(equipmentSpawnMode or "sandbox_chances")
-        .. " id=" .. tostring(record and record.id or "failed"))
-    return record
+        .. " id=" .. tostring(record and record.id or "failed")
+        .. (reason and " reason=" .. tostring(reason) or ""))
+    return record, reason
 end
 
 function H.FindTeleportPosition(record)

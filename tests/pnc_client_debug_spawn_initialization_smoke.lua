@@ -10,6 +10,7 @@ local player = {
     getZ = function() return 0 end,
 }
 local spawned
+local assigned
 local baseline
 local disclosure
 local knowledgeSnapshot
@@ -30,6 +31,7 @@ PNC = {
     Core = {
         IsClientOnly = function() return false end,
         Now = function() return 500 end,
+        LogInfo = function() end,
         LogWarn = function() end,
         DeepCopy = function(value)
             if type(value) ~= "table" then return value end
@@ -59,9 +61,13 @@ PNC = {
             return requested or "sandbox_chances"
         end,
     },
-    Factions = {
-        EnsurePlayerFaction = function()
-            return true, nil, { id = "faction_debug" }
+    ServerDebugCommandHandler = { Internal = {} },
+    Recruitment = {
+        Assign = function(receivedPlayer, record, options)
+            T.equal(receivedPlayer, player, "local debug spawn recruits for the player")
+            T.equal(options.source, "debug_companion_spawn")
+            assigned = record
+            return true
         end,
     },
     PlayerCharacters = {
@@ -105,10 +111,15 @@ PNC = {
         end,
     },
     API = {
-        Spawn = function(spec)
+        Spawn = function(spec, prepare)
             spawnCount = spawnCount + 1
             spawned = spec
-            return { id = "local-debug-" .. tostring(spawnCount) }
+            local record = { id = "local-debug-" .. tostring(spawnCount) }
+            if prepare then
+                local ok, reason = prepare(record)
+                if not ok then return nil, reason end
+            end
+            return record
         end,
     },
 }
@@ -121,6 +132,8 @@ package.preload["PsychopatzCore/World/PsychopatzTeleport"] = function()
     return {}
 end
 
+T.load("ProjectHoomans", "server",
+    "PNC/Networking/Handlers/ServerDebugCommandHandler/PNC_ServerDebugCommandHandler_Core.lua")
 T.load("ProjectHoomans", "client", "PNC/Networking/PNC_ClientActions.lua")
 
 T.equal(PNC.Client.SendDebug("spawn", {
@@ -128,9 +141,8 @@ T.equal(PNC.Client.SendDebug("spawn", {
     tacticalClass = "colonist",
     equipmentSpawnMode = "melee",
 }), true, "local companion debug spawn succeeds")
-T.equal(spawned.recruited, true, "local debug companion is recruited")
-T.equal(spawned.orderSpec.kind, "follow",
-    "local debug companion receives the follow order")
+T.equal(spawned.tacticalClass, "neutral", "companion starts with a normal NPC definition")
+T.equal(assigned.id, "local-debug-1", "SP routes the spawned NPC through recruitment")
 T.equal(baseline.npcID, "local-debug-1",
     "local debug companion baseline targets the spawned NPC")
 T.equal(baseline.standing.approval, 75,
@@ -154,6 +166,11 @@ PNC.Client.SendDebug("spawn", {
 })
 T.equal(baselineCount, 1,
     "neutral debug spawn does not receive companion relationship state")
+
+PNC.Recruitment.Assign = function() return false, "membership_rejected" end
+T.equal(PNC.Client.SendDebug("spawn", { tacticalClass = "colonist" }), false,
+    "local debug spawn reports recruitment failure")
+T.equal(baselineCount, 1, "failed recruit receives no companion initialization")
 
 -- Any multiplayer client context, including hosted/listen configurations,
 -- must use the authoritative debug command instead of local PNC.API.Spawn.

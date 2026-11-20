@@ -580,6 +580,7 @@ T.equal(countMap(PNC.Registry.DirtyByID), 0, "reloaded save leaves 0 dirty recor
 local recruited = assert(PNC.API.Spawn({
     id = "authority_recruit", name = "Authority Recruit",
     x = 100, y = 101, z = 0, tacticalClass = "neutral",
+    equipment = { worn = { Shirt = "Base.Shirt_FormalWhite" } },
 }))
 local recruitedID = assert(recruited.coreActorID)
 local function rosterContains(id)
@@ -666,6 +667,14 @@ assert(retried, retryReason)
 T.equal(rosterContains(failedRecord.id), true, "retry repairs rollback and recruits")
 
 local player = env.getPlayer()
+local debugCompanion = assert(PNC.ServerDebugCommandHandler.Spawn(env.getPlayer(), {
+    tacticalClass = "colonist", archetypeID = "Mechanic",
+    x = 100, y = 104, z = 0,
+}))
+local debugCompanionID = debugCompanion.id
+checkRecruitment(debugCompanion, assert(reg2:Get(debugCompanionID)), debugCompanionID)
+T.equal(rosterContains(debugCompanionID), true, "debug spawn enters the real Colonists roster")
+
 local starterTraits = PNC.StartingCompanionTraits.IDS
 player.getCharacterTraits = function()
     return { getKnownTraits = function() return { starterTraits.FRIEND, starterTraits.BROTHER } end }
@@ -694,16 +703,16 @@ for _, trait in ipairs({ starterTraits.FRIEND, starterTraits.BROTHER }) do
     T.equal(rosterContains(id), true, "each starter is canonically rostered")
 end
 
-local legacy = PNC.Types.NewRecord({
-    id = "legacy_migration_npc", displayName = "Legacy Migration",
+local localRecord = PNC.Types.NewRecord({
+    id = "local_persistence_npc", displayName = "Local Persistence",
     x = 100, y = 102, z = 0,
 })
-assert(PNC.Registry.AddRecord(legacy))
-local legacyKey = PNC.Registry.Internal.StorageKeyForID(legacy.id)
+assert(PNC.Registry.AddRecord(localRecord))
+local localKey = PNC.Registry.Internal.StorageKeyForID(localRecord.id)
 
 for _, onSave in ipairs(env.getEvents().OnSave or {}) do onSave() end
 local recruitedStores = env.getStores()
-T.truthy(recruitedStores[legacyKey], "old-format source is present awaiting migration")
+T.truthy(recruitedStores[localKey], "local record saves under its own key")
 env.resetModuleCache()
 env.installGlobals(recruitedStores)
 require "PsychopatzCore/Profiler/PsychopatzProfilerBootstrap"
@@ -717,23 +726,30 @@ for _, fn in ipairs(env.getEvents().OnServerStarted or {}) do fn() end
 local recovered = assert(PNC.Registry.Get(recruited.id)
     or PNC.Persistence.CoreProvider.PromoteCoreActor(recruitedID, PsychopatzCore))
 checkRecruitment(recovered, assert(reloadedActors.Get(recruitedID)))
+T.equal(recovered.equipment.worn.Shirt, "Base.Shirt_FormalWhite",
+    "recruited companion wears the same shirt after world reload")
 T.equal(recovered.ownerUsername, owner)
 T.equal(recovered.ownerCharacterUUID, ownerCharacter)
 T.equal(recovered.orderSpec.kind, "follow")
 T.equal(rosterContains(recovered.id), true, "reloaded canonical member appears in Colonists")
+local recoveredDebugCompanion = assert(PNC.Registry.Get(debugCompanionID))
+checkRecruitment(recoveredDebugCompanion, assert(reloadedActors.Get(debugCompanionID)), debugCompanionID)
+T.equal(rosterContains(debugCompanionID), true, "debug colonist remains rostered after reload")
 for _, id in ipairs(starterIDs) do
     local record = assert(PNC.Registry.Get(id))
     checkRecruitment(record, assert(reloadedActors.Get(id)), id)
     T.equal(record.orderSpec.kind, "follow")
     T.equal(rosterContains(id), true, "starter remains a colonist after reconnect")
 end
-local loadedLegacy = assert(PNC.Registry.Get(legacy.id))
-PNC.Registry.FlushDirty({ mode = "pump", maxRecords = 64, now = env.now() })
-T.equal(loadedLegacy.coreBacked, true, "bounded pump adopts legacy NPC")
-T.truthy(recruitedStores[legacyKey], "legacy data remains before durable save")
+local loadedLocal = assert(PNC.Registry.Get(localRecord.id))
+local adopted, adoptionReason =
+    PNC.Persistence.CoreProvider.EnsureActor(loadedLocal, PsychopatzCore)
+T.falsy(adopted, "persisted local record cannot be adopted into Core")
+T.equal(adoptionReason, "local_record_already_persisted")
+PNC.Registry.MarkDirty(loadedLocal, "test_local_record_update")
 for _, onSave in ipairs(env.getEvents().OnSave or {}) do onSave() end
-T.equal(recruitedStores[legacyKey], nil, "legacy data retired after Core save")
-T.truthy(reloadedActors.Get(legacy.id), "legacy actor is now canonical")
+T.falsy(PNC.Registry.DirtyByID[localRecord.id], "world save flushes the local update")
+T.falsy(reloadedActors.Get(localRecord.id), "world save does not migrate local records")
 local dismissed, dismissReason = PNC.ColonistDeparture.Depart(recovered, "manual", {
     player = env.getPlayer(),
 })
@@ -774,8 +790,8 @@ T.equal(dismissedRecord.ownerUsername, nil)
 T.equal(dismissedRecord.ownerCharacterUUID, nil)
 T.falsy(dismissedRecord.orderSpec.kind == "follow")
 T.equal(rosterContains(recruitedID), false, "dismissal survives roster reconstruction")
-T.truthy(finalActors.Get(legacy.id), "migrated actor survives a fresh reload")
-T.equal(dismissedStores[legacyKey], nil, "legacy retirement is idempotent")
+T.falsy(finalActors.Get(localRecord.id), "restart does not migrate local records")
+T.truthy(dismissedStores[localKey], "local record remains owned by local persistence")
 
 
 T.finish("pnc_lightweight_persistence_authority_smoke")

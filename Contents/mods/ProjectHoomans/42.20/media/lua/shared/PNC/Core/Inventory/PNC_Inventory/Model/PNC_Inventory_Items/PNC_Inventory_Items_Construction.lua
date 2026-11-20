@@ -1,6 +1,7 @@
 local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
 local Portable = require "PsychopatzCore/Inventory/PsychopatzPortableItemState"
+local Appearance = require "PNC/Core/Identity/PNC_Identity_Appearance"
 local FACTION_DOGTAG_TYPE = "Base.Necklace_DogTag"
 local FACTION_DOGTAG_TEMPLATE_KEY = "tmpl:faction_dogtag:0"
 local FACTION_DOGTAG_VERSION = 1
@@ -125,7 +126,18 @@ local function attachItem(inv, item)
     elseif item.bagContainer then
         Internal.ensureContainer(inv, item.bagContainer, 0)
     end
-    if item.wornSlot then inv.worn[item.wornSlot] = item.id end
+    if item.wornSlot then
+        for slot, itemID in pairs(inv.worn) do
+            if Appearance.WornSlotsConflict(item.wornSlot, slot) then
+                local displaced = inv.items[itemID]
+                if displaced and displaced ~= item then
+                    displaced.wornSlot = nil
+                end
+                inv.worn[slot] = nil
+            end
+        end
+        inv.worn[item.wornSlot] = item.id
+    end
     if item.attachedSlot then inv.attached[item.attachedSlot] = item.id end
     if item.equipSlot == "primary" then
         inv.equipped.primary = item.id
