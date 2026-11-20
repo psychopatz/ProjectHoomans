@@ -113,7 +113,8 @@ local function targetCoordinates(target)
     end
     return tonumber(object and readMethod(object, "getX") or target.x),
         tonumber(object and readMethod(object, "getY") or target.y),
-        tonumber(object and readMethod(object, "getZ") or target.z)
+        tonumber(object and readMethod(object, "getZ") or target.z),
+        object
 end
 
 function Effects.BuildShotPayload(record, shooter, target, weaponItem)
@@ -122,6 +123,7 @@ function Effects.BuildShotPayload(record, shooter, target, weaponItem)
     local tx
     local ty
     local tz
+    local targetBody
     local payload
     local startedAt = nowMs()
     logFirearmAudit("payload_build_start", record, nil,
@@ -143,7 +145,8 @@ function Effects.BuildShotPayload(record, shooter, target, weaponItem)
     runtime = record.runtime or {}
     record.runtime = runtime
     runtime.firearmShotSequence = (tonumber(runtime.firearmShotSequence) or 0) + 1
-    tx, ty, tz = targetCoordinates(target)
+    tx, ty, tz, targetBody = targetCoordinates(target)
+    local groundTarget = PNC.CombatUnarmed and PNC.CombatUnarmed.IsGroundTarget
     payload = {
         shotId = table.concat({
             tostring(record.id),
@@ -162,6 +165,7 @@ function Effects.BuildShotPayload(record, shooter, target, weaponItem)
         ty = ty,
         tz = tz,
         targetKind = target and tostring(target.kind or "") or nil,
+        targetOnFloor = targetBody and groundTarget and groundTarget(targetBody) or nil,
         tacticalClass = record.tacticalClass,
         factionID = record.affiliation and record.affiliation.factionID or nil,
         hostilityMode = record.hostility and record.hostility.mode or nil,

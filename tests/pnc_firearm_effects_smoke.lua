@@ -332,6 +332,7 @@ selfPayload.shotId = "npc_modded_rifle:self:1:1100"
 selfPayload.tx = 10
 selfPayload.ty = 20
 selfPayload.tz = 0
+selfPayload.targetKind = nil
 selfPayload.projectileCount = 1
 selfPayload.projectileSpread = 0
 T.equal(PNC.ClientFirearmEffects.Play(selfPayload), true,
@@ -340,6 +341,56 @@ T.truthy(math.abs(PNC.ClientFirearmEffects.ActiveTracers[1].dx - 0.6) < 0.001,
     "self-targeted tracer follows the NPC forward screen X")
 T.truthy(math.abs(PNC.ClientFirearmEffects.ActiveTracers[1].dy - 0.8) < 0.001,
     "self-targeted tracer follows the NPC forward screen Y")
+do
+    local effects = PNC.ClientFirearmEffects
+    effects.Reset()
+    anchorAvailable = false
+    local groundedBody = {
+        getX = function() return 45 end,
+        getY = function() return 22 end,
+        getZ = function() return 0 end,
+    }
+    PNC.CombatUnarmed = { IsGroundTarget = function(target)
+        return target == groundedBody
+    end }
+    local grounded = assert(PNC.FirearmEffects.BuildShotPayload(record, shooter, {
+        kind = "zombie", worldObject = groundedBody,
+    }, weapon))
+    T.equal(grounded.targetOnFloor, true, "authoritative shot captures target posture")
+    grounded.projectileCount = 1
+    local project = ISCoordConversion.ToScreen
+    local cameraX = 0
+    getCameraOffX = function() return cameraX end
+    ISCoordConversion.ToScreen = function(x, y, z)
+        local screenX, screenY = project(x, y, z)
+        return screenX - cameraX, screenY
+    end
+    local startLine = #renderLines
+    local beforeNative = nativeTracerCalls
+    T.truthy(effects.Play(grounded), "grounded shot plays without a nameplate anchor")
+    T.equal(nativeTracerCalls, beforeNative, "grounded tracer uses the low screen endpoint")
+    T.equal(#effects.ActiveTracers, 1, "one projectile uses one visual")
+    local tracer = effects.ActiveTracers[1]
+    local targetX, targetY = project(45, 22, 0.10)
+    T.equal(tracer.endX, targetX, "endpoint uses the target's position")
+    T.equal(tracer.endY, targetY, "endpoint stays near the floor")
+    effects.OnPreUIDraw()
+    cameraX = 17
+    for _ = 1, 12 do effects.OnPreUIDraw() end
+    T.equal(#effects.ActiveTracers, 0, "tracer expires when it reaches the target")
+    local first, second, last = renderLines[startLine + 1],
+        renderLines[startLine + 2], renderLines[#renderLines]
+    T.equal(second.x1 + cameraX, first.x2, "camera pan keeps adjoining segments joined")
+    T.equal(second.y1, first.y2, "segments have no random height changes")
+    T.equal(last.x2, math.floor(targetX - cameraX), "last segment stops at target X")
+    T.equal(last.y2, math.floor(targetY), "last segment stops at target height")
+    T.equal(#renderLines - startLine, math.ceil(tracer.distance / tracer.step),
+        "renderer submits no segments beyond impact")
+    ISCoordConversion.ToScreen = project
+    getCameraOffX = nil
+    anchorAvailable = true
+end
+
 PNC.ClientFirearmEffects.Reset()
 lightCreated = 0
 
@@ -379,7 +430,7 @@ cappedPayload.shotId = "npc_modded_rifle:remote:3:1100"
 cappedPayload.projectileCount = 16
 T.equal(PNC.ClientFirearmEffects.Play(cappedPayload), true,
     "high-count fallback shot rendered")
-T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 8,
+T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 5,
     "fallback visual projectile budget caps a high-count shot")
 T.equal(lightCreated, 2,
     "fallback light budget limits world lights in a burst")

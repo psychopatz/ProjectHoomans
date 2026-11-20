@@ -132,17 +132,24 @@ local function targetIsShooter(body, payload)
     local bodyY
     local targetX = tonumber(payload and payload.tx)
     local targetY = tonumber(payload and payload.ty)
-    if not body or not targetX or not targetY then return false end
+    if not body or payload.targetKind or not targetX or not targetY then return false end
     bodyX, bodyY = bodyWorldPosition(body, payload)
     return bodyX and bodyY
         and math.abs(targetX - bodyX) <= 0.25
         and math.abs(targetY - bodyY) <= 0.25
 end
 
+local function resolveTargetScreen(body, payload)
+    local x = tonumber(payload and payload.tx)
+    local y = tonumber(payload and payload.ty)
+    if not x or not y or targetIsShooter(body, payload) then return nil, nil end
+    local z = tonumber(payload.tz) or tonumber(payload.sz) or 0
+    -- Target coordinates are tile positions. Keep grounded impacts just above the floor.
+    if payload.targetOnFloor == true then z = z + 0.10 end
+    return projectToScreen(x, y, z)
+end
+
 local function resolveScreenDirection(body, payload, muzzleX, muzzleY, muzzleZ)
-    local targetX = tonumber(payload and payload.tx)
-    local targetY = tonumber(payload and payload.ty)
-    local targetZ = tonumber(payload and payload.tz) or 0
     local bodyX
     local bodyY
     local bodyZ
@@ -151,25 +158,19 @@ local function resolveScreenDirection(body, payload, muzzleX, muzzleY, muzzleZ)
     local originZ
     local originScreenX
     local originScreenY
-    local targetScreenX
-    local targetScreenY
+    local targetScreenX, targetScreenY = resolveTargetScreen(body, payload)
     local dx
     local dy
     local forwardX
     local forwardY
     local direction
-    if targetX and targetY and not targetIsShooter(body, payload) then
+    if targetScreenX and targetScreenY then
         bodyX, bodyY, bodyZ = bodyWorldPosition(body, payload)
         originX = tonumber(muzzleX) or bodyX
         originY = tonumber(muzzleY) or bodyY
         originZ = tonumber(muzzleZ) or bodyZ
         originScreenX, originScreenY = projectToScreen(originX, originY, originZ)
-        targetScreenX, targetScreenY = projectToScreen(
-            targetX,
-            targetY,
-            targetZ
-        )
-        if originScreenX and originScreenY and targetScreenX and targetScreenY then
+        if originScreenX and originScreenY then
             dx = targetScreenX - originScreenX
             dy = targetScreenY - originScreenY
             if math.abs(dx) + math.abs(dy) > 0.001 then
@@ -224,6 +225,7 @@ Effects.Internal.ScreenGeometry = {
     angleRadians = angleRadians,
     normalizeScreen = normalizeScreen,
     resolveScreenDirection = resolveScreenDirection,
+    resolveTargetScreen = resolveTargetScreen,
     resolveMuzzleScreen = resolveMuzzleScreen,
     getTracerColor = getTracerColor,
     hasLiveAnchor = hasLiveAnchor,

@@ -4,16 +4,16 @@ if not Effects then return end
 local Internal = Effects.Internal or {}
 local Deps = Internal.ProjectileVisualDeps or {}
 local Geometry = Internal.ScreenGeometry or {}
-local readMethod = Deps.readMethod
 local MAX_FALLBACK_TRACERS = Deps.MAX_FALLBACK_TRACERS
 local MAX_VISIBLE_TRACERS_PER_SHOT = Deps.MAX_VISIBLE_TRACERS_PER_SHOT
 local MAX_MUZZLE_FLASHES = Deps.MAX_MUZZLE_FLASHES
 local TRACER_TTL = Deps.TRACER_TTL
+local TRACER_SCREEN_LENGTH = Deps.TRACER_SCREEN_LENGTH
 local MUZZLE_FLASH_TTL = Deps.MUZZLE_FLASH_TTL
 local MUZZLE_FLASH_LENGTH = Deps.MUZZLE_FLASH_LENGTH
 
 local angleRadians = Geometry.angleRadians
-local normalizeScreen = Geometry.normalizeScreen
+local resolveTargetScreen = Geometry.resolveTargetScreen
 local resolveScreenDirection = Geometry.resolveScreenDirection
 local resolveMuzzleScreen = Geometry.resolveMuzzleScreen
 local getTracerColor = Geometry.getTracerColor
@@ -60,68 +60,69 @@ local function addMuzzleFlash(body, payload, muzzleX, muzzleY, muzzleZ)
 end
 
 local function addTracer(body, payload, muzzleX, muzzleY, muzzleZ)
+    local tracers = Effects.ActiveTracers
+    local available = MAX_FALLBACK_TRACERS - #tracers
+    if available <= 0 then return 0 end
     local sx = tonumber(muzzleX) or tonumber(payload.sx)
     local sy = tonumber(muzzleY) or tonumber(payload.sy)
     local sz = tonumber(muzzleZ) or tonumber(payload.sz) or 0
-    local count = math.max(1, math.min(16, math.floor(tonumber(payload.projectileCount) or 1)))
-    local visualCount = math.min(count, MAX_VISIBLE_TRACERS_PER_SHOT)
-    local spread = math.max(0, tonumber(payload.projectileSpread) or 0)
-    local startX
-    local startY
-    local anchorSource
-    local directionX
-    local directionY
-    local directionRadians
-    local projectileDirection
-    local dx
-    local dy
-    local centered
-    local normalized
-    local jitter
-    local color = getTracerColor(payload)
-    local added = 0
-    local i
     if not sx or not sy then return 0 end
-    startX, startY, anchorSource = resolveMuzzleScreen(body, payload, sx, sy, sz)
+    local startX, startY, anchorSource = resolveMuzzleScreen(body, payload, sx, sy, sz)
     if not startX or not startY then return 0 end
-    directionX, directionY = resolveScreenDirection(
-        body,
-        payload,
-        sx,
-        sy,
-        sz
-    )
-    directionRadians = angleRadians(directionY, directionX)
+
+    local targetX, targetY = resolveTargetScreen(body, payload)
+    local directionX, directionY, distance
+    if targetX and targetY then
+        local dx, dy = targetX - startX, targetY - startY
+        distance = math.sqrt(dx * dx + dy * dy)
+        if distance <= 0.001 then return 0 end
+        directionX, directionY = dx / distance, dy / distance
+    else
+        directionX, directionY = resolveScreenDirection(body, payload, sx, sy, sz)
+        distance = TRACER_SCREEN_LENGTH * 2
+        targetX, targetY = startX + directionX * distance, startY + directionY * distance
+    end
+
+    local count = math.max(1, math.floor(tonumber(payload.projectileCount) or 1))
+    local visualCount = math.min(count, MAX_VISIBLE_TRACERS_PER_SHOT, available)
+    local spread = math.rad(math.min(89, math.max(0, tonumber(payload.projectileSpread) or 0)))
+    if spread == 0 then visualCount = 1 end
+    local angle = visualCount > 1 and angleRadians(directionY, directionX) or nil
+    local step = math.max(TRACER_SCREEN_LENGTH, distance / TRACER_TTL)
+    local color = getTracerColor(payload)
+    local cameraX = getCameraOffX and getCameraOffX() or 0
+    local cameraY = getCameraOffY and getCameraOffY() or 0
     for i = 1, visualCount do
-        if #Effects.ActiveTracers >= MAX_FALLBACK_TRACERS then break end
-        centered = i - ((visualCount + 1) * 0.5)
-        normalized = centered / math.max(1, (visualCount - 1) * 0.5)
-        jitter = ZombRandFloat and ZombRandFloat(-0.3, 0.3) or 0
-        projectileDirection = directionRadians * 180 / math.pi
-            + (normalized * spread) + jitter
-        dx, dy = normalizeScreen(
-            math.cos(projectileDirection * math.pi / 180),
-            math.sin(projectileDirection * math.pi / 180),
-            1,
-            0
-        )
-        color = getTracerColor(payload)
-        Effects.ActiveTracers[#Effects.ActiveTracers + 1] = {
+        local dx, dy = directionX, directionY
+        local endX, endY = targetX, targetY
+        local heading
+        if angle then
+            local offset = (i - (visualCount + 1) * 0.5) / ((visualCount - 1) * 0.5)
+            heading = angle + offset * spread
+            if offset ~= 0 then
+                dx, dy = math.cos(heading), math.sin(heading)
+                endX, endY = startX + dx * distance, startY + dy * distance
+            end
+        end
+        tracers[#tracers + 1] = {
             x = startX,
             y = startY,
+            endX = endX,
+            endY = endY,
             dx = dx,
             dy = dy,
-            direction = projectileDirection,
-            altitudeVariation = ZombRandFloat and ZombRandFloat(-10, 10) or 0,
+            direction = heading,
+            distance = distance,
+            step = step,
+            traveled = 0,
+            cameraX = cameraX,
+            cameraY = cameraY,
             anchorSource = anchorSource,
             auditPayload = payload,
-            tick = 1,
-            ttl = TRACER_TTL,
             color = color,
         }
-        added = added + 1
     end
-    return added
+    return visualCount
 end
 
 local function playImpact(payload)

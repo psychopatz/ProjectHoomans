@@ -118,6 +118,8 @@ end
 
 local function resolveRange(body, weapon, payload)
     local range = tonumber(readMethod(weapon, "getMaxRange", body))
+        or tonumber(payload and payload.maxRange)
+    if range and range > 0 then return math.max(1, range) end
     local sx = tonumber(body and readMethod(body, "getX"))
         or tonumber(payload and payload.sx)
     local sy = tonumber(body and readMethod(body, "getY"))
@@ -127,53 +129,25 @@ local function resolveRange(body, weapon, payload)
     local tx = tonumber(payload and payload.tx)
     local ty = tonumber(payload and payload.ty)
     local tz = tonumber(payload and payload.tz) or sz
-    range = range or tonumber(payload and payload.maxRange)
-    if (not range or range <= 0) and sx and sy and sz and tx and ty and tz then
+    if sx and sy and sz and tx and ty and tz then
         range = distanceBetween(sx, sy, sz, tx, ty, tz)
     end
     return math.max(1, range or 30)
 end
 
-local function resolveEndpoint(body, payload, projectileIndex, projectileCount, spread)
-    local sx = tonumber(body and readMethod(body, "getX"))
-        or tonumber(payload and payload.sx)
-    local sy = tonumber(body and readMethod(body, "getY"))
-        or tonumber(payload and payload.sy)
-    local sz = tonumber(body and readMethod(body, "getZ"))
-        or tonumber(payload and payload.sz)
-    local tx = tonumber(payload and payload.tx)
-    local ty = tonumber(payload and payload.ty)
-    local tz = tonumber(payload and payload.tz)
-    local dx
-    local dy
-    local length
-    local centered
-    local normalized
-    local spreadAngle
-    local lateralOffset
-    if not sx or not sy or not sz or not tx or not ty or not tz then
-        return nil, nil, nil
-    end
-    if projectileCount <= 1 or (tonumber(spread) or 0) <= 0 then
-        return tx, ty, tz
-    end
-    dx = tx - sx
-    dy = ty - sy
-    length = math.sqrt((dx * dx) + (dy * dy))
-    if length <= 0.0001 then return tx, ty, tz end
-    centered = projectileIndex - ((projectileCount + 1) * 0.5)
-    normalized = centered / math.max(1, (projectileCount - 1) * 0.5)
-    spreadAngle = math.max(0, math.min(89, tonumber(spread) or 0))
-    lateralOffset = math.tan(spreadAngle * math.pi / 180) * length * normalized
-    return tx - ((dy / length) * lateralOffset),
-        ty + ((dx / length) * lateralOffset), tz
+local function spreadOffsets(body, payload, targetX, targetY, spread)
+    local sx = tonumber(readMethod(body, "getX")) or tonumber(payload.sx)
+    local sy = tonumber(readMethod(body, "getY")) or tonumber(payload.sy)
+    if not sx or not sy then return 0, 0 end
+    local scale = math.tan(math.rad(math.min(89, spread)))
+    return (sy - targetY) * scale, (targetX - sx) * scale
 end
 
 local function projectileCount(body, weapon, payload)
     local count = tonumber(readMethod(weapon, "getProjectileCount"))
         or tonumber(payload and payload.projectileCount)
         or 1
-    return math.max(1, math.min(32, math.floor(count)))
+    return math.max(1, math.min(5, math.floor(count)))
 end
 
 local function withNativeWeapon(body, weapon, callback)
@@ -233,13 +207,9 @@ function Native.PlayTracer(body, weapon, payload)
     local range
     local count
     local spread
-    local hasEndpoint
     local added = 0
     local controller
     local i
-    local x
-    local y
-    local z
     local ok
     local effect
     local addEffect
@@ -259,10 +229,9 @@ function Native.PlayTracer(body, weapon, payload)
     spread = tonumber(readMethod(weapon, "getProjectileSpread"))
         or tonumber(payload and payload.projectileSpread)
         or 0
-    hasEndpoint = payload
-        and tonumber(payload.tx) ~= nil
-        and tonumber(payload.ty) ~= nil
-        and tonumber(payload.tz) ~= nil
+    local targetX = tonumber(payload and payload.tx)
+    local targetY = tonumber(payload and payload.ty)
+    local targetZ = tonumber(payload and payload.tz)
 
     local function emit()
         controller = readMethod(body, "getBallisticsController")
@@ -272,11 +241,20 @@ function Native.PlayTracer(body, weapon, payload)
             controller = readMethod(body, "getBallisticsController")
         end
         if not controller then return false, "ballistics_controller_missing" end
-        if hasEndpoint then
+        if targetX and targetY and targetZ then
+            local spreadX, spreadY = 0, 0
+            if count > 1 and spread > 0 then
+                spreadX, spreadY = spreadOffsets(body, payload, targetX, targetY, spread)
+            else
+                count = 1
+            end
+            local center = (count + 1) * 0.5
+            local scale = math.max(1, (count - 1) * 0.5)
             local function emitEndpointEffects()
                 for i = 1, count do
-                    x, y, z = resolveEndpoint(body, payload, i, count, spread)
-                    effect = addEffect(tracer, body, range, x, y, z)
+                    local offset = (i - center) / scale
+                    effect = addEffect(tracer, body, range,
+                        targetX + spreadX * offset, targetY + spreadY * offset, targetZ)
                     if effect then added = added + 1 end
                 end
             end

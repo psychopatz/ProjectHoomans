@@ -133,4 +133,9 @@ T.equal(animationReadinessProbes, 0, "capability inspection probed opaque Animat
 
 T.falsy(Effects.Play(payload), "duplicate firearm shot was replayed")
 T.equal(#tracerCalls, 3, "duplicate shot created additional native tracers")
+
+weapon.getProjectileCount = function() return 32 end
+payload.shotId = "custom-weapon-visual-budget"
+T.truthy(Effects.Play(payload), "high-count native shot plays")
+T.equal(#tracerCalls, 8, "native visual work is capped at five tracers per shot")
 T.finish("pnc_client_native_firearm_effects_smoke")

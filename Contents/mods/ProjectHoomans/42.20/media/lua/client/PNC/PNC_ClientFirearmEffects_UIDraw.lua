@@ -12,7 +12,6 @@ end
 
 local Diagnostics = Deps.Diagnostics
 local SCREEN_CULL_MARGIN = Deps.SCREEN_CULL_MARGIN
-local TRACER_SCREEN_LENGTH = Deps.TRACER_SCREEN_LENGTH
 local MUZZLE_FLASH_LENGTH = Deps.MUZZLE_FLASH_LENGTH
 local MUZZLE_FLASH_COLOR = Deps.MUZZLE_FLASH_COLOR
 local MUZZLE_CORE_COLOR = Deps.MUZZLE_CORE_COLOR
@@ -35,12 +34,14 @@ local function lineVisible(x1, y1, x2, y2, screenWidth, screenHeight)
 end
 
 local function render()
+    local tracers = Effects.ActiveTracers
+    local flashes = Effects.ActiveMuzzleFlashes
+    if #tracers == 0 and #flashes == 0 then return end
     local renderer = getRenderer and getRenderer() or nil
     local texture = Effects.Texture
     local renderline
     local i
     local flash
-    local tracer
     local alpha
     local zoom
     local length
@@ -48,16 +49,9 @@ local function render()
     local y
     local tipX
     local tipY
-    local stepLength
-    local stepX
-    local stepY
     local screenWidth
     local screenHeight
     local core
-    local x1
-    local y1
-    local x2
-    local y2
     if isIngameState and not isIngameState() then
         logDrawBlocked("not_ingame")
         return
@@ -79,7 +73,8 @@ local function render()
         logDrawBlocked("renderline_unavailable")
         return
     end
-    if Diagnostics and Diagnostics.FirearmAuditEnabled == true then
+    local audit = Diagnostics and Diagnostics.FirearmAuditEnabled == true
+    if audit then
         Effects.DrawAuditState = {}
     end
     zoom = 1
@@ -92,7 +87,6 @@ local function render()
         screenHeight = tonumber(readMethod(core, "getScreenHeight")) or 0
     end
     zoom = math.max(0.1, zoom)
-    stepLength = TRACER_SCREEN_LENGTH / zoom
 
     -- The muzzle fallback deliberately uses the same B42-safe renderline
     -- overload as the Bandits projectile. Two short colored lines make a
@@ -100,7 +94,7 @@ local function render()
     -- unavailable SpriteRenderer texture-draw callback overload.
     for i = #Effects.ActiveMuzzleFlashes, 1, -1 do
         flash = Effects.ActiveMuzzleFlashes[i]
-        if flash.drawAuditStarted ~= true then
+        if audit and flash.drawAuditStarted ~= true then
             logFirearmAudit("muzzle_draw_begin", flash.auditPayload,
                 "muzzleIndex=" .. tostring(i),
                 "activeMuzzleFlashes=" .. tostring(#Effects.ActiveMuzzleFlashes),
@@ -137,7 +131,7 @@ local function render()
                     MUZZLE_CORE_COLOR.b,
                     alpha
                 )
-                if flash.drawRendered ~= true then
+                if audit and flash.drawRendered ~= true then
                     logFirearmAudit("muzzle_renderline_complete", flash.auditPayload,
                         "muzzleIndex=" .. tostring(i),
                         "renderer=SpriteRenderer",
@@ -165,74 +159,55 @@ local function render()
         end
     end
 
-    -- Match Bandits' proven projectile motion: start at the unscaled
-    -- isometric screen coordinate, advance by a fixed screen-space step, and
-    -- apply zoom only at render time. This is visibly a flying trajectory,
-    -- rather than a line that fades in place between two ground points.
-    for i = #Effects.ActiveTracers, 1, -1 do
-        tracer = Effects.ActiveTracers[i]
-        if tracer.drawAuditStarted ~= true then
+    if #tracers == 0 then return end
+    local cameraX = getCameraOffX and getCameraOffX() or 0
+    local cameraY = getCameraOffY and getCameraOffY() or 0
+    for index = #tracers, 1, -1 do
+        local tracer = tracers[index]
+        local offsetX = tracer.cameraX - cameraX
+        local offsetY = tracer.cameraY - cameraY
+        local from = tracer.traveled
+        local to = math.min(from + tracer.step, tracer.distance)
+        local reached = to >= tracer.distance
+        local x1 = (tracer.x + tracer.dx * from + offsetX) / zoom
+        local y1 = (tracer.y + tracer.dy * from + offsetY) / zoom
+        local endX = (tracer.endX + offsetX) / zoom
+        local endY = (tracer.endY + offsetY) / zoom
+        local x2 = reached and endX or (tracer.x + tracer.dx * to + offsetX) / zoom
+        local y2 = reached and endY or (tracer.y + tracer.dy * to + offsetY) / zoom
+        local visible = lineVisible(x1, y1, x2, y2, screenWidth, screenHeight)
+        if audit and not tracer.drawAuditStarted then
             logFirearmAudit("draw_begin", tracer.auditPayload,
-                "tracerIndex=" .. tostring(i),
-                "activeTracers=" .. tostring(#Effects.ActiveTracers),
-                "ttl=" .. tostring(tracer.ttl or ""))
+                "tracerIndex=" .. tostring(index),
+                "activeTracers=" .. tostring(#tracers))
             tracer.drawAuditStarted = true
         end
-        if tracer.x and tracer.y and tracer.dx and tracer.dy then
-            x1 = tracer.x / zoom
-            y1 = tracer.y / zoom
-            stepX = math.floor(stepLength * tracer.dx)
-            stepY = math.floor(stepLength * tracer.dy)
-            x2 = x1 + stepX
-            y2 = y1 + stepY
-            alpha = math.max(0.2, 1.0 - (tracer.tick / tracer.ttl))
-            if lineVisible(
-                x1,
-                y1,
-                x2,
-                y2 - ((tonumber(tracer.altitudeVariation) or 0) / zoom),
-                screenWidth,
-                screenHeight
-            ) then
-                renderer:renderline(
-                    texture,
-                    math.floor(x1),
-                    math.floor(y1),
-                    math.floor(x2),
-                    math.floor(y2 - ((tonumber(tracer.altitudeVariation) or 0) / zoom)),
-                    tracer.color.r,
-                    tracer.color.g,
-                    tracer.color.b,
-                    alpha
-                )
-                if tracer.drawRendered ~= true then
-                    logFirearmAudit("draw_renderline_complete", tracer.auditPayload,
-                        "tracerIndex=" .. tostring(i),
-                        "renderer=SpriteRenderer",
-                        "x1=" .. tostring(math.floor(x1)),
-                        "y1=" .. tostring(math.floor(y1)),
-                        "x2=" .. tostring(math.floor(x2)),
-                        "y2=" .. tostring(math.floor(y2
-                            - ((tonumber(tracer.altitudeVariation) or 0) / zoom))))
-                    tracer.drawRendered = true
-                end
-                tracer.x = tracer.x + stepX
-                tracer.y = tracer.y + stepY
-                tracer.tick = tracer.tick + 1
-                if tracer.tick >= tracer.ttl then
-                    logFirearmAudit("draw_complete", tracer.auditPayload,
-                        "tracerIndex=" .. tostring(i),
-                        "rendered=true",
-                        "frames=" .. tostring(tracer.tick))
-                    table.remove(Effects.ActiveTracers, i)
-                end
-            else
-                logFirearmAudit("draw_complete", tracer.auditPayload,
-                    "tracerIndex=" .. tostring(i),
-                    "rendered=false",
-                    "culled=true")
-                table.remove(Effects.ActiveTracers, i)
+        if visible then
+            renderer:renderline(texture,
+                math.floor(x1), math.floor(y1), math.floor(x2), math.floor(y2),
+                tracer.color.r, tracer.color.g, tracer.color.b,
+                math.max(0.2, 1 - from / tracer.distance))
+            if audit and not tracer.drawRendered then
+                logFirearmAudit("draw_renderline_complete", tracer.auditPayload,
+                    "tracerIndex=" .. tostring(index),
+                    "x1=" .. tostring(x1), "y1=" .. tostring(y1),
+                    "x2=" .. tostring(x2), "y2=" .. tostring(y2))
+                tracer.drawRendered = true
             end
+        end
+        local culled = not visible and not lineVisible(
+            x2, y2, endX, endY, screenWidth, screenHeight)
+        if reached or culled then
+            if audit then
+                logFirearmAudit("draw_complete", tracer.auditPayload,
+                    "rendered=" .. tostring(tracer.drawRendered == true),
+                    "culled=" .. tostring(culled))
+            end
+            local last = #tracers
+            tracers[index] = tracers[last]
+            tracers[last] = nil
+        else
+            tracer.traveled = to
         end
     end
 end

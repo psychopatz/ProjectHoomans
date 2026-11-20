@@ -116,8 +116,10 @@ function Effects.Play(payload)
         "result=" .. tostring(audioResult),
         "sound=" .. tostring(payload.shotSound or ""),
         "shellSound=" .. tostring(payload.shellFallSound or ""))
-    if anchoredFallback then
-        nativeResult, nativeReason = false, "nameplate_anchor_preferred"
+    local screenTracer = anchoredFallback or payload.targetOnFloor == true
+        or not (tonumber(payload.tx) and tonumber(payload.ty) and tonumber(payload.tz))
+    if screenTracer then
+        nativeResult, nativeReason = false, "screen_endpoint_preferred"
     else
         nativeResult, nativeReason = NativeEffects.PlayTracer(body, weapon, payload)
     end
@@ -125,7 +127,7 @@ function Effects.Play(payload)
         "result=" .. tostring(nativeResult),
         "reason=" .. tostring(nativeReason or ""))
     if not nativeResult then
-        if not anchoredFallback then recordNativeFailure(nativeReason) end
+        if not screenTracer then recordNativeFailure(nativeReason) end
         if not x then
             x, y, z = getMuzzlePosition(body, weapon, payload)
         end
