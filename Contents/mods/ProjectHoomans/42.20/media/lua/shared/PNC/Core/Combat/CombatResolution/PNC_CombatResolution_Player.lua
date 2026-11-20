@@ -86,14 +86,43 @@ function Resolution.ApplyPlayerDamage(player, amount, attackType, weaponItem, hi
     end
     if not applied then return false end
     addPlayerWound(bodyPart, hit)
-    if bodyDamage and bodyDamage.Update then
-        bodyDamage:Update()
-    end
-    if type(sendPlayerStatsChange) == "function" then
-        sendPlayerStatsChange(player)
+    local serverInternal = PNC.Server and PNC.Server.Internal or nil
+    if serverInternal and serverInternal.InTick == true then
+        -- Coalesce native BodyDamage:Update() and sendPlayerStatsChange() to
+        -- once per damaged player per server tick. All authoritative damage
+        -- and wound mutations are already committed above.
+        Resolution.PendingPlayerSync = Resolution.PendingPlayerSync or {}
+        Resolution.PendingPlayerSync[player] = bodyDamage or true
+    else
+        if bodyDamage and bodyDamage.Update then
+            bodyDamage:Update()
+        end
+        if type(sendPlayerStatsChange) == "function" then
+            sendPlayerStatsChange(player)
+        end
     end
     hit.healthLoss = healthLoss
     return applied, hit
+end
+
+function Resolution.FlushPendingPlayerSync()
+    local pending = Resolution.PendingPlayerSync
+    if type(pending) ~= "table" then return 0 end
+    local flushed = 0
+    Resolution.PendingPlayerSync = {}
+    for player, bodyDamage in pairs(pending) do
+        if type(bodyDamage) == "table" and bodyDamage.Update then
+            bodyDamage:Update()
+        elseif player and player.getBodyDamage then
+            local bd = player:getBodyDamage()
+            if bd and bd.Update then bd:Update() end
+        end
+        if player and type(sendPlayerStatsChange) == "function" then
+            sendPlayerStatsChange(player)
+        end
+        flushed = flushed + 1
+    end
+    return flushed
 end
 
 return Resolution

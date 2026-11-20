@@ -51,6 +51,11 @@ local function desiredOrder(record, mode, owner, faction, preservePlayerOrder)
             or kind == Const.ORDER_PATROL
             or kind == Const.ORDER_TRAVEL
             or registeredJob ~= nil
+            or (
+                kind == Const.ORDER_FOLLOW
+                and current.ownerUsername == owner.username
+                and current.ownerOnlineID == owner.onlineID
+            )
         ) then
             return Core.DeepCopy(current)
         end

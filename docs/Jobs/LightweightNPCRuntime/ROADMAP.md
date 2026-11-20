@@ -85,7 +85,7 @@ Report Core actor count, Hoomans promoted-record count, live-body count, schedul
 
 Native SP/MP feel/capacity acceptance remains user-owned unless explicitly assigned.
 
-## L6 — live FollowOwner, combat-hit, abstract-travel/materialization, and inventory/ModData scale reproduction / root-cause optimization
+## L6 — live FollowOwner, combat-hit, abstract-travel/materialization, and inventory/ModData scale reproduction / root-cause optimization (DEVELOPER GATES COMPLETE — READY FOR USER_ACCEPTANCE)
 
 Native acceptance after L5 exposed severe remaining stutter while the player walks with a multi-companion follow group. Treat that as a developer-side regression gap, not as a reason to discard the accepted L0-L5 architecture.
 

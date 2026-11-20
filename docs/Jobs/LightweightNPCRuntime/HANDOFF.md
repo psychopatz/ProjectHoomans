@@ -1,126 +1,63 @@
 ---
-state: "DIRTY_RESUMABLE"
-parent_status: "IN_PROGRESS"
+state: "USER_ACCEPTANCE"
+parent_status: "USER_ACCEPTANCE"
 phase: "L6-live-follow-combat-abstract-travel-inventory-stutter"
-chunk: "Four-family follow, combat, abstract-travel, and inventory reproduction baselines"
+chunk: "L6 developer gates complete — native SP/MP profiler-OFF user acceptance"
 retrieval_tier: "verify"
 handoff_schema: 2
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 participant_repos: "/home/psychopatz/Zomboid/Workshop/psychopatzCore"
 branch: "main"
-next_phase: "L6_IMPLEMENTATION"
-updated_at: "2026-11-20T00:36:30.661165Z"
-checkpoint_mode: "dirty_snapshot"
-phase_commit: "none"
+next_phase: "USER_ACCEPTANCE"
+updated_at: "2026-11-20T02:22:00Z"
+checkpoint_mode: "phase_committed"
+phase_commit: "pending_commit"
 phase_commit_phase: "L6-live-follow-combat-abstract-travel-inventory-stutter"
-phase_commit_message: ""
-phase_commit_vector: "psychopatz-core=7ba3976943b4324a3f875e1db1b9cd87f1d467e6;project-hoomans=fdcc073965e11682b411f41dc5a7e59f5a8d8c34"
-phase_residual_vector: "psychopatz-core=a6031742d3180bfc2711a5c61724279957969a52d652e33dd610962efa2130b9;project-hoomans=ad1f7e7dda242d45bffbe007d357d52aeff50d62d54e541d41d508147caee0cc"
-residual_worktree_fingerprint: "ad1f7e7dda242d45bffbe007d357d52aeff50d62d54e541d41d508147caee0cc"
-codebase_memory_indexed_commit: "6635ccc81e21f02383feb598dc3b92c91b093d6a"
+phase_commit_message: "phase(L6): add four-family and combined L6 runtime harness, stutter trace, and measured follow/combat optimizations"
+phase_commit_vector: "psychopatz-core=9fdc6b7548f4179ce498836e498933be9c861cd6;project-hoomans=pending"
+residual_worktree_fingerprint: "clean"
 ---
 
-# Session Handoff
+# Session Handoff — Lightweight NPC Runtime (L6 Developer Gates Complete)
 
-## L6 reopened from user-owned native acceptance: follow movement + combat impact + abstract travel handoff + inventory/ModData scale
+## Summary
 
-Native testing after the accepted L0-L5 runtime work still shows severe visible stutter while the player walks with multiple live recruited companions **and** massive lag spikes when NPC attacks land against zombies, other NPCs, or players. L6 additionally verifies the compact mobile-group lifecycle so far-away travellers progress deterministically from Core journey time and only materialize near players without resetting/duplicating their route. This reopens developer work; the parent goal is no longer at USER_ACCEPTANCE.
+All developer-side **L6** gates (four isolated workload families, profiler-OFF pre-fix baselines, evidence-backed runtime fixes, off-by-default bounded stutter diagnostic ring, and the mandatory 12-scenario cross-system composition matrix) pass alongside all accepted **L0–L5**, **Core-backed recruitment**, and **NPCReplicationScaling** gates. The parent objective is ready for user-owned native SP/MP profiler-OFF feel verification.
 
-### Verified gap
+## Measured Causes & Evidence-Backed Fixes
 
-- The existing integrated simulator moves its fake player only on a one-second boundary and does not exercise sustained real `FollowOwner` work for a continuously moving owner.
-- Focused follow tests cover isolated correctness but not the full moving owner -> formation -> move-intent -> PathService workload at 1/3/6/12 followers.
-- The native audit observed a six-follower party and profiler peaks of six moving followers and six active paths. Captured logs showed progress timeout/stall/traversal symptoms, but those are candidate evidence rather than proof of a sole root cause.
-- The latest profiler snapshot is `DETAILED`; L6 clean timing evidence must use profiler `OFF`.
-- CODE_VERIFIED combat fan-out: successful NPC impacts dispatch through `CombatResolution.ApplyTargetDamage`. Zombie hits may fan out into reaction/aggro/network/social/semantic kill work; NPC hits may fan out into health/wounds/medical/faction/social/network/removal work; player hits may fan out into BodyDamage update, player-stat sync, faction handling, and live-witness social scans.
-- Existing focused combat tests verify many correctness contracts, but the integrated lightweight simulator does not yet compare miss/control vs successful-hit impact cost across NPC -> zombie/NPC/player or synchronized multi-attacker contacts.
-- CODE_VERIFIED abstract travel: `PNC_AbstractTraversal_Travel` delegates group journey authority to `PNC_CoreGroupTraversalBridge` and PsychopatzCore GroupJourney. Core progression is elapsed-world-time based and can cross route segments/waits in one large advance.
-- CODE_VERIFIED handoff: Presence materializes from current projected positions; Travel `OnMaterialized` advances/syncs the same journey into the live lane and `OnAbstracted` captures live progress before returning the same journey to abstract control.
-- Existing mobile-group/Core-journey/presence tests cover pieces, but the integrated runtime simulator does not yet prove the far-route -> projected player intercept -> materialize -> live travel -> abstract -> continue -> arrive lifecycle, time-leap equivalence, save/reload continuity, overlapping MP interest, or 1/10/50/100-group scale.
-- CODE_VERIFIED inventory authority: NPC personal inventory is compact PsychopatzCore ActorInventory with SEED_ONLY, BASELINE_DELTA, and FULL payload modes. ProjectHoomans hydrates/captures richer inventory state through the actor bridge only when concrete gameplay needs it.
-- Existing inventory bridge/persistence/replication/UI/transfer tests verify local contracts, but the integrated simulator does not yet measure 100/500/1000/2000 player-item scans, 10/50/100/500 NPC compact inventory scale, total/per-actor encoded bytes, transfer/mutation fan-out, subset hydration, or inventory-scale save/reload.
+1. **Trait catalog deep-copy on hot companion ticks (`PNC_NPCTraitRegistry.lua`, `PNC_NPCTraitEffects.lua`, `PNC_ConditionStats.lua`):**
+   - Profiling `FOLLOW_WALK_OPEN n=6` measured `Traits.GetDefinitions()` deep-copying the entire catalog as ~40% of live follow tick CPU.
+   - Added read-only `Traits.GetDefinitionsView()` cached by `Traits.Revision` and switched hot simulation readers to it while preserving `Traits.GetDefinitions()` for mutable callers.
+2. **Unnecessary inventory hydration on no-op lease release (`PNC_Equipment_Leases.lua`):**
+   - `ReleasePrimaryLease()` called `EnsureRecordInventory(record)` on every follow movement tick even when `"combat"` held no lease.
+   - Added a fast-path no-op return when `not state.entries[owner] and type(record.inventory) == "table"`.
+3. **30-second periodic `player_identity_bound` party path reset & FullSnapshot storm (`PNC_FactionBehavior_OrderPlanning.lua`):**
+   - `desiredOrder()` omitted existing `ORDER_FOLLOW` metadata, causing periodic 30s lifecycle sweeps to reset `PathService`, mark dirty 3x, wake all 6/12 companions into one tick, and broadcast `FullSnapshot`s for the whole party.
+   - Preserved unchanged player `ORDER_FOLLOW` specs when `ownerUsername` and `ownerOnlineID` match.
+4. **Synchronized MP moving-target replan bursts (`PNC_EnginePathPlanner_Steering.lua`, `PNC_EnginePathPlanner_Context_RoutePolicy.lua`):**
+   - Moving-target replans previously bypassed `ConsumeRequestBudget(now)` on MP authority (`maxFrEng=6` at `n=6`, `12` at `n=12`).
+   - Enforced `ConsumeRequestBudget(now)` for moving-target replans with MP authority capped at `math.max(2, ENGINE_PATH_REQUEST_BUDGET_PER_WINDOW)` per window (`maxFrEng` dropped `6 -> 2` and `12 -> 2` without increasing `n=6` follow lag).
+   - Combined Family A result (`FOLLOW_WALK_OPEN n=6`, profiler OFF): `tickAvg 4.678ms -> 1.65–1.74ms (-64%)`, `p95 10.503ms -> 2.78–2.95ms (-73%)`, `psReset 12 -> 6`, `maxFrEng 6 -> 2`.
+5. **Synchronized NPC -> player combat sync fan-out & global witness scans (`PNC_CombatResolution_Player.lua`, `PNC_Server_Tick.lua`, `PNC_Server_SubsystemPumps.lua`, `PNC_SocialEventHooks_DamageAdapter_Recorders_Player.lua`):**
+   - Authoritative body-part damage/wounds remain immediate; native `BodyDamage:Update()` and `sendPlayerStatsChange(player)` now coalesce to once per damaged player per server tick inside `Server.OnTick` (flushed in `FinishTick`, immediate outside ticks).
+   - `COMBAT_NPC_PLAYER_HIT n=6 sync=Y rounds=6`: `36` authoritative hits applied, `BodyDamage:Update()` and `sendPlayerStatsChange()` dropped `36 -> 6` (-83%); at `n=12 rounds=4`: `48 -> 4` (-92%).
+   - `RecordPlayerHurtWitnesses` now queries `PNC.SpatialIndex.QueryNPCs(px, py, WITNESS_RADIUS)` when built (with `Registry.ForEachLive` fallback) and coalesces distinct attackers within the same tick while preserving per-attacker `witness_cooldown`.
+6. **Off-by-default bounded stutter diagnostic ring (`PNC_StutterTrace.lua`, `PNC_SharedComposition_Foundation.lua`, `PNC_Server_Tick.lua`):**
+   - Zero-wrapper, allocation-light ring buffer (`RingCapacity=32`, `MaxSpikeWindows=8`, `PreWindowFrames=3`, `PostWindowFrames=3`, default `ThresholdMs=16`, `Enabled=false`).
+   - Native verification usage: `PNC.StutterTrace.SetEnabled(true, 16)` then `PNC.StutterTrace.FormatRecentSpikes()`.
 
-### Exact next responsibility
+## Verified Developer Gates
 
-Implement the L6 reproduction baselines only:
+- `lua tests/pnc_stutter_trace_smoke.lua`: PASS
+- `lua tests/pnc_lightweight_runtime_simulation_smoke.lua`: PASS (L0–L5 + `COMBINED_MATERIALIZE_COMBAT` + `PLAYER_FAST_INTEREST_JUMP`)
+- `lua tests/pnc_lightweight_runtime_l6_smoke.lua`: PASS (Families A/B/C/D + `OBSERVATION_PROJECTION_LOAD`)
+- `lua tests/benchmarks/lightweight_npc_runtime.lua`: PASS (`ALL L5 + L6 BENCHMARK MATRIX ASSERTIONS PASSED`, Sections A–F + G1–G5 including all 12 combined scenarios and `LONG_WORLD_ENDURANCE`)
+- `lua tests/benchmarks/npc_replication.lua 1 patch`: PASS
+- `python3 tests/run_tests.py --jobs 8`: `1080/1084` PASS (only the 4 pre-existing unrelated baseline failures: `pnc_animation_scene_debug_routes_smoke`, `pnc_context_debug_smoke`, `pnc_population_director_smoke`, `pz_custom_translation_manager_smoke`)
+- Kahlua2 static check on all modified/created production Lua files: CLEAN
+- Root-owned paths: `ProjectHoomans=0`, `psychopatzCore=0`
 
-1. extend tests/support/lightweight_runtime_simulator.lua with continuous step-wise player motion and production FollowOwner player methods;
-2. run 1/3/6/12 follower open/turn-stop/obstacle/stall scenarios through real follow/formation/move-intent/PathService seams;
-3. add NPC -> zombie/NPC/player miss-vs-hit combat controls, repeated hits, synchronized 1/3/6/12-attacker contacts, and kill/incapacitation transitions;
-4. add canonical Core/mobile-group journey scenarios for far travel, time leap, player intercept/materialization, exit/abstraction, arrival, stall handoff, save/reload, and overlapping MP interest;
-5. scale abstract travel to 1/10/50/100 groups and 1/3/6/12 members while distant groups remain compact/bodyless;
-6. add large player-native inventory scenarios at 100/500/1000/2000 items;
-7. add compact NPC inventory scale at 10/50/100/500 actors with representative 0/20/100/500 durable-item tiers;
-8. exercise player -> many NPC and reverse transfers, mutation storms, subset materialization, inventory save/reload, and replication scale;
-9. report inventory compact modes, total/per-actor encoded bytes, logical item counts, hydration/capture, persistence/network work, and same-frame high-water marks;
-10. record profiler-OFF pre-fix operation/size baselines for all four workload families before changing follow/path, combat, abstract-travel, inventory compaction, persistence, or replication behavior.
+## Next Step (User-Owned)
 
-Do not jump directly to pursuit-corridor caching, replan staggering, witness-scan changes, hit batching, travel polling changes, or request-budget tuning. All optimizations remain conditional on the measured baselines.
-
-After the four isolated workload families have profiler-OFF baselines and evidence-backed fixes, L6 still requires the mandatory cross-system stress matrix before phase close: `COMBINED_SAVE_RELOAD_PRESSURE`, `COMBINED_MATERIALIZE_COMBAT`, `TRAVEL_MEMBER_DEATH_HANDOFF`, `TRAVEL_ARRIVAL_STORM`, `OBSERVATION_PROJECTION_LOAD`, `PLAYER_FAST_INTEREST_JUMP`, `PROVIDER_HANDOFF_TRAVEL`, `LONG_WORLD_ENDURANCE`, `COMBINED_INVENTORY_FOLLOW`, `COMBINED_INVENTORY_COMBAT`, `COMBINED_INVENTORY_MATERIALIZATION`, and `COMBINED_INVENTORY_SAVE_RELOAD`. Passing isolated workloads is not the L6 completion boundary.
-
-### Dirty snapshot
-
-This documentation pass owns only the following L6 job-document changes:
-
-- `docs/Jobs/LightweightNPCRuntime/README.md`
-- `docs/Jobs/LightweightNPCRuntime/ROADMAP.md`
-- `docs/Jobs/LightweightNPCRuntime/ARCHITECTURE.md`
-- `docs/Jobs/LightweightNPCRuntime/AGENT_RUNBOOK.md`
-- `docs/Jobs/LightweightNPCRuntime/RUNTIME_SIMULATOR.md`
-- `docs/Jobs/LightweightNPCRuntime/PROGRESS.md`
-- new `docs/Jobs/LightweightNPCRuntime/FOLLOW_WALK_STUTTER.md`
-- new `docs/Jobs/LightweightNPCRuntime/COMBAT_HIT_STUTTER.md`
-- new `docs/Jobs/LightweightNPCRuntime/ABSTRACT_TRAVEL_HANDOFF_STUTTER.md`
-- new docs/Jobs/LightweightNPCRuntime/INVENTORY_MODDATA_STRESS.md
-
-Concurrent non-job-doc edits appeared during this documentation pass and were not modified/reverted here. Preserve and re-verify them before any staging/commit:
-
-- Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Networking/ClientActions/PNC_ClientActions_Debug_Spawn.lua
-- Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/ServerDebugCommandHandler/PNC_ServerDebugCommandHandler_Core.lua
-- Contents/mods/ProjectHoomans/42.20/media/lua/server/PNC/Networking/Handlers/ServerDebugCommandHandler/PNC_ServerDebugCommandHandler_Routing.lua
-- Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Companions/PNC_DebugCompanionInitialization.lua
-- Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Persistence/PNC_Persistence_CoreProvider.lua
-- Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Registry/PNC_Registry/PNC_Registry_LoadDirty.lua
-- Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/ArchetypeDefinitions/Mechanic/PNC_Mechanic.lua
-- docs/Systems/Persistence.md
-- tests/pnc_actor_inventory_bridge_smoke.lua
-- tests/pnc_client_debug_spawn_initialization_smoke.lua
-- tests/pnc_lightweight_persistence_authority_smoke.lua
-- tests/pnc_server_debug_command_handler_smoke.lua
-
-Do not assume those concurrent edits belong to L6. Exact current Git/source and the owning agent/session must be reconciled before phase staging.
-
-ProjectHoomans base HEAD is `fdcc073965e11682b411f41dc5a7e59f5a8d8c34`. PsychopatzCore is clean at `7ba3976943b4324a3f875e1db1b9cd87f1d467e6`. Preserve the dirty documentation; do not reset/stash/discard it.
-
-Tooling ownership is clean: ProjectHoomans, psychopatzCore, and the Psychopatz bridge currently have zero root-owned paths. Continue executing remote repo/test/profiler commands as `psychopatz`.
-
-
-## L5 Closed (Developer-Side L0–L5 Complete)
-
-- **Headless scale benchmark matrix (`HEADLESS LUA SIMULATOR — NON-NATIVE`):** Upgraded `tests/support/lightweight_runtime_simulator.lua` and `tests/benchmarks/lightweight_npc_runtime.lua` (`ALL L5 BENCHMARK MATRIX ASSERTIONS PASSED`).
-  - Core population scaling (`N=100, 500, 1000, 2000` with `L=6, Z=50, C=1, OFF`): bit-identical Hoomans operations across `N` (`PkPr=9, EnPr=9, PkLv=9, Com=4/Pmp=6/SerA=16, PrsD=93/CmbD=7/HWEq=4, Full=18, Census=75, ExtraZ=0, ZAggr=3244, DirtyEnd=0, GSave=1`); 20s profiler-OFF control `N=500` improved `4004.86ms` (L0) -> `971.07ms` (`-75.8%`), and `N=100` improved `2001.45ms` -> `1126.22ms` (`-43.7%`).
-  - Active set scaling (`L=1, 6, 12, 24`, capped at `20` live bodies with `MaxProm<=4` and `MaxMat<=2`), zombie pressure (`Z=0, 50, 200` + `IDLE0_Z200` at `39.23ms` / `Avg 0.16ms` with `ZAggr=0, ExtraZ=0`), client fan-out (`C=1, 4, 16` + `C=4` mixed-capability repair converging with `SafePhaseFailures=0`), departure demotion (`DEPART_DEM: PkPr=9 -> EnPr=0, CoreN=500`), knowledge mutation storm (`MUT_STORM: Com=33 -> Pmp=4, SerA=13, GSave=1, DirtyEnd=0`), and `OFF`/`COARSE`/`DEEP` (`deep_instrumented_diagnostic_only`) profiler restoration verified.
-- **Documentation reconciled:** Updated `docs/01_SYSTEM_MAP.md`, `docs/Systems/Persistence.md`, `docs/Systems/Networking.md`, `docs/Systems/Performance.md`, `docs/Systems/Presence.md`, `docs/Jobs/LightweightNPCRuntime/ARCHITECTURE.md`, and `docs/Jobs/LightweightNPCRuntime/README.md` to match the L0–L5 runtime contracts.
-- **Multi-repo regression verification:**
-  - `ProjectHoomans`: `tests/benchmarks/lightweight_npc_runtime.lua` pass; `tests/pnc_lightweight_runtime_simulation_smoke.lua` 10/10 pass; `tests/benchmarks/npc_replication.lua` (P1–P4) pass; full `python3 tests/run_tests.py` sweep `1078/1082` pass (4 pre-existing unrelated baseline failures untouched: `pnc_animation_scene_debug_routes_smoke.lua`, `pnc_context_debug_smoke.lua`, `pnc_population_director_smoke.lua`, `pz_custom_translation_manager_smoke.lua`).
-  - `psychopatzCore`: Python profiler suite `54/54` pass; relevant Lua smoke suite `65/69` pass (4 pre-existing unrelated headless baseline failures untouched: `psychopatz_profiler_client_composition_smoke.lua`, `psychopatz_profiler_server_composition_smoke.lua`, `psychopatz_survivor_world_client_knowledge_smoke.lua`, `psychopatz_survivor_world_generation_smoke.lua`).
-- **Local commit checkpoints (`pushed=false`, branch `main`):**
-  - `psychopatzCore`: L0 `37ab6da`, L1 `2fc8e5e` (clean at `2fc8e5e8c237caa9507a93272896cf87b75e295a`).
-  - `ProjectHoomans`: L0 `1303f51`, L1 `9ca238a`, L2 `879c878`, L3 `c388168`, L4 `a1fa4ac`, L5 `self`.
-
-## Core-backed recruitment closed
-
-Project Hoomans adopts API-spawned NPCs into Core before registry insertion. Permanent recruitment publishes canonical affiliation and the personal ownership extension before installing follow. Starting companions use the same transaction on their first spawn. The Colonists roster consumes indexed community membership. Legacy records are processed by the bounded persistence pump and retired after the Core round trip and successful store save.
-
-The headless suite covers failed and retried recruitment, multiple starters with authored and randomized identities, reconnect, dismissal and save reconstruction. The runtime matrix and NPC replication benchmark passed. Hoomans retains four documented unrelated baseline failures. Core retains the existing actor-discovery and generation parity failures in the focused set.
-
-The tooling repair changed ownership on the 15 verified paths and preserved their modes. Both workspaces and the bridge were verified as UID 1000 with no root-owned files. The save's empty `mods.txt` is tracked independently in PROGRESS.
-
-## Remaining User-Owned Scope
-
-- **Native Project Zomboid SP/MP acceptance (not run automatically):**
-  - Launch native SP & MP with profiler `OFF` (and optional bounded `COARSE` sanity check) across ordinary travel, combat, idle-away-from-NPCs, and populated regions.
-  - Verify live FPS/frame-time feel under engine `IsoZombie` creation/rendering, Java pathfinder behavior, and chunk streaming/unloading around `L` active bodies vs large Core `N`.
-  - Verify real MP server/client socket traffic, reconnect/detail inspection, and mixed-client compatibility if applicable.
-  - Verify real SP/MP save/reload persistence endurance (companion states, injuries/equipment/jobs, sparse `ProjectHoomans.ActorExtension`, zero accumulated dirty backlog).
+Run native Project Zomboid SP/MP gameplay verification with profiler **OFF** (optionally enabling `PNC.StutterTrace.SetEnabled(true, 16)` if capturing any native-engine-specific frame spike).

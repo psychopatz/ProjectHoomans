@@ -36,6 +36,9 @@ function Internal.ConsumeRequestBudget(now)
         1,
         tonumber(Const.ENGINE_PATH_REQUEST_BUDGET_PER_WINDOW) or 1
     )
+    if Internal.IsMultiplayerAuthority and Internal.IsMultiplayerAuthority() then
+        allowed = math.max(2, allowed)
+    end
     if now - (tonumber(budget.windowStartedAt) or 0) >= windowMs then
         budget.windowStartedAt = now
         budget.used = 0

@@ -172,6 +172,13 @@ function Equipment.ReleasePrimaryLease(record, owner, options)
     options = type(options) == "table" and options or {}
     owner = tostring(owner or "")
     local state = runtimeFor(record)
+    -- Releasing an owner that holds no lease is the common case (every
+    -- follow move clears a combat target). Answer it from the lease state
+    -- without hydrating/restoring the record inventory; L6 follow profiling
+    -- measured that hydration as the dominant live-follow tick cost.
+    if state and not state.entries[owner] and type(record.inventory) == "table" then
+        return true, "primary_lease_already_released"
+    end
     local inventory = inventoryFor(record)
     if not state or not inventory then return false, "inventory_unavailable" end
     local entry = state.entries[owner]

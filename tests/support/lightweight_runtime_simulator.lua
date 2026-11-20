@@ -158,6 +158,7 @@ function Simulator.New(options)
         injectRevisionGap = options.injectRevisionGap == true,
         departAtMs = tonumber(options.departAtMs),
         massInterestActors = tonumber(options.massInterestActors),
+        workload = options.workload,
         profilerMode = string.upper(tostring(options.profilerMode or "OFF")),
         deepDurationMs = math.floor(tonumber(options.deepDurationMs) or 10000),
         quiet = options.quiet ~= false,
@@ -344,6 +345,13 @@ function Simulator:Run()
         end
         local pInv = makeInv()
         local pMod = {}
+        -- L6 continuous-motion contract: workloads drive these every step
+        -- through _setMotion; the defaults keep legacy scenarios unchanged.
+        local motion = { moving = false, running = false, sprinting = false, fx = 1, fy = 0 }
+        local forward = {
+            getX = function() return motion.fx end,
+            getY = function() return motion.fy end,
+        }
         players[p] = {
             __class = "IsoPlayer",
             getUsername = function() return "sim_player_" .. tostring(p) end,
@@ -354,11 +362,25 @@ function Simulator:Run()
             getY = function() return py end,
             _setY = function(v) py = v end,
             getZ = function() return pz end,
+            _motion = motion,
+            _setMotion = function(moving, running, fx, fy, sprinting)
+                motion.moving = moving == true
+                motion.running = running == true
+                motion.sprinting = sprinting == true
+                if fx and fy and (fx ~= 0 or fy ~= 0) then
+                    local len = math.sqrt(fx * fx + fy * fy)
+                    motion.fx, motion.fy = fx / len, fy / len
+                end
+            end,
+            isPlayerMoving = function() return motion.moving end,
+            getForwardDirection = function() return forward end,
+            getVehicle = function() return nil end,
             getAccessLevel = function() return "admin" end,
             isDead = function() return false end,
+            isAlive = function() return true end,
             isSneaking = function() return false end,
-            isRunning = function() return false end,
-            isSprinting = function() return false end,
+            isRunning = function() return motion.running end,
+            isSprinting = function() return motion.sprinting end,
             isAiming = function() return false end,
             getModData = function() return pMod end,
             getCurrentSquare = function() return getSquare(px, py, pz) end,
@@ -405,6 +427,7 @@ function Simulator:Run()
             getOnlineID = function() return oid end,
             getPersistentOutfitID = function() return oid + 10000 end,
             isDead = function() return false end,
+            isAlive = function() return true end,
             isFakeDead = function() return false end,
             getModData = function() return zmd end,
             getVariableBoolean = function(_, k) return vars[k] == true end,
@@ -449,6 +472,9 @@ function Simulator:Run()
             faceLocation = function() end,
             faceLocationF = function() end,
             setForwardDirection = function() end,
+            getForwardDirection = function()
+                return { getX = function() return 1 end, getY = function() return 0 end }
+            end,
             setForceEatingAnimation = function() end,
             setAttackOutcome = function() end,
             removeFromWorld = function()
@@ -475,6 +501,7 @@ function Simulator:Run()
         return zObj
     end
 
+    local fakeHitZombie
     getCell = function()
         return {
             getZombieList = function()
@@ -484,6 +511,13 @@ function Simulator:Run()
                 return makeJavaList(zombies)
             end,
             getGridSquare = function(_, x, y, z) return getSquare(x, y, z) end,
+            getFakeZombieForHit = function()
+                if not fakeHitZombie then
+                    fakeHitZombie = makeZombieShell(10000, 10000, 0)
+                    table.remove(zombies, #zombies)
+                end
+                return fakeHitZombie
+            end,
         }
     end
     getWorld = function() return { getCell = getCell } end
@@ -668,6 +702,33 @@ function Simulator:Run()
     local mutationIndex = 0
     local gapRepairInjected = false
 
+    -- L6 workload extension point. Workloads drive the same composed
+    -- production runtime; only narrow engine boundaries are faked here.
+    local workload = cfg.workload
+    local ctx = {
+        cfg = cfg,
+        players = players,
+        zombies = zombies,
+        metrics = metrics,
+        events = events,
+        stores = stores,
+        actorRegistry = actorRegistry,
+        runtimeStore = runtimeStore,
+        getSquare = getSquare,
+        makeInv = makeInv,
+        makeItem = makeItem,
+        makeJavaList = makeJavaList,
+        makeZombieShell = makeZombieShell,
+        snapshotStoreWrites = snapshotStoreWrites,
+        now = function() return nowMs end,
+        advanceClock = function(ms) nowMs = nowMs + math.floor(tonumber(ms) or 0) end,
+        fire = function(name, ...)
+            for _, fn in ipairs(events[name] or {}) do fn(...) end
+        end,
+        countMap = countMap,
+    }
+    if workload and workload.Setup then workload.Setup(ctx) end
+
     metrics.inTickPhase = true
     local tickCpuStart = os.clock()
     local totalTicks = math.floor(cfg.simulatedMs / cfg.stepMs)
@@ -685,11 +746,14 @@ function Simulator:Run()
             end
         end
         local matBeforeTick = metrics.materializationSuccesses
+        if workload and workload.BeforeTick then workload.BeforeTick(ctx, tick, elapsedMs) end
         local oneTickT0 = os.clock()
         for _, fn in ipairs(events.OnTick or {}) do
             fn()
         end
-        tickDurationsMs[#tickDurationsMs + 1] = (os.clock() - oneTickT0) * 1000
+        local oneTickMs = (os.clock() - oneTickT0) * 1000
+        tickDurationsMs[#tickDurationsMs + 1] = oneTickMs
+        if workload and workload.AfterTick then workload.AfterTick(ctx, tick, elapsedMs, oneTickMs) end
         local matDelta = metrics.materializationSuccesses - matBeforeTick
         if matDelta > maxMaterializationsInSingleTick then
             maxMaterializationsInSingleTick = matDelta
@@ -711,14 +775,14 @@ function Simulator:Run()
         end
         if nowMs % 1000 == 0 then
             local p1 = players[1]
-            if p1 and p1._setX and not departed then
+            if p1 and p1._setX and not departed and not (workload and workload.ownsPlayerMotion) then
                 p1._setX(10000 + ((math.floor(tick / 20)) % 4))
             end
             for _, fn in ipairs(events.EveryOneSecond or {}) do
                 fn()
             end
         end
-        if nowMs % cfg.mutationIntervalMs == 0 then
+        if nowMs % cfg.mutationIntervalMs == 0 and not (workload and workload.suppressLegacyMutations) then
             mutationIndex = mutationIndex + 1
             local targetRecord
             for _, rec in pairs(PNC.Registry.Data or {}) do
@@ -793,6 +857,11 @@ function Simulator:Run()
         fn()
     end
     snapshotStoreWrites()
+    local workloadReport = nil
+    if workload and workload.Finish then
+        workloadReport = workload.Finish(ctx)
+        snapshotStoreWrites()
+    end
 
     local endWrapperCounts = Integration
         and Integration.GetInstalledWrapperCounts
@@ -905,6 +974,7 @@ function Simulator:Run()
 
     local report = {
         RecruitmentRoundtrip = recruitmentRoundtrip,
+        Workload = workloadReport,
         CoreActors = actorRegistry:Count(),
         PromotedAtStartup = promotedAtStartup,
         PromotedHoomansRecords = endPromotedHoomansRecords,

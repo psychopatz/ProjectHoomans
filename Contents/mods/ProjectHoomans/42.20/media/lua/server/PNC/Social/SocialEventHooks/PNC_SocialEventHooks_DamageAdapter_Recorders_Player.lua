@@ -137,6 +137,12 @@ function H.RecordPlayerHurtWitnesses(player, attacker, context)
         -- repeated hit callbacks do not need another full live-NPC scan.
         return 0, 0, "witness_cooldown"
     end
+    Hooks.LastPlayerHurtWitnessTickByPlayer =
+        Hooks.LastPlayerHurtWitnessTickByPlayer or {}
+    if Hooks.LastPlayerHurtWitnessTickByPlayer[actorKey] == currentTime then
+        return 0, 0, "witness_same_tick_coalesced"
+    end
+    Hooks.LastPlayerHurtWitnessTickByPlayer[actorKey] = currentTime
     if Hooks.LastPlayerHurtWitnessAt[throttleKey] == nil then
         local order = Hooks.PlayerHurtWitnessThrottleOrder
         order[#order + 1] = throttleKey
@@ -150,7 +156,7 @@ function H.RecordPlayerHurtWitnesses(player, attacker, context)
     position = positionOf(attacker)
     safeContext = copyHurtContext(context, attacker)
     safeContext.attackerID = attackerID
-    Registry.ForEachLive(function(record, body, npcID)
+    local function inspectWitness(record, body, npcID)
         local eventID
         local targetKey
         local result
@@ -205,7 +211,26 @@ function H.RecordPlayerHurtWitnesses(player, attacker, context)
             "damage=" .. tostring(safeContext.damage),
             "woundType=" .. tostring(safeContext.woundType or "unknown"),
         })
-    end)
+    end
+    local spatial = PNC.SpatialIndex
+    local playerPos = positionOf(player)
+    if spatial and type(spatial.QueryNPCs) == "function"
+        and (tonumber(spatial.RebuildCount) or 0) > 0
+        and playerPos and playerPos.x and playerPos.y
+        and Registry.GetLiveZombie
+    then
+        local nearby = spatial.QueryNPCs(playerPos.x, playerPos.y, WITNESS_RADIUS)
+        for i = 1, #nearby do
+            local record = nearby[i]
+            local npcID = record and record.id or nil
+            local body = npcID and Registry.GetLiveZombie(npcID) or nil
+            if body then
+                inspectWitness(record, body, npcID)
+            end
+        end
+    else
+        Registry.ForEachLive(inspectWitness)
+    end
     audit({
         "luaSide=server",
         "event=PlayerHurtWitnessScan",

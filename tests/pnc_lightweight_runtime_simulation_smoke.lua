@@ -280,4 +280,35 @@ local recruitmentReport = withMode("OFF", {
 T.equal(recruitmentReport.RecruitmentRoundtrip, true,
     "Core adoption, recruitment, roster, persistence and promotion roundtrip")
 
+-- ============================================================================
+-- 14. L6 Mandatory Fast Combined Smoke (COMBINED_MATERIALIZE_COMBAT + JUMP)
+-- Full four-family fast smoke runs in parallel in pnc_lightweight_runtime_l6_smoke.lua.
+-- ============================================================================
+local CombinedWL = require "tests/support/lightweight_runtime_workloads/combined"
+
+local matCombatRep = Simulator.New({
+    actorCount = 1, nearbyActors = 0, expectedPromotedActors = 0, zombieCount = 0,
+    simulatedMs = 5500, stepMs = 50, profilerMode = "OFF", quiet = true,
+    workload = CombinedWL.New({ scenario = "COMBINED_MATERIALIZE_COMBAT", fast = true }),
+}):Run()
+print("L6_MAT_CB: " .. CombinedWL.Format(matCombatRep.Workload))
+T.equal(matCombatRep.SafePhaseFailures, 0, "L6_MAT_CB SafePhase failures")
+T.truthy(matCombatRep.Workload.Promotions >= 1 and matCombatRep.Workload.CombatHits >= 1,
+    "L6_MAT_CB materialized travelling hostile group and landed deterministic hits")
+T.equal(matCombatRep.Workload.LiveAtEnd, 0, "L6_MAT_CB abstracted safely after player departure")
+
+local fastJumpRep = Simulator.New({
+    actorCount = 1, nearbyActors = 0, expectedPromotedActors = 0, zombieCount = 0,
+    simulatedMs = 4000, stepMs = 50, profilerMode = "OFF", quiet = true,
+    workload = CombinedWL.New({ scenario = "PLAYER_FAST_INTEREST_JUMP", fast = true }),
+}):Run()
+print("L6_JUMP:   " .. CombinedWL.Format(fastJumpRep.Workload))
+T.equal(fastJumpRep.SafePhaseFailures, 0, "L6_JUMP SafePhase failures")
+T.truthy(fastJumpRep.Workload.JumpSpawnX > 12100,
+    "L6_JUMP materialized near projected route position, not departure staging")
+T.truthy(fastJumpRep.MaxPromotionsInSingleRefresh <= 4,
+    "L6_JUMP respected per-refresh promotion budget")
+T.truthy(fastJumpRep.MaxMaterializationsInSingleTick <= 2,
+    "L6_JUMP respected per-tick materialization budget")
+
 T.finish("pnc_lightweight_runtime_simulation_smoke")

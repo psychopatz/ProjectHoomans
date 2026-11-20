@@ -290,4 +290,157 @@ for _, scenario in ipairs({
     ))
 end
 
-print("\nALL L5 BENCHMARK MATRIX ASSERTIONS PASSED.")
+-- ============================================================================
+-- G. L6 Four-Family & Mandatory Cross-System Composition Matrix (Profiler OFF)
+-- ============================================================================
+local FollowWL = require "tests/support/lightweight_runtime_workloads/follow"
+local CombatWL = require "tests/support/lightweight_runtime_workloads/combat"
+local TravelWL = require "tests/support/lightweight_runtime_workloads/travel"
+local InventoryWL = require "tests/support/lightweight_runtime_workloads/inventory"
+local CombinedWL = require "tests/support/lightweight_runtime_workloads/combined"
+
+print("\nG1. L6 FAMILY A — CONTINUOUS FOLLOWOWNER MOVEMENT (Profiler OFF)")
+print(string.rep("-", 116))
+for _, spec in ipairs({
+    { scenario = "FOLLOW_WALK_OPEN", followers = 1 },
+    { scenario = "FOLLOW_WALK_OPEN", followers = 3 },
+    { scenario = "FOLLOW_WALK_OPEN", followers = 6 },
+    { scenario = "FOLLOW_WALK_OPEN", followers = 12 },
+    { scenario = "FOLLOW_WALK_TURN_STOP", followers = 6 },
+    { scenario = "FOLLOW_WALK_OBSTACLE", followers = 6 },
+    { scenario = "FOLLOW_WALK_STALL", followers = 6 },
+}) do
+    local r = runCase({
+        actorCount = 20, nearbyActors = 0, expectedPromotedActors = 0, zombieCount = 0,
+        simulatedMs = FollowWL.SimulatedMs(spec.scenario, 6000), stepMs = 50, profilerMode = "OFF",
+        workload = FollowWL.New({ scenario = spec.scenario, followers = spec.followers, warmupMs = 6000 }),
+    })
+    print(FollowWL.Format(r.Workload))
+    T.equal(r.SafePhaseFailures, 0, spec.scenario .. " SafePhaseFailures")
+    T.truthy(r.Workload.MaxFrameEnginePathRequests <= 3,
+        spec.scenario .. " bounded same-frame engine path requests")
+end
+
+print("\nG2. L6 FAMILY B — COMBAT-HIT CONTACT SPIKES (MISS vs HIT, Staggered & Sync)")
+print(string.rep("-", 116))
+for _, sc in ipairs(CombatWL.Scenarios) do
+    local r = runCase({
+        actorCount = 20, nearbyActors = 0, expectedPromotedActors = 0, zombieCount = 0,
+        simulatedMs = 3500, stepMs = 50, profilerMode = "OFF",
+        workload = CombatWL.New({ scenario = sc, attackers = 6, synchronized = false, rounds = 4 }),
+    })
+    print(CombatWL.Format(r.Workload))
+    T.equal(r.SafePhaseFailures, 0, sc .. " SafePhaseFailures")
+end
+for _, sc in ipairs({ "COMBAT_NPC_ZOMBIE_HIT", "COMBAT_NPC_NPC_HIT", "COMBAT_NPC_PLAYER_HIT" }) do
+    local r = runCase({
+        actorCount = 20, nearbyActors = 0, expectedPromotedActors = 0, zombieCount = 0,
+        simulatedMs = 3500, stepMs = 50, profilerMode = "OFF",
+        workload = CombatWL.New({ scenario = sc, attackers = 6, synchronized = true, witnesses = 12, rounds = 4 }),
+    })
+    print(CombatWL.Format(r.Workload))
+    T.equal(r.SafePhaseFailures, 0, sc .. " sync SafePhaseFailures")
+    if sc == "COMBAT_NPC_PLAYER_HIT" then
+        T.equal(r.Workload.PlayerBodyDamageUpdate, 4, "sync player hit BodyDamage:Update coalesced")
+        T.equal(r.Workload.PlayerStatsChange, 4, "sync player hit sendPlayerStatsChange coalesced")
+    end
+end
+
+print("\nG3. L6 FAMILY C — ABSTRACT TRAVEL & MATERIALIZATION HANDOFF")
+print(string.rep("-", 116))
+for _, sc in ipairs(TravelWL.Scenarios) do
+    local pCount = (sc == "ABSTRACT_ROUTE_MP_INTEREST") and 2 or 1
+    local r = runCase({
+        actorCount = 1, nearbyActors = 0, expectedPromotedActors = 0, zombieCount = 0,
+        playerCount = pCount, clientCount = pCount,
+        simulatedMs = 7000, stepMs = 50, profilerMode = "OFF",
+        workload = TravelWL.New({ scenario = sc, groupCount = 10, groupSize = 3 }),
+    })
+    print(TravelWL.Format(r.Workload))
+    T.equal(r.SafePhaseFailures, 0, sc .. " SafePhaseFailures")
+    if sc == "ABSTRACT_ROUTE_FAR" then
+        T.equal(r.Workload.PeakPromotedRecords, 0, "ABSTRACT_ROUTE_FAR stays compact")
+    elseif sc == "ABSTRACT_ROUTE_TIME_LEAP" then
+        T.truthy(r.Workload.TimeLeapDiff < 1e-6, "ABSTRACT_ROUTE_TIME_LEAP converges")
+    elseif sc == "ABSTRACT_ROUTE_ARRIVAL" then
+        T.equal(r.Workload.MaxArrivalsPerGroup, 1, "ABSTRACT_ROUTE_ARRIVAL exactly-once")
+    elseif sc == "ABSTRACT_ROUTE_MP_INTEREST" then
+        T.equal(r.Workload.MPHeldBySecondPlayer, true, "MP second player keeps group live")
+        T.equal(r.Workload.MPAbstractedAfterBothLeft, true, "MP abstracts after both leave")
+    end
+end
+for _, g in ipairs({ 1, 10, 50, 100 }) do
+    local r = runCase({
+        actorCount = 1, nearbyActors = 0, expectedPromotedActors = 0, zombieCount = 0,
+        simulatedMs = 5000, stepMs = 50, profilerMode = "OFF",
+        workload = TravelWL.New({ scenario = "ABSTRACT_ROUTE_PLAYER_INTERCEPT", groupCount = g, groupSize = 3 }),
+    })
+    print(TravelWL.Format(r.Workload))
+    T.equal(r.SafePhaseFailures, 0, "TRAVEL_SCALE_" .. g .. " SafePhaseFailures")
+    T.truthy(r.Workload.PeakLiveBodies <= 4, "TRAVEL_SCALE_" .. g .. " only nearby group live")
+end
+
+print("\nG4. L6 FAMILY D — INVENTORY & MODDATA SCALE")
+print(string.rep("-", 116))
+for _, spec in ipairs({
+    { scenario = "PLAYER_INVENTORY_LARGE", playerItems = 2000, ms = 500 },
+    { scenario = "NPC_INVENTORY_COMPACT_SCALE", npcCount = 100, itemsPerNpc = 20, ms = 500 },
+    { scenario = "NPC_INVENTORY_COMPACT_SCALE", npcCount = 500, itemsPerNpc = 20, ms = 500 },
+    { scenario = "PLAYER_TO_MANY_NPCS", transferNpcs = 50, ms = 1000 },
+    { scenario = "MANY_NPCS_TO_PLAYER", transferNpcs = 10, ms = 1000 },
+    { scenario = "NPC_INVENTORY_MUTATION_STORM", ms = 1000 },
+    { scenario = "INVENTORY_MATERIALIZE_SUBSET", npcCount = 100, itemsPerNpc = 20, subsetLive = 4, ms = 4000 },
+    { scenario = "INVENTORY_SAVE_RELOAD_SCALE", npcCount = 100, itemsPerNpc = 20, ms = 1000 },
+    { scenario = "INVENTORY_REPLICATION_SCALE", players = 2, ms = 1500 },
+}) do
+    local r = runCase({
+        actorCount = 1, nearbyActors = 0, expectedPromotedActors = 0, zombieCount = 0,
+        playerCount = spec.players or 1, clientCount = spec.players or 1,
+        simulatedMs = spec.ms or 1500, stepMs = 50, profilerMode = "OFF",
+        workload = InventoryWL.New(spec),
+    })
+    print(InventoryWL.Format(r.Workload))
+    T.equal(r.SafePhaseFailures, 0, spec.scenario .. " SafePhaseFailures")
+    T.equal(r.Workload.FullModeCount, 0, spec.scenario .. " zero FULL mode fallbacks")
+    T.equal(r.Workload.LegacyAuthorityCount, 0, spec.scenario .. " zero legacy shadow authority")
+    if spec.scenario == "INVENTORY_SAVE_RELOAD_SCALE" then
+        T.equal(r.Workload.ReconstructedEqual, true, "INVENTORY_SAVE_RELOAD_SCALE exact equality")
+    elseif spec.scenario == "NPC_INVENTORY_MUTATION_STORM" then
+        T.equal(r.Workload.UnrelatedTouched, 0, "NPC_INVENTORY_MUTATION_STORM actor-scoped dirtying")
+    end
+end
+
+print("\nG5. L6 MANDATORY COMBINED CROSS-SYSTEM MATRIX (12 SCENARIOS)")
+print(string.rep("-", 116))
+for _, sc in ipairs(CombinedWL.Scenarios) do
+    local ms = (sc == "COMBINED_INVENTORY_FOLLOW") and FollowWL.SimulatedMs("FOLLOW_WALK_OPEN", 6000)
+        or (sc == "LONG_WORLD_ENDURANCE" and 12000 or 6500)
+    local r = runCase({
+        actorCount = 1, nearbyActors = 0, expectedPromotedActors = 0, zombieCount = 0,
+        simulatedMs = ms, stepMs = 50, profilerMode = "OFF",
+        workload = CombinedWL.New({ scenario = sc, fast = false }),
+    })
+    T.equal(r.SafePhaseFailures, 0, sc .. " SafePhaseFailures")
+    if sc == "COMBINED_INVENTORY_FOLLOW" then
+        print(FollowWL.Format(r.Workload))
+        T.truthy(r.Workload.MaxFrameEnginePathRequests <= 2, sc .. " bounded engine path requests")
+    else
+        print(CombinedWL.Format(r.Workload))
+        if sc == "TRAVEL_MEMBER_DEATH_HANDOFF" then
+            T.equal(r.Workload.Dead1Live, false, "abstract-killed member never rematerializes")
+            T.equal(r.Workload.Dead2Live, false, "live-killed member never rematerializes")
+        elseif sc == "OBSERVATION_PROJECTION_LOAD" then
+            T.equal(r.Workload.Promotions, 0, "projection observation is read-only")
+            T.equal(r.Workload.Materializations, 0, "projection observation never materializes")
+        elseif sc == "TRAVEL_ARRIVAL_STORM" then
+            T.equal(r.Workload.MaxArrivalsPerGroup, 1, "arrival storm stays exactly-once")
+        elseif sc == "COMBINED_SAVE_RELOAD_PRESSURE" or sc == "COMBINED_INVENTORY_SAVE_RELOAD" then
+            T.equal(r.Workload.LegacyAuthorityCount, 0, sc .. " zero legacy authority")
+        elseif sc == "LONG_WORLD_ENDURANCE" then
+            T.equal(r.Workload.LiveAtEnd, 0, "endurance leaks 0 live bodies")
+            T.equal(r.Workload.DirtyAtEnd, 0, "endurance leaks 0 dirty records")
+        end
+    end
+end
+
+print("\nALL L5 + L6 BENCHMARK MATRIX ASSERTIONS PASSED.")

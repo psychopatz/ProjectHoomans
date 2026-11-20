@@ -5,10 +5,14 @@ local Server = PNC.Server
 local H = Server.Internal
 local Core = PNC.Core
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local StutterTrace = PNC.StutterTrace
 
 function Server.OnTick()
     local clockOK, now = H.SafePhase("server_tick.clock", Core.Now)
     if not clockOK then return end
+
+    local stutterActive = StutterTrace and StutterTrace.Enabled == true
+    if stutterActive then StutterTrace.BeginTick(now) end
 
     local timerName
     local timerStart
@@ -16,6 +20,7 @@ function Server.OnTick()
         timerName, timerStart = Diagnostics.BeginTiming("Server.Update", now)
     end
 
+    H.InTick = true
     local prepareOK, due = H.SafePhase("server_tick.prepare", H.PrepareTick,
         nil, now)
     if not prepareOK or type(due) ~= "table" then due = {} end
@@ -27,6 +32,7 @@ function Server.OnTick()
         }, record, now)
     end
     H.SafePhase("server_tick.finish", H.FinishTick, nil, now)
+    H.InTick = false
     if PNC.StartingCompanionCustomizationService
         and PNC.StartingCompanionCustomizationService.Pump
     then
@@ -38,5 +44,6 @@ function Server.OnTick()
         )
     end
     if timerName then Diagnostics.EndTiming(timerName, timerStart) end
+    if stutterActive then StutterTrace.EndTick(now) end
     if Diagnostics then Diagnostics.LogRuntimeSummary(now) end
 end

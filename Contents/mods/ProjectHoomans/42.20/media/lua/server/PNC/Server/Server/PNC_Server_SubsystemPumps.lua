@@ -197,6 +197,8 @@ function H.FinishTick(now)
             "Server.Finish", H.TimingNow)
     end
     H.TimingSample = timerName ~= nil
+    safeOptional("server_finish.player_damage_sync",
+        PNC.CombatResolution, "FlushPendingPlayerSync")
     safeOptional("server_finish.network_flush", Network, "FlushRosterDeltas",
         nil, now, false)
     safeOptional("server_finish.core_demotions",

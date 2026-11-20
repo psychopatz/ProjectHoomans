@@ -316,6 +316,27 @@ function Traits.GetDefinitions()
     return output
 end
 
+-- Shared read-only snapshot for hot simulation readers (needs, sleep, combat
+-- modifiers). GetDefinitions deep-copies the whole catalog on every call; L6
+-- follow profiling measured that copy as ~40% of live companion tick CPU.
+-- The snapshot is rebuilt only when Register bumps Revision. Callers must
+-- treat the returned array and definitions as immutable; use GetDefinitions
+-- for a private mutable copy.
+local definitionsView
+local definitionsViewRevision
+local definitionsViewCount
+function Traits.GetDefinitionsView()
+    if definitionsView == nil
+        or definitionsViewRevision ~= Traits.Revision
+        or definitionsViewCount ~= #Traits.Ordered
+    then
+        definitionsView = Traits.GetDefinitions()
+        definitionsViewRevision = Traits.Revision
+        definitionsViewCount = #Traits.Ordered
+    end
+    return definitionsView
+end
+
 function Traits.NormalizeSet(source)
     local output = {}
     addSource(output, source)

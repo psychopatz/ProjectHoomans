@@ -69,8 +69,9 @@ end
 
 local function generationGroups()
     local output = {}
-    local definitions = NPCTraits and NPCTraits.GetDefinitions
-        and NPCTraits.GetDefinitions() or {}
+    local definitions = NPCTraits and (NPCTraits.GetDefinitionsView
+        or NPCTraits.GetDefinitions)
+        and (NPCTraits.GetDefinitionsView or NPCTraits.GetDefinitions)() or {}
     local specifications = NPCTraits and NPCTraits.GetGenerationGroups
         and NPCTraits.GetGenerationGroups() or {}
     for index = 1, #specifications do
@@ -209,8 +210,9 @@ function Stats.GetActiveTraitIDs(source)
     ensureCurrentTraits(source)
     local traits = Stats.NormalizeTraits(source and source.dynamicTraits or source)
     local output = {}
-    local definitions = NPCTraits and NPCTraits.GetDefinitions
-        and NPCTraits.GetDefinitions() or {}
+    local definitions = NPCTraits and (NPCTraits.GetDefinitionsView
+        or NPCTraits.GetDefinitions)
+        and (NPCTraits.GetDefinitionsView or NPCTraits.GetDefinitions)() or {}
     for index = 1, #definitions do
         local id = definitions[index].id
         if traits[id] then

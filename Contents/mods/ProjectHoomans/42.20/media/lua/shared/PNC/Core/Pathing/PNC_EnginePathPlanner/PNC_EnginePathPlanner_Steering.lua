@@ -98,9 +98,10 @@ function Planner.GetSteeringTarget(record, body, finalTarget, owner)
         if (levelChanged or targetMoved)
             and now - (tonumber(navigation.plannedAt) or 0) >= replanMs
         then
-            if Internal.IsMultiplayerAuthority()
-                or Internal.ConsumeRequestBudget(now)
-            then
+            -- Apply the per-window request budget to moving-target replans in
+            -- both SP and MP authority so a group of followers never triggers a
+            -- synchronized same-frame replan burst when the owner turns/runs.
+            if Internal.ConsumeRequestBudget(now) then
                 if Diagnostics then Diagnostics.Increment("Pathing.Replans") end
                 Internal.BeginRequest(
                     body,

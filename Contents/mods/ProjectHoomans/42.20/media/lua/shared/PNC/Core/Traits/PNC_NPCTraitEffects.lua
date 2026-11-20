@@ -41,7 +41,7 @@ end
 
 local function eachDefinition(source, callback)
     local selected = selectedTraits(source)
-    local definitions = Traits.GetDefinitions()
+    local definitions = (Traits.GetDefinitionsView or Traits.GetDefinitions)()
     local index
     local definition
     if type(callback) ~= "function" then return selected end
@@ -140,7 +140,7 @@ function Effects.ResolveFirearmModifiers(source)
         registryRevision = tonumber(Traits and Traits.Revision) or 0,
     }
     selected = selectedTraits(source)
-    definitions = Traits.GetDefinitions()
+    definitions = (Traits.GetDefinitionsView or Traits.GetDefinitions)()
     for index = 1, #definitions do
         definition = definitions[index]
         if selected[definition.id] then
@@ -219,7 +219,7 @@ function Effects.ResolveMeleeModifiers(source)
         registryRevision = tonumber(Traits and Traits.Revision) or 0,
     }
     selected = selectedTraits(source)
-    definitions = Traits.GetDefinitions()
+    definitions = (Traits.GetDefinitionsView or Traits.GetDefinitions)()
     for index = 1, #definitions do
         definition = definitions[index]
         if selected[definition.id] then
