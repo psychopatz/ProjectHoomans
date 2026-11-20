@@ -259,6 +259,16 @@ function Lifecycle.SweepPersistedLiveShells(now, forceCensus)
     return stats
 end
 
+local clearedEarlyZombies = {}
+local clearedEarlyCount = 0
+local clearedEarlyEpoch = 0
+
+function Internal.InvalidateEarlyZombieCache()
+    clearedEarlyEpoch = clearedEarlyEpoch + 1
+    clearedEarlyZombies = {}
+    clearedEarlyCount = 0
+end
+
 function Lifecycle.InterceptLoadedShell(zombie, source)
     local reg = Internal.registry()
     local registryWasLoaded
@@ -269,7 +279,19 @@ function Lifecycle.InterceptLoadedShell(zombie, source)
     local record
     local matchReason
     local legacyEntry
-    if not zombie or (zombie.isDead and zombie:isDead()) then
+    local isEarlyUpdate = source == "early_zombie_update"
+    local startupDone = Lifecycle.StartupCleanup
+        and Lifecycle.StartupCleanup.begun == true
+        and Lifecycle.StartupCleanup.active ~= true
+    if not zombie then
+        return false
+    end
+    if isEarlyUpdate and startupDone
+        and clearedEarlyZombies[zombie] == clearedEarlyEpoch
+    then
+        return false
+    end
+    if zombie.isDead and zombie:isDead() then
         return false
     end
     if Internal.IsProtectedBody and Internal.IsProtectedBody(zombie) then
@@ -387,6 +409,16 @@ function Lifecycle.InterceptLoadedShell(zombie, source)
                         .. tostring(matchReason or "matched")
                 )
             end
+        end
+        if isEarlyUpdate and startupDone and not weak and not naked then
+            if clearedEarlyCount >= 2048 then
+                clearedEarlyZombies = {}
+                clearedEarlyCount = 0
+            end
+            if clearedEarlyZombies[zombie] == nil then
+                clearedEarlyCount = clearedEarlyCount + 1
+            end
+            clearedEarlyZombies[zombie] = clearedEarlyEpoch
         end
         return false
     end

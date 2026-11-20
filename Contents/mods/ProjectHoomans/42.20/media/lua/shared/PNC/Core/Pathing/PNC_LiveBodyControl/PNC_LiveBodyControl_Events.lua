@@ -304,18 +304,19 @@ function LiveBodyControl.OnZombieUpdate(zombie)
     -- tryThump() call. If vanilla sees a window on the feeler tile, stop the
     -- zombie movement state here so it cannot enter the player-only climb
     -- implementation.
+    local passageBlocked = false
     if LiveBodyControl.BlockVanillaPassage then
-        LiveBodyControl.BlockVanillaPassage(
+        passageBlocked = LiveBodyControl.BlockVanillaPassage(
             zombie,
             nil,
             Core and Core.Now and Core.Now() or 0
-        )
+        ) == true
     end
-    -- The passage guard can touch the native action state after the first
-    -- ownership fence. Reconcile once more so the next engine frame starts
-    -- with a clean owner. OnZombieUpdate is after doDeferredMovement, so the
-    -- generic animation fence is still required for same-frame prevention.
-    if PNC.EnginePathPlanner
+    -- Only re-reconcile the native movement owner if BlockVanillaPassage
+    -- actually touched the body; otherwise after_managed_intent already
+    -- left the owner clean for this frame.
+    if passageBlocked
+        and PNC.EnginePathPlanner
         and PNC.EnginePathPlanner.ReconcileNativeMovementOwner
     then
         PNC.EnginePathPlanner.ReconcileNativeMovementOwner(

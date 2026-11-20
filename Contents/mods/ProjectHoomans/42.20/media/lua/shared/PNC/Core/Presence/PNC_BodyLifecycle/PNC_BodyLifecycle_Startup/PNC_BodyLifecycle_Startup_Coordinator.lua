@@ -78,6 +78,9 @@ function Lifecycle.BeginStartupBodyCleanup(now, forceReset)
         return state
     end
     state.begun = true
+    if Internal.InvalidateEarlyZombieCache then
+        Internal.InvalidateEarlyZombieCache()
+    end
     state.active = true
     state.complete = false
     state.passes = 0

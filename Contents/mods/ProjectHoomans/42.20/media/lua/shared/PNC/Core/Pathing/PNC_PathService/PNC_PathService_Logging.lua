@@ -188,12 +188,16 @@ function Internal.logMoveTransition(record, zombie, lane, verb, reason, extra)
     Internal.logMoveDebug(record, zombie, lane, verb, reason, extra)
 end
 
--- Passage events are intentionally always-on and compact. Movement debug is
--- opt-in, which made a window/fence use invisible in normal multiplayer
--- console captures even though the traversal lane was active.
+-- Passage events are gated behind movement debug to avoid main-thread
+-- console.txt I/O spikes during multi-companion fence/window crossings.
 function Internal.logTraversalEvent(record, zombie, lane, eventName, reason,
     extra)
     if not Core or not Core.LogInfo then return end
+    if Internal.isMovementDebugEnabled
+        and not Internal.isMovementDebugEnabled(record)
+    then
+        return
+    end
     Core.LogInfo(
         "[PNC][PATH] traversal_" .. tostring(eventName or "event")
             .. " " .. Internal.buildMoveLogMessage(

@@ -740,15 +740,37 @@ end
 -- Save/chunk loads can miss OnZombieCreate, and creation can precede outfit
 -- initialization. Recognize durable carriers at the update boundary too;
 -- removal still waits for the existing authority-owned, revalidated pump.
+-- Cache verified ordinary zombies keyed by carrier count so ordinary hordes do
+-- not pay pcall(getModData) + IsOrphanedShell on every frame (60Hz * Z).
+local clearedOrdinaryZombies = {}
+local clearedOrdinaryCount = 0
+
 function Lifecycle.OnHuskZombieUpdate(zombie)
     if Internal.SpawnInProgress == true or not isAuthority()
-        or not zombie or isMarkedBody(zombie) or isDeadBody(zombie)
+        or not zombie
     then
+        return
+    end
+    local carrierEpoch = Lifecycle.ShellCarrierCount
+        and Lifecycle.ShellCarrierCount() or 0
+    if clearedOrdinaryZombies[zombie] == carrierEpoch then
+        return
+    end
+    if isMarkedBody(zombie) or isDeadBody(zombie) then
         return
     end
     if matchesOrphanedShell(zombie) then
         Lifecycle.OnZombieCreate(zombie)
+        return
     end
+    if clearedOrdinaryCount >= 2048 then
+        clearedOrdinaryZombies = {}
+        clearedOrdinaryCount = 0
+    end
+    if clearedOrdinaryZombies[zombie] == nil then
+        clearedOrdinaryCount = clearedOrdinaryCount + 1
+    end
+    clearedOrdinaryZombies[zombie] = carrierEpoch
 end
 
 if Events and Events.OnZombieUpdate and Events.OnZombieUpdate.Add then

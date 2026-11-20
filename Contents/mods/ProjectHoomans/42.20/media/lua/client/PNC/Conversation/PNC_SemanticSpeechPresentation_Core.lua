@@ -42,6 +42,10 @@ local function firstBoolean(primary, secondary)
 end
 
 local function log(event, details)
+    local diag = PNC.PerformanceScalingDiagnostics
+    if not diag or diag.SemanticAuditEnabled ~= true then
+        return
+    end
     if print then
         print("[PNC][SemanticSpeech] " .. tostring(event) .. " "
             .. tostring(details or ""))

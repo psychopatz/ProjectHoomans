@@ -19,7 +19,6 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     modData = zombie.getModData and zombie:getModData() or nil
     object, kind = LiveBodyControl.GetVanillaPassageAhead(zombie)
     if not object then
-        VANILLA_PASSAGE_GUARD_LOGGED[zombie] = nil
         return false
     end
     --[[
@@ -44,10 +43,11 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     local vaultHazard = kind == "door"
         and LiveBodyControl.IsHoppableLowDoor(object)
     local moving = LiveBodyControl.IsNativeMoving(zombie)
+    local hasNativePath = zombie.getPath2 and zombie:getPath2() ~= nil or false
     actionState = LiveBodyControl.GetActionStateName(zombie)
     if not passageMovementState(actionState)
         and not ((climbable and isClientState() and moving)
-            or ((vaultHazard or fenceHazard) and moving))
+            or ((vaultHazard or fenceHazard) and (moving or hasNativePath)))
     then
         return false
     end
@@ -122,11 +122,13 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
                 "LiveBodyControl.VanillaFenceBlocked")
         end
     end
-    if not VANILLA_PASSAGE_GUARD_LOGGED[zombie]
+    local logNow = tonumber(now) or (PNC.Core and PNC.Core.Now and PNC.Core.Now()) or 0
+    local lastLoggedAt = tonumber(VANILLA_PASSAGE_GUARD_LOGGED[zombie]) or -1
+    if (lastLoggedAt < 0 or (logNow - lastLoggedAt) >= 10000)
         and PNC.Core
         and PNC.Core.LogWarn
     then
-        VANILLA_PASSAGE_GUARD_LOGGED[zombie] = true
+        VANILLA_PASSAGE_GUARD_LOGGED[zombie] = logNow
         PNC.Core.LogWarn(
             "[PNC][PATH] vanilla_passage_guard kind=" .. tostring(kind)
                 .. " action=" .. tostring(actionState)

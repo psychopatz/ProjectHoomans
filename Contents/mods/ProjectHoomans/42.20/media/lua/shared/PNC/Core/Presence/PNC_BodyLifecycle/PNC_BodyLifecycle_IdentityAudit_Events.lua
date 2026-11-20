@@ -28,6 +28,10 @@ function Audit.OnCreateLivingCharacter(character)
 end
 
 function Audit.OnZombieUpdate(zombie)
+    local diag = PNC.PerformanceScalingDiagnostics
+    if not diag or diag.BodyIdentityAuditEnabled ~= true then
+        return
+    end
     Audit.Capture(zombie, "on_zombie_update", nil, false)
 end
 
