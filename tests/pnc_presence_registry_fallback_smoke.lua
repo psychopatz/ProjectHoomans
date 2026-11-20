@@ -98,6 +98,7 @@ T.equal(rebuilds, 1, "interest pass did not rebuild before querying")
 
 -- Simulate a later stale-index window after the relog pass. The periodic
 -- bounded registry reconciliation must still recover the record.
+record.runtime.materializeWakeAt = nil
 now = 2100
 T.equal(PNC.Presence.RefreshMaterializationCandidates(now, true), 1,
     "periodic registry fallback did not recover stale index")

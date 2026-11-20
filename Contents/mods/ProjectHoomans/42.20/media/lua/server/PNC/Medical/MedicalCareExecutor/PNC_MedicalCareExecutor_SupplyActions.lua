@@ -14,6 +14,7 @@ local requesterForTask = Internal.requesterForTask
 local Common = Internal.Common
 local Wounds = Internal.Wounds
 local sendSupplyState = Internal.sendSupplyState
+local lastSupplyAttemptAt = Internal.LastSupplyAttemptAt
 local SUPPLY_RETRY_MS = Internal.SUPPLY_RETRY_MS
 
 function Executor.NotifyBandageSupportState(task, state)

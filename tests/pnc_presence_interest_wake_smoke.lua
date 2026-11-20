@@ -84,6 +84,15 @@ T.truthy(PNC.Presence.RefreshMaterializationCandidates(now, false) == 0,
 T.truthy(scheduled == 1, "throttled wake scheduled duplicate work")
 T.truthy(rebuildCalls == 1,
     "throttled interest wake rebuilt the spatial index")
+now = 1250
+T.equal(PNC.Presence.RefreshMaterializationCandidates(now, false), 1,
+    "expired wake stays discoverable until it is processed")
+T.equal(scheduled, 1, "refresh must not replace a due scheduler entry")
+T.equal(record.runtime.materializeWakeAt, 1050, "the original deadline remains due")
+record.runtime.materializeWakeAt = nil
+T.equal(PNC.Presence.RefreshMaterializationCandidates(now, true), 1,
+    "interest may wake the NPC again after reconciliation consumes the wake")
+T.equal(scheduled, 2, "consumed wake can be scheduled again")
 T.finish("pnc_presence_interest_wake_smoke")
 
 T.finish("pnc_presence_interest_wake_smoke")

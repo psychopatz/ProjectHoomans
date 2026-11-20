@@ -324,4 +324,30 @@ T.equal(lastTreatmentOptions.consumeItem, false,
 T.equal(aiTask.status, Status.COMPLETED,
     "abstract patient request also closes durably")
 
+local donorSearches = 0
+PNC.Registry.ForEach = function(callback)
+    donorSearches = donorSearches + 1
+    callback(doctor)
+    callback(patient)
+end
+patient.wounds = { "UpperArm_L" }
+local supplyTask = {
+    id = "medical:supply", patientKind = "npc", patientId = patient.id,
+    status = Status.WAITING_FOR_SUPPLY, supplyRequesterId = doctor.id,
+    supplyRequestId = "medical-bandage:medical:supply:1",
+    policy = { requireItem = true },
+}
+tasks[supplyTask.id] = supplyTask
+local waiting, supplyReason = Executor.RequestBandageSupport(supplyTask.id)
+T.truthy(waiting, "missing bandage starts support without an exception")
+T.equal(supplyReason, "waiting_for_supply")
+local firstSearches = donorSearches
+T.truthy(Executor.RequestBandageSupport(supplyTask.id))
+T.equal(donorSearches - firstSearches, 2, "repeat checks skip the donor scan")
+now = now + Executor.Internal.SUPPLY_RETRY_MS
+local searchesBeforeRetry = donorSearches
+T.truthy(Executor.RequestBandageSupport(supplyTask.id))
+T.equal(donorSearches - searchesBeforeRetry, 3,
+    "expired throttle allows another donor scan")
+
 T.finish("pnc_medical_care_executor_smoke")

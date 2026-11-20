@@ -293,8 +293,10 @@ local function wakeCandidates(ordered, now)
         record.runtime.presenceInterestFallback =
             entry.source == "registry_fallback"
         local retryAt = tonumber(record.runtime.materializeRetryAt) or 0
-        local wakeAt = tonumber(record.runtime.materializeWakeAt) or 0
-        local hasPendingWake = (retryAt > now) or (wakeAt > now)
+        -- Interest refresh runs before PopDue. Keep the wake until Reconcile
+        -- consumes it, even when it is already due or the scheduler is busy.
+        local hasPendingWake = (retryAt > now)
+            or record.runtime.materializeWakeAt ~= nil
         if not hasPendingWake and woken < maxNewWakes then
             woken = woken + 1
             local wakeClockAt = baseAt
