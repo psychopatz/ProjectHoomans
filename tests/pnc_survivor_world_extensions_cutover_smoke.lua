@@ -19,6 +19,7 @@ Events = {
 
 PNC = {}
 require "PNC/Core/Base/PNC_Core"
+require "PNC/Core/Relationships/PNC_EntityRef"
 require "PNC/Core/Persistence/PNC_ModDataStore"
 require "PNC/Core/Factions/PNC_FactionConstants"
 require "PNC/Core/Factions/PNC_FactionArchetypes"
@@ -544,6 +545,67 @@ T.equal(
     ]),
     nil,
     "reload does not resurrect retired faction root"
+)
+
+-- Regression: a newly created player faction with unsaved Hoomans-only
+-- extensions (ownerPlayerKey/playerMemberKeys) must NOT lose its player
+-- ownership when Extensions.RebuildAll / RefreshFromCore runs before OnSave.
+local coreReg = assert(PNC.CoreSurvivorWorldAuthority.Registry)
+assert(coreReg:UpsertFaction({
+    id = "faction_player_live",
+    name = "patz Company",
+    archetypeID = "settler",
+    status = "active",
+    tags = {
+        automaticallyCreated = true,
+        factionNamePending = true,
+        promotedFromProvisional = true,
+    },
+}))
+local playerKey = assert(
+    PNC.EntityRef.ForPlayerIdentity("sp_slot_0", "char_live_1")
+)
+PNC.Factions.Registry.byID.faction_player_live =
+    PNC.FactionTypes.NewFaction({
+        id = "faction_player_live",
+        name = "patz Company",
+        archetypeID = "settler",
+        status = "active",
+        ownerPlayerKey = playerKey,
+        playerMemberKeys = { [playerKey] = true },
+        tags = {
+            automaticallyCreated = true,
+            factionNamePending = true,
+            promotedFromProvisional = true,
+        },
+    })
+PNC.Factions.Registry.byPlayerKey[playerKey] = "faction_player_live"
+PNC.Factions.Loaded = true
+PNC.Factions.Dirty = true
+
+local refreshedOK, refreshedReason = Extensions.RefreshFromCore()
+T.truthy(refreshedOK, refreshedReason)
+local rebuiltPlayerFaction =
+    assert(PNC.Factions.Registry.byID.faction_player_live)
+T.equal(
+    rebuiltPlayerFaction.ownerPlayerKey,
+    playerKey,
+    "mid-session RebuildAll must preserve dirty faction ownerPlayerKey"
+)
+T.equal(
+    rebuiltPlayerFaction.playerMemberKeys
+        and rebuiltPlayerFaction.playerMemberKeys[playerKey],
+    true,
+    "mid-session RebuildAll must preserve dirty faction playerMemberKeys"
+)
+T.equal(
+    PNC.Factions.Registry.byPlayerKey[playerKey],
+    "faction_player_live",
+    "mid-session RebuildAll must preserve byPlayerKey index"
+)
+T.truthy(
+    Extensions.Dirty,
+    "absorbing dirty live extensions must mark Extensions.Dirty for OnSave"
 )
 
 T.finish("pnc_survivor_world_extensions_cutover_smoke")

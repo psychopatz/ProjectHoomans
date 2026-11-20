@@ -62,6 +62,67 @@ function Extensions.CaptureAll()
     }
 end
 
+local function mergeExtensionMap(target, source)
+    target = type(target) == "table" and target or {}
+    for key, value in pairs(type(source) == "table" and source or {}) do
+        target[key] = value
+    end
+    return target
+end
+
+local function preserveDirtyLiveExtensions()
+    Extensions.Registry = type(Extensions.Registry) == "table"
+        and Extensions.Registry or Extensions.NewRegistry()
+    local preserved = false
+    if PNC.Factions and PNC.Factions.Loaded == true
+        and PNC.Factions.Dirty == true
+        and type(Extensions.CaptureFactions) == "function"
+    then
+        Extensions.Registry.factions = mergeExtensionMap(
+            Extensions.Registry.factions,
+            Extensions.CaptureFactions()
+        )
+        preserved = true
+    end
+    if PNC.Communities and PNC.Communities.Loaded == true
+        and PNC.Communities.Dirty == true
+        and type(Extensions.CaptureCommunities) == "function"
+    then
+        local communities, sites = Extensions.CaptureCommunities()
+        Extensions.Registry.communities = mergeExtensionMap(
+            Extensions.Registry.communities,
+            communities
+        )
+        Extensions.Registry.sitesByID = mergeExtensionMap(
+            Extensions.Registry.sitesByID,
+            sites
+        )
+        preserved = true
+    end
+    if PNC.HoomansWorldView and PNC.HoomansWorldView.Loaded == true
+        and PNC.HoomansWorldView.Dirty == true
+        and type(Extensions.CaptureAbstract) == "function"
+    then
+        local groups, locations, abstract = Extensions.CaptureAbstract()
+        Extensions.Registry.groups = mergeExtensionMap(
+            Extensions.Registry.groups,
+            groups
+        )
+        Extensions.Registry.locations = mergeExtensionMap(
+            Extensions.Registry.locations,
+            locations
+        )
+        if type(abstract) == "table" then
+            Extensions.Registry.abstract = abstract
+        end
+        preserved = true
+    end
+    if preserved then
+        Extensions.Dirty = true
+    end
+    return preserved
+end
+
 function Extensions.RebuildAll(coreSnapshot)
     if type(coreSnapshot) ~= "table" then
         return false, "core_survivor_world_snapshot_required"
@@ -72,6 +133,11 @@ function Extensions.RebuildAll(coreSnapshot)
     then
         return false, "pnc_world_views_unavailable"
     end
+
+    -- Capture any unsaved Hoomans-only extension state (such as a newly
+    -- created player faction's ownerPlayerKey/playerMemberKeys) before
+    -- rebuilding views from Core so mid-session reloads never drop it.
+    preserveDirtyLiveExtensions()
 
     local factions = Extensions.RebuildFactions(coreSnapshot)
     local communities =
