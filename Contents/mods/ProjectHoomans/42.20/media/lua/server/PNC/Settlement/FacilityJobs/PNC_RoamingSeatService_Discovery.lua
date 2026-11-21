@@ -191,3 +191,4 @@ end
 
 
 Internal.findSeat = findSeat
+Service.FindCandidate = findSeat

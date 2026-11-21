@@ -51,6 +51,17 @@ local function tryGuardSeat(record, zombie, order)
     then
         return false
     end
+    local tasking = PNC.Tasking
+    if tasking and tasking.Providers and tasking.Providers.autonomy
+        and tasking.Events and type(tasking.Events.Emit) == "function"
+    then
+        tasking.Events.Emit("AMBIENT_OPPORTUNITY", {
+            record = record,
+            source = "Behavior.GuardAnchor",
+            cause = "guard_seat",
+        })
+        return false
+    end
     return service.TryStartGuard(
         record,
         zombie,

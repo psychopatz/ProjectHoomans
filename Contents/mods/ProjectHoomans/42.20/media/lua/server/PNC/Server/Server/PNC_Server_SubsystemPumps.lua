@@ -88,8 +88,12 @@ function H.PrepareTick(now)
         nil, now)
     safeOptional("server_prepare.needs", PNC.NeedsScheduler, "Pump", nil,
         now)
-    safeOptional("server_prepare.living_room", PNC.LivingRoomService, "Pump",
-        nil, now)
+    if not (PNC.Tasking and PNC.Tasking.Providers
+        and PNC.Tasking.Providers.autonomy)
+    then
+        safeOptional("server_prepare.living_room", PNC.LivingRoomService,
+            "Pump", nil, now)
+    end
     safeOptional("server_prepare.provision", PNC.ProvisionScheduler, "Pump",
         nil, now)
     safeOptional("server_prepare.camp_resources",

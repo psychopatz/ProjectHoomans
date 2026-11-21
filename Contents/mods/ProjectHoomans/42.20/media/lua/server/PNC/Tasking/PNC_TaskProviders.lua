@@ -3,3 +3,6 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeR
 require "PNC/Tasking/PNC_WorkTaskProvider"
 require "PNC/Tasking/PNC_CorpseHaulService"
 require "PNC/Tasking/PNC_TaskRequestService"
+require "PNC/Tasking/Autonomy/PNC_AutonomyScorer"
+require "PNC/Tasking/Autonomy/PNC_CoPresenceService"
+require "PNC/Tasking/Autonomy/PNC_AutonomyTaskProvider"

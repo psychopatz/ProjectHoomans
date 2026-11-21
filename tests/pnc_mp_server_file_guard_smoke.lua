@@ -172,9 +172,9 @@ listing:close()
 -- The starting-companion customization service and its production command
 -- handler are also server-only and loaded through the guarded composition and
 -- command-routing roots.
--- PNC_Tasking_Claims is server-only, guarded by AllowsServerCode(), and loaded
--- by PNC_Tasking before PNC_Tasking_Assignment.
-T.equal(#serverOnlyFiles, 1060,
+-- PNC_Tasking_Claims and Phase U3 Autonomy modules are server-only, guarded by
+-- AllowsServerCode(), and loaded by PNC_Tasking / PNC_TaskProviders.
+T.equal(#serverOnlyFiles, 1063,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

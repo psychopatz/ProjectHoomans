@@ -45,8 +45,8 @@ end
 
 function ISPNCColonistWindow:onTab(button)
     local selected = Controller.SelectTab(self, button)
-    if selected and self.tab == "task" then
-        self:requestSnapshot("task_tab")
+    if selected and (self.tab == "task" or self.tab == "debug") then
+        self:requestSnapshot(tostring(self.tab) .. "_tab")
     end
     return selected
 end
@@ -77,7 +77,7 @@ function ISPNCColonistWindow:colonistSections()
 end
 
 function ISPNCColonistWindow:requestSnapshot(source)
-    local taskBrainNpcID = self.tab == "task"
+    local taskBrainNpcID = (self.tab == "task" or self.tab == "debug")
         and self.selectedPersonID or nil
     -- The selected colonist's journal travels on demand; other colonists omit
     -- it, which keeps the roster inside one packet for large colonies.

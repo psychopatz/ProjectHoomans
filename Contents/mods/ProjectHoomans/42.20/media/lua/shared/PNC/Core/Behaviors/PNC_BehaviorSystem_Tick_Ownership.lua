@@ -47,11 +47,44 @@ function H.Run(record, zombie, now)
         return true
     end
 
+    local leases = PNC.TaskLeaseService
+    local runtime = record and record.runtime or nil
+    local ambientState = runtime and runtime.roamAmbient or nil
+    if ambientState and ambientState.taskLeaseId ~= nil then
+        local activeLease = leases and leases.Get
+            and leases.Get(ambientState.taskLeaseId) or nil
+        if not activeLease then
+            if PNC.RoamAmbient and PNC.RoamAmbient.Stop then
+                PNC.RoamAmbient.Stop(
+                    record, zombie, "task_lease_released", "movement")
+            else
+                runtime.roamAmbient = nil
+            end
+        else
+            return true
+        end
+    end
+
     local roamingAmbient = PNC.RoamAmbient
     if roamingAmbient and roamingAmbient.Tick
         and roamingAmbient.Tick(record, zombie, now)
     then
         return true
+    end
+
+    local seatState = runtime and runtime.roamingSeat or nil
+    if seatState and seatState.taskLeaseId ~= nil then
+        local activeLease = leases and leases.Get
+            and leases.Get(seatState.taskLeaseId) or nil
+        if not activeLease then
+            if PNC.RoamingSeat and PNC.RoamingSeat.Stop then
+                PNC.RoamingSeat.Stop(record, zombie, "task_lease_released")
+            else
+                runtime.roamingSeat = nil
+            end
+        else
+            return true
+        end
     end
 
     local roamingSeat = PNC.RoamingSeat

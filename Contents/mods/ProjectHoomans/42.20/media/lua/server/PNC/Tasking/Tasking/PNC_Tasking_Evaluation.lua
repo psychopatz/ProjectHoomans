@@ -108,6 +108,7 @@ function H.ExternalCurrent(record)
         and kind ~= followKind
         and kind ~= campKind
         and kind ~= tostring(PNC.Const and PNC.Const.ORDER_GUARD or "guard")
+        and kind ~= tostring(PNC.Const and PNC.Const.ORDER_ROAM or "roam")
         and kind ~= "facility_activity"
     then
         return { taskId = "order:" .. kind, precedence = "FORCED_ORDER",

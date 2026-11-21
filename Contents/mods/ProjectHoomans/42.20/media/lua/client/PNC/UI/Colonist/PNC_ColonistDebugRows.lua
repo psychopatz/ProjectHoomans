@@ -177,6 +177,90 @@ function Rows.Build(person, snapshot, window, component)
             }
         end
     end
+    local brain = type(person) == "table" and person.taskBrain or nil
+    if type(brain) == "table" then
+        local current = type(brain.current) == "table" and brain.current or nil
+        local activeBand = tostring(brain.activeBand
+            or (current and current.precedence) or "IDLE")
+        rows[#rows + 1] = {
+            key = "debug_ai_band",
+            label = Shared.Tr("UI_PNC_ColonyDebug_AIBand", "AI Band / Decision"),
+            detail = string.format("%s | %s | cause %s | task %s",
+                activeBand,
+                tostring(brain.decision or "NONE"),
+                tostring(brain.lastCause or "-"),
+                tostring(current and (current.operation or current.taskId) or "IDLE")),
+            colorName = current and "accent" or "muted",
+        }
+
+        local claims = type(brain.leaseClaims) == "table" and #brain.leaseClaims > 0
+            and brain.leaseClaims or brain.claims
+        local claimKeys = {}
+        local claimCount = type(claims) == "table" and #claims or 0
+        for i = 1, math.min(4, claimCount) do
+            claimKeys[#claimKeys + 1] = tostring(claims[i].key or claims[i])
+        end
+        rows[#rows + 1] = {
+            key = "debug_ai_claims",
+            label = Shared.Tr("UI_PNC_ColonyDebug_TaskClaims", "Tasking Claims"),
+            detail = #claimKeys > 0
+                and string.format("%d: %s", claimCount, table.concat(claimKeys, ", "))
+                or "0 active",
+        }
+
+        local autonomy = type(brain.autonomyDiagnostics) == "table"
+            and brain.autonomyDiagnostics or nil
+        if autonomy then
+            local cands = type(autonomy.candidates) == "table"
+                and autonomy.candidates or {}
+            for i = 1, math.min(3, #cands) do
+                local cand = cands[i]
+                rows[#rows + 1] = {
+                    key = "debug_ai_autonomy_cand_" .. tostring(i),
+                    label = Shared.Tr("UI_PNC_ColonyDebug_AutonomyCand",
+                        "Autonomy Candidate") .. " #" .. tostring(i),
+                    detail = string.format(
+                        "%s [%s] score %.2f (trait %+.2f, mood %+.2f, dist -%.2f)",
+                        tostring(cand.adId or "unknown"),
+                        tostring(cand.band or "IDLE"),
+                        tonumber(cand.score) or 0,
+                        tonumber(cand.traitDelta) or 0,
+                        tonumber(cand.moodDelta) or 0,
+                        tonumber(cand.distancePenalty) or 0),
+                    colorName = i == 1 and "success" or "muted",
+                }
+            end
+            local rejs = type(autonomy.rejections) == "table"
+                and autonomy.rejections or {}
+            for i = 1, math.min(4, #rejs) do
+                local rej = rejs[i]
+                rows[#rows + 1] = {
+                    key = "debug_ai_autonomy_rej_" .. tostring(i),
+                    label = Shared.Tr("UI_PNC_ColonyDebug_AutonomyRej",
+                        "Autonomy Rejected") .. " #" .. tostring(i),
+                    detail = string.format("%s: %s",
+                        tostring(rej.adId or "unknown"),
+                        tostring(rej.reason or "REJECTED")),
+                    colorName = "danger",
+                }
+            end
+            local co = type(autonomy.coPresence) == "table"
+                and autonomy.coPresence or nil
+            if co then
+                rows[#rows + 1] = {
+                    key = "debug_ai_copresence",
+                    label = Shared.Tr("UI_PNC_ColonyDebug_CoPresence", "Co-Presence"),
+                    detail = string.format("%s | %s | reason %s | peers %d",
+                        tostring(co.situationId or "-"),
+                        co.triggered == true and "TRIGGERED" or "IDLE",
+                        tostring(co.reason or "-"),
+                        type(co.participants) == "table" and #co.participants or 0),
+                    colorName = co.triggered == true and "success" or "muted",
+                }
+            end
+        end
+    end
+
     return rows
 end
 

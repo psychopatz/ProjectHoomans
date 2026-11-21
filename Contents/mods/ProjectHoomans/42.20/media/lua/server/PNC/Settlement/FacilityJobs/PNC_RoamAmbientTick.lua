@@ -20,7 +20,8 @@ local function canContinue(record, zombie, state, at)
     end
     if runtime.target ~= nil or runtime.combatTarget ~= nil
         or runtime.attackAction ~= nil or runtime.facilityActivity ~= nil
-        or runtime.workOrderId ~= nil or runtime.taskLeaseId ~= nil
+        or runtime.workOrderId ~= nil
+        or (runtime.taskLeaseId ~= nil and runtime.taskLeaseId ~= state.taskLeaseId)
         or runtime.medicalCare ~= nil or runtime.treatment ~= nil
         or at < (tonumber(runtime.inCombatUntil) or 0)
         or at < (tonumber(health and health.recentDamageUntil) or 0)

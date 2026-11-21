@@ -48,7 +48,9 @@ local function sleepActionable(record)
         and fatigue >= (tonumber(policy.actionable) or 0.70)
 end
 
-local function eligible(record, currentTime)
+local function eligible(record, currentTime, opts)
+    opts = type(opts) == "table" and opts or nil
+    local allowAutonomy = opts ~= nil and opts.allowActiveAutonomyLease == true
     if not record or record.alive == false
         or not PNC.CompanionCommands
         or not PNC.CompanionCommands.IsCompanion(record)
@@ -61,11 +63,19 @@ local function eligible(record, currentTime)
         -- actor temporarily owned by Puppet Opera.
         return false
     end
-    if PNC.TaskLeaseService and PNC.TaskLeaseService.ForNPC(record.id) then
+    local currentLease = PNC.TaskLeaseService
+        and PNC.TaskLeaseService.ForNPC(record.id) or nil
+    if currentLease and not (allowAutonomy
+        and tostring(currentLease.sourceDomain or "") == "autonomy")
+    then
         return false
     end
+    local hasAutonomyActivity = allowAutonomy
+        and record.runtime
+        and record.runtime.autonomyAdId ~= nil
+        and record.runtime.facilityActivity ~= nil
     if record.runtime and (record.runtime.workOrderId
-        or record.runtime.facilityActivity)
+        or (record.runtime.facilityActivity and not hasAutonomyActivity))
     then
         -- An automatic living-room activity may have been started in the same
         -- server tick that fatigue crossed the sleep threshold. End that idle
@@ -92,9 +102,11 @@ local function eligible(record, currentTime)
     local camp = isCamp(record)
     local base = not camp and homeBase(record) or nil
     if not camp and not isHome(record, base) then return false end
-    local key = tostring(record.id)
-    if currentTime < (tonumber(Service.NextAttemptAt[key]) or 0) then
-        return false
+    if not (opts and opts.ignoreCadence == true) then
+        local key = tostring(record.id)
+        if currentTime < (tonumber(Service.NextAttemptAt[key]) or 0) then
+            return false
+        end
     end
     return true, camp, base
 end
@@ -167,6 +179,66 @@ local function start(record, acquired, camp, live)
             acquired.reservationId, "ambient_start_failed")
     end
     return ok == true
+end
+
+Service.IsEligible = eligible
+
+function Service.PreviewSeat(record, _, camp, base)
+    if camp then
+        if not PNC.CampResourceService
+            or not PNC.CampResourceService.AcquireSeat
+        then
+            return nil
+        end
+        return {
+            camp = true,
+            facilityId = record and record.orderSpec
+                and record.orderSpec.campId or "camp",
+            x = record and tonumber(record.x) or 0,
+            y = record and tonumber(record.y) or 0,
+        }
+    end
+    if base and base.id and PNC.FacilityService
+        and PNC.FacilityService.ListByCapability
+    then
+        local facilities = PNC.FacilityService.ListByCapability(
+            base.id, "living")
+        local facility = type(facilities) == "table" and facilities[1] or nil
+        if not facility then return nil end
+        return {
+            camp = false,
+            baseId = base.id,
+            facilityId = facility.id,
+            x = tonumber(facility.x) or (record and tonumber(record.x)) or 0,
+            y = tonumber(facility.y) or (record and tonumber(record.y)) or 0,
+        }
+    end
+    return nil
+end
+
+function Service.AcquireSeat(record, live, camp, base)
+    if live == nil then live = liveBody(record) end
+    if camp == nil and base == nil then
+        camp = isCamp(record)
+        base = not camp and homeBase(record) or nil
+    end
+    local acquired
+    if camp then
+        acquired = campSeat(record, live)
+    else
+        acquired = homeSeat(record, base, live)
+    end
+    return acquired, camp, base
+end
+
+Service.StartSeat = start
+
+function Service.StopSeat(record, reason)
+    if not record or not PNC.FacilityJobs or not PNC.FacilityJobs.Stop then
+        return false
+    end
+    return PNC.FacilityJobs.Stop(
+        record, reason or "ambient_seat_stopped") == true
 end
 
 function Service.Pump(currentTime)

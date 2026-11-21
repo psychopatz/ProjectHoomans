@@ -56,6 +56,17 @@ function H.Run(record, zombie, order, state, now)
         if now < state.waitUntil then
             state.phase = "idle"
             record.activeBehavior = "Roam:area:idle"
+            local tasking = PNC.Tasking
+            if tasking and tasking.Providers and tasking.Providers.autonomy
+                and tasking.Events and type(tasking.Events.Emit) == "function"
+            then
+                tasking.Events.Emit("AMBIENT_OPPORTUNITY", {
+                    record = record,
+                    source = "Behavior.RoamArea",
+                    cause = "roam_idle",
+                })
+                return true
+            end
             if PNC.RoamAmbient and PNC.RoamAmbient.TryStart
                 and PNC.RoamAmbient.TryStart(
                     record, zombie, order, state, now)

@@ -196,3 +196,5 @@ Internal.hasActivePath = hasActivePath
 Internal.canAttempt = canAttempt
 Internal.canAttemptGuard = canAttemptGuard
 Internal.idHash = idHash
+Service.CanAttempt = canAttempt
+Service.CanAttemptGuard = canAttemptGuard

@@ -125,3 +125,4 @@ Internal.resetRoam = resetRoam
 Internal.finish = finish
 Internal.stop = stop
 Internal.beginAttempt = beginAttempt
+Service.Stop = stop

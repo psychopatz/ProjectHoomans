@@ -26,11 +26,10 @@ local RESERVATION_PURPOSE = Internal.RESERVATION_PURPOSE
 local GUARD_RESERVATION_PURPOSE = Internal.GUARD_RESERVATION_PURPOSE
 local beginAttempt = Internal.beginAttempt
 
-local function startSeat(record, zombie, at, ownerKind)
+local function startCandidate(record, zombie, candidate, at, ownerKind)
     local resourcesService = facilityResources()
     local reservationsService = facilityReservations()
     local id = tostring(record and record.id or "")
-    local candidate
     local ok
     local reservation
     local runtime
@@ -44,8 +43,6 @@ local function startSeat(record, zombie, at, ownerKind)
     then
         return false
     end
-    if not beginAttempt(id, at) then return false end
-    candidate = findSeat(record, zombie)
     if not candidate or not reservationsService
         or not reservationsService.ReserveResource
     then
@@ -129,5 +126,17 @@ local function startSeat(record, zombie, at, ownerKind)
     return Service.Tick(record, zombie, at)
 end
 
+local function startSeat(record, zombie, at, ownerKind)
+    local id = tostring(record and record.id or "")
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        return false
+    end
+    if not beginAttempt(id, at) then return false end
+    local candidate = findSeat(record, zombie)
+    return startCandidate(record, zombie, candidate, at, ownerKind)
+end
 
+Service.StartCandidate = startCandidate
 Internal.startSeat = startSeat

@@ -127,11 +127,21 @@ function Tasking.Queries.BuildBrain(npcId, limit)
     end
     local winner = visible[1] and H.Copy(visible[1]) or nil
     local currentRow = current and decorate(current, true) or nil
+    local diagnosticsByProvider = providerDiagnostics(npcId)
+    local activeBand = currentRow and tostring(currentRow.precedence or "IDLE")
+        or "IDLE"
+    local claims = Tasking.Claims
+        and type(Tasking.Claims.ListByOwner) == "function"
+        and Tasking.Claims.ListByOwner(npcId) or {}
+    local leaseClaims = current and Tasking.Claims
+        and type(Tasking.Claims.ListByLease) == "function"
+        and Tasking.Claims.ListByLease(current.leaseId) or {}
     return {
         freshness = freshness,
         generatedAt = generatedAt,
         recordRevision = recordRevision,
         leaseRevision = current and tonumber(current.revision) or nil,
+        activeBand = activeBand,
         current = currentRow,
         winner = winner,
         candidates = visible,
@@ -143,7 +153,11 @@ function Tasking.Queries.BuildBrain(npcId, limit)
         eventType = diagnostics and diagnostics.eventType or nil,
         providerFailures = diagnostics
             and H.Copy(diagnostics.providerFailures) or {},
-        providerDiagnostics = providerDiagnostics(npcId),
+        providerDiagnostics = diagnosticsByProvider,
+        claims = claims,
+        leaseClaims = leaseClaims,
+        autonomyDiagnostics = diagnosticsByProvider
+            and diagnosticsByProvider.autonomy or nil,
     }
 end
 

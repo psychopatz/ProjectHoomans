@@ -733,6 +733,20 @@ function Adapter.PromoteCoreActor(actorOrID, core, options)
     if not PNC.Registry.AddRecord(record) then
         return nil, "pnc_core_actor_record_add_failed"
     end
+    if PNC.AutonomyScorer
+        and type(PNC.AutonomyScorer.HydrateOnPromotion) == "function"
+    then
+        local elapsedHours = math.max(0,
+            tonumber(actor.elapsedOfflineHours or actor.offlineHours) or 0)
+        if elapsedHours == 0 and actor.lastSimulatedAt
+            and actor.worldAgeHours
+        then
+            elapsedHours = math.max(0,
+                (tonumber(actor.worldAgeHours) or 0)
+                - (tonumber(actor.lastSimulatedAt) or 0))
+        end
+        PNC.AutonomyScorer.HydrateOnPromotion(record, elapsedHours, nowMs)
+    end
     Adapter.Metrics.promotions = (tonumber(Adapter.Metrics.promotions) or 0) + 1
     return record, "created"
 end
