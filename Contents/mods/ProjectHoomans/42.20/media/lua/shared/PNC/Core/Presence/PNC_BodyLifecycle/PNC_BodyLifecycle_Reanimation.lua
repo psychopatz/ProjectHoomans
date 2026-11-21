@@ -84,6 +84,19 @@ end
 function Lifecycle.ReleaseReanimatedNPC(record, zombie)
     if not record or not zombie or not Core.IsAuthority() then return false end
     clearManagedState(record, zombie)
+    if PNC.SecondaryChannel
+        and type(PNC.SecondaryChannel.ClearForRecord) == "function"
+    then
+        -- clearManagedState already removed PNCAlertLevel/PNCPosture/PNCSecondaryState via clearVariable;
+        -- ClearForRecord frees record.runtime.secondaryChannel and stops any active voice playback.
+        PNC.SecondaryChannel.ClearForRecord(record)
+    end
+    if PNC.AgitationService
+        and type(PNC.AgitationService.Clear) == "function"
+        and record.id ~= nil
+    then
+        PNC.AgitationService.Clear(record.id)
+    end
     if PNC.JointSceneLease
         and type(PNC.JointSceneLease.OnParticipantUnavailable) == "function"
         and record.id ~= nil

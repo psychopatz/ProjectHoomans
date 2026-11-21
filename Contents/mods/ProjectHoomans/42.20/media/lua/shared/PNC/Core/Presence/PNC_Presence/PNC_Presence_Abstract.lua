@@ -59,7 +59,7 @@ local function worldAgeHours()
         and getGameTime():getWorldAgeHours() or 0
 end
 
-local function notifyAbstraction(record, reason)
+local function notifyAbstraction(record, reason, zombie)
     local entityRef = PNC.EntityRef
         and PNC.EntityRef.ForNPC(record.id) or nil
     if PNC.FactionIncidentService
@@ -98,7 +98,7 @@ local function notifyAbstraction(record, reason)
     if PNC.SecondaryChannel
         and type(PNC.SecondaryChannel.ClearForRecord) == "function"
     then
-        PNC.SecondaryChannel.ClearForRecord(record)
+        PNC.SecondaryChannel.ClearForRecord(record, zombie)
     end
     if PNC.AgitationService
         and type(PNC.AgitationService.Clear) == "function"
@@ -227,7 +227,7 @@ function Presence.Abstract(record, reason)
             "reason=" .. tostring(reason or "abstract"),
         })
     end
-    notifyAbstraction(record, reason)
+    notifyAbstraction(record, reason, zombie)
     record.presenceState = Const.PRESENCE_ABSTRACT
     record.runtime = record.runtime or {}
     local abstractNow = Core.Now()

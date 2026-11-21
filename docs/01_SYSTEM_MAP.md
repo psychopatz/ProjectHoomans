@@ -58,12 +58,25 @@
 - `PNC_Perception`: target selection, zombie lookup, and nearby threat counting
 - `PNC_Perception_Frame`: short-lived per-NPC zombie candidate, LOS, and
   multi-radius threat-count cache
+- `PNC_PerceptionService` and `PNC_PerceptionRuntime`: activity-sensitive
+  `100/250/1000 ms` perception cadence, squared-distance + cosine azimuth cone
+  pre-filter, budgeted `<= 8`/tick LOS queue, `OnWorldSound` listener/shock
+  bridge, and bounded `ClueMemory`
 - `PNC_Stamina`: stamina authority, recovery, attack costs, and visibility timers
 - `PNC_NeedsDefinitions` and `PNC_NeedsUtils`: centralized 0–100 Need
   definitions, condition levels, initialization ranges, elapsed-time rate
   inputs, and serialization-safe state normalization
 - `PNC_Visuals`: owns appearance application and reusable body-visual operations such as clothing visuals, attached-item cleanup, and model refresh
 - `PNC_Animation`: single animation state writer
+- `PNC_SecondaryChannel`: orthogonal non-interrupting layer for coincident-guarded
+  `faceLocationF` gaze, Build 42 `AnimSet` variables (`PNCAlertLevel`,
+  `PNCPosture`, `PNCSecondaryState`) replicated via `BuildPresenceDelta` and
+  reset on abstraction/reanimation, and priority-gated barks with lazy
+  multiplicative line-exhaustion recovery
+- Compiled AI & ConvoEngine Catalogs (`common/media/lua/shared/PNC/`): generated
+  by `PsychopatzCore` `CodeBuilder` under `AutonomyAd`, `ReactionPolicy`,
+  `WorkScenario`, and `ConvoEngine/Index/Director` (sparse Director inverted index
+  with zero duplicate behavior/beat bodies)
 - `PNC_Health`: custom HP, incapacitation, death ownership
 - `PNC_Combat`: combat entry
 - `PNC_Combat_Melee`: melee attack start rules
@@ -205,7 +218,26 @@
   incapacitation rescue attribution
 - `PNC_SocialEncounterTracker`: non-persistent, stable-key combat aggregation
   for protection, shared survival, and conservative abandonment
+- `PNC_SocialWitnessService`: server-authoritative witness-bounded `PsychopatzSocial`
+  memory recording and deduplicated 1-hop hearsay propagation
 - `PNC_SocialEventDebug`: opt-in read-only processed-event diagnostics
+- `PNC.Tasking` (`PNC_TaskPriority`, `PNC_TaskLeaseService`, `PNC_Tasking_Claims`):
+  unified 8-band priority arbiter (`SAME_BAND_MARGIN = 0.08`, cap `64`), dirty
+  reevaluation queue, and atomic lease-bound resource claims
+- `PNC_WorkService` & `PNC_WorkToilRunner`: `O(dirty)` colony work reconciler
+  and 5-step dual executor unifying `FARMING`, `FISHING`, `LUMBER`, and
+  `CORPSE_HAUL` adapters with `AbortOrder` claim/input/tool cleanup
+- `PNC_AutonomyScorer`, `PNC_AutonomyTaskProvider`, `PNC_CoPresenceService`,
+  and `PNC_ScenarioScheduler`: compiled-IR `OPTIONAL`/`IDLE` autonomy scoring,
+  hysteresis, co-presence situations, and time-of-day scenario chaining
+- `PNC_AgitationService`, `PNC_ReactionPolicyEvaluator`, and
+  `PNC_ShockingReactionTaskProvider`: sparse lazy-decay agitation and 5-intent
+  non-lethal reactivity (`StopAndAssess`, `BackAway`, `Investigate`,
+  `WarnGroup`, `SmartFlee`) subscribed to Core `PsychopatzShockingEventBus`
+- `PNC_DialogueMicroBeatDirector`, `PNC_JointSceneLeaseService`, and
+  `PNC_StreetInteractionService`: zero-LLM 5-stage micro-beat dialogue director
+  atop `ConvoEngine`, 2–4 participant `JointSceneLease`, global mix-ins, and
+  RDR2-style `GREET`/`ANTAGONIZE`/`DEFUSE` street acts
 
 ## Client
 - `PNC_Client`: roster cache, character-payload cache, sync requests, context menu debug tools

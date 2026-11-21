@@ -1,7 +1,7 @@
 # Progress: UnifiedSchemaDrivenNPCAI
 
-Parent goal: IN PROGRESS
-Current phase: Phase U6 — Cross-Tier Scale Proof, Full Harness Acceptance & Final Closure
+Parent goal: READY FOR USER LIVE TEST
+Current phase: User-Owned Native SP/MP Live Acceptance (Developer-side Phases U0–U6 COMPLETE)
 
 Accepted:
 
@@ -10,29 +10,31 @@ Accepted:
 * Phase U2 — `CodeBuilder` Multi-IR Expansion (`psychopatzCore` @ `010a6260cabe39f210095ba3d1bfb710d35b98cf`, `ProjectHoomans` @ `13ca3255df7dab59202ba2322920239a83f3f7d0`).
 * Phase U3 — Sims Band-Gated Autonomy & Co-Presence Unification (`24d7bcd96389cce3b6541248a9f1c7f4d1c27c61`).
 * Phase U4 — GTA V / RDR2 Behavioral Reactivity & Secondary Channel (`psychopatzCore` @ `2a32bb7eb43a8331a95ff3a8760d94abd70ca127`, `ProjectHoomans` @ `6800ec9c9185366815d68e3deb34093dcc75b425`).
-* Phase U5 — S13D–S13F Prerequisite Gate + Façade-Inspired Dialogue Director & RDR2 Street Interaction (`psychopatzCore` @ `bbd9fee90a96f63323129ea29e5bf76e2f1525be`, `DynamicTrading` @ `d4034fac5f547e00253dc3b9db5fd4554e37b535`, `ProjectHoomans`):
-  * Closed `ConvoEngine` S13D–S13F across Core, DynamicTrading, and Hoomans: retired all duplicate `Behaviors/Director/*` & `Beats/Director/*` projections, generated `ConvoEngine/Index/Director.lua`, and updated provider tests.
-  * Added `PNC_DialogueMicroBeatDirector` (5-stage deterministic micro-beats, ephemeral scene tension, causally independent global mix-ins, zero LLM calls), `PNC_JointSceneLeaseService` (server-owned 2–4 participant leases with secondary listener reactivity and `HARD_EMERGENCY`/demotion/reanimation abort cleanup), `PNC_StreetInteractionService` (`GREET`/`ANTAGONIZE`/`DEFUSE` acts linked to `AgitationService`, `SecondaryChannel`, and `DialogueMicroBeatDirector`), and `PNC_SocialWitnessService` (witness-only `PsychopatzSocial` memory recording + deduplicated 1-hop hearsay).
-  * Wired `PNC_SemanticEventRuntime`, `PNC_CoPresenceService` (`InteractionSceneAdopters`), `PNC_SocialGreetingService.HandleStreetAct`, `PNC_Presence_Abstract`, `PNC_BodyLifecycle_Reanimation`, `PNC_Tasking_Queries.BuildBrain`, Colonists Debug GUI (`debug_ai_dialogue_director`), and fixed `PNC_ColonistDepartureService_Depart` nil `PNC.OrderSystem` guard.
+* Phase U5 — S13D–S13F Prerequisite Gate + Façade-Inspired Dialogue Director & RDR2 Street Interaction (`psychopatzCore` @ `bbd9fee90a96f63323129ea29e5bf76e2f1525be`, `DynamicTrading` @ `d4034fac5f547e00253dc3b9db5fd4554e37b535`, `ProjectHoomans` @ `0e35ae37deb6e385a806136bfa1edbca9acfe8e6`).
+* Phase U6 — Cross-Tier Scale Proof, Multi-Repo Verification, Adversarial Audit & Closure (`ProjectHoomans` local commit):
+  * Added Kahlua2-clean `tests/pnc_u6_unified_ai_scale_smoke.lua` (`pz-verify --kahlua --severity ERROR` 0 errors/0 warnings) verifying `O(N)`/`O(L)` 200-abstract + 6-live scaling, `<= 64` autonomy evaluation cap, `SAME_BAND_MARGIN = 0.08`, 8-band wall, `<= 8`/tick LOS queue on 32 threats, demotion teardown, 200-event `PsychopatzShockingEventBus` FIFO `128` cap + `1000ms` dedup + `HARD_EMERGENCY` `JointSceneLease` abort, `O(dirty)` 4-chore `WorkService` + `AbortOrder`, 3-NPC micro-beat + global mix-in (`llmCalls = 0`), RDR2 `GREET`/`ANTAGONIZE`/`DEFUSE` + witness-only `PsychopatzSocial` hearsay, compact `SecondaryChannel` presence delta, and profiler-OFF zero overhead.
+  * Closed adversarial Check #3 finding: updated `PNC_Presence_Abstract.notifyAbstraction` to pass `zombie` into `PNC.SecondaryChannel.ClearForRecord(record, zombie)` and updated `PNC_BodyLifecycle_Reanimation.ReleaseReanimatedNPC` to call `PNC.SecondaryChannel.ClearForRecord(record)` + `PNC.AgitationService.Clear(record.id)` right after `clearManagedState(record, zombie)`.
+  * Reconciled `docs/01_SYSTEM_MAP.md` and `docs/Jobs/UnifiedSchemaDrivenNPCAI/*` to `READY FOR USER LIVE TEST`.
 
 Current evidence:
 
-* `TEST_VERIFIED` (U5):
-  * `psychopatzCore`: `357/357` Python unittests OK; `14/14` Core Lua smokes PASS; `reconcile.py --check` clean (`missing=0, drifted=0, stale=0, retired_present=0, ambiguous=0`); `convo_engine_cli director-readiness --summary` `ok=true` (all 5 counters `0`, all 8 `readinessChecks=true`); `audit-integrity --check-determinism` OK (`fileCount=446`, `diffs=[]`); `convo_engine_naming_audit --summary` (`ok=true, activeCurrentPsdlIdentityCount=0`); `pz-verify --kahlua` 0 errors.
-  * `DynamicTrading`: `92/92` PASS; `pz-verify --kahlua` 0 errors on reconciled `DTCommon/ConvoEngine/Registry.lua`.
-  * `ProjectHoomans`: `32/32` U5b focused Lua suites PASS (`u5_dialogue`, `semantic_interaction`, `social_director`, `social_conversation`, `social_greeting`, `social_event`, `u4_reactivity`, `u3_autonomy`, `mp_server_file_guard` @ `1071`, `composition_bootstrap`, `tasking`, `colonist_ui`, `colonist_task`, `reanimation`); `19/19` U5a provider Python OK; `test_dialogue_completeness_workbench` PASS; full provider Python `156/165` modules PASS (`651` tests run, `27` skipped, `10` failures + `3` errors across 9 pre-U0 semantic-harness fixture drifts untouched).
-* `STATIC_ONLY` (U5): `pz-verify --kahlua --severity ERROR` returned `0` errors across all 16 U5 production, generated, and test Lua files (`pnc_mp_server_file_guard_smoke.lua` expectedly uses host `io.*`). `git diff --check` clean.
-* `TEST_VERIFIED` (U4): Core `psychopatz_shocking_event_bus_smoke`, `psychopatz_capability_contract_smoke`, `psychopatz_boundary_isolation_smoke` OK; `DynamicTrading` 92/92 PASS; ProjectHoomans 13 suites — 29/29 PASS.
-* `TEST_VERIFIED` (U3): ProjectHoomans 13 Lua suites — 20/20 PASS.
-* `TEST_VERIFIED` (U2): `psychopatzCore` 30/30 Python + 5/5 Lua + `reconcile.py --check` clean; `DynamicTrading` 92/92 PASS; `PASS generated_ai_ir_registries_lua_load`.
-* `TEST_VERIFIED` (U1): `u1_work_foundation` + focused work/farming/lumber/fishing/corpse/tasking suites — 81/81 passed.
+* `TEST_VERIFIED` (U6 post-final-edit):
+  * `ProjectHoomans`: `126/126` PASS (`u6_unified_ai_scale`, `u5_dialogue`, `u4_reactivity`, `u3_autonomy`, `u1_work_foundation`, `reanimation`, `presence`, `mp_server_file_guard` @ `1071`); full Lua suite `1086/1090` PASS (the 4 failures — `pnc_animation_scene_debug_routes_smoke`, `pnc_context_debug_smoke`, `pnc_population_director_smoke`, `pz_custom_translation_manager_smoke` — are pre-U0 baseline failures in untouched Context/Population/Translation modules); focused ConvoEngine Python suite `35/35` OK (`7/7` modules); U5 full Python run `156/165` modules PASS (`651` run, `27` skipped; 9 pre-U0 semantic-harness fixture drifts untouched).
+  * `psychopatzCore` (`bbd9fee90a96f63323129ea29e5bf76e2f1525be`): `357/357` Python unittests OK; `reconcile.py --check` clean; `convo_engine_cli director-readiness --summary` (`ok=true`, all 5 counters `0`, 8 checks `true`); `audit-integrity --check-determinism` OK (`446` files, `0` violations, `diffs=[]`); `convo_engine_naming_audit --summary` (`ok=true`, `activeCurrentPsdlIdentityCount=0`); `19/19` Core ConvoEngine/Social/ShockingBus/Kernel Lua smokes PASS.
+  * `DynamicTrading` (`d4034fac5f547e00253dc3b9db5fd4554e37b535`): `PASS 92/92`.
+* `STATIC_ONLY` (U6):
+  * `pz-verify --kahlua --severity ERROR` returns `0` errors across `tests/pnc_u6_unified_ai_scale_smoke.lua`, `PNC_Presence_Abstract.lua`, `PNC_BodyLifecycle_Reanimation.lua`, and all U1–U5 production/generated Lua files.
+  * Independent read-only adversarial verifier audit (`17/17` checks across 7 areas): **PASS, 0 mandatory findings remaining**.
+* Environment / toolchain notes:
+  * `pz-runtime-harness` (`project-hoomans run --allow-runtime-mismatch` and `suite` with current Build 42.22 profile `baseline-79175035`): reports `toolchain_incompatible` because PZ 42.22 `projectzomboid.jar` uses Java 25 classfile major `69` while the host provides `javac 17.0.20.1` (max major `61`) with only JRE 25 bundled and no JDK 25 installed locally. Host JDK was left untouched per policy.
+  * `git diff --check` clean across all modified files.
 
 Known gap:
 
-* **Phase U6**: Add cross-tier scale proof (`tests/pnc_u6_unified_ai_scale_smoke.lua`), run full multi-repo suites + real PZ headless Kahlua JVM harness (`pz-runtime-harness`), run independent adversarial verification pass, and reconcile `docs/01_SYSTEM_MAP.md` & final job closure (`READY FOR USER LIVE TEST`).
+* User-owned native Project Zomboid Singleplayer and Multiplayer live acceptance testing (plus optional JDK 25 installation if re-running `pz-runtime-harness` JVM compilation against Build 42.22).
 
-Next Chunk: Chunk U6A — Create `tests/pnc_u6_unified_ai_scale_smoke.lua`, execute full 3-repo + headless Kahlua JVM verification, run adversarial verification, and close U6 docs/commit.
+Next Chunk: USER_LIVE_TEST — Native Project Zomboid SP/MP live verification by user.
 
 Immediate acceptance:
 
-* Full Lua suite passes 100%, `DynamicTrading` (`Core + DTCommon + DTAbstract`) passes 92/92, Core suites pass 100%, `pz-runtime-harness` passes cleanly, zero mandatory verifier findings, and parent is marked `READY FOR USER LIVE TEST`.
+* Native SP & MP check of: colony work/hauling without stutter, Sims band-gated autonomy & co-presence situations, gunshot/weapon/explosion reactivity + `SecondaryChannel` AnimSet vars/gaze/barks, RDR2 `GREET`/`ANTAGONIZE`/`DEFUSE` + multi-NPC micro-beats + witness-only hearsay, Colonists Debug GUI telemetry, and standalone `DynamicTrading` load without `ProjectHoomans`.
