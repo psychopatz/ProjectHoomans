@@ -1,27 +1,30 @@
 # Progress: UnifiedSchemaDrivenNPCAI
 
 Parent goal: IN PROGRESS
-Current phase: Phase U0 — Live Workspace Audit, Prerequisite Verification & Manifest Freeze
+Current phase: Phase U1 — RimWorld Work Foundation Unification
 
 Accepted:
 
-* Cross-game architectural synthesis (Sims, Façade, GTA V/RDR2 behavioral reactivity, RimWorld work/Defs) and Adopt/Adapt/Reject ownership specification approved.
-* Canonical job documentation drafted under `docs/Jobs/UnifiedSchemaDrivenNPCAI/`.
+* Phase U0 — Live Workspace Audit, Prerequisite Verification & Manifest Freeze (`CODE_VERIFIED` across `ProjectHoomans`, `psychopatzCore`, `DynamicTrading`, and `pz-java-baseline`).
+* Canonical job documentation reconciled against verified live HEADs, Build 42 Java engine contracts, and frozen cross-repo Phase U1–U6 ownership manifest.
 
 Current evidence:
 
-* Architectural design grounded in prior workspace audits (`PNC.Tasking`, `NeedFacilityTriggers`, `ConvoEngine v1`, `LightweightNPCRuntime`, `Portable Social State`, `ModularWorkFoundationAndFarming`).
-* Live Git HEADs: VERIFIED on disk for all three repositories (main; worktrees clean). Prerequisite phase states: NOT YET SOURCE-VERIFIED.
+* `CODE_VERIFIED`: Live Git HEADs and clean worktrees verified on `main`:
+  * `ProjectHoomans` @ `cbf62c1aedbb57cf486503ae707c8ca6a457e2a6` (pre-U0-closure baseline)
+  * `psychopatzCore` @ `e7149129f10da87c28b56d6359aac3ff461eba09`
+  * `DynamicTrading` @ `2b66a9583fcbe3d9e915b6c16ab9d6851d053eab`
+* `CODE_VERIFIED`: Hard prerequisites `LightweightNPCRuntime` (L0–L6), `Portable Social State` (P0–P12/H0–H8/DT0–DT6), `PortableActorLifecycleGC` (L0–L9), and `ModularWorkFoundationAndFarming` (F1–F5) are developer-complete; `ConvoEngine` S13D–S13F (`psychopatzCore`) is sequenced as gate U5a before Phase U5 Dialogue Director work.
+* `CODE_VERIFIED`: Build 42 Java constraints (`IsoGameCharacter.setVariable` server no-op for `IsoZombie`, `faceLocationF` zero-delta warning, `CanSee` no-FOV check, `WorldSoundManager` server `chunk.soundList` gap) verified against `pz-java-baseline`.
 
 Known gap:
 
-* Prerequisite roadmaps (`LightweightNPCRuntime`, `Portable Social State`, `ModularWorkFoundationAndFarming`) must be checked against actual current HEADs before locking implementation order for U1–U5.
-* Line-level internals of `PNC_SocialEventHooks_CombatAdapter_Awareness.lua`, `SceneAdopters.lua`, `PNC_AmbientFacilityService.lua`, combat executors, and Build 42 `AnimSets` require read-only `codebase-memory-mcp` inspection.
+* Phase U1 unification targets: `PNC.Tasking.Claims` does not yet exist; `WorkService.RegisterReconciler` is unwired for `FARMING`/`FISHING`/`LUMBER`/`CORPSE_HAUL`; `CorpseHaulService` still registers a standalone `Events.OnTick` loop; `LumberService.Pump` duplicates reconcile polling; legacy `"farming"` Tasking provider still registers at startup; `WorkToilRunner.AbortOrder` is not yet implemented.
 
-Next Chunk: Chunk U0A — Run read-only workspace discovery across `ProjectHoomans`, `psychopatzCore`, and `DynamicTrading` to record verified HEAD/worktree fingerprints, audit live status of prerequisite jobs, inspect high-pressure target modules, and freeze the Phase U1–U6 manifest.
+Next Chunk: Chunk U1A — Implement `PNC.Tasking.Claims`, wire automatic release into `PNC_TaskLeaseService_Release` and `PNC_Tasking_Assignment`, bridge Work/WorkZone/Lumber/CorpseHaul claims, add `WorkToilRunner.AbortOrder`, and unify all 4 chores onto dirty-state `WorkService.RegisterReconciler`.
 
 Immediate acceptance:
 
-* Verified HEAD/branch/status table stamped into `HANDOFF.md` and `ROADMAP.md`.
-* Source-verified prerequisite readiness report (which phases of L0–L5, P0–P9, and F1–F5 are already complete vs. open).
-* Frozen non-overlapping file-ownership manifest ready for Phase U1/U2 execution.
+* `PNC.Tasking.Claims` (`Acquire`, `Renew`, `Release`, `ReleaseByLease`, `ReleaseByOwner`, `PruneExpired`, `GetDiagnostics`) verified under TaskLease release and rollback.
+* All 4 chore reconcilers (`FARMING`, `FISHING`, `LUMBER`, `CORPSE_HAUL`) registered on `WorkService` with zero standalone production `Events.OnTick` chore polling loops and zero `isFarmer` gates.
+* Focused `u1_work_foundation`, `mp_server_file_guard`, `work`, `farming`, `lumber`, `fishing`, `corpse`, and `tasking` tests + Kahlua lint pass.
