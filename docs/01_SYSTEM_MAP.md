@@ -60,8 +60,10 @@
   multi-radius threat-count cache
 - `PNC_PerceptionService` and `PNC_PerceptionRuntime`: activity-sensitive
   `100/250/1000 ms` perception cadence, squared-distance + cosine azimuth cone
-  pre-filter, budgeted `<= 8`/tick LOS queue, `OnWorldSound` listener/shock
-  bridge, and bounded `ClueMemory`
+  pre-filter (`PassesBodyVisionCone` used by `PNC_Perception_Frame`,
+  `Visibility`, and `ActorSearch` with `2.5m` peripheral ring + engaged-threat
+  bypass), budgeted `<= 8`/tick LOS queue (pumped in `FinishTick` when pending),
+  `OnWorldSound` listener/shock bridge, and bounded `ClueMemory`
 - `PNC_Stamina`: stamina authority, recovery, attack costs, and visibility timers
 - `PNC_NeedsDefinitions` and `PNC_NeedsUtils`: centralized 0–100 Need
   definitions, condition levels, initialization ranges, elapsed-time rate
@@ -236,8 +238,14 @@
   `WarnGroup`, `SmartFlee`) subscribed to Core `PsychopatzShockingEventBus`
 - `PNC_DialogueMicroBeatDirector`, `PNC_JointSceneLeaseService`, and
   `PNC_StreetInteractionService`: zero-LLM 5-stage micro-beat dialogue director
-  atop `ConvoEngine`, 2–4 participant `JointSceneLease`, global mix-ins, and
-  RDR2-style `GREET`/`ANTAGONIZE`/`DEFUSE` street acts
+  atop `ConvoEngine`, 2–4 participant `JointSceneLease`, global mix-ins,
+  `FinishTick` O(1)-guarded timeout/lease sweeps, and RDR2-style
+  `GREET`/`ANTAGONIZE`/`DEFUSE` street acts
+- `PNC_UnifiedAIDebugService`: server-authoritative Unified AI & Cone Debug Lab
+  snapshot builder and live trigger dispatcher (`emit_gunfire`, `emit_explosion`,
+  `emit_weapon_aimed`, `emit_suspicious_sound`, `street_greet`,
+  `street_antagonize`, `street_defuse`, `trigger_copresence`, `inject_mixin`,
+  `reevaluate_ai`, `clear_npc_ai`)
 
 ## Client
 - `PNC_Client`: roster cache, character-payload cache, sync requests, context menu debug tools
@@ -273,5 +281,11 @@
   an abstract NPC reservation token and reports the named occupant
 - `PNC_ContextHub`: central reusable NPC selection and right-click hub
 - `PNC_NPCSelection`: cursor-space NPC selection helper used by context providers
-- `PNC_Nameplates`: overhead name, HP, stamina, and nameplate debug overlay
+- `PNC_Nameplates`: overhead name, HP, stamina, and live combat/perception
+  debug overlay (compiled cone radius/FOV, `2.5m` peripheral ring, clue
+  markers, and `VISION`/`REACT` telemetry rendered both in combat and idle)
+- `PNC_UnifiedAIDebugWindow` (`pnc.unifiedAI` in PsychopatzCore Debug Hub):
+  SP & MP Unified AI & Cone Debug Lab inspecting live perception cones, clues,
+  agitation, secondary channel, claims, autonomy, and micro-beat scenes with
+  one-click live event triggers
 - `PNC_CharacterWindow`: vanilla-like NPC character shell and tabs

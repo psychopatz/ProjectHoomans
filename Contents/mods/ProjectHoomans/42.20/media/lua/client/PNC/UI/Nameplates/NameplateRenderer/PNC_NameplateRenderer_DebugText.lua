@@ -385,6 +385,36 @@ local function appendCombatDefense(lines, debugState)
         .. (debugState.defensePushed == true and '+push' or '')
 end
 
+function Renderer.BuildVisionDebugLines(debugState, outLines)
+    if type(debugState) ~= 'table' then return outLines or {} end
+    local lines = outLines or {}
+    if debugState.perceptionProfileId ~= nil
+        or debugState.coneRadius ~= nil
+        or debugState.coneHalfAngleDegrees ~= nil
+    then
+        local halfDeg = tonumber(debugState.coneHalfAngleDegrees)
+        local fovText = halfDeg and tostring(math.floor(halfDeg * 2 + 0.5)) .. 'd' or '-'
+        lines[#lines + 1] = 'VISION '
+            .. tostring(debugState.perceptionProfileId or 'default')
+            .. ' fov=' .. fovText
+            .. ' r=' .. tostring(debugState.coneRadius or '-') .. 'm'
+            .. ' clues=' .. tostring(tonumber(debugState.clueCount) or 0)
+            .. ' skip=' .. tostring(tonumber(debugState.coneRejectedCount) or 0)
+    end
+    if debugState.agitationStage ~= nil
+        or debugState.secondaryAlertLevel ~= nil
+        or debugState.secondaryState ~= nil
+    then
+        lines[#lines + 1] = 'REACT ag='
+            .. tostring(debugState.agitationStage or 'calm')
+            .. '(' .. tostring(math.floor((tonumber(debugState.agitationScore) or 0) + 0.5)) .. ')'
+            .. ' sec=' .. tostring(debugState.secondaryAlertLevel or 'calm')
+            .. '/' .. tostring(debugState.secondaryPosture or 'relaxed')
+            .. (debugState.secondaryState ~= nil and (' [' .. tostring(debugState.secondaryState) .. ']') or '')
+    end
+    return lines
+end
+
 function Renderer.BuildCombatDebugLines(debugState, currentTargetDistance)
     if type(debugState) ~= 'table' then return {} end
     local lines = {}
@@ -395,6 +425,7 @@ function Renderer.BuildCombatDebugLines(debugState, currentTargetDistance)
             or 'observing'
     )
     appendCombatSummary(lines, debugState, mode, decision)
+    Renderer.BuildVisionDebugLines(debugState, lines)
     appendThreatSummary(lines, debugState)
     appendViewedZombieRows(lines, debugState)
     appendCombatTarget(lines, debugState, currentTargetDistance)

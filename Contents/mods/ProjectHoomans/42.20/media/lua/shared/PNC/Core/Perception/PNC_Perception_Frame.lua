@@ -121,6 +121,18 @@ function Perception.GetZombieFrame(record, requestedRadius)
     return frame
 end
 
+local function zombieEntryId(zombie)
+    local modData = zombie and zombie.getModData and zombie:getModData() or nil
+    if modData and modData.PNC_ZombieID ~= nil then
+        return tostring(modData.PNC_ZombieID)
+    end
+    if PNC.SpatialIndex and type(PNC.SpatialIndex.GetZombieID) == "function" and zombie then
+        local zId = PNC.SpatialIndex.GetZombieID(zombie)
+        if zId ~= nil then return tostring(zId) end
+    end
+    return nil
+end
+
 function Perception.GetVisibleZombieEntries(record, requestedRadius)
     local frame = Perception.GetZombieFrame(record, requestedRadius)
     local output
@@ -130,14 +142,22 @@ function Perception.GetVisibleZombieEntries(record, requestedRadius)
         or 12) ^ 2
     local limit
     local startIndex
-    local endIndex
+    local lastChecked
     local i
     local entry
     local visible
     local visibilityKind
     local recent
     local recentID
-    local modData
+    local attackerID
+    local activeTargetID
+    local zId
+    local svc
+    local observer
+    local profile
+    local coneRejected = 0
+    local checked = 0
+    local losCount = 0
     if not frame then return {} end
     if not frame.visibleEntries then
         output = {}
@@ -151,50 +171,90 @@ function Perception.GetVisibleZombieEntries(record, requestedRadius)
             )
         )
         if startIndex > #frame.entries then startIndex = 1 end
-        endIndex = math.min(#frame.entries, startIndex + limit - 1)
-        for i = startIndex, endIndex do
-            entry = frame.entries[i]
-            visible, visibilityKind = Perception.CanSeeWorldObject(
-                record,
-                entry.zombie
-            )
-            if visible then
-                output[#output + 1] = {
-                    zombie = entry.zombie,
-                    distSq = entry.distSq,
-                    visibilityKind = visibilityKind,
-                }
-            end
-        end
-        if #output <= 0 and endIndex < #frame.entries then
-            record.runtime.perceptionLosCursor = endIndex + 1
-        else
-            record.runtime.perceptionLosCursor = 1
-        end
         recent = record.runtime and record.runtime.recentThreat or nil
         recentID = recent and recent.kind == "zombie"
             and tostring(recent.id or "") or nil
+        attackerID = record.runtime and record.runtime.zombieAttacker
+            and tostring(record.runtime.zombieAttacker.zombieId or "") or nil
+        activeTargetID = record.runtime and record.runtime.target
+            and record.runtime.target.kind == "zombie"
+            and tostring(record.runtime.target.zombieId or "") or nil
+        svc = PNC.PerceptionService
+        observer = PNC.Registry and PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(record.id) or nil
+        profile = svc and type(svc.GetProfile) == "function"
+            and svc.GetProfile(record) or nil
+        local useConeFilter = svc
+            and type(svc.PassesBodyVisionCone) == "function"
+        local totalEntries = #frame.entries
+        lastChecked = startIndex - 1
+        while checked < totalEntries and losCount < limit do
+            i = ((startIndex + checked - 1) % totalEntries) + 1
+            checked = checked + 1
+            lastChecked = i
+            entry = frame.entries[i]
+            zId = zombieEntryId(entry.zombie)
+            local isEngaged = zId ~= nil and (
+                zId == recentID or zId == attackerID or zId == activeTargetID
+            )
+            local inCone = true
+            if useConeFilter then
+                inCone = svc.PassesBodyVisionCone(
+                    record,
+                    entry.zombie,
+                    profile,
+                    observer,
+                    { radius = frame.radius, bypassCone = isEngaged }
+                )
+            end
+            if not inCone then
+                coneRejected = coneRejected + 1
+            else
+                losCount = losCount + 1
+                visible, visibilityKind = Perception.CanSeeWorldObject(
+                    record,
+                    entry.zombie
+                )
+                if visible then
+                    output[#output + 1] = {
+                        zombie = entry.zombie,
+                        distSq = entry.distSq,
+                        visibilityKind = visibilityKind,
+                    }
+                end
+            end
+        end
+        frame.coneRejectedCount = coneRejected
+        if #output <= 0 and totalEntries > 0 and lastChecked < totalEntries then
+            record.runtime.perceptionLosCursor = lastChecked + 1
+        else
+            record.runtime.perceptionLosCursor = 1
+        end
         if recentID and recentID ~= "" then
-            for i = 1, #frame.entries do
-                entry = frame.entries[i]
-                modData = entry.zombie and entry.zombie.getModData
-                    and entry.zombie:getModData() or nil
-                if (i < startIndex or i > endIndex)
-                    and modData
-                    and tostring(modData.PNC_ZombieID or "") == recentID
-                then
-                    visible, visibilityKind = Perception.CanSeeWorldObject(
-                        record,
-                        entry.zombie
-                    )
-                    if visible then
-                        output[#output + 1] = {
-                            zombie = entry.zombie,
-                            distSq = entry.distSq,
-                            visibilityKind = visibilityKind,
-                        }
-                    end
+            local alreadyIncluded = false
+            for j = 1, #output do
+                if zombieEntryId(output[j].zombie) == recentID then
+                    alreadyIncluded = true
                     break
+                end
+            end
+            if not alreadyIncluded then
+                for k = 1, totalEntries do
+                    entry = frame.entries[k]
+                    if zombieEntryId(entry.zombie) == recentID then
+                        visible, visibilityKind = Perception.CanSeeWorldObject(
+                            record,
+                            entry.zombie
+                        )
+                        if visible then
+                            output[#output + 1] = {
+                                zombie = entry.zombie,
+                                distSq = entry.distSq,
+                                visibilityKind = visibilityKind,
+                            }
+                        end
+                        break
+                    end
                 end
             end
         end

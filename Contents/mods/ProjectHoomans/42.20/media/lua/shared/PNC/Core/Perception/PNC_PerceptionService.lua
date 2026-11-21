@@ -119,6 +119,16 @@ local function resolveFacingUnit(record, zombie)
     local runtime = type(record) == "table" and record.runtime or nil
     local fx = runtime and tonumber(runtime.facingDirX) or nil
     local fy = runtime and tonumber(runtime.facingDirY) or nil
+    if (fx == nil or fy == nil)
+        and PNC.ActorFacing
+        and type(PNC.ActorFacing.Resolve) == "function"
+    then
+        local resolved = PNC.ActorFacing.Resolve(record, { body = zombie })
+        if resolved and resolved.x ~= nil and resolved.y ~= nil then
+            fx = resolved.x
+            fy = resolved.y
+        end
+    end
     if (fx == nil or fy == nil) and zombie then
         if type(zombie.getForwardDirection) == "function" then
             local dir = zombie:getForwardDirection()
@@ -135,21 +145,37 @@ local function resolveFacingUnit(record, zombie)
         end
     end
     if fx == nil or fy == nil then
-        return 1, 0
+        return nil, nil, false
     end
     local lenSq = fx * fx + fy * fy
     if lenSq <= 1e-6 then
-        return 1, 0
+        return nil, nil, false
     end
     local inv = 1 / math.sqrt(lenSq)
-    return fx * inv, fy * inv
+    return fx * inv, fy * inv, true
 end
 
----Local squared-distance + precomputed cosine azimuth pre-filter prior to any Ray/LOS call.
-function Service.CheckVisionCone(record, targetX, targetY, targetZ, profile, zombie)
+function Service.ResolveFacing(record, zombie)
+    return resolveFacingUnit(record, zombie)
+end
+
+function Service.GetHalfFovDegrees(profile)
+    local cosHalf = tonumber(profile and profile.cosHalfFov) or Service.DEFAULT_COS_HALF_FOV
+    cosHalf = math.max(-1, math.min(1, cosHalf))
+    return math.deg(math.acos(cosHalf))
+end
+
+function Service.HasPendingLOS()
+    return (tonumber(Service._losHead) or 1) <= (tonumber(Service._losTail) or 0)
+end
+
+---Local squared-distance + cosine azimuth cone filter prior to any Ray/LOS call.
+---Respects 2.5m 360-degree peripheral awareness and optional bypass/fallback flags.
+function Service.CheckCombatVisionCone(record, targetX, targetY, targetZ, profile, zombie, opts)
     if type(record) ~= "table" or targetX == nil or targetY == nil then
         return false, math.huge, -1
     end
+    opts = type(opts) == "table" and opts or nil
     profile = profile or Service.GetProfile(record)
     local ox = tonumber(record.x) or (zombie and zombie.getX and zombie:getX()) or 0
     local oy = tonumber(record.y) or (zombie and zombie.getY and zombie:getY()) or 0
@@ -162,15 +188,24 @@ function Service.CheckVisionCone(record, targetX, targetY, targetZ, profile, zom
     local dx = (tonumber(targetX) or 0) - ox
     local dy = (tonumber(targetY) or 0) - oy
     local distSq = dx * dx + dy * dy
-    local visionRange = tonumber(profile.visionRange) or Service.DEFAULT_VISION_RANGE
+    local visionRange = (opts and tonumber(opts.radius))
+        or tonumber(profile.visionRange)
+        or Service.DEFAULT_VISION_RANGE
     if distSq > visionRange * visionRange then
         Service._stats.coneRejected = Service._stats.coneRejected + 1
         return false, distSq, -1
     end
-    if distSq <= Service.CLOSE_PERIPHERAL_DIST_SQ then
+    if distSq <= Service.CLOSE_PERIPHERAL_DIST_SQ or (opts and opts.bypassCone == true) then
         return true, distSq, 1
     end
-    local fx, fy = resolveFacingUnit(record, zombie)
+    local fx, fy, hasHeading = resolveFacingUnit(record, zombie)
+    if not hasHeading then
+        if opts and opts.enforceHeadingFallback == true then
+            fx, fy = 1, 0
+        else
+            return true, distSq, 1
+        end
+    end
     local dist = math.sqrt(distSq)
     local dot = (dx * fx + dy * fy) / dist
     local cosHalf = tonumber(profile.cosHalfFov) or Service.DEFAULT_COS_HALF_FOV
@@ -179,6 +214,29 @@ function Service.CheckVisionCone(record, targetX, targetY, targetZ, profile, zom
         return false, distSq, dot
     end
     return true, distSq, dot
+end
+
+function Service.PassesBodyVisionCone(record, targetObject, profile, zombie, opts)
+    if not record or not targetObject or type(targetObject.getX) ~= "function" then
+        return false
+    end
+    return Service.CheckCombatVisionCone(
+        record,
+        targetObject:getX(),
+        targetObject:getY(),
+        type(targetObject.getZ) == "function" and targetObject:getZ() or record.z,
+        profile,
+        zombie,
+        opts
+    )
+end
+
+---Local squared-distance + precomputed cosine azimuth pre-filter prior to any Ray/LOS call.
+function Service.CheckVisionCone(record, targetX, targetY, targetZ, profile, zombie)
+    return Service.CheckCombatVisionCone(
+        record, targetX, targetY, targetZ, profile, zombie,
+        { enforceHeadingFallback = true }
+    )
 end
 
 function Service.PruneClues(record, at)

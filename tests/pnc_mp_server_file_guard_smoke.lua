@@ -175,7 +175,9 @@ listing:close()
 -- PNC_Tasking_Claims and Phase U3/U4/U5 modules are server-only, guarded by
 -- AllowsServerCode(), and loaded by PNC_Tasking / PNC_TaskProviders /
 -- PNC_SemanticEventRuntime.
-T.equal(#serverOnlyFiles, 1071,
+-- PNC_UnifiedAIDebugService is server-only, guarded by AllowsServerCode(),
+-- and loaded by PNC_ServerComposition.
+T.equal(#serverOnlyFiles, 1072,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

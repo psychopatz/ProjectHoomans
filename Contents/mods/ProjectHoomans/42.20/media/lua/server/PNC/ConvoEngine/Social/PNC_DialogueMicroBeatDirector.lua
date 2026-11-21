@@ -666,6 +666,12 @@ function Director.TickTimeout(sceneId, at)
 end
 
 function Director.SweepTimeouts(at)
+    local hasAny = false
+    for _ in pairs(Director.ActiveScenes) do
+        hasAny = true
+        break
+    end
+    if not hasAny then return 0 end
     local current = nowMs(at)
     local ids = {}
     for id in pairs(Director.ActiveScenes) do

@@ -132,17 +132,26 @@ function Internal.CollectEnemyZombies(record, radius)
             0,
             Core.Now()
         ) or {}
+    local svc = PNC.PerceptionService
+    local useConeFilter = svc and type(svc.PassesBodyVisionCone) == "function"
+    local observer = useConeFilter and Registry and Registry.GetLiveZombie
+        and Registry.GetLiveZombie(record.id) or nil
+    local profile = useConeFilter and svc.GetProfile and svc.GetProfile(record) or nil
     for i = 1, #zombies do
         zombie = zombies[i]
         if zombie and (not zombie:isDead()) and (not Core.IsManagedNPCBody(zombie)) and math.abs(zombie:getZ() - record.z) < 1 then
             distSq = Core.DistanceSq(record.x, record.y, zombie:getX(), zombie:getY())
-            visible, visibilityKind = Perception.CanSeeWorldObject(record, zombie)
-            if distSq <= (radius * radius) and visible then
-                results[#results + 1] = {
-                    zombie = zombie,
-                    distSq = distSq,
-                    visibilityKind = visibilityKind,
-                }
+            local inCone = distSq <= (radius * radius)
+                and (not useConeFilter or svc.PassesBodyVisionCone(record, zombie, profile, observer, { radius = radius }))
+            if inCone then
+                visible, visibilityKind = Perception.CanSeeWorldObject(record, zombie)
+                if visible then
+                    results[#results + 1] = {
+                        zombie = zombie,
+                        distSq = distSq,
+                        visibilityKind = visibilityKind,
+                    }
+                end
             end
         end
     end

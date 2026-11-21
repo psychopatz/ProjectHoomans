@@ -31,12 +31,21 @@ function Perception.FindNearestEnemyPlayer(record, radius)
     local visibilityKind
     local candidate
 
+    local svc = PNC.PerceptionService
+    local useCone = svc and type(svc.PassesBodyVisionCone) == "function"
+    local observer = useCone and Registry and Registry.GetLiveZombie
+        and Registry.GetLiveZombie(record.id) or nil
+    local profile = useCone and svc.GetProfile and svc.GetProfile(record) or nil
     for i = 1, #players do
         player = players[i]
         visible = false
         visibilityKind = nil
         if player then
-            visible, visibilityKind = Perception.CanSeeWorldObject(record, player)
+            local inCone = not useCone
+                or svc.PassesBodyVisionCone(record, player, profile, observer, { radius = radius })
+            if inCone then
+                visible, visibilityKind = Perception.CanSeeWorldObject(record, player)
+            end
         end
         local factionEnemy = not PNC.Factions
             or not PNC.Factions.CanNPCTargetPlayer
@@ -92,13 +101,32 @@ function Perception.FindNearestEnemyNPC(record, radius)
     local visibilityKind
     local candidate
 
+    local svc = PNC.PerceptionService
+    local useCone = svc and type(svc.PassesBodyVisionCone) == "function"
+    local observer = useCone and Registry and Registry.GetLiveZombie
+        and Registry.GetLiveZombie(record.id) or nil
+    local profile = useCone and svc.GetProfile and svc.GetProfile(record) or nil
+    local recent = record and record.runtime and record.runtime.recentThreat or nil
+    local recentNpcId = recent and recent.kind == "npc" and tostring(recent.id or "") or nil
+    local activeNpcId = record and record.runtime and record.runtime.target
+        and record.runtime.target.kind == "npc" and tostring(record.runtime.target.id or "") or nil
+
     for i = 1, #npcs do
         target = npcs[i]
         targetZombie = target and Registry and Registry.GetLiveZombie and Registry.GetLiveZombie(target.id) or nil
         visible = false
         visibilityKind = nil
         if targetZombie then
-            visible, visibilityKind = Perception.CanSeeWorldObject(record, targetZombie)
+            local tid = tostring(target.id or "")
+            local isEngaged = tid ~= "" and (tid == recentNpcId or tid == activeNpcId)
+            local inCone = not useCone
+                or svc.PassesBodyVisionCone(record, targetZombie, profile, observer, {
+                    radius = radius,
+                    bypassCone = isEngaged,
+                })
+            if inCone then
+                visible, visibilityKind = Perception.CanSeeWorldObject(record, targetZombie)
+            end
         end
         if target and target.alive ~= false and targetZombie
             and math.abs(target.z - record.z) < 1 and visible

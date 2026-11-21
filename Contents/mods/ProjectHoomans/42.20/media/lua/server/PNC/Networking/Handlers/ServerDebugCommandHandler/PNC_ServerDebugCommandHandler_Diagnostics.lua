@@ -60,6 +60,18 @@ function H.HandleDiagnosticAction(player, args)
         )
         return true
     end
+    if args.action == "unified_ai_debug_action" then
+        local service = PNC.UnifiedAIDebugService
+        if not service or type(service.PerformAction) ~= "function" then
+            network.SendUnifiedAIDebug(
+                player, nil, true, "unified_ai_debug_unavailable"
+            )
+            return true
+        end
+        local snapshot, reason = service.PerformAction(player, args)
+        network.SendUnifiedAIDebug(player, snapshot, true, reason)
+        return true
+    end
     return false
 end
 

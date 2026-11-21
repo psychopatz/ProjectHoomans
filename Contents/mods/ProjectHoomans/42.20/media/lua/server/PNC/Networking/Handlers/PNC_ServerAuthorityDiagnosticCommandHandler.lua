@@ -125,6 +125,28 @@ Router.Register(Const.CMD_SEMANTIC_SOCIAL_DEBUG_REQUEST,
     end
 )
 
+Router.Register(Const.CMD_UNIFIED_AI_DEBUG_REQUEST,
+    function(player, args, rawArgs)
+        if not Router.CanUseDebug(player) then
+            Network.SendUnifiedAIDebug(
+                player, nil, false, "not_authorized"
+            )
+            return
+        end
+        local service = PNC.UnifiedAIDebugService
+        if not service or type(service.BuildSnapshot) ~= "function" then
+            Network.SendUnifiedAIDebug(
+                player, nil, true, "unified_ai_debug_unavailable"
+            )
+            return
+        end
+        local npcId = rawArgs and rawArgs.npcId or (args and args.npcId) or nil
+        Network.SendUnifiedAIDebug(
+            player, service.BuildSnapshot(npcId, player), true, nil
+        )
+    end
+)
+
 Router.Register(Const.CMD_WORLD_EFFECT_DEBUG_REQUEST,
     function(player, args, rawArgs)
         if not Router.CanUseDebug(player) then

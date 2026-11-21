@@ -96,4 +96,22 @@ return {
         ClientState.lastSemanticSocialDebugReceiveAt = Core.Now()
         return snapshot ~= nil, reason
     end,
+
+    unified_ai_debug_action = function(player, args)
+        local service = PNC.UnifiedAIDebugService
+        if not service or type(service.PerformAction) ~= "function" then
+            return false
+        end
+        local snapshot, reason = service.PerformAction(player, args)
+        ClientState.unifiedAIDebugAuthorized = snapshot ~= nil
+        ClientState.unifiedAIDebug = snapshot
+        ClientState.unifiedAIDebugReason = reason
+        ClientState.lastUnifiedAIDebugReceiveAt = Core.Now()
+        if PNC.UnifiedAIDebugUI
+            and type(PNC.UnifiedAIDebugUI.ReceiveSnapshot) == "function"
+        then
+            PNC.UnifiedAIDebugUI.ReceiveSnapshot(snapshot)
+        end
+        return snapshot ~= nil, reason
+    end,
 }

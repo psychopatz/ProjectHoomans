@@ -213,4 +213,33 @@ function Client.RequestWorldEffectDebug(state, kind, limit)
     return true
 end
 
+function Client.RequestUnifiedAIDebug(npcId)
+    local player = Internal.GetPlayer()
+    if not Client.CanUseDebug() then
+        ClientState.unifiedAIDebugAuthorized = false
+        ClientState.unifiedAIDebug = nil
+        ClientState.unifiedAIDebugReason = "not_authorized"
+        return false, "not_authorized"
+    end
+    ClientState.lastUnifiedAIDebugRequestAt = Core.Now()
+    local args = { npcId = npcId }
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE,
+                Const.CMD_UNIFIED_AI_DEBUG_REQUEST, args)
+            return true, "sent"
+        end
+        return false, "player_unavailable"
+    end
+    local service = PNC.UnifiedAIDebugService
+    if not service or type(service.BuildSnapshot) ~= "function" then
+        return false, "unified_ai_debug_unavailable"
+    end
+    ClientState.unifiedAIDebugAuthorized = true
+    ClientState.unifiedAIDebug = service.BuildSnapshot(npcId, player)
+    ClientState.unifiedAIDebugReason = nil
+    ClientState.lastUnifiedAIDebugReceiveAt = Core.Now()
+    return true
+end
+
 return Client

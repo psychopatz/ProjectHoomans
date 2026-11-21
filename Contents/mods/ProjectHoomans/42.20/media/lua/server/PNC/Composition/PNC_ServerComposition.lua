@@ -88,6 +88,7 @@ require "PNC/Conversation/PNC_ConversationServer"
 require "PNC/Compatibility/Mods/Necroa/PNC_Necroa_ExposureServer"
 require "PNC/Server/PNC_ServerInventory"
 require "PNC/Semantics/PNC_SemanticItemTaskRuntime"
+require "PNC/Tasking/PNC_UnifiedAIDebugService"
 require "PNC/Networking/PNC_ServerCommandRouting"
 require "PNC/Stealth/PNC_ServerStealthDiscovery"
 if PNC.ProfilerIntegration and PNC.ProfilerIntegration.InstallServer then

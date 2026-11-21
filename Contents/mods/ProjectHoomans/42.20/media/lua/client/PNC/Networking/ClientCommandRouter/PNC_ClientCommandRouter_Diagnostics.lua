@@ -78,6 +78,16 @@ Internal.RegisterServerCommand(Const.CMD_SEMANTIC_SOCIAL_DEBUG, function(args)
     ClientState.lastSemanticSocialDebugReceiveAt = Core.Now()
 end)
 
+Internal.RegisterServerCommand(Const.CMD_UNIFIED_AI_DEBUG, function(args)
+    ClientState.unifiedAIDebugAuthorized = args.authorized == true
+    ClientState.unifiedAIDebug = args.snapshot
+    ClientState.unifiedAIDebugReason = args.reason
+    ClientState.lastUnifiedAIDebugReceiveAt = Core.Now()
+    if PNC.UnifiedAIDebugUI and type(PNC.UnifiedAIDebugUI.ReceiveSnapshot) == "function" then
+        PNC.UnifiedAIDebugUI.ReceiveSnapshot(args.snapshot)
+    end
+end)
+
 Internal.RegisterServerCommand(Const.CMD_WORLD_EFFECT_DEBUG, function(args)
     ClientState.worldEffectDebugAuthorized = args.authorized == true
     ClientState.worldEffectDebug = args.snapshot

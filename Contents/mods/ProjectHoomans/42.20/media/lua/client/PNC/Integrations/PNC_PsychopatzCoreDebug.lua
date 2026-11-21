@@ -394,6 +394,28 @@ PsychopatzCore.DebugHub.RegisterTool({
     end,
 })
 
+PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.unifiedAI",
+    source = "Project Hoomans",
+    order = 205,
+    title = translateHubText("UI_PNC_DebugHub_UnifiedAI_Title",
+        "Unified AI & Cone Debug Lab"),
+    description = translateHubText(
+        "UI_PNC_DebugHub_UnifiedAI_Description",
+        "Inspect live perception cones, clues, agitation, autonomy, claims, and dialogue micro-beats, and trigger live test events."),
+    available = function()
+        return PNC
+            and PNC.UnifiedAIDebugUI
+            and PNC.UnifiedAIDebugUI.Toggle
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        PNC.UnifiedAIDebugUI.Toggle()
+    end,
+})
+
 -- Project Hoomans settings belong to the standard in-game settings registry.
 -- Remove old debug-hub launchers as well when this file is hot-reloaded.
 PsychopatzCore.DebugHub.UnregisterTool("pnc.settings")

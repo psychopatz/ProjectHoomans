@@ -336,6 +336,12 @@ function LeaseService.GetForNPC(npcId)
 end
 
 function LeaseService.SweepExpired(at)
+    local hasAny = false
+    for _ in pairs(LeaseService.LeasesById) do
+        hasAny = true
+        break
+    end
+    if not hasAny then return 0 end
     local current = nowMs(at)
     local expiredIds = {}
     for id, lease in pairs(LeaseService.LeasesById) do

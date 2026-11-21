@@ -47,13 +47,32 @@ function H.BuildCombatDebugDelta(record, inCombat, now, firearmState)
     local combatDebugTransitioned = record.runtime
         and record.runtime.combatDebugWasActive ~= inCombat
         or false
+    local sc = record.runtime and record.runtime.secondaryChannel or nil
+    local clues = record.runtime and record.runtime.clueMemory or nil
+    local agState = record.id ~= nil
+        and PNC.AgitationService
+        and type(PNC.AgitationService.GetState) == "function"
+        and PNC.AgitationService.GetState(record.id, now) or nil
+    local reactivitySignature = tostring(agState and agState.stage or "calm")
+        .. ":" .. tostring(clues and #clues or 0)
+        .. ":" .. tostring(sc and sc.alertLevel or "calm")
+        .. ":" .. tostring(sc and sc.posture or "relaxed")
+        .. ":" .. tostring(sc and sc.secondaryState or "")
+    local reactivityTransitioned = record.runtime
+        and record.runtime.lastReactivityDebugSig ~= reactivitySignature
+        or false
+    local reactivityActive = (agState and agState.active == true)
+        or (clues and #clues > 0)
+        or (sc ~= nil and (sc.alertLevel ~= "calm" or sc.posture ~= "relaxed" or (sc.secondaryState or "") ~= ""))
     local combatDebugState
     if lastCombatDebugAt <= 0
         or combatDebugTransitioned
         or zombieDebugTransitioned
+        or reactivityTransitioned
         or (inCombat and now - lastCombatDebugAt >= 150)
         or (baseZombieDebugActive
             and now - lastCombatDebugAt >= 350)
+        or (reactivityActive and now - lastCombatDebugAt >= 750)
         or (zombieAlertDebugActive
             and now - lastCombatDebugAt >= (
                 tonumber(Const and Const.ZOMBIE_ALERT_DEBUG_REFRESH_MS)
@@ -77,6 +96,7 @@ function H.BuildCombatDebugDelta(record, inCombat, now, firearmState)
     if record.runtime then
         record.runtime.combatDebugWasActive = inCombat
         record.runtime.zombieDebugWasActive = zombieDebugActive
+        record.runtime.lastReactivityDebugSig = reactivitySignature
     end
     return combatDebugState
 end

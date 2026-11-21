@@ -3,6 +3,7 @@ local Internal = Renderer.Internal
 local Presentation = PNC.NameplatePresentation
 local Fonts = Presentation.Fonts
 local screenPoint = Internal.ScreenPoint
+local drawVisionConeOnly = Internal.DrawVisionConeOnly
 local drawCombatRanges = Internal.DrawCombatRanges
 local drawCombatTargets = Internal.DrawCombatTargets
 local appendCombatAnimationLines = Internal.AppendCombatAnimationLines
@@ -29,7 +30,18 @@ local function drawCombatDebug(manager, entry)
         or type(debugState.zombieAttacker) == 'table'
         or entry.snapshot.attackMode == true
         or entry.snapshot.inCombat == true
-    if not active then return end
+    if not active then
+        if type(drawVisionConeOnly) == 'function' then
+            drawVisionConeOnly(manager, zombie, debugState, worldX, worldY, worldZ)
+        end
+        if type(Renderer.BuildVisionDebugLines) == 'function' then
+            local visionLines = Renderer.BuildVisionDebugLines(debugState)
+            if #visionLines > 0 then
+                drawCombatText(manager, zombie, debugState, visionLines)
+            end
+        end
+        return
+    end
     drawCombatRanges(manager, zombie, debugState, worldX, worldY, worldZ)
     local targetDistance = drawCombatTargets(
         manager, zombie, debugState, worldX, worldY, worldZ
@@ -42,10 +54,6 @@ local function drawCombatDebug(manager, entry)
     if #lines <= 0 then return end
     drawCombatText(manager, zombie, debugState, lines)
 end
-
-Renderer.RenderCombatDebug = drawCombatDebug
-Renderer.ResolveZombieAttacker = resolveZombieAttacker
-
 
 Renderer.RenderCombatDebug = drawCombatDebug
 Renderer.ResolveZombieAttacker = resolveZombieAttacker

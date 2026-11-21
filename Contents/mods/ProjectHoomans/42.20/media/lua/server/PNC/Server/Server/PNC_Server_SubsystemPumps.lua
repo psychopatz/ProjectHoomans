@@ -211,6 +211,17 @@ function H.FinishTick(now)
     safeOptional("server_finish.persistence_pump",
         PNC.PersistenceCoordinator, "Pump", nil, now)
     safeOptional("server_finish.zombie_aggro", ZombieAggro, "Pump", nil, now)
+    if PNC.PerceptionService
+        and type(PNC.PerceptionService.HasPendingLOS) == "function"
+        and PNC.PerceptionService.HasPendingLOS()
+    then
+        safeOptional("server_finish.perception_los", PNC.PerceptionService,
+            "PumpLOSQueue", nil, now)
+    end
+    safeOptional("server_finish.dialogue_timeouts", PNC.DialogueMicroBeatDirector,
+        "SweepTimeouts", nil, now)
+    safeOptional("server_finish.joint_scene_leases", PNC.JointSceneLease,
+        "SweepExpired", nil, now)
     safeOptional(
         "server_finish.stealth_discovery",
         PNC.ServerStealthDiscovery,

@@ -22,6 +22,8 @@ local COMBAT_MOVE_COLOR = { r = 0.5, g = 1.0, b = 0.3, a = 0.88 }
 local COMBAT_DEFENSE_COLOR = { r = 0.16, g = 1.0, b = 0.30, a = 0.78 }
 local COMBAT_BLOCKER_COLOR = { r = 1.0, g = 0.15, b = 0.8, a = 0.95 }
 local ZOMBIE_ATTACKER_COLOR = { r = 1.0, g = 0.28, b = 0.12, a = 0.96 }
+local PERIPHERAL_CONE_COLOR = { r = 0.25, g = 0.9, b = 1.0, a = 0.28 }
+local CLUE_MARKER_COLOR = { r = 1.0, g = 0.72, b = 0.16, a = 0.88 }
 local COMBAT_MARKER_HALF_SIZE = 9
 local COMBAT_DEBUG_CONE_SEGMENTS = 8
 local COMBAT_DEBUG_CIRCLE_SEGMENTS = 16
@@ -342,8 +344,43 @@ local function drawZombieAttackerDebug(
     )
 end
 
-local function drawCombatRanges(manager, zombie, debugState, worldX, worldY, worldZ)
+local function drawVisionConeOnly(manager, zombie, debugState, worldX, worldY, worldZ)
     drawCombatCone(manager, zombie, debugState)
+    local peripheralRadius = tonumber(debugState.peripheralRadius) or 2.5
+    if peripheralRadius > 0 then
+        drawWorldCircle(
+            manager,
+            worldX,
+            worldY,
+            worldZ,
+            peripheralRadius,
+            PERIPHERAL_CONE_COLOR,
+            true,
+            COMBAT_DEBUG_CIRCLE_SEGMENTS
+        )
+    end
+    local clues = type(debugState.clues) == "table" and debugState.clues or nil
+    if clues then
+        for i = 1, #clues do
+            local c = clues[i]
+            local cx = c and tonumber(c.x)
+            local cy = c and tonumber(c.y)
+            local cz = (c and tonumber(c.z)) or worldZ
+            if cx and cy then
+                drawWorldLine(manager, worldX, worldY, worldZ, cx, cy, cz, {
+                    r = CLUE_MARKER_COLOR.r,
+                    g = CLUE_MARKER_COLOR.g,
+                    b = CLUE_MARKER_COLOR.b,
+                    a = 0.40,
+                })
+                drawWorldMarker(manager, cx, cy, cz, CLUE_MARKER_COLOR, 6)
+            end
+        end
+    end
+end
+
+local function drawCombatRanges(manager, zombie, debugState, worldX, worldY, worldZ)
+    drawVisionConeOnly(manager, zombie, debugState, worldX, worldY, worldZ)
     drawWorldCircle(
         manager,
         worldX,
@@ -541,6 +578,7 @@ local function drawCombatText(manager, zombie, debugState, lines)
 end
 
 
+Internal.DrawVisionConeOnly = drawVisionConeOnly
 Internal.DrawCombatRanges = drawCombatRanges
 Internal.DrawCombatTargets = drawCombatTargets
 Internal.AppendCombatAnimationLines = appendCombatAnimationLines
