@@ -64,6 +64,14 @@ local function rebuildWorkerClaims()
             workers[workerId] = order.id
             if order.stationId then
                 stations[tostring(order.stationId)] = order.id
+                local claims = PNC.Tasking and PNC.Tasking.Claims or nil
+                if claims and type(claims.Acquire) == "function" then
+                    claims.Acquire("work_station:" .. tostring(order.stationId),
+                        "order:" .. tostring(order.id), {
+                            domain = "work",
+                            ttlMs = 0,
+                        })
+                end
             end
         else
             local released, releaseReason = releaseAssignment(order,

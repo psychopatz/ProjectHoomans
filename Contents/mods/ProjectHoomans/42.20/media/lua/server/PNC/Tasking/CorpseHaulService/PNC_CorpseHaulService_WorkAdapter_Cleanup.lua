@@ -128,8 +128,16 @@ local function clearWorkRuntime(order, reason)
                 assignment.deathMarkerId)
         end
         Service.Runtime.byToken[assignment.haulToken] = nil
-        Service.Runtime.byDrop[Internal.pointKey(assignment.dropX,
-            assignment.dropY, assignment.dropZ)] = nil
+        local dropKey = Internal.pointKey(assignment.dropX,
+            assignment.dropY, assignment.dropZ)
+        Service.Runtime.byDrop[dropKey] = nil
+        local claims = PNC.Tasking and PNC.Tasking.Claims or nil
+        if claims and type(claims.Release) == "function" then
+            claims.Release("corpse:" .. tostring(assignment.haulToken),
+                nil, reason or "corpse_haul_cleanup")
+            claims.Release("corpse_drop:" .. tostring(dropKey),
+                nil, reason or "corpse_haul_cleanup")
+        end
     end
     if not preserveCarriedCorpse and order and order.payload then
         order.payload.carryX, order.payload.carryY, order.payload.carryZ = nil,

@@ -23,8 +23,15 @@ local function pruneExpired(zone, at)
             removeKeys[#removeKeys + 1] = key
         end
     end
+    local taskClaims = PNC.Tasking and PNC.Tasking.Claims or nil
     for index = 1, #removeKeys do
-        claims[removeKeys[index]] = nil
+        local key = removeKeys[index]
+        local removedClaim = claims[key]
+        claims[key] = nil
+        if taskClaims and type(taskClaims.Release) == "function" and zone.id then
+            taskClaims.Release("zone:" .. tostring(zone.id) .. ":" .. tostring(key),
+                removedClaim and removedClaim.workerId, "work_zone_expired")
+        end
     end
 end
 
@@ -47,6 +54,23 @@ function Service.ClaimTarget(zoneId, targetKey, workerId, opts)
     local current = zone.claims[targetKey]
     if current and tostring(current.workerId) ~= workerId then
         return false, "TARGET_CLAIMED"
+    end
+    local claims = PNC.Tasking and PNC.Tasking.Claims or nil
+    if claims and type(claims.Acquire) == "function" then
+        local acquired, claimReason = claims.Acquire(
+            "zone:" .. tostring(zoneId) .. ":" .. targetKey,
+            workerId,
+            {
+                leaseId = opts.leaseId,
+                domain = "work_zone",
+                at = at,
+                expiresAt = at + ttl,
+            }
+        )
+        if not acquired then
+            return false, claimReason == "RESOURCE_CLAIMED"
+                and "TARGET_CLAIMED" or claimReason
+        end
     end
     zone.claims[targetKey] = {
         targetKey = targetKey,
@@ -71,6 +95,11 @@ function Service.RenewTarget(zoneId, targetKey, workerId, ttlSeconds, at)
     local now = tonumber(at) or Internal.now()
     local ttl = math.max(1, tonumber(ttlSeconds) or DEFAULT_CLAIM_TTL)
     claim.expiresAt = now + ttl
+    local claims = PNC.Tasking and PNC.Tasking.Claims or nil
+    if claims and type(claims.Renew) == "function" then
+        claims.Renew("zone:" .. tostring(zoneId) .. ":" .. targetKey,
+            workerId, nil, now, claim.expiresAt)
+    end
     return true, claim
 end
 
@@ -79,6 +108,7 @@ function Service.ReleaseTarget(zoneId, targetKey, workerId)
     local zone = Service.GetZone and Service.GetZone(zoneId) or nil
     if not zone then return false, "WORK_ZONE_NOT_FOUND" end
     zone.claims = zone.claims or {}
+    local claims = PNC.Tasking and PNC.Tasking.Claims or nil
     if targetKey ~= nil then
         local key = tostring(targetKey)
         local claim = zone.claims[key]
@@ -87,6 +117,10 @@ function Service.ReleaseTarget(zoneId, targetKey, workerId)
             return false, "TARGET_CLAIMED"
         end
         zone.claims[key] = nil
+        if claims and type(claims.Release) == "function" then
+            claims.Release("zone:" .. tostring(zoneId) .. ":" .. key,
+                workerId or claim.workerId, "work_zone_released")
+        end
         return true
     end
     local released = 0
@@ -97,7 +131,14 @@ function Service.ReleaseTarget(zoneId, targetKey, workerId)
         end
     end
     for index = 1, #removeKeys do
-        zone.claims[removeKeys[index]] = nil
+        local removedKey = removeKeys[index]
+        local removedClaim = zone.claims[removedKey]
+        zone.claims[removedKey] = nil
+        if claims and type(claims.Release) == "function" then
+            claims.Release("zone:" .. tostring(zoneId) .. ":" .. removedKey,
+                removedClaim and removedClaim.workerId or workerId,
+                "work_zone_released")
+        end
         released = released + 1
     end
     return released > 0, released

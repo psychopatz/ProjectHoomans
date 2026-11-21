@@ -10,7 +10,12 @@ local ensureZoneRuntime = Internal.EnsureZoneRuntime
 local markDirty = Internal.MarkDirty
 local now = Internal.Now
 
+local function taskClaims()
+    return PNC.Tasking and PNC.Tasking.Claims or nil
+end
+
 local function expireClaims(at)
+    local claims = taskClaims()
     for key, claim in pairs(Service.Runtime.claims) do
         if at >= (tonumber(claim.expiresAt) or 0) then
             local tree = Service.Data.trees[key]
@@ -18,6 +23,10 @@ local function expireClaims(at)
                 and tree.status ~= "INVALID"
             then tree.status = "DISCOVERED" end
             Service.Runtime.claims[key] = nil
+            if claims and type(claims.Release) == "function" then
+                claims.Release("lumber_tree:" .. tostring(key),
+                    claim and claim.npcId, "lumber_claim_expired")
+            end
             markDirty()
         end
     end
@@ -35,9 +44,19 @@ function Service.ClaimTree(treeKey, npcId, at)
     if current and at < (tonumber(current.expiresAt) or 0)
         and tostring(current.npcId) ~= npcId
     then return false, "tree_claimed" end
+    local expiresAt = at + Service.CLAIM_TTL_MS
+    local claims = taskClaims()
+    if claims and type(claims.Acquire) == "function" then
+        local acquired = claims.Acquire("lumber_tree:" .. key, npcId, {
+            domain = "lumber",
+            at = at,
+            expiresAt = expiresAt,
+        })
+        if not acquired then return false, "tree_claimed" end
+    end
     Service.Runtime.claims[key] = {
         npcId = npcId, claimedAt = at,
-        expiresAt = at + Service.CLAIM_TTL_MS,
+        expiresAt = expiresAt,
     }
     tree.status = "IN_PROGRESS"
     tree.revision = (tonumber(tree.revision) or 0) + 1
@@ -46,11 +65,17 @@ function Service.ClaimTree(treeKey, npcId, at)
 end
 
 function Service.RenewTreeClaim(treeKey, npcId, at)
-    local claim = Service.Runtime.claims[tostring(treeKey or "")]
+    local key = tostring(treeKey or "")
+    local claim = Service.Runtime.claims[key]
     if not claim or tostring(claim.npcId) ~= tostring(npcId or "") then
         return false, "claim_missing"
     end
-    claim.expiresAt = (tonumber(at) or now()) + Service.CLAIM_TTL_MS
+    local atTime = tonumber(at) or now()
+    claim.expiresAt = atTime + Service.CLAIM_TTL_MS
+    local claims = taskClaims()
+    if claims and type(claims.Renew) == "function" then
+        claims.Renew("lumber_tree:" .. key, npcId, nil, atTime, claim.expiresAt)
+    end
     return true
 end
 
@@ -78,6 +103,10 @@ function Service.ReleaseTree(treeKey, reason)
     if key == "" then return true end
     local tree = Service.GetTree(key)
     Service.Runtime.claims[key] = nil
+    local claims = taskClaims()
+    if claims and type(claims.Release) == "function" then
+        claims.Release("lumber_tree:" .. key, nil, reason or "released")
+    end
     if tree and tree.status ~= "DEPLETED" and tree.status ~= "INVALID" then
         tree.status = "DISCOVERED"
         tree.revision = (tonumber(tree.revision) or 0) + 1
@@ -95,6 +124,10 @@ function Service.CompleteTree(treeKey, mode)
     tree.completedAt = now()
     tree.revision = (tonumber(tree.revision) or 0) + 1
     Service.Runtime.claims[tostring(treeKey)] = nil
+    local claims = taskClaims()
+    if claims and type(claims.Release) == "function" then
+        claims.Release("lumber_tree:" .. tostring(treeKey), nil, "depleted")
+    end
     markDirty()
     return true, "depleted"
 end

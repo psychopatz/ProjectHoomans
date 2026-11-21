@@ -60,6 +60,11 @@ local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
     if order.workerId and Service.ClaimsByWorker[order.workerId] == order.id then
         Service.ClaimsByWorker[order.workerId] = nil
     end
+    local claims = PNC.Tasking and PNC.Tasking.Claims or nil
+    if claims and type(claims.ReleaseByOwner) == "function" and order.id ~= nil then
+        claims.ReleaseByOwner("order:" .. tostring(order.id),
+            reason or "work_released")
+    end
     if order.facilityReservationId and PNC.FacilityReservations then
         PNC.FacilityReservations.Release(order.facilityReservationId,
             reason or "work_released")

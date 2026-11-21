@@ -31,8 +31,11 @@ local function findBaseAssignment(base)
     for _, candidate in ipairs(corpses) do
         local data = candidate.corpse:getModData()
         local token = candidate.token
+        local claims = PNC.Tasking and PNC.Tasking.Claims or nil
         local active = token and (Internal.workOrderForToken(token)
-            or Service.Runtime.byToken[token]) or nil
+            or Service.Runtime.byToken[token]
+            or (claims and type(claims.IsClaimed) == "function"
+                and claims.IsClaimed("corpse:" .. tostring(token)))) or nil
         local stale = data and data.PNC_CorpseHaulTaskId
         if not active and (not stale or not Service.IsLifecycleProtected(stale)) then
             if stale then

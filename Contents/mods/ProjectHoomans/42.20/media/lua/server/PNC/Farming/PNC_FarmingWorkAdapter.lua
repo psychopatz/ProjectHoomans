@@ -52,5 +52,11 @@ if Work and Work.RegisterOperation then
         CancelHandler = Adapter.Cancel,
     })
 end
+if Work and Work.RegisterReconciler then
+    Work.RegisterReconciler("FARMING", Adapter.Reconcile)
+    if PNC.Tasking and PNC.Tasking.Providers then
+        PNC.Tasking.Providers.farming = nil
+    end
+end
 
 return Adapter

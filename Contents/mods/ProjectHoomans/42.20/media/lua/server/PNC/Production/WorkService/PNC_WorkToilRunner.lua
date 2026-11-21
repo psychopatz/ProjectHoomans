@@ -143,4 +143,50 @@ function Runner.RunToilStep(order, lease, adapter, opts)
     return true, phase
 end
 
+---Deterministically releases claims, output capacity, staged inputs, held tools,
+---and live movement state when a toil order is aborted or preempted.
+function Runner.AbortOrder(order, lease, reason)
+    if type(order) ~= "table" then return false, "WORK_ORDER_UNAVAILABLE" end
+    local abortReason = tostring(reason or "toil_aborted")
+    local workerId = order.workerId or (lease and lease.npcId)
+    local record = workerId and PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(workerId) or nil
+    local body = workerId and PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(workerId) or nil
+
+    local claims = PNC.Tasking and PNC.Tasking.Claims or nil
+    if claims then
+        if order.id ~= nil and type(claims.ReleaseByOwner) == "function" then
+            claims.ReleaseByOwner("order:" .. tostring(order.id), abortReason)
+        end
+        if lease and lease.leaseId and type(claims.ReleaseByLease) == "function" then
+            claims.ReleaseByLease(lease.leaseId, abortReason)
+        end
+    end
+
+    if PNC.WorkOutputService and type(PNC.WorkOutputService.ReleaseOutputCapacity) == "function" then
+        PNC.WorkOutputService.ReleaseOutputCapacity(order, PNC.ColonyStorageService)
+    end
+    if order.payload and order.payload.input
+        and PNC.WorkInputService and type(PNC.WorkInputService.Cancel) == "function"
+    then
+        PNC.WorkInputService.Cancel(order)
+    end
+    if record and order.operation
+        and PNC.WorkItemService and type(PNC.WorkItemService.Release) == "function"
+    then
+        PNC.WorkItemService.Release(record, order.operation, nil, { reason = abortReason })
+    end
+    if record and record.runtime then
+        record.runtime.workApproachWatch = nil
+        record.runtime.workApproachDiagnostic = nil
+    end
+    if record and body and PNC.BehaviorCommon
+        and type(PNC.BehaviorCommon.HaltMovement) == "function"
+    then
+        PNC.BehaviorCommon.HaltMovement(record, body, abortReason)
+    end
+    return true, abortReason
+end
+
 return Runner

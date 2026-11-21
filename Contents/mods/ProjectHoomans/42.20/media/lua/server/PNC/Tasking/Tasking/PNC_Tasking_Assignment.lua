@@ -58,7 +58,58 @@ function H.Preempt(record, current, winner)
     return true, external.taskId, true
 end
 
+local function releaseAssignmentClaims(winner, assignment, reason, lease)
+    local claims = Tasking and Tasking.Claims or nil
+    if not claims then return end
+    if lease and lease.leaseId and type(claims.ReleaseByLease) == "function" then
+        H.SafeCall("claims_lease_rollback", claims.ReleaseByLease, {
+            npcId = winner and winner.npcId,
+            leaseId = lease.leaseId,
+            domain = winner and winner.sourceDomain,
+        }, lease.leaseId, reason)
+    end
+    if assignment and type(assignment.claimKeys) == "table"
+        and type(claims.Release) == "function"
+    then
+        local owner = assignment.claimOwnerId or (winner and winner.npcId)
+        for i = 1, #assignment.claimKeys do
+            H.SafeCall("claims_key_rollback", claims.Release, {
+                npcId = winner and winner.npcId,
+                leaseId = lease and lease.leaseId or nil,
+                domain = winner and winner.sourceDomain,
+            }, assignment.claimKeys[i], owner, reason)
+        end
+    end
+end
+
+local function attachLeaseClaims(winner, assignment, lease)
+    local claims = Tasking and Tasking.Claims or nil
+    if not claims or not lease or not lease.leaseId then return end
+    if assignment and type(assignment.claimKeys) == "table"
+        and type(claims.AttachLease) == "function"
+    then
+        local owner = assignment.claimOwnerId or (winner and winner.npcId)
+        lease.claimKeys = {}
+        for i = 1, #assignment.claimKeys do
+            local key = assignment.claimKeys[i]
+            lease.claimKeys[#lease.claimKeys + 1] = key
+            claims.AttachLease(key, owner, lease.leaseId)
+        end
+    end
+    if winner and winner.sourceDomain == "work" and winner.sourceRef
+        and type(claims.ListByOwner) == "function"
+        and type(claims.AttachLease) == "function"
+    then
+        local orderOwner = "order:" .. tostring(winner.sourceRef)
+        local orderClaims = claims.ListByOwner(orderOwner)
+        for i = 1, #orderClaims do
+            claims.AttachLease(orderClaims[i].key, orderOwner, lease.leaseId)
+        end
+    end
+end
+
 local function rollback(winner, assignment, reason, lease)
+    releaseAssignmentClaims(winner, assignment, reason, lease)
     local provider = Tasking.Providers[winner.sourceDomain]
     if provider and provider.RollbackAssignment then
         local rollbackOK, rollbackResult = H.SafeCall(
@@ -95,6 +146,7 @@ function H.Assign(winner)
         rollback(winner, assignment, "lease_creation_failed")
         return false, leaseReason
     end
+    attachLeaseClaims(winner, assignment, lease)
     local started = true
     local startReason
     if provider.Start then

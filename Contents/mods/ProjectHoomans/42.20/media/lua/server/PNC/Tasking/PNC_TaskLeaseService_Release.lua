@@ -58,6 +58,20 @@ function Leases.Release(id, reason)
         end
         lease.reservationId = nil
     end
+    local claims = PNC.Tasking and PNC.Tasking.Claims or nil
+    if claims then
+        local claimReason = reason == "complete"
+            and "complete" or reason or "task_released"
+        if type(claims.ReleaseByLease) == "function" then
+            claims.ReleaseByLease(lease.leaseId, claimReason)
+        end
+        if type(lease.claimKeys) == "table" and type(claims.Release) == "function" then
+            for i = 1, #lease.claimKeys do
+                claims.Release(lease.claimKeys[i], lease.npcId, claimReason)
+            end
+            lease.claimKeys = nil
+        end
+    end
     Leases.ByID[lease.leaseId], Leases.ByNPC[lease.npcId] = nil, nil
     Internal.RemoveActive(lease.leaseId)
     lease.phase, lease.releaseReason = "DONE", tostring(reason or "released")

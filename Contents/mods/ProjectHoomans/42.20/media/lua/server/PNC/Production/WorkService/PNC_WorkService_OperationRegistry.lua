@@ -59,3 +59,39 @@ function Service.RegisterReconciler(id, handler)
     Service.ReconcileHandlers[id] = handler
     return true
 end
+
+---Registers an operation descriptor table onto WorkService handler registries.
+function Service.RegisterOperation(operation, handlers)
+    operation = tostring(operation or "")
+    if operation == "" or type(handlers) ~= "table" then return false end
+    if type(handlers.TargetProvider) == "function" then
+        Service.RegisterTargetProvider(operation, handlers.TargetProvider)
+    end
+    if type(handlers.ExecutionHandler) == "function" then
+        Service.RegisterExecution(operation, handlers.ExecutionHandler)
+    end
+    if type(handlers.AbstractExecutionHandler) == "function" then
+        Service.RegisterAbstractExecution(operation, handlers.AbstractExecutionHandler)
+    end
+    if type(handlers.CompletionHandler) == "function" then
+        Service.RegisterCompletion(operation, handlers.CompletionHandler)
+    end
+    if type(handlers.CompletionRecoveryHandler) == "function" then
+        Service.RegisterCompletionRecovery(operation, handlers.CompletionRecoveryHandler)
+    end
+    if type(handlers.PreparationHandler) == "function" then
+        Service.RegisterPreparation(operation, handlers.PreparationHandler)
+    end
+    if type(handlers.CollectionHandler) == "function" then
+        Service.RegisterCollection(operation, handlers.CollectionHandler)
+    end
+    local cancel = handlers.CancelHandler or handlers.CleanupHandler
+    if type(cancel) == "function" then
+        Service.CancellationHandlers = Service.CancellationHandlers or {}
+        Service.CancellationHandlers[operation] = cancel
+    end
+    if type(handlers.Reconciler) == "function" then
+        Service.RegisterReconciler(operation, handlers.Reconciler)
+    end
+    return true
+end

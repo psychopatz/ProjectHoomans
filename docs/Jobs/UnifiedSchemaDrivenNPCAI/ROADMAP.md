@@ -57,13 +57,13 @@ Zero parallel file overlap allowed across phases or concurrent workers:
 * **Purpose:** Verify live Git state (`ProjectHoomans`, `psychopatzCore`, `DynamicTrading`), audit real completion state of prerequisite jobs, verify Build 42 Java ground truth via `pz-java-baseline`, and freeze the cross-repo Phase U1–U6 manifest.
 * **Acceptance Gate:** Source-verified prerequisite table, Build 42 Java constraints, and frozen file-ownership manifest recorded; zero production edits during U0. (**PASSED**)
 
-### Phase U1 — RimWorld Work Foundation Unification (**NEXT**)
+### Phase U1 — RimWorld Work Foundation Unification (**COMPLETE**)
 
 * **Dependencies:** U0.
-* **Responsibilities:** Implement `PNC.Tasking.Claims` (`Acquire`, `Renew`, `Release`, `ReleaseByLease`, `ReleaseByOwner`, `PruneExpired`, `GetDiagnostics`) with automatic release in `PNC_TaskLeaseService_Release` and `PNC_Tasking_Assignment` rollback; bridge station/zone/tree/corpse claims cleanly; add `WorkToilRunner.AbortOrder`; register all four colony chores (`FARMING`, `FISHING`, `LUMBER`, `CORPSE_HAUL`) onto `WorkService.RegisterReconciler`; gate/remove standalone `CorpseHaulService` `Events.OnTick`, duplicate `LumberService.Pump` reconcile call, and redundant `"farming"` Tasking provider when `WorkService` is active.
-* **Acceptance Gate:** Zero standalone chore polling loops in production composition; all 4 chore reconcilers wired into `WorkService`; `PNC.Tasking.Claims` auto-releases on lease teardown; zero `isFarmer` gates; focused `work`, `farming`, `lumber`, `fishing`, `corpse`, `tasking`, `mp_server_file_guard`, and `u1_work_foundation` tests + Kahlua lint pass.
+* **Responsibilities:** Implemented `PNC.Tasking.Claims` (`Acquire`, `Renew`, `AttachLease`, `Release`, `ReleaseByLease`, `ReleaseByOwner`, `PruneExpired`, `GetDiagnostics`) with automatic release in `PNC_TaskLeaseService_Release` and `PNC_Tasking_Assignment` rollback; bridged station/zone/tree/corpse claims cleanly; added `WorkToilRunner.AbortOrder` and missing `WorkService.RegisterOperation`; registered all four colony chores (`FARMING`, `FISHING`, `LUMBER`, `CORPSE_HAUL`) onto sorted `WorkService.RegisterReconciler`; gated standalone `CorpseHaulService` `Events.OnTick`, duplicate `LumberService.Pump` reconcile call, and redundant `"farming"` Tasking provider when `WorkService` is active.
+* **Acceptance Gate:** `TEST_VERIFIED` — `u1_work_foundation` (1/1), `mp_server_file_guard` (1/1), `work` (33/33), `farming` (5/5), `lumber` (8/8), `fishing` (10/10), `corpse` (15/15), `tasking` (8/8) + `pz-verify` Kahlua lint (0 errors on all 22 production Lua files) + 0 `isFarmer` gates. (**PASSED**)
 
-### Phase U2 — `CodeBuilder` Multi-IR Expansion (`psychopatzCore` Primary)
+### Phase U2 — `CodeBuilder` Multi-IR Expansion (`psychopatzCore` Primary — **NEXT**)
 
 * **Dependencies:** U0, `SocialPolicy IR` alignment.
 * **Responsibilities:** Extend `CodeBuilder` with offline `abstract`/`parent` flattening, two-pass cross-IR symbol validation, JSON Patch overlays, deterministic SHA-256 reconciliation (`reconcile.py` header fix aligned with `social_policy_compiler.py`), `SocialPolicy` extensions (`stackLimit`, `stackedEffectMultiplier`, `nullifyingTraits`), and flat Lua emitters for `AutonomyAd IR`, `ReactionPolicy IR`, and `WorkDef & Scenario IR` routed via `targets/pz_packages.json`. Add static validation for Build 42 `AnimSet` XML keys (`ProjectHoomans/common/media/AnimSets/`) and `PNC.NPCVoice.Catalog.Events` keys.

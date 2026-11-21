@@ -72,6 +72,7 @@ Tasking.ORPHAN_RECONCILE_INTERVAL_MS = 5000
 Tasking.NextOrphanReconcileAt = Tasking.NextOrphanReconcileAt or 0
 
 require "PNC/Tasking/Tasking/PNC_Tasking_Core"
+require "PNC/Tasking/PNC_Tasking_Claims"
 require "PNC/Tasking/Tasking/PNC_Tasking_EventInbox"
 require "PNC/Tasking/Tasking/PNC_Tasking_Assignment"
 require "PNC/Tasking/Tasking/PNC_Tasking_Evaluation"

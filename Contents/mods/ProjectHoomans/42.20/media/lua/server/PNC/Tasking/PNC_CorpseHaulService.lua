@@ -93,7 +93,12 @@ function Service.Pump(now)
     if timerName then ScalingDiagnostics.EndTiming(timerName, timerStart) end
 end
 
-if Events and Events.OnTick and not Service.TickHookRegistered then
+local hasWorkReconciler = PNC.WorkService
+    and PNC.WorkService.ReconcileHandlers
+    and PNC.WorkService.ReconcileHandlers.CORPSE_HAUL ~= nil
+if Events and Events.OnTick and not Service.TickHookRegistered
+    and not hasWorkReconciler
+then
     Events.OnTick.Add(function() Service.Pump() end)
     Service.TickHookRegistered = true
 end

@@ -14,6 +14,9 @@ local function reconcileOrphanedActivities(at)
     end
     Tasking.NextOrphanReconcileAt = at
         + Tasking.ORPHAN_RECONCILE_INTERVAL_MS
+    if Tasking.Claims and type(Tasking.Claims.PruneExpired) == "function" then
+        Tasking.Claims.PruneExpired(at, 128)
+    end
     if not PNC.Registry or not PNC.Registry.ForEach
         or not PNC.FacilityJobs or not PNC.FacilityJobs.Stop
     then return 0 end

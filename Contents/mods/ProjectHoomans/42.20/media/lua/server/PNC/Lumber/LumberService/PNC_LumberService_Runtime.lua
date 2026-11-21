@@ -82,7 +82,11 @@ function Service.Pump(at)
             end
         end
     end
-    if PNC.LumberWorkAdapter and PNC.LumberWorkAdapter.Reconcile
+    local hasWorkReconciler = PNC.WorkService
+        and PNC.WorkService.ReconcileHandlers
+        and PNC.WorkService.ReconcileHandlers.LUMBER ~= nil
+    if not hasWorkReconciler and PNC.LumberWorkAdapter
+        and PNC.LumberWorkAdapter.Reconcile
         and at >= (tonumber(Service.Runtime.nextWorkReconcileAt) or 0)
     then
         Service.Runtime.nextWorkReconcileAt = at

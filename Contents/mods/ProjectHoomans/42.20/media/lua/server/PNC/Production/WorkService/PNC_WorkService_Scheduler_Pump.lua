@@ -58,8 +58,17 @@ function Internal.Tick(at)
             ScalingDiagnostics.BeginTiming("WorkService.Reconcile", at)
     end
     Service.ReconcileWorkerState()
-    for _, reconcile in pairs(Service.ReconcileHandlers) do
-        reconcile()
+    local reconcileIds = {}
+    for id, reconcile in pairs(Service.ReconcileHandlers) do
+        if type(reconcile) == "function" then
+            reconcileIds[#reconcileIds + 1] = id
+        end
+    end
+    table.sort(reconcileIds, function(left, right)
+        return tostring(left) < tostring(right)
+    end)
+    for index = 1, #reconcileIds do
+        Service.ReconcileHandlers[reconcileIds[index]](at)
     end
     if reconciliationTimerName then
         ScalingDiagnostics.EndTiming(

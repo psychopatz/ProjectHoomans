@@ -58,6 +58,26 @@ local function claimStation(order, worker)
         end
         return false, "NO_STOCKPILE_ACCESS_NODE"
     end
+    local claims = PNC.Tasking and PNC.Tasking.Claims or nil
+    if claims and type(claims.Acquire) == "function" and order.id ~= nil then
+        local claimedOk = claims.Acquire("work_station:" .. stationId,
+            "order:" .. tostring(order.id), {
+                domain = "work",
+                ttlMs = 0,
+                metadata = {
+                    orderId = order.id,
+                    workerId = worker.id,
+                    stationId = stationId,
+                },
+            })
+        if not claimedOk then
+            if acquired.reservationId and PNC.FacilityReservations then
+                PNC.FacilityReservations.Release(acquired.reservationId,
+                    "station_claim_conflict")
+            end
+            return false, "NO_AVAILABLE_WORKSTATION"
+        end
+    end
     Service.ClaimsByStation[stationId], Service.ClaimsByWorker[worker.id] = order.id, order.id
     order.workerId, order.stationId = worker.id, stationId
     order.facilityId = acquired.facilityId

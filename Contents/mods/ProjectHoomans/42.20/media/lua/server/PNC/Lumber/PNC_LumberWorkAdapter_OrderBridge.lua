@@ -171,20 +171,34 @@ function Adapter.Reconcile()
     return count
 end
 
-if Work and Work.RegisterTargetProvider then
-    Work.RegisterTargetProvider("LUMBER", Adapter.Target)
+if Work and Work.RegisterOperation then
+    Work.RegisterOperation("LUMBER", {
+        TargetProvider = Adapter.Target,
+        ExecutionHandler = Adapter.Execute,
+        AbstractExecutionHandler = Adapter.Execute,
+        CompletionHandler = Adapter.Complete,
+        CleanupHandler = Adapter.Cancel,
+        CancelHandler = Adapter.Cancel,
+    })
+else
+    if Work and Work.RegisterTargetProvider then
+        Work.RegisterTargetProvider("LUMBER", Adapter.Target)
+    end
+    if Work and Work.RegisterExecution then
+        Work.RegisterExecution("LUMBER", Adapter.Execute)
+    end
+    if Work and Work.RegisterAbstractExecution then
+        Work.RegisterAbstractExecution("LUMBER", Adapter.Execute)
+    end
+    if Work then
+        Work.CompletionHandlers = Work.CompletionHandlers or {}
+        Work.CompletionHandlers.LUMBER = Adapter.Complete
+        Work.CancellationHandlers = Work.CancellationHandlers or {}
+        Work.CancellationHandlers.LUMBER = Adapter.Cancel
+    end
 end
-if Work and Work.RegisterExecution then
-    Work.RegisterExecution("LUMBER", Adapter.Execute)
-end
-if Work and Work.RegisterAbstractExecution then
-    Work.RegisterAbstractExecution("LUMBER", Adapter.Execute)
-end
-if Work then
-    Work.CompletionHandlers = Work.CompletionHandlers or {}
-    Work.CompletionHandlers.LUMBER = Adapter.Complete
-    Work.CancellationHandlers = Work.CancellationHandlers or {}
-    Work.CancellationHandlers.LUMBER = Adapter.Cancel
+if Work and Work.RegisterReconciler then
+    Work.RegisterReconciler("LUMBER", Adapter.Reconcile)
 end
 
 

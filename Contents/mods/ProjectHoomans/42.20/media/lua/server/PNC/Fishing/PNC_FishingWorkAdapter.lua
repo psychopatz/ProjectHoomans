@@ -168,5 +168,8 @@ if Work and Work.RegisterOperation then
         CancelHandler = Adapter.Cancel,
     })
 end
+if Work and Work.RegisterReconciler then
+    Work.RegisterReconciler("FISHING", Adapter.Reconcile)
+end
 
 return Adapter

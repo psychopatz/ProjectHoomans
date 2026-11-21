@@ -100,6 +100,20 @@ local function workTaskFor(order, lease, assignment)
         Service.Runtime.byTask[taskId] = task
         Service.Runtime.byToken[assignment.haulToken] = taskId
         Service.Runtime.byDrop[task.dropKey] = taskId
+        local claims = PNC.Tasking and PNC.Tasking.Claims or nil
+        if claims and type(claims.Acquire) == "function" then
+            local owner = "order:" .. taskId
+            claims.Acquire("corpse:" .. tostring(assignment.haulToken), owner, {
+                leaseId = lease and lease.leaseId or nil,
+                domain = "corpse_haul",
+                ttlMs = 0,
+            })
+            claims.Acquire("corpse_drop:" .. tostring(task.dropKey), owner, {
+                leaseId = lease and lease.leaseId or nil,
+                domain = "corpse_haul",
+                ttlMs = 0,
+            })
+        end
     end
     if record then
         record.runtime = record.runtime or {}
@@ -202,6 +216,11 @@ local function bindWorkService()
     end
     Work.CancellationHandlers = Work.CancellationHandlers or {}
     Work.CancellationHandlers.CORPSE_HAUL = cancelWorkOrder
+    if Work.RegisterReconciler then
+        Work.RegisterReconciler("CORPSE_HAUL", function(at)
+            return Service.Pump(at)
+        end)
+    end
     return true
 end
 
