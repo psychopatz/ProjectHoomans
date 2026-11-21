@@ -143,6 +143,9 @@ function Network.BuildPresenceDelta(record)
         combatDebugState = combatDebugState,
         campResourceDebug = buildCampResourceDebugState(record),
         seatingDebug = buildSeatingDebugState(record),
+        secondaryChannel = PNC.SecondaryChannel
+            and type(PNC.SecondaryChannel.BuildDeltaPayload) == "function"
+            and PNC.SecondaryChannel.BuildDeltaPayload(record, now) or nil,
         travel = buildTravelSummary(record, false),
     }
 end

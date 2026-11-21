@@ -38,6 +38,9 @@ local EVENT_TO_DOMAIN = {
     work_sequence_complete = "presence",
     animation_scene = "presence",
     animation_scene_debug = "presence",
+    secondary_channel = "presence",
+    agitation = "presence",
+    bark = "presence",
     storage_courier = "presence",
     manual_corpse_haul_result = "presence",
 

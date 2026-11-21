@@ -136,6 +136,18 @@ function Tasking.Queries.BuildBrain(npcId, limit)
     local leaseClaims = current and Tasking.Claims
         and type(Tasking.Claims.ListByLease) == "function"
         and Tasking.Claims.ListByLease(current.leaseId) or {}
+    local at = now()
+    local record = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(npcId) or nil
+    local agitation = PNC.AgitationService
+        and type(PNC.AgitationService.GetState) == "function"
+        and PNC.AgitationService.GetState(npcId, at) or nil
+    local clues = record and PNC.PerceptionService
+        and type(PNC.PerceptionService.GetClues) == "function"
+        and PNC.PerceptionService.GetClues(record, at) or nil
+    local sc = record and PNC.SecondaryChannel
+        and type(PNC.SecondaryChannel.BuildDeltaPayload) == "function"
+        and PNC.SecondaryChannel.BuildDeltaPayload(record, at) or nil
     return {
         freshness = freshness,
         generatedAt = generatedAt,
@@ -158,6 +170,11 @@ function Tasking.Queries.BuildBrain(npcId, limit)
         leaseClaims = leaseClaims,
         autonomyDiagnostics = diagnosticsByProvider
             and diagnosticsByProvider.autonomy or nil,
+        agitation = agitation,
+        clueCount = type(clues) == "table" and #clues or 0,
+        scenarioId = record and record.runtime
+            and record.runtime.activeScenarioId or nil,
+        secondaryChannel = sc,
     }
 end
 

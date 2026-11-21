@@ -259,6 +259,33 @@ function Rows.Build(person, snapshot, window, component)
                 }
             end
         end
+
+        local agitation = type(brain.agitation) == "table" and brain.agitation or nil
+        local secondary = type(brain.secondaryChannel) == "table"
+            and brain.secondaryChannel or nil
+        if agitation or brain.scenarioId or (tonumber(brain.clueCount) or 0) > 0
+            or secondary
+        then
+            local stage = tostring(agitation and agitation.stage or "calm")
+            local agScore = tonumber(agitation and agitation.score) or 0
+            local posture = tostring(secondary and secondary.posture or "relaxed")
+            local alertVar = tostring(secondary and secondary.alertLevel or stage)
+            rows[#rows + 1] = {
+                key = "debug_ai_reactivity",
+                label = Shared.Tr("UI_PNC_ColonyDebug_Reactivity",
+                    "Reactivity / Secondary"),
+                detail = string.format(
+                    "agitation %s (%.0f) | clues %d | scenario %s | vars %s/%s",
+                    stage,
+                    agScore,
+                    tonumber(brain.clueCount) or 0,
+                    tostring(brain.scenarioId or "-"),
+                    alertVar,
+                    posture),
+                colorName = stage == "hostile" and "danger"
+                    or stage == "tense" and "accent" or "muted",
+            }
+        end
     end
 
     return rows

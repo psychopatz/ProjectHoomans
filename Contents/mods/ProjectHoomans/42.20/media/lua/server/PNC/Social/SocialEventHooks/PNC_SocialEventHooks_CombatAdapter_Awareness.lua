@@ -966,6 +966,22 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
             tacticalPrompt,
             tacticalSpatial
         )
+        local shockBus = PsychopatzCore and PsychopatzCore.ShockingEventBus or nil
+        if shockBus and type(shockBus.Emit) == "function"
+            and record.x ~= nil and record.y ~= nil
+        then
+            shockBus.Emit({
+                eventType = "shock.suspicious_sound",
+                x = tonumber(record.x) or 0,
+                y = tonumber(record.y) or 0,
+                z = tonumber(record.z) or 0,
+                radius = 22,
+                severity = math.min(95, 50 + count * 3),
+                sourceId = record.id,
+                dedupKey = "horde:" .. tostring(state.episodeID or record.id),
+                at = now,
+            })
+        end
         return true, eventID, "started"
     end
 

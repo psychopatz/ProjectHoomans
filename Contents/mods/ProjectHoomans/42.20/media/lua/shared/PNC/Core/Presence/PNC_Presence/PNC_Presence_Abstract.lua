@@ -95,6 +95,17 @@ local function notifyAbstraction(record, reason)
             reason or "abstract"
         )
     end
+    if PNC.SecondaryChannel
+        and type(PNC.SecondaryChannel.ClearForRecord) == "function"
+    then
+        PNC.SecondaryChannel.ClearForRecord(record)
+    end
+    if PNC.AgitationService
+        and type(PNC.AgitationService.Clear) == "function"
+        and record and record.id ~= nil
+    then
+        PNC.AgitationService.Clear(record.id)
+    end
 end
 
 local function clearLiveRuntime(record)

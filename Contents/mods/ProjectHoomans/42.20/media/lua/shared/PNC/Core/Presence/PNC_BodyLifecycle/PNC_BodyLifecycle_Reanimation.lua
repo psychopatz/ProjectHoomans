@@ -34,7 +34,8 @@ local CONTROL_VARIABLES = {
     "PNCLive", "PNCActor", "PNCAnim", "PNCMoveAnim", "PNCWalkType",
     "PNCPrimary", "PNCSecondary", "PNCPrimaryType", "PNCImmediateAnim",
     "PNCAnimSpeed", "PNCEngineWalkType", "PNCMoving", "PNCIsRunning",
-    "PNCIsCrawling", "NoLungeTarget", "NoLungeAttack",
+    "PNCIsCrawling", "PNCAlertLevel", "PNCPosture", "PNCSecondaryState",
+    "NoLungeTarget", "NoLungeAttack",
 }
 
 local function setBoolean(zombie, methodName, value)

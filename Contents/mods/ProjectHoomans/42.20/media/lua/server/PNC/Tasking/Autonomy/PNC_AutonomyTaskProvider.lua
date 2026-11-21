@@ -150,6 +150,15 @@ local function makeCandidate(record, entry)
     local ad = entry.ad
     local ctx = entry.context
     local band = entry.band == "OPTIONAL" and "OPTIONAL" or "IDLE"
+    local urgency = tonumber(entry.urgency) or 0
+    if PNC.ScenarioScheduler
+        and type(PNC.ScenarioScheduler.GetScenarioBoostForAd) == "function"
+    then
+        local boost = PNC.ScenarioScheduler.GetScenarioBoostForAd(record, ad.id)
+        if tonumber(boost) and boost > 0 then
+            urgency = math.min(1.0, urgency + boost)
+        end
+    end
     return {
         taskId = "autonomy:" .. tostring(ad.id) .. ":" .. tostring(record.id),
         npcId = tostring(record.id),
@@ -158,7 +167,7 @@ local function makeCandidate(record, entry)
         sourceDomain = Provider.DOMAIN,
         sourceRef = tostring(ad.id),
         precedence = band,
-        urgency = entry.urgency,
+        urgency = urgency,
         capability = tostring(ad.capability or "facility.idle"),
         interruptPolicy = "NORMAL",
         adId = tostring(ad.id),

@@ -70,6 +70,14 @@ local function removeLocalBody(body)
     if not body then
         return false
     end
+    if PNC.NPCVoice and type(PNC.NPCVoice.Stop) == "function" then
+        PNC.NPCVoice.Stop(body)
+    end
+    if PNC.SecondaryChannel
+        and type(PNC.SecondaryChannel.ClearAnimVars) == "function"
+    then
+        PNC.SecondaryChannel.ClearAnimVars(body)
+    end
     if LiveBodyControl and LiveBodyControl.EnforceManagedSafety then
         LiveBodyControl.EnforceManagedSafety(body, "client_stale_body_remove")
     end

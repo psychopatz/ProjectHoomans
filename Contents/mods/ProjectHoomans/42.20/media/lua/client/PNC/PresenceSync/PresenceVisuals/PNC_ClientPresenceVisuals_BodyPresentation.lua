@@ -76,6 +76,11 @@ local function applyBodyPresentation(
     end
     syncTreatmentSound(zombie, snapshot, modData)
     syncDrinkSound(zombie, snapshot, modData)
+    if PNC.SecondaryChannel
+        and type(PNC.SecondaryChannel.ApplyClientSnapshot) == "function"
+    then
+        PNC.SecondaryChannel.ApplyClientSnapshot(snapshot, zombie, modData)
+    end
     if PNC.CompanionCommandPresentation
         and PNC.CompanionCommandPresentation.SyncAcknowledgement
     then

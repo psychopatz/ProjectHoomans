@@ -29,6 +29,7 @@ Tasking.WATCHDOG_DOMAINS.lumber = true
 Tasking.WATCHDOG_DOMAINS.scavenge = true
 Tasking.WATCHDOG_DOMAINS.medical = true
 Tasking.WATCHDOG_DOMAINS.autonomy = true
+Tasking.WATCHDOG_DOMAINS.reaction = true
 
 require "PNC/Tasking/Tasking/PNC_Tasking_Recovery_Context"
 require "PNC/Tasking/Tasking/PNC_Tasking_Recovery_Retry"
