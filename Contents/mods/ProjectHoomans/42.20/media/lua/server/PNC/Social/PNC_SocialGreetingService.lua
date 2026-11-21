@@ -323,4 +323,15 @@ Internal.NearbyTargets = nearbyTargets
 Internal.PlayerKey = playerKey
 Internal.CanPlayerMeetNPC = Service.CanPlayerMeetNPC
 
+function Service.HandleStreetAct(playerOrSource, npcOrId, act, opts)
+    local street = PNC.StreetInteraction
+    if not street and type(require) == "function" then
+        street = require "PNC/ConvoEngine/Social/PNC_StreetInteractionService"
+    end
+    if not street or type(street.HandleStreetAct) ~= "function" then
+        return false, "STREET_INTERACTION_UNAVAILABLE"
+    end
+    return street.HandleStreetAct(playerOrSource, npcOrId, act, opts)
+end
+
 return Service

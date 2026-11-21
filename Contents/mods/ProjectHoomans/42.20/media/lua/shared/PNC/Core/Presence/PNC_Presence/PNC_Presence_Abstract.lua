@@ -106,6 +106,12 @@ local function notifyAbstraction(record, reason)
     then
         PNC.AgitationService.Clear(record.id)
     end
+    if PNC.JointSceneLease
+        and type(PNC.JointSceneLease.OnParticipantUnavailable) == "function"
+        and record and record.id ~= nil
+    then
+        PNC.JointSceneLease.OnParticipantUnavailable(record.id, reason or "abstract")
+    end
 end
 
 local function clearLiveRuntime(record)

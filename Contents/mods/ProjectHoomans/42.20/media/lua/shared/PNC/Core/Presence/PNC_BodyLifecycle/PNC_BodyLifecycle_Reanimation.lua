@@ -84,6 +84,12 @@ end
 function Lifecycle.ReleaseReanimatedNPC(record, zombie)
     if not record or not zombie or not Core.IsAuthority() then return false end
     clearManagedState(record, zombie)
+    if PNC.JointSceneLease
+        and type(PNC.JointSceneLease.OnParticipantUnavailable) == "function"
+        and record.id ~= nil
+    then
+        PNC.JointSceneLease.OnParticipantUnavailable(record.id, "reanimated")
+    end
 
     -- Restore only the safeguards used to make the managed IsoZombie harmless.
     -- Do not normalize its posture, reanimation state, health, speed, target,

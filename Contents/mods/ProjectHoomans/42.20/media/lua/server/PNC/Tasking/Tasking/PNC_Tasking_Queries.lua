@@ -175,6 +175,9 @@ function Tasking.Queries.BuildBrain(npcId, limit)
         scenarioId = record and record.runtime
             and record.runtime.activeScenarioId or nil,
         secondaryChannel = sc,
+        dialogueDirector = PNC.DialogueMicroBeatDirector
+            and type(PNC.DialogueMicroBeatDirector.GetActorTelemetry) == "function"
+            and PNC.DialogueMicroBeatDirector.GetActorTelemetry(npcId) or nil,
     }
 end
 

@@ -65,7 +65,7 @@ class InteractionBehaviorStructuralDiffContractTests(WarmWorkerTestMixin, unitte
         self.assertTrue(
             any(
                 path.endswith(
-                    "PsychopatzCore/ConvoEngine/Behaviors/Director/Social/Acknowledgement.lua"
+                    "PsychopatzCore/ConvoEngine/Behavior/Social/Acknowledgement.lua"
                 )
                 for path in report["changedGeneratedPaths"]
             ),

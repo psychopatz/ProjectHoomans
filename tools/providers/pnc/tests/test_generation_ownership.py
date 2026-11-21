@@ -323,7 +323,7 @@ class GenerationOwnershipTests(unittest.TestCase):
             registry_text = registry.read_text(encoding="utf-8")
             self.assertIn("Registry.PACKS = {}", registry_text)
             self.assertIn(
-                'DTCommon/ConvoEngine/Behaviors',
+                'DTCommon/ConvoEngine/Behavior',
                 registry_text,
             )
             self.assertIn(

@@ -120,9 +120,14 @@ function Service.Depart(record, cause, options)
     record.activeJob = nil
     record.activeBehavior = nil
     if record.orderSpec and record.orderSpec.kind == Const.ORDER_FOLLOW then
-        PNC.OrderSystem.SetOrder(record, {
+        local guardOrder = {
             kind = Const.ORDER_GUARD, x = record.x, y = record.y, z = record.z,
-        })
+        }
+        if PNC.OrderSystem and type(PNC.OrderSystem.SetOrder) == "function" then
+            PNC.OrderSystem.SetOrder(record, guardOrder)
+        else
+            record.orderSpec = guardOrder
+        end
     end
 
     local current = Factions.Get(mobileFaction.id)

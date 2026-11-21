@@ -286,6 +286,25 @@ function Rows.Build(person, snapshot, window, component)
                     or stage == "tense" and "accent" or "muted",
             }
         end
+
+        local dd = type(brain.dialogueDirector) == "table"
+            and brain.dialogueDirector or nil
+        if dd then
+            rows[#rows + 1] = {
+                key = "debug_ai_dialogue_director",
+                label = Shared.Tr("UI_PNC_ColonyDebug_DialogueDirector",
+                    "Dialogue Director"),
+                detail = string.format(
+                    "%s | beat %s | tension %s | act %s | lease %s",
+                    tostring(dd.stage or "-"),
+                    tostring(dd.beatId or "-"),
+                    dd.tension ~= nil and tostring(math.floor(tonumber(dd.tension) or 0)) or "-",
+                    tostring(dd.lastAct or "-"),
+                    tostring(dd.leaseId or "-")),
+                colorName = dd.aborted == true and "danger"
+                    or dd.closed == false and "accent" or "muted",
+            }
+        end
     end
 
     return rows

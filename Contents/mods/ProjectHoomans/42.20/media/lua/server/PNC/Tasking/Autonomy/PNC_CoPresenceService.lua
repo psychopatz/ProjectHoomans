@@ -33,10 +33,9 @@ local function resolveSubmitter(opts)
     if type(opts) == "table" and type(opts.submitSocial) == "function" then
         return opts.submitSocial
     end
-    local adopters = PNC.ConvoEngine
-        and PNC.ConvoEngine.Interaction
-        and PNC.ConvoEngine.Interaction.SceneAdopters
-        or nil
+    local convo = PNC.ConvoEngine
+    local adopters = convo and (convo.InteractionSceneAdopters
+        or (convo.Interaction and convo.Interaction.SceneAdopters)) or nil
     if adopters and type(adopters.SubmitSocial) == "function" then
         return adopters.SubmitSocial
     end

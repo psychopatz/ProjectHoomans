@@ -93,13 +93,19 @@ class PragmaticInteractionCompilerTests(unittest.TestCase):
         _modules, reports = render_conversation_runtime_plan(model)
         self.assertTrue(
             any(
-                row["kind"] == "Beats" and row["domain"] == "social"
+                row["kind"] == "ConvoEngine" and row["module"] == "PsychopatzCore/ConvoEngine/Beat/Social/Conflict"
                 for row in reports
             )
         )
         self.assertTrue(
             any(
-                row["kind"] == "Behaviors" and row["domain"] == "social"
+                row["kind"] == "ConvoEngine" and row["module"] == "PsychopatzCore/ConvoEngine/Behavior/Social/Conflict"
+                for row in reports
+            )
+        )
+        self.assertTrue(
+            any(
+                row["kind"] == "Index" and row.get("indexKind") == "Director"
                 for row in reports
             )
         )

@@ -43,7 +43,7 @@ class PragmaticInteractionBeatInspectorTests(WarmWorkerTestMixin, unittest.TestC
         self.assertTrue(report["effectFree"])
         self.assertIn(
             "Contents/mods/PsychopatzCore/common/media/lua/shared/"
-            "PsychopatzCore/ConvoEngine/Beats/Director/Social/Conflict.lua",
+            "PsychopatzCore/ConvoEngine/Beat/Social/Conflict.lua",
             report["changedGeneratedPaths"],
         )
         self.assertEqual(source.read_bytes(), before)
@@ -117,7 +117,7 @@ class PragmaticInteractionBeatInspectorTests(WarmWorkerTestMixin, unittest.TestC
                 (
                     repository
                     / "Contents/mods/PsychopatzCore/common/media/lua/shared/"
-                    "PsychopatzCore/ConvoEngine/Beats/Director/Social/Conflict.lua"
+                    "PsychopatzCore/ConvoEngine/Beat/Social/Conflict.lua"
                 ).is_file()
             )
             for language in ("EN", "TL"):
