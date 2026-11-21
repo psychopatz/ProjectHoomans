@@ -16,7 +16,7 @@
   * Focused: `python3 tests/run_tests.py <filter>` (e.g., `u1_work_foundation`, `mp_server_file_guard`, `work`, `farming`, `lumber`, `fishing`, `corpse`, `tasking`)
   * Full (gates & U6 only): `python3 tests/run_tests.py`
 * **psychopatzCore CodeBuilder & Lua suites** (run from `/home/psychopatz/Zomboid/Workshop/psychopatzCore`):
-  * Compiler/reconcile unit tests: `python3 -m pytest tools/semantic_harness/tests`
+  * Compiler/reconcile unit tests: `python3 -m unittest`
   * Reconcile check: `python3 tools/semantic_harness/codebuilder/reconcile.py --check`
   * Lua suite: `python3 tests/run_tests.py` (or targeted `lua <test>.lua`)
 * **DynamicTrading standalone compatibility suite** (run from `/home/psychopatz/Zomboid/Workshop/DynamicTrading`):

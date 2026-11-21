@@ -1,0 +1,9 @@
+{
+  "schema": "psychopatz.reaction-policy.package.v1",
+  "version": 1,
+  "package": "ProjectHoomans.ReactionPolicy",
+  "owner": "ProjectHoomans",
+  "shards": [
+    "policies/reactivity_core.json"
+  ]
+}

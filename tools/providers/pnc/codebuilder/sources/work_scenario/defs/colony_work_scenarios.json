@@ -1,0 +1,87 @@
+{
+  "schema": "psychopatz.work-scenario.v1",
+  "version": 1,
+  "owner": "ProjectHoomans",
+  "domain": "Colony",
+  "workDefs": [
+    {
+      "id": "work.base_outdoor_chore",
+      "abstract": true,
+      "usesFatigueGate": true,
+      "executionPolicy": "HYBRID",
+      "toilSteps": [
+        "ENSURE_TOOLS",
+        "COLLECT_INPUTS",
+        "APPROACH_TARGET",
+        "WORK_TARGET",
+        "DELIVER_OUTPUTS"
+      ],
+      "animVar": "PNCMoveAnim"
+    },
+    {
+      "id": "work.farming",
+      "parent": "work.base_outdoor_chore",
+      "operation": "FARMING",
+      "job": "Farmer",
+      "requiredCapabilityTags": ["farming"],
+      "toolTag": "farming_tool"
+    },
+    {
+      "id": "work.lumber",
+      "parent": "work.base_outdoor_chore",
+      "operation": "LUMBER",
+      "job": "Lumber",
+      "requiredCapabilityTags": ["lumber"],
+      "toolTag": "lumber_axe"
+    },
+    {
+      "id": "work.fishing",
+      "parent": "work.base_outdoor_chore",
+      "operation": "FISHING",
+      "job": "Fishing",
+      "requiredCapabilityTags": ["fishing"],
+      "toolTag": "fishing_rod"
+    },
+    {
+      "id": "work.corpse_haul",
+      "parent": "work.base_outdoor_chore",
+      "operation": "CORPSE_HAUL",
+      "job": "CorpseHaul",
+      "requiredCapabilityTags": ["hauling"],
+      "forbiddenCapabilityTags": ["pacifist_corpse_refusal"]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "scenario.morning_chores",
+      "startHour": 6,
+      "endHour": 12,
+      "weight": 1.2,
+      "workDefId": "work.farming",
+      "nextScenarioId": "scenario.afternoon_work",
+      "animVar": "PNCMoveAnim",
+      "requiredTags": ["colony"]
+    },
+    {
+      "id": "scenario.afternoon_work",
+      "startHour": 12,
+      "endHour": 18,
+      "weight": 1.0,
+      "workDefId": "work.lumber",
+      "nextScenarioId": "scenario.evening_lounge",
+      "animVar": "PNCMoveAnim",
+      "requiredTags": ["colony"]
+    },
+    {
+      "id": "scenario.evening_lounge",
+      "startHour": 18,
+      "endHour": 22,
+      "weight": 1.4,
+      "adId": "ad.social_lounge",
+      "nextScenarioId": "scenario.morning_chores",
+      "animVar": "PNCPosture",
+      "barkKey": "bark.whisper_check",
+      "requiredTags": ["colony"]
+    }
+  ]
+}
