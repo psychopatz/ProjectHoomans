@@ -290,6 +290,17 @@ function Internal.StartRetreat(record, zombie, target, distance, mode, stopDista
                     now
                 )
             end
+            local callouts = PNC and PNC.Semantics
+                and PNC.Semantics.CombatTargetCallouts or nil
+            if callouts and type(callouts.OnStaminaFatigue) == "function" then
+                pcall(
+                    callouts.OnStaminaFatigue,
+                    record,
+                    "exhausted",
+                    now,
+                    { retreating = true }
+                )
+            end
         end
     end
     return true, reason

@@ -105,12 +105,13 @@ local function statsFromFallback(sp)
     local fatigue = tonumber(c.fatigue) or tonumber(sp.needs and sp.needs.fatigue) or 0
     local pain = tonumber(c.pain) or 0
     local bleeding = h.bleeding == true
+    local stState = string.lower(tostring(sp.stamina and sp.stamina.state or ""))
     local style = "neutral"
     local b = tostring(sp.activeBehavior or sp.behavior or "")
     local tRole = tostring(sp.tacticalRole or sp.role or "")
     if b == "hostile" or sp.isHostile == true then style = "hostile"
     elseif panic >= 70 or bravery <= 0.30 or tostring(sp.combatPolicy or "") == "passive" or tostring(sp.attackType or "") == "none" then style = "shaken"
-    elseif bleeding or pain >= 55 or fatigue >= 0.80 then style = "exhausted"
+    elseif bleeding or pain >= 55 or fatigue >= 0.80 or stState == "exhausted" then style = "exhausted"
     elseif aggression >= 0.72 then style = "aggressive"
     elseif bravery >= 0.72 then style = "brave"
     elseif sp.tactical == true or tRole == "guard" or tRole == "soldier" or tRole == "scout" then style = "tactical"
@@ -120,7 +121,7 @@ local function statsFromFallback(sp)
         panic = panic, stress = tonumber(c.stress) or 0, fatigue = fatigue, pain = pain,
         bleeding = bleeding, healthState = tostring(h.state or "okay"), hpRatio = 1,
         isCowardly = bravery <= 0.30 or panic >= 55, isBrave = bravery >= 0.72,
-        isExhausted = fatigue >= 0.75 or pain >= 50 or bleeding,
+        isExhausted = fatigue >= 0.75 or pain >= 50 or bleeding or stState == "exhausted",
     }
 end
 

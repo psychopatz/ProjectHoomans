@@ -90,6 +90,24 @@
       "Tell me about it, {addressee.name}. Keep your eyes peeled, rain hides their footsteps.",
       "Yeah, {addressee.name}, I'm already getting drenched. Let's watch our step.",
       "I hear you, {addressee.name}. At least the rain cools things down, stay alert."
+    ],
+    "say.variants.stamina_winded_callout": [
+      "Whoa, {addressee.name}, give me a second to catch my breath.",
+      "{addressee.name}, my legs are burning. Slowing down for a beat.",
+      "Running low on wind here, {addressee.name}.",
+      "Hold up a sec, {addressee.name}, I'm getting winded."
+    ],
+    "say.variants.stamina_exhausted_callout": [
+      "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!",
+      "{addressee.name}, my arms feel like lead! Need a moment to recover!",
+      "Zero stamina left, {addressee.name}, I can barely swing!",
+      "Falling back a step, {addressee.name}, I'm totally spent!"
+    ],
+    "say.variants.cover_winded_reply_callout": [
+      "I've got you covered, {addressee.name}! Catch your breath!",
+      "Step back, {addressee.name}, I'll hold them off for a minute!",
+      "Take a breather, {addressee.name}, I got this side!",
+      "Don't push it, {addressee.name}! Stay behind me and recover!"
     ]
   }
 }

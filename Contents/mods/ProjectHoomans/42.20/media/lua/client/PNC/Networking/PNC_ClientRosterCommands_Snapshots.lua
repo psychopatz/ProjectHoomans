@@ -232,6 +232,14 @@ local function mergeSnapshot(current, incoming)
     if type(current) ~= "table" then
         return incoming
     end
+    -- Periodic roster deltas in singleplayer/same-cell carry interestDetailed = false
+    -- so they don't overwrite a live detailed local snapshot into rebuilding full
+    -- snapshots on every client tick.
+    local preserveDetailed = current.interestDetailed == true
+        and type(incoming) == "table"
+        and incoming.interestDetailed == false
+        and incoming.deathMarker ~= true
+        and (incoming.presenceState == nil or incoming.presenceState == current.presenceState)
     if type(incoming) == "table"
         and type(incoming.travel) == "table"
         and incoming.travel.route == nil
@@ -242,6 +250,9 @@ local function mergeSnapshot(current, incoming)
     end
     for key, _ in pairs(incoming or {}) do
         current[key] = incoming[key]
+    end
+    if preserveDetailed then
+        current.interestDetailed = true
     end
     return current
 end

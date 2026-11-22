@@ -29,6 +29,7 @@ local function distSq(x1, y1, x2, y2)
     local dx, dy = (tonumber(x2) or 0) - (tonumber(x1) or 0), (tonumber(y2) or 0) - (tonumber(y1) or 0)
     return dx * dx + dy * dy
 end
+I.DistSq = distSq
 
 function I.FindSquadmates(rec, radius)
     local perc, sp, reg = PNC.Perception, PNC.SpatialIndex, PNC.Registry

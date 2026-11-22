@@ -189,12 +189,13 @@ local function ratioFor(stamina)
     )
 end
 
-local function updateState(record, stamina)
+local function updateState(record, stamina, now)
     local ratio
-    stamina = stamina or ensureState(record)
+    stamina = stamina or ensureState(record, now)
     if not stamina then
         return nil
     end
+    local prevState = stamina.state
     ratio = ratioFor(stamina)
     if ratio <= 0.15 then
         stamina.state = "exhausted"
@@ -204,6 +205,21 @@ local function updateState(record, stamina)
         stamina.state = "working"
     else
         stamina.state = "fresh"
+    end
+    if prevState ~= nil and stamina.state ~= prevState then
+        if PNC.Registry and PNC.Registry.MarkDirty then
+            PNC.Registry.MarkDirty(record, "stamina")
+        end
+        if stamina.state == "exhausted"
+            or (stamina.state == "winded" and prevState ~= "exhausted")
+        then
+            local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts
+            if callouts and type(callouts.OnStaminaFatigue) == "function"
+                and (not Core or not Core.IsAuthority or Core.IsAuthority())
+            then
+                pcall(callouts.OnStaminaFatigue, record, stamina.state, now or (Core and Core.Now and Core.Now()))
+            end
+        end
     end
     return stamina
 end
@@ -246,12 +262,10 @@ function Stamina.SpendAttack(record, attackType, skillID)
         return false
     end
     drain = Stamina.GetAttackDrain(record, attackType, skillID)
+    local now = Core.Now()
     stamina.current = clamp((tonumber(stamina.current) or 0) - drain, 0, tonumber(stamina.max) or 100)
-    stamina.visibleUntil = Core.Now() + Const.STAMINA_VISIBLE_MS
-    updateState(record, stamina)
-    if PNC.Registry and PNC.Registry.MarkDirty then
-        PNC.Registry.MarkDirty(record, "stamina")
-    end
+    stamina.visibleUntil = now + Const.STAMINA_VISIBLE_MS
+    updateState(record, stamina, now)
     return true
 end
 
@@ -326,7 +340,7 @@ function Stamina.Update(record, zombie, now)
 
     local previous = tonumber(stamina.current) or 0
     stamina.current = clamp(previous + (recoverRate * elapsed), 0, tonumber(stamina.max) or 100)
-    updateState(record, stamina)
+    updateState(record, stamina, now)
 end
 
 function Stamina.BuildSnapshot(record)

@@ -230,6 +230,36 @@ function Lifecycle.New(options)
     }
 end
 
+local function oldestSharedEventKey(store)
+    local referenced = {}
+    for _, pair in pairs(type(store.pairs) == "table" and store.pairs or {}) do
+        if type(pair) == "table" and type(pair.eventRefs) == "table" then
+            for _, ref in ipairs(pair.eventRefs) do
+                if ref ~= nil then referenced[tostring(ref)] = true end
+            end
+        end
+    end
+    local bestUnrefKey, bestUnrefAt = nil, nil
+    local bestAnyKey, bestAnyAt = nil, nil
+    for key, entry in pairs(store.sharedEvents) do
+        local occ = tonumber(type(entry) == "table" and entry.occurredAt) or -math.huge
+        local keyStr = tostring(key)
+        if not referenced[keyStr] then
+            if bestUnrefKey == nil or occ < bestUnrefAt
+                or (occ == bestUnrefAt and keyStr < tostring(bestUnrefKey))
+            then
+                bestUnrefKey, bestUnrefAt = key, occ
+            end
+        end
+        if bestAnyKey == nil or occ < bestAnyAt
+            or (occ == bestAnyAt and keyStr < tostring(bestAnyKey))
+        then
+            bestAnyKey, bestAnyAt = key, occ
+        end
+    end
+    return bestUnrefKey or bestAnyKey
+end
+
 function Lifecycle.RegisterSharedEvent(store, event)
     if type(store) ~= "table" or type(event) ~= "table" then
         return nil, "lifecycle_store_required"
@@ -240,10 +270,19 @@ function Lifecycle.RegisterSharedEvent(store, event)
     local eventID = clean(event.eventRef or event.eventID or event.id, 128)
     if not eventID then return nil, "event_reference_required" end
     if not store.sharedEvents[eventID] then
+        local limit = tonumber(store.limits and store.limits.sharedEvents) or 0
+        if limit <= 0 then
+            return nil, "shared_event_budget_exhausted"
+        end
         local count = 0
         for _ in pairs(store.sharedEvents) do count = count + 1 end
-        if count >= store.limits.sharedEvents then
-            return nil, "shared_event_budget_exhausted"
+        if count >= limit then
+            local evictKey = oldestSharedEventKey(store)
+            if evictKey ~= nil then
+                store.sharedEvents[evictKey] = nil
+            else
+                return nil, "shared_event_budget_exhausted"
+            end
         end
         store.sharedEvents[eventID] = {
             id = eventID,

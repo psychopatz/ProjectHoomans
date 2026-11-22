@@ -90,6 +90,24 @@
       "Oo nga, {addressee.name}. Maging alerto ka, tinatakpan ng ulan ang yabag nila.",
       "Sabi mo pa, {addressee.name}, basang basa na rin ako. Ingat sa paligid.",
       "Narinig kita, {addressee.name}. Magmatyag tayo habang umuulan."
+    ],
+    "say.variants.stamina_winded_callout": [
+      "Teka lang, {addressee.name}, hinihingal na ako rito.",
+      "{addressee.name}, bumibigat na hininga ko. Pahinga muna saglit.",
+      "Nauubusan na ako ng hangin, {addressee.name}.",
+      "Sandali lang, {addressee.name}, pagod na pagod na ako."
+    ],
+    "say.variants.stamina_exhausted_callout": [
+      "Ubos na ubos na ako, {addressee.name}! Bantayan mo ako habang naghahabol ng hininga!",
+      "{addressee.name}, hindi ko na maiangat braso ko! Kailangan kong bumawi!",
+      "Wala na akong lakas, {addressee.name}, hindi na ako makapalo!",
+      "Aatras muna ako nang kaunti, {addressee.name}, sagad na lakas ko!"
+    ],
+    "say.variants.cover_winded_reply_callout": [
+      "Ako na bahala sa'yo, {addressee.name}! Huminga ka muna!",
+      "Umatras ka muna, {addressee.name}, haharangin ko muna sila!",
+      "Bawi ka muna ng lakas, {addressee.name}, ako na rito!",
+      "Huwag mong pilitin, {addressee.name}! Dito ka sa likod ko habang nagpapahinga!"
     ]
   }
 }

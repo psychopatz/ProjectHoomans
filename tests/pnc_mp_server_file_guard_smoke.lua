@@ -180,9 +180,9 @@ listing:close()
 -- PNC_UnifiedAIDebugService is server-only, guarded by AllowsServerCode(),
 -- and loaded by PNC_ServerComposition.
 -- PNC_SemanticCombatTargetCallouts_Context, _Delivery, _AllyReplies,
--- _Situations and _Medical are server-only, guarded by AllowsServerCode(),
--- and loaded by PNC_SemanticCombatTargetCallouts.
-T.equal(#serverOnlyFiles, 1078,
+-- _Situations, _Medical, and _Stamina are server-only, guarded by
+-- AllowsServerCode(), and loaded by PNC_SemanticCombatTargetCallouts.
+T.equal(#serverOnlyFiles, 1079,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

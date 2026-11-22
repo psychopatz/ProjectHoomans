@@ -903,7 +903,8 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
     if actorID == "" then
         return false, "actor_id_required", OUTCOME_TERMINAL
     end
-    local actor = reg:Get(actorID)
+    local actor = (type(reg.Peek) == "function" and reg:Peek(actorID))
+        or reg:Get(actorID)
     if not actor then
         return false, "core_actor_not_found", OUTCOME_TERMINAL
     end
@@ -932,7 +933,8 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
             if type(record.runtime) == "table" then
                 record.runtime.coreSocialDirty = nil
             end
-            actor = reg:Get(actorID)
+            actor = (type(reg.Peek) == "function" and reg:Peek(actorID))
+                or reg:Get(actorID)
             if not actor then
                 return false, "core_actor_not_found", OUTCOME_TERMINAL
             end
@@ -960,18 +962,28 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
         end
     end
 
+    local syncedInvRev = nil
     if type(record.inventory) == "table" and hasInventoryBridgeDeps() then
-        local captured, _, captureErr = ActorInventoryBridge.CaptureRecord(
-            record, actor
-        )
-        if not captured then
-            return false,
-                captureErr or "core_inventory_capture_failed",
-                OUTCOME_RETRYABLE
-        end
-        if Json.Encode(captured) ~= Json.Encode(actor.personalInventory) then
-            patch.personalInventory = captured
-            hasPatch = true
+        local invRev = tonumber(record.inventory.revision) or 0
+        local lastInvRev = type(record.runtime) == "table"
+            and record.runtime._coreSyncedInventoryRev or nil
+        if actor.personalInventory == nil
+            or lastInvRev ~= invRev
+            or options.forceInventory == true
+        then
+            local captured, _, captureErr = ActorInventoryBridge.CaptureRecord(
+                record, actor
+            )
+            if not captured then
+                return false,
+                    captureErr or "core_inventory_capture_failed",
+                    OUTCOME_RETRYABLE
+            end
+            if Json.Encode(captured) ~= Json.Encode(actor.personalInventory) then
+                patch.personalInventory = captured
+                hasPatch = true
+            end
+            syncedInvRev = invRev
         end
     end
 
@@ -1005,11 +1017,17 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
     end
 
     if hasPatch then
-        local committed, commitErr = reg:Commit(actorID, patch, actor.revision)
+        local committed, commitErr = reg:Commit(
+            actorID, patch, actor.revision, { returnClone = false }
+        )
         if not committed then
             return false,
                 commitErr or "core_actor_commit_failed",
                 OUTCOME_RETRYABLE
+        end
+        if syncedInvRev ~= nil then
+            record.runtime = type(record.runtime) == "table" and record.runtime or {}
+            record.runtime._coreSyncedInventoryRev = syncedInvRev
         end
         Adapter.Metrics.syncs = (tonumber(Adapter.Metrics.syncs) or 0) + 1
         record.coreRevision = committed.revision
@@ -1024,6 +1042,10 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
         }, OUTCOME_WRITTEN
     end
 
+    if syncedInvRev ~= nil then
+        record.runtime = type(record.runtime) == "table" and record.runtime or {}
+        record.runtime._coreSyncedInventoryRev = syncedInvRev
+    end
     if record.runtime then record.runtime.coreAffiliationDirty = nil end
     return true, {
         committed = false,

@@ -14,6 +14,7 @@ S.COOLDOWN_MS = 5000
 S.WITNESS_RADIUS = tonumber(PNC.Const and PNC.Const.ZOMBIE_TARGET_RADIUS) or 12
 
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_Medical"
+require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_Stamina"
 
 local Common, Core, Registry = PNC.BehaviorCommon, PNC.Core, PNC.Registry
 local Projection = PNC.TacticalSpatialProjection or require "PNC/Core/Spatial/PNC_TacticalSpatialProjection"

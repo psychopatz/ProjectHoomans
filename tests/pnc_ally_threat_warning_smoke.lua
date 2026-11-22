@@ -1201,6 +1201,51 @@ do
         PNC.SocialEventHooks.ObserveZombieHorde(rainA, 5, 4, nowMs, "zombie_observation")
         T.equal(#deliveredBarks, beforeHorde,
             "5k ObserveZombieHorde suppresses duplicate non-prompt chatter during active team skirmish")
+
+        -- 5j. Winded & exhausted stamina callouts + coherent cover_winded squadmate reply.
+        Callouts.ResetRuntime()
+        local fatigueTeam = "squad5j"
+        rainA.factionID, rainB.factionID, rainWing.factionID = fatigueTeam, fatigueTeam, fatigueTeam
+        rainA.runtime.lastWindedCalloutAt = nil
+        rainA.runtime.lastExhaustedCalloutAt = nil
+        rainA.runtime.target = nil
+        rainB.runtime.target = nil
+        local beforeWinded = #deliveredBarks
+        local wAt = nowMs + 200000
+        local okW = Callouts.OnStaminaFatigue(rainA, "winded", wAt)
+        T.truthy(okW, "5j winded callout emits with nearby squadmate")
+        T.equal(#deliveredBarks, beforeWinded + 1, "5j winded emits one bark")
+        assertNoRawTokens(deliveredBarks[#deliveredBarks].text, "5j winded")
+        assertNoLLMHyphens(deliveredBarks[#deliveredBarks].text, "5j winded")
+
+        local throttleOk = Callouts.OnStaminaFatigue(rainWing, "winded", wAt + 1000)
+        T.falsy(throttleOk, "5j team-wide throttle blocks rapid consecutive winded barks")
+
+        local beforeExh = #deliveredBarks
+        local exAt = wAt + 7000
+        local okExh = Callouts.OnStaminaFatigue(rainA, "exhausted", exAt)
+        T.truthy(okExh, "5j exhausted overrides winded after cooldowns")
+        T.equal(#deliveredBarks, beforeExh + 1, "5j exhausted callout emits")
+        assertNoRawTokens(deliveredBarks[#deliveredBarks].text, "5j exhausted")
+        assertNoLLMHyphens(deliveredBarks[#deliveredBarks].text, "5j exhausted")
+        Callouts.PumpPendingReplies(exAt + 800)
+        T.equal(#deliveredBarks, beforeExh + 2, "5j exhausted queues cover_winded ally reply")
+        T.contains(deliveredBarks[#deliveredBarks].text, "Sammie", "5j cover_winded addresses exhausted NPC")
+        assertNoRawTokens(deliveredBarks[#deliveredBarks].text, "5j cover_winded")
+        assertNoLLMHyphens(deliveredBarks[#deliveredBarks].text, "5j cover_winded")
+
+        local solo = makeNPC("j-solo", { x = 500, y = 500, factionID = "solo5j" })
+        solo.name = "Lonely"
+        local oldPX, oldPY = playerWorldObj._x, playerWorldObj._y
+        playerWorldObj._x, playerWorldObj._y = 10, 10
+        local soloSilent = Callouts.OnStaminaFatigue(solo, "exhausted", exAt + 20000)
+        T.falsy(soloSilent, "5j solo NPC without nearby allies or player stays silent")
+        playerWorldObj._x, playerWorldObj._y = 502, 500
+        local beforePlayerFallback = #deliveredBarks
+        local soloNearPlayer = Callouts.OnStaminaFatigue(solo, "exhausted", exAt + 20500)
+        playerWorldObj._x, playerWorldObj._y = oldPX, oldPY
+        T.truthy(soloNearPlayer, "5j solo NPC speaks winded line to nearby player")
+        T.equal(#deliveredBarks, beforePlayerFallback + 1, "5j solo player fallback emits one bark")
     end
 
     -- 5h. Lightweight transient bark fast-path skips full conversation assembly & relationship UI sync.

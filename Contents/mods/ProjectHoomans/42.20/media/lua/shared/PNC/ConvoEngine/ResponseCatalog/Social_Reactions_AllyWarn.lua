@@ -37,6 +37,7 @@ end
 local CALLOUT_ROLES = {
     "crawler", "blindside", "last_one", "bandaging_self",
     "bandaging_ally", "checkin_injured", "checkin_clear", "weather_rain_open",
+    "stamina_winded", "stamina_exhausted",
 }
 
 local function registerCalloutPool(poolID, templatePrefix)
@@ -78,6 +79,10 @@ local function appendReplySituations(vars, poolID, act)
     vars[#vars + 1] = makeVariant(
         poolID, "combat.ally_warn.callout.weather_rain_reply_callout",
         "weather_rain_reply", { combatReactionRole = "weather_rain_reply" }, 97, act
+    )
+    vars[#vars + 1] = makeVariant(
+        poolID, "combat.ally_warn.callout.cover_winded_reply_callout",
+        "cover_winded", { combatReactionRole = "cover_winded" }, 97, act
     )
 end
 

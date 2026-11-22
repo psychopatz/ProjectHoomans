@@ -85,6 +85,10 @@ s.interestDetailed = true
 PNC.Client.Internal.StoreSnapshot(s)
 T.equal(PNC.ClientPresenceSync.ResolveBodyForNPC("npc_a"), body,
     "fresh interest-enter proof reconstructs client identity")
+PNC.Client.Internal.StoreSnapshot({ id = "npc_a", alive = true, presenceState = "live",
+    interestDetailed = false, replicaSequence = 4 }, false, true, "roster_delta")
+T.equal(PNC.Network.ClientState.snapshots.npc_a.interestDetailed, true,
+    "roster_delta merge preserves active interestDetailed=true snapshot")
 PNC.Core.IsClientOnly = function() return false end
 T.equal(R.AcceptSnapshot(s), false, "SP cannot enter MP admission")
 return T.finish("pnc_client_body_cleanup_smoke")

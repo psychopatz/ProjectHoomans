@@ -53,6 +53,15 @@
       },
       {
         "id": "weather_rain_reply_callout"
+      },
+      {
+        "id": "stamina_winded_callout"
+      },
+      {
+        "id": "stamina_exhausted_callout"
+      },
+      {
+        "id": "cover_winded_reply_callout"
       }
     ]
   },

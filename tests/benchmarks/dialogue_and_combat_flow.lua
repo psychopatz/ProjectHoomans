@@ -294,6 +294,58 @@ bench("DialogueBeats.Pump (idle)", 2000, function(i)
     DialogueBeats.Pump(nowMs + i)
 end)
 
+do
+    local Actors = require "PsychopatzCore/Actors/PsychopatzActors"
+    local actorReg = Actors.NewRegistry()
+    local bigConductEvidence = {}
+    for idx = 1, 60 do
+        bigConductEvidence[#bigConductEvidence + 1] = {
+            id = "cond:" .. idx,
+            eventID = "ev:" .. idx,
+            type = "survived_combat_together",
+            actorKey = "npc:heavy",
+            targetKey = "npc:ally-" .. (idx % 6),
+            summary = string.rep("shared_combat_memory_payload_", 16),
+        }
+    end
+    local bigMemories = {}
+    for idx = 1, 40 do
+        bigMemories[#bigMemories + 1] = {
+            id = "mem:" .. idx,
+            eventID = "ev:" .. idx,
+            type = "survived_combat_together",
+            aboutKey = "npc:ally-" .. (idx % 6),
+            retentionClass = "LONG",
+            refStrength = "WEAK",
+            summary = string.rep("memory_text_", 24),
+        }
+    end
+    local createdActor = actorReg:Create({
+        actorId = "npc:bench_heavy",
+        identitySeed = "heavy-seed",
+        social = {
+            memoryBank = bigMemories,
+            extensions = {
+                ProjectHoomans = {
+                    conduct = { evidence = bigConductEvidence },
+                },
+            },
+        },
+    })
+    assert(createdActor, "failed to create heavy actor for Commit benchmark")
+    local rev = createdActor.revision
+    local commitMs = bench("ActorRegistry:Commit (100KB social)", 200, function(i)
+        local c = actorReg:Commit("npc:bench_heavy", {
+            world = { location = { position = { x = 100 + i * 0.1, y = 200, z = 0 } } },
+        }, rev, { returnClone = false })
+        assert(c and c.revision, "Commit failed")
+        rev = c.revision
+    end)
+    if not BASELINE_MODE then
+        assert(commitMs < 50, "ActorRegistry:Commit regressed: " .. tostring(commitMs) .. "ms")
+    end
+end
+
 -- ============================================================================
 -- 2. FLOW INVARIANTS CHECKER
 -- ============================================================================
@@ -538,6 +590,41 @@ for _, r in ipairs(roles) do
 end
 check(distinctRoleTexts == #roles,
     "all 7 relationship farewell roles produce distinct tone lines (distinct=" .. distinctRoleTexts .. ")")
+
+print("\n=== 2C. SHARED EVENT BUDGET EVICTION & WINDED/EXHAUSTED DIALOGUE ===")
+local Lifecycle = T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/Interaction/Lifecycle.lua")
+local lStore = Lifecycle.New({ worldHour = 1 })
+local sawBudgetErr = false
+for idx = 1, 80 do
+    local evId, evRes = Lifecycle.RegisterSharedEvent(lStore, {
+        id = "social:shared_combat:" .. idx,
+        type = "survived_combat_together",
+        occurredAt = idx * 0.1,
+    })
+    if not evId and evRes == "shared_event_budget_exhausted" then
+        sawBudgetErr = true
+    end
+end
+local sharedCount = 0
+for _ in pairs(lStore.sharedEvents) do sharedCount = sharedCount + 1 end
+check(not sawBudgetErr, "RegisterSharedEvent evicts oldest entries cleanly without exhausting budget")
+check(sharedCount == lStore.limits.sharedEvents and lStore.sharedEvents["social:shared_combat:80"] ~= nil,
+    "sharedEvents remains bounded at limit while retaining newest events (count=" .. sharedCount .. ")")
+
+Callouts.ResetRuntime()
+deliveredBarks = {}
+local windedA = makeNPC("w-1", { name = "Sammie", x = 10, y = 10, factionID = "windedSquad" })
+local windedB = makeNPC("w-2", { name = "Adrienne", x = 11, y = 10, factionID = "windedSquad" })
+local exOk = Callouts.OnStaminaFatigue(windedA, "exhausted", 900000)
+check(exOk == true and #deliveredBarks >= 1, "OnStaminaFatigue emits exhausted callout (count=" .. #deliveredBarks .. ")")
+local exTxt = deliveredBarks[#deliveredBarks].ambientFlavor and deliveredBarks[#deliveredBarks].ambientFlavor.text or ""
+check(exTxt ~= "" and not string.find(exTxt, "%s", 1, true) and not string.find(exTxt, " - ", 1, true),
+    "exhausted callout resolves cleanly without %s or dash (text=" .. tostring(exTxt) .. ")")
+Callouts.PumpPendingReplies(901000)
+check(#deliveredBarks >= 2, "squadmate emits cover_winded reply after exhausted callout (count=" .. #deliveredBarks .. ")")
+local covTxt = deliveredBarks[#deliveredBarks].ambientFlavor and deliveredBarks[#deliveredBarks].ambientFlavor.text or ""
+check(covTxt ~= "" and not string.find(covTxt, "%s", 1, true) and not string.find(covTxt, " - ", 1, true),
+    "cover_winded reply resolves cleanly without %s or dash (text=" .. tostring(covTxt) .. ")")
 
 if #flowFailures > 0 then
     print(string.format("\nSUMMARY: %d flow failures (BASELINE_MODE=%s)", #flowFailures, tostring(BASELINE_MODE)))

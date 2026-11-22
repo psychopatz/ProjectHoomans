@@ -160,6 +160,9 @@ function S.PumpPendingReplies(now)
     return fired
 end
 
-function S.ResetRuntime() S.PendingReplies, S.PendingReplyCount, S.NextReplyDueAt = {}, 0, nil end
+function S.ResetRuntime()
+    S.PendingReplies, S.PendingReplyCount, S.NextReplyDueAt = {}, 0, nil
+    if type(S.ResetStaminaCallouts) == "function" then S.ResetStaminaCallouts() end
+end
 
 return S

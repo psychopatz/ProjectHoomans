@@ -120,6 +120,7 @@ local ALLY_WARN_SITUATION_ROLES = {
     medic_no_bandage = true,
     checkin_ok = true,
     weather_rain_reply = true,
+    cover_winded = true,
 }
 
 local function poolFor(spec)
