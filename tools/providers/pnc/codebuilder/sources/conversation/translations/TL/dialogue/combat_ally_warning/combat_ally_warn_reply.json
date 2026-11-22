@@ -21,6 +21,31 @@
       "Magtira ka ng {target.name} para sa akin, {addressee.name}, papasok {scene.location}!",
       "Tutok na sa {target.name} {scene.location}, {addressee.name}! Oras na tumba!"
     ],
+    "say.variants.engaging_shaken": [
+      "Puta, {addressee.name}, may {target.name}?! Dito ka lang sa tabi ko!",
+      "Lintik, {target.name} {scene.location}! Huwag mo akong iwan, {addressee.name}!",
+      "Shit, {addressee.name}, nanginginig ako rito, bantayan mo likod ko!"
+    ],
+    "say.variants.engaging_brave": [
+      "Handa na ako, {addressee.name}. Patumbahin natin ang {target.name}.",
+      "Sige lang, {addressee.name}, hawak ko ang panig na 'to.",
+      "Kalma lang, {addressee.name}, nasa tabi mo lang ako."
+    ],
+    "say.variants.engaging_aggressive": [
+      "Ayos, {addressee.name}, itira mo ang {target.name} para sa akin!",
+      "Oras na! Papasok ako nang mainit, {addressee.name}!",
+      "Maling grupo kinalaban nila, {addressee.name}, sugod na!"
+    ],
+    "say.variants.engaging_supportive": [
+      "Sa likod ko lang kung lumala, {addressee.name}!",
+      "Bantay ko likod mo, {addressee.name}, huwag maghiwalay!",
+      "Ingat sa tapak, {addressee.name}, sabay natin lilinisin ang {target.name}!"
+    ],
+    "say.variants.engaging_exhausted": [
+      "Pagod na ako, {addressee.name}, pero babantayan ko pa rin gilid mo.",
+      "Masakit pa tama ko, {addressee.name}, huwag palampasin ang {target.name}!",
+      "Ubos na lakas ko, {addressee.name}, bilisan natin tapusin ang {target.name}!"
+    ],
     "say.variants.alerted_neutral": [
       "Narinig kita, {addressee.name}! Hinahanap ko na ang {target.name} {scene.location}!",
       "Lilingon ako para bantayan ka, {addressee.name}, ingat sa {target.name} {scene.location}!",
@@ -68,6 +93,18 @@
       "Nasa likod mo na ako, {addressee.name}, patumbahin ang {target.name}!",
       "Haharangin ko sa gilid ang {target.name}, {addressee.name}!",
       "Sasabay sa sugod mo, {addressee.name}! Tapusin ang {target.name}!"
+    ],
+    "say.variants.wingman_shaken": [
+      "Puta, may kasunod pa? Dikit lang tayo, {addressee.name}!",
+      "Ilayo mo sila sa akin, {addressee.name}, bantay ako sa likod!"
+    ],
+    "say.variants.wingman_brave": [
+      "Handa na rin ako, {addressee.name}. Tapusin na natin sila.",
+      "Matatag sa tabi mo, {addressee.name}, tuloy lang!"
+    ],
+    "say.variants.wingman_aggressive": [
+      "Magtira ka ng isa para sa akin, {addressee.name}!",
+      "Mabilis akong iikot, {addressee.name}, durugin ang {target.name}!"
     ],
     "say.variants.wingman_alerted_neutral": [
       "Aabante sa likod mo, {addressee.name}! Abang sa {target.name}!",

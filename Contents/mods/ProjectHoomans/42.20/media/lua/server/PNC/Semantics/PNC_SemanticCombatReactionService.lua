@@ -218,6 +218,7 @@ local function ambientPayload(
     context.realizationID = realization.realizationID
     context.offerIDs = realization.offerIDs or {}
     return {
+        lightweightBark = eventType ~= "player_assaulted_npc",
         source = eventType,
         eventID = eventID,
         eventRef = eventID,
@@ -256,13 +257,13 @@ local function ambientPayload(
             relationshipTier = profile.relationshipTier,
             mergeKey = "combat_kill_reaction:" .. tostring(record.id),
             cooldowns = {
-                familyMs = Service.SPEAKER_COOLDOWN_MS,
-                speakerMs = Service.SPEAKER_COOLDOWN_MS,
-                ambientMs = 2500,
-                mergeWindowMs = 750,
+                familyMs = 3000,
+                speakerMs = 3000,
+                ambientMs = 900,
+                mergeWindowMs = 500,
             },
             ttlMs = 7000,
-            holdMs = 1600,
+            holdMs = 1100,
             context = context,
             presentationClass = presentationClass,
             combatMoment = Moment.Snapshot(moment),

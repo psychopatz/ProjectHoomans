@@ -113,10 +113,11 @@ local function deliverTeammateDamageFlavor(
     end
     Hooks.LastTeammateHurtAt[throttleKey] = currentTime + 1500
     attackerID = damageAttackerID(attacker, hit)
-    Registry.ForEachLive(function(record, body, npcID)
+    local function considerWitness(record, body, npcID)
         local factionID
         local medicalBandageAvailable
-        if not record or not body or not npcID
+        if #observers >= 2
+            or not record or not body or not npcID
             or record.alive == false
             or (body.isDead and body:isDead())
             or sameID(npcID, targetRecord.id)
@@ -142,7 +143,22 @@ local function deliverTeammateDamageFlavor(
             body = body,
             medicalBandageAvailable = medicalBandageAvailable,
         }
-    end)
+    end
+    local spatial = PNC.SpatialIndex
+    local tx, ty = tonumber(targetRecord.x), tonumber(targetRecord.y)
+    if spatial and type(spatial.QueryNPCs) == "function" and tx and ty then
+        local nearby = spatial.QueryNPCs(tx, ty, 16)
+        if type(nearby) == "table" then
+            for i = 1, #nearby do
+                local rec = nearby[i]
+                local id = rec and rec.id
+                local body = id ~= nil and Registry.GetLiveZombie and Registry.GetLiveZombie(id) or nil
+                considerWitness(rec, body, id)
+            end
+        end
+    else
+        Registry.ForEachLive(considerWitness)
+    end
     if not Core or type(Core.ForEachPlayer) ~= "function" then
         return 0, candidates, "player_iteration_unavailable"
     end
@@ -242,6 +258,7 @@ local function deliverTeammateDamageFlavor(
                     observer.id,
                     eventType,
                     {
+                        lightweightBark = true,
                         source = eventType,
                         eventID = eventID,
                         eventRef = eventID,
@@ -284,7 +301,7 @@ local function deliverTeammateDamageFlavor(
                                     or semanticCompatibility,
                             },
                             family = "combat_commentary",
-                            priority = 55,
+                            priority = 42,
                             -- Keep the supply-shortage line grounded in the
                             -- authoritative inventory check above.
                             llmEligible = observer.medicalBandageAvailable
@@ -297,11 +314,12 @@ local function deliverTeammateDamageFlavor(
                             relationshipState = "unknown",
                             relationshipTier = "reserved",
                             mergeKey = observer.id .. ":combat_commentary",
+                            holdMs = 1000,
                             cooldowns = {
-                                familyMs = 20000,
-                                speakerMs = 20000,
-                                ambientMs = 4500,
-                                mergeWindowMs = 5000,
+                                familyMs = 4000,
+                                speakerMs = 3000,
+                                ambientMs = 900,
+                                mergeWindowMs = 500,
                             },
                             context = context,
                         },

@@ -39,12 +39,12 @@ local function inspectInjuryAndBandages(rec)
     return injured == true, bleeding == true, hasB == true
 end
 
-local function queueSitReply(sp, addr, desc, role, now, delayMs, ref, canEngage)
+local function queueSitReply(sp, addr, desc, role, now, delayMs, ref, canEngage, threadId)
     if not S.EnqueueCustomReply then return end
     S.EnqueueCustomReply({
         speaker = sp, addressee = addr, desc = desc, role = role,
         canEngage = canEngage ~= false, now = now, delayMs = delayMs,
-        eventRef = ref, barkOpts = I.SituationBarkOpts,
+        eventRef = ref, threadID = threadId, barkOpts = I.SituationBarkOpts,
     })
 end
 
@@ -74,7 +74,7 @@ function S.OnAllyBandagingUnderThreat(actor, patient, now)
     local desc = { semanticClass = "human_hostile", enemyType = "hostile", x = actor.x, y = actor.y, z = actor.z }
     local ref = "bandage:" .. tostring(actor.id) .. ":" .. tostring(math.floor(now))
     local spoke = I.EmitSituationCallout(actor, coverAlly, desc, role, now, ref, pName and { ["target.name"] = pName } or nil)
-    if spoke then queueSitReply(coverAlly, actor, desc, "cover_bandage", now, 600, ref .. ":cover", true) end
+    if spoke then queueSitReply(coverAlly, actor, desc, "cover_bandage", now, 600, ref .. ":cover", true, ref) end
     return spoke
 end
 
@@ -108,19 +108,19 @@ function S.OnTargetCleared(record, previousTarget, reason, now)
         if not I.EmitSituationCallout(checker, injAlly, desc, "checkin_injured", now, ref) then return false end
         local injCanEngage = injAlly.attackType ~= "none"
         if injHasB then
-            queueSitReply(injAlly, checker, desc, "injured_has_bandage", now, 650, ref .. ":hasb", injCanEngage)
+            queueSitReply(injAlly, checker, desc, "injured_has_bandage", now, 650, ref .. ":hasb", injCanEngage, ref)
         else
-            queueSitReply(injAlly, checker, desc, "injured_no_bandage", now, 650, ref .. ":nob", injCanEngage)
+            queueSitReply(injAlly, checker, desc, "injured_no_bandage", now, 650, ref .. ":nob", injCanEngage, ref)
             local _, _, checkerHasB = inspectInjuryAndBandages(checker)
             local helper = checkerHasB and checker or medic
-            queueSitReply(helper or checker, injAlly, desc, helper and "medic_has_bandage" or "medic_no_bandage", now, 1450, ref .. ":med", true)
+            queueSitReply(helper or checker, injAlly, desc, helper and "medic_has_bandage" or "medic_no_bandage", now, 1450, ref .. ":med", true, ref)
         end
         return true
     elseif (tonumber(sk.initialCount) or 1) >= 3 then
         if perc and perc.MarkSkirmishBeat then perc.MarkSkirmishBeat(teamKey, "checkin", now) end
         if not I.EmitSituationCallout(record, mates[1], desc, "checkin_clear", now, ref) then return false end
-        queueSitReply(mates[1], record, desc, "checkin_ok", now, 650, ref .. ":ok1", mates[1].attackType ~= "none")
-        if mates[2] then queueSitReply(mates[2], mates[1], desc, "checkin_ok", now, 1350, ref .. ":ok2", mates[2].attackType ~= "none") end
+        queueSitReply(mates[1], record, desc, "checkin_ok", now, 650, ref .. ":ok1", mates[1].attackType ~= "none", ref)
+        if mates[2] then queueSitReply(mates[2], mates[1], desc, "checkin_ok", now, 1350, ref .. ":ok2", mates[2].attackType ~= "none", ref) end
         return true
     end
     return false

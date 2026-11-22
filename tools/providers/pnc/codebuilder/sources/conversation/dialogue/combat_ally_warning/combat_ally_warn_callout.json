@@ -47,6 +47,12 @@
       },
       {
         "id": "checkin_clear_callout"
+      },
+      {
+        "id": "weather_rain_open_callout"
+      },
+      {
+        "id": "weather_rain_reply_callout"
       }
     ]
   },

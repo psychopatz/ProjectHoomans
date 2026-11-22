@@ -47,35 +47,43 @@ function H.BuildCombatDebugDelta(record, inCombat, now, firearmState)
     local combatDebugTransitioned = record.runtime
         and record.runtime.combatDebugWasActive ~= inCombat
         or false
-    local sc = record.runtime and record.runtime.secondaryChannel or nil
-    local clues = record.runtime and record.runtime.clueMemory or nil
-    local rawWarnLink = record.runtime and record.runtime.lastWarningLink or nil
-    local warnActive = type(rawWarnLink) == "table"
-        and now < (tonumber(rawWarnLink.expiresAt) or 0) or false
-    local warnAt = warnActive and tonumber(rawWarnLink.at or rawWarnLink.expiresAt) or 0
-    local agState = record.id ~= nil
-        and PNC.AgitationService
-        and type(PNC.AgitationService.GetState) == "function"
-        and PNC.AgitationService.GetState(record.id, now) or nil
-    local reactivitySignature = tostring(agState and agState.stage or "calm")
-        .. ":" .. tostring(clues and #clues or 0)
-        .. ":" .. tostring(sc and sc.alertLevel or "calm")
-        .. ":" .. tostring(sc and sc.posture or "relaxed")
-        .. ":" .. tostring(sc and sc.secondaryState or "")
-        .. ":" .. tostring(warnAt)
-    local reactivityTransitioned = record.runtime
-        and record.runtime.lastReactivityDebugSig ~= reactivitySignature
+    local debugOverlayOn = (PNC.Nameplates and PNC.Nameplates.Settings
+            and PNC.Nameplates.Settings.showCombatDebug == true)
+        or (Diagnostics and Diagnostics.NPCThreatAuditEnabled == true)
         or false
-    local reactivityActive = (agState and agState.active == true)
-        or (clues and #clues > 0)
-        or warnActive
-        or (sc ~= nil and (sc.alertLevel ~= "calm" or sc.posture ~= "relaxed" or (sc.secondaryState or "") ~= ""))
+    local reactivitySignature, reactivityTransitioned, reactivityActive = "", false, false
+    if debugOverlayOn then
+        local sc = record.runtime and record.runtime.secondaryChannel or nil
+        local clues = record.runtime and record.runtime.clueMemory or nil
+        local rawWarnLink = record.runtime and record.runtime.lastWarningLink or nil
+        local warnActive = type(rawWarnLink) == "table"
+            and now < (tonumber(rawWarnLink.expiresAt) or 0) or false
+        local warnAt = warnActive and tonumber(rawWarnLink.at or rawWarnLink.expiresAt) or 0
+        local agState = record.id ~= nil
+            and PNC.AgitationService
+            and type(PNC.AgitationService.GetState) == "function"
+            and PNC.AgitationService.GetState(record.id, now) or nil
+        reactivitySignature = tostring(agState and agState.stage or "calm")
+            .. ":" .. tostring(clues and #clues or 0)
+            .. ":" .. tostring(sc and sc.alertLevel or "calm")
+            .. ":" .. tostring(sc and sc.posture or "relaxed")
+            .. ":" .. tostring(sc and sc.secondaryState or "")
+            .. ":" .. tostring(warnAt)
+        reactivityTransitioned = record.runtime
+            and record.runtime.lastReactivityDebugSig ~= reactivitySignature
+            or false
+        reactivityActive = (agState and agState.active == true)
+            or (clues and #clues > 0)
+            or warnActive
+            or (sc ~= nil and (sc.alertLevel ~= "calm" or sc.posture ~= "relaxed" or (sc.secondaryState or "") ~= ""))
+    end
+    local combatRefreshMs = debugOverlayOn and 150 or 500
     local combatDebugState
     if lastCombatDebugAt <= 0
         or combatDebugTransitioned
         or zombieDebugTransitioned
         or reactivityTransitioned
-        or (inCombat and now - lastCombatDebugAt >= 150)
+        or (inCombat and now - lastCombatDebugAt >= combatRefreshMs)
         or (baseZombieDebugActive
             and now - lastCombatDebugAt >= 350)
         or (reactivityActive and now - lastCombatDebugAt >= 750)
@@ -102,7 +110,9 @@ function H.BuildCombatDebugDelta(record, inCombat, now, firearmState)
     if record.runtime then
         record.runtime.combatDebugWasActive = inCombat
         record.runtime.zombieDebugWasActive = zombieDebugActive
-        record.runtime.lastReactivityDebugSig = reactivitySignature
+        if debugOverlayOn then
+            record.runtime.lastReactivityDebugSig = reactivitySignature
+        end
     end
     return combatDebugState
 end

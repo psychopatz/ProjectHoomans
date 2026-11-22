@@ -15,7 +15,7 @@ local function tr(key, fallback)
     return (type(v) == "string" and v ~= "") and v or fallback
 end
 
-local function fmtKey(key, fallback, ...) return string.format(tr(key, fallback), ...) end
+local function fmtKey(k, fb, ...) return string.format(tr(k, fb), ...) end
 
 local function cleanText(v)
     if v == nil then return nil end
@@ -37,23 +37,20 @@ local KIND_KEYS = {
     hostile = { "UI_PNC_AllyWarn_Type_Hostile", "hostile", "hostiles" },
 }
 
-local function kindLabel(enemyType, plural, posture)
-    local et = tostring(enemyType or "hostile")
-    local key = (et == "zombie" and (posture == "crawler" or posture == "sprinter")) and posture or et
+local function kindLabel(et, pl, pos)
+    local key = (tostring(et or "hostile") == "zombie" and (pos == "crawler" or pos == "sprinter")) and pos or tostring(et or "hostile")
     local sp = KIND_KEYS[key] or KIND_KEYS.hostile
-    return tr(sp[1] .. (plural and "_Pl" or "_Sg"), sp[plural and 3 or 2])
+    return tr(sp[1] .. (pl and "_Pl" or "_Sg"), sp[pl and 3 or 2])
 end
 
 local function isSpeakerIndoors(sp)
     local cell = type(getCell) == "function" and getCell() or nil
     if not cell or not cell.getGridSquare then return false end
-    local sq = cell:getGridSquare(
-        math.floor(tonumber(sp and sp.x) or 0), math.floor(tonumber(sp and sp.y) or 0), math.floor(tonumber(sp and sp.z) or 0)
-    )
+    local sq = cell:getGridSquare(math.floor(tonumber(sp and sp.x) or 0), math.floor(tonumber(sp and sp.y) or 0), math.floor(tonumber(sp and sp.z) or 0))
     return sq ~= nil and sq.getRoom and sq:getRoom() ~= nil
 end
 
-local function resolveLocationLabel(speaker, desc, now, tone, preSpatial)
+local function resolveLocationLabel(speaker, desc, now, tone, preSp)
     local sx, sy, sz = tonumber(speaker and speaker.x) or tonumber(desc.x) or 0, tonumber(speaker and speaker.y) or tonumber(desc.y) or 0, tonumber(speaker and speaker.z) or 0
     local tx, ty, tz = tonumber(desc.x) or sx, tonumber(desc.y) or sy, tonumber(desc.z) or sz
     if tz - sz >= 1 then return tr("UI_PNC_AllyWarn_Loc_Upstairs", "upstairs") end
@@ -62,11 +59,10 @@ local function resolveLocationLabel(speaker, desc, now, tone, preSpatial)
     if rm and string.lower(rm) ~= "room" then return fmtKey("UI_PNC_AllyWarn_Loc_InRoom", "in the %s", rm) end
     local dx, dy = tx - sx, ty - sy
     if (dx * dx + dy * dy) <= 2.25 then return tr("UI_PNC_AllyWarn_Loc_RightHere", "right on us") end
-    local proj, relMod, bearing, sp = PNC.TacticalSpatialProjection, PsychopatzCore and PsychopatzCore.SpatialRelation or nil, nil, preSpatial
+    local proj, relMod, bearing, sp = PNC.TacticalSpatialProjection, PsychopatzCore and PsychopatzCore.SpatialRelation or nil, nil, preSp
     if not sp and proj and type(proj.Project) == "function" and relMod then
         sp = proj.Project(speaker, {
-            kind = desc.semanticClass or "human_hostile",
-            id = desc.id or desc.zombieId or desc.actorId or "threat",
+            kind = desc.semanticClass or "human_hostile", id = desc.id or desc.zombieId or desc.actorId or "threat",
             x = tx, y = ty, z = tz, observedAt = now,
         }, { now = now, sameAreaThreshold = 0.5, maxThreatAgeMs = 4000, allowCachedFacing = true, maxCachedFacingAgeMs = 5000 })
     end
@@ -84,9 +80,7 @@ local function resolveLocationLabel(speaker, desc, now, tone, preSpatial)
         end
     end
     if bearing then
-        if desc.isIndoors == false and isSpeakerIndoors(speaker) then
-            return fmtKey("UI_PNC_AllyWarn_Loc_OutsideDir", "outside, %s", bearing)
-        end
+        if desc.isIndoors == false and isSpeakerIndoors(speaker) then return fmtKey("UI_PNC_AllyWarn_Loc_OutsideDir", "outside, %s", bearing) end
         return bearing
     end
     return tr("UI_PNC_AllyWarn_Loc_Nearby", "nearby")
@@ -94,56 +88,51 @@ end
 
 function S.ResolveAllyWarnTone(record, profile)
     local b = tostring(record and (record.activeBehavior or record.behavior) or "")
-    if b == "hostile" or (record and record.isHostile == true) or tostring(profile and profile.combatTone or "") == "aggressive" then
-        return "hostile"
+    if b == "hostile" or (record and record.isHostile == true) or tostring(profile and profile.combatTone or "") == "aggressive" then return "hostile" end
+    local pol, at = tostring(record and record.combatPolicy or ""), tostring(record and record.attackType or "")
+    if (profile and profile.nervous == true) or pol == "passive" or at == "none" then return "shaken" end
+    local bc, prof = PNC.Semantics and PNC.Semantics.BeatContext or nil, PNC.Semantics and PNC.Semantics.CombatReactionProfile or nil
+    if bc and type(bc.Build) == "function" and type(record) == "table" then
+        local ctx = bc.Build(record, nil, { inCombat = true })
+        local st = ctx and ctx.actor and ctx.actor.style or nil
+        if st and st ~= "neutral" then return st end
+    elseif prof and type(prof.Build) == "function" and type(record) == "table" then
+        local pr = prof.Build(record, "", { role = "witness", actorKind = "npc", inCombat = true })
+        if pr and pr.allyWarnStyle and pr.allyWarnStyle ~= "neutral" then return pr.allyWarnStyle end
     end
     local role = tostring(record and (record.tacticalRole or record.role) or "")
-    if (profile and profile.tactical == true) or (record and record.tactical == true) or role == "guard" or role == "soldier" or role == "scout" then
-        return "tactical"
-    end
-    local policy, at = tostring(record and record.combatPolicy or ""), tostring(record and record.attackType or "")
-    if (profile and profile.nervous == true) or policy == "passive" or at == "none" then return "shaken" end
+    if (profile and profile.tactical == true) or (record and record.tactical == true) or role == "guard" or role == "soldier" or role == "scout" then return "tactical" end
     return "neutral"
 end
 
-function S.BuildRichSpeechTokens(speakerRecord, callerRecord, desc, now, tone, opts)
+function S.BuildRichSpeechTokens(speaker, caller, desc, now, tone, opts)
     desc = type(desc) == "table" and desc or {}
     opts = type(opts) == "table" and opts or nil
     local count = math.max(1, math.floor(tonumber(desc.enemyCount) or 1))
-    local posture, et = desc.enemyPosture, tostring(desc.enemyType or "hostile")
-    local kSg, kPl = kindLabel(et, false, posture), kindLabel(et, true, posture)
-    local callerRaw = (callerRecord and (callerRecord.name or callerRecord.fullName)) or desc.callerName
-    local callerName = S.FirstTokenName(callerRaw) or tr("UI_PNC_AllyWarn_FallbackCaller", "friend")
+    local pos, et = desc.enemyPosture, tostring(desc.enemyType or "hostile")
+    local kSg, kPl = kindLabel(et, false, pos), kindLabel(et, true, pos)
+    local cRaw = (caller and (caller.name or caller.fullName)) or desc.callerName
+    local cName = S.FirstTokenName(cRaw) or tr("UI_PNC_AllyWarn_FallbackCaller", "friend")
     local dName, facName = S.FirstTokenName(desc.displayName) or cleanText(desc.displayName), cleanText(desc.factionName)
-    local targetLabel
+    local tLabel
     if dName then
-        targetLabel = count > 1 and fmtKey("UI_PNC_AllyWarn_NamedWithCrew", "%s and their crew", dName) or dName
+        tLabel = count > 1 and fmtKey("UI_PNC_AllyWarn_NamedWithCrew", "%s and their crew", dName) or dName
     else
-        local sgNoun, plNoun = facName and (facName .. " " .. kSg) or kSg, facName and (facName .. " " .. kPl) or kPl
-        if count >= 10 then targetLabel = fmtKey("UI_PNC_AllyWarn_PackOf", "a pack of %s", plNoun)
-        elseif count >= 6 then targetLabel = fmtKey("UI_PNC_AllyWarn_GroupOf", "a group of %s", plNoun)
-        elseif count >= 3 then targetLabel = fmtKey("UI_PNC_AllyWarn_FewOf", "a few %s", plNoun)
+        local sg, pl = facName and (facName .. " " .. kSg) or kSg, facName and (facName .. " " .. kPl) or kPl
+        if count >= 10 then tLabel = fmtKey("UI_PNC_AllyWarn_PackOf", "a pack of %s", pl)
+        elseif count >= 6 then tLabel = fmtKey("UI_PNC_AllyWarn_GroupOf", "a group of %s", pl)
+        elseif count >= 3 then tLabel = fmtKey("UI_PNC_AllyWarn_FewOf", "a few %s", pl)
         elseif count == 2 then
-            if not facName and et == "zombie" and posture == nil then
-                targetLabel = tr("UI_PNC_AllyWarn_CoupleStragglers", "a couple of stragglers")
-            else
-                targetLabel = fmtKey("UI_PNC_AllyWarn_CoupleOf", "a couple of %s", plNoun)
-            end
+            tLabel = (not facName and et == "zombie" and pos == nil)
+                and tr("UI_PNC_AllyWarn_CoupleStragglers", "a couple of stragglers")
+                or fmtKey("UI_PNC_AllyWarn_CoupleOf", "a couple of %s", pl)
         else
-            targetLabel = fmtKey("UI_PNC_AllyWarn_SinglePrefix", "a %s", sgNoun)
+            tLabel = fmtKey("UI_PNC_AllyWarn_SinglePrefix", "a %s", sg)
         end
     end
     local loc = ""
-    if not (opts and opts.skipLocation == true) then
-        loc = resolveLocationLabel(speakerRecord, desc, now, tone, opts and opts.spatial or nil)
-    end
-    return {
-        ["addressee.name"] = callerName,
-        ["target.name"] = targetLabel,
-        ["target.count"] = tostring(count),
-        ["target.kind"] = count > 1 and kPl or kSg,
-        ["scene.location"] = loc,
-    }
+    if not (opts and opts.skipLocation == true) then loc = resolveLocationLabel(speaker, desc, now, tone, opts and opts.spatial or nil) end
+    return { ["addressee.name"] = cName, ["target.name"] = tLabel, ["target.count"] = tostring(count), ["target.kind"] = count > 1 and kPl or kSg, ["scene.location"] = loc }
 end
 
 return S

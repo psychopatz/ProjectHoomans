@@ -75,6 +75,8 @@ PNC.Network = {
             npcId = tostring(npcId),
             eventType = tostring(eventType),
             text = payload and payload.ambientFlavor and payload.ambientFlavor.text or nil,
+            ambientFlavor = payload and payload.ambientFlavor or nil,
+            lightweightBark = payload and payload.lightweightBark or nil,
             at = nowMs,
         }
         return true
@@ -899,6 +901,300 @@ do
     assertNoLLMHyphens(deliveredBarks[2].text, "5g checkin_ok_1")
     assertNoRawTokens(deliveredBarks[3].text, "5g checkin_ok_2")
     assertNoLLMHyphens(deliveredBarks[3].text, "5g checkin_ok_2")
+
+    -- Load shared/client/server semantic & flavor modules for end-to-end thread, stat, and beat verification.
+    T.addPackagePaths({
+        { "PsychopatzCore", "common" },
+        { "PsychopatzCore", "common_client" },
+        { "ProjectHoomans", "shared" },
+        { "ProjectHoomans", "server" },
+        { "ProjectHoomans", "common_lua" },
+    })
+    Events = Events or { OnTick = { Add = function() end } }
+    getTimeInMillis = function() return nowMs end
+    PNC.NPCTraitContext = PNC.NPCTraitContext or {
+        Collect = function(record) return record and record.npcTraits or {} end,
+    }
+    T.load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticCombatReactionProfile.lua")
+    T.load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticCombatWeaponContext.lua")
+    T.load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticCombatMoment.lua")
+    local CombatReactionService = T.load("ProjectHoomans", "server", "PNC/Semantics/PNC_SemanticCombatReactionService.lua")
+    local BeatContext = T.load("ProjectHoomans", "server", "PNC/Semantics/PNC_SemanticBeatContext.lua")
+    local DialogueBeats = T.load("ProjectHoomans", "server", "PNC/Semantics/PNC_SemanticDialogueBeats.lua")
+    local EventBus = require "PsychopatzCore/Events/PC_EventBus"
+    local Message = require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
+    local FlavorClient = require "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient"
+
+    -- 5i. Real PsychopatzCore.SocialFlavorClient multi-NPC thread + weapon kill reaction (long_blunt, priority 24).
+    do
+        for k in pairs(npcStore) do npcStore[k] = nil end
+        for k in pairs(liveBodies) do liveBodies[k] = nil end
+        for i = #deliveredBarks, 1, -1 do deliveredBarks[i] = nil end
+        PNC.Perception.ResetAllyThreatWarnings()
+        Callouts.ResetRuntime()
+        PNC.ConvoEngine.SpeechRealization.ResetSelections()
+        PNC.ConvoEngine.CombatBanterArbiter.ResetRuntime()
+        FlavorClient.Reset()
+        FlavorClient.SetLLMProvider(nil)
+        zombieWorld._dead = false
+        zombieWorld._x, zombieWorld._y, zombieWorld._z = 18, 10, 0
+        nowMs = 400000
+
+        local published = {}
+        local capture5i = true
+        EventBus.subscribe(Message.EVENT_TYPE, function(msg)
+            if capture5i then published[#published + 1] = msg end
+        end, "test-5i-thread")
+
+        local pushedIndex = 0
+        local function pumpNewBarksToClient()
+            while pushedIndex < #deliveredBarks do
+                pushedIndex = pushedIndex + 1
+                local b = deliveredBarks[pushedIndex]
+                local af = b.ambientFlavor or {}
+                FlavorClient.Enqueue({
+                    eventID = af.eventID or (b.eventType .. ":" .. tostring(pushedIndex)),
+                    speakerID = b.npcId,
+                    family = af.family,
+                    priority = af.priority,
+                    text = af.text or af.resolvedText or b.text,
+                    threadID = af.threadID,
+                    cooldowns = af.cooldowns,
+                    holdMs = af.holdMs,
+                    ttlMs = af.ttlMs,
+                })
+            end
+            FlavorClient.Pump(nowMs)
+        end
+
+        local caller = makeNPC("i-caller", { x = 10, y = 10, factionID = "survivors", tactical = true })
+        caller.name = "Sammie"
+        local lead = makeNPC("i-lead", { x = 11, y = 10, factionID = "survivors", tactical = true })
+        lead.name = "Adrienne"
+        local wingman = makeNPC("i-wingman", { x = 12, y = 10, factionID = "survivors" })
+        wingman.name = "Pete"
+
+        local okCall = Callouts.OnTargetChanged({
+            target = { kind = "zombie", zombieId = "z-101", x = 18, y = 10, z = 0 },
+            at = nowMs,
+        }, caller)
+        T.truthy(okCall, "5i caller warning emits")
+        T.equal(#deliveredBarks, 1, "5i caller bark delivered")
+        T.truthy(deliveredBarks[1].ambientFlavor and deliveredBarks[1].ambientFlavor.threadID,
+            "5i caller bark carries threadID")
+        pumpNewBarksToClient()
+        T.equal(#published, 1, "5i caller bark publishes via SocialFlavorClient")
+
+        nowMs = nowMs + 750
+        Callouts.PumpPendingReplies(nowMs)
+        T.equal(#deliveredBarks, 2, "5i Lead reply delivered at +750ms")
+        pumpNewBarksToClient()
+        T.equal(#published, 2, "5i Lead reply publishes through same threadID without ambient drop")
+
+        nowMs = nowMs + 750
+        Callouts.PumpPendingReplies(nowMs)
+        T.equal(#deliveredBarks, 3, "5i Wingman reply delivered at +1500ms")
+        pumpNewBarksToClient()
+        T.equal(#published, 3, "5i Wingman reply publishes through same threadID without ambient drop")
+
+        nowMs = nowMs + 1100
+        local savedSkills = PNC.Skills
+        PNC.Skills = {
+            ResolveWeaponSkill = function(_, fullType)
+                if fullType == "Base.BaseballBat" then return "LongBlunt" end
+                return "Strength"
+            end,
+            GetEffectiveSkillLevel = function() return 4 end,
+        }
+        local killEmitted = CombatReactionService.OnNPCKill(caller, zombieWorld, {
+            attackType = "melee",
+            weaponFullType = "Base.BaseballBat",
+            now = nowMs,
+        })
+        PNC.Skills = savedSkills
+        T.truthy((killEmitted or 0) >= 1, "5i CombatReactionService.OnNPCKill emits blunt weapon reaction")
+        T.equal(#deliveredBarks, 4, "5i blunt weapon kill bark delivered")
+        T.equal(deliveredBarks[4].lightweightBark, true, "5i kill reaction uses lightweightBark fast-path")
+        T.equal(deliveredBarks[4].ambientFlavor.context.combatWeaponFamily, "long_blunt",
+            "5i kill reaction preserves long_blunt weapon family")
+        pumpNewBarksToClient()
+        T.equal(#published, 4, "5i all 4 lines (callout, Lead, Wingman, blunt kill) publish on client")
+        capture5i = false
+    end
+
+    -- 5j. Bravery, personality, and conditionStats routing in ally warn replies.
+    do
+        for k in pairs(npcStore) do npcStore[k] = nil end
+        for k in pairs(liveBodies) do liveBodies[k] = nil end
+        BeatContext.ResetRuntime()
+        PNC.ConvoEngine.SpeechRealization.ResetSelections()
+        nowMs = 420000
+
+        local toneCases = {
+            {
+                id = "j-shaken",
+                opts = { attackType = "auto", social = { personality = { bravery = 0.15 } }, conditionStats = { panic = 75 } },
+                style = "shaken", engTpl = "combat.ally_warn.reply.engaging_shaken",
+                altTpl = "combat.ally_warn.reply.engaging_shaken", wingTpl = "combat.ally_warn.reply.wingman_shaken",
+            },
+            {
+                id = "j-brave",
+                opts = { attackType = "auto", social = { personality = { bravery = 0.90 } } },
+                style = "brave", engTpl = "combat.ally_warn.reply.engaging_brave",
+                wingTpl = "combat.ally_warn.reply.wingman_brave",
+            },
+            {
+                id = "j-agg",
+                opts = { attackType = "auto", social = { personality = { aggression = 0.85 } } },
+                style = "aggressive", engTpl = "combat.ally_warn.reply.engaging_aggressive",
+                wingTpl = "combat.ally_warn.reply.wingman_aggressive",
+            },
+            {
+                id = "j-exh",
+                opts = { attackType = "auto", conditionStats = { fatigue = 0.85, bleeding = true } },
+                style = "exhausted", engTpl = "combat.ally_warn.reply.engaging_exhausted",
+            },
+            {
+                id = "j-sup",
+                opts = { attackType = "auto", social = { personality = { compassion = 0.88 } } },
+                style = "supportive", engTpl = "combat.ally_warn.reply.engaging_supportive",
+            },
+        }
+        local callerStub = { id = "j-caller", name = "Sammie" }
+        local threatDesc = {
+            semanticClass = "human_hostile", enemyType = "bandit", displayName = "Marcus",
+            enemyCount = 1, x = 14, y = 10, z = 0, roomName = "kitchen",
+        }
+        for _, tc in ipairs(toneCases) do
+            local rec = makeNPC(tc.id, tc.opts)
+            rec.social = tc.opts.social or { relationships = {} }
+            rec.conditionStats = tc.opts.conditionStats or {}
+            local tone = Callouts.ResolveAllyWarnTone(rec, nil)
+            T.equal(tone, tc.style, "5j tone matches stats for " .. tc.style)
+
+            local toks = Callouts.BuildRichSpeechTokens(rec, callerStub, threatDesc, nowMs, tone)
+            local txt, res = Callouts.ResolveSemanticLine(rec, "combat_ally_warn_reply_engaging", "ACK",
+                "human_hostile", "j:eng:" .. tc.style, nil, toks, { replyRole = "lead" })
+            T.truthy(res, "5j engaging resolution exists for " .. tc.style)
+            T.equal(res.templateID, tc.engTpl, "5j engaging template for " .. tc.style)
+            assertNoRawTokens(txt, "5j engaging " .. tc.style)
+            assertNoLLMHyphens(txt, "5j engaging " .. tc.style)
+
+            if tc.altTpl then
+                local altTxt, altRes = Callouts.ResolveSemanticLine(rec, "combat_ally_warn_reply_alerted", "ACK",
+                    "human_hostile", "j:alt:" .. tc.style, nil, toks, { replyRole = "lead" })
+                T.truthy(altRes, "5j alerted resolution exists for " .. tc.style)
+                T.equal(altRes.templateID, tc.altTpl, "5j alerted template for " .. tc.style)
+                assertNoRawTokens(altTxt, "5j alerted " .. tc.style)
+                assertNoLLMHyphens(altTxt, "5j alerted " .. tc.style)
+            end
+            if tc.wingTpl then
+                local wTxt, wRes = Callouts.ResolveSemanticLine(rec, "combat_ally_warn_reply_engaging", "ACK",
+                    "human_hostile", "j:wing:" .. tc.style, nil, toks, { replyRole = "wingman" })
+                T.truthy(wRes, "5j wingman resolution exists for " .. tc.style)
+                T.equal(wRes.templateID, tc.wingTpl, "5j wingman template for " .. tc.style)
+                assertNoRawTokens(wTxt, "5j wingman " .. tc.style)
+                assertNoLLMHyphens(wTxt, "5j wingman " .. tc.style)
+            end
+        end
+    end
+
+    -- 5k. Extensible BeatContext + DialogueBeats weather/rain 2-beat + ObserveZombieHorde active-skirmish dedup.
+    do
+        for k in pairs(npcStore) do npcStore[k] = nil end
+        for k in pairs(liveBodies) do liveBodies[k] = nil end
+        for i = #deliveredBarks, 1, -1 do deliveredBarks[i] = nil end
+        BeatContext.ResetRuntime()
+        DialogueBeats.ResetRuntime()
+        PNC.Perception.ResetAllyThreatWarnings()
+        Callouts.ResetRuntime()
+        PNC.ConvoEngine.SpeechRealization.ResetSelections()
+        PNC.ConvoEngine.CombatBanterArbiter.ResetRuntime()
+        nowMs = 440000
+
+        BeatContext.RegisterProvider("custom_test", function(ctx)
+            ctx.custom_test = { customFlag = true }
+        end)
+        local provList = BeatContext.ListProviders()
+        local foundProv = false
+        for _, id in ipairs(provList) do if id == "custom_test" then foundProv = true end end
+        T.truthy(foundProv, "5k BeatContext.ListProviders includes custom_test")
+
+        local rainA = makeNPC("k-sammie", { x = 10, y = 10, factionID = "survivors" })
+        rainA.name = "Sammie"
+        local rainB = makeNPC("k-adrienne", { x = 11, y = 10, factionID = "survivors" })
+        rainB.name = "Adrienne"
+
+        local builtCtx = BeatContext.Build(rainA, rainB, { now = nowMs })
+        T.truthy(builtCtx.custom_test and builtCtx.custom_test.customFlag == true,
+            "5k BeatContext.Build runs custom provider")
+        BeatContext.UnregisterProvider("custom_test")
+
+        DialogueBeats.RegisterHook("custom.test_hook", {
+            eventTypes = { "custom.ping" },
+            evaluate = function() return nil end,
+        })
+        local hooks = DialogueBeats.ListHooks()
+        local hasCustomHook, hasRainHook = false, false
+        for _, id in ipairs(hooks) do
+            if id == "custom.test_hook" then hasCustomHook = true end
+            if id == "environment.weather_rain" then hasRainHook = true end
+        end
+        T.truthy(hasCustomHook, "5k DialogueBeats.ListHooks includes custom hook")
+        T.truthy(hasRainHook, "5k DialogueBeats.ListHooks includes weather_rain hook")
+        DialogueBeats.UnregisterHook("custom.test_hook")
+
+        local rainOk = DialogueBeats.Emit("environment.weather_changed", {
+            weather = "rain", previous = "clear", anchor = rainA, partner = rainB,
+        }, nowMs)
+        T.truthy(rainOk, "5k rain transition emits opening beat for calm pair")
+        T.equal(#deliveredBarks, 1, "5k rain opening bark delivers")
+        assertNoRawTokens(deliveredBarks[1].text, "5k rain open")
+        assertNoLLMHyphens(deliveredBarks[1].text, "5k rain open")
+
+        nowMs = nowMs + 1000
+        DialogueBeats.Pump(nowMs)
+        T.equal(#deliveredBarks, 2, "5k rain reply beat delivers on DialogueBeats.Pump")
+        T.contains(deliveredBarks[2].text, "Sammie", "5k rain reply addresses Sammie")
+        assertNoRawTokens(deliveredBarks[2].text, "5k rain reply")
+        assertNoLLMHyphens(deliveredBarks[2].text, "5k rain reply")
+
+        rainA.runtime.target = { kind = "zombie", id = "z-101" }
+        nowMs = nowMs + 130000
+        local rainCombat = DialogueBeats.Emit("environment.weather_changed", {
+            weather = "rain", previous = "clear", anchor = rainA, partner = rainB,
+        }, nowMs)
+        T.falsy(rainCombat, "5k weather beat stays silent while actor is in combat")
+        T.equal(#deliveredBarks, 2, "5k no bark delivered in combat rain attempt")
+
+        PNC.SocialEventHooks = PNC.SocialEventHooks or {}
+        PNC.SocialEventHooksInternal = PNC.SocialEventHooksInternal or {
+            WorldAgeHours = function() return 1 end,
+        }
+        PNC.Relationships = PNC.Relationships or { AddMemory = function() return true end }
+        PNC.Semantics.SocialReactions = PNC.Semantics.SocialReactions or PNC.ConvoEngine.SocialReactions
+        PNC.Semantics.SocialContext = PNC.Semantics.SocialContext or {
+            ResolveNPCType = function() return "companion" end,
+        }
+        T.load("ProjectHoomans", "server",
+            "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Awareness.lua")
+
+        rainA.runtime.target = nil
+        zombieWorld._dead = false
+        zombieWorld._x, zombieWorld._y, zombieWorld._z = 18, 10, 0
+        local rainWing = makeNPC("k-pete", { x = 12, y = 10, factionID = "squad5k" })
+        rainWing.name = "Pete"
+        rainA.factionID, rainB.factionID = "squad5k", "squad5k"
+        local okSkirmish = Callouts.OnTargetChanged({
+            target = { kind = "zombie", zombieId = "z-101", x = 18, y = 10, z = 0 },
+            at = nowMs,
+        }, rainA)
+        T.truthy(okSkirmish, "5k active team skirmish established")
+        local beforeHorde = #deliveredBarks
+        PNC.SocialEventHooks.ObserveZombieHorde(rainA, 5, 4, nowMs, "zombie_observation")
+        T.equal(#deliveredBarks, beforeHorde,
+            "5k ObserveZombieHorde suppresses duplicate non-prompt chatter during active team skirmish")
+    end
 
     -- 5h. Lightweight transient bark fast-path skips full conversation assembly & relationship UI sync.
     local presCalls, relUiCalls, recvCalls, cmdHandlers = 0, 0, {}, {}

@@ -21,6 +21,31 @@
       "Leave some of {target.name} for me, {addressee.name}, pushing {scene.location}!",
       "Locked on {target.name} {scene.location}, {addressee.name}! Time to drop them!"
     ],
+    "say.variants.engaging_shaken": [
+      "Oh shit, {addressee.name}, {target.name}?! Stay right by me!",
+      "Aw hell, {target.name} {scene.location}! Don't leave me behind, {addressee.name}!",
+      "Shit, {addressee.name}, I'm shaking here, watch my back!"
+    ],
+    "say.variants.engaging_brave": [
+      "I'm ready, {addressee.name}. Let's drop {target.name}.",
+      "Bring them on, {addressee.name}. I've got this side.",
+      "Steady, {addressee.name}, I'm right beside you."
+    ],
+    "say.variants.engaging_aggressive": [
+      "Hell yeah, {addressee.name}, save {target.name} for me!",
+      "About time! Coming in hot, {addressee.name}!",
+      "They picked the wrong crew, {addressee.name}, pushing in!"
+    ],
+    "say.variants.engaging_supportive": [
+      "Stay behind me if it gets ugly, {addressee.name}!",
+      "I've got your back, {addressee.name}, stick together!",
+      "Watch your footing, {addressee.name}, we'll clear {target.name} together!"
+    ],
+    "say.variants.engaging_exhausted": [
+      "I'm beat, {addressee.name}, but I'll still watch your flank.",
+      "Still hurting here, {addressee.name}, don't let {target.name} slip past!",
+      "Running low on steam, {addressee.name}, let's finish {target.name} quick!"
+    ],
     "say.variants.alerted_neutral": [
       "Heard you, {addressee.name}! Looking for {target.name} {scene.location} now!",
       "Turning to cover you, {addressee.name}, watch out for {target.name} {scene.location}!",
@@ -68,6 +93,18 @@
       "Right behind you, {addressee.name}, let's drop {target.name}!",
       "Cutting off {target.name} from the side, {addressee.name}!",
       "Pushing in with you, {addressee.name}! Finish {target.name}!"
+    ],
+    "say.variants.wingman_shaken": [
+      "Oh shit, there's more? Stay close, {addressee.name}!",
+      "Keep them off me, {addressee.name}, watching behind us!"
+    ],
+    "say.variants.wingman_brave": [
+      "I'm ready too, {addressee.name}. Let's finish them.",
+      "Holding strong beside you, {addressee.name}, keep pushing!"
+    ],
+    "say.variants.wingman_aggressive": [
+      "Save one for me, {addressee.name}!",
+      "Coming around fast, {addressee.name}, let's wreck {target.name}!"
     ],
     "say.variants.wingman_alerted_neutral": [
       "Moving up behind you, {addressee.name}! Watching for {target.name}!",

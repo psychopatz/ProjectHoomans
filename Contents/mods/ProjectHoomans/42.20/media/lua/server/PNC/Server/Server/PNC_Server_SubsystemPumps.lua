@@ -220,6 +220,14 @@ function H.FinishTick(now)
         safeOptional("server_finish.ally_warn_replies", callouts,
             "PumpPendingReplies", nil, now)
     end
+    local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if beats and (
+        ((tonumber(beats.PendingCount) or 0) > 0
+            and (beats.NextDueAt == nil or now >= (tonumber(beats.NextDueAt) or 0)))
+        or now >= (tonumber(beats.NextEnvCheckAt) or 0)
+    ) and type(beats.Pump) == "function" then
+        safeOptional("server_finish.dialogue_beats", beats, "Pump", nil, now)
+    end
     safeOptional("server_finish.dialogue_timeouts", PNC.DialogueMicroBeatDirector,
         "SweepTimeouts", nil, now)
     safeOptional("server_finish.joint_scene_leases", PNC.JointSceneLease,

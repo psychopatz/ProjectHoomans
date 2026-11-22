@@ -182,7 +182,7 @@ listing:close()
 -- PNC_SemanticCombatTargetCallouts_Context, _Delivery, _AllyReplies,
 -- _Situations and _Medical are server-only, guarded by AllowsServerCode(),
 -- and loaded by PNC_SemanticCombatTargetCallouts.
-T.equal(#serverOnlyFiles, 1075,
+T.equal(#serverOnlyFiles, 1078,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

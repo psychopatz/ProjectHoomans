@@ -32,6 +32,7 @@ function H.BuildReceivePayload(receive)
             or ambientFlavor.flavorID
             or "semantic.speech.selected",
         family = receive.family,
+        threadID = ambientFlavor.threadID or context.threadID or context.sceneID,
         priority = tonumber(ambientFlavor.priority) or 35,
         llmPriority = tonumber(ambientFlavor.llmPriority) or 90,
         weight = tonumber(ambientFlavor.weight) or 1,

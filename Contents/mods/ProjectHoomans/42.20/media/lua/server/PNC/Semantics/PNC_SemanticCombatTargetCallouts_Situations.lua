@@ -12,7 +12,11 @@ local S = PNC.Semantics.CombatTargetCallouts or {}
 local I = PNC.Semantics.CombatTargetCalloutsInternal
 PNC.Semantics.CombatTargetCallouts = S
 
-local SIT_BARK_OPTS = { family = "combat_ally_warn_situation", priority = 78, cooldownMs = 1000, familyCooldownMs = 1000 }
+local SIT_BARK_OPTS = {
+    family = "combat_ally_warn_situation", priority = 68, priorityHoldMs = 800,
+    cooldownMs = 1000, familyCooldownMs = 1000, holdMs = 600,
+    clientCooldowns = { familyMs = 1500, speakerMs = 1800, ambientMs = 400, mergeWindowMs = 0 },
+}
 I.SituationBarkOpts = SIT_BARK_OPTS
 
 function I.SituationNow(at)
@@ -68,10 +72,12 @@ function I.EmitSituationCallout(speaker, addr, desc, role, now, ref, extraTokens
         eventType = "combat_ally_warn_callout",
         speechEventID = res and res.realizationID or ("semantic.combat." .. tostring(role)),
         act = "WARN", family = SIT_BARK_OPTS.family, cooldownMs = SIT_BARK_OPTS.cooldownMs,
-        familyCooldownMs = SIT_BARK_OPTS.familyCooldownMs, priority = 78,
+        familyCooldownMs = SIT_BARK_OPTS.familyCooldownMs, priority = SIT_BARK_OPTS.priority,
+        priorityHoldMs = SIT_BARK_OPTS.priorityHoldMs, holdMs = SIT_BARK_OPTS.holdMs,
+        clientCooldowns = SIT_BARK_OPTS.clientCooldowns, threadID = ref,
         streamKey = "ally-warn-sit:" .. tostring(speaker.id),
         eventRef = ref, text = text, presentationClass = res and res.presentationClass or "BARK",
-        context = { eventType = "combat_ally_warn_callout", eventRef = ref, transient = true },
+        context = { eventType = "combat_ally_warn_callout", eventRef = ref, threadID = ref, transient = true },
     })
     return (tonumber(sent) or 0) > 0
 end
@@ -101,7 +107,7 @@ function S.TryEmitBlindsideWarning(caller, ally, desc, now, ref)
     if spoke and S.EnqueueCustomReply then
         S.EnqueueCustomReply({
             speaker = ally, addressee = caller, desc = desc, role = "blindside_reply",
-            now = now, delayMs = 600, eventRef = ref .. ":b_reply", barkOpts = SIT_BARK_OPTS,
+            now = now, delayMs = 600, eventRef = ref .. ":b_reply", threadID = ref, barkOpts = SIT_BARK_OPTS,
         })
     end
     return spoke
@@ -124,7 +130,7 @@ function S.TryEmitLastStragglerBeat(caller, ally, desc, now, ref)
     if spoke and S.EnqueueCustomReply then
         S.EnqueueCustomReply({
             speaker = addr, addressee = caller, desc = desc, role = "last_one_reply",
-            now = now, delayMs = 650, eventRef = ref .. ":l_reply", barkOpts = SIT_BARK_OPTS,
+            now = now, delayMs = 650, eventRef = ref .. ":l_reply", threadID = ref, barkOpts = SIT_BARK_OPTS,
         })
     end
     return spoke

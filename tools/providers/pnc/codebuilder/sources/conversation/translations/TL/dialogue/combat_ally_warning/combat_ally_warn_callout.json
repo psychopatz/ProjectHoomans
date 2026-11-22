@@ -80,6 +80,16 @@
       "Ligtas na, {addressee.name}. Nakatayo pa ba lahat?",
       "Maayos ang laban, {addressee.name}. May nasugatan ba?",
       "Tahimik na ang paligid, {addressee.name}. Ayos ka lang diyan?"
+    ],
+    "say.variants.weather_rain_open_callout": [
+      "Naku, bumubuhos na ang ulan, {addressee.name}. Kailangan natin ng silong mamaya.",
+      "Ang lakas ng ulan, {addressee.name}. Mababasa tayo rito sa labas.",
+      "Parang may paparating na bagyo, {addressee.name}. Maghanap tayo ng masisilungan."
+    ],
+    "say.variants.weather_rain_reply_callout": [
+      "Oo nga, {addressee.name}. Maging alerto ka, tinatakpan ng ulan ang yabag nila.",
+      "Sabi mo pa, {addressee.name}, basang basa na rin ako. Ingat sa paligid.",
+      "Narinig kita, {addressee.name}. Magmatyag tayo habang umuulan."
     ]
   }
 }

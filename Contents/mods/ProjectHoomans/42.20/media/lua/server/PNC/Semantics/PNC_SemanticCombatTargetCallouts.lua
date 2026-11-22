@@ -105,7 +105,7 @@ function S.OnTargetChanged(event, record)
     end
     if pres or (wr and wr.emitted == true and text) then
         ctx = {
-            eventType = evType, eventRef = ref, targetKind = tCls, targetRef = tostring(tid or ""),
+            eventType = evType, eventRef = ref, threadID = ref, targetKind = tCls, targetRef = tostring(tid or ""),
             tacticalSpatial = spatial, tacticalPresentationMode = mode, tacticalPresentationReason = modeReason,
             tacticalSpatialPresentation = pres, presentationClass = pCls, transient = true,
         }
@@ -118,9 +118,9 @@ function S.OnTargetChanged(event, record)
     if not hasNet and not (wr and wr.emitted == true) then return false, "presentation_transport_unavailable" end
 
     local sent = hasNet and text and S.DeliverBark(record, now, {
-        eventType = evType, speechEventID = spID, act = "WARN", family = S.FAMILY,
-        eventRef = ref, text = text, priority = 75, presentationClass = pCls, context = ctx,
-        tacticalSpatial = spatial, tacticalPresentation = pres,
+        eventType = evType, speechEventID = spID, act = "WARN", family = S.FAMILY, threadID = ref,
+        eventRef = ref, text = text, priority = 62, priorityHoldMs = 700, holdMs = 550,
+        presentationClass = pCls, context = ctx, tacticalSpatial = spatial, tacticalPresentation = pres,
     }) or 0
 
     local sec = PNC and PNC.SecondaryChannel or nil

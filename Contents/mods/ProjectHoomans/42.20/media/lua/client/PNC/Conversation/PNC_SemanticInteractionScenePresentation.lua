@@ -66,6 +66,7 @@ function ScenePresentation.Receive(packet)
         eventRef = eventID,
         eventType = "semantic_scene",
         family = "semantic_scene",
+        threadID = sceneID,
         npcID = speakerID,
         speechEventID = "semantic.scene.speech",
         semanticOwned = true,
@@ -85,6 +86,13 @@ function ScenePresentation.Receive(packet)
         pumpImmediately = true,
         priority = 55,
         weight = 100,
+        holdMs = 850,
+        cooldowns = {
+            familyMs = 2000,
+            speakerMs = 1500,
+            ambientMs = 800,
+            mergeWindowMs = 0,
+        },
         source = {
             kind = "semantic_speech",
             channel = "interaction_scene",

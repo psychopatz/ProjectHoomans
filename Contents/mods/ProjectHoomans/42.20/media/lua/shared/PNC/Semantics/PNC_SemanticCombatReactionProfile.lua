@@ -114,21 +114,57 @@ end
 
 function Profile.Build(record, playerKey, options)
     options = type(options) == "table" and options or {}
-    local relationship = relationshipFor(record, tostring(playerKey or ""))
-    local personality = personalityFor(record)
-    local traits = TraitContext and TraitContext.Collect
-        and TraitContext.Collect(record) or {}
+    local playerId = tostring(playerKey or "")
+    local role = tostring(options.role or "witness")
+    local actorKind = tostring(options.actorKind or "player")
+    local inCombat = options.inCombat == true
+    local relationship = relationshipFor(record, playerId)
+    local state = tostring(
+        relationship.state or relationship.category or "unknown"
+    )
     local condition = conditionFor(record)
     local pressure, nearbyCount = pressureFor(record, options)
     local panic = number(condition.panic, 0)
     local stress = number(condition.stress, 0)
+    local fatigue = number(
+        condition.fatigue ~= nil and condition.fatigue
+            or (type(record) == "table" and type(record.needs) == "table" and record.needs.fatigue),
+        0
+    )
+    local pain = number(condition.pain, 0)
+    local health = healthState(record)
+    local h = type(record) == "table" and type(record.health) == "table" and record.health or nil
+    local body = h and type(h.body) == "table" and h.body or nil
+    local bleeding = (h and h.bleeding == true)
+        or number(body and body.bleedingRate, 0) > 0
+        or number(body and body.openWoundCount, 0) > 0
+        or number(h and h.bleedingRate, 0) > 0
+        or number(h and h.openWoundCount, 0) > 0
+        or false
+    local rt = type(record) == "table" and type(record.runtime) == "table" and record.runtime or nil
+    local now = PNC and PNC.Core and type(PNC.Core.Now) == "function"
+        and tonumber(PNC.Core.Now()) or nil
+    local cacheSig = nil
+    if rt and options.noCache ~= true and now ~= nil and now > 0 then
+        cacheSig = table.concat({
+            playerId, role, actorKind, tostring(inCombat), health, pressure,
+            tostring(nearbyCount), tostring(math.floor(panic / 15)),
+            tostring(math.floor(stress * 4)), tostring(math.floor(fatigue * 4)),
+            tostring(math.floor(pain / 20)), tostring(bleeding), state,
+        }, "|")
+        local c = rt._combatProfileCache
+        if type(c) == "table" and c.sig == cacheSig and now < (tonumber(c.expiresAt) or 0) then
+            return c.profile
+        end
+    end
+
+    local personality = personalityFor(record)
+    local traits = TraitContext and TraitContext.Collect
+        and TraitContext.Collect(record) or {}
     local bravery = unit(personality.bravery, 0.5)
     local aggression = unit(personality.aggression, 0.5)
     local compassion = unit(personality.compassion, 0.5)
     local socialStyle = tostring(personality.socialStyle or "neutral")
-    local state = tostring(
-        relationship.state or relationship.category or "unknown"
-    )
     local styleProjection = Style.Resolve({
         npcID = record and record.id,
         npcRecord = record,
@@ -138,8 +174,8 @@ function Profile.Build(record, playerKey, options)
         relationshipState = state,
         dialogueSituation = {
             npc = {
-                inCombat = options.inCombat == true,
-                healthState = healthState(record),
+                inCombat = inCombat,
+                healthState = health,
             },
         },
     })
@@ -194,21 +230,55 @@ function Profile.Build(record, playerKey, options)
         reactionStyle = "practical"
     end
 
-    local health = healthState(record)
+    local tRole = tostring(type(record) == "table" and (record.tacticalRole or record.role) or "")
+    local isTactical = (type(record) == "table" and record.tactical == true)
+        or tRole == "guard" or tRole == "soldier" or tRole == "scout"
+    local isCowardly = shakenTrait or bravery <= 0.30 or panic >= 55
+    local isBrave = braveTrait or bravery >= 0.72
+    local isExhausted = fatigue >= 0.75 or pain >= 50 or health == "injured" or bleeding == true
+    local allyWarnStyle
+    if (type(record) == "table" and (record.activeBehavior == "hostile" or record.isHostile == true))
+        or state == "enemy"
+    then
+        allyWarnStyle = "hostile"
+    elseif (mood == "panicked" or shakenTrait or bravery <= 0.30
+            or tostring(type(record) == "table" and record.combatPolicy or "") == "passive"
+            or tostring(type(record) == "table" and record.attackType or "") == "none")
+        and not braveTrait
+    then
+        allyWarnStyle = "shaken"
+    elseif bleeding == true or pain >= 55 or fatigue >= 0.80 then
+        allyWarnStyle = "exhausted"
+    elseif aggressiveTrait or aggression >= 0.72 then
+        allyWarnStyle = "aggressive"
+    elseif isBrave then
+        allyWarnStyle = "brave"
+    elseif isTactical then
+        allyWarnStyle = "tactical"
+    elseif supportiveTrait or compassion >= 0.66 then
+        allyWarnStyle = "supportive"
+    else
+        allyWarnStyle = "neutral"
+    end
+
+    local curHp, maxHp = tonumber(h and h.current), tonumber(h and h.max)
+    local hpRatio = (curHp and maxHp and maxHp > 0) and unit(curHp / maxHp, 1)
+        or (health == "injured" and 0.6 or 1)
+
     local healthText = health == "injured"
         and "I'm hurt, but I'm still moving."
         or mood == "panicked"
             and "I'm not hurt, but I need a second."
             or "I'm okay."
 
-    return {
+    local out = {
         schemaVersion = Profile.VERSION,
         schema = Profile.SCHEMA,
-        combatReactionRole = tostring(options.role or "witness"),
+        combatReactionRole = role,
         combatReactionStyle = reactionStyle,
         combatReactionMood = mood,
         combatPressure = pressure,
-        killerActorKind = tostring(options.actorKind or "player"),
+        killerActorKind = actorKind,
         relationshipState = state,
         relationshipTier = relationshipTier(relationship),
         socialStyle = socialStyle,
@@ -219,6 +289,19 @@ function Profile.Build(record, playerKey, options)
         nearbyZombieCount = nearbyCount,
         speechVariant = speechVariant,
         traits = traits,
+        bravery = bravery,
+        aggression = aggression,
+        compassion = compassion,
+        panic = panic,
+        stress = stress,
+        fatigue = fatigue,
+        pain = pain,
+        bleeding = bleeding == true,
+        hpRatio = hpRatio,
+        isCowardly = isCowardly == true,
+        isBrave = isBrave == true,
+        isExhausted = isExhausted == true,
+        allyWarnStyle = allyWarnStyle,
         provenance = {
             personality = "social.personality",
             traits = "NPCTraitContext",
@@ -228,6 +311,10 @@ function Profile.Build(record, playerKey, options)
             speechStyle = "SpeechStyleContext",
         },
     }
+    if rt and cacheSig then
+        rt._combatProfileCache = { expiresAt = now + 1500, sig = cacheSig, profile = out }
+    end
+    return out
 end
 
 return Profile

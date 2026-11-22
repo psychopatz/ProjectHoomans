@@ -36,7 +36,7 @@ end
 
 local CALLOUT_ROLES = {
     "crawler", "blindside", "last_one", "bandaging_self",
-    "bandaging_ally", "checkin_injured", "checkin_clear",
+    "bandaging_ally", "checkin_injured", "checkin_clear", "weather_rain_open",
 }
 
 local function registerCalloutPool(poolID, templatePrefix)
@@ -75,18 +75,35 @@ local function appendReplySituations(vars, poolID, act)
     for _, s in ipairs(REPLY_SITUATIONS) do
         vars[#vars + 1] = replyVar(poolID, s.tpl, { combatReactionRole = s.role }, s.pri, act)
     end
+    vars[#vars + 1] = makeVariant(
+        poolID, "combat.ally_warn.callout.weather_rain_reply_callout",
+        "weather_rain_reply", { combatReactionRole = "weather_rain_reply" }, 97, act
+    )
+end
+
+local function appendWingmanStats(vars, poolID)
+    for _, v in ipairs({
+        replyVar(poolID, "wingman_shaken", { combatReactionRole = "wingman", combatReactionStyle = "shaken" }, 95, "ACK"),
+        replyVar(poolID, "wingman_brave", { combatReactionRole = "wingman", combatReactionStyle = "brave" }, 94, "ACK"),
+        replyVar(poolID, "wingman_aggressive", { combatReactionRole = "wingman", combatReactionStyle = "aggressive" }, 95, "ACK"),
+    }) do vars[#vars + 1] = v end
 end
 
 local P_ENG = "semantic.combat.ally_warn.reply.engaging"
 local engVars = {}
-appendReplySituations(engVars, P_ENG, "ACK")
+appendWingmanStats(engVars, P_ENG)
 for _, v in ipairs({
     replyVar(P_ENG, "anchor_tactical", { combatReactionRole = "anchor", combatReactionStyle = "tactical" }, 96, "ACK"),
     replyVar(P_ENG, "anchor_combat", { combatReactionRole = "anchor" }, 92, "ACK"),
     replyVar(P_ENG, "wingman_engaging_hostile", { combatReactionRole = "wingman", combatReactionStyle = "hostile" }, 95, "ACK"),
     replyVar(P_ENG, "wingman_engaging_tactical", { combatReactionRole = "wingman", combatReactionStyle = "tactical" }, 94, "ACK"),
     replyVar(P_ENG, "wingman_engaging_neutral", { combatReactionRole = "wingman" }, 90, "ACK"),
+    replyVar(P_ENG, "engaging_shaken", { combatReactionStyle = "shaken" }, 82, "ACK"),
     replyVar(P_ENG, "engaging_hostile", { combatReactionStyle = "hostile" }, 80, "ACK"),
+    replyVar(P_ENG, "engaging_aggressive", { combatReactionStyle = "aggressive" }, 79, "ACK"),
+    replyVar(P_ENG, "engaging_exhausted", { combatReactionStyle = "exhausted" }, 78, "ACK"),
+    replyVar(P_ENG, "engaging_brave", { combatReactionStyle = "brave" }, 77, "ACK"),
+    replyVar(P_ENG, "engaging_supportive", { combatReactionStyle = "supportive" }, 76, "ACK"),
     replyVar(P_ENG, "engaging_tactical", { combatReactionStyle = "tactical" }, 75, "ACK"),
     replyVar(P_ENG, "engaging_neutral", nil, 50, "ACK"),
 }) do engVars[#engVars + 1] = v end
@@ -94,13 +111,18 @@ Catalog.Register(P_ENG, { variants = engVars })
 
 local P_ALT = "semantic.combat.ally_warn.reply.alerted"
 local altVars = {}
-appendReplySituations(altVars, P_ALT, "ACK")
+appendWingmanStats(altVars, P_ALT)
 for _, v in ipairs({
     replyVar(P_ALT, "anchor_tactical", { combatReactionRole = "anchor", combatReactionStyle = "tactical" }, 96, "ACK"),
     replyVar(P_ALT, "anchor_combat", { combatReactionRole = "anchor" }, 92, "ACK"),
     replyVar(P_ALT, "wingman_alerted_tactical", { combatReactionRole = "wingman", combatReactionStyle = "tactical" }, 95, "ACK"),
     replyVar(P_ALT, "wingman_alerted_neutral", { combatReactionRole = "wingman" }, 90, "ACK"),
+    replyVar(P_ALT, "engaging_shaken", { combatReactionStyle = "shaken" }, 82, "ACK"),
     replyVar(P_ALT, "alerted_hostile", { combatReactionStyle = "hostile" }, 80, "ACK"),
+    replyVar(P_ALT, "engaging_aggressive", { combatReactionStyle = "aggressive" }, 79, "ACK"),
+    replyVar(P_ALT, "engaging_exhausted", { combatReactionStyle = "exhausted" }, 78, "ACK"),
+    replyVar(P_ALT, "engaging_brave", { combatReactionStyle = "brave" }, 77, "ACK"),
+    replyVar(P_ALT, "engaging_supportive", { combatReactionStyle = "supportive" }, 76, "ACK"),
     replyVar(P_ALT, "alerted_tactical", { combatReactionStyle = "tactical" }, 75, "ACK"),
     replyVar(P_ALT, "alerted_neutral", nil, 50, "ACK"),
 }) do altVars[#altVars + 1] = v end
@@ -108,7 +130,7 @@ Catalog.Register(P_ALT, { variants = altVars })
 
 local P_DEF = "semantic.combat.ally_warn.reply.defensive"
 local defVars = {}
-appendReplySituations(defVars, P_DEF, "REACT")
+appendReplySituations(defVars, P_DEF, "ACK")
 for _, v in ipairs({
     replyVar(P_DEF, "wingman_defensive", { combatReactionRole = "wingman" }, 90, "REACT"),
     replyVar(P_DEF, "defensive_shaken", { combatReactionStyle = "shaken" }, 75, "REACT"),

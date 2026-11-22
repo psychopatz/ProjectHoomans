@@ -14,10 +14,10 @@ S.PendingReplies = S.PendingReplies or {}
 S.PendingReplyCount = tonumber(S.PendingReplyCount) or #S.PendingReplies
 S.NextReplyDueAt = S.NextReplyDueAt
 
-local MAX_PENDING_REPLIES, MAX_REPLIES_PER_WARNING = 32, 3
-local ROLE_BY_IDX = { "lead", "wingman", "anchor" }
+local MAX_Q, MAX_R = 32, 3
+local ROLES = { "lead", "wingman", "anchor" }
 
-local function syncQueueMeta()
+local function syncMeta()
     local list, minDue = S.PendingReplies, nil
     for i = 1, #list do
         local d = tonumber(list[i].dueAt)
@@ -27,7 +27,7 @@ local function syncQueueMeta()
 end
 
 local function pushPendingReply(entry)
-    while #S.PendingReplies >= MAX_PENDING_REPLIES do table.remove(S.PendingReplies, 1) end
+    while #S.PendingReplies >= MAX_Q do table.remove(S.PendingReplies, 1) end
     S.PendingReplies[#S.PendingReplies + 1] = entry
 end
 
@@ -82,7 +82,7 @@ local function dispatchReply(e, rec, now, reg, perc, sec)
     local tCls = (e.desc and e.desc.semanticClass) or e.threatClass or "human_hostile"
     local text, res = S.ResolveSemanticLine(rec, ev, act, tCls, e.eventRef, nil, toks, { replyRole = role })
     if not text then return end
-    local sent = S.SendReplyBark(rec, now, ev, act, e.eventRef, text, res, toks, e.barkOpts)
+    local sent = S.SendReplyBark(rec, now, ev, act, e.eventRef, text, res, toks, e.barkOpts, e.threadID)
     local w = e.wave
     if w and (tonumber(sent) or 0) > 0 then
         local rName = tostring(rec.name or rec.fullName or "")
@@ -94,17 +94,18 @@ end
 function S.EnqueueCustomReply(spec)
     if type(spec) ~= "table" or type(spec.speaker) ~= "table" or spec.speaker.id == nil then return 0 end
     local sp, addr, now = spec.speaker, spec.addressee, S.Finite(spec.now) or 0
+    local ref = spec.eventRef or ("sit:" .. tostring(sp.id))
     pushPendingReply({
         allyId = tostring(sp.id), allyRecord = sp, callerRecord = addr, addresseeRecord = addr,
         callerId = tostring(addr and addr.id or ""), callerName = tostring(addr and (addr.name or addr.fullName) or ""),
         desc = spec.desc, threatClass = spec.threatClass or "human_hostile", canEngage = spec.canEngage ~= false,
         skipLOSCheck = true, skipLocation = true, role = spec.role, wave = spec.wave,
-        extraTokens = spec.extraTokens, barkOpts = spec.barkOpts,
+        extraTokens = spec.extraTokens, barkOpts = spec.barkOpts, threadID = spec.threadID or ref,
         eventType = spec.eventType or "combat_ally_warn_reply_engaging", act = spec.act or "ACK",
-        barkId = spec.barkId or "bark.alert_hey", eventRef = spec.eventRef or ("sit:" .. tostring(sp.id)),
+        barkId = spec.barkId or "bark.alert_hey", eventRef = ref,
         dueAt = now + (tonumber(spec.delayMs) or 650), expiresAt = now + (tonumber(spec.ttlMs) or 6000),
     })
-    syncQueueMeta()
+    syncMeta()
     return 1
 end
 
@@ -117,7 +118,7 @@ function S.EnqueueAllyReplies(caller, wr, now, eventRef)
         leadSpoke = false, wingmanSpoke = false,
     }
     local queued, refPrefix = 0, tostring(eventRef or "") .. ":reply:"
-    for idx = 1, math.min(MAX_REPLIES_PER_WARNING, #notified) do
+    for idx = 1, math.min(MAX_R, #notified) do
         local item = notified[idx]
         local ally = type(item) == "table" and item.record or nil
         if type(ally) == "table" and ally.id ~= nil and ally.alive ~= false then
@@ -125,7 +126,7 @@ function S.EnqueueAllyReplies(caller, wr, now, eventRef)
             pushPendingReply({
                 allyId = tostring(ally.id), allyRecord = ally, callerRecord = caller,
                 callerId = w.callerId, callerName = w.callerName, desc = wr.descriptor, canEngage = eng,
-                role = ROLE_BY_IDX[idx] or "wingman", wave = w,
+                role = ROLES[idx] or "wingman", wave = w, threadID = eventRef,
                 eventType = eng and "combat_ally_warn_reply_alerted" or "combat_ally_warn_reply_defensive",
                 act = eng and "ACK" or "REACT", barkId = eng and "bark.alert_hey" or "bark.whisper_check",
                 eventRef = refPrefix .. tostring(ally.id),
@@ -134,7 +135,7 @@ function S.EnqueueAllyReplies(caller, wr, now, eventRef)
             queued = queued + 1
         end
     end
-    syncQueueMeta()
+    syncMeta()
     return queued
 end
 
@@ -155,7 +156,7 @@ function S.PumpPendingReplies(now)
         end
     end
     S.PendingReplies = rem
-    syncQueueMeta()
+    syncMeta()
     return fired
 end
 

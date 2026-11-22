@@ -626,7 +626,7 @@ local function emitZombieAwareness(
             family = awarenessFamily,
             speakerCooldownMs = 0,
             familyCooldownMs = ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS,
-            priorityHoldMs = tacticalPrompt == true and 5000 or 3000,
+            priorityHoldMs = tacticalPrompt == true and 4000 or 900,
             priority = combatMoment.priority,
             moment = combatMoment,
         })
@@ -754,6 +754,7 @@ local function emitZombieAwareness(
         context.eventRef = eventID
         context.offerIDs = realization.offerIDs or {}
         result = {
+            lightweightBark = tacticalPrompt ~= true,
             source = eventType,
             eventID = eventID,
             npcID = npcID,
@@ -790,12 +791,12 @@ local function emitZombieAwareness(
                 mergeKey = eventID,
                 cooldowns = {
                     familyMs = ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS,
-                    speakerMs = 0,
-                    ambientMs = 4500,
+                    speakerMs = tacticalPrompt == true and 0 or 2500,
+                    ambientMs = tacticalPrompt == true and 4500 or 1200,
                     mergeWindowMs = 0,
                 },
                 ttlMs = 8000,
-                holdMs = 1800,
+                holdMs = tacticalPrompt == true and 1800 or 1000,
                 context = context,
                 presentationClass = presentationClass,
                 combatMoment = CombatMoment.Snapshot(combatMoment),
@@ -844,6 +845,13 @@ local function emitZombieAwareness(
         if delivered then emitted = emitted + 1 end
     end)
     return emitted
+end
+
+local function hasActiveTeamSkirmish(record, now)
+    local p = PNC.Perception or Perception
+    return p and type(p.GetTeamKey) == "function"
+        and type(p.GetActiveSkirmish) == "function"
+        and p.GetActiveSkirmish(p.GetTeamKey(record), now) ~= nil
 end
 
 function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
@@ -895,6 +903,7 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
             local sceneAdopters = PNC.ConvoEngine and PNC.ConvoEngine.InteractionSceneAdopters or nil
             if sceneAdopters
                 and type(sceneAdopters.OnHordeTransition) == "function"
+                and not hasActiveTeamSkirmish(record, now)
             then
                 sceneAdopters.OnHordeTransition(record, {
                     phase = "cleared",
@@ -934,12 +943,15 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
             and EncounterIntent.IsPromptSpeaker(
                 record, state.episodeID
             ) == true
+        local skirmishActive = tacticalPrompt ~= true
+            and hasActiveTeamSkirmish(record, now)
         local tacticalSpatial = buildHordeSpatial(
             record, now, state.episodeID
         )
         local sceneAdopters = PNC.ConvoEngine and PNC.ConvoEngine.InteractionSceneAdopters or nil
         if sceneAdopters
             and type(sceneAdopters.OnHordeTransition) == "function"
+            and not skirmishActive
         then
             sceneAdopters.OnHordeTransition(record, {
                 phase = "started",
@@ -952,20 +964,22 @@ function Hooks.ObserveZombieHorde(record, count, threshold, now, source)
                 spatial = tacticalSpatial,
             })
         end
-        emitZombieAwareness(
-            record,
-            eventType,
-            "social.zombie_horde_detected",
-            eventID,
-            source or "zombie_observation",
-            now,
-            count,
-            nil,
-            "started",
-            state.episodeID,
-            tacticalPrompt,
-            tacticalSpatial
-        )
+        if not skirmishActive then
+            emitZombieAwareness(
+                record,
+                eventType,
+                "social.zombie_horde_detected",
+                eventID,
+                source or "zombie_observation",
+                now,
+                count,
+                nil,
+                "started",
+                state.episodeID,
+                tacticalPrompt,
+                tacticalSpatial
+            )
+        end
         local shockBus = PsychopatzCore and PsychopatzCore.ShockingEventBus or nil
         if shockBus and type(shockBus.Emit) == "function"
             and record.x ~= nil and record.y ~= nil

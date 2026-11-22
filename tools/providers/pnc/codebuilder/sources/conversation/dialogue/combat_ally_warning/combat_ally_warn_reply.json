@@ -19,6 +19,21 @@
         "id": "engaging_hostile"
       },
       {
+        "id": "engaging_shaken"
+      },
+      {
+        "id": "engaging_brave"
+      },
+      {
+        "id": "engaging_aggressive"
+      },
+      {
+        "id": "engaging_supportive"
+      },
+      {
+        "id": "engaging_exhausted"
+      },
+      {
         "id": "alerted_neutral"
       },
       {
@@ -41,6 +56,15 @@
       },
       {
         "id": "wingman_engaging_hostile"
+      },
+      {
+        "id": "wingman_shaken"
+      },
+      {
+        "id": "wingman_brave"
+      },
+      {
+        "id": "wingman_aggressive"
       },
       {
         "id": "wingman_alerted_neutral"

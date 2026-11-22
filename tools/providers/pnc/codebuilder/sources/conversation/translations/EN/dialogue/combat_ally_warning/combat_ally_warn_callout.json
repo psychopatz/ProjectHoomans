@@ -80,6 +80,16 @@
       "All clear, {addressee.name}. Everyone still standing?",
       "We handled that well, {addressee.name}. Anyone hurt?",
       "Area's clear, {addressee.name}. You good over there?"
+    ],
+    "say.variants.weather_rain_open_callout": [
+      "Great, it's starting to pour, {addressee.name}. We might want some cover soon.",
+      "Rain's coming down hard, {addressee.name}. Gonna be soaked if we stay out here.",
+      "Feels like a real storm rolling in, {addressee.name}. Stay dry if you can."
+    ],
+    "say.variants.weather_rain_reply_callout": [
+      "Tell me about it, {addressee.name}. Keep your eyes peeled, rain hides their footsteps.",
+      "Yeah, {addressee.name}, I'm already getting drenched. Let's watch our step.",
+      "I hear you, {addressee.name}. At least the rain cools things down, stay alert."
     ]
   }
 }

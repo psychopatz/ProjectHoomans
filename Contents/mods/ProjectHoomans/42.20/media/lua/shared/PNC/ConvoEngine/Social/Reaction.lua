@@ -110,6 +110,18 @@ local function filteredPlan(plan, context)
     return output, offerIDs
 end
 
+local ALLY_WARN_SITUATION_ROLES = {
+    blindside_reply = true,
+    last_one_reply = true,
+    cover_bandage = true,
+    injured_has_bandage = true,
+    injured_no_bandage = true,
+    medic_has_bandage = true,
+    medic_no_bandage = true,
+    checkin_ok = true,
+    weather_rain_reply = true,
+}
+
 local function poolFor(spec)
     if spec.poolID then return tostring(spec.poolID) end
     local eventType = string.lower(tostring(spec.eventType or ""))
@@ -232,13 +244,19 @@ local function poolFor(spec)
         end
         return "semantic.combat.ally_warn.callout.hostile"
     end
-    if eventType == "combat_ally_warn_reply_engaging" then
-        return "semantic.combat.ally_warn.reply.engaging"
-    end
-    if eventType == "combat_ally_warn_reply_alerted" then
-        return "semantic.combat.ally_warn.reply.alerted"
-    end
-    if eventType == "combat_ally_warn_reply_defensive" then
+    if eventType == "combat_ally_warn_reply_engaging"
+        or eventType == "combat_ally_warn_reply_alerted"
+        or eventType == "combat_ally_warn_reply_defensive"
+    then
+        if ALLY_WARN_SITUATION_ROLES[tostring(context.combatReactionRole or "")] then
+            return "semantic.combat.ally_warn.reply.defensive"
+        end
+        if eventType == "combat_ally_warn_reply_engaging" then
+            return "semantic.combat.ally_warn.reply.engaging"
+        end
+        if eventType == "combat_ally_warn_reply_alerted" then
+            return "semantic.combat.ally_warn.reply.alerted"
+        end
         return "semantic.combat.ally_warn.reply.defensive"
     end
     if string.find(eventType, "combat", 1, true)
