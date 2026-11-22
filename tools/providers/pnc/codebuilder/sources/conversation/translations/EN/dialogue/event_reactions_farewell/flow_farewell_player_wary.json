@@ -1,0 +1,17 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.player_wary",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "I'm heading out. Stay sharp.",
+      "Keep your hands where I can see them.",
+      "I'll keep moving.",
+      "Stay clear, and I'll do the same.",
+      "Alright, we're done for now.",
+      "Watching my back. Watch yours.",
+      "I'm moving on.",
+      "Keep your distance."
+    ]
+  }
+}

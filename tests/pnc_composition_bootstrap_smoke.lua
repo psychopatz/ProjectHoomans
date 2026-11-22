@@ -315,10 +315,10 @@ for _, dependency in ipairs(conversationRuntimeCalls) do
 end
 local inlineChatIndex = indexOf(
     conversationRuntimeCalls,
-    "PNC/Integrations/PBrainZ/PNC_PBrainZ_InlineChat"
+    "PNC/Conversation/InlineChat/PNC_InlineChat"
 )
 T.falsy(inlineChatIndex,
-    "Conversation runtime does not load the PBrainZ integration")
+    "Conversation runtime does not load inline chat directly")
 
 local conversationCompositionCalls = capture(
     ROOT
@@ -341,7 +341,7 @@ local expectedConversationComposition = {
     "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation",
     "PNC/Integrations/PBrainZ/PNC_PBrainZ",
     "PNC/Integrations/PBrainZ/PNC_PBrainZ_Bridge",
-    "PNC/Integrations/PBrainZ/PNC_PBrainZ_InlineChat",
+    "PNC/Conversation/InlineChat/PNC_InlineChat",
 }
 for index = 1, #expectedConversationComposition do
     T.equal(conversationCompositionCalls[index],

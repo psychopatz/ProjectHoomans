@@ -127,6 +127,8 @@ local function decision(ir, route, branch, reason, options)
         kind = "semantic_dialogue_decision",
         route = route,
         branch = branch,
+        closeConversation = branch == "FAREWELL_ACKNOWLEDGED" and true or nil,
+        topic = branch == "FAREWELL_ACKNOWLEDGED" and "farewell" or nil,
         confidence = tonumber(ir and ir.confidence) or 0,
         intent = ir and ir.intent,
         speechAct = ir and ir.speechAct,

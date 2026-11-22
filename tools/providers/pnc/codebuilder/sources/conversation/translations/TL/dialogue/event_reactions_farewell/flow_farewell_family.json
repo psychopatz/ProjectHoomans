@@ -1,0 +1,18 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.family",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Mag-ingat ka sa labas. Alam mo kung gaano ka kahalaga sa akin.",
+      "Umuwi kang ligtas, ha? Ayoko nang mawala ka rin.",
+      "Yumuko sa panganib at umuwing buo.",
+      "Ipangako mong hindi ka magpapakabayani sa labas.",
+      "Alagaan mo sarili mo. Maghihintay ako rito para sa iyo.",
+      "Lagi kang magtago sa kubli at bumalik agad pagkatapos.",
+      "Pakiusap, mag-ingat ka. Walang iwanan sa pamilya.",
+      "Bantayan ang bawat kanto. Gusto kitang makitang bumalik.",
+      "Huwag kang magtatagal sa labas. Mag-ingat ka."
+    ]
+  }
+}

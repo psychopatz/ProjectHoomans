@@ -8,11 +8,22 @@ return function(Catalog, Core)
         local candidates = {}
         local rows = explain and {} or nil
         local bestScore = nil
+        local condCtx = nil
         for index = 1, #pool.variants do
             local variant = pool.variants[index]
-            local matched, specificity, checks = Core.matches(
-                variant, context, explain
-            )
+            local matched, specificity, checks
+            if type(variant.when) ~= "table"
+                or (variant._whenCompiled == true and variant._whenKeys == nil)
+            then
+                matched, specificity, checks = true, 0, explain and {} or nil
+            else
+                if condCtx == nil then condCtx = Core.conditionContext(context) end
+                if Core.matchesNormalized then
+                    matched, specificity, checks = Core.matchesNormalized(variant, condCtx, explain)
+                else
+                    matched, specificity, checks = Core.matches(variant, context, explain)
+                end
+            end
             local score = nil
             if matched then
                 score = (tonumber(variant.priority) or 0) * 100 + specificity
@@ -99,12 +110,12 @@ return function(Catalog, Core)
             plan = variant.plan,
             dialogueAct = variant.dialogueAct,
             topic = variant.topic,
-            groundedFactRefs = Core.copy(variant.groundedFactRefs),
+            groundedFactRefs = variant.groundedFactRefs and Core.copy(variant.groundedFactRefs) or nil,
             uncertainty = variant.uncertainty,
             tone = variant.tone,
             personalityStyle = variant.personalityStyle,
             contentOwner = variant.contentOwner,
-            translationArgs = Core.copy(variant.translationArgs),
+            translationArgs = variant.translationArgs and Core.copy(variant.translationArgs) or nil,
         }, selectedIndex
     end
 

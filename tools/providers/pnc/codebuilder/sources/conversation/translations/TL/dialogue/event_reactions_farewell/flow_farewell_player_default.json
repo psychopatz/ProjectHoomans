@@ -1,0 +1,17 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.player_default",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Mag-ingat ka sa labas.",
+      "Kailangan ko nang magpatuloy. Ingat.",
+      "Mamaya na lang ulit.",
+      "Magandang kapalaran sa labas.",
+      "Magkita na lang tayo sa paligid.",
+      "Mag-ingat ka.",
+      "Panatilihing bukas ang mga mata.",
+      "Aalis na ako. Mabuhay ka."
+    ]
+  }
+}

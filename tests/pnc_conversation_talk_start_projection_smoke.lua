@@ -53,32 +53,25 @@ T.equal(hostile.route, "hostile_full_conversation",
 T.falsy(hostile.hostileInlineAvailable,
     "headless projection does not fake inline support")
 
-PNC.PBrainZ = {
-    GetProviderStatus = function()
-        return { ready = false, reason = "heartbeat_missing" }
-    end,
-    OpenInlineForTarget = function() return true end,
-}
+PNC.Conversation.InlineChat = {}
 local unavailableInline = TalkStart.Project(entry({
     tacticalClass = "hostile",
     hostility = { attackPlayers = true },
 }), nil, { source = "smoke" })
 T.equal(unavailableInline.route, "hostile_full_conversation",
-    "provider-unavailable hostile fallback route")
-T.equal(unavailableInline.hostileInlineReason, "heartbeat_missing",
-    "provider reason is retained")
+    "unwired inline hostile fallback route")
+T.equal(unavailableInline.hostileInlineReason, "inline_route_unavailable",
+    "unwired inline route reason is retained")
 
-PNC.PBrainZ.GetProviderStatus = function()
-    return { ready = true, status = "ready" }
-end
+PNC.Conversation.InlineChat.OpenForTarget = function() return true end
 local availableInline = TalkStart.Project(entry({
     tacticalClass = "hostile",
     hostility = { attackPlayers = true },
 }), nil, { source = "smoke" })
 T.equal(availableInline.route, "hostile_inline",
-    "ready provider uses inline route")
+    "semantic-first inline chat uses inline route even without PBrainZ")
 T.truthy(availableInline.hostileInlineAvailable,
-    "ready provider reports inline support")
+    "semantic-first inline chat reports inline support")
 
 local dead = TalkStart.Project(entry({
     tacticalClass = "neutral",

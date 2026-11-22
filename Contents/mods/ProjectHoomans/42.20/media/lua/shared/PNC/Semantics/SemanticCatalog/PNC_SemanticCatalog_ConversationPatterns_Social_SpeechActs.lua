@@ -90,6 +90,14 @@ function Internal.RegisterSocialSpeechActs()
         0.97,
         75
     )
+
+    registerPattern(
+        "pnc.social.farewell",
+        { "@FAREWELL" },
+        { intent = "FAREWELL", speechAct = "FAREWELL", topic = "farewell" },
+        0.96,
+        74
+    )
 end
 
 return Internal

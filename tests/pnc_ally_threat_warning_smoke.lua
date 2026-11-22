@@ -989,13 +989,19 @@ do
         Callouts.PumpPendingReplies(nowMs)
         T.equal(#deliveredBarks, 2, "5i Lead reply delivered at +750ms")
         pumpNewBarksToClient()
-        T.equal(#published, 2, "5i Lead reply publishes through same threadID without ambient drop")
+        T.equal(#published, 1, "5i Lead reply waits on serialized speech floor instead of overlapping caller")
+        nowMs = nowMs + 3200
+        pumpNewBarksToClient()
+        T.equal(#published, 2, "5i Lead reply publishes through same threadID once floor clears")
 
         nowMs = nowMs + 750
         Callouts.PumpPendingReplies(nowMs)
-        T.equal(#deliveredBarks, 3, "5i Wingman reply delivered at +1500ms")
+        T.equal(#deliveredBarks, 3, "5i Wingman reply delivered sequentially")
         pumpNewBarksToClient()
-        T.equal(#published, 3, "5i Wingman reply publishes through same threadID without ambient drop")
+        T.equal(#published, 2, "5i Wingman reply waits on serialized speech floor instead of overlapping Lead")
+        nowMs = nowMs + 3200
+        pumpNewBarksToClient()
+        T.equal(#published, 3, "5i Wingman reply publishes through same threadID once floor clears")
 
         nowMs = nowMs + 1100
         local savedSkills = PNC.Skills
@@ -1017,8 +1023,9 @@ do
         T.equal(deliveredBarks[4].lightweightBark, true, "5i kill reaction uses lightweightBark fast-path")
         T.equal(deliveredBarks[4].ambientFlavor.context.combatWeaponFamily, "long_blunt",
             "5i kill reaction preserves long_blunt weapon family")
+        nowMs = nowMs + 3200
         pumpNewBarksToClient()
-        T.equal(#published, 4, "5i all 4 lines (callout, Lead, Wingman, blunt kill) publish on client")
+        T.equal(#published, 4, "5i all 4 lines (callout, Lead, Wingman, blunt kill) publish serially on client")
         capture5i = false
     end
 

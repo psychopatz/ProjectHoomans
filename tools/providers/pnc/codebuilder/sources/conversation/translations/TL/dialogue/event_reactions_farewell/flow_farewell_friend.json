@@ -1,0 +1,18 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.friend",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Mag-ingat ka sa labas, kaibigan. Bumalik kang buo.",
+      "Bantayan ang likod mo. Huwag mo akong paghanapin sa iyo.",
+      "Mabuti at nakapag-usap tayo. Mabuhay ka riyan.",
+      "Alagaan mo sarili mo. Kita tayo agad.",
+      "Masarap palaging kausap ka. Bantayan ang mga sulok.",
+      "Magmatyag ka, pare. Kita tayo mamaya.",
+      "Ingatan mo sarili mo. Nandito lang ako kung magkagulo.",
+      "Huwag kang bibitaw, kaibigan. Marami pa tayong gagawin.",
+      "Huwag kang gagawa ng delikado nang wala ako, ha?"
+    ]
+  }
+}

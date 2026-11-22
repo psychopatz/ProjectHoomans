@@ -19,6 +19,7 @@ PNC.Conversation.Farewell = Farewell
 
 local pending = {}
 local recent = {}
+local lastPlayerFarewellAt = -math.huge
 local Context = PNC.Conversation.FarewellContext
 local InteractionLifecycle = PNC.ConvoEngine and PNC.ConvoEngine.InteractionLifecycle or nil
 local RealizationAuthority = PNC.ConvoEngine and PNC.ConvoEngine.RealizationAuthority or nil
@@ -29,10 +30,16 @@ if not RealizationAuthority then
     )
     RealizationAuthority = ok and loaded or nil
 end
+local SpeechRealization = PNC.ConvoEngine and PNC.ConvoEngine.SpeechRealization or nil
+if not SpeechRealization then
+    local ok, loaded = pcall(require, "PNC/ConvoEngine/SpeechRealization")
+    SpeechRealization = ok and loaded or nil
+end
 
 Farewell.CHANCE_PERCENT = Farewell.CHANCE_PERCENT or 55
 Farewell.NPC_DELAY_MS = Farewell.NPC_DELAY_MS or 1900
 Farewell.COOLDOWN_MS = Farewell.COOLDOWN_MS or 12000
+Farewell.PLAYER_COOLDOWN_MS = Farewell.PLAYER_COOLDOWN_MS or 2500
 Farewell.PENDING_TTL_MS = Farewell.PENDING_TTL_MS or 7000
 
 local function clean(value, fallback)
@@ -95,6 +102,30 @@ local function eligibleReason(reason)
         and reason ~= "message_submitted"
         and reason ~= "conversation_interrupted"
         and reason ~= "bridge_disabled"
+        and reason ~= "semantic_farewell"
+        and reason ~= "inline_silent_close"
+        and reason ~= "inline_group_silent_close"
+end
+
+local function realizeLine(realization, npcID, role, salt)
+    if not realization then return nil end
+    local text = realization.fallback
+    local sr = SpeechRealization or (PNC.ConvoEngine and PNC.ConvoEngine.SpeechRealization)
+    if sr and type(sr.Apply) == "function" then
+        local ap = sr.Apply({
+            selectionID = realization.realizationID,
+            templateID = realization.templateID,
+            fallback = text,
+        }, {
+            npcID = tostring(npcID or "farewell"),
+            socialRole = role,
+            phraseSalt = salt,
+        })
+        if type(ap) == "table" and type(ap.fallback) == "string" and ap.fallback ~= "" then
+            text = ap.fallback
+        end
+    end
+    return clean(text, nil)
 end
 
 local function deliver(item, current)
@@ -112,7 +143,7 @@ local function deliver(item, current)
         text = item.text,
         semanticOwned = true,
         family = "conversation_farewell",
-        priority = 100,
+        priority = 72,
         weight = 1,
         speakerID = item.npcID,
         speakerName = item.context.npcFullName,
@@ -122,8 +153,7 @@ local function deliver(item, current)
         seed = item.seed,
         llmEligible = false,
         memoryEligible = false,
-        ttlMs = 4500,
-        holdMs = 4500,
+        ttlMs = 9000,
         cooldowns = { ambientMs = 0, familyMs = 0, speakerMs = 0 },
         mergeKey = "conversation-farewell:" .. item.npcID,
         presentationState = {
@@ -157,13 +187,16 @@ function Farewell.Schedule(spec, state, reason)
     local npcID = clean(spec and spec.npcID or state and state.npcID, nil)
     local current = now()
     local role
-    local farewellContext
+    local npcFarewellCtx
+    local playerFarewellCtx
     local player
     local playerID
     local seed
     local playerText
+    local npcText
     local interaction
-    local realization
+    local npcRealization
+    local playerRealization
     if not state or state.farewellEvaluated then
         return false, "already_evaluated"
     end
@@ -178,30 +211,44 @@ function Farewell.Schedule(spec, state, reason)
         return false, "chance"
     end
     role = Context.ResolveSocialRole(spec)
-    farewellContext, player, playerID = Context.Build(spec, role, npcID)
-    if role == "hostile" then
-        farewellContext.socialStyle = "withdrawn"
-    elseif role == "lover" or role == "family" or role == "colonist" then
-        farewellContext.socialStyle = "friendly"
+    npcFarewellCtx, player, playerID = Context.Build(spec, role, npcID)
+    npcFarewellCtx.farewellSpeaker = "npc"
+    if role == "hostile" or role == "wary" then
+        npcFarewellCtx.socialStyle = "withdrawn"
+    elseif role == "lover" or role == "family" or role == "friend" or role == "colonist" then
+        npcFarewellCtx.socialStyle = "friendly"
     end
     if not RealizationAuthority
         or type(RealizationAuthority.Resolve) ~= "function"
     then
         return false, "semantic_realization_unavailable"
     end
-    realization = RealizationAuthority.Resolve({
+    local topic = context.currentTopic or context.conversationTopic or "farewell"
+    seed = "conversation-farewell:" .. npcID .. ":" .. tostring(state.token or current)
+    npcRealization = RealizationAuthority.Resolve({
         poolID = "semantic.flow.farewell",
         responsePlanID = "semantic.flow.farewell",
         realizationFamily = "farewell",
         act = "FAREWELL",
-        topic = context.currentTopic or context.conversationTopic
-            or "farewell",
-        context = farewellContext,
-        salt = tostring(npcID) .. ":" .. tostring(state.token or current),
+        topic = topic,
+        context = npcFarewellCtx,
+        salt = seed .. ":npc",
     })
-    if not realization then
+    if not npcRealization then
         return false, "semantic_farewell_plan_unavailable"
     end
+    playerFarewellCtx = {}
+    for k, v in pairs(npcFarewellCtx) do playerFarewellCtx[k] = v end
+    playerFarewellCtx.farewellSpeaker = "player"
+    playerRealization = RealizationAuthority.Resolve({
+        poolID = "semantic.flow.farewell",
+        responsePlanID = "semantic.flow.farewell",
+        realizationFamily = "farewell",
+        act = "FAREWELL",
+        topic = topic,
+        context = playerFarewellCtx,
+        salt = seed .. ":player",
+    }) or npcRealization
     if InteractionLifecycle
         and type(InteractionLifecycle.Envelope) == "table"
         and type(InteractionLifecycle.Envelope.Lifecycle) == "function"
@@ -214,17 +261,17 @@ function Farewell.Schedule(spec, state, reason)
                 playerUUID = playerID,
                 topic = context.currentTopic or context.conversationTopic,
                 provenance = {
-                    responsePlanID = realization.responsePlanID,
-                    realizationFamily = realization.realizationFamily,
-                    realizationID = realization.realizationID,
+                    responsePlanID = npcRealization.responsePlanID,
+                    realizationFamily = npcRealization.realizationFamily,
+                    realizationID = npcRealization.realizationID,
                 },
             }
         )
     end
-    seed = "conversation-farewell:" .. npcID .. ":"
-        .. tostring(state.token or current)
-    playerText = realization.fallback
-    if playerText and player then
+    playerText = realizeLine(playerRealization, "player:" .. tostring(playerID or "local"), role, seed .. ":player")
+    npcText = realizeLine(npcRealization, npcID, role, seed .. ":npc")
+    if playerText and player and current >= lastPlayerFarewellAt + Farewell.PLAYER_COOLDOWN_MS then
+        lastPlayerFarewellAt = current
         PNC.PlayerSpeech.Speak(player, playerText, {
             commandID = "conversation_farewell",
             eventID = seed .. ":player",
@@ -238,15 +285,15 @@ function Farewell.Schedule(spec, state, reason)
         npcID = npcID,
         playerID = playerID,
         role = role,
-        context = farewellContext,
+        context = npcFarewellCtx,
         interaction = interaction,
-        text = realization.fallback,
-        semanticAct = realization.semanticAct,
-        topic = realization.topic,
-        responsePlanID = realization.responsePlanID,
-        realizationFamily = realization.realizationFamily,
-        realizationID = realization.realizationID,
-        factRefs = realization.groundedFactRefs,
+        text = npcText,
+        semanticAct = npcRealization.semanticAct,
+        topic = npcRealization.topic,
+        responsePlanID = npcRealization.responsePlanID,
+        realizationFamily = npcRealization.realizationFamily,
+        realizationID = npcRealization.realizationID,
+        factRefs = npcRealization.groundedFactRefs,
         seed = seed,
         dueAt = current + Farewell.NPC_DELAY_MS,
         expiresAt = current + Farewell.PENDING_TTL_MS,
@@ -273,6 +320,7 @@ end
 function Farewell.Reset()
     pending = {}
     recent = {}
+    lastPlayerFarewellAt = -math.huge
     return true
 end
 

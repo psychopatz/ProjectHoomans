@@ -38,11 +38,22 @@ function Group:Submit(value, part)
 
     local primaryResult = primary.lastSemanticDialogueResult
     local primaryActionResult = primary.lastSemanticActionResult
-    if accepted == true and primaryResult
-        and primaryResult.decision
-        and primaryResult.decision.route ~= "llm_fallback"
-        and not primaryResult.decision.giftOffer
-        and not primaryResult.decision.giftConsent
+    local decision = primaryResult and primaryResult.decision or nil
+    if decision and (decision.branch == "FAREWELL_ACKNOWLEDGED"
+        or decision.closeConversation == true)
+    then
+        for _, member in ipairs(self.members or {}) do
+            local host = member and member.host
+            local st = host and (host.lifecycleState
+                or (host.spec and host.spec.context
+                    and host.spec.context.conversationLifecycleState))
+            if type(st) == "table" then st.farewellEvaluated = true end
+        end
+    elseif accepted == true and primaryResult
+        and decision
+        and decision.route ~= "llm_fallback"
+        and not decision.giftOffer
+        and not decision.giftConsent
     then
         if isBroadcastCamp(self, primaryResult, value) then
             self:QueueGroupCampResponses(

@@ -1,0 +1,17 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.player_friend",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Take care of yourself, friend. Talk soon.",
+      "Watch your back out there. See you soon.",
+      "Catch you later, buddy. Stay safe.",
+      "Don't get bit while I'm gone.",
+      "Always good talking. Hang in there.",
+      "Alright, I'm off. Stay sharp, friend.",
+      "Keep breathing until I get back.",
+      "See you shortly, friend."
+    ]
+  }
+}

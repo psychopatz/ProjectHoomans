@@ -30,7 +30,7 @@ Core.CONDITION_FIELDS = {
     "combatReactionMood", "combatPressure", "killerActorKind",
     "combatAttackType", "combatWeaponFamily", "combatWeaponSkill",
     "combatSkillBand", "combatHitZone", "combatWoundType",
-    "combatWeaponNamed", "hordePhase",
+    "combatWeaponNamed", "hordePhase", "socialRole", "farewellSpeaker",
 }
 
 function Core.copy(value, depth)
@@ -285,21 +285,36 @@ function Core.conditionContext(context)
         combatWoundType = context.combatWoundType,
         combatWeaponNamed = context.combatWeaponNamed,
         hordePhase = context.hordePhase,
+        socialRole = context.socialRole or social.role,
+        farewellSpeaker = context.farewellSpeaker,
     }
 end
 
-function Core.matches(variant, context, withTrace)
+local function compileWhenKeys(when)
+    if type(when) ~= "table" then return nil end
+    local keys = {}
+    for index = 1, #Core.CONDITION_FIELDS do
+        local field = Core.CONDITION_FIELDS[index]
+        if when[field] ~= nil then keys[#keys + 1] = field end
+    end
+    return #keys > 0 and keys or nil
+end
+
+function Core.matchesNormalized(variant, condCtx, withTrace)
     local when = variant.when
+    local whenKeys = variant._whenKeys
     local actual
     local field
     local index
-    if type(when) ~= "table" then return true, 0, withTrace and {} or nil end
-    context = Core.conditionContext(context)
+    if type(when) ~= "table" or (variant._whenCompiled == true and whenKeys == nil) then
+        return true, 0, withTrace and {} or nil
+    end
+    local keys = whenKeys or Core.CONDITION_FIELDS
     local specificity = 0
     local checks = withTrace and {} or nil
-    for index = 1, #Core.CONDITION_FIELDS do
-        field = Core.CONDITION_FIELDS[index]
-        actual = context[field]
+    for index = 1, #keys do
+        field = keys[index]
+        actual = condCtx[field]
         if when[field] ~= nil then
             local passed = scalarMatches(when[field], actual)
             if checks then
@@ -321,6 +336,14 @@ function Core.matches(variant, context, withTrace)
         end
     end
     return true, specificity, checks
+end
+
+function Core.matches(variant, context, withTrace)
+    local when = variant.when
+    if type(when) ~= "table" or (variant._whenCompiled == true and variant._whenKeys == nil) then
+        return true, 0, withTrace and {} or nil
+    end
+    return Core.matchesNormalized(variant, Core.conditionContext(context), withTrace)
 end
 
 local function prepareVariant(poolID, index, value)
@@ -360,6 +383,7 @@ local function prepareVariant(poolID, index, value)
         ))
     end
     local contentOwner = value.contentOwner or contentOwnerForPool(poolID)
+    local when = Core.copy(value.when)
     return {
         id = id,
         templateID = templateID ~= "" and templateID or id,
@@ -375,7 +399,9 @@ local function prepareVariant(poolID, index, value)
         personalityStyle = value.personalityStyle,
         contentOwner = contentOwner,
         translationArgs = Core.copy(value.translationArgs),
-        when = Core.copy(value.when),
+        when = when,
+        _whenKeys = compileWhenKeys(when),
+        _whenCompiled = true,
         priority = tonumber(value.priority) or 0,
     }, nil, detail
 end

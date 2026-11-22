@@ -1,0 +1,17 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.player_hostile",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "We're done talking.",
+      "I'm out of here. Watch yourself.",
+      "Say whatever you want, I'm leaving.",
+      "Enough talk. Keep your distance.",
+      "Don't follow me.",
+      "I've heard enough from you.",
+      "Stay out of my path.",
+      "Save your breath."
+    ]
+  }
+}

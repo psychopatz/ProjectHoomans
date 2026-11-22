@@ -502,8 +502,8 @@ T.equal(record.runtime.conversationParley, nil,
 -- it can create a combat-gated scene lease. The fallback keeps the exact
 -- selected entry instead of resolving a different nearest NPC.
 local fallbackCalls = {}
-PNC.PBrainZ = {
-    RequestInlineFallback = function(entry, reason, view)
+PNC.Conversation.InlineChat = {
+    RequestFallback = function(entry, reason, view)
         fallbackCalls[#fallbackCalls + 1] = {
             entry = entry,
             reason = reason,

@@ -1,39 +1,29 @@
--- Headless conversation host creation and retargeting.
+-- Headless conversation host creation and retargeting for inline chat.
 PNC = PNC or {}
-PNC.PBrainZ = PNC.PBrainZ or {}
-PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
+PNC.Conversation = PNC.Conversation or {}
+PNC.Conversation.InlineChat = PNC.Conversation.InlineChat or {}
+PNC.Conversation.InlineChat.Internal = PNC.Conversation.InlineChat.Internal or {}
 
 require "PNC/Conversation/PNC_ConversationTime"
 require "PNC/Conversation/PNC_ConversationGroup"
 pcall(require, "PNC/ConvoEngine/RuntimeFacade")
 
-local Integration = PNC.PBrainZ
-local Internal = Integration.Internal
-local Config = Internal.InlineChatConfig
+local InlineChat = PNC.Conversation.InlineChat
+local Internal = InlineChat.Internal
+local Config = Internal.Config
 local Resolver = PNC.CompanionTargetResolver
-local Inline = Integration.Inline
-local SemanticRuntime = PNC.Conversation
-    and PNC.Conversation.Semantic
-if SemanticRuntime
-    and type(SemanticRuntime.Register) == "function"
-then
-    SemanticRuntime.Register(
-        PNC.Conversation, PNC.Conversation.Group, PNC.Conversation.Time)
+local State = InlineChat.State
+local SemanticRuntime = PNC.Conversation and PNC.Conversation.Semantic
+if SemanticRuntime and type(SemanticRuntime.Register) == "function" then
+    SemanticRuntime.Register(PNC.Conversation, PNC.Conversation.Group, PNC.Conversation.Time)
 end
-local Hosts = Internal.InlineChatHosts or {}
-Internal.InlineChatHosts = Hosts
+local Hosts = Internal.Hosts or {}
+Internal.Hosts = Hosts
 
 function Hosts.Build(entry, player)
-    if not PNC.Conversation.BuildDefinition
-        or not PsychopatzCore.Conversation.CreateHeadless
-    then
+    if not PNC.Conversation.BuildDefinition or not PsychopatzCore.Conversation.CreateHeadless then
         if print then
-            print("[PNC][LLM] inline_host_failed reason=dependencies_unavailable"
-                .. " build_definition="
-                .. tostring(type(PNC.Conversation.BuildDefinition) == "function")
-                .. " create_headless="
-                .. tostring(type(PsychopatzCore.Conversation.CreateHeadless)
-                    == "function"))
+            print("[PNC][InlineChat] inline_host_failed reason=dependencies_unavailable")
         end
         return nil
     end
@@ -42,19 +32,14 @@ function Hosts.Build(entry, player)
     definition.context.nameplateConversation = true
     definition.context.guardThreats = false
     local host = PsychopatzCore.Conversation.CreateHeadless(definition)
-    if not host then
+    if not host or host.lifecycleError then
         if print then
-            print("[PNC][LLM] inline_host_failed reason=create_headless")
+            print("[PNC][InlineChat] inline_host_failed reason="
+                .. tostring(host and host.lifecycleError or "create_headless"))
         end
         return nil
     end
-    if host.lifecycleError then
-        if print then
-            print("[PNC][LLM] inline_host_failed reason=lifecycle "
-                .. tostring(host.lifecycleError))
-        end
-        return nil
-    end
+    host.inlineChat = true
     host.pbrainz = true
     return host
 end
@@ -71,20 +56,14 @@ function Hosts.RefreshContext(host, entry, player)
 end
 
 function Hosts.Rebuild(player, resolved, requestedMode)
-    local oldHosts = {}
-    local newHosts = {}
-    local createdHosts = {}
-    local entries = {}
+    local oldHosts, newHosts, createdHosts, entries = {}, {}, {}, {}
     local targets = resolved and resolved.targets or {}
-    local primaryTarget = resolved
-        and (resolved.primary or resolved.target) or nil
-    local mode = Resolver.NormalizeMode(
-        requestedMode or Inline.mode or Config.MODE_NEAREST
-    )
+    local primaryTarget = resolved and (resolved.primary or resolved.target) or nil
+    local mode = Resolver.NormalizeMode(requestedMode or State.mode or Config.MODE_NEAREST)
     local primaryID = tostring(primaryTarget and primaryTarget.id or "")
     local primaryIndex
     if not primaryTarget then return false, "no_primary_target" end
-    for _, old in ipairs(Inline.hosts or {}) do
+    for _, old in ipairs(State.hosts or {}) do
         local id = tostring(old and old.spec and old.spec.npcID or "")
         if id ~= "" then oldHosts[id] = old end
     end
@@ -109,9 +88,7 @@ function Hosts.Rebuild(player, resolved, requestedMode)
                 if id == primaryID then primaryIndex = #entries end
             elseif mode ~= Config.MODE_NEARBY then
                 for _, created in ipairs(createdHosts) do
-                    if created and created.close then
-                        created:close("inline_target_build_failed")
-                    end
+                    if created and created.close then created:close("inline_target_build_failed") end
                 end
                 return false, "target_host_build_failed:" .. id
             end
@@ -119,9 +96,7 @@ function Hosts.Rebuild(player, resolved, requestedMode)
     end
     if #newHosts == 0 then
         for _, created in ipairs(createdHosts) do
-            if created and created.close then
-                created:close("inline_target_build_failed")
-            end
+            if created and created.close then created:close("inline_target_build_failed") end
         end
         return false, "no_hosts"
     end
@@ -129,30 +104,24 @@ function Hosts.Rebuild(player, resolved, requestedMode)
         if unused and unused.close then unused:close("inline_retargeted") end
     end
     primaryIndex = primaryIndex or 1
-    Inline.entries = entries
-    Inline.hosts = newHosts
-    Inline.target = entries[primaryIndex]
-    Inline.targetID = tostring(Inline.target.id)
-    Inline.host = newHosts[primaryIndex]
-    Inline.groupConversation = nil
+    State.entries = entries
+    State.hosts = newHosts
+    State.target = entries[primaryIndex]
+    State.targetID = tostring(State.target.id)
+    State.host = newHosts[primaryIndex]
+    State.groupConversation = nil
     if mode == Config.MODE_NEARBY and #newHosts > 1
-        and SemanticRuntime
-        and type(SemanticRuntime.CreateGroup) == "function"
+        and SemanticRuntime and type(SemanticRuntime.CreateGroup) == "function"
     then
-        local group
-        local reason
-        group, reason = SemanticRuntime.CreateGroup(
-            Inline.host, newHosts, entries, player, { mode = mode }
-        )
+        local group, reason = SemanticRuntime.CreateGroup(State.host, newHosts, entries, player, { mode = mode })
         if group then
-            Inline.groupConversation = group
+            State.groupConversation = group
         elseif print then
-            print("[PNC][LLM] inline_group_failed reason="
-                .. tostring(reason or "group_create_failed"))
+            print("[PNC][InlineChat] inline_group_failed reason=" .. tostring(reason or "group_create_failed"))
         end
     end
     for _, host in ipairs(newHosts) do
-        if not Inline.groupConversation then
+        if not State.groupConversation then
             host.groupConversation = nil
             host.groupMemberID = nil
             host.groupPrimary = nil
@@ -162,51 +131,41 @@ function Hosts.Rebuild(player, resolved, requestedMode)
 end
 
 function Hosts.RefreshLocked(player)
-    local entries = Inline.entries or {}
-    local hosts = Inline.hosts or {}
+    local entries = State.entries or {}
+    local hosts = State.hosts or {}
     for index, entry in ipairs(entries) do
         local refreshed = Resolver.BuildConversationEntry({
-            id = entry.id,
-            source = entry.source,
-            record = entry.record,
-            snapshot = entry.snapshot,
-            zombie = entry.zombie,
+            id = entry.id, source = entry.source, record = entry.record,
+            snapshot = entry.snapshot, zombie = entry.zombie,
         })
         if refreshed and tostring(refreshed.id or "") ~= "" then
             refreshed.name = refreshed.name or entry.name
             entries[index] = refreshed
             Hosts.RefreshContext(hosts[index], refreshed, player)
-            if Inline.targetID
-                and tostring(Inline.targetID) == tostring(refreshed.id)
-            then
-                Inline.target = refreshed
+            if State.targetID and tostring(State.targetID) == tostring(refreshed.id) then
+                State.target = refreshed
             end
         end
     end
-    if Inline.groupConversation
-        and type(Inline.groupConversation.Rebind) == "function"
-    then
-        local rebound = Inline.groupConversation:Rebind(
-            hosts, entries, Inline.host
-        )
+    if State.groupConversation and type(State.groupConversation.Rebind) == "function" then
+        local rebound = State.groupConversation:Rebind(hosts, entries, State.host)
         if not rebound then
-            Inline.groupConversation = nil
+            State.groupConversation = nil
             for _, host in ipairs(hosts) do
                 host.groupConversation = nil
                 host.groupMemberID = nil
                 host.groupPrimary = nil
             end
         else
-            Inline.host = Inline.groupConversation:PrimaryView()
-            local primary = Inline.groupConversation:MemberForHost(Inline.host)
-            Inline.target = primary and primary.entry or Inline.target
-            Inline.targetID = Inline.target
-                and tostring(Inline.target.id or "") or Inline.targetID
+            State.host = State.groupConversation:PrimaryView()
+            local primary = State.groupConversation:MemberForHost(State.host)
+            State.target = primary and primary.entry or State.target
+            State.targetID = State.target and tostring(State.target.id or "") or State.targetID
         end
     end
 end
 
-Integration.RebuildInlineHosts = function(player, resolved, mode)
+InlineChat.RebuildHosts = function(player, resolved, mode)
     return Hosts.Rebuild(player, resolved, mode)
 end
 

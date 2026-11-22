@@ -14,7 +14,7 @@ PNC.Semantics.CombatTargetCallouts = S
 
 local SIT_BARK_OPTS = {
     family = "combat_ally_warn_situation", priority = 68, priorityHoldMs = 800,
-    cooldownMs = 1000, familyCooldownMs = 1000, holdMs = 600,
+    cooldownMs = 1000, familyCooldownMs = 1000, ttlMs = 9000,
     clientCooldowns = { familyMs = 1500, speakerMs = 1800, ambientMs = 400, mergeWindowMs = 0 },
 }
 I.SituationBarkOpts = SIT_BARK_OPTS
@@ -73,7 +73,8 @@ function I.EmitSituationCallout(speaker, addr, desc, role, now, ref, extraTokens
         speechEventID = res and res.realizationID or ("semantic.combat." .. tostring(role)),
         act = "WARN", family = SIT_BARK_OPTS.family, cooldownMs = SIT_BARK_OPTS.cooldownMs,
         familyCooldownMs = SIT_BARK_OPTS.familyCooldownMs, priority = SIT_BARK_OPTS.priority,
-        priorityHoldMs = SIT_BARK_OPTS.priorityHoldMs, holdMs = SIT_BARK_OPTS.holdMs,
+        priorityHoldMs = SIT_BARK_OPTS.priorityHoldMs, ttlMs = SIT_BARK_OPTS.ttlMs,
+        interrupt = role == "blindside",
         clientCooldowns = SIT_BARK_OPTS.clientCooldowns, threadID = ref,
         streamKey = "ally-warn-sit:" .. tostring(speaker.id),
         eventRef = ref, text = text, presentationClass = res and res.presentationClass or "BARK",

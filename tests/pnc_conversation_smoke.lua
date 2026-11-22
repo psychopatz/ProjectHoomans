@@ -1225,8 +1225,8 @@ T.equal(incompleteReplica.context.allowHostileParley, false,
     "missing MP hostility data fails closed")
 
 local hostileRouteCalls = {}
-PNC.PBrainZ = {
-    OpenInlineForTarget = function(entry)
+PNC.Conversation.InlineChat = {
+    OpenForTarget = function(entry)
         hostileRouteCalls[#hostileRouteCalls + 1] = entry
         return true
     end,

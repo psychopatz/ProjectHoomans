@@ -1,0 +1,17 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.player_wary",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Aalis na ako. Magmatyag ka.",
+      "Panatilihin mong kita ko ang mga kamay mo.",
+      "Tuloy na ako.",
+      "Lumayo ka sa gulo, ganoon din ako.",
+      "Sige, hanggang dito na muna.",
+      "Babantayan ko ang likod ko. Bantayan mo ang sa iyo.",
+      "Lalakad na ako.",
+      "Dumistansya ka muna."
+    ]
+  }
+}

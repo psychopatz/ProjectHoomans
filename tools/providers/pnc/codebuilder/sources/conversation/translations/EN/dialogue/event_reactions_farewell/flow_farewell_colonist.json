@@ -1,0 +1,18 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.colonist",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Watch your perimeter out there.",
+      "Stay sharp. Let us know if you run into trouble.",
+      "Keep your radio close and your head down.",
+      "Got it. Watch your corners out there.",
+      "Check in with the camp when you get back.",
+      "Watch your supplies and come back safe.",
+      "Stay alert out there. We still need you standing.",
+      "Watch your six. Don't get pinned down alone.",
+      "Stick to clear streets and make it back."
+    ]
+  }
+}

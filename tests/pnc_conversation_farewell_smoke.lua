@@ -155,4 +155,45 @@ T.equal(#Client.GetQueueSnapshot(), 0,
     "reopening the same NPC cancels the delayed farewell")
 
 T.truthy(#tickHandlers > 0, "farewell installs a client tick pump")
+
+-- Verify distinct player vs NPC farewell wording, 7 social roles, player dedup, and new exclusions.
+Farewell.Reset()
+Client.Reset()
+Farewell.RollChance = function() return true end
+spoken = {}
+messages = {}
+
+local hostileSpec = spec("npc-hostile-2", {
+    id = "npc-hostile-2",
+    hostility = { attackPlayers = true },
+})
+local okHostile = Farewell.Schedule(hostileSpec, { npcID = "npc-hostile-2", token = "h-tok" }, "close_button")
+T.truthy(okHostile, "hostile close still schedules cold farewell")
+now = now + Farewell.NPC_DELAY_MS + 100
+Farewell.Pump(now)
+Client.Pump(now)
+T.equal(#spoken, 1, "player speaks once for hostile close")
+T.truthy(spoken[1] ~= messages[#messages].text, "player and hostile NPC use distinct farewell lines")
+T.equal(messages[#messages].source.socialRole, "hostile", "hostile role propagated")
+
+local warySpec = spec("npc-wary", { id = "npc-wary", snapshot = { relationshipCategory = "Rival" } })
+T.equal(Farewell.ResolveSocialRole(warySpec), "wary", "rival resolves wary role")
+local friendSpec = spec("npc-friend", { id = "npc-friend", snapshot = { relationshipCategory = "Friend" } })
+T.equal(Farewell.ResolveSocialRole(friendSpec), "friend", "friend resolves friend role")
+local colSpec = spec("npc-col", { id = "npc-col", snapshot = { relationshipCategory = "Colonist" } })
+T.equal(Farewell.ResolveSocialRole(colSpec), "colonist", "colonist resolves colonist role")
+
+-- Player farewell dedup cooldown prevents 4x stacked lines when closing multiple hosts on the same tick.
+now = now + Farewell.PLAYER_COOLDOWN_MS
+local beforeSpoken = #spoken
+Farewell.Schedule(warySpec, { npcID = "npc-wary", token = "w1" }, "close_button")
+Farewell.Schedule(friendSpec, { npcID = "npc-friend", token = "f1" }, "close_button")
+T.equal(#spoken, beforeSpoken + 1, "rapid second close does not stack duplicate player farewell lines")
+
+for _, excluded in ipairs({ "semantic_farewell", "inline_silent_close", "inline_group_silent_close" }) do
+    local okEx, rEx = Farewell.Schedule(colSpec, { npcID = "npc-col", token = excluded }, excluded)
+    T.falsy(okEx, "excluded close reason " .. excluded .. " does not schedule farewell")
+    T.equal(rEx, "ineligible_close", excluded .. " returns ineligible_close")
+end
+
 T.finish("pnc_conversation_farewell_smoke")

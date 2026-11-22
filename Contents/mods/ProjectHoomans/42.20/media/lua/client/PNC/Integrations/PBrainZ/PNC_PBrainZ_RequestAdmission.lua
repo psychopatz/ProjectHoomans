@@ -12,7 +12,8 @@ local Admission = Internal.RequestAdmission or {}
 Internal.RequestAdmission = Admission
 
 function Admission.RecipientViews(view, part)
-    local inline = Integration.Inline
+    local inline = PNC.Conversation and PNC.Conversation.InlineChat
+        and PNC.Conversation.InlineChat.State or nil
     if part and inline and part == inline.part
         and tostring(part.inputMode or "nearest") == "nearby"
         and type(inline.hosts) == "table"

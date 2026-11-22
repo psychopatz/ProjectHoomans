@@ -1,0 +1,17 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.player_friend",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Mag-ingat ka, kaibigan. Usap tayo ulit.",
+      "Bantayan ang likod mo. Kita tayo agad.",
+      "Mamaya ulit, pare. Mag-ingat ka.",
+      "Huwag kang magpapakagat habang wala ako.",
+      "Masarap kausap palagi. Kapit lang.",
+      "Sige, lakad na ako. Magmatyag ka, kaibigan.",
+      "Huwag kang bibitaw hanggang makabalik ako.",
+      "Kita tayo agad, kaibigan."
+    ]
+  }
+}

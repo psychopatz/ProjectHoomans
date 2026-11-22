@@ -311,14 +311,16 @@ local secondView = {
 function secondView:isConversationInteractive()
     return self.session.busy ~= true
 end
-Integration.Inline = {
+PNC.Conversation = PNC.Conversation or {}
+PNC.Conversation.InlineChat = PNC.Conversation.InlineChat or {}
+PNC.Conversation.InlineChat.State = {
     part = { inputMode = "nearby" },
     hosts = { headlessView, secondView },
 }
 local batchSubmitted = Integration.Submit(
     headlessView,
     "Hello everyone",
-    Integration.Inline.part
+    PNC.Conversation.InlineChat.State.part
 )
 T.truthy(batchSubmitted, "nearby overlay request was rejected")
 local firstBatchPacket = Integration.Poll()

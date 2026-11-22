@@ -1,0 +1,18 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.lover",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Bumalik ka sa akin nang ligtas. Huwag kang magtatagal.",
+      "Mag-ingat ka sa labas, mahal. Hihintayin kita.",
+      "Ipangako mong babalik kang buo.",
+      "Ingatan mo sarili mo. Ikaw na lang ang natitira sa akin.",
+      "Huwag mo akong pag-alalahin nang matagal. Bilisan mong bumalik.",
+      "Maging ligtas ka diyan, mahal ko. Nakabantay ako sa iyo.",
+      "Kumapit ka diyan sa labas. Umuwi ka agad sa akin.",
+      "Bibilangin ko ang mga minuto hanggang makabalik ka.",
+      "Mabuhay ka para sa akin. Marami pa tayong bukas."
+    ]
+  }
+}

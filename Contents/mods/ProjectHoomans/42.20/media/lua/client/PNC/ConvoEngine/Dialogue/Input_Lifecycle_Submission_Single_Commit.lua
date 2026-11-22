@@ -14,6 +14,65 @@ local audit = Internal.audit
 local traceTurn = Internal.traceTurn
 local SemanticTelemetryPrompt = require
     "PNC/Semantics/PNC_SemanticTelemetryPrompt"
+local FarewellRole = require "PNC/ConvoEngine/Dialogue/FarewellRole"
+
+local function markFarewellEvaluated(view)
+    local ls = view and (view.lifecycleState
+        or (view.spec and view.spec.context and view.spec.context.conversationLifecycleState))
+    if type(ls) == "table" then ls.farewellEvaluated = true end
+    local group = view and view.groupConversation
+    if type(group) == "table" then
+        for _, member in ipairs(group.members or {}) do
+            local host = member and member.host
+            local hls = host and (host.lifecycleState
+                or (host.spec and host.spec.context and host.spec.context.conversationLifecycleState))
+            if type(hls) == "table" then hls.farewellEvaluated = true end
+        end
+    end
+end
+
+local function deliverClosingFarewellReply(view, result, context)
+    local client = PsychopatzCore and PsychopatzCore.SocialFlavorClient
+    if not client or type(client.Enqueue) ~= "function" then return end
+    local decision = result and result.decision or {}
+    local presCtx = type(Internal.ShallowContext) == "function"
+        and Internal.ShallowContext(view) or {}
+    presCtx.dialogueIR = result and result.ir
+    presCtx.dialogueDecision = decision
+    local payloads = Internal.ResponseAdapter and Internal.ResponseAdapter.Payloads
+        and Internal.ResponseAdapter.Payloads(decision, presCtx) or {}
+    local first = payloads[1] or decision.response or {}
+    local text = tostring(first.text or first.fallback or "")
+    if text == "" then return end
+    local npcID = tostring(view and view.spec and view.spec.npcID or context and context.npcID or "")
+    if npcID == "" then return end
+    local role = FarewellRole.ResolveFromContext(context, npcID)
+    client.Enqueue({
+        eventID = "semantic-farewell:" .. npcID .. ":" .. tostring(result and result.sequence or 0),
+        flavorID = first.renderTemplateID or first.templateID or "semantic.flow.farewell",
+        text = text,
+        semanticOwned = true,
+        family = "conversation_farewell",
+        priority = 72,
+        weight = 1,
+        speakerID = npcID,
+        speakerName = context and context.npcFullName or npcID,
+        speakerKind = "npc",
+        playerUUID = context and context.characterUUID,
+        llmEligible = false,
+        memoryEligible = false,
+        ttlMs = 9000,
+        cooldowns = { ambientMs = 0, familyMs = 0, speakerMs = 0 },
+        presentationState = { nameplate = true, conversationUI = false, interrupt = false, tts = true },
+        source = {
+            kind = "semantic_speech",
+            eventType = "conversation_farewell",
+            socialRole = role,
+            semanticAct = "FAREWELL",
+            topic = "farewell",
+        },
+    })
+end
 
 function Internal.CommitSingleSubmission(view, prepared, interpretation)
     local value = prepared.value
@@ -185,6 +244,10 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
     local deferCompoundResponse = compoundPart
         and compoundIndex ~= nil and compoundCount ~= nil
         and compoundIndex < compoundCount
+    local closeOnFarewell = finalDecision and (
+        finalDecision.branch == "FAREWELL_ACKNOWLEDGED"
+        or finalDecision.closeConversation == true
+    )
     local submitted, submitReason = Internal.FinishLocalSubmit(
         view,
         value,
@@ -193,7 +256,8 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
             or deferIdentityResponse == true
             or deferGossipResponse == true
             or deferFactResponse == true
-            or deferCompoundResponse == true,
+            or deferCompoundResponse == true
+            or closeOnFarewell == true,
             skipInputPresentation = transientSemanticSurface
                 or compoundPart and compoundIndex ~= 1,
             inputValue = compoundPart and compoundIndex == 1
@@ -222,7 +286,13 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
             sequence = result and result.sequence,
         }
     end
-    if submitted == true and not transientSemanticSurface then
+    if submitted == true and closeOnFarewell then
+        markFarewellEvaluated(view)
+        deliverClosingFarewellReply(view, result, context)
+        if view.headless ~= true and type(view.close) == "function" then
+            view:close("semantic_farewell")
+        end
+    elseif submitted == true and not transientSemanticSurface then
         Internal.RefreshSuggestions(view, result)
     end
     traceTurn(view, value, result, "semantic_input_local", {

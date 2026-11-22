@@ -1,0 +1,17 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.player_colonist",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Keep holding the line. I'll check back soon.",
+      "Stay sharp here. I'm moving out.",
+      "Watch our backs out here. Talk in a bit.",
+      "Stay ready. I'll be around.",
+      "Keep supplies steady. See you in a bit.",
+      "I'm heading out for a bit. Watch camp.",
+      "Cover your sector. Catch you soon.",
+      "I'll check back in shortly."
+    ]
+  }
+}

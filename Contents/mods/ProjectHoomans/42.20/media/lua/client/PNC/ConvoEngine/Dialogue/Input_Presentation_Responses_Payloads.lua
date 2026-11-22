@@ -58,8 +58,12 @@ local function formatTemplateText(text, args)
     if firstArg ~= nil and firstArg ~= "" then
         text = string.gsub(text, "%%1", function() return tostring(firstArg) end)
         text = string.gsub(text, "%%s", function() return tostring(firstArg) end)
-    elseif string.find(text, "%%s, ", 1, true) == 1 then
-        text = string.gsub(text, "^%%s, ", "")
+    elseif string.find(text, "%s", 1, true) or string.find(text, "%1", 1, true) then
+        text = string.gsub(text, "^%%[s1],%s*", "")
+        text = string.gsub(text, ",%s*%%[s1]([%p%s]?)", "%1")
+        text = string.gsub(text, "%%[s1]%s*", "")
+        text = string.gsub(text, "^%s+", "")
+        text = string.gsub(text, "%s%s+", " ")
         local first = string.sub(text, 1, 1)
         if first ~= "" then
             text = string.upper(first) .. string.sub(text, 2)

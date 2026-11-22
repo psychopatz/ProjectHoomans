@@ -76,10 +76,10 @@ function Conversation.Open(entry, player, forcedTime)
     -- Keep this handoff targeted to the selected entry so it cannot silently
     -- switch the player to the nearest unrelated NPC.
     if talkStart.route == "hostile_inline"
-        and PNC.PBrainZ
-        and PNC.PBrainZ.OpenInlineForTarget
+        and Conversation.InlineChat
+        and Conversation.InlineChat.OpenForTarget
     then
-        local handedOff = PNC.PBrainZ.OpenInlineForTarget(entry)
+        local handedOff = Conversation.InlineChat.OpenForTarget(entry)
         auditTalkStart("native.talk.inline_handoff", talkStart, {
             handedOff = handedOff == true,
         })

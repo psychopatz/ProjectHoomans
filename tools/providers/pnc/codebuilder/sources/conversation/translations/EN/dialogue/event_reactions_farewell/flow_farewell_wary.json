@@ -1,0 +1,18 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.wary",
+  "locale": "EN",
+  "entries": {
+    "say.variants.neutral": [
+      "Keep your distance out there.",
+      "Stay on your side and we won't have trouble.",
+      "I'll believe it when I see it. Watch yourself.",
+      "Don't test my patience next time.",
+      "We're done here for now.",
+      "You stay sharp, and stay clear of trouble.",
+      "I have my eyes open. Move along.",
+      "Fair enough. Just keep your hands visible next time.",
+      "We'll see how long this lasts."
+    ]
+  }
+}

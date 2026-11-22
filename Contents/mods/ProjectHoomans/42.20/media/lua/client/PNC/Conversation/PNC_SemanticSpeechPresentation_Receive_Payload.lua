@@ -79,10 +79,11 @@ function H.BuildReceivePayload(receive)
             ),
             interrupt = H.FirstBoolean(
                 presentationOverrides.interrupt,
-                false
+                ambientFlavor.interrupt == true
             ),
             tts = H.FirstBoolean(presentationOverrides.tts, true),
         },
+        interrupt = ambientFlavor.interrupt == true,
         source = {
             kind = H.Clean(sourceOverrides.kind, "social_flavor"),
             channel = H.Clean(sourceOverrides.channel, nil),

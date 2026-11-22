@@ -59,7 +59,7 @@ function S.ResolveSemanticLine(rec, evType, act, tClass, ref, profile, tokens, e
     if not sr then local ok, m = pcall(require, "PNC/ConvoEngine/SpeechRealization"); if ok and type(m) == "table" then sr = m end end
     if sr and type(sr.Apply) == "function" then
         local ap = sr.Apply(
-            { selectionID = res.realizationID, templateID = res.templateID, fallback = raw, plan = res.responsePlan },
+            { selectionID = res.realizationID, templateID = res.templateID, fallback = raw },
             { npcID = tostring(rec.id), phraseSalt = tostring(ref or "") .. ":" .. tostring(rec.id) }
         )
         if type(ap) == "table" and type(ap.fallback) == "string" and ap.fallback ~= "" then raw = ap.fallback end
@@ -98,7 +98,8 @@ function S.DeliverBark(rec, now, opts)
                 speechEventID = opts.speechEventID, text = opts.text, semanticOwned = true, eventType = ev,
                 act = opts.act or "WARN", topic = "combat", factRefs = {}, offerIDs = {}, family = fam,
                 priority = pri, weight = 0.25, llmEligible = false, memoryEligible = false, npcID = npcId,
-                mergeKey = ref .. ":" .. npcId, ttlMs = opts.ttlMs or 6000, holdMs = opts.holdMs or 550, cooldowns = cCds,
+                mergeKey = ref .. ":" .. npcId, ttlMs = opts.ttlMs or 9000, holdMs = opts.holdMs,
+                interrupt = opts.interrupt == true, cooldowns = cCds,
                 context = ctx, presentationClass = pres, source = { kind = "semantic_speech", channel = "combat", eventType = ev },
             },
         }) == true
@@ -121,7 +122,8 @@ function S.SendReplyBark(rec, now, ev, act, ref, text, res, toks, opts, threadId
         eventType = ev, speechEventID = res and res.realizationID or ("semantic." .. ev), act = act,
         family = (opts and opts.family) or "combat_ally_warn_reply", eventRef = ref, text = text, threadID = tid,
         priority = (opts and opts.priority) or 62, priorityHoldMs = (opts and opts.priorityHoldMs) or 700,
-        holdMs = (opts and opts.holdMs) or 550, cooldownMs = (opts and opts.cooldownMs) or 3500,
+        holdMs = opts and opts.holdMs or nil, ttlMs = (opts and opts.ttlMs) or 9000,
+        cooldownMs = (opts and opts.cooldownMs) or 3500,
         familyCooldownMs = (opts and opts.familyCooldownMs) or (opts and opts.cooldownMs) or 3500,
         clientCooldowns = (opts and opts.clientCooldowns) or cds(1500, 2000, 400),
         maxSpeakers = 1, streamKey = (opts and opts.streamKey) or ("ally-warn-reply:" .. tostring(rec.id)),

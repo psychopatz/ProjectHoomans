@@ -42,7 +42,7 @@ end
 require "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation"
 require "PNC/Integrations/PBrainZ/PNC_PBrainZ"
 require "PNC/Integrations/PBrainZ/PNC_PBrainZ_Bridge"
-require "PNC/Integrations/PBrainZ/PNC_PBrainZ_InlineChat"
+require "PNC/Conversation/InlineChat/PNC_InlineChat"
 
 -- Inline integration loading can populate additional Conversation factories.
 -- Re-register the semantic runtime after that boundary so any caller that

@@ -149,22 +149,36 @@ end
 
 Catalog.Register("semantic.flow.farewell", {
     variants = {
-        response(
-            "semantic.flow.farewell",
-            "friendly",
-            { socialStyle = { "friendly", "protective" } },
-            2,
-            "FAREWELL",
-            "farewell"
-        ),
-        response(
-            "semantic.flow.farewell",
-            "default",
-            nil,
-            0,
-            "FAREWELL",
-            "farewell"
-        ),
+        response("semantic.flow.farewell", "player_hostile",
+            { farewellSpeaker = "player", socialRole = "hostile" }, 16, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "player_wary",
+            { farewellSpeaker = "player", socialRole = "wary" }, 15, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "player_lover",
+            { farewellSpeaker = "player", socialRole = "lover" }, 16, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "player_family",
+            { farewellSpeaker = "player", socialRole = "family" }, 16, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "player_friend",
+            { farewellSpeaker = "player", socialRole = "friend" }, 15, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "player_colonist",
+            { farewellSpeaker = "player", socialRole = "colonist" }, 14, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "player_default",
+            { farewellSpeaker = "player" }, 10, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "hostile",
+            { socialRole = "hostile" }, 6, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "wary",
+            { socialRole = "wary" }, 5, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "lover",
+            { socialRole = "lover" }, 6, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "family",
+            { socialRole = "family" }, 6, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "friend",
+            { socialRole = "friend" }, 5, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "colonist",
+            { socialRole = "colonist" }, 4, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "friendly",
+            { socialStyle = { "friendly", "protective" } }, 2, "FAREWELL", "farewell"),
+        response("semantic.flow.farewell", "default",
+            nil, 0, "FAREWELL", "farewell"),
     },
 })
 

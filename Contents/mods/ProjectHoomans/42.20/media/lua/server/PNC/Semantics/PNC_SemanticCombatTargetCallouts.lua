@@ -119,7 +119,7 @@ function S.OnTargetChanged(event, record)
 
     local sent = hasNet and text and S.DeliverBark(record, now, {
         eventType = evType, speechEventID = spID, act = "WARN", family = S.FAMILY, threadID = ref,
-        eventRef = ref, text = text, priority = 62, priorityHoldMs = 700, holdMs = 550,
+        eventRef = ref, text = text, priority = 62, priorityHoldMs = 700, ttlMs = 9000,
         presentationClass = pCls, context = ctx, tacticalSpatial = spatial, tacticalPresentation = pres,
     }) or 0
 

@@ -35,8 +35,8 @@ local function requestNameplateFallback(view, spec, reason)
     if isNameplateConversation(spec) or not isHostileConversation(spec) then
         return false
     end
-    local integration = PNC.PBrainZ
-    if not integration or not integration.RequestInlineFallback then
+    local inline = PNC.Conversation and PNC.Conversation.InlineChat
+    if not inline or not inline.RequestFallback then
         return false
     end
     local context = spec and spec.context or {}
@@ -44,7 +44,7 @@ local function requestNameplateFallback(view, spec, reason)
         id = spec and spec.npcID,
         zombie = spec and spec.character,
     }
-    return integration.RequestInlineFallback(entry, reason, view) == true
+    return inline.RequestFallback(entry, reason, view) == true
 end
 
 local function refresh(state, spec)

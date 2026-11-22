@@ -1,0 +1,17 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.player_family",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Mag-ingat ka habang nasa labas ako. Babalik ako agad.",
+      "Alagaan mo sarili mo para sa akin. Usap tayo ulit.",
+      "Huwag kang susugal sa panganib, ha? Babalik ako.",
+      "Diyan ka lang at yumuko sa gulo.",
+      "Bantayan mo sarili mo. Hindi tayo maghihiwalay.",
+      "Babalik ako agad, pangako iyan.",
+      "Mag-ingat ka. Hindi ako magtatagal.",
+      "Ingatan mo sarili mo hanggang pagbalik ko."
+    ]
+  }
+}

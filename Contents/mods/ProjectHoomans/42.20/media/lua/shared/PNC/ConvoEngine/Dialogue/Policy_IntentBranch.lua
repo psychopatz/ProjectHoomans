@@ -47,9 +47,18 @@ return function(dependencies)
         elseif isIdentityEvasion(ir, state, context) then
             branch = "IDENTITY_NAME_EVASION"
             reason = "identity_question_evaded"
-        elseif ir.intent == "GREET" or ir.speechAct == "GREET" then
+        elseif ir.intent == "GREET"
+            or ir.intent == "GREETING"
+            or ir.speechAct == "GREET"
+            or ir.speechAct == "GREETING"
+        then
             branch = "GREET_ACKNOWLEDGED"
             reason = "recognized_greeting"
+        elseif ir.intent == "FAREWELL"
+            or ir.speechAct == "FAREWELL"
+        then
+            branch = "FAREWELL_ACKNOWLEDGED"
+            reason = "recognized_farewell"
         elseif ir.intent == "COMPLIMENT"
             or ir.speechAct == "COMPLIMENT"
         then

@@ -61,6 +61,14 @@ function Internal.RegisterDialogueConcepts()
         "hello", "hello there", "hi", "hi there", "hey", "hey there",
         "good morning", "good afternoon", "good evening",
     })
+    registerConcept("FAREWELL", {
+        "bye", "goodbye", "good bye", "see you", "see ya",
+        "see you later", "see you around", "see you soon",
+        "gotta go", "got to go", "have to go", "i have to go", "i gotta go",
+        "talk later", "talk to you later", "catch you later",
+        "farewell", "heading out", "i'm heading out", "im heading out",
+        "take care", "we're done", "we are done",
+    })
     registerConcept("TIME", {
         "time", "what time is it", "what day is it", "today", "date",
         "morning", "afternoon", "evening", "night",

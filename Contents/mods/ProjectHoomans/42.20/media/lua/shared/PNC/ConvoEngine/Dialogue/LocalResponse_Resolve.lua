@@ -14,6 +14,7 @@ local followsRelationshipStatusAnswer =
     Internal.FollowsRelationshipStatusAnswer
 local followsQuestionAnswer = Internal.FollowsQuestionAnswer
 local resolveQuestion = Internal.ResolveQuestion
+local FarewellRole = require "PNC/ConvoEngine/Dialogue/FarewellRole"
 
 local function wellbeingFactsUnknown(context)
     local situation = type(context) == "table"
@@ -133,6 +134,20 @@ function Response.Resolve(ir, state, context, branch)
         end
         return catalogResponse("semantic.greeting", ir, state, context, {
             topic = state and state.currentTopic,
+        })
+    end
+    if branch == "FAREWELL_ACKNOWLEDGED" then
+        local role = FarewellRole.ResolveFromContext(context)
+        local farewellCtx = copyArgs(context)
+        farewellCtx.socialRole = role
+        farewellCtx.farewellSpeaker = "npc"
+        if role == "hostile" then
+            farewellCtx.socialStyle = "withdrawn"
+        elseif role == "lover" or role == "family" or role == "friend" or role == "colonist" then
+            farewellCtx.socialStyle = "friendly"
+        end
+        return catalogResponse("semantic.flow.farewell", ir, state, farewellCtx, {
+            topic = "farewell",
         })
     end
     if branch == "SEMANTIC_NAVIGATION_RECEIVED" then

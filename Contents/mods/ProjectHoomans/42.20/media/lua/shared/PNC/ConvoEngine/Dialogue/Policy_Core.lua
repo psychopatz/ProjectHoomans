@@ -113,6 +113,10 @@ local RESPONSE_TEMPLATES = {
         templateID = "semantic.greet.acknowledged",
         fallback = "Hey there.",
     },
+    FAREWELL_ACKNOWLEDGED = {
+        templateID = "flow.farewell.default",
+        fallback = "Take care.",
+    },
     OFFER_RECEIVED = {
         templateID = "semantic.offer.received",
         fallback = "I'd really like one. Could I have it?",

@@ -364,7 +364,7 @@ return {
         ["domain"] = "event_reactions_farewell",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/EventReactionsFarewell",
-        ["recordCount"] = 2,
+        ["recordCount"] = 15,
     },
     {
         ["domain"] = "event_reactions_leader_loss",

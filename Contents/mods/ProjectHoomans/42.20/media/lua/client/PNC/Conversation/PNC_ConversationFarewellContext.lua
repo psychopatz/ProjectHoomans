@@ -4,6 +4,7 @@ PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
 require "PNC/Semantics/PNC_SemanticAddressResolver"
+local FarewellRole = require "PNC/ConvoEngine/Dialogue/FarewellRole"
 local AddressResolver = PNC.Semantics
     and PNC.Semantics.AddressResolver
     or require "PNC/Semantics/PNC_SemanticAddressResolver"
@@ -25,82 +26,8 @@ local function call(object, method)
     return ok and value or nil
 end
 
-local function normalized(value)
-    value = string.lower(clean(value, ""))
-    return string.gsub(value, "[%s%-]", "_")
-end
-
-local function entryParts(entry)
-    entry = type(entry) == "table" and entry or {}
-    return entry,
-        type(entry.snapshot) == "table" and entry.snapshot or {},
-        type(entry.record) == "table" and entry.record or {}
-end
-
-local function firstValue(entry, snapshot, record, key)
-    return entry[key] or snapshot[key] or record[key]
-end
-
-local function relationshipKind(entry, snapshot, record, summary, context)
-    local generation = record.generation or snapshot.generation or {}
-    return firstValue(entry, snapshot, record, "relationshipKind")
-        or firstValue(entry, snapshot, record, "conversationRelationship")
-        or firstValue(entry, snapshot, record, "relationshipCategory")
-        or generation.relationshipKind
-        or summary and (
-            summary.relationshipKind or summary.category or summary.state
-                or summary.status
-        )
-        or context.conversationRelationshipID
-end
-
-local function isHostile(entry, snapshot, record, context)
-    local entryHostility = entry.hostility or {}
-    local snapshotHostility = snapshot.hostility or {}
-    local recordHostility = record.hostility or {}
-    return context.playerHostile == true
-        or context.tacticalClass == "hostile"
-        or entry.tacticalClass == "hostile"
-        or snapshot.tacticalClass == "hostile"
-        or record.tacticalClass == "hostile"
-        or entryHostility.attackPlayers == true
-        or snapshotHostility.attackPlayers == true
-        or recordHostility.attackPlayers == true
-end
-
 function Context.ResolveSocialRole(spec)
-    local context = spec and spec.context or {}
-    local entry, snapshot, record = entryParts(context.entry)
-    local state = PNC.Network and PNC.Network.ClientState or {}
-    local npcID = clean(spec and spec.npcID or entry.id, nil)
-    local summary = state.conversationRelationships
-        and state.conversationRelationships[npcID] or nil
-    local kind = normalized(relationshipKind(
-        entry, snapshot, record, summary, context
-    ))
-    local tactical = normalized(firstValue(
-        entry, snapshot, record, "tacticalClass"
-    ) or context.tacticalClass)
-    if isHostile(entry, snapshot, record, context)
-        or kind == "hostile" or tactical == "hostile"
-    then
-        return "hostile"
-    end
-    if kind == "lover" or kind == "partner" or kind == "spouse" then
-        return "lover"
-    end
-    local family = {
-        brother = true, sister = true, mother = true, father = true,
-        parent = true, child = true, son = true, daughter = true,
-        family = true,
-    }
-    if family[kind] then return "family" end
-    if kind == "member" or kind == "companion" or kind == "colonist"
-        or context.npcType == "colonist" or context.npcType == "follower"
-    then
-        return "colonist"
-    end
-    return "neutral"
+    return FarewellRole.ResolveFromSpec(spec)
 end
 
 local function nameParts(fullName, firstName)

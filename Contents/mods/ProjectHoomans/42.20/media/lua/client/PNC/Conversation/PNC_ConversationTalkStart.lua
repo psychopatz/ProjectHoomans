@@ -97,28 +97,14 @@ local function availability(entry, targetType)
 end
 
 local function inlineAvailability()
-    local integration = PNC.PBrainZ
-    if type(integration) ~= "table" then
-        return false, "pbrainz_unavailable"
+    local inline = PNC.Conversation and PNC.Conversation.InlineChat
+    if type(inline) ~= "table" then
+        return false, "inline_chat_unavailable"
     end
-
-    if type(integration.GetProviderStatus) == "function" then
-        local status = integration.GetProviderStatus()
-        if type(status) ~= "table" or status.ready ~= true then
-            return false, type(status) == "table"
-                and (status.reason or status.status)
-                or "provider_unavailable"
-        end
-    elseif type(integration.IsProviderAvailable) == "function" then
-        if integration.IsProviderAvailable() ~= true then
-            return false, "provider_unavailable"
-        end
-    end
-
-    if type(integration.OpenInlineForTarget) ~= "function" then
+    if type(inline.OpenForTarget) ~= "function" then
         return false, "inline_route_unavailable"
     end
-    return true, "pbrainz_inline_available"
+    return true, "semantic_inline_available"
 end
 
 local function ownershipFacts(entry)

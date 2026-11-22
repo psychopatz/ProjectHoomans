@@ -1,0 +1,17 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "flow.farewell.player_hostile",
+  "locale": "TL",
+  "entries": {
+    "say.variants.neutral": [
+      "Tapos na tayo mag-usap.",
+      "Aalis na ako. Bantayan mo sarili mo.",
+      "Sabihin mo ang gusto mo, aalis na ako.",
+      "Tama na ang usapan. Dumistansya ka.",
+      "Huwag kang susunod sa akin.",
+      "Sapat na ang narinig ko sa iyo.",
+      "Huwag kang haharang sa daan ko.",
+      "Huwag mo nang sayangin ang laway mo."
+    ]
+  }
+}

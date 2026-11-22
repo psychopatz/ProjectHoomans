@@ -1,11 +1,13 @@
 -- Shared constants for the compact inline chat adapter.
 PNC = PNC or {}
-PNC.PBrainZ = PNC.PBrainZ or {}
-PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
+PNC.Conversation = PNC.Conversation or {}
+PNC.Conversation.InlineChat = PNC.Conversation.InlineChat or {}
+PNC.Conversation.InlineChat.Internal = PNC.Conversation.InlineChat.Internal or {}
 
-local Internal = PNC.PBrainZ.Internal
-local Config = Internal.InlineChatConfig or {}
-Internal.InlineChatConfig = Config
+local InlineChat = PNC.Conversation.InlineChat
+local Internal = InlineChat.Internal
+local Config = Internal.Config or {}
+Internal.Config = Config
 
 Config.MAX_INPUT_LENGTH = Config.MAX_INPUT_LENGTH or 4000
 Config.WIDTH = Config.WIDTH or 320
@@ -21,9 +23,7 @@ Config.MODE_NEARBY = "nearby"
 Config.SCOPE_COLONISTS = "colonists"
 Config.SCOPE_OTHER = "other"
 Config.SCOPE_SOCIAL = "social"
-Config.HIGHLIGHT_COLOR = {
-    r = 0.0, g = 1.0, b = 1.0, a = 0.85,
-}
+Config.HIGHLIGHT_COLOR = { r = 0.0, g = 1.0, b = 1.0, a = 0.85 }
 Config.TITLE = {
     key = "UI_PsychopatzConversation_Panel_LLMInlineInput",
     fallback = "TALK TO",

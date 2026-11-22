@@ -253,14 +253,48 @@ local function relationshipArgument(style, argument)
     return term and tostring(bond.kind or "") or nil
 end
 
+local function stripResidualPlaceholders(text)
+    if type(text) ~= "string" then return text end
+    if not string.find(text, "%s", 1, true) and not string.find(text, "%1", 1, true) then
+        return text
+    end
+    local cleaned = text
+    cleaned = string.gsub(cleaned, "^%%[s1],%s*", "")
+    cleaned = string.gsub(cleaned, ",%s*%%[s1]([%p%s]?)", "%1")
+    cleaned = string.gsub(cleaned, "%%[s1]%s*", "")
+    cleaned = string.gsub(cleaned, "^%s+", "")
+    cleaned = string.gsub(cleaned, "%s%s+", " ")
+    if cleaned ~= "" then
+        cleaned = string.upper(string.sub(cleaned, 1, 1)) .. string.sub(cleaned, 2)
+    end
+    return cleaned
+end
+
+local function hasAnyTemplateArgs(args, translationArgs)
+    if type(translationArgs) == "table" and #translationArgs > 0 then
+        return true
+    end
+    if type(args) == "table" then
+        for _, v in pairs(args) do
+            if v ~= nil and tostring(v) ~= "" then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 local function preferredPhraseStyle(style)
     style = type(style) == "table" and style or {}
     local variant = tostring(style.variant or "neutral")
     local bond = type(style.bond) == "table" and style.bond or nil
     if bond and tostring(bond.class or "") ~= "" then
-        return "bond_" .. variant
+        local addr = relationshipArgument(style, "familyAddress")
+        if type(addr) == "string" and addr ~= "" then
+            return "bond_" .. variant, addr
+        end
     end
-    return variant
+    return variant, nil
 end
 
 function Realization.Resolve(templateID, style, semanticFallback)
@@ -303,7 +337,7 @@ function Realization.Resolve(templateID, style, semanticFallback)
     }
 end
 
-local function applySegment(segment, style, blocked, context, salt, localSelections)
+local function applySegment(segment, style, blocked, context, salt, localSelections, phraseStyle, familyAddress, hasResponseArgs)
     if type(segment) ~= "table" or segment.kind ~= "translation" then
         return segment, nil
     end
@@ -311,9 +345,12 @@ local function applySegment(segment, style, blocked, context, salt, localSelecti
         return segment, nil
     end
 
+    if not phraseStyle then
+        phraseStyle, familyAddress = preferredPhraseStyle(style)
+    end
     local phrase = selectPhrase(
         segment.templateID,
-        preferredPhraseStyle(style),
+        phraseStyle,
         context,
         salt,
         localSelections
@@ -323,12 +360,37 @@ local function applySegment(segment, style, blocked, context, salt, localSelecti
     local output = copy(segment)
     local resolvedTemplateID = (phrase.translationKey ~= "" and phrase.translationKey)
         or segment.templateID
-    output.args = copy(segment.args or {})
+    output.args = type(segment.args) == "table" and copy(segment.args) or {}
     output.semanticTemplateID = segment.templateID
     output.templateID = resolvedTemplateID
-    output.fallback = phrase.fallback
+    local fb = phrase.fallback
+    local stripped = false
+    if tostring(phrase.style or ""):sub(1, 5) == "bond_" then
+        local addr = familyAddress or relationshipArgument(style, "familyAddress")
+        if type(addr) == "string" and addr ~= "" then
+            output.args.familyAddress = addr
+            output.args["addressee.name"] = addr
+        else
+            fb = stripResidualPlaceholders(fb)
+            stripped = true
+        end
+    elseif string.find(tostring(fb or ""), "%s", 1, true)
+        and not hasResponseArgs
+        and not hasAnyTemplateArgs(output.args, output.translationArgs)
+    then
+        fb = stripResidualPlaceholders(fb)
+        stripped = true
+    end
+    output.fallback = fb
     if phrase.enFallback ~= nil and phrase.enFallback ~= "" then
-        output.enFallback = phrase.enFallback
+        if stripped or (string.find(tostring(phrase.enFallback), "%s", 1, true)
+            and not hasResponseArgs
+            and not hasAnyTemplateArgs(output.args, output.translationArgs))
+        then
+            output.enFallback = stripResidualPlaceholders(phrase.enFallback)
+        else
+            output.enFallback = phrase.enFallback
+        end
     end
     output.realizationFamily = segment.templateID
     output.realizationVariant = tostring(
@@ -340,14 +402,10 @@ local function applySegment(segment, style, blocked, context, salt, localSelecti
     output.phraseAntiRepeatReason = phrase.antiRepeatReason
     output.phraseSemanticTemplateID = phrase.semanticTemplateID
     output.phraseStyle = phrase.style
-    if tostring(phrase.style or ""):sub(1, 5) == "bond_" then
-        output.args.familyAddress = relationshipArgument(style, "familyAddress")
-        output.args["addressee.name"] = output.args.familyAddress
-    end
 
     return output, {
         templateID = resolvedTemplateID,
-        fallback = phrase.fallback,
+        fallback = fb,
         family = segment.templateID,
         variant = output.realizationVariant,
         contentStyle = phrase.style,
@@ -439,14 +497,28 @@ end
 function Realization.Apply(response, context)
     if type(response) ~= "table" then return response end
     local style = Style.Resolve(context)
-    local output = copy(response)
-    local semanticPlan = type(response.plan) == "table"
-        and copy(response.plan) or nil
-    local compositional, compositionalReason =
-        compositionalInteractionResponse(
+    local hasPlan = type(response.plan) == "table"
+    local hasInteractionPlan = type(context) == "table" and type(context.interactionPlan) == "table"
+    local compositionalReason
+    if hasInteractionPlan then
+        local semanticPlan = hasPlan and copy(response.plan) or nil
+        local compositional
+        compositional, compositionalReason = compositionalInteractionResponse(
             response, context, style, semanticPlan
         )
-    if compositional then return compositional end
+        if compositional then return compositional end
+    end
+    local output = {}
+    for key, item in pairs(response) do
+        if type(key) == "string" or type(key) == "number" then
+            if type(item) == "table" then
+                output[key] = copy(item, 0)
+            else
+                output[key] = item
+            end
+        end
+    end
+    local semanticPlan = hasPlan and response.plan or nil
     local renderPlan = output.plan
     local applications = 0
     local fallbackCount = 0
@@ -462,6 +534,8 @@ function Realization.Apply(response, context)
         or context.seed
         or context.caseID
     )) or response.selectionID
+    local phraseStyle, familyAddress = preferredPhraseStyle(style)
+    local hasResponseArgs = hasAnyTemplateArgs(response.args, response.translationArgs)
 
     if response.selectionID == "semantic.refuse.default" then
         blocked["social.acknowledged"] = true
@@ -474,7 +548,8 @@ function Realization.Apply(response, context)
             for segmentIndex = 1, math.min(#(turn.segments or {}), 6) do
                 segment, resolved = applySegment(
                     turn.segments[segmentIndex], style, blocked,
-                    context, phraseSalt, localSelections
+                    context, phraseSalt, localSelections,
+                    phraseStyle, familyAddress, hasResponseArgs
                 )
                 turn.segments[segmentIndex] = segment
                 if resolved then
@@ -485,40 +560,67 @@ function Realization.Apply(response, context)
             end
         end
     end
-    segment, resolved = applySegment({
-        kind = "translation",
-        templateID = output.templateID,
-        fallback = output.fallback,
-        args = output.args,
-    }, style, blocked, context, phraseSalt, localSelections)
-    if resolved then
-        output.args = segment.args
-        output.semanticTemplateID = output.templateID
-        output.renderTemplateID = segment.templateID or resolved.templateID
-        output.fallback = segment.fallback or resolved.fallback
-        if segment.enFallback ~= nil and segment.enFallback ~= "" then
-            output.enFallback = segment.enFallback
-        end
-        output.realizationFamily = resolved.family
-        output.realizationVariant = resolved.variant
-        output.realizationFallbackReason = resolved.fallbackReason
-        output.phraseFamilyID = segment.phraseFamilyID
-        output.phraseID = segment.phraseID
-        output.phrasePoolSize = segment.phrasePoolSize
-        output.phraseAntiRepeatReason = segment.phraseAntiRepeatReason
-        output.phraseSemanticTemplateID = segment.phraseSemanticTemplateID
-        if output.phraseID then
-            output.phraseSelection = {
-                familyID = output.phraseFamilyID,
-                phraseID = output.phraseID,
-                style = style.variant,
-                poolSize = output.phrasePoolSize,
-                antiRepeatReason = output.phraseAntiRepeatReason,
+    if output.templateID and not blocked[output.templateID] then
+        local phrase = selectPhrase(
+            output.templateID, phraseStyle, context, phraseSalt, localSelections
+        )
+        if phrase then
+            local resolvedTemplateID = (phrase.translationKey ~= "" and phrase.translationKey)
+                or output.templateID
+            local fb = phrase.fallback
+            output.args = type(output.args) == "table" and output.args or {}
+            local hasArgs = hasResponseArgs or hasAnyTemplateArgs(output.args, output.translationArgs)
+            local stripped = false
+            if tostring(phrase.style or ""):sub(1, 5) == "bond_" then
+                local addr = familyAddress or relationshipArgument(style, "familyAddress")
+                if type(addr) == "string" and addr ~= "" then
+                    output.args.familyAddress = addr
+                    output.args["addressee.name"] = addr
+                else
+                    fb = stripResidualPlaceholders(fb)
+                    stripped = true
+                end
+            elseif string.find(tostring(fb or ""), "%s", 1, true) and not hasArgs then
+                fb = stripResidualPlaceholders(fb)
+                stripped = true
+            end
+            output.semanticTemplateID = output.templateID
+            output.renderTemplateID = resolvedTemplateID
+            output.fallback = fb
+            if phrase.enFallback ~= nil and phrase.enFallback ~= "" then
+                if stripped or (string.find(tostring(phrase.enFallback), "%s", 1, true) and not hasArgs) then
+                    output.enFallback = stripResidualPlaceholders(phrase.enFallback)
+                else
+                    output.enFallback = phrase.enFallback
+                end
+            end
+            output.realizationFamily = output.templateID
+            output.realizationVariant = tostring(style.variant or "neutral")
+            output.phraseFamilyID = phrase.familyID
+            output.phraseID = phrase.phraseID
+            output.phrasePoolSize = phrase.poolSize
+            output.phraseAntiRepeatReason = phrase.antiRepeatReason
+            output.phraseSemanticTemplateID = phrase.semanticTemplateID
+            if output.phraseID then
+                output.phraseSelection = {
+                    familyID = output.phraseFamilyID,
+                    phraseID = output.phraseID,
+                    style = style.variant,
+                    poolSize = output.phrasePoolSize,
+                    antiRepeatReason = output.phraseAntiRepeatReason,
+                }
+            end
+            resolved = {
+                templateID = resolvedTemplateID,
+                fallback = fb,
+                family = output.templateID,
+                variant = output.realizationVariant,
+                contentStyle = phrase.style,
+                fallbackReason = nil,
             }
+            applications = applications + 1
+            first = first or resolved
         end
-        applications = applications + 1
-        first = first or resolved
-        if resolved.fallbackReason then fallbackCount = fallbackCount + 1 end
     end
     output.realization = {
         family = first and first.family or nil,
@@ -530,15 +632,18 @@ function Realization.Apply(response, context)
     }
     output.semanticVariantID = output.selectionID
     output.speechStyleVariant = style.variant
-    if type(context) == "table" and context.interactionPlan ~= nil then
+    if hasInteractionPlan then
         output.utterancePlanFallbackReason = compositionalReason
     end
-    -- Keep the semantic response plan canonical while the renderer uses the
-    -- realized copy. Queued payloads and decision results then share one
-    -- stable plan identity without losing style-specific rendering.
-    if semanticPlan then
+    if type(output.fallback) == "string"
+        and string.find(output.fallback, "%s", 1, true)
+        and not (hasResponseArgs or hasAnyTemplateArgs(output.args, output.translationArgs))
+    then
+        output.fallback = stripResidualPlaceholders(output.fallback)
+    end
+    if hasPlan then
         output.renderPlan = output.plan
-        output.plan = semanticPlan
+        output.plan = copy(response.plan, 0)
     end
     return output
 end

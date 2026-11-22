@@ -209,6 +209,8 @@ local function selectorContext(ir, state, context)
         hostilityCount = hostilityCount,
         insultCount = insultCount,
         lastSpeechAct = lastSpeechAct,
+        socialRole = context.socialRole or social.role,
+        farewellSpeaker = context.farewellSpeaker,
     }
 end
 
