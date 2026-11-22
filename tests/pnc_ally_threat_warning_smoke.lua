@@ -158,13 +158,16 @@ PNC.PerceptionService = {
     end,
 }
 
--- Load ConvoEngine catalog, Compatibility API, Perception AllyThreat stack, and Callouts.
+-- Load ConvoEngine catalog, SpatialRelation, Compatibility API, Perception AllyThreat stack, and Callouts.
+T.load("PsychopatzCore", "common", "PsychopatzCore/Spatial/PsychopatzSpatialRelation.lua")
 T.load("ProjectHoomans", "common_lua", "PNC/ConvoEngine/Registry.lua")
 T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua")
+T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/SpeechRealization.lua")
 T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/Social/Reaction.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Compatibility/PNC_Compatibility_API.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/Visibility.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/AllyThreatEligibility.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/AllyThreatMeta.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/AllyThreatTargets.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/AllyThreatAlert.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/AllyThreatPublish.lua")
@@ -217,6 +220,13 @@ local function makeNPC(id, opts)
         getZ = function() return rec.z end,
         isDead = function() return rec.alive == false end,
         isAlive = function() return rec.alive ~= false end,
+        getForwardDirection = function()
+            local rt = rec.runtime or {}
+            return {
+                getX = function() return tonumber(rt.facingDirX) or 1 end,
+                getY = function() return tonumber(rt.facingDirY) or 0 end,
+            }
+        end,
     }
     return rec
 end
@@ -448,6 +458,148 @@ do
     shockProvider.Tick({ leaseId = "lease-1", npcId = "shock-caller" })
     T.truthy(sAlly.runtime.allyThreatAlert ~= nil, "WarnGroup must populate unified allyThreatAlert")
     T.equal(sAlly.runtime.allyThreatAlert.kind, "zombie", "WarnGroup must forward normalized zombie target")
+end
+
+-- 5. Verify rich contextual callouts and replies (target names, counts/types, locations, defensive, rotation).
+do
+    local function assertNoRawTokens(text, label)
+        T.truthy(type(text) == "string" and text ~= "", label .. ": empty text")
+        if string.find(text, "{", 1, true) or string.find(text, "}", 1, true) then
+            error(label .. ": unresolved token in: " .. tostring(text))
+        end
+    end
+
+    -- 5a. Named hostile NPC ("Marcus") inside named room ("kitchen") with engaging + defensive allies.
+    npcStore, liveBodies, deliveredBarks = {}, {}, {}
+    PNC.Registry.Data = npcStore
+    PNC.Perception.ResetAllyThreatWarnings()
+    PNC.ConvoEngine.SpeechRealization.ResetSelections()
+    Callouts.ResetRuntime()
+    nowMs = 70000
+
+    local sammie = makeNPC("sammie", { x = 10, y = 10, factionID = "survivors", tactical = true })
+    sammie.name = "Sammie"
+    local adrienne = makeNPC("adrienne", { x = 11, y = 10, factionID = "survivors", tactical = true })
+    adrienne.name = "Adrienne"
+    local pete = makeNPC("pete", { x = 12, y = 10, factionID = "survivors", attackType = "none" })
+    pete.name = "Pete"
+    local marcus = makeNPC("marcus", { x = 14, y = 10, factionID = "raiders" })
+    marcus.name = "Marcus"
+
+    local ok, _ = Callouts.OnTargetChanged({
+        target = { kind = "npc", id = "marcus", x = 14, y = 10, z = 0, roomName = "kitchen" },
+        at = nowMs,
+    }, sammie)
+    T.truthy(ok, "named hostile NPC warning must emit")
+    T.equal(#deliveredBarks, 1, "caller bark must deliver immediately")
+    local calloutText = deliveredBarks[1].text
+    assertNoRawTokens(calloutText, "5a callout")
+    T.contains(calloutText, "Marcus", "callout must name target Marcus")
+    T.contains(calloutText, "in the kitchen", "callout must name kitchen location")
+
+    nowMs = nowMs + 1500
+    local fired = Callouts.PumpPendingReplies(nowMs)
+    T.equal(fired, 2, "both Adrienne (engaging) and Pete (defensive) must reply")
+    T.equal(#deliveredBarks, 3, "two reply barks must deliver")
+    assertNoRawTokens(deliveredBarks[2].text, "5a engaging reply")
+    assertNoRawTokens(deliveredBarks[3].text, "5a defensive reply")
+    T.contains(deliveredBarks[2].text, "Sammie", "engaging reply must address caller Sammie")
+    T.contains(deliveredBarks[2].text, "Marcus", "engaging reply must name Marcus")
+    T.contains(deliveredBarks[2].text, "in the kitchen", "engaging reply must name kitchen")
+    T.contains(deliveredBarks[3].text, "Sammie", "defensive reply must address caller Sammie")
+    T.contains(deliveredBarks[3].text, "Marcus", "defensive reply must name Marcus")
+    T.equal(deliveredBarks[3].eventType, "combat_ally_warn_reply_defensive",
+        "passive ally must use defensive reply type")
+
+    -- 5b. Multiple zombies (count = 4 from cached perceptionFrame) with tactical bearing.
+    deliveredBarks = {}
+    PNC.Perception.ResetAllyThreatWarnings()
+    Callouts.ResetRuntime()
+    nowMs = 85000
+
+    local zNear = function(zx, zy)
+        return { getX = function() return zx end, getY = function() return zy end, isDead = function() return false end }
+    end
+    local tacticalSpotter = makeNPC("tact-1", {
+        x = 10, y = 10, factionID = "survivors", tactical = true,
+        runtime = {
+            facingDirX = 1, facingDirY = 0,
+            perceptionFrame = {
+                entries = {
+                    { zombie = zombieWorld },
+                    { zombie = zNear(18.5, 10) },
+                    { zombie = zNear(19, 11) },
+                    { zombie = zNear(17.5, 9) },
+                },
+            },
+        },
+    })
+    tacticalSpotter.name = "Clay"
+    local tacticalAlly = makeNPC("tact-2", {
+        x = 10, y = 11, factionID = "survivors", tactical = true,
+        runtime = { facingDirX = 1, facingDirY = 0 },
+    })
+    tacticalAlly.name = "Adrienne"
+
+    local okZ, _ = Callouts.OnTargetChanged({
+        target = { kind = "zombie", zombieId = "z-101", x = 18, y = 10, z = 0 },
+        at = nowMs,
+        ignoreWarningCooldown = true,
+    }, tacticalSpotter)
+    T.truthy(okZ, "multi-zombie warning must emit")
+    assertNoRawTokens(deliveredBarks[1].text, "5b zombie callout")
+    T.contains(deliveredBarks[1].text, "4 walkers", "callout must state exact nearby zombie count + type")
+    T.contains(deliveredBarks[1].text, "o'clock", "tactical callout must include clock bearing")
+
+    nowMs = nowMs + 1500
+    Callouts.PumpPendingReplies(nowMs)
+    T.truthy(#deliveredBarks >= 2, "tactical ally reply must deliver")
+    assertNoRawTokens(deliveredBarks[2].text, "5b zombie reply")
+    T.contains(deliveredBarks[2].text, "Clay", "reply must address caller Clay")
+    T.contains(deliveredBarks[2].text, "4 walkers", "reply must repeat enemy count + type")
+
+    -- 5c. Modded foreign_npc group (bandits x2) + ConvoEngine variant rotation across waves.
+    deliveredBarks = {}
+    PNC.Compatibility.API.RegisterAdapter({
+        id = "bandits",
+        capabilities = { targeting = true, relationships = true },
+        canAttack = function() return true end,
+        resolveTarget = function(ctx)
+            local ref = ctx and ctx.ref
+            if ref and tostring(ref.actorId or "") == "b-99" then
+                return {
+                    kind = "foreign_npc", provider = "bandits", actorId = "b-99",
+                    displayName = "Viper", factionName = "Marauders",
+                    worldObject = zombieWorld, threatClass = "human_hostile",
+                }
+            end
+            return nil
+        end,
+    })
+    nowMs = 100000
+    Callouts.OnTargetChanged({
+        target = {
+            kind = "foreign_npc", provider = "bandits", actorId = "b-99",
+            x = 18, y = 10, z = 0, enemyCount = 2,
+        },
+        at = nowMs, ignoreWarningCooldown = true,
+    }, tacticalSpotter)
+    local bText1 = deliveredBarks[#deliveredBarks].text
+    assertNoRawTokens(bText1, "5c foreign_npc callout 1")
+    T.contains(bText1, "Viper and their crew", "named multi-hostile foreign target must mention leader and crew")
+
+    nowMs = 110000
+    Callouts.OnTargetChanged({
+        target = {
+            kind = "foreign_npc", provider = "bandits", actorId = "b-88",
+            worldObject = zombieWorld, x = 18, y = 10, z = 0, enemyCount = 2,
+        },
+        at = nowMs, ignoreWarningCooldown = true,
+    }, tacticalSpotter)
+    local bText2 = deliveredBarks[#deliveredBarks].text
+    assertNoRawTokens(bText2, "5c foreign_npc callout 2")
+    T.contains(bText2, "2 bandits", "unnamed bandit pair must mention count and provider enemy type")
+    T.truthy(bText1 ~= bText2, "variant rotation must vary callout wording across events")
 end
 
 T.finish("pnc_ally_threat_warning_smoke")

@@ -7,6 +7,7 @@ PNC.Perception.Internal = PNC.Perception.Internal or {}
 local Perception, Internal = PNC.Perception, PNC.Perception.Internal
 local Core, Const = PNC.Core, PNC.Const or {}
 local Registry, Relationships = PNC.Registry, PNC.Relationships
+if not Internal.ExtractThreatMeta then require "PNC/Core/Perception/PNC_Perception/AllyThreatMeta" end
 
 local function resolveTargetWorld(kind, spec)
     local coord, bodyAlive = Internal.AllyWarningCoord, Internal.AllyWarningBodyAlive
@@ -56,15 +57,18 @@ function Perception.NormalizeThreatDescriptor(target, at)
     if not info then return nil end
     local x = info.object and coord(info.object, "getX", target.x) or (info.record and tonumber(info.record.x)) or tonumber(target.x)
     local y = info.object and coord(info.object, "getY", target.y) or (info.record and tonumber(info.record.y)) or tonumber(target.y)
-    local z = info.object and coord(info.object, "getZ", target.z) or (info.record and tonumber(info.record.z)) or tonumber(target.z) or 0
+    local z = tonumber(info.object and coord(info.object, "getZ", target.z) or (info.record and tonumber(info.record.z)) or tonumber(target.z)) or 0
     if x == nil or y == nil or (not info.object and not info.record and target.x == nil) then return nil end
     local now = at ~= nil and (tonumber(at) or 0) or (Core and Core.Now and tonumber(Core.Now()) or 0)
+    local m = Internal.ExtractThreatMeta and Internal.ExtractThreatMeta(kind, target, info, x, y, z) or {}
     return {
         kind = kind, key = info.key, id = target.id, zombieId = target.zombieId,
         onlineID = info.onlineID ~= nil and info.onlineID or target.onlineID,
         username = info.username or target.username, provider = target.provider,
         actorId = target.actorId or target.id, generation = target.generation,
-        x = x, y = y, z = tonumber(z) or 0, semanticClass = info.semanticClass, observedAt = now,
+        x = x, y = y, z = z, semanticClass = info.semanticClass, observedAt = now,
+        displayName = m.displayName, enemyType = m.enemyType, factionName = m.factionName,
+        roomName = m.roomName, isIndoors = m.isIndoors, enemyCount = m.enemyCount or 1,
     }
 end
 

@@ -91,6 +91,8 @@ function Perception.PublishAllyThreatWarning(caller, target, opts)
     if not Spatial or type(Spatial.QueryNPCs) ~= "function" then
         for _, rec in pairs(Registry and Registry.Data or {}) do raw[#raw + 1] = rec end
     end
+    descriptor.enemyCount = Internal.EstimateThreatCount and Internal.EstimateThreatCount(caller, descriptor, raw) or 1
+    descriptor.callerName = tostring(caller.name or caller.fullName or "")
 
     local sorted = {}
     for i = 1, #raw do

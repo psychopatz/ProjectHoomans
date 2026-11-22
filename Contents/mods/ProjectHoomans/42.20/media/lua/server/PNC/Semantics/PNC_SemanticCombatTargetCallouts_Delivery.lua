@@ -5,6 +5,8 @@ PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 PNC.ConvoEngine = PNC.ConvoEngine or {}
 
+require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_Context"
+
 local Service = PNC.Semantics.CombatTargetCallouts or {}
 PNC.Semantics.CombatTargetCallouts = Service
 
@@ -51,28 +53,19 @@ local function canHear(player, record)
     return false
 end
 
-function Service.ResolveAllyWarnTone(record, profile)
-    local b = tostring(record and (record.activeBehavior or record.behavior) or "")
-    if b == "hostile" or (record and record.isHostile == true)
-        or tostring(profile and profile.combatTone or "") == "aggressive"
-    then
-        return "hostile"
+function Service.FormatTokens(text, tokens)
+    local out = tostring(text or "")
+    if type(tokens) ~= "table" then return out end
+    for key, val in pairs(tokens) do
+        if type(key) == "string" and (type(val) == "string" or type(val) == "number") then
+            local rep = tostring(val)
+            out = string.gsub(out, "{" .. key .. "}", function() return rep end)
+        end
     end
-    local role = tostring(record and (record.tacticalRole or record.role) or "")
-    if (profile and profile.tactical == true)
-        or role == "guard" or role == "soldier" or role == "scout"
-    then
-        return "tactical"
-    end
-    local policy = tostring(record and record.combatPolicy or "")
-    local attackType = tostring(record and record.attackType or "")
-    if (profile and profile.nervous == true) or policy == "passive" or attackType == "none" then
-        return "shaken"
-    end
-    return "neutral"
+    return out
 end
 
-function Service.ResolveSemanticLine(record, eventType, act, threatClass, eventRef, profile)
+function Service.ResolveSemanticLine(record, eventType, act, threatClass, eventRef, profile, tokens)
     local reactions = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions
     if type(reactions) ~= "table" or type(reactions.Resolve) ~= "function" then
         return nil, nil
@@ -89,8 +82,29 @@ function Service.ResolveSemanticLine(record, eventType, act, threatClass, eventR
             inCombat = true,
         },
     })
-    local text = type(resolved) == "table" and (resolved.fallback or resolved.text) or nil
-    if type(text) ~= "string" or text == "" then return nil, nil end
+    if type(resolved) ~= "table" then return nil, nil end
+    local raw = resolved.fallback or resolved.text
+    local sr = PNC.ConvoEngine and PNC.ConvoEngine.SpeechRealization
+    if not sr then
+        local ok, mod = pcall(require, "PNC/ConvoEngine/SpeechRealization")
+        if ok and type(mod) == "table" then sr = mod end
+    end
+    if sr and type(sr.Apply) == "function" then
+        local applied = sr.Apply({
+            selectionID = resolved.realizationID,
+            templateID = resolved.templateID,
+            fallback = raw,
+            plan = resolved.responsePlan,
+        }, {
+            npcID = tostring(record.id),
+            phraseSalt = tostring(eventRef or "") .. ":" .. tostring(record.id),
+        })
+        if type(applied) == "table" and type(applied.fallback) == "string" and applied.fallback ~= "" then
+            raw = applied.fallback
+        end
+    end
+    if type(raw) ~= "string" or raw == "" then return nil, nil end
+    local text = type(Service.FormatTokens) == "function" and Service.FormatTokens(raw, tokens) or raw
     return text, resolved
 end
 

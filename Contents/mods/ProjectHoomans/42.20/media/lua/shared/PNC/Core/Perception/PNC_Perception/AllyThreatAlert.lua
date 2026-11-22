@@ -41,11 +41,12 @@ function Internal.ApplyAllyThreatAlert(callerKey, item, desc, now, staggerIdx)
     local hasLOS = objForLos ~= nil and Perception.CanSeeWorldObject ~= nil and Perception.CanSeeWorldObject(ally, objForLos) == true or false
 
     ally.runtime.allyThreatAlert = {
-        kind = desc.kind, key = desc.key, id = desc.id, zombieId = desc.zombieId,
-        onlineID = desc.onlineID, username = desc.username, provider = desc.provider,
-        actorId = desc.actorId, generation = desc.generation, x = desc.x, y = desc.y, z = desc.z,
-        semanticClass = desc.semanticClass, callerId = callerKey, relationKind = item.relationKind,
-        observedAt = now, expiresAt = now + 6000, viaAllyWarning = true,
+        kind = desc.kind, key = desc.key, id = desc.id, zombieId = desc.zombieId, onlineID = desc.onlineID,
+        username = desc.username, provider = desc.provider, actorId = desc.actorId, generation = desc.generation,
+        x = desc.x, y = desc.y, z = desc.z, semanticClass = desc.semanticClass, callerId = callerKey,
+        callerName = desc.callerName, displayName = desc.displayName, enemyType = desc.enemyType,
+        factionName = desc.factionName, roomName = desc.roomName, isIndoors = desc.isIndoors, enemyCount = desc.enemyCount,
+        relationKind = item.relationKind, observedAt = now, expiresAt = now + 6000, viaAllyWarning = true,
         canEngage = canEngage, engageReason = engageReason, alertRadius = item.effRadius,
     }
     ally.runtime.allyThreatAlertCheckAt, ally.runtime.allyThreatAlertVisible = 0, hasLOS
@@ -117,7 +118,6 @@ function Perception.FindAllyThreatAlert(record, radius, allowUnseen)
         runtime.allyThreatAlertVisible, runtime.allyThreatAlertVisibilityKind = visible == true, kind
     end
     if runtime.allyThreatAlertVisible ~= true then
-        if allowUnseen ~= true then return nil end
         return nil
     end
 

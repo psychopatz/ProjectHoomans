@@ -27,31 +27,19 @@ local Language = PNC.Semantics.TacticalSpatialLanguage
 local Profile = PNC.Semantics.CombatReactionProfile
     or require "PNC/Semantics/PNC_SemanticCombatReactionProfile"
 
-local VALID_TARGET_KINDS = {
-    zombie = true,
-    npc = true,
-    player = true,
-    foreign_npc = true,
-}
+local VALID_TARGET_KINDS = { zombie = true, npc = true, player = true, foreign_npc = true }
 
-local function finite(value)
-    return Service.Finite(value)
-end
+local function finite(value) return Service.Finite(value) end
 
 local function targetPoint(target, warningResult)
     if type(target) ~= "table" then return nil end
-    local x = finite(target.x)
-    local y = finite(target.y)
-    local z = finite(target.z)
+    local x, y, z = finite(target.x), finite(target.y), finite(target.z)
     if x and y then return x, y, z or 0, "combat_target" end
     local id = tostring(target.id or target.zombieId or target.actorId or "")
     local reg = (PNC and PNC.Registry) or Registry
-    local record = id ~= "" and reg
-        and type(reg.Get) == "function" and reg.Get(id) or nil
-    if type(record) == "table" then
-        x = finite(record.x)
-        y = finite(record.y)
-        z = finite(record.z)
+    local rec = id ~= "" and reg and type(reg.Get) == "function" and reg.Get(id) or nil
+    if type(rec) == "table" then
+        x, y, z = finite(rec.x), finite(rec.y), finite(rec.z)
         if x and y then return x, y, z or 0, "target_record" end
     end
     local desc = type(warningResult) == "table" and warningResult.descriptor or nil
@@ -101,67 +89,50 @@ function Service.OnTargetChanged(event, record)
     if not x and not (warningResult and warningResult.emitted) then
         return false, "target_position_unavailable"
     end
-
     local semanticClass = (kind == "zombie" or tostring(target.threatClass or "") == "zombie")
         and "zombie" or "human_hostile"
     local targetId = target.id or target.zombieId or target.actorId or target.onlineID
-    local profile = Profile.Build(record, "", {
-        role = "witness",
-        actorKind = "npc",
-        inCombat = true,
-    })
-
+    local profile = Profile.Build(record, "", { role = "witness", actorKind = "npc", inCombat = true })
     local spatial, spatialReason, presentation, textReason, mode, modeReason, text
     if x then
         spatial, spatialReason = Projection.Project(record, {
-            kind = semanticClass,
-            id = targetId,
-            x = x,
-            y = y,
-            z = z,
-            observedAt = now,
-            positionSource = source,
-        }, {
-            now = now,
-            sameAreaThreshold = 0.5,
-            maxThreatAgeMs = 2000,
-        })
+            kind = semanticClass, id = targetId, x = x, y = y, z = z,
+            observedAt = now, positionSource = source,
+        }, { now = now, sameAreaThreshold = 0.5, maxThreatAgeMs = 2000 })
         if spatial then
             mode, modeReason = Language.SelectMode(record, profile, spatial)
-            spatial.presentationMode = mode
-            spatial.presentationReason = modeReason
-            text, textReason, presentation = Language.Decorate(
-                "", semanticClass, spatial, mode
-            )
+            spatial.presentationMode, spatial.presentationReason = mode, modeReason
+            text, textReason, presentation = Language.Decorate("", semanticClass, spatial, mode)
         end
     end
 
     local ref = eventID(event, record, target)
-    local evType = (semanticClass == "zombie")
-        and "combat_zombie_acquired" or "combat_hostile_acquired"
-    local speechID = (semanticClass == "zombie")
-        and "semantic.combat.zombie_acquired" or "semantic.combat.hostile_acquired"
+    local evType = (semanticClass == "zombie") and "combat_zombie_acquired" or "combat_hostile_acquired"
+    local speechID = "semantic.combat." .. ((semanticClass == "zombie") and "zombie_acquired" or "hostile_acquired")
     local presClass, resolved, ctx = "TACTICAL_BARK", nil, nil
-    if presentation then
+    if warningResult and warningResult.emitted == true then
+        local tone = Service.ResolveAllyWarnTone(record, profile)
+        local toks = Service.BuildRichSpeechTokens and Service.BuildRichSpeechTokens(
+            record, record, warningResult.descriptor, now, tone
+        ) or nil
+        local rich, rRes = Service.ResolveSemanticLine(
+            record, "combat_ally_warn_callout", "WARN", semanticClass, ref, profile, toks
+        )
+        if rich then
+            text, resolved = rich, rRes
+            evType = "combat_ally_warn_callout"
+            speechID = rRes and rRes.realizationID or "semantic.combat.ally_warn.callout"
+            presClass = rRes and rRes.presentationClass or "BARK"
+        end
+    end
+    if presentation or (warningResult and warningResult.emitted == true and text) then
         ctx = {
-            eventType = evType,
-            eventRef = ref,
-            targetKind = semanticClass,
-            targetRef = tostring(targetId or ""),
-            tacticalSpatial = spatial,
-            tacticalPresentationMode = mode,
-            tacticalPresentationReason = modeReason,
-            tacticalSpatialPresentation = presentation,
-            presentationClass = "TACTICAL_BARK",
+            eventType = evType, eventRef = ref, targetKind = semanticClass,
+            targetRef = tostring(targetId or ""), tacticalSpatial = spatial,
+            tacticalPresentationMode = mode, tacticalPresentationReason = modeReason,
+            tacticalSpatialPresentation = presentation, presentationClass = presClass,
             transient = true,
         }
-    elseif warningResult and warningResult.emitted == true then
-        text, resolved = Service.ResolveSemanticLine(
-            record, "combat_ally_warn_callout", "WARN", semanticClass, ref, profile
-        )
-        evType = "combat_ally_warn_callout"
-        speechID = resolved and resolved.realizationID or "semantic.combat.ally_warn.callout"
-        presClass = resolved and resolved.presentationClass or "BARK"
     else
         return false, textReason or spatialReason
     end

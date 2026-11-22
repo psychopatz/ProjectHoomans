@@ -4,52 +4,52 @@
   "locale": "TL",
   "entries": {
     "say.variants.engaging_neutral": [
-      "Nakita ko na! Papunta na!",
-      "Kita ko na sila, kasunod mo na ako!",
-      "Papunta na, pigilan muna!",
-      "Sige, papasok na ako sa laban!"
+      "Kita ko na—{target.name} {scene.location}, {addressee.name}! Papunta na!",
+      "Hawak sa tingin ko ang {target.name} {scene.location}—kasunod mo na ako, {addressee.name}!",
+      "Papunta na, {addressee.name}! Pigilan ang {target.name} {scene.location}!",
+      "Sige, {addressee.name}, lulusob ako sa {target.name} {scene.location}!"
     ],
     "say.variants.engaging_tactical": [
-      "Kumpirmado ang target, lumalaban na!",
-      "Kopyado! Umiikot para umatake!",
-      "Nakatutok na ako, sumusulong!",
-      "Sige, lumalapit sa kontak mo!"
+      "Kumpirmado ang {target.name} {scene.location}, {addressee.name}—lumalaban na!",
+      "Kopyado, {addressee.name}! Umiikot sa {target.name} {scene.location}!",
+      "Nakatutok na ako sa {target.name} {scene.location}, kasabay mo {addressee.name}!",
+      "Sige, {addressee.name}, lumalapit sa {target.name} {scene.location}!"
     ],
     "say.variants.engaging_hostile": [
-      "Kita ko na sila! Tatapusin ko 'to!",
-      "Oo, kita ko ang hayop na 'yan! Sugod!",
-      "Magtira ka para sa akin! Papasok!",
-      "Naka-lock na! Oras na para tumba!"
+      "Kita ko na ang {target.name} {scene.location}, {addressee.name}! Tatapusin ko 'to!",
+      "Oo, {addressee.name}, nakita ko ang {target.name} {scene.location}! Sugod!",
+      "Magtira ka sa {target.name} para sa akin, {addressee.name}! Papasok {scene.location}!",
+      "Naka-lock na ang {target.name} {scene.location}, {addressee.name}! Oras na tumba!"
     ],
     "say.variants.alerted_neutral": [
-      "Narinig kita! Tinitingnan ko ngayon!",
-      "Nasaan? Titingnan ko ang direksyong 'yan!",
-      "Sige, haharap ako para suportahan ka!",
-      "Teka, naririnig ko ang gulo!"
+      "Narinig kita, {addressee.name}! Hinahanap ko na ang {target.name} {scene.location}!",
+      "Haharap ako sa {scene.location}, {addressee.name}—mag-ingat sa {target.name}!",
+      "Sige, {addressee.name}, susuporta ako laban sa {target.name} {scene.location}!",
+      "Teka, {addressee.name}! Tinitingnan ko {scene.location} para sa {target.name}!"
     ],
     "say.variants.alerted_tactical": [
-      "Kopyado ang kontak, sinusuri ang sektor!",
-      "Lilingon para magbantay, wala pang tanaw!",
-      "Alerto na, humahanap ng linaw sa target!",
-      "Sige, binabantayan ang direksyong 'yan!"
+      "Kopyado ang kontak, {addressee.name}! Sinusuri {scene.location} para sa {target.name}!",
+      "Lilingon sa likod mo, {addressee.name}—wala pang linaw ang {target.name} {scene.location}!",
+      "Alerto, {addressee.name}, humahanap ng tanaw sa {target.name} {scene.location}!",
+      "Sige, {addressee.name}, binabantayan {scene.location} laban sa {target.name}!"
     ],
     "say.variants.alerted_hostile": [
-      "Nasaan sila?! Papunta na ako diyan!",
-      "Magpakita ka! Tinitingnan ang kabilang banda!",
-      "Libangin mo sila, umiikot na ako!",
-      "Huwag pakawalan, hinahanap ko na!"
+      "Libangin ang {target.name}, {addressee.name}! Papunta na ako {scene.location}!",
+      "Huwag pakawalan ang {target.name} {scene.location}, {addressee.name}—papasok ako!",
+      "Saan banda {scene.location}, {addressee.name}?! Pupuntahan ko ang {target.name}!",
+      "Ipitin ang {target.name} {scene.location}, {addressee.name}, umiikot na ako!"
     ],
     "say.variants.defensive_neutral": [
-      "Teka, lalayo muna ako! Mag-ingat!",
-      "Narinig kita, aatras sa ligtas na lugar!",
-      "Umiiwas muna sa gulo, ingat kayo!",
-      "Mag-ingat ka, dito muna ako sa likod!"
+      "Teka, {addressee.name}, lalayo muna ako sa {target.name} {scene.location}!",
+      "Narinig kita, {addressee.name}—aatras palayo sa {target.name} {scene.location}!",
+      "Umiiwas sa {target.name} {scene.location}—mag-ingat ka, {addressee.name}!",
+      "Ingat sa {target.name} {scene.location}, {addressee.name}, dito muna ako sa likod!"
     ],
     "say.variants.defensive_shaken": [
-      "Naku—mag-ingat kayo diyan!",
-      "Masyadong malapit! Umatras muna!",
-      "Narinig ko 'yon—yuyuko muna ako!",
-      "Huwag silang palapitin! Umiiwas na!"
+      "Mag-ingat sa {target.name} {scene.location}, {addressee.name}—lalayo ako!",
+      "Masyadong malapit! Umiiwas na sa {target.name} {scene.location}, {addressee.name}!",
+      "Naririnig ko ang {target.name} {scene.location}, {addressee.name}—yuyuko muna ako!",
+      "Huwag palapitin ang {target.name} mula {scene.location}, {addressee.name}!"
     ]
   }
 }

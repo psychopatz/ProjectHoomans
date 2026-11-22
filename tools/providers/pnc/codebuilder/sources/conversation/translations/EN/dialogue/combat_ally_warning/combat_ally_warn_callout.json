@@ -4,40 +4,40 @@
   "locale": "EN",
   "entries": {
     "say.variants.zombie_neutral": [
-      "Heads up, dead ones closing in!",
-      "Zombies nearby, stay sharp!",
-      "Walkers incoming, watch your back!",
-      "Got dead moving on us, get ready!"
+      "Heads up—{target.name} closing in {scene.location}!",
+      "Watch it! Got {target.name} moving {scene.location}!",
+      "Stay sharp, {target.name} spotted {scene.location}!",
+      "Incoming! We've got {target.name} {scene.location}!"
     ],
     "say.variants.zombie_tactical": [
-      "Visual on infected! Weapons up!",
-      "Walkers advancing on our position, engage!",
-      "Contact dead! Converge and clear!",
-      "Multiple walkers closing, hold formation!"
+      "Contact dead—{target.name} {scene.location}! Weapons up!",
+      "Visual on {target.name} advancing {scene.location}, engage!",
+      "{target.name} {scene.location}! Converge and clear!",
+      "Hold formation—{target.name} pushing in {scene.location}!"
     ],
     "say.variants.zombie_hostile": [
-      "Dead meat wandering into our turf! Drop them!",
-      "Rotters nearby, shut them up fast!",
-      "Watch your flank, walkers creeping in!",
-      "Infected close! Cut them down!"
+      "Drop them! {target.name} wandering {scene.location}!",
+      "Cut down {target.name} {scene.location} before they swarm!",
+      "Watch your flank—{target.name} creeping in {scene.location}!",
+      "Fresh meat! {target.name} right {scene.location}!"
     ],
     "say.variants.hostile_neutral": [
-      "Watch out, hostile target spotted!",
-      "Got trouble nearby, stay on guard!",
-      "Enemy contact! Watch yourself!",
-      "Someone's coming for us, get ready!"
+      "Watch out—{target.name} spotted {scene.location}!",
+      "Got trouble! {target.name} moving {scene.location}!",
+      "Heads up, {target.name} coming in {scene.location}!",
+      "Stay on guard! {target.name} {scene.location}!"
     ],
     "say.variants.hostile_tactical": [
-      "Hostile contact spotted! Weapons ready!",
-      "Armed threat in sector, engage!",
-      "Enemy closing in, eyes front and engage!",
-      "Threat confirmed in range, take them down!"
+      "Hostile contact! {target.name} {scene.location}, weapons ready!",
+      "Armed threat—{target.name} {scene.location}, engage!",
+      "Eyes on {target.name} closing {scene.location}!",
+      "Threat confirmed—{target.name} in range {scene.location}, take cover!"
     ],
     "say.variants.hostile_hostile": [
-      "Got an intruder! Flush them out!",
-      "Fresh target! Tear them apart!",
-      "Enemy right here! No mercy!",
-      "Kill them before they run!"
+      "Flush them out! Got {target.name} {scene.location}!",
+      "Tear them apart—{target.name} caught {scene.location}!",
+      "Right there! Drop {target.name} {scene.location}!",
+      "Don't let them slip—{target.name} {scene.location}!"
     ]
   }
 }

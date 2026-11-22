@@ -47,7 +47,9 @@ function Service.EnqueueAllyReplies(caller, warningResult, now, eventRef)
             Service.PendingReplies[#Service.PendingReplies + 1] = {
                 allyId = tostring(ally.id),
                 allyRecord = ally,
+                callerRecord = caller,
                 callerId = tostring(caller and caller.id or ""),
+                callerName = tostring(caller and (caller.name or caller.fullName) or ""),
                 teamKey = tostring(warningResult.teamKey or caller and caller.id or "team"),
                 desc = warningResult.descriptor,
                 canEngage = item.canEngage == true,
@@ -99,11 +101,18 @@ function Service.PumpPendingReplies(now)
                 local profile = profileMod and profileMod.Build and profileMod.Build(rec, "", {
                     role = "ally", actorKind = "npc", inCombat = true,
                 }) or {}
+                local tone = Service.ResolveAllyWarnTone(rec, profile)
+                local callerRec = entry.callerRecord
+                    or (reg and type(reg.Get) == "function" and reg.Get(entry.callerId))
+                    or { id = entry.callerId, name = entry.callerName }
+                local tokens = type(Service.BuildRichSpeechTokens) == "function"
+                    and Service.BuildRichSpeechTokens(rec, callerRec, entry.desc, now, tone) or nil
                 local tClass = entry.desc and entry.desc.semanticClass or "human_hostile"
                 local text, resolved = Service.ResolveSemanticLine(
-                    rec, ev, act, tClass, entry.eventRef, profile
+                    rec, ev, act, tClass, entry.eventRef, profile, tokens
                 )
                 if text then
+                    local presClass = resolved and resolved.presentationClass or "BARK"
                     Service.DeliverBark(rec, now, {
                         eventType = ev,
                         speechEventID = resolved and resolved.realizationID or ("semantic." .. ev),
@@ -111,12 +120,22 @@ function Service.PumpPendingReplies(now)
                         family = "combat_ally_warn_reply",
                         eventRef = entry.eventRef,
                         text = text,
-                        priority = 70,
+                        priority = 75,
                         cooldownMs = 3500,
                         familyCooldownMs = 3500,
-                        maxSpeakers = 2,
-                        streamKey = "ally-warn-reply:" .. tostring(entry.teamKey),
-                        presentationClass = resolved and resolved.presentationClass or "BARK",
+                        maxSpeakers = 1,
+                        streamKey = "ally-warn-reply:" .. tostring(rec.id),
+                        presentationClass = presClass,
+                        context = {
+                            eventType = ev,
+                            eventRef = entry.eventRef,
+                            presentationClass = presClass,
+                            transient = true,
+                            targetLabel = tokens and tokens["target.name"] or nil,
+                            targetCount = tokens and tonumber(tokens["target.count"]) or nil,
+                            locationLabel = tokens and tokens["scene.location"] or nil,
+                            callerName = tokens and tokens["addressee.name"] or nil,
+                        },
                     })
                 end
                 fired = fired + 1

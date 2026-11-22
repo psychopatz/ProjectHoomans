@@ -4,52 +4,52 @@
   "locale": "EN",
   "entries": {
     "say.variants.engaging_neutral": [
-      "I see them! Moving in!",
-      "Got eyes on them, right behind you!",
-      "On my way, hold them off!",
-      "Copy that, jumping into the fight!"
+      "I see {target.name} {scene.location}, {addressee.name}! Moving in!",
+      "Got eyes on {target.name} {scene.location}—right behind you, {addressee.name}!",
+      "On my way, {addressee.name}! Holding {target.name} {scene.location}!",
+      "Copy that, {addressee.name}, jumping on {target.name} {scene.location}!"
     ],
     "say.variants.engaging_tactical": [
-      "Visual confirmed, engaging target!",
-      "Copy! Moving to flank and engage!",
-      "I've got a bead on them, advancing!",
-      "Roger, converging on your contact!"
+      "Visual confirmed on {target.name} {scene.location}, {addressee.name}—engaging!",
+      "Copy, {addressee.name}! Moving to flank {target.name} {scene.location}!",
+      "I've got a bead on {target.name} {scene.location}, advancing with you, {addressee.name}!",
+      "Roger, {addressee.name}, converging on {target.name} {scene.location}!"
     ],
     "say.variants.engaging_hostile": [
-      "Got 'em in my sights! Moving to finish it!",
-      "Yeah, I see the bastard! Going in!",
-      "Leave some for me! Pushing up!",
-      "Locked on! Time to drop them!"
+      "Got {target.name} in my sights {scene.location}, {addressee.name}! Finishing this!",
+      "Yeah, {addressee.name}, I see {target.name} {scene.location}! Going in!",
+      "Leave some of {target.name} for me, {addressee.name}! Pushing {scene.location}!",
+      "Locked on {target.name} {scene.location}, {addressee.name}! Time to drop them!"
     ],
     "say.variants.alerted_neutral": [
-      "Heard you! Looking around now!",
-      "Where? Checking that direction!",
-      "Copy, turning to back you up!",
-      "Wait up, I hear trouble!"
+      "Heard you, {addressee.name}! Looking for {target.name} {scene.location} now!",
+      "Turning toward {scene.location}, {addressee.name}—watch out for {target.name}!",
+      "Copy, {addressee.name}, backing you up against {target.name} {scene.location}!",
+      "On it, {addressee.name}! Checking {scene.location} for {target.name}!"
     ],
     "say.variants.alerted_tactical": [
-      "Copy contact, scanning your sector!",
-      "Turning to cover, no visual yet!",
-      "On alert, moving to get eyes on target!",
-      "Roger, sweeping that bearing now!"
+      "Copy contact, {addressee.name}! Scanning {scene.location} for {target.name}!",
+      "Turning to cover {addressee.name}—no visual on {target.name} {scene.location} yet!",
+      "On alert, {addressee.name}, moving for eyes on {target.name} {scene.location}!",
+      "Roger, {addressee.name}, sweeping {scene.location} for {target.name}!"
     ],
     "say.variants.alerted_hostile": [
-      "Where are they?! Coming to back you up!",
-      "Show yourself! Checking that side!",
-      "Keep 'em busy, I'm coming around!",
-      "Don't let 'em slip, scanning now!"
+      "Keep {target.name} busy, {addressee.name}! Coming {scene.location} now!",
+      "Don't let {target.name} slip {scene.location}, {addressee.name}—I'm moving in!",
+      "Where {scene.location}, {addressee.name}?! Coming to drop {target.name}!",
+      "Pin {target.name} down {scene.location}, {addressee.name}, I'm coming around!"
     ],
     "say.variants.defensive_neutral": [
-      "Whoa, staying clear! Watch out!",
-      "Heard you, falling back to cover!",
-      "Keeping out of the way, stay safe!",
-      "Be careful, I'm hanging back!"
+      "Whoa, {addressee.name}, keeping clear of {target.name} {scene.location}!",
+      "Heard you, {addressee.name}—falling back away from {target.name} {scene.location}!",
+      "Staying out of reach of {target.name} {scene.location}—be careful, {addressee.name}!",
+      "Watch yourself around {target.name} {scene.location}, {addressee.name}, I'm hanging back!"
     ],
     "say.variants.defensive_shaken": [
-      "Oh no—watching out, stay safe!",
-      "Too close! Backing off now!",
-      "I heard that—staying low!",
-      "Don't let them reach us! Getting clear!"
+      "Be careful with {target.name} {scene.location}, {addressee.name}—I'm staying back!",
+      "Too close! Getting clear of {target.name} {scene.location}, {addressee.name}!",
+      "I hear {target.name} {scene.location}, {addressee.name}—keeping my head down!",
+      "Don't let {target.name} reach us from {scene.location}, {addressee.name}!"
     ]
   }
 }
