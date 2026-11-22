@@ -84,6 +84,8 @@ local function buildTelevisionPlan(anchor, partner, openRole, replyRole, fam, re
             and "semantic.world.media.broadcast"
             or "semantic.world.object.notice"),
         eventType = "world_television_beat",
+        domain = "world",
+        channel = "world",
         topic = "television",
         openAct = "CHAT",
         replyAct = "CHAT",

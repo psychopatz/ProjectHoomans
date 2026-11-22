@@ -1,4 +1,5 @@
 -- Extensible beat hook registry and threaded NPC conversation runner.
+-- Transient beats only: never acts as an interactive scene engine or transcript store.
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
@@ -7,24 +8,46 @@ PNC.Semantics = PNC.Semantics or {}
 PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 require "PNC/Semantics/PNC_SemanticBeatContext"
-require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_Delivery"
+local Transport = require "PNC/Semantics/PNC_SemanticSpeechTransport"
 
 local Beats = PNC.Semantics.DialogueBeats or {}
 PNC.Semantics.DialogueBeats = Beats
 
-Beats.VERSION = 1
+Beats.VERSION = 2
 Beats.PendingTurns = Beats.PendingTurns or {}
 Beats.PendingCount = tonumber(Beats.PendingCount) or #Beats.PendingTurns
 Beats.NextDueAt = Beats.NextDueAt
 Beats.NextEnvCheckAt = tonumber(Beats.NextEnvCheckAt) or 0
 Beats.LastWeather = Beats.LastWeather
 Beats._seq = tonumber(Beats._seq) or 0
+Beats.ActiveThreads = Beats.ActiveThreads or {}
 
-local MAX_Q, hooks, hookCooldowns = 32, {}, {}
+local MAX_Q, MAX_THREADS = 32, 32
+local hooks, hookCooldowns, threadOrder = {}, {}, {}
 
 local function nowMs(at)
     if at ~= nil then return tonumber(at) or 0 end
     return PNC.Core and type(PNC.Core.Now) == "function" and tonumber(PNC.Core.Now()) or 0
+end
+
+local function livePresenceValue()
+    return tostring(PNC.Const and PNC.Const.PRESENCE_LIVE or "live")
+end
+
+local function isActorAvailable(actor, registeredAtStart, reg)
+    if type(actor) ~= "table" or actor.id == nil then return false, nil end
+    local latest = (reg and type(reg.Get) == "function") and reg.Get(actor.id) or nil
+    if registeredAtStart == true and latest == nil then
+        return false, nil
+    end
+    local rec = latest or actor
+    if rec.alive == false or rec.departed == true or rec.removed == true then
+        return false, nil
+    end
+    if rec.presenceState ~= nil and tostring(rec.presenceState) ~= livePresenceValue() then
+        return false, nil
+    end
+    return true, rec
 end
 
 local function syncMeta()
@@ -36,14 +59,74 @@ local function syncMeta()
     Beats.PendingCount, Beats.NextDueAt = #list, minDue
 end
 
+local function removeOrder(id)
+    for i = #threadOrder, 1, -1 do
+        if threadOrder[i] == id then
+            table.remove(threadOrder, i)
+            return
+        end
+    end
+end
+
+local function purgeTurnsForThread(tid)
+    local list, rem, removed = Beats.PendingTurns, {}, 0
+    for i = 1, #list do
+        if list[i].threadID == tid then
+            removed = removed + 1
+        else
+            rem[#rem + 1] = list[i]
+        end
+    end
+    Beats.PendingTurns = rem
+    return removed
+end
+
+local function registerThread(tid, now, expiresAt, participants)
+    if not Beats.ActiveThreads[tid] then
+        while #threadOrder >= MAX_THREADS do
+            local oldest = table.remove(threadOrder, 1)
+            Beats.ActiveThreads[oldest] = nil
+            purgeTurnsForThread(oldest)
+        end
+        threadOrder[#threadOrder + 1] = tid
+    end
+    Beats.ActiveThreads[tid] = {
+        threadID = tid,
+        createdAt = now,
+        expiresAt = expiresAt,
+        participants = participants,
+        status = "active",
+    }
+end
+
+local function pruneCompletedThreads(now)
+    local hasPending = {}
+    for i = 1, #Beats.PendingTurns do
+        hasPending[Beats.PendingTurns[i].threadID] = true
+    end
+    for i = #threadOrder, 1, -1 do
+        local tid = threadOrder[i]
+        local t = Beats.ActiveThreads[tid]
+        if not t or (now >= (t.expiresAt or math.huge)) or not hasPending[tid] then
+            Beats.ActiveThreads[tid] = nil
+            table.remove(threadOrder, i)
+        end
+    end
+end
+
 function Beats.RegisterHook(id, spec)
     id = tostring(id or "")
     if id == "" or type(spec) ~= "table" or type(spec.evaluate) ~= "function" then return false end
     local sub = {}
-    for _, ev in ipairs(type(spec.eventTypes) == "table" and spec.eventTypes or { "*" }) do sub[tostring(ev)] = true end
+    for _, ev in ipairs(type(spec.eventTypes) == "table" and spec.eventTypes or { "*" }) do
+        sub[tostring(ev)] = true
+    end
     hooks[id] = {
-        id = id, eventTypes = sub, priority = tonumber(spec.priority) or 50,
-        cooldownMs = math.max(0, tonumber(spec.cooldownMs) or 0), evaluate = spec.evaluate,
+        id = id,
+        eventTypes = sub,
+        priority = tonumber(spec.priority) or 50,
+        cooldownMs = math.max(0, tonumber(spec.cooldownMs) or 0),
+        evaluate = spec.evaluate,
     }
     return true
 end
@@ -63,52 +146,80 @@ function Beats.ListHooks()
 end
 
 local function turnTokens(turn, ctx)
-    local S = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil
     local sp, addr = turn.speaker, turn.addressee or turn.speaker
-    local desc = turn.desc or { semanticClass = "human_hostile", enemyType = "hostile" }
-    local toks = (S and S.BuildRichSpeechTokens)
-        and S.BuildRichSpeechTokens(sp, addr, desc, ctx and ctx.now or 0, nil, { skipLocation = true })
-        or { ["addressee.name"] = tostring(addr and (addr.name or addr.fullName) or "friend") }
-    if type(ctx and ctx.tokens) == "table" then for k, v in pairs(ctx.tokens) do toks[k] = v end end
-    if type(turn.tokens) == "table" then for k, v in pairs(turn.tokens) do toks[k] = v end end
+    local S = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil
+    local toks
+    if turn.desc ~= nil and S and type(S.BuildRichSpeechTokens) == "function" then
+        toks = S.BuildRichSpeechTokens(sp, addr, turn.desc, ctx and ctx.now or 0, nil, { skipLocation = true })
+    else
+        local addrName = Transport.FirstTokenName(addr and (addr.name or addr.fullName)) or "friend"
+        toks = { ["addressee.name"] = addrName }
+    end
+    if type(ctx and ctx.tokens) == "table" then
+        for k, v in pairs(ctx.tokens) do toks[k] = v end
+    end
+    if type(turn.tokens) == "table" then
+        for k, v in pairs(turn.tokens) do toks[k] = v end
+    end
     return toks
 end
 
 local function deliverTurn(t, tid, now, ctx)
-    local S = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil
-    if not S or type(t) ~= "table" or type(t.speaker) ~= "table" or t.speaker.alive == false then return false end
-    if type(S.ResolveSemanticLine) ~= "function" or type(S.DeliverBark) ~= "function" then return false end
-    local ev, act, tCls, ref = t.eventType or "combat_ally_warn_callout", t.act or "WARN", t.threatClass or "human_hostile", t.eventRef or tid
-    local lineText, res = S.ResolveSemanticLine(
-        t.speaker,
-        ev,
-        act,
-        tCls,
-        ref,
-        nil,
-        turnTokens(t, ctx),
-        {
-            replyRole = t.role,
-            poolID = t.poolID,
-            topic = t.topic,
-            context = t.context,
-            inCombat = t.inCombat,
-        }
-    )
+    if type(t) ~= "table" or type(t.speaker) ~= "table" then return false end
+    local okSpeaker, sp = isActorAvailable(t.speaker, false, nil)
+    if not okSpeaker then return false end
+    local ev = t.eventType or "social_beat"
+    local act = t.act or "REACT"
+    local domain = t.domain or t.topic or "social"
+    local topic = t.topic or domain
+    local channel = t.channel or domain
+    local ref = t.eventRef or tid
+    local lineText, res = Transport.ResolveLine(sp, {
+        eventType = ev,
+        eventID = ref,
+        act = act,
+        topic = topic,
+        domain = domain,
+        poolID = t.poolID,
+        role = t.role,
+        tokens = turnTokens(t, ctx),
+        context = t.context,
+        inCombat = t.inCombat == true,
+    })
     if not lineText then return false end
     if t.barkId and PNC.SecondaryChannel and PNC.SecondaryChannel.RequestBark then
-        PNC.SecondaryChannel.RequestBark(t.speaker, t.barkId, now)
+        PNC.SecondaryChannel.RequestBark(sp, t.barkId, now)
     end
-    local sent = S.DeliverBark(t.speaker, now, {
-        eventType = ev, speechEventID = res and res.realizationID or ("semantic.beat." .. tostring(t.role or "line")),
-        act = act, family = t.family or "semantic_beat", threadID = tid,
-        priority = tonumber(t.priority) or 30, priorityHoldMs = tonumber(t.priorityHoldMs) or 500,
-        holdMs = tonumber(t.holdMs) or 700, cooldownMs = tonumber(t.cooldownMs) or 1500,
-        familyCooldownMs = tonumber(t.familyCooldownMs) or 1500, clientCooldowns = t.clientCooldowns,
-        maxSpeakers = 1, streamKey = "beat:" .. tostring(t.speaker.id), eventRef = ref,
+    local sent = Transport.Deliver(sp, now, {
+        eventType = ev,
+        speechEventID = res and res.realizationID or ("semantic.beat." .. tostring(t.role or "line")),
+        act = act,
+        domain = domain,
+        topic = topic,
+        channel = channel,
+        lane = "beat",
+        family = t.family or "semantic_beat",
+        threadID = tid,
+        priority = tonumber(t.priority) or 30,
+        priorityHoldMs = tonumber(t.priorityHoldMs) or 500,
+        holdMs = tonumber(t.holdMs) or 700,
+        cooldownMs = tonumber(t.cooldownMs) or 1500,
+        familyCooldownMs = tonumber(t.familyCooldownMs) or 1500,
+        clientCooldowns = t.clientCooldowns,
+        tts = t.tts ~= false,
+        streamKey = "beat:" .. tostring(sp.id),
+        eventRef = ref,
         text = lineText,
         presentationClass = res and res.presentationClass or "BARK",
-        context = { eventType = ev, eventRef = ref, threadID = tid, transient = true },
+        context = {
+            eventType = ev,
+            eventRef = ref,
+            threadID = tid,
+            lane = "beat",
+            domain = domain,
+            topic = topic,
+            transient = true,
+        },
     })
     return (tonumber(sent) or 0) > 0
 end
@@ -119,17 +230,154 @@ function Beats.StartThread(plan, now, ctx)
     Beats._seq = Beats._seq + 1
     local tid = tostring(plan.threadID or ("beat:" .. tostring(plan.eventRef or Beats._seq)))
     local ok = type(plan.opening) == "table" and deliverTurn(plan.opening, tid, now, ctx) or false
-    for _, r in ipairs(type(plan.replies) == "table" and plan.replies or {}) do
-        if type(r) == "table" and type(r.speaker) == "table" then
-            while #Beats.PendingTurns >= MAX_Q do table.remove(Beats.PendingTurns, 1) end
-            Beats.PendingTurns[#Beats.PendingTurns + 1] = {
-                turn = r, threadID = tid, family = plan.family or r.family,
-                dueAt = now + (tonumber(r.delayMs) or 800), expiresAt = now + (tonumber(r.ttlMs) or 6000), ctx = ctx,
-            }
+    local reg = PNC.Registry
+    local hasRegGet = reg and type(reg.Get) == "function"
+    local participants = {}
+    if type(plan.opening) == "table" then
+        if type(plan.opening.speaker) == "table" and plan.opening.speaker.id ~= nil then
+            participants[tostring(plan.opening.speaker.id)] = plan.opening.speaker
         end
+        if type(plan.opening.addressee) == "table" and plan.opening.addressee.id ~= nil then
+            participants[tostring(plan.opening.addressee.id)] = plan.opening.addressee
+        end
+    end
+    local maxExpires = now + (tonumber(plan.ttlMs) or 6000)
+    local queuedReplies = 0
+    for _, r in ipairs(type(plan.replies) == "table" and plan.replies or {}) do
+        if type(r) == "table" and type(r.speaker) == "table" and r.speaker.id ~= nil then
+            while #Beats.PendingTurns >= MAX_Q do table.remove(Beats.PendingTurns, 1) end
+            local expAt = now + (tonumber(r.ttlMs) or 6000)
+            if expAt > maxExpires then maxExpires = expAt end
+            participants[tostring(r.speaker.id)] = r.speaker
+            if type(r.addressee) == "table" and r.addressee.id ~= nil then
+                participants[tostring(r.addressee.id)] = r.addressee
+            end
+            Beats.PendingTurns[#Beats.PendingTurns + 1] = {
+                turn = r,
+                threadID = tid,
+                family = plan.family or r.family,
+                dueAt = now + (tonumber(r.delayMs) or 800),
+                expiresAt = expAt,
+                speakerRegistered = hasRegGet and reg.Get(r.speaker.id) ~= nil or false,
+                addresseeRegistered = (type(r.addressee) == "table" and r.addressee.id ~= nil and hasRegGet)
+                    and (reg.Get(r.addressee.id) ~= nil) or false,
+                ctx = ctx,
+            }
+            queuedReplies = queuedReplies + 1
+        end
+    end
+    if queuedReplies > 0 then
+        registerThread(tid, now, maxExpires, participants)
     end
     syncMeta()
     return tid, ok
+end
+
+function Beats.CancelThread(threadID)
+    local tid = tostring(threadID or "")
+    if tid == "" then return 0 end
+    local removed = purgeTurnsForThread(tid)
+    local hadThread = Beats.ActiveThreads[tid] ~= nil
+    Beats.ActiveThreads[tid] = nil
+    removeOrder(tid)
+    syncMeta()
+    return (removed > 0 or hadThread) and math.max(removed, 1) or 0
+end
+
+function Beats.OnActorUnavailable(actorID)
+    local id = tostring(actorID or "")
+    if id == "" then return 0 end
+    local list, rem, removed = Beats.PendingTurns, {}, 0
+    for i = 1, #list do
+        local e = list[i]
+        local spId = e.turn and e.turn.speaker and e.turn.speaker.id
+        local adId = e.turn and e.turn.addressee and e.turn.addressee.id
+        if tostring(spId or "") == id or tostring(adId or "") == id then
+            removed = removed + 1
+        else
+            rem[#rem + 1] = e
+        end
+    end
+    Beats.PendingTurns = rem
+    pruneCompletedThreads(nowMs(nil))
+    syncMeta()
+    return removed
+end
+
+function Beats.HandoffToScene(threadID, spec)
+    local tid = tostring(threadID or "")
+    if tid == "" then return nil, "thread_id_required" end
+    spec = type(spec) == "table" and spec or {}
+
+    local thread = Beats.ActiveThreads[tid]
+    local cancelled = Beats.CancelThread(tid)
+
+    local runtime = spec.runtime or (PNC.ConvoEngine and PNC.ConvoEngine.InteractionSceneRuntime)
+    if type(runtime) ~= "table" then
+        local ok, loaded = pcall(require, "PNC/ConvoEngine/Interaction/SceneRuntime")
+        runtime = ok and loaded or nil
+    end
+    if type(runtime) ~= "table" or type(runtime.Open) ~= "function" then
+        return nil, "scene_runtime_unavailable"
+    end
+
+    local participants = spec.participants
+    if type(participants) ~= "table" and thread and type(thread.participants) == "table" then
+        participants = {}
+        for pid, actor in pairs(thread.participants) do
+            participants[#participants + 1] = { id = pid, actor = actor, kind = "npc" }
+        end
+    end
+
+    local requestedID = spec.sceneID or spec.id
+    if requestedID ~= nil and tostring(requestedID) == tid then
+        requestedID = "scene:handoff:" .. tid
+    end
+
+    local openSpec = {}
+    for k, v in pairs(spec) do
+        if k ~= "runtime" and k ~= "sceneID" then
+            openSpec[k] = v
+        end
+    end
+    openSpec.id = requestedID
+    openSpec.participants = participants
+
+    local scene, sceneIDOrErr
+    if type(runtime.scheduler) == "table" then
+        scene, sceneIDOrErr = runtime:Open(openSpec)
+    else
+        scene, sceneIDOrErr = runtime.Open(openSpec)
+    end
+    if not scene then
+        return nil, sceneIDOrErr
+    end
+    return scene, scene.id, {
+        threadID = tid,
+        sceneID = scene.id,
+        cancelledTurns = cancelled,
+    }
+end
+
+function Beats.GetThreadSnapshot()
+    local active = {}
+    for i = 1, #threadOrder do
+        local tid = threadOrder[i]
+        local t = Beats.ActiveThreads[tid]
+        if t then
+            active[#active + 1] = {
+                threadID = tid,
+                createdAt = t.createdAt,
+                expiresAt = t.expiresAt,
+                status = t.status,
+            }
+        end
+    end
+    return {
+        pendingCount = #Beats.PendingTurns,
+        activeThreadCount = #active,
+        threads = active,
+    }
 end
 
 function Beats.Emit(eventName, payload, now)
@@ -138,13 +386,17 @@ function Beats.Emit(eventName, payload, now)
     now, payload = nowMs(now), type(payload) == "table" and payload or {}
     local m = {}
     for _, h in pairs(hooks) do
-        if (h.eventTypes[eventName] or h.eventTypes["*"]) and now >= (tonumber(hookCooldowns[h.id]) or 0) then m[#m + 1] = h end
+        if (h.eventTypes[eventName] or h.eventTypes["*"]) and now >= (tonumber(hookCooldowns[h.id]) or 0) then
+            m[#m + 1] = h
+        end
     end
     if #m == 0 then return false, "no_matching_hook" end
     table.sort(m, function(a, b) return a.priority ~= b.priority and a.priority > b.priority or a.id < b.id end)
     local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
-    local ctx = BC and BC.Build and BC.Build(payload.anchor or payload.speaker, payload.partner or payload.addressee, { now = now, inCombat = payload.inCombat == true })
-        or { now = now, actor = {}, env = payload.env or {}, tokens = {} }
+    local ctx = BC and BC.Build and BC.Build(payload.anchor or payload.speaker, payload.partner or payload.addressee, {
+        now = now,
+        inCombat = payload.inCombat == true,
+    }) or { now = now, actor = {}, env = payload.env or {}, tokens = {} }
     for i = 1, #m do
         local h = m[i]
         local ok, plan = pcall(h.evaluate, eventName, payload, ctx)
@@ -160,27 +412,44 @@ end
 function Beats.Pump(now)
     now = nowMs(now)
     local fired = 0
-    if (tonumber(Beats.PendingCount) or 0) > 0 and (Beats.NextDueAt == nil or now >= tonumber(Beats.NextDueAt)) then
+    if (tonumber(Beats.PendingCount) or 0) > 0 then
         local reg, rem = PNC.Registry, {}
         for i = 1, #Beats.PendingTurns do
             local e = Beats.PendingTurns[i]
-            if now < e.dueAt then rem[#rem + 1] = e
-            elseif now < (e.expiresAt or math.huge) then
-                local sp = e.turn.speaker
-                e.turn.speaker = (reg and reg.Get and sp.id and reg.Get(sp.id)) or sp
-                if deliverTurn(e.turn, e.threadID, now, e.ctx) then fired = fired + 1 end
+            local threadActive = (Beats.ActiveThreads[e.threadID] == nil)
+                or (Beats.ActiveThreads[e.threadID].status == "active"
+                    and now < (Beats.ActiveThreads[e.threadID].expiresAt or math.huge))
+            local spOk, resolvedSpeaker = isActorAvailable(e.turn.speaker, e.speakerRegistered, reg)
+            local addrOk = (type(e.turn.addressee) ~= "table")
+                or isActorAvailable(e.turn.addressee, e.addresseeRegistered, reg)
+            if threadActive and spOk and addrOk and now < (e.expiresAt or math.huge) then
+                if now < e.dueAt then
+                    rem[#rem + 1] = e
+                else
+                    e.turn.speaker = resolvedSpeaker
+                    if deliverTurn(e.turn, e.threadID, now, e.ctx) then
+                        fired = fired + 1
+                    end
+                end
             end
         end
         Beats.PendingTurns = rem
+        pruneCompletedThreads(now)
         syncMeta()
+    elseif #threadOrder > 0 then
+        pruneCompletedThreads(now)
     end
-    if Beats.CheckEnvironment and now >= (tonumber(Beats.NextEnvCheckAt) or 0) then Beats.CheckEnvironment(now) end
+    if Beats.CheckEnvironment and now >= (tonumber(Beats.NextEnvCheckAt) or 0) then
+        Beats.CheckEnvironment(now)
+    end
     return fired
 end
 
 function Beats.ResetRuntime()
     Beats.PendingTurns, Beats.PendingCount, Beats.NextDueAt = {}, 0, nil
     Beats.NextEnvCheckAt, Beats.LastWeather, hookCooldowns = 0, nil, {}
+    Beats.ActiveThreads, threadOrder = {}, {}
+    Transport.ResetRuntime()
     local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
     if BC and type(BC.ResetRuntime) == "function" then BC.ResetRuntime() end
     if type(Beats.ResetHouseAlarmRuntime) == "function" then Beats.ResetHouseAlarmRuntime() end

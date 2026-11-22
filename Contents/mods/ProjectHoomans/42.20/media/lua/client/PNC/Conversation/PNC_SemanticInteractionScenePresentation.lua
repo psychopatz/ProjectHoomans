@@ -38,7 +38,9 @@ function ScenePresentation.Receive(packet)
 
     local observerOnly = packet.observerOnly == true
         or packet.audienceRole ~= "recipient"
+    local scenePriority = math.max(80, tonumber(packet.priority) or 80)
     local context = {
+        lane = "scene",
         sceneID = sceneID,
         sceneSequence = tonumber(packet.sequence) or 0,
         sceneSpeakerID = speakerID,
@@ -66,7 +68,9 @@ function ScenePresentation.Receive(packet)
         eventRef = eventID,
         eventType = "semantic_scene",
         family = "semantic_scene",
-        threadID = sceneID,
+        lane = "scene",
+        sceneID = sceneID,
+        conversationID = sceneID,
         npcID = speakerID,
         speechEventID = "semantic.scene.speech",
         semanticOwned = true,
@@ -84,7 +88,7 @@ function ScenePresentation.Receive(packet)
         llmEligible = false,
         memoryEligible = false,
         pumpImmediately = true,
-        priority = 55,
+        priority = scenePriority,
         weight = 100,
         holdMs = 850,
         cooldowns = {
@@ -96,6 +100,10 @@ function ScenePresentation.Receive(packet)
         source = {
             kind = "semantic_speech",
             channel = "interaction_scene",
+            lane = "scene",
+            sceneID = sceneID,
+            sessionID = sceneID,
+            priority = scenePriority,
             contextEligible = false,
         },
         presentationState = {

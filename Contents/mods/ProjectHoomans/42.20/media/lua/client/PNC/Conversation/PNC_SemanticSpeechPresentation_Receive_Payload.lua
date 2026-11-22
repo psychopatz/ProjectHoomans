@@ -23,6 +23,20 @@ function H.BuildReceivePayload(receive)
         or type(ambientFlavor.resolvedText) == "string"
             and ambientFlavor.resolvedText
             or nil
+    local sceneID = H.Clean(ambientFlavor.sceneID or context.sceneID, nil)
+    local lane = H.Clean(
+        ambientFlavor.lane or context.lane or sourceOverrides.lane,
+        sceneID and "scene" or "beat"
+    )
+    local threadID = lane == "beat"
+        and H.Clean(ambientFlavor.threadID or context.threadID, nil)
+        or nil
+    local conversationID = H.Clean(
+        ambientFlavor.conversationID or context.conversationID,
+        lane == "scene" and sceneID or nil
+    )
+    local priority = tonumber(ambientFlavor.priority)
+        or (lane == "scene" and 80 or 35)
     return {
         eventID = receive.eventID,
         eventRef = ambientFlavor.eventRef or receive.eventID,
@@ -32,8 +46,11 @@ function H.BuildReceivePayload(receive)
             or ambientFlavor.flavorID
             or "semantic.speech.selected",
         family = receive.family,
-        threadID = ambientFlavor.threadID or context.threadID or context.sceneID,
-        priority = tonumber(ambientFlavor.priority) or 35,
+        lane = lane,
+        sceneID = sceneID,
+        threadID = threadID,
+        conversationID = conversationID,
+        priority = priority,
         llmPriority = tonumber(ambientFlavor.llmPriority) or 90,
         weight = tonumber(ambientFlavor.weight) or 1,
         -- Semantic producers historically called this field `resolvedText`.
@@ -87,6 +104,11 @@ function H.BuildReceivePayload(receive)
         source = {
             kind = H.Clean(sourceOverrides.kind, "social_flavor"),
             channel = H.Clean(sourceOverrides.channel, nil),
+            lane = lane,
+            sceneID = sceneID,
+            threadID = threadID,
+            sessionID = H.Clean(sourceOverrides.sessionID, sceneID),
+            priority = priority,
             eventType = H.Clean(sourceOverrides.eventType, receive.eventType),
             relationshipState = receive.relationshipState,
             socialRole = receive.role,
@@ -95,7 +117,7 @@ function H.BuildReceivePayload(receive)
             responsePlanID = ambientFlavor.responsePlanID,
             realizationFamily = ambientFlavor.realizationFamily,
             realizationID = ambientFlavor.realizationID,
-        contentOwner = ambientFlavor.contentOwner,
+            contentOwner = ambientFlavor.contentOwner,
             factRefs = ambientFlavor.factRefs,
             contextEligible = sourceOverrides.contextEligible,
             semanticOwned = semanticOwned,

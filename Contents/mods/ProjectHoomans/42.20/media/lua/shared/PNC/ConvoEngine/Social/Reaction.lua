@@ -151,6 +151,9 @@ local function poolFor(spec)
         end
         return "semantic.world.object.notice"
     end
+    if eventType == "world_weather_beat" then
+        return "semantic.world.weather.rain"
+    end
     if eventType == "zombie_kill_witnessed"
         or eventType == "zombie_kill_self"
     then

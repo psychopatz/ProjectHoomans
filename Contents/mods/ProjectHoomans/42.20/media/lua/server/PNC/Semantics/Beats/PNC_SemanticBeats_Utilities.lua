@@ -35,6 +35,8 @@ local function makeUtilityHook(id, eventName, openRole, replyRole, fam, refPrefi
                 family = fam,
                 poolID = "semantic.world.utility.outage",
                 eventType = "world_event_beat",
+                domain = "world",
+                channel = "world",
                 topic = "world_event",
                 openAct = "REACT",
                 replyAct = "REACT",

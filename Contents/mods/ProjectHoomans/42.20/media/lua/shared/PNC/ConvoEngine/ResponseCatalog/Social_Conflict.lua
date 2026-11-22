@@ -516,4 +516,23 @@ Catalog.Register("semantic.world.media.broadcast", {
     },
 })
 
+Catalog.Register("semantic.world.weather.rain", {
+    variants = {
+        {
+            id = "semantic.world.weather.rain.weather_rain_open",
+            templateID = "world.weather.rain_warn.rain_open",
+            fallback = "Great, it's starting to pour, {addressee.name}. We might want some cover soon.",
+            when = { combatReactionRole = "weather_rain_open" },
+            priority = 6,
+        },
+        {
+            id = "semantic.world.weather.rain.weather_rain_reply",
+            templateID = "world.weather.rain_reply.rain_reply",
+            fallback = "Tell me about it, {addressee.name}. Keep your eyes peeled, rain hides their footsteps.",
+            when = { combatReactionRole = "weather_rain_reply" },
+            priority = 6,
+        },
+    },
+})
+
 return true

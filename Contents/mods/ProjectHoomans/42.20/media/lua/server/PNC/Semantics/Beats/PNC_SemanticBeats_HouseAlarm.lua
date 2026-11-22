@@ -90,6 +90,8 @@ Beats.RegisterHook("environment.house_alarm", {
             family = "world_house_alarm",
             poolID = "semantic.world.alarm.react",
             eventType = "world_event_beat",
+            domain = "world",
+            channel = "world",
             topic = "world_event",
             openAct = "WARN",
             replyAct = "REACT",

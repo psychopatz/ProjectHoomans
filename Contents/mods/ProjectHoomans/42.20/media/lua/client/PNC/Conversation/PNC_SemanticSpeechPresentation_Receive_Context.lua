@@ -207,7 +207,8 @@ function H.BuildReceiveContext(ambientFlavor, summary, networkArgs)
         "reserved"
     )
     local eventType = ambientFlavor.eventType or "social_flavor"
-    local family = ambientFlavor.family or "combat_commentary"
+    local family = ambientFlavor.family
+        or (ambientFlavor.lane == "scene" and "semantic_scene" or "semantic_beat")
     local active, view = H.ActiveConversationFor(npcID)
     local context = type(ambientFlavor.context) == "table"
         and ambientFlavor.context or {}

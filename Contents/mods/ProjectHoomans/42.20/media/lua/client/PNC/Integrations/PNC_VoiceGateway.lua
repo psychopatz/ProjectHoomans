@@ -26,12 +26,18 @@ local function activeEntry(message)
     local view = conversation and conversation.instance or nil
     local session = view and view.session or nil
     if not view or not session then return nil end
-    if tostring(session.conversationID or "")
-        ~= tostring(message and message.conversationID or "")
-    then
+    local context = view.spec and view.spec.context or nil
+    local source = type(message and message.source) == "table"
+        and message.source or nil
+    local sceneID = source and trim(source.sceneID or source.sessionID) or ""
+    local msgConvID = trim(message and message.conversationID)
+    local sessConvID = trim(session.conversationID)
+    local matchesConv = sessConvID ~= "" and sessConvID == msgConvID
+    local matchesScene = sceneID ~= ""
+        and context and trim(context.sceneID) == sceneID
+    if not matchesConv and not matchesScene then
         return nil
     end
-    local context = view.spec and view.spec.context or nil
     return context and context.entry or nil
 end
 
@@ -103,12 +109,22 @@ end
 local function speechFor(message)
     local state = type(message and message.presentationState) == "table"
         and message.presentationState or {}
+    local source = type(message and message.source) == "table"
+        and message.source or {}
     local requested = state.speech or state.speechPolicy
+    local isScene = trim(source.lane) == "scene"
+        or trim(source.channel) == "interaction_scene"
+        or trim(source.sceneID) ~= ""
     local speech = {
         mode = "RESPONSE",
         allow_overlap = false,
         can_interrupt = false,
     }
+    if isScene then
+        speech.priority = tonumber(source.priority) or 80
+    elseif tonumber(source.priority) ~= nil then
+        speech.priority = tonumber(source.priority)
+    end
     if type(requested) ~= "table" then return speech end
     local fields = {
         "effect_profile", "effectProfile",
