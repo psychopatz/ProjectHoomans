@@ -65,6 +65,12 @@ function H.Owned(record)
 end
 
 function H.Log(record, needType, before, after, reason)
+    if (reason == "passive_decay" or reason == "passive_increase")
+        and math.abs((tonumber(after) or 0) - (tonumber(before) or 0)) < 0.01
+        and not (PNC.NeedsDebug and PNC.NeedsDebug.VerboseHistory == true)
+    then
+        return
+    end
     PNC.NeedsDebug = PNC.NeedsDebug or {}
     local history = PNC.NeedsDebug.individualHistory or {}
     PNC.NeedsDebug.individualHistory = history

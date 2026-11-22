@@ -1,0 +1,25 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.player_assaulted.friendly_push",
+  "locale": "TL",
+  "entries": {
+    "say.variants.first": [
+      "Teka, hinay-hinay lang! Kakampi mo ako!",
+      "Hoy, tingnan mo tinatamaan mo!",
+      "Ingat naman, {addressee.name}, muntik mo na akong matumba!",
+      "Teka lang, kakampi ako! Huwag mo akong itulak!"
+    ],
+    "say.variants.warn": [
+      "Seryoso, {addressee.name}, itigil mo na 'yang panunulak!",
+      "Pangalawa na 'yan ah. Baka magkaproblema tayo kung uulitin mo.",
+      "Hoy! Tigilan mo nga ang kakatulak sa akin!",
+      "Tama na, {addressee.name}! Dumistansya ka kung hindi ka makapag-ingat."
+    ],
+    "say.variants.penalty": [
+      "Sobra na 'yan, {addressee.name}. Ulitin mo pa at masisira na tiwala ko sa'yo.",
+      "Sawa na ako sa kakatulak mo ngayong araw. Lumayo ka muna!",
+      "Itigil mo na 'yan, {addressee.name}! Nauubos na pasensya ko sa'yo.",
+      "Kung tuloy ka sa panunulak, huwag kang umasang pagkakatiwalaan pa kita."
+    ]
+  }
+}

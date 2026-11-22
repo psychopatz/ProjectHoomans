@@ -17,6 +17,7 @@ local isAuthority = H.isAuthority
 local resolveObserver = H.resolveObserver
 local validateTarget = H.validateTarget
 local getRelationship = H.getRelationship
+local ensureSocialForMutation = H.ensureSocialForMutation
 local buildMemorySpec = H.buildMemorySpec
 local findMemory = H.findMemory
 local hasRecentEvent = H.hasRecentEvent
@@ -76,17 +77,23 @@ function Relationships.ApplyEventMutation(
     if not memory or memory.aboutKey ~= targetKey then
         return false, "invalid_memory"
     end
-    social = Types.NormalizeSocialState(
-        record.social,
-        record.identitySeed,
-        record.archetypeID
-    )
+    if ensureSocialForMutation then
+        social = ensureSocialForMutation(record)
+    else
+        social = Types.NormalizeSocialState(
+            record.social,
+            record.identitySeed,
+            record.archetypeID
+        )
+    end
     if hasRecentEvent(social, eventID) then
         return false, "duplicate_event"
     end
     relationship = getRelationship(record, targetKey)
     relationship = relationship
-        and Types.NormalizeRelationship(relationship, targetKey)
+        and (Types.CloneRelationshipForMutation
+            and Types.CloneRelationshipForMutation(relationship, targetKey)
+            or Types.NormalizeRelationship(relationship, targetKey))
         or Types.NewRelationship(targetKey)
     if findMemory(relationship, memory.id) then
         return false, "duplicate_memory_id"
@@ -126,7 +133,8 @@ function Relationships.ApplyEventMutation(
         relationship,
         targetKey,
         worldAgeHours,
-        Constants.MEMORY_LIMIT
+        Constants.MEMORY_LIMIT,
+        true
     )
     memoryIndex = findMemory(relationship, memory.id)
     if not withinLimit then
@@ -164,7 +172,8 @@ function Relationships.ApplyEventMutation(
     relationship = Math.RecalculateRelationship(
         relationship,
         targetKey,
-        worldAgeHours
+        worldAgeHours,
+        true
     )
     social.morale = math.max(
         Constants.MORALE_MIN,
@@ -221,10 +230,15 @@ function Relationships.ApplyEventMutation(
         )
     end
     return true, "applied", {
-        relationship = Types.NormalizeRelationship(
-            record.social.relationships[targetKey],
-            targetKey
-        ),
+        relationship = Types.CloneRelationshipForMutation
+            and Types.CloneRelationshipForMutation(
+                record.social.relationships[targetKey],
+                targetKey
+            )
+            or Types.NormalizeRelationship(
+                record.social.relationships[targetKey],
+                targetKey
+            ),
         morale = record.social.morale,
         memoryID = memoryOutcome.durable and memory.id or nil,
         proposedMemoryID = memory.id,

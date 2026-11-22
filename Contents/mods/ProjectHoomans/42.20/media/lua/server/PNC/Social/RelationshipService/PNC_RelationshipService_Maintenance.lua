@@ -14,7 +14,7 @@ local isAuthority = Internal.isAuthority
 local resolveObserver = Internal.resolveObserver
 local validateTarget = Internal.validateTarget
 local getRelationship = Internal.getRelationship
-local prepareSocial = Internal.prepareSocial
+local prepareSocial = Internal.ensureSocialForMutation or Internal.prepareSocial
 local commit = Internal.commit
 
 function Relationships.Recalculate(observerNPCID, targetKey, worldAgeHours)

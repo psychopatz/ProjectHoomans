@@ -16,6 +16,33 @@ function Factions.Get(factionID)
         faction and nil or "faction_not_found"
 end
 
+-- Server-internal read-only access without deep-cloning the full faction tree.
+-- Callers must never mutate the returned table directly.
+function Factions.Peek(factionID)
+    Factions.EnsureLoaded()
+    local faction = Internal.registryRecord(factionID)
+    return faction or nil, faction and nil or "faction_not_found"
+end
+
+function Factions.ForEachActiveMobileGroup(callback)
+    if type(callback) ~= "function" then return 0 end
+    Factions.EnsureLoaded()
+    local count = 0
+    for factionID, faction in pairs(
+        Factions.Registry and Factions.Registry.byID or {}
+    ) do
+        if type(faction) == "table"
+            and faction.status == "active"
+            and type(faction.mobile) == "table"
+            and faction.mobile.active == true
+        then
+            count = count + 1
+            if callback(faction, factionID) == false then break end
+        end
+    end
+    return count
+end
+
 function Factions.GetPresentation(factionID)
     Factions.EnsureLoaded()
     local faction = Internal.registryRecord(factionID)

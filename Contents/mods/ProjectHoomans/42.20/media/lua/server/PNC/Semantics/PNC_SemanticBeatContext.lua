@@ -11,13 +11,15 @@ PNC.Semantics.BeatContext = BC
 BC.VERSION = 1
 
 local WEATHER_TTL_MS = 2000
+local UTILITIES_TTL_MS = 5000
 local providers = {}
 local providerOrder = {}
 local weatherCache = { expiresAt = -1, data = nil }
+local utilitiesCache = { expiresAt = -1, data = nil }
 
-local function safeCall(obj, method)
+local function safeCall(obj, method, ...)
     if not obj or type(obj[method]) ~= "function" then return nil end
-    local ok, val = pcall(obj[method], obj)
+    local ok, val = pcall(obj[method], obj, ...)
     return ok and val or nil
 end
 
@@ -80,6 +82,70 @@ function BC.GetWorldWeather(now, force)
     }
     weatherCache.data = data
     weatherCache.expiresAt = now + WEATHER_TTL_MS
+    return data
+end
+
+function BC.GetWorldUtilities(now, force)
+    now = tonumber(now) or (PNC.Core and type(PNC.Core.Now) == "function" and tonumber(PNC.Core.Now())) or 0
+    if not force and utilitiesCache.data and now < (tonumber(utilitiesCache.expiresAt) or 0) then
+        return utilitiesCache.data
+    end
+    local sb = (type(getSandboxOptions) == "function" and getSandboxOptions())
+        or (SandboxOptions and type(SandboxOptions.getInstance) == "function" and SandboxOptions.getInstance())
+        or nil
+    local world = (type(getWorld) == "function" and getWorld())
+        or (IsoWorld and IsoWorld.instance)
+        or nil
+    local gt = type(getGameTime) == "function" and getGameTime() or nil
+
+    local worldDays = tonumber(gt and safeCall(gt, "getWorldAgeDaysSinceBegin"))
+    if worldDays == nil then
+        local hours = tonumber(gt and safeCall(gt, "getWorldAgeHours"))
+        worldDays = hours and (hours / 24) or 0
+    end
+    local currentDay = math.floor(worldDays)
+
+    local elecShutDay = sb and tonumber(safeCall(sb, "getElecShutModifier")) or nil
+    local waterShutDay = sb and tonumber(safeCall(sb, "getWaterShutModifier")) or nil
+
+    local powerOn = true
+    local hasHydro = world and type(world.isHydroPowerOn) == "function"
+    local hasGrid = sb and type(sb.doesPowerGridExist) == "function"
+    if hasHydro then
+        powerOn = safeCall(world, "isHydroPowerOn") == true
+    end
+    if hasGrid then
+        local grid = safeCall(sb, "doesPowerGridExist") == true
+        powerOn = hasHydro and (powerOn and grid) or grid
+    elseif not hasHydro and elecShutDay ~= nil and elecShutDay >= 0 then
+        powerOn = worldDays < elecShutDay
+    end
+
+    local waterOn = true
+    if waterShutDay ~= nil and waterShutDay >= 0 then
+        waterOn = worldDays < waterShutDay
+    end
+
+    local powerOutToday = (not powerOn)
+        and elecShutDay ~= nil
+        and elecShutDay >= 0
+        and currentDay == math.floor(elecShutDay)
+    local waterOutToday = (not waterOn)
+        and waterShutDay ~= nil
+        and waterShutDay >= 0
+        and currentDay == math.floor(waterShutDay)
+
+    local data = {
+        powerOn = powerOn == true,
+        waterOn = waterOn == true,
+        elecShutDay = elecShutDay,
+        waterShutDay = waterShutDay,
+        currentDay = currentDay,
+        powerOutToday = powerOutToday == true,
+        waterOutToday = waterOutToday == true,
+    }
+    utilitiesCache.data = data
+    utilitiesCache.expiresAt = now + UTILITIES_TTL_MS
     return data
 end
 
@@ -157,9 +223,16 @@ end)
 
 BC.RegisterProvider("environment_weather", function(ctx, sp)
     local w = BC.GetWorldWeather(ctx.now)
-    local env = {}
+    local env = type(ctx.env) == "table" and ctx.env or {}
     for k, v in pairs(w) do env[k] = v end
     env.isIndoors = isRecordIndoors(sp)
+    ctx.env = env
+end)
+
+BC.RegisterProvider("environment_utilities", function(ctx)
+    local u = BC.GetWorldUtilities(ctx.now)
+    local env = type(ctx.env) == "table" and ctx.env or {}
+    for k, v in pairs(u) do env[k] = v end
     ctx.env = env
 end)
 
@@ -185,6 +258,8 @@ end
 function BC.ResetRuntime()
     weatherCache.expiresAt = -1
     weatherCache.data = nil
+    utilitiesCache.expiresAt = -1
+    utilitiesCache.data = nil
 end
 
 return BC

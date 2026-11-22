@@ -153,7 +153,7 @@ end
 local reactionFamily
 
 local function ambientPayload(
-    record, profile, eventType, eventID, facts, burst, moment
+    record, profile, eventType, eventID, facts, burst, moment, spec
 )
     local context = {
         eventType = eventType,
@@ -173,6 +173,13 @@ local function ambientPayload(
         combatWoundType = moment and moment.woundType,
         combatWeaponNamed = moment and moment.weaponNameEligible == true,
         combatWeaponDisplayName = moment and moment.weaponDisplayName,
+        assaultKind = type(spec) == "table" and spec.assaultKind or nil,
+        friendlyPushTier = type(spec) == "table" and spec.friendlyPushTier or nil,
+        friendlyPushCount = type(spec) == "table" and spec.friendlyPushCount or nil,
+        lootCategory = type(spec) == "table" and spec.lootCategory or nil,
+        lootItemName = type(spec) == "table" and spec.lootItemName or nil,
+        addresseeName = type(spec) == "table" and spec.addresseeName or nil,
+        isShove = type(spec) == "table" and spec.isShove == true or nil,
         relationshipState = profile.relationshipState,
         relationshipTier = profile.relationshipTier,
         socialStyle = profile.socialStyle,
@@ -212,6 +219,25 @@ local function ambientPayload(
                 function() return context.combatWeaponDisplayName end
             )
         end
+    end
+    local lootName = context.lootItemName or "gear"
+    local lootPlaceholders = {
+        "{loot.item}",
+        "{slot.loot.name}",
+    }
+    for _, placeholder in ipairs(lootPlaceholders) do
+        realization.fallback = string.gsub(
+            realization.fallback,
+            placeholder,
+            function() return lootName end
+        )
+    end
+    if context.addresseeName and context.addresseeName ~= "" then
+        realization.fallback = string.gsub(
+            realization.fallback,
+            "{addressee.name}",
+            function() return context.addresseeName end
+        )
     end
     context.responsePlanID = realization.responsePlanID
     context.realizationFamily = realization.realizationFamily
@@ -301,7 +327,7 @@ local function sendReaction(
         eventID, eventType, record, profile, spec, burst, moment
     )
     local payload, reason, realization = ambientPayload(
-        record, profile, eventType, eventID, facts, burst, moment
+        record, profile, eventType, eventID, facts, burst, moment, spec
     )
     local audienceKey = playerKey(player)
     local family = reactionFamily(eventType)
@@ -736,15 +762,16 @@ function Service.OnPlayerAssaultedNPC(record, player, spec)
         reactionStyle = profile.combatReactionStyle,
         relationshipState = profile.relationshipState,
         relationshipTier = profile.relationshipTier,
-        priority = 40,
+        priority = tonumber(spec.priority) or 40,
         presentationClass = "BARK",
         source = "player_assault",
         occurredAt = now,
     })
     local allowed, reason = Arbiter.Begin({
-        streamKey = "player_assaulted_npc:" .. tostring(record.id or ""),
+        streamKey = "player_assaulted_npc:" .. tostring(record.id or "")
+            .. ":" .. tostring(spec.assaultKind or "default"),
         now = now,
-        cooldownMs = Service.SPEAKER_COOLDOWN_MS,
+        cooldownMs = tonumber(spec.cooldownMs) or Service.SPEAKER_COOLDOWN_MS,
         maxSpeakers = 1,
         priority = moment.priority,
         moment = moment,
@@ -753,6 +780,11 @@ function Service.OnPlayerAssaultedNPC(record, player, spec)
         return 0, reason == "stream_cooldown"
             and "speaker_cooldown" or reason
     end
+    local descriptor = call(player, "getDescriptor")
+    local addresseeName = (descriptor and call(descriptor, "getForename"))
+        or call(player, "getDisplayName")
+        or call(player, "getUsername")
+        or "friend"
     local sent = sendReaction(
         player,
         record,
@@ -763,6 +795,13 @@ function Service.OnPlayerAssaultedNPC(record, player, spec)
             targetKind = "human_npc",
             targetID = tostring(record.id or ""),
             hostilityReason = spec.hostilityReason or "attacked_by_player",
+            assaultKind = spec.assaultKind,
+            friendlyPushTier = spec.friendlyPushTier,
+            friendlyPushCount = spec.friendlyPushCount,
+            lootCategory = spec.lootCategory,
+            lootItemName = spec.lootItemName,
+            addresseeName = tostring(addresseeName or "friend"),
+            isShove = spec.isShove == true,
             nextAction = "Defend against the attacker.",
             x = x, y = y, z = z,
         },

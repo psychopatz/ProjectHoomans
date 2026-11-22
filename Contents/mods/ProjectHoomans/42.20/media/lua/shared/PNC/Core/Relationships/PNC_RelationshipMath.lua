@@ -32,8 +32,7 @@ function Math.NextMemorySequence(relationship)
     return math.min(2147483646, sequence + 1)
 end
 
-function Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
-    local normalized = Types.NormalizeMemory(memory)
+local function calculateMemoryStrengthFast(normalized, worldAgeHours)
     local coreSocial = PsychopatzCore and PsychopatzCore.Actors
         and PsychopatzCore.Actors.Social or nil
     if not normalized then
@@ -42,7 +41,6 @@ function Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
     if coreSocial and type(coreSocial.CalculateMemoryStrength) == "function" then
         return coreSocial.CalculateMemoryStrength(normalized, worldAgeHours)
     end
-    local elapsedDays
     if normalized.permanent or normalized.retentionClass == "ANCHOR" then
         return normalized.strength
     end
@@ -56,7 +54,7 @@ function Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
     if normalized.retentionClass == "SCENE" then
         return worldAgeHours <= normalized.createdAt and normalized.strength or 0
     end
-    elapsedDays = math.max(
+    local elapsedDays = math.max(
         0,
         (worldAgeHours - normalized.createdAt) / 24
     )
@@ -66,8 +64,14 @@ function Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
     )
 end
 
-function Math.RecalculateRelationship(value, targetKey, worldAgeHours)
-    local relationship = Types.NormalizeRelationship(value, targetKey)
+function Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
+    local normalized = Types.NormalizeMemory(memory)
+    return calculateMemoryStrengthFast(normalized, worldAgeHours)
+end
+
+function Math.RecalculateRelationship(value, targetKey, worldAgeHours, alreadyNormalized)
+    local isFast = alreadyNormalized == true and type(value) == "table" and type(value.memories) == "table"
+    local relationship = isFast and value or Types.NormalizeRelationship(value, targetKey)
     local approval
     local respect
     local _
@@ -77,6 +81,12 @@ function Math.RecalculateRelationship(value, targetKey, worldAgeHours)
     if not relationship then
         return nil, false
     end
+    local beforeApproval = relationship.approval
+    local beforeRespect = relationship.respect
+    local beforeFamiliarity = relationship.familiarity
+    local beforeState = relationship.state
+    local beforePrevState = relationship.previousState
+    local beforeLastEval = relationship.lastEvaluatedAt
     worldAgeHours = tonumber(worldAgeHours)
     if worldAgeHours == nil
         or worldAgeHours ~= worldAgeHours
@@ -89,10 +99,9 @@ function Math.RecalculateRelationship(value, targetKey, worldAgeHours)
     approval = relationship.baselineApproval
     respect = relationship.baselineRespect
     for _, memory in pairs(relationship.memories) do
-        strength = Math.CalculateMemoryStrengthAtTime(
-            memory,
-            worldAgeHours
-        )
+        strength = isFast
+            and calculateMemoryStrengthFast(memory, worldAgeHours)
+            or Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
         approval = approval + (memory.approvalEffect * strength)
         respect = respect + (memory.respectEffect * strength)
         memory.lastEvaluatedAt = worldAgeHours
@@ -118,13 +127,24 @@ function Math.RecalculateRelationship(value, targetKey, worldAgeHours)
         relationship.state = resolvedState
     end
     relationship.lastEvaluatedAt = worldAgeHours
+    if isFast then
+        local changed = beforeApproval ~= relationship.approval
+            or beforeRespect ~= relationship.respect
+            or beforeFamiliarity ~= relationship.familiarity
+            or beforeState ~= relationship.state
+            or beforePrevState ~= relationship.previousState
+            or beforeLastEval ~= relationship.lastEvaluatedAt
+        return relationship, changed
+    end
     return relationship, not Types.AreEqual(value, relationship)
 end
 
-function Math.PruneMemories(value, targetKey, worldAgeHours, maximum)
-    local relationship = Types.NormalizeRelationship(value, targetKey)
+function Math.PruneMemories(value, targetKey, worldAgeHours, maximum, alreadyNormalized)
+    local isFast = alreadyNormalized == true and type(value) == "table" and type(value.memories) == "table"
+    local relationship = isFast and value or Types.NormalizeRelationship(value, targetKey)
     local kept = {}
     local removable = {}
+    local strengthByID = {}
     local _
     local memory
     local removed = 0
@@ -137,10 +157,12 @@ function Math.PruneMemories(value, targetKey, worldAgeHours, maximum)
         math.floor(tonumber(maximum) or Constants.MEMORY_LIMIT)
     )
     for _, memory in pairs(relationship.memories) do
-        if memory.permanent
-            or Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours) > 0
-        then
+        local strength = isFast
+            and calculateMemoryStrengthFast(memory, worldAgeHours)
+            or Math.CalculateMemoryStrengthAtTime(memory, worldAgeHours)
+        if memory.permanent or strength > 0 then
             kept[#kept + 1] = memory
+            strengthByID[memory.id] = strength
             if not memory.permanent then
                 removable[#removable + 1] = memory
             end
@@ -149,10 +171,8 @@ function Math.PruneMemories(value, targetKey, worldAgeHours, maximum)
         end
     end
     table.sort(removable, function(left, right)
-        local leftStrength =
-            Math.CalculateMemoryStrengthAtTime(left, worldAgeHours)
-        local rightStrength =
-            Math.CalculateMemoryStrengthAtTime(right, worldAgeHours)
+        local leftStrength = strengthByID[left.id] or 0
+        local rightStrength = strengthByID[right.id] or 0
         if leftStrength ~= rightStrength then
             return leftStrength < rightStrength
         end

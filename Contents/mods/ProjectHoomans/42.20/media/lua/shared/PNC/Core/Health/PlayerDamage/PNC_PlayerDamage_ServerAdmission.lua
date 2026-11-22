@@ -145,7 +145,8 @@ function PlayerDamage.HandleClientReport(player, args)
     local applied
     applied, reason = PlayerDamage.Apply(
         record, zombie, player, weapon, report.damage,
-        "player_weapon_report")
+        "player_weapon_report",
+        { isShove = report.isShove == true })
     Internal.Audit(record, "server_admission",
         applied and "applied" or "rejected", reason,
         attackerKey, report.weaponFullType, report.damage)

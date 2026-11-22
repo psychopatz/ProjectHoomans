@@ -228,8 +228,18 @@ local function updateMobile(faction, patch, reason)
     if not Factions or not Factions.UpdateMobileGroup then
         return faction
     end
-    local ok = Factions.UpdateMobileGroup(faction.id, patch, reason)
-    return ok and Factions.Get(faction.id) or faction
+    local ok = Factions.UpdateMobileGroup(
+        faction.id,
+        patch,
+        reason,
+        { skipReturnCopy = true }
+    )
+    if ok then
+        return (Factions.Peek and Factions.Peek(faction.id))
+            or Factions.Get(faction.id)
+            or faction
+    end
+    return faction
 end
 
 function H.RefreshStrategic(faction, at)
@@ -252,16 +262,25 @@ function H.RefreshStrategic(faction, at)
     )
     local target = H.FindPlayerBaseTarget(faction)
     local current = mobile.strategicTarget
+    local changed = false
     if target and not sameTarget(current, target) then
         faction = updateMobile(faction, {
             strategicTarget = target,
         }, "mobile_player_base_target")
+        changed = true
     elseif not target and current and current.baseID then
         faction = updateMobile(faction, {
             strategicTarget = nil,
         }, "mobile_player_base_lost")
+        changed = true
     end
-    H.RepairMobileOrders(faction)
+    local revKey = tostring((faction.mobile and faction.mobile.revision) or 0)
+        .. ":" .. tostring((faction.mobile and faction.mobile.ambient and faction.mobile.ambient.revision) or 0)
+    local prevKey = H.LastRepairedAmbientRevision
+        and H.LastRepairedAmbientRevision[faction.id] or nil
+    if changed or prevKey ~= revKey then
+        H.RepairMobileOrders(faction)
+    end
     endDiagnosticTiming(
         timingName,
         timingStart,

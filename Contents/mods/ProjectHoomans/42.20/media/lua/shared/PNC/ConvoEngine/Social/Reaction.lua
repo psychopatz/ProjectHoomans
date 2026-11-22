@@ -128,7 +128,20 @@ local function poolFor(spec)
     local eventType = string.lower(tostring(spec.eventType or ""))
     local context = type(spec.context) == "table" and spec.context or {}
     if eventType == "player_assaulted_npc" then
+        local assaultKind = tostring(context.assaultKind or "")
+        if assaultKind == "friendly_push" then
+            return "semantic.player_assaulted.friendly_push"
+        end
+        if assaultKind == "looter_taunt" then
+            return "semantic.player_assaulted.looter_taunt"
+        end
         return "semantic.player_assaulted_npc"
+    end
+    if eventType == "world_event_beat" then
+        return "semantic.world_beats.events"
+    end
+    if eventType == "world_television_beat" then
+        return "semantic.world_beats.television"
     end
     if eventType == "zombie_kill_witnessed"
         or eventType == "zombie_kill_self"

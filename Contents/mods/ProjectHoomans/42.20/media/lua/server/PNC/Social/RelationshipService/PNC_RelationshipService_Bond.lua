@@ -49,6 +49,14 @@ function Internal.EvaluateDurableBond(record, targetKey, worldAgeHours)
     end
     relationship = Internal.getRelationship(record, targetKey)
     if not relationship then return false, "relationship_not_found" end
+    local rawBondClass = type(relationship.bond) == "table"
+        and tostring(relationship.bond.class or "none") or "none"
+    if rawBondClass ~= "none" and Types.NormalizeBond(relationship.bond).class ~= "none" then
+        return false, "bond_already_established"
+    end
+    if not meetsFriendGate(relationship) then
+        return false, "friend_gate_not_met"
+    end
     relationship = Types.NormalizeRelationship(relationship, targetKey)
     bond = Types.NormalizeBond(relationship.bond)
     if bond.class ~= "none" then return false, "bond_already_established" end

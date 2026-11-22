@@ -18,6 +18,28 @@ local NecroaExposure = PNC.Compatibility
 
 H.LastLivePositionSafetyRefreshAt =
     tonumber(H.LastLivePositionSafetyRefreshAt) or 0
+H.NextThreatPruneAt = tonumber(H.NextThreatPruneAt) or 0
+
+local function pumpSocialEncounters()
+    local worldAge = PNC.SocialEventHooks.WorldAgeHours()
+    local now = tonumber(H.TimingNow) or 0
+    if PNC.SocialEventHooks.PruneThreatAttributions
+        and (PNC.SocialEventHooks.ThreatAttributionCount == nil
+            or (tonumber(PNC.SocialEventHooks.ThreatAttributionCount) or 0) > 0)
+        and now >= (tonumber(H.NextThreatPruneAt) or 0)
+    then
+        H.NextThreatPruneAt = now + 1000
+        PNC.SocialEventHooks.PruneThreatAttributions(worldAge)
+    end
+    PNC.SocialEncounterTracker.Pump(worldAge)
+end
+
+local function pumpSocialGreeting()
+    local worldAge = PNC.SocialEventHooks
+        and PNC.SocialEventHooks.WorldAgeHours
+        and PNC.SocialEventHooks.WorldAgeHours() or nil
+    PNC.SocialGreeting.Pump(worldAge)
+end
 
 local function safeOptional(stage, owner, method, context, ...)
     local callback = owner and owner[method]
@@ -243,21 +265,10 @@ function H.FinishTick(now)
         and PNC.SocialEncounterTracker.Pump
         and PNC.SocialEventHooks
     then
-        H.SafePhase("server_finish.social_encounters", function()
-            local worldAge = PNC.SocialEventHooks.WorldAgeHours()
-            if PNC.SocialEventHooks.PruneThreatAttributions then
-                PNC.SocialEventHooks.PruneThreatAttributions(worldAge)
-            end
-            PNC.SocialEncounterTracker.Pump(worldAge)
-        end)
+        H.SafePhase("server_finish.social_encounters", pumpSocialEncounters)
     end
     if PNC.SocialGreeting and PNC.SocialGreeting.Pump then
-        H.SafePhase("server_finish.social_greeting", function()
-            local worldAge = PNC.SocialEventHooks
-                and PNC.SocialEventHooks.WorldAgeHours
-                and PNC.SocialEventHooks.WorldAgeHours() or nil
-            PNC.SocialGreeting.Pump(worldAge)
-        end)
+        H.SafePhase("server_finish.social_greeting", pumpSocialGreeting)
     end
     if timerName then
         ScalingDiagnostics.EndTiming(timerName, timerStart)

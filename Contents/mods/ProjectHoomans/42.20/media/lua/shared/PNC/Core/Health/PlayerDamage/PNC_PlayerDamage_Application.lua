@@ -11,11 +11,21 @@ local Core = PNC.Core
 local Health = PNC.Health
 local Network = PNC.Network
 
+local function notifyAssaultSemantics(methodName, record, attacker, spec)
+    local semantics = PNC and PNC.Semantics and PNC.Semantics.PlayerAssaultReactions or nil
+    if type(semantics) ~= "table" or type(semantics[methodName]) ~= "function" then
+        return false
+    end
+    local ok = pcall(semantics[methodName], record, attacker, spec)
+    return ok == true
+end
+
 function PlayerDamage.Apply(record, zombie, attacker, weapon,
-    reportedDamage, source)
+    reportedDamage, source, options)
     local amount
     local applied
     local usedCombatService = false
+    local isShove
     if not record or not zombie then
         return false, "missing_target"
     end
@@ -24,6 +34,9 @@ function PlayerDamage.Apply(record, zombie, attacker, weapon,
     then
         return false, "not_authority"
     end
+    isShove = type(options) == "table" and options.isShove == true
+        or (Runtime.IsShove and Runtime.IsShove(attacker, weapon, reportedDamage) == true)
+        or false
     if not PlayerDamage.CanDamageRecord(record, attacker) then
         Runtime.RestoreEngineBuffer(zombie, record)
         if PlayerDamage.IsFriendlyOwner(record, attacker)
@@ -36,11 +49,33 @@ function PlayerDamage.Apply(record, zombie, attacker, weapon,
                 "friendly_owner_hit"
             )
         end
+        if attacker then
+            notifyAssaultSemantics("OnFriendlyPushOrStrike", record, attacker, {
+                isShove = isShove,
+                weapon = weapon,
+                weaponFullType = Runtime.GetFullType(weapon),
+                damage = tonumber(reportedDamage) or 0,
+                source = source,
+            })
+        end
         return false, "colonist_protected"
     end
     amount = PlayerDamage.ScaleDamage(reportedDamage, weapon)
     if amount <= 0 then
         Runtime.RestoreEngineBuffer(zombie, record)
+        if isShove == true and attacker and record.alive ~= false then
+            local hostileClass = Const and Const.TACTICAL_CLASS_HOSTILE or "hostile"
+            local method = record.tacticalClass == hostileClass
+                and "OnHostileAttackedByPlayer"
+                or "OnFriendlyPushOrStrike"
+            notifyAssaultSemantics(method, record, attacker, {
+                isShove = true,
+                weapon = weapon,
+                weaponFullType = Runtime.GetFullType(weapon),
+                damage = tonumber(reportedDamage) or 0,
+                source = source,
+            })
+        end
         return false, "invalid_damage"
     end
     if PNC.CombatResolution and PNC.CombatResolution.ApplyTargetDamage then

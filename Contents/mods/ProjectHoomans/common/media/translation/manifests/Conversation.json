@@ -23,6 +23,7 @@
       "EN/Conversation/Text/convo/ConvoEngine_task.json",
       "EN/Conversation/Text/convo/ConvoEngine_tool_reply.json",
       "EN/Conversation/Text/convo/ConvoEngine_ui.json",
+      "EN/Conversation/Text/convo/ConvoEngine_world.json",
       "EN/Conversation/Text/convo/SemanticResponses.json",
       "EN/Conversation/UI.json"
     ],
@@ -49,6 +50,7 @@
       "TL/Conversation/Text/convo/ConvoEngine_task.json",
       "TL/Conversation/Text/convo/ConvoEngine_tool_reply.json",
       "TL/Conversation/Text/convo/ConvoEngine_ui.json",
+      "TL/Conversation/Text/convo/ConvoEngine_world.json",
       "TL/Conversation/Text/convo/SemanticResponses.json",
       "TL/Conversation/UI.json"
     ]

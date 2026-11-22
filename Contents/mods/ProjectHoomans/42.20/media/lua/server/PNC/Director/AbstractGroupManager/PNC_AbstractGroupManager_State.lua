@@ -57,31 +57,31 @@ function Groups.SynchronizeMembersAtLocation(group)
         if record and record.alive ~= false and not live
             and record.presenceState ~= Const.PRESENCE_LIVE
         then
-            if record.orderSpec
+            local isFollowing = record.orderSpec
                 and tostring(record.orderSpec.kind or "")
                     == tostring(Const.ORDER_FOLLOW or "follow")
-            then
-                -- A strategic group arrival must not reset a follower to the
-                -- group's location. Follow owns the record position.
-                return
-            end
-            local offsetX = ((index - 1) % 3) - 1
-            local offsetY = math.floor((index - 1) / 3)
-            record.x, record.y, record.z = location.x + offsetX,
-                location.y + offsetY, location.z
-            record.anchorX, record.anchorY, record.anchorZ =
-                location.x, location.y, location.z
-            if type(record.orderSpec) == "table" then
-                record.orderSpec.x, record.orderSpec.y, record.orderSpec.z =
+            -- A strategic group arrival must not reset a follower to the
+            -- group's location. Follow owns the record position; skip only
+            -- this follower so remaining non-follower members still sync.
+            if not isFollowing then
+                local offsetX = ((index - 1) % 3) - 1
+                local offsetY = math.floor((index - 1) / 3)
+                record.x, record.y, record.z = location.x + offsetX,
+                    location.y + offsetY, location.z
+                record.anchorX, record.anchorY, record.anchorZ =
                     location.x, location.y, location.z
+                if type(record.orderSpec) == "table" then
+                    record.orderSpec.x, record.orderSpec.y, record.orderSpec.z =
+                        location.x, location.y, location.z
+                end
+                if PNC.SpatialIndex and PNC.SpatialIndex.UpdateNPC then
+                    PNC.SpatialIndex.UpdateNPC(record)
+                end
+                if PNC.Registry.MarkDirty then
+                    PNC.Registry.MarkDirty(record, "abstract_group_arrival")
+                end
+                updated = updated + 1
             end
-            if PNC.SpatialIndex and PNC.SpatialIndex.UpdateNPC then
-                PNC.SpatialIndex.UpdateNPC(record)
-            end
-            if PNC.Registry.MarkDirty then
-                PNC.Registry.MarkDirty(record, "abstract_group_arrival")
-            end
-            updated = updated + 1
         end
     end
     return updated

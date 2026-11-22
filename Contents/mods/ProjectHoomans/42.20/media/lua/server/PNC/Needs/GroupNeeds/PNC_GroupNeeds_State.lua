@@ -28,6 +28,13 @@ function H.Write(faction, state, reason)
 end
 
 function H.History(faction, needType, before, after, reason)
+    if (reason == "passive_decay" or reason == "passive_increase")
+        and type(before) == "number" and type(after) == "number"
+        and math.abs(after - before) < 0.01
+        and not (PNC.NeedsDebug and PNC.NeedsDebug.VerboseHistory == true)
+    then
+        return
+    end
     PNC.NeedsDebug = PNC.NeedsDebug or {}
     local store = PNC.NeedsDebug.groupHistory or {}
     PNC.NeedsDebug.groupHistory = store

@@ -104,12 +104,43 @@ function S.OnTargetChanged(event, record)
         spatial.presentationMode, spatial.presentationReason = mode, modeReason
         text, textReason, pres = Language.Decorate("", tCls, spatial, mode)
     end
+
+    local hostileClass = PNC and PNC.Const and PNC.Const.TACTICAL_CLASS_HOSTILE or "hostile"
+    local assaultReactions = kind == "player"
+        and record.tacticalClass == hostileClass
+        and PNC and PNC.Semantics and PNC.Semantics.PlayerAssaultReactions or nil
+    local hostilePlayer = nil
+    if assaultReactions and type(assaultReactions.OnHostileAcquiredPlayer) == "function" then
+        hostilePlayer = target.player
+            or (core and type(core.ResolvePlayerByOnlineID) == "function"
+                and core.ResolvePlayerByOnlineID(target.onlineID or target.id))
+            or (core and type(core.ResolvePlayerByUsername) == "function"
+                and core.ResolvePlayerByUsername(target.username))
+            or (target.playerIndex ~= nil and type(getSpecificPlayer) == "function"
+                and getSpecificPlayer(target.playerIndex))
+            or nil
+    end
+
+    local tauntEmitted = false
+    if hostilePlayer and assaultReactions then
+        local okTaunt, emittedTaunt = pcall(
+            assaultReactions.OnHostileAcquiredPlayer,
+            record,
+            hostilePlayer,
+            { now = now }
+        )
+        tauntEmitted = okTaunt == true and emittedTaunt == true
+    end
+
     if pres or (wr and wr.emitted == true and text) then
         ctx = {
             eventType = evType, eventRef = ref, threadID = ref, targetKind = tCls, targetRef = tostring(tid or ""),
             tacticalSpatial = spatial, tacticalPresentationMode = mode, tacticalPresentationReason = modeReason,
             tacticalSpatialPresentation = pres, presentationClass = pCls, transient = true,
         }
+    elseif tauntEmitted then
+        if wr and wr.emitted == true then S.EnqueueAllyReplies(record, wr, now, ref) end
+        return true, { eventRef = ref, tauntEmitted = true, sent = 1, warning = wr }
     else
         return false, textReason or spatialReason
     end
@@ -118,11 +149,11 @@ function S.OnTargetChanged(event, record)
     local hasNet = core and type(core.ForEachPlayer) == "function" and net and type(net.SendConversationRelationshipForNPC) == "function"
     if not hasNet and not (wr and wr.emitted == true) then return false, "presentation_transport_unavailable" end
 
-    local sent = hasNet and text and S.DeliverBark(record, now, {
+    local sent = (not tauntEmitted and hasNet and text) and S.DeliverBark(record, now, {
         eventType = evType, speechEventID = spID, act = "WARN", family = S.FAMILY, threadID = ref,
         eventRef = ref, text = text, priority = 62, priorityHoldMs = 700, ttlMs = 9000,
         presentationClass = pCls, context = ctx, tacticalSpatial = spatial, tacticalPresentation = pres,
-    }) or 0
+    }) or (tauntEmitted and 1 or 0)
 
     local sec = PNC and PNC.SecondaryChannel or nil
     if sec and type(sec.RequestBark) == "function" and (sent > 0 or (wr and wr.emitted == true)) then

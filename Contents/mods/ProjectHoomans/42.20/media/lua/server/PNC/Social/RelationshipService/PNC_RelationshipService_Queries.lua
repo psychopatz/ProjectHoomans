@@ -245,11 +245,23 @@ function Relationships.SetDebugBaseline(
 end
 
 local function getNumeric(observerNPCID, targetKey, field)
-    local relationship
+    local record
     local reason
-    relationship, reason = Relationships.Get(observerNPCID, targetKey)
-    if not relationship then
+    local relationship
+    record, reason = resolveObserver(observerNPCID)
+    if not record then
         return nil, reason
+    end
+    targetKey, reason = validateTarget(targetKey)
+    if not targetKey then
+        return nil, reason
+    end
+    relationship = getRelationship(record, targetKey)
+    if not relationship then
+        return nil, "relationship_not_found"
+    end
+    if field == "state" then
+        return relationship.state or Constants.STATE_UNKNOWN
     end
     return relationship[field]
 end

@@ -34,13 +34,22 @@ local function sliceExhausted(startedAt, processed)
 end
 
 local function refreshIndividuals()
-    Scheduler.IndividualIDs = {}
+    local ids = Scheduler.IndividualIDs
+    if type(ids) ~= "table" then
+        ids = {}
+        Scheduler.IndividualIDs = ids
+    end
+    local count = 0
     for id, record in pairs(PNC.Registry and PNC.Registry.Data or {}) do
         if record.alive ~= false and PNC.IndividualNeeds.IsEligible(record) then
-            Scheduler.IndividualIDs[#Scheduler.IndividualIDs + 1] = tostring(id)
+            count = count + 1
+            ids[count] = tostring(id)
         end
     end
-    table.sort(Scheduler.IndividualIDs)
+    for index = #ids, count + 1, -1 do
+        ids[index] = nil
+    end
+    table.sort(ids)
     Scheduler.IndividualCursor = 1
 end
 
@@ -72,12 +81,19 @@ function Scheduler.Pump(now)
         groupTimerName, groupTimerStart = ScalingDiagnostics.BeginTiming(
             "Needs.Groups", now)
     end
-    if cycleStarted and PNC.Factions and PNC.Factions.List and PNC.GroupNeeds then
-        for _, faction in ipairs(PNC.Factions.List()) do
+    if cycleStarted and PNC.Factions and PNC.GroupNeeds then
+        local function updateGroup(faction)
             if PNC.GroupNeeds.IsGroup(faction) then
                 PNC.GroupNeeds.UpdateToNow(faction, "passive_decay")
                 if profiling then Scheduler.Profile.groupUpdates = Scheduler.Profile.groupUpdates + 1 end
                 count = count + 1
+            end
+        end
+        if type(PNC.Factions.ForEachActiveMobileGroup) == "function" then
+            PNC.Factions.ForEachActiveMobileGroup(updateGroup)
+        elseif PNC.Factions.List then
+            for _, faction in ipairs(PNC.Factions.List()) do
+                updateGroup(faction)
             end
         end
     end
@@ -94,6 +110,7 @@ function Scheduler.Pump(now)
     if PNC.Registry and PNC.Registry.Data and PNC.IndividualNeeds then
         local processed = 0
         local sliceStartedAt = clockNow(now)
+        local at = Utils.WorldAgeHours()
         while Scheduler.IndividualCursor <= #Scheduler.IndividualIDs do
             local id = Scheduler.IndividualIDs[Scheduler.IndividualCursor]
             Scheduler.IndividualCursor = Scheduler.IndividualCursor + 1
@@ -101,15 +118,19 @@ function Scheduler.Pump(now)
             local record = PNC.Registry.Data[id]
             if record and record.alive ~= false
                 and PNC.IndividualNeeds.IsEligible(record) then
-                PNC.IndividualNeeds.UpdateToNow(record, "passive_decay")
+                PNC.IndividualNeeds.UpdateToNow(record, "passive_decay", at)
                 if PNC.ConditionStats then
-                    local at = Utils.WorldAgeHours()
                     local condition = PNC.ConditionStats.Ensure(record, at)
                     local elapsed = math.max(0, at
                         - (tonumber(condition.lastUpdateWorldAge) or at))
-                    PNC.ConditionStats.Update(record, elapsed,
-                        PNC.IndividualNeeds.GetActivity(record), at)
-                    if elapsed > 0 and PNC.Registry.MarkDirty then
+                    local _, condChanged = PNC.ConditionStats.Update(
+                        record,
+                        elapsed,
+                        PNC.IndividualNeeds.GetActivity(record),
+                        at,
+                        condition
+                    )
+                    if condChanged and PNC.Registry.MarkDirty then
                         PNC.Registry.MarkDirty(record,
                             "condition_stats_update")
                     end

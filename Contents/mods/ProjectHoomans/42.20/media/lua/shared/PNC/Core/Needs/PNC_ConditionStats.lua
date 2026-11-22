@@ -148,6 +148,12 @@ end
 
 function Stats.HasTrait(record, id)
     ensureCurrentTraits(record)
+    if type(record) == "table" and type(record.dynamicTraits) == "table"
+        and type(record.runtime) == "table"
+        and record.runtime._normalizedTraitsRef == record.dynamicTraits
+    then
+        return record.dynamicTraits[traitID(id)] == true
+    end
     return Stats.NormalizeTraits(record and record.dynamicTraits)[traitID(id)]
         == true
 end
@@ -155,6 +161,8 @@ end
 function Stats.SetTraits(record, source)
     if type(record) ~= "table" then return false, "npc_missing" end
     record.dynamicTraits = Stats.NormalizeTraits(source)
+    record.runtime = type(record.runtime) == "table" and record.runtime or {}
+    record.runtime._normalizedTraitsRef = record.dynamicTraits
     updateTraitFingerprint(record)
     record.dynamicTraitsAuthored = true
     record.dynamicTraitsGenerationVersion = 0
@@ -171,14 +179,29 @@ function Stats.EnsureTraits(record)
     ))
     local version = math.max(0, math.floor(
         tonumber(record.dynamicTraitsGenerationVersion) or 0))
+    if (record.dynamicTraitsAuthored == true or version == currentVersion)
+        and type(record.dynamicTraits) == "table"
+        and record.dynamicTraitFingerprint ~= nil
+        and type(record.runtime) == "table"
+        and record.runtime._normalizedTraitsRef == record.dynamicTraits
+    then
+        if record.dynamicTraitsAuthored == true and version ~= 0 then
+            record.dynamicTraitsGenerationVersion = 0
+        end
+        return record.dynamicTraits, false
+    end
     if record.dynamicTraitsAuthored == true then
         record.dynamicTraits = Stats.NormalizeTraits(record.dynamicTraits)
+        record.runtime = type(record.runtime) == "table" and record.runtime or {}
+        record.runtime._normalizedTraitsRef = record.dynamicTraits
         updateTraitFingerprint(record)
         record.dynamicTraitsGenerationVersion = 0
         return record.dynamicTraits, false
     end
     if version == currentVersion then
         record.dynamicTraits = Stats.NormalizeTraits(record.dynamicTraits)
+        record.runtime = type(record.runtime) == "table" and record.runtime or {}
+        record.runtime._normalizedTraitsRef = record.dynamicTraits
         updateTraitFingerprint(record)
         return record.dynamicTraits, false
     end
@@ -197,6 +220,8 @@ function Stats.EnsureTraits(record)
         record.dynamicTraitsAuthored = false
         record.dynamicTraitsGenerationVersion = currentVersion
     end
+    record.runtime = type(record.runtime) == "table" and record.runtime or {}
+    record.runtime._normalizedTraitsRef = record.dynamicTraits
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, version == 0 and hasExisting
             and "dynamic_traits_initialized"
@@ -262,8 +287,29 @@ end
 
 function Stats.Ensure(record, at)
     Stats.EnsureTraits(record)
-    record.conditionStats = Stats.NormalizeState(record.conditionStats, at)
-    return record.conditionStats
+    local current = record and record.conditionStats or nil
+    if type(current) == "table"
+        and current.version == Stats.VERSION
+        and type(current.lastUpdateWorldAge) == "number"
+        and current.lastUpdateWorldAge >= 0
+        and type(current.stress) == "number"
+        and type(current.boredom) == "number"
+        and type(current.panic) == "number"
+    then
+        for index = 1, #Stats.TYPES do
+            local id = Stats.TYPES[index]
+            local definition = Stats.DEFINITIONS[id]
+            local v = current[id]
+            if v < definition.minimum then
+                current[id] = definition.minimum
+            elseif v > definition.maximum then
+                current[id] = definition.maximum
+            end
+        end
+        return current, false
+    end
+    record.conditionStats = Stats.NormalizeState(current, at)
+    return record.conditionStats, true
 end
 
 function Stats.GetRates(record, activity)
@@ -292,18 +338,31 @@ function Stats.GetRates(record, activity)
     return { stress = stress, boredom = boredom, panic = panic }
 end
 
-function Stats.Update(record, elapsedHours, activity, at)
-    local state = Stats.Ensure(record, at)
-    local rates = Stats.GetRates(record, activity)
+function Stats.Update(record, elapsedHours, activity, at, preEnsuredState)
+    local created = false
+    local state = preEnsuredState
+    if type(state) ~= "table" then
+        state, created = Stats.Ensure(record, at)
+    end
     elapsedHours = math.max(0, tonumber(elapsedHours) or 0)
+    if elapsedHours <= 0 then
+        return state, created == true
+    end
+    local rates = Stats.GetRates(record, activity)
+    local changed = created == true
     for index = 1, #Stats.TYPES do
         local id = Stats.TYPES[index]
         local definition = Stats.DEFINITIONS[id]
-        state[id] = math.max(definition.minimum, math.min(definition.maximum,
-            state[id] + rates[id] * elapsedHours))
+        local before = state[id]
+        local after = math.max(definition.minimum, math.min(definition.maximum,
+            before + rates[id] * elapsedHours))
+        if math.abs(after - before) > 1e-6 then
+            changed = true
+        end
+        state[id] = after
     end
     state.lastUpdateWorldAge = math.max(0, tonumber(at) or 0)
-    return state
+    return state, changed
 end
 
 return Stats

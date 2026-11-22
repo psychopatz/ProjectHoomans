@@ -175,6 +175,7 @@ local function normalizeStringList(value, maximum)
 end
 
 local function boundedString(value, maximum)
+    if value == nil then return nil end
     value = normalizeRequiredString(value)
     if not value then return nil end
     return string.sub(value, 1, maximum or 256)

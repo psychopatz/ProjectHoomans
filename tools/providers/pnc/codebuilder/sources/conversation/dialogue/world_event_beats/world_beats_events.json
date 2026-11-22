@@ -1,0 +1,58 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "world.beats.events",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "house_alarm_open"
+      },
+      {
+        "id": "house_alarm_reply"
+      },
+      {
+        "id": "power_shutoff_open"
+      },
+      {
+        "id": "power_shutoff_reply"
+      },
+      {
+        "id": "water_shutoff_open"
+      },
+      {
+        "id": "water_shutoff_reply"
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "social_interaction",
+      "domain": "social"
+    }
+  ]
+}

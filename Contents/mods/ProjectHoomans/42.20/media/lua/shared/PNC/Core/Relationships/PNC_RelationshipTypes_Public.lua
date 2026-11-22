@@ -345,6 +345,76 @@ function Types.NormalizeRelationship(value, targetKey)
     }
 end
 
+local function cloneFlatMap(src)
+    local out = {}
+    if type(src) ~= "table" then return out end
+    for k, v in pairs(src) do out[k] = v end
+    return out
+end
+
+function Types.CloneRelationshipForMutation(value, targetKey)
+    if type(value) == "table"
+        and value.targetKind ~= nil
+        and type(value.memories) == "table"
+        and type(value.interactionJournal) == "table"
+        and type(value.saturation) == "table"
+        and type(value.cooldowns) == "table"
+        and type(value.bond) == "table"
+        and Constants.VALID_STATES[tostring(value.state or "")]
+    then
+        local memories = {}
+        local srcMemories = value.memories
+        for i = 1, #srcMemories do
+            local m = srcMemories[i]
+            if type(m) == "table" then
+                local mc = {}
+                for k, v in pairs(m) do mc[k] = v end
+                if type(m.tags) == "table" then
+                    mc.tags = cloneFlatMap(m.tags)
+                end
+                memories[#memories + 1] = mc
+            end
+        end
+        local satCopy = {}
+        for k, v in pairs(value.saturation) do
+            if type(v) == "table" then
+                satCopy[k] = cloneFlatMap(v)
+            end
+        end
+        local journalCopy = {}
+        local srcJournal = value.interactionJournal
+        for i = 1, #srcJournal do
+            journalCopy[i] = srcJournal[i]
+        end
+        local prevState = tostring(value.previousState or "")
+        if not Constants.VALID_STATES[prevState] then
+            prevState = Constants.STATE_UNKNOWN
+        end
+        return {
+            targetKind = value.targetKind,
+            targetID = value.targetID,
+            baselineApproval = tonumber(value.baselineApproval) or 0,
+            baselineRespect = tonumber(value.baselineRespect) or 0,
+            approval = tonumber(value.approval) or 0,
+            respect = tonumber(value.respect) or 0,
+            familiarity = tonumber(value.familiarity) or 0,
+            state = value.state,
+            previousState = prevState,
+            memories = memories,
+            saturation = satCopy,
+            cooldowns = cloneFlatMap(value.cooldowns),
+            interactionJournal = journalCopy,
+            interactionRevision = tonumber(value.interactionRevision) or 0,
+            lastInteractionAt = tonumber(value.lastInteractionAt) or 0,
+            lastEvaluatedAt = tonumber(value.lastEvaluatedAt) or 0,
+            revision = tonumber(value.revision) or 0,
+            bond = cloneFlatMap(value.bond),
+            extensions = copyExtensions(value.extensions),
+        }
+    end
+    return Types.NormalizeRelationship(value, targetKey)
+end
+
 function Types.NewSocialState(value, identitySeed, archetypeID, traitSource)
     return Types.NormalizeSocialState(
         value, identitySeed, archetypeID, traitSource)

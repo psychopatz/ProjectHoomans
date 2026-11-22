@@ -288,13 +288,13 @@ function Resolution.ApplyNPCDamage(targetRecord, targetBody, hit)
     if hit and hit.attackerKind == "player"
         and relationships and relationships.ProvokeNeutralByPlayer
     then
+        local player = Core and Core.ResolvePlayerByOnlineID
+            and Core.ResolvePlayerByOnlineID(hit.attackerOnlineID)
+            or Core and Core.ResolvePlayerByUsername
+                and Core.ResolvePlayerByUsername(hit.attackerUsername)
+            or nil
         local provoked = relationships.ProvokeNeutralByPlayer(targetRecord)
         if provoked == true then
-            local player = Core and Core.ResolvePlayerByOnlineID
-                and Core.ResolvePlayerByOnlineID(hit.attackerOnlineID)
-                or Core and Core.ResolvePlayerByUsername
-                    and Core.ResolvePlayerByUsername(hit.attackerUsername)
-                or nil
             local reactionService = PNC.SemanticCombatReactionService
                 or PNC.Semantics
                     and PNC.Semantics.CombatReactionService or nil
@@ -312,8 +312,29 @@ function Resolution.ApplyNPCDamage(targetRecord, targetBody, hit)
                         y = targetRecord.y,
                         z = targetRecord.z,
                         hostilityReason = "attacked_by_player",
+                        assaultKind = "neutral_turned_hostile",
                     }
                 )
+            end
+        elseif targetRecord.alive ~= false
+            and targetRecord.tacticalClass == (PNC.Const and PNC.Const.TACTICAL_CLASS_HOSTILE or "hostile")
+        then
+            local assaultReactions = PNC.Semantics
+                and PNC.Semantics.PlayerAssaultReactions or nil
+            if player and assaultReactions
+                and type(assaultReactions.OnHostileAttackedByPlayer) == "function"
+            then
+                pcall(assaultReactions.OnHostileAttackedByPlayer, targetRecord, player, {
+                    attackType = hit.attackType,
+                    attackKind = hit.attackKind,
+                    woundType = hit.woundType,
+                    weaponItem = hit.weaponItem,
+                    weaponFullType = hit.weaponFullType,
+                    damage = hit.amount,
+                    x = targetRecord.x,
+                    y = targetRecord.y,
+                    z = targetRecord.z,
+                })
             end
         end
     end

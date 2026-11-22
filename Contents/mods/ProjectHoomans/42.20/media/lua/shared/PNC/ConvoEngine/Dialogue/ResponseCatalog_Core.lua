@@ -30,7 +30,8 @@ Core.CONDITION_FIELDS = {
     "combatReactionMood", "combatPressure", "killerActorKind",
     "combatAttackType", "combatWeaponFamily", "combatWeaponSkill",
     "combatSkillBand", "combatHitZone", "combatWoundType",
-    "combatWeaponNamed", "hordePhase", "socialRole", "farewellSpeaker",
+    "combatWeaponNamed", "assaultKind", "friendlyPushTier", "lootCategory",
+    "hordePhase", "socialRole", "farewellSpeaker",
 }
 
 function Core.copy(value, depth)
@@ -284,6 +285,9 @@ function Core.conditionContext(context)
         combatHitZone = context.combatHitZone,
         combatWoundType = context.combatWoundType,
         combatWeaponNamed = context.combatWeaponNamed,
+        assaultKind = context.assaultKind,
+        friendlyPushTier = context.friendlyPushTier,
+        lootCategory = context.lootCategory,
         hordePhase = context.hordePhase,
         socialRole = context.socialRole or social.role,
         farewellSpeaker = context.farewellSpeaker,

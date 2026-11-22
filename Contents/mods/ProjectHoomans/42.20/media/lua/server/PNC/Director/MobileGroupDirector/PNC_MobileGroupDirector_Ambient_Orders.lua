@@ -162,49 +162,58 @@ function H.RepairMobileOrders(faction)
         return 0
     end
     local repaired = 0
-    for _, record in ipairs(memberRecords(faction)) do
-        local jobSystem = PNC.JobSystem
-        local facilityActive = jobSystem
-            and jobSystem.IsFacilityActivityActive
-            and jobSystem.IsFacilityActivityActive(record)
-        local ambientVisit = PNC.AmbientVisitService
-            and PNC.AmbientVisitService.IsOrderProtected
-            and PNC.AmbientVisitService.IsOrderProtected(record)
-        local memberExpected = expected
-        if holdForNoShelter then
-            local current = record.orderSpec
-            local preserveHoldPosition = record.runtime
-                and record.runtime.mobileNoShelterHold == true
-                and current
-                and current.kind == expected.kind
-            local fallbackX = finite(record.x, finite(record.anchorX, 0))
-            local fallbackY = finite(record.y, finite(record.anchorY, 0))
-            local fallbackZ = finite(record.z, finite(record.anchorZ, 0))
-            memberExpected = {
-                kind = expected.kind,
-                x = preserveHoldPosition
-                    and finite(current.x, fallbackX) or fallbackX,
-                y = preserveHoldPosition
-                    and finite(current.y, fallbackY) or fallbackY,
-                z = preserveHoldPosition
-                    and finite(current.z, fallbackZ) or fallbackZ,
-            }
-            record.runtime = record.runtime or {}
-            record.runtime.mobileNoShelterHold = true
-        elseif record.runtime then
-            record.runtime.mobileNoShelterHold = nil
-        end
-        if not facilityActive and not ambientVisit
-            and not sameOrder(record.orderSpec, memberExpected)
-        then
-            if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
-                PNC.OrderSystem.SetOrder(record, H.Copy(memberExpected))
-            else
-                record.orderSpec = H.Copy(memberExpected)
+    for npcID in pairs(faction and faction.memberIDs or {}) do
+        local record = PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(npcID) or nil
+        if record and record.alive ~= false then
+            local jobSystem = PNC.JobSystem
+            local facilityActive = jobSystem
+                and jobSystem.IsFacilityActivityActive
+                and jobSystem.IsFacilityActivityActive(record)
+            local ambientVisit = PNC.AmbientVisitService
+                and PNC.AmbientVisitService.IsOrderProtected
+                and PNC.AmbientVisitService.IsOrderProtected(record)
+            local memberExpected = expected
+            if holdForNoShelter then
+                local current = record.orderSpec
+                local preserveHoldPosition = record.runtime
+                    and record.runtime.mobileNoShelterHold == true
+                    and current
+                    and current.kind == expected.kind
+                local fallbackX = finite(record.x, finite(record.anchorX, 0))
+                local fallbackY = finite(record.y, finite(record.anchorY, 0))
+                local fallbackZ = finite(record.z, finite(record.anchorZ, 0))
+                memberExpected = {
+                    kind = expected.kind,
+                    x = preserveHoldPosition
+                        and finite(current.x, fallbackX) or fallbackX,
+                    y = preserveHoldPosition
+                        and finite(current.y, fallbackY) or fallbackY,
+                    z = preserveHoldPosition
+                        and finite(current.z, fallbackZ) or fallbackZ,
+                }
+                record.runtime = record.runtime or {}
+                record.runtime.mobileNoShelterHold = true
+            elseif record.runtime then
+                record.runtime.mobileNoShelterHold = nil
             end
-            repaired = repaired + 1
+            if not facilityActive and not ambientVisit
+                and not sameOrder(record.orderSpec, memberExpected)
+            then
+                if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
+                    PNC.OrderSystem.SetOrder(record, H.Copy(memberExpected))
+                else
+                    record.orderSpec = H.Copy(memberExpected)
+                end
+                repaired = repaired + 1
+            end
         end
     end
+    H.LastRepairedAmbientRevision = H.LastRepairedAmbientRevision or {}
+    local ambRev = mobile and mobile.ambient and mobile.ambient.revision or 0
+    local mobRev = mobile and mobile.revision or 0
+    H.LastRepairedAmbientRevision[faction.id] =
+        tostring(mobRev) .. ":" .. tostring(ambRev)
     endDiagnosticTiming(
         timingName,
         timingStart,

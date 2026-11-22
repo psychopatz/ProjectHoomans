@@ -139,15 +139,31 @@ function Common.SetCombatTarget(record, target, source)
 end
 
 function Common.ClearCombatTarget(record, reason, zombie)
-    local equipmentInfo = Equipment.Describe(record)
-    local combatTactics = PNC.CombatTactics
-    local committedAttack
     local previousTarget = record and record.runtime
         and record.runtime.target or nil
     record.runtime = record.runtime or {}
-    record.runtime.target = nil
-    record.runtime.targetSource = nil
-    record.runtime.targetAt = nil
+    local runtime = record.runtime
+    if previousTarget == nil
+        and runtime.attackAction == nil
+        and (tonumber(runtime.inCombatUntil) or 0) <= 0
+        and not (runtime.equipmentLeaseState
+            and runtime.equipmentLeaseState.entries
+            and runtime.equipmentLeaseState.entries.combat)
+        and runtime.staminaRecoveryActive ~= true
+        and runtime.equipmentAttackModeApplied == false
+        and runtime.targetKind == "none"
+    then
+        runtime.targetSource = nil
+        runtime.targetAt = nil
+        runtime.combatBlockReason = reason or "no_target"
+        return
+    end
+    local combatTactics = PNC.CombatTactics
+    local committedAttack
+    local equipmentInfo
+    runtime.target = nil
+    runtime.targetSource = nil
+    runtime.targetAt = nil
     if previousTarget
         and Diagnostics and Diagnostics.NPCThreatAuditEnabled == true
         and Diagnostics.LogNPCThreatAudit
@@ -173,10 +189,9 @@ function Common.ClearCombatTarget(record, reason, zombie)
         -- explicit disengage is authoritative. Leaving the old lease alive
         -- kept both the activity label and weapon presentation in Fighting
         -- after ordinary movement had already resumed.
-        record.runtime.inCombatUntil = 0
+        runtime.inCombatUntil = 0
         if Equipment.ReleaseCombatLease then
             Equipment.ReleaseCombatLease(record, zombie, "combat_target_clear")
-            equipmentInfo = Equipment.Describe(record)
         end
     end
     if not zombie and PNC.Registry and PNC.Registry.GetLiveZombie then
@@ -185,12 +200,13 @@ function Common.ClearCombatTarget(record, reason, zombie)
     if Equipment.ApplyCombatState and zombie then
         Equipment.ApplyCombatState(zombie, record, committedAttack)
     end
+    equipmentInfo = Equipment.Describe(record)
     Common.SetCombatDebug(
         record,
         nil,
         reason or "no_target",
         equipmentInfo.combatModeResolved or tostring(record.weaponMode or "melee"),
-        equipmentInfo.weaponStatus or record.runtime.weaponStatus
+        equipmentInfo.weaponStatus or runtime.weaponStatus
     )
     if previousTarget ~= nil and record and record.alive ~= false then
         local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil

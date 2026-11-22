@@ -257,7 +257,9 @@ local definitionCount = 0
 for _, _ in pairs(PNC.SocialEventDefinitions) do
     definitionCount = definitionCount + 1
 end
-T.equal(definitionCount, 26, "social event definitions")
+T.equal(definitionCount, 27, "social event definitions")
+T.truthy(PNC.SocialEventDefinitions.player_harassed_friendly_npc,
+    "friendly harassment definition")
 T.truthy(PNC.SocialEventDefinitions.necroa_mask_removed,
     "Necroa mask removal definition")
 T.truthy(PNC.SocialEventDefinitions.necroa_player_mask_removed,

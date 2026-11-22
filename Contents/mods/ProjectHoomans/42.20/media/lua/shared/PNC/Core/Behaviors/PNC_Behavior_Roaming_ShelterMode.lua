@@ -33,6 +33,7 @@ function H.Run(record, zombie, order)
     )
     if target then
         state.phase = "combat"
+        state.haltedAtShelter = nil
         Common.SetCombatTarget(record, target, "roaming_threat")
         BehaviorCombat.TickEngage(record, zombie, target)
         return true
@@ -46,6 +47,8 @@ function H.Run(record, zombie, order)
         state.targetX, state.targetY, state.targetZ = targetX, targetY, targetZ
         state.targetID = targetID
         state.reached = false
+        state.haltedAtShelter = nil
+        state.nextShelterAttemptAt = nil
     end
     if state.reached
         or Core.Distance(record.x, record.y, targetX, targetY)
@@ -54,22 +57,30 @@ function H.Run(record, zombie, order)
         state.reached = true
         state.phase = "sheltered"
         Common.ClearCombatTarget(record, "sheltered", zombie)
-        Common.HaltMovement(record, zombie, "mobile_shelter")
+        if state.haltedAtShelter ~= true then
+            Common.HaltMovement(record, zombie, "mobile_shelter")
+            state.haltedAtShelter = true
+        end
         record.activeBehavior = "Roam:shelter:sheltered"
         if order.ambientMobile == true
             and order.ambientObjective == "shelter"
+            and now >= (tonumber(state.nextShelterAttemptAt) or 0)
             and PNC.AmbientVisitService
             and PNC.AmbientVisitService.TryStartMobileShelter
         then
-            PNC.AmbientVisitService.TryStartMobileShelter(
+            local started = PNC.AmbientVisitService.TryStartMobileShelter(
                 record,
                 zombie,
                 order,
                 now
             )
+            if not started then
+                state.nextShelterAttemptAt = now + 2500
+            end
         end
         return true
     end
+    state.haltedAtShelter = nil
     Common.ClearCombatTarget(record, "moving_to_shelter", zombie)
     Common.MoveRecord(
         record,

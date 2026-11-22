@@ -79,7 +79,22 @@ local function deliverTurn(t, tid, now, ctx)
     if not S or type(t) ~= "table" or type(t.speaker) ~= "table" or t.speaker.alive == false then return false end
     if type(S.ResolveSemanticLine) ~= "function" or type(S.DeliverBark) ~= "function" then return false end
     local ev, act, tCls, ref = t.eventType or "combat_ally_warn_callout", t.act or "WARN", t.threatClass or "human_hostile", t.eventRef or tid
-    local lineText, res = S.ResolveSemanticLine(t.speaker, ev, act, tCls, ref, nil, turnTokens(t, ctx), { replyRole = t.role })
+    local lineText, res = S.ResolveSemanticLine(
+        t.speaker,
+        ev,
+        act,
+        tCls,
+        ref,
+        nil,
+        turnTokens(t, ctx),
+        {
+            replyRole = t.role,
+            poolID = t.poolID,
+            topic = t.topic,
+            context = t.context,
+            inCombat = t.inCombat,
+        }
+    )
     if not lineText then return false end
     if t.barkId and PNC.SecondaryChannel and PNC.SecondaryChannel.RequestBark then
         PNC.SecondaryChannel.RequestBark(t.speaker, t.barkId, now)
@@ -168,8 +183,16 @@ function Beats.ResetRuntime()
     Beats.NextEnvCheckAt, Beats.LastWeather, hookCooldowns = 0, nil, {}
     local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
     if BC and type(BC.ResetRuntime) == "function" then BC.ResetRuntime() end
+    if type(Beats.ResetHouseAlarmRuntime) == "function" then Beats.ResetHouseAlarmRuntime() end
+    if type(Beats.ResetUtilitiesRuntime) == "function" then Beats.ResetUtilitiesRuntime() end
+    if type(Beats.ResetWorldObjectRuntime) == "function" then Beats.ResetWorldObjectRuntime() end
+    if type(Beats.ResetTelevisionRuntime) == "function" then Beats.ResetTelevisionRuntime() end
 end
 
 require "PNC/Semantics/PNC_SemanticDialogueBeats_Environment"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_HouseAlarm"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_Utilities"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_WorldObjects"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_Television"
 
 return Beats

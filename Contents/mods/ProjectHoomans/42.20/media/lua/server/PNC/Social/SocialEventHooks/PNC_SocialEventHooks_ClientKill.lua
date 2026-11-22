@@ -24,11 +24,14 @@ local function call(object, method, ...)
     return nil
 end
 
-local function audit(fields)
-    if not (PNC.Config
+local function isAuditEnabled()
+    return PNC.Config
         and PNC.Config.Relationships
-        and PNC.Config.Relationships.DebugCombatCallbacks == true)
-    then
+        and PNC.Config.Relationships.DebugCombatCallbacks == true
+end
+
+local function audit(fields)
+    if not isAuditEnabled() then
         return false
     end
     local message = "[ZombieKillAudit] " .. table.concat(fields, " ")
@@ -59,22 +62,24 @@ function Hooks.HandleClientZombieKill(player, zombie, context)
             result, reason = Hooks.OnThreatDied(zombie)
         end
     end
-    audit({
-        "luaSide=server",
-        "event=ZombieKillReport",
-        "phase=relationship_dispatch",
-        "result=" .. tostring(result),
-        "reason=" .. tostring(reason or "nil"),
-        "playerKey=" .. tostring(Hooks.ResolvePlayerKey(player)),
-        "threatID=" .. tostring(threatID),
-        "killerOnlineID="
-            .. tostring(call(player, "getOnlineID") or "nil"),
-        "serverNativeZombieKills="
-            .. tostring(call(player, "getZombieKills") or "nil"),
-        "clientNativeZombieKills="
-            .. tostring(context and context.nativeZombieKills or "nil"),
-        "source=" .. tostring(context and context.source or "unknown"),
-    })
+    if isAuditEnabled() then
+        audit({
+            "luaSide=server",
+            "event=ZombieKillReport",
+            "phase=relationship_dispatch",
+            "result=" .. tostring(result),
+            "reason=" .. tostring(reason or "nil"),
+            "playerKey=" .. tostring(Hooks.ResolvePlayerKey(player)),
+            "threatID=" .. tostring(threatID),
+            "killerOnlineID="
+                .. tostring(call(player, "getOnlineID") or "nil"),
+            "serverNativeZombieKills="
+                .. tostring(call(player, "getZombieKills") or "nil"),
+            "clientNativeZombieKills="
+                .. tostring(context and context.nativeZombieKills or "nil"),
+            "source=" .. tostring(context and context.source or "unknown"),
+        })
+    end
     return result, reason
 end
 
@@ -88,12 +93,14 @@ local registered, reason = Detector.RegisterConsumer(
     }
 )
 
-audit({
-    "luaSide=server",
-    "event=consumer_registration",
-    "consumer=ProjectHoomans.SocialCombat",
-    "result=" .. tostring(registered),
-    "reason=" .. tostring(reason or "nil"),
-})
+if isAuditEnabled() then
+    audit({
+        "luaSide=server",
+        "event=consumer_registration",
+        "consumer=ProjectHoomans.SocialCombat",
+        "result=" .. tostring(registered),
+        "reason=" .. tostring(reason or "nil"),
+    })
+end
 
 return Hooks

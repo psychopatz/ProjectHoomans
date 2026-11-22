@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.player_assaulted.looter_taunt",
+  "locale": "TL",
+  "entries": {
+    "say.variants.backpack": [
+      "Ganda ng {slot.loot.name} sa likod mo! Ibaba mo 'yan bago ko kunin sa bangkay mo!",
+      "Mukhang mabigat 'yang {slot.loot.name} mo. Ako na gagamit niyan!",
+      "Pustahan puno ng gamit 'yang {slot.loot.name}! Ilapag mo na!",
+      "Sa akin na 'yang {slot.loot.name} pagbagsak mo sa lupa!"
+    ],
+    "say.variants.weapon": [
+      "Ayos 'yang {slot.loot.name} na hawak mo! Mas bagay sa kamay ko 'yan!",
+      "Bubunutin ko 'yang {slot.loot.name} mula sa malamig mong kamay!",
+      "Salamat sa pagdadala ng {slot.loot.name}! Bitawan mo na 'yan!",
+      "Sayang ang ganyang {slot.loot.name} kung sa'yo lang mapupunta!"
+    ],
+    "say.variants.money": [
+      "May dala ka pang {slot.loot.name} kahit gumuho na ang mundo? Ibaba ang gamit mo!",
+      "May {slot.loot.name} o totoong rasyon sa bulsa mo? Ilabas lahat 'yan!",
+      "Ilabas lahat! Akin na 'yang {slot.loot.name} at lahat ng gamit mo!",
+      "Tingnan natin kung ano pang itinatago mo bukod sa {slot.loot.name}!"
+    ],
+    "say.variants.general": [
+      "Ilapag lahat ng gamit mo kung ayaw mong duguan!",
+      "Magandang huli ah. Akin na lahat ng suot at dala mo!",
+      "Huwag ka nang tumakbo, ibigay mo lahat ng nakuha mong rasyon!",
+      "Suwerte namin ngayon. Iwan ang mga gamit kung gusto mong makatakas!"
+    ]
+  }
+}

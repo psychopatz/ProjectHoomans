@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/ConvoEngine/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "0c0dd14df241eb4b742a95ede0729f2131a3ac66d66cb1497ea50aff9d9e9e39"
-Registry.WHOLE_MODEL_FINGERPRINT = "01de384807125b19a67fd0aa09af8ee9fa949beb48dd89f5eeb7e5334a35a239"
+Registry.WHOLE_MODEL_FINGERPRINT = "dd640836f89173aeff2f88d77a317250ac56edf5ba252cd9c20085354bf8eeaf"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -212,6 +212,7 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskToolReplies")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/WellbeingContent")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/WorldEventBeats")
 appendConvoPlans(require "PsychopatzCore/ConvoEngine/Beat/Social/Conflict")
 appendConvoPlans(require "PsychopatzCore/ConvoEngine/Beat/Social/FirstContact")
 appendConvoPlans(require "PsychopatzCore/ConvoEngine/Beat/Social/Repair")

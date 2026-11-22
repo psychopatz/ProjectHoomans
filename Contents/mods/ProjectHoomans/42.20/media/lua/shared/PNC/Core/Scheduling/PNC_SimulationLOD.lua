@@ -126,8 +126,7 @@ function LOD.Resolve(record)
     return "live_idle"
 end
 
-function LOD.GetCadence(record)
-    local tier = LOD.Resolve(record)
+function LOD.GetCadenceForTier(tier)
     if tier == "presence_wake" then return 50 end
     if tier == "vehicle" then
         return math.min(
@@ -172,8 +171,11 @@ function LOD.GetCadence(record)
         or 1000
 end
 
-function LOD.GetDecisionInterval(record)
-    local tier = LOD.Resolve(record)
+function LOD.GetCadence(record)
+    return LOD.GetCadenceForTier(LOD.Resolve(record))
+end
+
+function LOD.GetDecisionIntervalForTier(tier)
     if tier == "presence_wake" then return 50 end
     if tier == "combat_action" then return 50 end
     if tier == "threat_alert" then
@@ -207,8 +209,11 @@ function LOD.GetDecisionInterval(record)
     return tonumber(Const.SIMULATION_LIVE_IDLE_MS) or 1000
 end
 
-function LOD.GetVitalsInterval(record)
-    local tier = LOD.Resolve(record)
+function LOD.GetDecisionInterval(record)
+    return LOD.GetDecisionIntervalForTier(LOD.Resolve(record))
+end
+
+function LOD.GetVitalsIntervalForTier(tier)
     if tier == "combat_action" or tier == "combat"
         or tier == "incapacitated"
     then
@@ -231,6 +236,10 @@ function LOD.GetVitalsInterval(record)
     return tonumber(Const.SIMULATION_VITALS_LIVE_MS) or 1000
 end
 
+function LOD.GetVitalsInterval(record)
+    return LOD.GetVitalsIntervalForTier(LOD.Resolve(record))
+end
+
 function LOD.GetPresenceInterval(record)
     if record.presenceState == Const.PRESENCE_ABSTRACT then
         return tonumber(Const.SIMULATION_PRESENCE_ABSTRACT_MS) or 3000
@@ -238,8 +247,7 @@ function LOD.GetPresenceInterval(record)
     return tonumber(Const.SIMULATION_PRESENCE_LIVE_MS) or 500
 end
 
-function LOD.GetPathInterval(record)
-    local tier = LOD.Resolve(record)
+function LOD.GetPathIntervalForTier(tier)
     if tier == "combat_action" then
         return tonumber(Const.SIMULATION_PATH_HOT_MS) or 50
     end
@@ -250,4 +258,8 @@ function LOD.GetPathInterval(record)
         return tonumber(Const.SIMULATION_PATH_MOVING_MS) or 100
     end
     return tonumber(Const.SIMULATION_PATH_IDLE_MS) or 500
+end
+
+function LOD.GetPathInterval(record)
+    return LOD.GetPathIntervalForTier(LOD.Resolve(record))
 end

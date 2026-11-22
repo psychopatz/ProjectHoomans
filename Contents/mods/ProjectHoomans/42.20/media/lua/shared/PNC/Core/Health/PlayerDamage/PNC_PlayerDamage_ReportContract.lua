@@ -96,6 +96,7 @@ function Report.Normalize(input)
         bodyLease = bodyLease,
         weaponFullType = weaponFullType,
         damage = damage,
+        isShove = input.isShove == true,
     }
 end
 
@@ -112,5 +113,6 @@ function Report.Create(fields)
         bodyLease = fields.bodyLease,
         weaponFullType = fields.weaponFullType,
         damage = fields.damage,
+        isShove = fields.isShove == true,
     })
 end

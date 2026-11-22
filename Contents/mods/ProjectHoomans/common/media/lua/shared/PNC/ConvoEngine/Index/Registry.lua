@@ -166,7 +166,7 @@ return {
         ["domain"] = "combat_player_assault_reactions",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatPlayerAssaultReactions",
-        ["recordCount"] = 5,
+        ["recordCount"] = 8,
     },
     {
         ["domain"] = "combat_tactical_spatial",
@@ -593,6 +593,12 @@ return {
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/WellbeingContent",
         ["recordCount"] = 12,
+    },
+    {
+        ["domain"] = "world_event_beats",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/WorldEventBeats",
+        ["recordCount"] = 2,
     },
     {
         ["domain"] = "social_reactions_hostile_offer_threat",

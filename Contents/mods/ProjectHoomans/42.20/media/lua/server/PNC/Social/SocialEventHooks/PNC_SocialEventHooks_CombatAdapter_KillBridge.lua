@@ -28,19 +28,27 @@ local call = H.CombatCall or function(object, method, ...)
 end
 local audit = H.CombatAudit or function() end
 
+local function isAuditEnabled()
+    return PNC.Config
+        and PNC.Config.Relationships
+        and PNC.Config.Relationships.DebugCombatCallbacks == true
+end
+
 function H.OnWeaponHitCharacter(attacker, target, context)
     local result, reason = Hooks.OnPlayerWeaponHitThreat(attacker, target)
-    audit({
-        "luaSide=server",
-        "runtime=" .. tostring(context and context.runtime or "unknown"),
-        "event=OnWeaponHitCharacter",
-        "result=" .. tostring(result),
-        "reason=" .. tostring(reason or "nil"),
-        "attackerOnlineID="
-            .. tostring(call(attacker, "getOnlineID") or "nil"),
-        "zombieOnlineID="
-            .. tostring(call(target, "getOnlineID") or "nil"),
-    })
+    if isAuditEnabled() then
+        audit({
+            "luaSide=server",
+            "runtime=" .. tostring(context and context.runtime or "unknown"),
+            "event=OnWeaponHitCharacter",
+            "result=" .. tostring(result),
+            "reason=" .. tostring(reason or "nil"),
+            "attackerOnlineID="
+                .. tostring(call(attacker, "getOnlineID") or "nil"),
+            "zombieOnlineID="
+                .. tostring(call(target, "getOnlineID") or "nil"),
+        })
+    end
     return result, reason
 end
 
@@ -63,15 +71,17 @@ function H.OnZombieDead(killer, zombie, context)
             }
         )
     end
-    audit({
-        "luaSide=server",
-        "event=PlayerKillSemanticReaction",
-        "phase=ephemeral_presentation",
-        "result=" .. tostring(reactions > 0),
-        "reason=" .. tostring(reactionReason),
-        "threatID=" .. tostring(threatID),
-        "reactionCount=" .. tostring(reactions),
-    })
+    if isAuditEnabled() then
+        audit({
+            "luaSide=server",
+            "event=PlayerKillSemanticReaction",
+            "phase=ephemeral_presentation",
+            "result=" .. tostring(reactions > 0),
+            "reason=" .. tostring(reactionReason),
+            "threatID=" .. tostring(threatID),
+            "reactionCount=" .. tostring(reactions),
+        })
+    end
     return result, reason
 end
 

@@ -36,6 +36,9 @@ function Resolution.ApplyZombieDamage(attackerRecord, attackerZombie, target, hi
     socialNow = PNC.SocialEventHooks
         and PNC.SocialEventHooks.WorldAgeHours
         and PNC.SocialEventHooks.WorldAgeHours() or nil
+    local vx = victim:getX()
+    local vy = victim:getY()
+    local vz = victim:getZ()
     if actorKey
         and socialNow
         and PNC.SocialEncounterTracker
@@ -53,9 +56,9 @@ function Resolution.ApplyZombieDamage(attackerRecord, attackerZombie, target, hi
             targetX = protectedRecord and protectedRecord.x or nil,
             targetY = protectedRecord and protectedRecord.y or nil,
             targetZ = protectedRecord and protectedRecord.z or nil,
-            x = victim:getX(),
-            y = victim:getY(),
-            z = victim:getZ(),
+            x = vx,
+            y = vy,
+            z = vz,
         })
     end
     fakeZombie = getCell and getCell():getFakeZombieForHit() or nil
@@ -123,9 +126,9 @@ function Resolution.ApplyZombieDamage(attackerRecord, attackerZombie, target, hi
             threatID = threatID,
             threatWasTargeting = targetKey ~= nil,
             occurredAt = socialNow,
-            x = victim:getX(),
-            y = victim:getY(),
-            z = victim:getZ(),
+            x = vx,
+            y = vy,
+            z = vz,
         })
     end
     local engineEvents = PNC.Semantics and PNC.Semantics.EngineEvents or nil
@@ -138,9 +141,9 @@ function Resolution.ApplyZombieDamage(attackerRecord, attackerZombie, target, hi
             npcID = attackerRecord and tostring(attackerRecord.id) or nil,
             zombieKey = threatID and tostring(threatID) or nil,
             occurredAt = socialNow,
-            x = victim:getX(),
-            y = victim:getY(),
-            z = victim:getZ(),
+            x = vx,
+            y = vy,
+            z = vz,
             source = "npc_combat_resolution",
         })
     end
@@ -150,9 +153,9 @@ function Resolution.ApplyZombieDamage(attackerRecord, attackerZombie, target, hi
         and type(reactionService.OnNPCKill) == "function"
     then
         reactionService.OnNPCKill(attackerRecord, victim, {
-            x = victim:getX(),
-            y = victim:getY(),
-            z = victim:getZ(),
+            x = vx,
+            y = vy,
+            z = vz,
             attackType = hit.attackType,
             attackKind = hit.attackKind,
             weaponItem = hit.weaponItem,

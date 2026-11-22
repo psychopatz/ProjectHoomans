@@ -46,12 +46,26 @@ end
 function S.ResolveSemanticLine(rec, evType, act, tClass, ref, profile, tokens, extra)
     local react = PNC.ConvoEngine and PNC.ConvoEngine.SocialReactions
     if type(react) ~= "table" or type(react.Resolve) ~= "function" then return nil, nil end
+    local ex = type(extra) == "table" and extra or nil
+    local context = {
+        semanticThreatClass = tClass,
+        combatReactionStyle = S.ResolveAllyWarnTone(rec, profile),
+        combatReactionRole = ex and ex.replyRole or nil,
+        inCombat = (ex and ex.inCombat ~= nil) and ex.inCombat or true,
+    }
+    if ex and type(ex.context) == "table" then
+        for k, v in pairs(ex.context) do
+            context[k] = v
+        end
+    end
     local res = react.Resolve({
-        eventType = evType, eventID = ref, npcID = tostring(rec.id), act = act, topic = "combat",
-        context = {
-            semanticThreatClass = tClass, combatReactionStyle = S.ResolveAllyWarnTone(rec, profile),
-            combatReactionRole = type(extra) == "table" and extra.replyRole or nil, inCombat = true,
-        },
+        eventType = evType,
+        eventID = ref,
+        npcID = tostring(rec.id),
+        act = act,
+        topic = (ex and ex.topic) or "combat",
+        poolID = ex and ex.poolID or nil,
+        context = context,
     })
     if type(res) ~= "table" then return nil, nil end
     local raw = res.fallback or res.text

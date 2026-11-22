@@ -45,7 +45,15 @@ end
 
 local function syncMobileGroups()
     local imported = 0
-    if not PNC.Factions or not PNC.Factions.List then return 0 end
+    if not PNC.Factions then return 0 end
+    if type(PNC.Factions.ForEachActiveMobileGroup) == "function" then
+        PNC.Factions.ForEachActiveMobileGroup(function(faction)
+            local group, reason = Groups.ImportMobileFaction(faction)
+            if group and reason == "created" then imported = imported + 1 end
+        end)
+        return imported
+    end
+    if not PNC.Factions.List then return 0 end
     for _, faction in ipairs(PNC.Factions.List()) do
         if PNC.Factions.IsMobileGroup(faction) then
             local group, reason = Groups.ImportMobileFaction(faction)

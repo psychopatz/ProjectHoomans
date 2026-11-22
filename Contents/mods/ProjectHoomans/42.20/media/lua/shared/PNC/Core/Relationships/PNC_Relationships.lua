@@ -98,6 +98,15 @@ function Relationships.SetTacticalClass(record, tacticalClass, reason)
 
     record.tacticalClass = normalized
     record.hostility = Types.DefaultHostility(normalized)
+    if normalized == Const.TACTICAL_CLASS_HOSTILE and type(record.hostility) == "table" then
+        record.hostility.originTacticalClass = record.hostility.originTacticalClass or previous
+        if tostring(reason or "") == "attacked_by_player" then
+            record.hostility.provokedByPlayer = true
+            record.hostility.provokedReason = "attacked_by_player"
+        elseif previous ~= Const.TACTICAL_CLASS_HOSTILE then
+            record.hostility.provokedReason = tostring(reason or "relationship")
+        end
+    end
     record.runtime = record.runtime or {}
     record.runtime.target = nil
     record.runtime.attackAction = nil

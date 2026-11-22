@@ -16,12 +16,44 @@ local setDiagnosticGauge = Internal.setDiagnosticGauge or function() end
 local finite = Internal.AmbientTargets.finite
 local shelterTargetIsLocal = Internal.AmbientTargets.shelterTargetIsLocal
 
+local function peekFaction(factionID)
+    if Factions and type(Factions.Peek) == "function" then
+        return Factions.Peek(factionID)
+    end
+    return Factions and Factions.Get and Factions.Get(factionID) or nil
+end
+
+local function cachedMobileFactionIDs()
+    local registry = Factions and Factions.Registry or nil
+    local rev = tonumber(registry and registry.revision) or -1
+    local cache = H._mobileFactionIDCache
+    if type(cache) == "table"
+        and cache.registryRef == registry
+        and cache.revision == rev
+    then
+        return cache.ids
+    end
+    local ids = {}
+    for factionID, faction in pairs(registry and registry.byID or {}) do
+        if faction.status == "active" and Factions.IsMobileGroup(faction) then
+            ids[#ids + 1] = factionID
+        end
+    end
+    table.sort(ids)
+    H._mobileFactionIDCache = {
+        registryRef = registry,
+        revision = rev,
+        ids = ids,
+    }
+    return ids
+end
+
 -- Re-evaluate one group's objective immediately. The scheduled pump keeps
 -- this bounded across the world; debug tools and migration code can use this
 -- targeted entry point without scanning every mobile faction.
 function H.RefreshFactionObjective(factionID, at)
     if not H.Authority() then return false, "not_authority" end
-    local faction = Factions.Get(factionID)
+    local faction = peekFaction(factionID)
     if not faction then return false, "faction_not_found" end
     if not Factions.IsMobileGroup(faction) then
         return false, "not_mobile_group"
@@ -59,15 +91,7 @@ function H.PumpAmbient(at, budget)
     local discoveryTimingName, discoveryTimingStart = beginDiagnosticTiming(
         "MobileAmbient.FactionDiscovery"
     )
-    local factionIDs = {}
-    for factionID, faction in pairs(
-        Factions.Registry and Factions.Registry.byID or {}
-    ) do
-        if faction.status == "active" and Factions.IsMobileGroup(faction) then
-            factionIDs[#factionIDs + 1] = factionID
-        end
-    end
-    table.sort(factionIDs)
+    local factionIDs = cachedMobileFactionIDs()
     endDiagnosticTiming(
         discoveryTimingName,
         discoveryTimingStart,
@@ -77,7 +101,7 @@ function H.PumpAmbient(at, budget)
     local processed = 0
     while processed < budget and #factionIDs > 0 do
         if cursor > #factionIDs then cursor = 1 end
-        local faction = Factions.Get(factionIDs[cursor])
+        local faction = peekFaction(factionIDs[cursor])
         local selectionsBefore = context.ambientTargetSelections
         if faction then
             if H.ExpirePlayerRoamArea then
@@ -97,7 +121,7 @@ function H.PumpAmbient(at, budget)
                 if expired then
                     incrementDiagnostic("MobileAmbient.PlayerRoamExpired")
                 end
-                if expired then faction = updated or Factions.Get(
+                if expired then faction = updated or peekFaction(
                     faction.id
                 ) or faction end
             end

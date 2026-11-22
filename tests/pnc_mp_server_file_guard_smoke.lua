@@ -182,7 +182,10 @@ listing:close()
 -- PNC_SemanticCombatTargetCallouts_Context, _Delivery, _AllyReplies,
 -- _Situations, _Medical, and _Stamina are server-only, guarded by
 -- AllowsServerCode(), and loaded by PNC_SemanticCombatTargetCallouts.
-T.equal(#serverOnlyFiles, 1079,
+-- PNC_SemanticPlayerAssaultReactions and Beats/PNC_SemanticBeats_{HouseAlarm,
+-- Utilities,WorldObjects,Television} are server-only, guarded by
+-- AllowsServerCode(), and loaded by SemanticEventRuntime/DialogueBeats.
+T.equal(#serverOnlyFiles, 1084,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

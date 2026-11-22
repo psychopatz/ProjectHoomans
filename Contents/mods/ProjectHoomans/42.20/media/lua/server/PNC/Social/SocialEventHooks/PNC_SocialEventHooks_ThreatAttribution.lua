@@ -98,11 +98,25 @@ function Hooks.OnPlayerWeaponHitThreat(attacker, target)
             result = "recorded",
         })
     end
-    Hooks.ThreatAttributions[threatID] = {
-        actorKey = actorKey,
-        targetKey = targetKey,
-        lastAt = now,
-    }
+    if Hooks.ThreatAttributionTableRef ~= Hooks.ThreatAttributions then
+        Hooks.ThreatAttributionTableRef = Hooks.ThreatAttributions
+        Hooks.ThreatAttributionCount = nil
+    end
+    local existing = Hooks.ThreatAttributions[threatID]
+    if existing then
+        existing.actorKey = actorKey
+        existing.targetKey = targetKey
+        existing.lastAt = now
+    else
+        Hooks.ThreatAttributions[threatID] = {
+            actorKey = actorKey,
+            targetKey = targetKey,
+            lastAt = now,
+        }
+        if Hooks.ThreatAttributionCount ~= nil then
+            Hooks.ThreatAttributionCount = Hooks.ThreatAttributionCount + 1
+        end
+    end
     if target.isDead and target:isDead() then
         return Hooks.OnThreatDied(target)
     end
@@ -115,9 +129,21 @@ function Hooks.OnThreatDied(zombie)
     if threatID == nil then
         return false, "missing_threat_id"
     end
+    if Hooks.ThreatAttributionTableRef ~= Hooks.ThreatAttributions then
+        Hooks.ThreatAttributionTableRef = Hooks.ThreatAttributions
+        Hooks.ThreatAttributionCount = nil
+    end
     threatID = tostring(threatID)
     attribution = Hooks.ThreatAttributions[threatID]
-    Hooks.ThreatAttributions[threatID] = nil
+    if attribution then
+        Hooks.ThreatAttributions[threatID] = nil
+        if Hooks.ThreatAttributionCount ~= nil then
+            Hooks.ThreatAttributionCount = math.max(
+                0,
+                Hooks.ThreatAttributionCount - 1
+            )
+        end
+    end
     if not attribution then
         return false, "unattributed_threat"
     end
@@ -137,6 +163,14 @@ function Hooks.PruneThreatAttributions(occurredAt)
     local threatID
     local attribution
     local removed = 0
+    local remaining = 0
+    if Hooks.ThreatAttributionTableRef ~= Hooks.ThreatAttributions then
+        Hooks.ThreatAttributionTableRef = Hooks.ThreatAttributions
+        Hooks.ThreatAttributionCount = nil
+    end
+    if Hooks.ThreatAttributionCount == 0 then
+        return 0
+    end
     occurredAt = tonumber(occurredAt) or H.WorldAgeHours()
     for threatID, attribution in pairs(Hooks.ThreatAttributions) do
         if occurredAt - (tonumber(attribution.lastAt) or 0)
@@ -144,8 +178,11 @@ function Hooks.PruneThreatAttributions(occurredAt)
         then
             Hooks.ThreatAttributions[threatID] = nil
             removed = removed + 1
+        else
+            remaining = remaining + 1
         end
     end
+    Hooks.ThreatAttributionCount = remaining
     return removed
 end
 

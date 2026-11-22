@@ -36,6 +36,26 @@ function Runtime.IsRangedWeapon(weapon)
         and tostring(weapon:getSubCategory() or "") == "Firearm"
 end
 
+function Runtime.IsShove(attacker, weapon, damage)
+    if attacker and attacker.isDoShove then
+        local ok
+        local result
+        ok, result = pcall(attacker.isDoShove, attacker)
+        if ok and result == true then
+            return true
+        end
+    end
+    if attacker and attacker.getVariableBoolean then
+        local ok
+        local result
+        ok, result = pcall(attacker.getVariableBoolean, attacker, "bDoShove")
+        if ok and result == true then
+            return true
+        end
+    end
+    return weapon == nil and (tonumber(damage) or 0) <= 0
+end
+
 function Runtime.RestoreEngineBuffer(zombie, record)
     local health = record and record.health or nil
     local buffer

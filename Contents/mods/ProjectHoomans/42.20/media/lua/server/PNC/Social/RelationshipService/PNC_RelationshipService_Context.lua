@@ -128,6 +128,39 @@ local function prepareSocial(record)
     return normalized, not Types.AreEqual(record.social, normalized)
 end
 
+local function ensureSocialForMutation(record)
+    if PNC.Persistence and PNC.Persistence.CoreSocial
+        and type(PNC.Persistence.CoreSocial.EnsureRuntimeView) == "function"
+    then
+        PNC.Persistence.CoreSocial.EnsureRuntimeView(record, PsychopatzCore)
+    end
+    local source = type(record.social) == "table" and record.social or nil
+    if source
+        and source.schemaVersion == Constants.SOCIAL_SCHEMA_VERSION
+        and type(source.relationships) == "table"
+        and type(source.recentEventIDs) == "table"
+        and type(source.personality) == "table"
+        and source.authority ~= "core"
+    then
+        local shallow = {}
+        for k, v in pairs(source) do
+            shallow[k] = v
+        end
+        local relCopy = {}
+        for k, v in pairs(source.relationships) do
+            relCopy[k] = v
+        end
+        shallow.relationships = relCopy
+        local recentCopy = {}
+        for i = 1, #source.recentEventIDs do
+            recentCopy[i] = source.recentEventIDs[i]
+        end
+        shallow.recentEventIDs = recentCopy
+        return shallow, false
+    end
+    return prepareSocial(record)
+end
+
 
 local function findMemory(relationship, memoryID)
     local index
@@ -175,6 +208,7 @@ Internal.validateTarget = validateTarget
 Internal.getRelationship = getRelationship
 Internal.buildMemorySpec = buildMemorySpec
 Internal.prepareSocial = prepareSocial
+Internal.ensureSocialForMutation = ensureSocialForMutation
 Internal.findMemory = findMemory
 Internal.hasRecentEvent = hasRecentEvent
 Internal.appendRecentEvent = appendRecentEvent

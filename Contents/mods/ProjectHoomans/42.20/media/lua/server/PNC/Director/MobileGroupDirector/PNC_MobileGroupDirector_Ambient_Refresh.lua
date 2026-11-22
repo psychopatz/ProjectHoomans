@@ -37,6 +37,7 @@ function H.RefreshAmbient(faction, at, context)
     )
     local phase = H.AmbientPhase(at)
     local ambient = mobile.ambient or {}
+    local prevObjective = ambient.objective
     local objective = phase == Constants.MOBILE_AMBIENT_DAY
         and Constants.MOBILE_AMBIENT_ROAD
         or Constants.MOBILE_AMBIENT_SHELTER
@@ -45,6 +46,7 @@ function H.RefreshAmbient(faction, at, context)
         == Constants.MOBILE_AMBIENT_SHELTER
         and target ~= nil
         and not shelterTargetIsLocal(mobile, target)
+    local ambientMutated = staleShelterTarget
     if staleShelterTarget then
         ambient = {
             phase = phase,
@@ -122,6 +124,7 @@ function H.RefreshAmbient(faction, at, context)
                 ambient = ambient,
             }, "mobile_ambient_objective")
             H.SyncAbstractObjective(faction, objective, target, at)
+            ambientMutated = true
         else
             ambient = {
                 phase = phase,
@@ -137,6 +140,7 @@ function H.RefreshAmbient(faction, at, context)
             faction = updateMobile(faction, {
                 ambient = ambient,
             }, "mobile_ambient_target_retry")
+            ambientMutated = true
         end
     elseif target and checkDue then
         if objective == Constants.MOBILE_AMBIENT_SHELTER
@@ -146,30 +150,67 @@ function H.RefreshAmbient(faction, at, context)
                 bounds = target.bounds,
             }, ownershipSnapshot)
         then
-            ambient.nextObjectiveAt = at
+            ambient = {
+                phase = ambient.phase,
+                objective = ambient.objective,
+                target = ambient.target,
+                holdForNoShelter = ambient.holdForNoShelter,
+                nextCheckAt = ambient.nextCheckAt,
+                nextObjectiveAt = at,
+                retryAt = ambient.retryAt,
+                revision = ambient.revision,
+            }
             faction = updateMobile(faction, {
                 ambient = ambient,
             }, "mobile_ambient_shelter_invalidated")
+            ambientMutated = true
         else
-            ambient.nextCheckAt = at + Constants.MOBILE_AMBIENT_CHECK_HOURS
-            faction = updateMobile(faction, {
-                ambient = ambient,
-            }, "mobile_ambient_objective_checked")
+            local nextCheckAt = at + Constants.MOBILE_AMBIENT_CHECK_HOURS
+            if Factions and type(Factions.TouchMobileAmbientCheck) == "function" then
+                Factions.TouchMobileAmbientCheck(faction.id, nextCheckAt)
+            else
+                ambient.nextCheckAt = nextCheckAt
+                faction = updateMobile(faction, {
+                    ambient = ambient,
+                }, "mobile_ambient_objective_checked")
+            end
         end
     end
     if objective ~= Constants.MOBILE_AMBIENT_SHELTER
         and PNC.AmbientVisitService
         and PNC.AmbientVisitService.ReleaseMobileShelter
     then
-        for _, record in ipairs(memberRecords(faction)) do
-            PNC.AmbientVisitService.ReleaseMobileShelter(
-                record,
-                "mobile_shelter_day_started",
-                at
-            )
+        for npcID in pairs(faction and faction.memberIDs or {}) do
+            local record = PNC.Registry and PNC.Registry.Get
+                and PNC.Registry.Get(npcID) or nil
+            if record and record.alive ~= false
+                and (ambientMutated
+                    or prevObjective == Constants.MOBILE_AMBIENT_SHELTER
+                    or (PNC.AmbientVisitService.IsActive
+                        and PNC.AmbientVisitService.IsActive(record, at)))
+            then
+                PNC.AmbientVisitService.ReleaseMobileShelter(
+                    record,
+                    "mobile_shelter_day_started",
+                    at
+                )
+            end
         end
     end
-    H.RepairMobileOrders(faction)
+    local latestMobile = faction and faction.mobile or mobile
+    local latestAmb = latestMobile and latestMobile.ambient or ambient
+    local revKey = tostring((latestMobile and latestMobile.revision) or 0)
+        .. ":" .. tostring((latestAmb and latestAmb.revision) or 0)
+    local prevKey = H.LastRepairedAmbientRevision
+        and H.LastRepairedAmbientRevision[faction.id] or nil
+    H.AmbientRepairCounters = H.AmbientRepairCounters or {}
+    local cycleCount = (H.AmbientRepairCounters[faction.id] or 0) + 1
+    if ambientMutated or prevKey ~= revKey or cycleCount >= 10 then
+        H.AmbientRepairCounters[faction.id] = 0
+        H.RepairMobileOrders(faction)
+    else
+        H.AmbientRepairCounters[faction.id] = cycleCount
+    end
     endDiagnosticTiming(
         timingName,
         timingStart,

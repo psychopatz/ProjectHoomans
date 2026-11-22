@@ -116,6 +116,24 @@ Definitions.player_damaged_npc = {
     },
 }
 
+Definitions.player_harassed_friendly_npc = {
+    id = "player_harassed_friendly_npc",
+    allowedSourceSystems = { combat = true, social = true, semantics = true },
+    targetMemory = {
+        type = "player_harassed_friendly_npc",
+        approvalEffect = -4,
+        respectEffect = -3,
+        moraleEffect = -2,
+        familiarityGain = 0,
+        strength = 1,
+        decayPerDay = 0.04,
+        permanent = false,
+        shareable = false,
+        knowledgeSource = "experienced",
+        tags = { combat = true, social = true, harassment = true },
+    },
+}
+
 Definitions.faction_member_attacked = {
     id = "faction_member_attacked",
     allowedSourceSystems = { combat = true },
@@ -469,6 +487,7 @@ local semanticByType = {
     abandoned_in_combat = { code = 1102, retentionSalience = 235, longTerm = true, gossipEvent = "abandonment", classes = { "grievance" }, relations = { opens = { "repair" } } },
     witnessed_player_hurt = { retentionSalience = 120, classes = { "witnessed_harm" }, relations = {} },
     player_damaged_npc = { retentionSalience = 210, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
+    player_harassed_friendly_npc = { retentionSalience = 135, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
     faction_member_attacked = { retentionSalience = 200, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },
     survived_combat_together = { retentionSalience = 160, classes = { "shared_danger" }, relations = {} },
     player_insulted = { retentionSalience = 150, classes = { "grievance", "hostility" }, relations = { opens = { "repair" } } },

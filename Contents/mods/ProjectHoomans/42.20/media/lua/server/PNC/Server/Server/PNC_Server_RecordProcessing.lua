@@ -60,7 +60,7 @@ local function shouldReconcileAbstractFollowHandoff(record)
     return Presence and type(Presence.Reconcile) == "function"
 end
 
-local function nextRecordDueAt(record, now)
+local function nextRecordDueAt(record, now, preResolvedTier)
     local runtime = record and record.runtime or nil
     local retryAt = runtime and tonumber(runtime.materializeRetryAt) or nil
     if retryAt and retryAt > (tonumber(now) or 0) then
@@ -77,6 +77,12 @@ local function nextRecordDueAt(record, now)
                 tonumber(Scheduler.SLOT_MS) or 50,
                 tonumber(Const.MATERIALIZE_CHUNK_RETRY_MS) or 250
             )
+    end
+    if preResolvedTier ~= nil and SimulationLOD
+        and SimulationLOD.GetCadenceForTier
+    then
+        return (tonumber(now) or 0)
+            + SimulationLOD.GetCadenceForTier(preResolvedTier)
     end
     return (tonumber(now) or 0) + Scheduler.GetCadence(record)
 end
@@ -123,12 +129,17 @@ function H.ProcessRecord(record, now)
         Presence.Reconcile(record)
     end
     zombie = Registry.GetLiveZombie(record.id)
+    local lodTier = SimulationLOD and SimulationLOD.Resolve
+        and SimulationLOD.Resolve(record) or nil
+    local vitalsInterval = (lodTier and SimulationLOD.GetVitalsIntervalForTier)
+        and SimulationLOD.GetVitalsIntervalForTier(lodTier)
+        or (SimulationLOD and SimulationLOD.GetVitalsInterval(record) or 250)
     if not SimulationClock
         or SimulationClock.IsDue(
             record,
             "vitals",
             now,
-            SimulationLOD and SimulationLOD.GetVitalsInterval(record) or 250,
+            vitalsInterval,
             false
         )
     then
@@ -183,20 +194,27 @@ function H.ProcessRecord(record, now)
             Presence.Reconcile(record)
         end
         zombie = Registry.GetLiveZombie(record.id)
+        if SimulationLOD and SimulationLOD.Resolve then
+            lodTier = SimulationLOD.Resolve(record)
+        end
         record.lastThinkAt = now
-        decisionInterval = SimulationLOD
-            and SimulationLOD.GetDecisionInterval(record)
-            or Scheduler.GetCadence(record)
+        decisionInterval = (lodTier and SimulationLOD.GetDecisionIntervalForTier)
+            and SimulationLOD.GetDecisionIntervalForTier(lodTier)
+            or (SimulationLOD and SimulationLOD.GetDecisionInterval(record)
+                or Scheduler.GetCadence(record))
         record.nextThinkAt = now + decisionInterval
     end
 
+    local pathInterval = (lodTier and SimulationLOD.GetPathIntervalForTier)
+        and SimulationLOD.GetPathIntervalForTier(lodTier)
+        or (SimulationLOD and SimulationLOD.GetPathInterval(record) or 100)
     pathDue = zombie and record.alive ~= false and (
         not SimulationClock
         or SimulationClock.IsDue(
             record,
             "path",
             now,
-            SimulationLOD and SimulationLOD.GetPathInterval(record) or 100,
+            pathInterval,
             false
         )
     )
@@ -235,7 +253,7 @@ function H.ProcessRecord(record, now)
         Network.QueuePeriodicRoster(record, now)
     end
     if Scheduler and Scheduler.Schedule then
-        Scheduler.Schedule(record, nextRecordDueAt(record, now))
+        Scheduler.Schedule(record, nextRecordDueAt(record, now, lodTier))
     end
     if timerName then
         ScalingDiagnostics.EndTiming(timerName, timerStart, record.id)
