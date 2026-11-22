@@ -210,6 +210,11 @@ function Beats.CheckEnvironment(now)
     if type(Beats.CheckUtilities) == "function" then
         Beats.CheckUtilities(now)
     end
+    if PNC.WorldKnowledge and type(PNC.WorldKnowledge.ObserveHelicopterEpisode) == "function" then
+        local worldHours = PNC.Core and type(PNC.Core.NowWorldAgeHours) == "function"
+            and PNC.Core.NowWorldAgeHours() or nil
+        PNC.WorldKnowledge.ObserveHelicopterEpisode(worldHours)
+    end
     if type(Beats.CheckNearbyWorldObjects) == "function" then
         Beats.CheckNearbyWorldObjects(now)
     end

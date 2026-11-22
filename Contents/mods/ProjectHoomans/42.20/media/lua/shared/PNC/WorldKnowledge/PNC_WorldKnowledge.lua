@@ -296,6 +296,42 @@ function Adapter.RenderFact(fact, reference, options)
         end
         return "I know for sure that " .. domain .. " is " .. status .. "."
     end
+    if fact.kind == "utility.state" then
+        local utility = tostring(payload.utility or "utilities")
+        local status = tostring(payload.status or "changed")
+        if epistemic == "uncertain" then
+            return "Someone mentioned " .. utility .. " is " .. status .. ", though I haven't checked it myself."
+        end
+        if status == "off" then
+            return "The " .. utility .. " is out."
+        end
+        return "The " .. utility .. " is back on."
+    end
+    if fact.kind == "world.helicopter_overflight" then
+        local locLabel = payload.locationLabel
+            or (type(fact.location) == "table" and fact.location.name)
+            or nil
+        local path = reference and tostring(reference.acquisitionPath or "") or ""
+        if provenance == "radio" then
+            if locLabel then
+                return "Radio traffic mentioned a helicopter near " .. tostring(locLabel) .. "."
+            end
+            return "Radio traffic mentioned a helicopter in the area."
+        end
+        if epistemic == "uncertain" or provenance == "told" then
+            if locLabel then
+                return "Someone told me a helicopter flew near " .. tostring(locLabel) .. ", though I didn't see it myself."
+            end
+            return "Someone told me a helicopter passed by, though I didn't see it myself."
+        end
+        if provenance == "environmental" or path == "helicopter_indoor_audio" then
+            return "I heard a helicopter pass nearby while I was indoors, though I couldn't see its course."
+        end
+        if locLabel then
+            return "I saw a helicopter pass over " .. tostring(locLabel) .. "."
+        end
+        return "I saw a helicopter pass overhead."
+    end
     return nil
 end
 
@@ -332,6 +368,8 @@ function Adapter.QueryActorFact(record, querySpec, nowHours)
                 if string.lower(tostring(fact.kind or "")) == wantedTopic
                     or string.lower(subjID) == wantedTopic
                     or string.lower(subjName) == wantedTopic
+                    or string.lower(tostring(payload.semanticType or "")) == wantedTopic
+                    or string.lower(tostring(payload.utility or "")) == wantedTopic
                     or string.lower(tostring(payload.eventType or "")) == wantedTopic
                     or string.lower(tostring(payload.milestoneID or "")) == wantedTopic
                     or string.lower(tostring(payload.label or "")) == wantedTopic

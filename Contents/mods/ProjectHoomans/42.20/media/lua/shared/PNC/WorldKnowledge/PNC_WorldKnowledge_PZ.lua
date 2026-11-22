@@ -262,4 +262,85 @@ function Adapter.PropagateConversation(fromRecord, toRecord, options)
     return transferred, reason
 end
 
+Adapter.HELICOPTER_HEARING_RADIUS = 450
+
+function Adapter.IsRecordIndoors(record, opts)
+    if type(opts) == "table" and type(opts.isIndoors) == "function" then
+        return opts.isIndoors(record) == true
+    end
+    if type(record) ~= "table" then return false end
+    if record.indoors == true then return true end
+    if type(getCell) ~= "function" then return false end
+    local cell = getCell()
+    if not cell or type(cell.getGridSquare) ~= "function" then return false end
+    local sq = cell:getGridSquare(
+        math.floor(tonumber(record.x) or 0),
+        math.floor(tonumber(record.y) or 0),
+        math.floor(tonumber(record.z) or 0)
+    )
+    return sq ~= nil and sq.getRoom and sq:getRoom() ~= nil
+end
+
+function Adapter.SyncHelicopterPerception(hx, hy, factID, nowHours, opts)
+    opts = type(opts) == "table" and opts or {}
+    local core = Adapter.Core
+    if not core or not factID or hx == nil or hy == nil then return 0 end
+    local spatial = opts.spatial or PNC.SpatialIndex
+    if type(spatial) ~= "table" then return 0 end
+
+    local list = nil
+    local radius = tonumber(opts.radius) or Adapter.HELICOPTER_HEARING_RADIUS
+    if type(spatial.QueryNPCs) == "function" then
+        list = spatial.QueryNPCs(hx, hy, radius)
+    elseif type(spatial.QueryActors) == "function" then
+        local area = spatial.QueryActors(hx, hy, radius)
+        list = type(area) == "table" and area.npcs or nil
+    end
+    if type(list) ~= "table" then return 0 end
+
+    local acquired = 0
+    local maxBatch = math.min(#list, tonumber(opts.maxActors) or 24)
+    for i = 1, maxBatch do
+        local rec = list[i]
+        local actorID = type(rec) == "table" and rec.alive ~= false and Adapter.ActorID(rec) or nil
+        if actorID then
+            local indoors = Adapter.IsRecordIndoors(rec, opts)
+            local existing = core.ActorKnowledge.Get(core.KnowledgeState, actorID, factID)
+            local shouldAcquire = existing == nil
+                or (existing.provenance == "environmental" and not indoors)
+                or (existing.provenance == "told" or existing.provenance == "radio")
+            if shouldAcquire then
+                local provenance = indoors and "environmental" or "witnessed"
+                local confidence = indoors and 0.65 or 0.95
+                local path = indoors and "helicopter_indoor_audio" or "helicopter_outdoor_visual"
+                local ok = core.Acquire(actorID, factID, {
+                    authorized = true,
+                    provenance = provenance,
+                    source = indoors and "helicopter_sound" or "helicopter_sight",
+                    acquisitionPath = path,
+                    confidence = confidence,
+                    learnedAt = tonumber(nowHours) or now(),
+                })
+                if ok then acquired = acquired + 1 end
+            end
+        end
+    end
+    return acquired
+end
+
+function Adapter.ObserveHelicopterEpisode(nowHours, opts)
+    opts = type(opts) == "table" and opts or {}
+    local coreAdapter = PsychopatzCore and PsychopatzCore.WorldEventAdapter or nil
+    if type(coreAdapter) ~= "table" or type(coreAdapter.ObserveHelicopter) ~= "function" then
+        return nil, "core_world_event_adapter_unavailable"
+    end
+    local at = tonumber(nowHours) or now()
+    local res, status = coreAdapter.ObserveHelicopter(at, opts)
+    if type(res) == "table" and (res.action == "started" or res.action == "updated") and res.factID then
+        local acquired = Adapter.SyncHelicopterPerception(res.x, res.y, res.factID, at, opts)
+        res.actorsUpdated = acquired
+    end
+    return res, status
+end
+
 return Adapter
