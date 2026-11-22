@@ -1,5 +1,6 @@
 PNC = PNC or {}
 require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Projection"
+require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_BiteConflictPolicy"
 
 local Wounds = PNC.NPCWounds
 local Core = PNC.Core

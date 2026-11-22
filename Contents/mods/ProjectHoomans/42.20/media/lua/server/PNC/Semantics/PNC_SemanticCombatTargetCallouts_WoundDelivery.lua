@@ -84,7 +84,8 @@ function I.EmitWoundDialogue(record, evType, roleVariant, profile, hitDesc, now,
     ctx.responsePlan = res and res.responsePlan or nil
     ctx.responsePlanID = res and res.responsePlanID or nil
     ctx.realizationID = res and res.realizationID or nil
-    ctx.biteExecutionThreat = record.runtime and record.runtime.biteExecutionThreat or nil
+    ctx.biteConflictFacts = record.runtime and record.runtime.biteConflictFacts or nil
+    ctx.biteExecutionThreat = record.runtime and (record.runtime.biteConflictFacts or record.runtime.biteExecutionThreat) or nil
     ctx.eventType = evType
     ctx.eventRef = ref
     ctx.threadID = ref
@@ -131,6 +132,14 @@ function I.EmitWoundDialogue(record, evType, roleVariant, profile, hitDesc, now,
         context = ctx,
     })
     if (tonumber(sent) or 0) <= 0 then return false, "no_audience" end
+    if type(S.RecordHighSalienceInjuryMemory) == "function" then
+        S.RecordHighSalienceInjuryMemory(record, {
+            profile = profile,
+            eventRef = ref,
+            provenance = "experienced",
+            now = now,
+        })
+    end
     if S.EnqueueCustomReply and #responders > 0 then
         local replyOpts = {
             family = WOUND_BARK_OPTS.family,
@@ -162,7 +171,8 @@ function I.EmitWoundDialogue(record, evType, roleVariant, profile, hitDesc, now,
                     participantBand = pBand,
                     participantCount = pCount,
                     flowID = "combat.injury.triage_exchange",
-                    biteExecutionThreat = record.runtime and record.runtime.biteExecutionThreat or nil,
+                    biteConflictFacts = record.runtime and record.runtime.biteConflictFacts or nil,
+                    biteExecutionThreat = record.runtime and (record.runtime.biteConflictFacts or record.runtime.biteExecutionThreat) or nil,
                 },
                 barkOpts = replyOpts,
             })

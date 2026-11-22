@@ -166,6 +166,17 @@ function S.HandoffInjuryBeatToScene(record, threadID, spec)
     if type(record) == "table" then
         record.runtime = record.runtime or {}
         record.runtime.activeInjuryTriageState = triageState
+        if type(S.RecordHighSalienceInjuryMemory) == "function"
+            and (nodeId == "triage_resolution" or stateValue ~= nil)
+        then
+            S.RecordHighSalienceInjuryMemory(record, {
+                kind = "triage_resolution",
+                eventRef = tid,
+                triageOutcome = stateValue or nodeId,
+                provenance = "experienced",
+                now = now,
+            })
+        end
     end
     if type(context) == "table" then
         context.activeInjuryTriageState = triageState
