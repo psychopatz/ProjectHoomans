@@ -154,10 +154,6 @@ function Transport.ResolveLine(rec, opts)
 
     local raw = res.fallback or res.text
     sr = sr or (PNC.ConvoEngine and PNC.ConvoEngine.SpeechRealization)
-    if not sr then
-        local ok, m = pcall(require, "PNC/ConvoEngine/SpeechRealization")
-        if ok and type(m) == "table" then sr = m end
-    end
     if sr and type(sr.Apply) == "function" then
         local ap = sr.Apply(
             { selectionID = res.realizationID, templateID = res.templateID, fallback = raw },

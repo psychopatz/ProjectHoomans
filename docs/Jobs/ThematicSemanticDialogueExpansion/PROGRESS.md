@@ -1,14 +1,14 @@
 # Progress — Thematic Semantic Dialogue Expansion
 
-**Status:** D6 & D7 COMPLETE; proceeding into D8 (Exhaustive Acceptance + Adversarial Verification + Performance Regression).
+**Status:** D0–D8 COMPLETE (ALL DEVELOPER ACCEPTANCE GATES PASSED, 0 MANDATORY FINDINGS); READY FOR D9 USER NATIVE SP/MP ACCEPTANCE.
 **Primary repository:** /home/psychopatz/Zomboid/Workshop/ProjectHoomans
-**Participants:** /home/psychopatz/Zomboid/Workshop/psychopatzCore when reusable ConvoEngine/world-event contracts change; /home/psychopatz/Zomboid/Workshop/DynamicTrading when D5A economic world-event projection requires DTCommon/DTHoomans changes.
+**Participants:** /home/psychopatz/Zomboid/Workshop/psychopatzCore (`cf8a1d4`), /home/psychopatz/Zomboid/Workshop/DynamicTrading (`c176e171`).
 **Branch policy:** existing main only; no new branch.
-**Current ProjectHoomans HEAD:** 32143d78a (pre-D6/D7 commit)
+**Current ProjectHoomans HEAD:** 765345614 (pre-D8 commit)
 **Current psychopatzCore HEAD:** cf8a1d4
 **Current DynamicTrading HEAD:** c176e171
-**Current phase:** D8 — Exhaustive developer acceptance, adversarial verification, and performance regression proof.
-**Next Chunk:** Run full cross-mod acceptance tests, CodeBuilder `--check`, Kahlua lint, performance benchmarks, static anti-regression guards, and independent adversarial verification across all D0–D7 deliverables, then stop at D9 with the user SP/MP checklist.
+**Current phase:** D9 — User-owned native Project Zomboid SP/MP acceptance.
+**Next Chunk:** User native SP/MP verification checklist (no further autonomous developer edits until user feedback).
 
 ## Completed phases
 
@@ -25,6 +25,7 @@
   - Authored canonical declarative Beat families `chronology.milestone.react`, `world.event.food_crisis`, `world.event.raider_surge`, and `world.event.surplus` with grounded 1990s Kentucky EN/TL translations; wired into `PNC_ChronologyMilestones`, `ResponseCatalog`, and `Social/Reaction`; cleaned immersion-breaking `"Charm cooldown"` jargon; raised `DialogueFlowRegistry.DEFAULT_MAX_FLOWS` (32->64) to accommodate the 8 thematic flows cleanly; reconciled CodeBuilder (`ok=true, clean=true`).
   - Extended Core Semantic Lab / Observatory (`cf8a1d4`) with D7 lane ownership (`sceneID`/`threadID`), inline hygiene badges, disposition/demeanor breakdown, grounding/provenance/epistemic status, and N-actor role bindings (16/16 Core Python tests OK).
   - Verified full D7 input/presentation parity (`pnc_input_presentation_parity_smoke.lua` + InlineChat/Group/Farewell/VoiceGateway/PBrainZ/declarative beats smoke suites passing).
+- **D8 (CODE_VERIFIED, TEST_VERIFIED):** Independent adversarial functional + performance verification passed across all 3 repos: CodeBuilder `reconcile.py --check` (`ok=true, clean=true`, 485 desired, 0 drift), 18/18 PH Lua suites, 3/3 Core Lua + 7/7 Core Python + `audit-integrity` (`violationCount=0`), 24/24 DT suites, 3 PH performance benchmarks (`dialogue_and_combat_flow`, `combat_and_firearms_flow`, `data_mutation_and_mobile_groups_flow`), 83/83 touched mod `.lua` files passing `pz_verify.py --kahlua --severity WARNING` with 0 errors/warnings, static zero-new-`OnTick`/zero-`math.random()`/zero-global-scan/bounded-ModData guards, and Stage 6 repair removing all 6 `pcall(require, ...)` calls flagged by adversarial verification.
 
 ## Re-audit findings
 

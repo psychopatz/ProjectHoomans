@@ -18,16 +18,13 @@ local TraitContext = PNC.NPCTraitContext
 local Style = PNC.ConvoEngine.SpeechStyleContext
     or require "PNC/ConvoEngine/SpeechStyleContext"
 
+local DispositionProjection = (PNC.ConvoEngine and PNC.ConvoEngine.DispositionProjection)
+    or require "PNC/ConvoEngine/DispositionProjection"
+
 local function resolveDispositionProjection()
-    local dp = PNC and PNC.ConvoEngine and PNC.ConvoEngine.DispositionProjection
+    local dp = (PNC and PNC.ConvoEngine and PNC.ConvoEngine.DispositionProjection) or DispositionProjection
     if type(dp) == "table" and type(dp.Resolve) == "function" then
         return dp
-    end
-    if type(require) == "function" then
-        local ok, loaded = pcall(require, "PNC/ConvoEngine/DispositionProjection")
-        if ok and type(loaded) == "table" and type(loaded.Resolve) == "function" then
-            return loaded
-        end
     end
     return nil
 end

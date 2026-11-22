@@ -313,10 +313,6 @@ function Beats.HandoffToScene(threadID, spec)
     local cancelled = Beats.CancelThread(tid)
 
     local runtime = spec.runtime or (PNC.ConvoEngine and PNC.ConvoEngine.InteractionSceneRuntime)
-    if type(runtime) ~= "table" then
-        local ok, loaded = pcall(require, "PNC/ConvoEngine/Interaction/SceneRuntime")
-        runtime = ok and loaded or nil
-    end
     if type(runtime) ~= "table" or type(runtime.Open) ~= "function" then
         return nil, "scene_runtime_unavailable"
     end
