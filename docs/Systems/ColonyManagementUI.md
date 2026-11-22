@@ -82,5 +82,4 @@ diagnostics, or run a facility test. Every action is authorized and applied on
 the server (or the single-player authority) and returns a fresh Colony
 Management snapshot.
 The tab's `Provision Diagnostics` control opens a separate responsive modal for
-the selected colonist. The same modal is available as `Provision Stats` in the
-debug NPC Monitor/directory.
+the selected colonist.
