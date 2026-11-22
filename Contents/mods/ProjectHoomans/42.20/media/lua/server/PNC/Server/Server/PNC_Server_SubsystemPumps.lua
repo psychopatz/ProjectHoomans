@@ -212,6 +212,13 @@ function H.FinishTick(now)
         safeOptional("server_finish.perception_los", PNC.PerceptionService,
             "PumpLOSQueue", nil, now)
     end
+    local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil
+    if callouts and (tonumber(callouts.PendingReplyCount) or 0) > 0
+        and type(callouts.PumpPendingReplies) == "function"
+    then
+        safeOptional("server_finish.ally_warn_replies", callouts,
+            "PumpPendingReplies", nil, now)
+    end
     safeOptional("server_finish.dialogue_timeouts", PNC.DialogueMicroBeatDirector,
         "SweepTimeouts", nil, now)
     safeOptional("server_finish.joint_scene_leases", PNC.JointSceneLease,

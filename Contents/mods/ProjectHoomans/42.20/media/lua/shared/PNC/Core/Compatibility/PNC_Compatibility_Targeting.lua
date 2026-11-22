@@ -38,6 +38,34 @@ local function isVisible(source, target, options)
     return target.visible ~= false
 end
 
+local function passesVisionCone(source, candidate, radius)
+    local svc = PNC.PerceptionService
+    if not svc or type(svc.PassesBodyVisionCone) ~= "function" then
+        return true
+    end
+    local perception = PNC.Perception
+    local aid = tostring(candidate.actorId or candidate.id or "")
+    local prov = tostring(candidate.provider or "")
+    local runtime = type(source) == "table" and source.runtime or nil
+    local recent = runtime and runtime.recentThreat or nil
+    local active = runtime and runtime.target or nil
+    local isEngaged = (recent and recent.kind == "foreign_npc"
+            and tostring(recent.provider or "") == prov
+            and tostring(recent.id or "") == aid)
+        or (active and active.kind == "foreign_npc"
+            and tostring(active.provider or "") == prov
+            and tostring(active.actorId or active.id or "") == aid)
+        or (perception and perception.IsWarnedThreat ~= nil
+            and perception.IsWarnedThreat(source, "foreign_npc", aid, prov) == true)
+    local observer = PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(source.id) or nil
+    local profile = type(svc.GetProfile) == "function" and svc.GetProfile(source) or nil
+    return svc.PassesBodyVisionCone(source, candidate.worldObject, profile, observer, {
+        radius = radius,
+        bypassCone = isEngaged == true,
+    })
+end
+
 function Targeting.FindNearestEnemy(source, radius, options)
     local best
     local candidates
@@ -71,7 +99,9 @@ function Targeting.FindNearestEnemy(source, radius, options)
             ) < 1
         then
             allowed = API.CanAttack(source, candidate, context)
-            if allowed and isVisible(source, candidate, options) then
+            if allowed and passesVisionCone(source, candidate, limit)
+                and isVisible(source, candidate, options)
+            then
                 candidate.threatening = true
                 distSq = distanceSq(source, candidate)
                 if distSq <= limitSq then

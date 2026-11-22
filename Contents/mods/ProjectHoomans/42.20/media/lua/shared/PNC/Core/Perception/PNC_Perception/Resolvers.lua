@@ -78,6 +78,11 @@ function Perception.ResolveCompanionTarget(record)
         return nil
     end
 
+    if Perception.FindAllyThreatAlert then
+        local warnedTarget = Perception.FindAllyThreatAlert(record, defenseRadius, false)
+        if warnedTarget then return warnedTarget end
+    end
+
     if not record.hostility or record.hostility.attackNPCs ~= false then
         npcTarget = Perception.FindNearestEnemyNPC(record, defenseRadius)
     end
@@ -145,6 +150,14 @@ function Perception.ResolveCompanionProtectionTarget(record, ownerEngaged)
         )
         if npcGroupThreat then return npcGroupThreat end
     end
+    if Perception.FindAllyThreatAlert then
+        local warnedTarget = Perception.FindAllyThreatAlert(
+            record,
+            Internal.GetCompanionDefenseRadius(),
+            false
+        )
+        if warnedTarget then return warnedTarget end
+    end
     if ownerEngaged == true then
         return Perception.ResolveCompanionTarget(record)
     end
@@ -168,6 +181,15 @@ function Perception.ResolveHostileTarget(record)
     if immediateThreat then
         publishNPCGroupAlert(record, immediateThreat)
         return immediateThreat
+    end
+
+    if Perception.FindAllyThreatAlert then
+        local warnedTarget = Perception.FindAllyThreatAlert(
+            record,
+            tonumber(Const.ZOMBIE_TARGET_RADIUS) or 12,
+            false
+        )
+        if warnedTarget then return warnedTarget end
     end
 
     if hostileConfig.attackNPCs ~= false then
@@ -208,6 +230,15 @@ function Perception.ResolveRoamingTarget(record, radius)
     ) or Perception.FindImmediateZombieThreat(record, searchRadius)
 
     if immediateThreat then return immediateThreat end
+
+    if Perception.FindAllyThreatAlert then
+        local warnedTarget = Perception.FindAllyThreatAlert(
+            record,
+            searchRadius,
+            false
+        )
+        if warnedTarget then return warnedTarget end
+    end
 
     if hostility.attackNPCs ~= false then
         npcTarget = Perception.FindNearestEnemyNPC(record, searchRadius)

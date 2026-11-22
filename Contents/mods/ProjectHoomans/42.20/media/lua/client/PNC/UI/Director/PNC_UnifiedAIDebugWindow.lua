@@ -81,6 +81,8 @@ function ISPNCUnifiedAIDebugWindow:createChildren()
     local buttonDefs = {
         { "refresh", tr("UI_PNC_UnifiedAI_Action_Refresh", "REFRESH"), "quiet" },
         { "toggle_cone", tr("UI_PNC_UnifiedAI_Action_ConeOverlay", "CONE OVERLAY"), "primary" },
+        { "cycle_detail_mode", tr("UI_PNC_UnifiedAI_Action_DetailMode", "OVERLAY MODE"), "quiet" },
+        { "test_warn_allies", tr("UI_PNC_UnifiedAI_Action_TestWarnAllies", "TEST: WARN ALLIES"), "primary" },
         { "emit_gunfire", tr("UI_PNC_UnifiedAI_Action_Gunfire", "SHOCK: GUNFIRE"), "danger" },
         { "emit_explosion", tr("UI_PNC_UnifiedAI_Action_Explosion", "SHOCK: EXPLOSION"), "danger" },
         { "emit_weapon_aimed", tr("UI_PNC_UnifiedAI_Action_WeaponAim", "SHOCK: WEAPON AIM"), "warning" },
@@ -193,6 +195,20 @@ function ISPNCUnifiedAIDebugWindow:refreshDetails()
     self.details:clear()
     addKV(self, "Last Action", snapshot.lastActionStatus or "-")
     addKV(self, "Combat Cone Overlay", combatConeOn and "ON" or "OFF")
+    local overlayMode = PNC.Nameplates and type(PNC.Nameplates.GetCombatDebugDetailMode) == "function"
+        and tostring(PNC.Nameplates.GetCombatDebugDetailMode() or "cones") or "cones"
+    addKV(self, "Combat Overlay Mode", string.upper(overlayMode))
+    local globals = type(snapshot.globals) == "table" and snapshot.globals or {}
+    local warnStats = type(globals.allyWarningStats) == "table" and globals.allyWarningStats or {}
+    addKV(self, "Ally Warnings",
+        "pub=" .. tostring(tonumber(warnStats.published) or 0)
+        .. " notified=" .. tostring(tonumber(warnStats.notified) or 0)
+        .. " pending=" .. tostring(tonumber(globals.pendingAllyReplies) or 0))
+    local sel = type(snapshot.selected) == "table" and snapshot.selected or nil
+    if sel and sel.allyWarnedBy then
+        addKV(self, "Warned By", tostring(sel.allyWarnedBy)
+            .. " (" .. tostring(sel.allyWarnedKind or "?") .. ")")
+    end
     addKV(self, "Live NPCs / Active Claims", tostring(g.liveNpcCount or 0) .. " / " .. tostring(g.activeClaims or 0))
     addKV(self, "Perception ConeSkipped / LOS Exec", tostring(pStats.coneRejected or 0) .. " / " .. tostring(pStats.losExecuted or 0))
     addKV(self, "WorldSounds / CluesRecorded", tostring(pStats.worldSoundsProcessed or 0) .. " / " .. tostring(pStats.cluesRecorded or 0))
@@ -227,6 +243,13 @@ function ISPNCUnifiedAIDebugWindow:onAction(button)
     if id == "toggle_cone" then
         if PNC.Nameplates and type(PNC.Nameplates.ToggleCombatDebug) == "function" then
             PNC.Nameplates.ToggleCombatDebug()
+        end
+        self:refreshDetails()
+        return
+    end
+    if id == "cycle_detail_mode" then
+        if PNC.Nameplates and type(PNC.Nameplates.CycleCombatDebugDetailMode) == "function" then
+            PNC.Nameplates.CycleCombatDebugDetailMode()
         end
         self:refreshDetails()
         return

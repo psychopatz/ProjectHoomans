@@ -14,6 +14,7 @@ require "PNC/ConvoEngine/ResponseCatalog/CompanionCommands"
 require "PNC/ConvoEngine/ResponseCatalog/CombatKill_Core"
 require "PNC/ConvoEngine/ResponseCatalog/Social_Conflict"
 require "PNC/ConvoEngine/ResponseCatalog/Social_Reactions"
+require "PNC/ConvoEngine/ResponseCatalog/Social_Reactions_AllyWarn"
 require "PNC/ConvoEngine/ResponseCatalog/Medical"
 
 return true

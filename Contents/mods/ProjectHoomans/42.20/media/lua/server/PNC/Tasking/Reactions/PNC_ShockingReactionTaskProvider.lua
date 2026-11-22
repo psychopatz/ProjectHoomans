@@ -319,29 +319,66 @@ function Provider.Tick(lease)
     elseif intent == "WarnGroup" then
         if not st.warned then
             st.warned = true
-            local allies = queryNearbyNPCs(rec.x or 0, rec.y or 0, 14)
-            local count = 0
-            for i = 1, #allies do
-                if count >= Provider.MAX_WARN_ALLIES then break end
-                local ally = allies[i]
-                if type(ally) == "table" and ally.id ~= rec.id and ally.alive ~= false
-                    and (not rec.factionID or ally.factionID == rec.factionID)
-                then
-                    count = count + 1
-                    if PNC.SecondaryChannel and PNC.SecondaryChannel.SetAlertLevel then
-                        PNC.SecondaryChannel.SetAlertLevel(ally, "wary")
-                    end
-                    if PNC.PerceptionService and PNC.PerceptionService.RecordClue
-                        and st.targetX and st.targetY
-                    then
-                        PNC.PerceptionService.RecordClue(ally, {
-                            key = "warn:" .. tostring(rec.id),
-                            kind = "hearsay_warning",
-                            x = st.targetX,
-                            y = st.targetY,
-                            z = st.targetZ or 0,
-                            severity = 70,
-                        }, at)
+            local active = Provider.ActiveByLease[lease.leaseId]
+            local sourceId = active and active.event and active.event.sourceId or nil
+            local sourceKind = active and active.event and active.event.sourceKind or nil
+            local target = nil
+            if sourceKind == "player" or (sourceId ~= nil and PNC.Core
+                and type(PNC.Core.ResolvePlayerByUsername) == "function"
+                and PNC.Core.ResolvePlayerByUsername(sourceId))
+            then
+                target = { kind = "player", username = sourceId, x = st.targetX, y = st.targetY, z = st.targetZ }
+            elseif sourceKind == "zombie" or (sourceId ~= nil and PNC.Perception
+                and type(PNC.Perception.FindZombieByID) == "function"
+                and PNC.Perception.FindZombieByID(sourceId))
+            then
+                target = { kind = "zombie", zombieId = sourceId, x = st.targetX, y = st.targetY, z = st.targetZ }
+            elseif sourceId ~= nil and PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(sourceId) then
+                target = { kind = "npc", id = sourceId, x = st.targetX, y = st.targetY, z = st.targetZ }
+            elseif sourceKind == "foreign_npc" then
+                target = {
+                    kind = "foreign_npc",
+                    provider = active and active.event and active.event.sourceProvider,
+                    actorId = sourceId,
+                    x = st.targetX, y = st.targetY, z = st.targetZ,
+                }
+            end
+            if target and PNC.Perception
+                and type(PNC.Perception.PublishAllyThreatWarning) == "function"
+            then
+                PNC.Perception.PublishAllyThreatWarning(rec, target, {
+                    at = at,
+                    radius = 14,
+                    source = "shock_reaction_warn_group",
+                })
+            else
+                local allies = queryNearbyNPCs(rec.x or 0, rec.y or 0, 14)
+                local count = 0
+                for i = 1, #allies do
+                    if count >= Provider.MAX_WARN_ALLIES then break end
+                    local ally = allies[i]
+                    local eligible = PNC.Perception
+                        and type(PNC.Perception.AreWarningAllies) == "function"
+                        and PNC.Perception.AreWarningAllies(rec, ally)
+                        or (type(ally) == "table" and ally.id ~= rec.id and ally.alive ~= false
+                            and (not rec.factionID or ally.factionID == rec.factionID))
+                    if eligible then
+                        count = count + 1
+                        if PNC.SecondaryChannel and PNC.SecondaryChannel.SetAlertLevel then
+                            PNC.SecondaryChannel.SetAlertLevel(ally, "wary")
+                        end
+                        if PNC.PerceptionService and PNC.PerceptionService.RecordClue
+                            and st.targetX and st.targetY
+                        then
+                            PNC.PerceptionService.RecordClue(ally, {
+                                key = "warn:" .. tostring(rec.id),
+                                kind = "hearsay_warning",
+                                x = st.targetX,
+                                y = st.targetY,
+                                z = st.targetZ or 0,
+                                severity = 70,
+                            }, at)
+                        end
                     end
                 end
             end

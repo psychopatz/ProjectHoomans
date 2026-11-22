@@ -42,11 +42,12 @@ function Renderer.Render(manager, settings)
         end
     end
     if settings.showCombatDebug then
+        local combatRenderState = { usedLabelRects = {} }
         for _, entry in pairs(manager.entries) do
             if not entry.debugOnly
                 and scopeVisible(entry, Scopes.DEBUG, true)
             then
-                drawCombatDebug(manager, entry)
+                drawCombatDebug(manager, entry, settings, combatRenderState)
             end
         end
     end

@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.ally_warn.callout",
+  "locale": "TL",
+  "entries": {
+    "say.variants.zombie_neutral": [
+      "Mag-ingat, may mga patay na papalapit!",
+      "May mga zombie sa malapit, maging alerto!",
+      "May mga walker na parating, bantayan ang likod!",
+      "May mga bangkay na papalapit sa atin, humanda!"
+    ],
+    "say.variants.zombie_tactical": [
+      "May nakitang zombie! Itaas ang sandata!",
+      "Sumusulong ang mga walker sa pwesto natin, laban!",
+      "Kontak ng patay! Magtipon at linisin!",
+      "Maraming walker ang lumalapit, hawakan ang pwesto!"
+    ],
+    "say.variants.zombie_hostile": [
+      "May mga bulok na lumalapit sa teritoryo natin! Patumbahin!",
+      "May mga walker sa paligid, tapusin agad!",
+      "Bantayan ang gilid, may zombie sa paligid!",
+      "Malapit ang zombie! Hiwain na 'yan!"
+    ],
+    "say.variants.hostile_neutral": [
+      "Mag-ingat, may kalabang nakita!",
+      "May gulo sa malapit, bantay lang!",
+      "Kalaban sa paligid! Mag-ingat ka!",
+      "May sumusugod sa atin, humanda!"
+    ],
+    "say.variants.hostile_tactical": [
+      "May kalabang nakita! Ihanda ang sandata!",
+      "Armadong banta sa sektor, sumugod!",
+      "Kalaban lumalapit, tutukan at labanan!",
+      "Nakumpirma ang banta sa abot, patumbahin!"
+    ],
+    "say.variants.hostile_hostile": [
+      "May nanghihimasok! Palabasin 'yan!",
+      "Bagong target! Durugin sila!",
+      "Kalaban nandito! Walang awa!",
+      "Patayin bago makatakas!"
+    ]
+  }
+}

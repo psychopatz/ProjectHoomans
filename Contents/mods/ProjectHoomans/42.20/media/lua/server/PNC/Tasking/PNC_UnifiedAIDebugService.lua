@@ -106,6 +106,7 @@ local function buildSelectedDetail(record, now)
     local topRejection = type(rejections) == "table" and rejections[1] or nil
     local memBank = type(record.social) == "table" and type(record.social.memoryBank) == "table"
         and record.social.memoryBank or nil
+    local alert = type(runtime.allyThreatAlert) == "table" and runtime.allyThreatAlert or nil
 
     return {
         id = npcId,
@@ -140,6 +141,10 @@ local function buildSelectedDetail(record, now)
         dialogueStage = dialogue and dialogue.stage or nil,
         dialogueBeatId = dialogue and dialogue.beatId or nil,
         dialogueTension = dialogue and dialogue.tension or nil,
+        allyWarnedBy = alert and alert.callerId or nil,
+        allyWarnedKind = alert and alert.kind or nil,
+        allyWarnExpiresInMs = (alert and alert.expiresAt and tonumber(alert.expiresAt) > now)
+            and math.floor(tonumber(alert.expiresAt) - now) or 0,
         socialMemoryCount = memBank and #memBank or 0,
     }
 end
@@ -212,6 +217,9 @@ function Service.BuildSnapshot(selectedNpcId, player, statusMessage)
             dialogueStats = dStats,
             jointLeaseStats = lStats,
             workReconcilers = listWorkReconcilers(),
+            allyWarningStats = PNC.Perception and PNC.Perception.AllyWarningStats or {},
+            pendingAllyReplies = PNC.Semantics and PNC.Semantics.CombatTargetCallouts
+                and tonumber(PNC.Semantics.CombatTargetCallouts.PendingReplyCount) or 0,
         },
         lastActionStatus = statusMessage or Service._lastActionStatus,
     }
@@ -398,6 +406,46 @@ function Service.PerformAction(player, args)
             statusMsg = "cleared:" .. tid
         else
             statusMsg = "no_npc_selected"
+        end
+    elseif action == "test_warn_allies" then
+        if not target then
+            statusMsg = "no_npc_selected"
+        else
+            local runtime = type(target.runtime) == "table" and target.runtime or {}
+            local threat = type(runtime.target) == "table" and runtime.target or nil
+            if not threat then
+                local fx = tonumber(runtime.facingDirX) or 1
+                local fy = tonumber(runtime.facingDirY) or 0
+                threat = {
+                    kind = "zombie",
+                    zombieId = "debug_threat_" .. tostring(now),
+                    id = "debug_threat_" .. tostring(now),
+                    x = (tonumber(target.x) or 0) + fx * 5,
+                    y = (tonumber(target.y) or 0) + fy * 5,
+                    z = tonumber(target.z) or 0,
+                }
+            end
+            local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil
+            if callouts and type(callouts.OnTargetChanged) == "function" then
+                local ok, res = callouts.OnTargetChanged({
+                    target = threat,
+                    at = now,
+                    source = "unified_ai_debug_lab",
+                    ignoreWarningCooldown = true,
+                }, target)
+                local warn = type(res) == "table" and res.warning or nil
+                local count = warn and type(warn.notified) == "table" and #warn.notified or 0
+                local reason = warn and warn.reason or (type(res) == "string" and res or tostring(ok))
+                statusMsg = "warn_allies:" .. tostring(count) .. ":" .. tostring(reason)
+            elseif PNC.Perception and type(PNC.Perception.PublishAllyThreatWarning) == "function" then
+                local res = PNC.Perception.PublishAllyThreatWarning(target, threat, {
+                    at = now, ignoreCooldown = true,
+                })
+                local count = res and type(res.notified) == "table" and #res.notified or 0
+                statusMsg = "warn_allies:" .. tostring(count) .. ":" .. tostring(res and res.reason)
+            else
+                statusMsg = "ally_warning_unavailable"
+            end
         end
     end
 

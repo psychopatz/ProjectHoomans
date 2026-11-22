@@ -525,6 +525,21 @@ return {
             ["sourceShard"] = "behavior/scene/task_work/scene_task_work_assigned.json",
         },
         {
+            ["bytes"] = 27784,
+            ["domain"] = "combat_ally_warning",
+            ["kind"] = "ConvoEngine",
+            ["module"] = "PNC/ConvoEngine/Dialogue/CombatAllyWarning",
+            ["owner"] = "ProjectHoomans",
+            ["recordCount"] = 2,
+            ["recordIDs"] = {
+                "combat.ally_warn.callout",
+                "combat.ally_warn.reply",
+            },
+            ["registryOwner"] = "ProjectHoomans",
+            ["shardOwner"] = "ProjectHoomans",
+            ["sourceShard"] = "dialogue/combat_ally_warning/combat_ally_warn_callout.json",
+        },
+        {
             ["bytes"] = 26418,
             ["domain"] = "combat_horde",
             ["kind"] = "ConvoEngine",
@@ -2614,6 +2629,22 @@ return {
             ["sourceShard"] = "@index/behavior/social",
         },
         {
+            ["bytes"] = 753,
+            ["domain"] = "combat_ally_warning",
+            ["indexKind"] = "dialogue",
+            ["kind"] = "Index",
+            ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatAllyWarning",
+            ["owner"] = "ProjectHoomans",
+            ["recordCount"] = 2,
+            ["recordIDs"] = {
+                "combat.ally_warn.callout",
+                "combat.ally_warn.reply",
+            },
+            ["registryOwner"] = "ProjectHoomans",
+            ["shardOwner"] = "ProjectHoomans",
+            ["sourceShard"] = "@index/dialogue/combat_ally_warning",
+        },
+        {
             ["bytes"] = 680,
             ["domain"] = "combat_horde",
             ["indexKind"] = "dialogue",
@@ -4596,12 +4627,12 @@ return {
             ["sourceShard"] = "@index/realization/social_warning_wellbeing",
         },
         {
-            ["bytes"] = 21276,
+            ["bytes"] = 21466,
             ["domain"] = "index",
             ["kind"] = "IndexRegistry",
             ["module"] = "PNC/ConvoEngine/Index/Registry",
             ["owner"] = "ProjectHoomans",
-            ["recordCount"] = 107,
+            ["recordCount"] = 108,
             ["recordIDs"] = {
             },
             ["registryOwner"] = "ProjectHoomans",
@@ -4687,5 +4718,5 @@ return {
             ["sourceShard"] = "@index/director/core",
         },
     },
-    ["wholeModelFingerprint"] = "b9b7cab159a7f22893a5cc8ec1eafd7fd6f164bd407644fa7853d4f943093471",
+    ["wholeModelFingerprint"] = "c6f4f3925328c413626022905fed031a4ac3b32cc0ecc89889de99187d0671c6",
 }

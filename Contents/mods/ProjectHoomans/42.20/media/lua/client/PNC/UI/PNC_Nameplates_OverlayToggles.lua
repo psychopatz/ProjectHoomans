@@ -53,6 +53,9 @@ function Nameplates.TogglePathDebug()
         "UI_PNC_PathOverlayEnabled", "UI_PNC_PathOverlayDisabled")
 end
 
+local DETAIL_MODE_ORDER = { "cones", "compact", "full" }
+local DETAIL_MODE_VALID = { cones = true, compact = true, full = true }
+
 function Nameplates.IsCombatDebugEnabled()
     return Settings.showCombatDebug == true
 end
@@ -60,6 +63,42 @@ function Nameplates.ToggleCombatDebug()
     Settings.showCombatDebug = not Settings.showCombatDebug
     return announce("showCombatDebug", Settings.showCombatDebug,
         "UI_PNC_CombatOverlayEnabled", "UI_PNC_CombatOverlayDisabled")
+end
+
+function Nameplates.GetCombatDebugDetailMode()
+    local mode = tostring(Settings.combatDebugDetailMode or "cones")
+    return DETAIL_MODE_VALID[mode] and mode or "cones"
+end
+
+function Nameplates.SetCombatDebugDetailMode(mode, announceResult)
+    local nextMode = DETAIL_MODE_VALID[tostring(mode or "")]
+        and tostring(mode) or "cones"
+    Settings.combatDebugDetailMode = nextMode
+    if PNC.SettingsStore and type(PNC.SettingsStore.Set) == "function" then
+        PNC.SettingsStore:Set("combatDebugDetailMode", nextMode, true)
+    end
+    if announceResult == true then
+        local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+        if player and HaloTextHelper and HaloTextHelper.addText then
+            local key = "UI_PNC_CombatDebugMode_" .. nextMode
+            local label = PNC.Translation and PNC.Translation.GetKey
+                and PNC.Translation.GetKey(key) or key
+            HaloTextHelper.addText(player, label)
+        end
+    end
+    return nextMode
+end
+
+function Nameplates.CycleCombatDebugDetailMode(announceResult)
+    local current = Nameplates.GetCombatDebugDetailMode()
+    local nextMode = "cones"
+    for i = 1, #DETAIL_MODE_ORDER do
+        if DETAIL_MODE_ORDER[i] == current then
+            nextMode = DETAIL_MODE_ORDER[(i % #DETAIL_MODE_ORDER) + 1]
+            break
+        end
+    end
+    return Nameplates.SetCombatDebugDetailMode(nextMode, announceResult)
 end
 
 function Nameplates.IsFactionDebugEnabled()

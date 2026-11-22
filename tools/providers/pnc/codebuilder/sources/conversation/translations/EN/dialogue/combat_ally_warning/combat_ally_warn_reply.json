@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.ally_warn.reply",
+  "locale": "EN",
+  "entries": {
+    "say.variants.engaging_neutral": [
+      "I see them! Moving in!",
+      "Got eyes on them, right behind you!",
+      "On my way, hold them off!",
+      "Copy that, jumping into the fight!"
+    ],
+    "say.variants.engaging_tactical": [
+      "Visual confirmed, engaging target!",
+      "Copy! Moving to flank and engage!",
+      "I've got a bead on them, advancing!",
+      "Roger, converging on your contact!"
+    ],
+    "say.variants.engaging_hostile": [
+      "Got 'em in my sights! Moving to finish it!",
+      "Yeah, I see the bastard! Going in!",
+      "Leave some for me! Pushing up!",
+      "Locked on! Time to drop them!"
+    ],
+    "say.variants.alerted_neutral": [
+      "Heard you! Looking around now!",
+      "Where? Checking that direction!",
+      "Copy, turning to back you up!",
+      "Wait up, I hear trouble!"
+    ],
+    "say.variants.alerted_tactical": [
+      "Copy contact, scanning your sector!",
+      "Turning to cover, no visual yet!",
+      "On alert, moving to get eyes on target!",
+      "Roger, sweeping that bearing now!"
+    ],
+    "say.variants.alerted_hostile": [
+      "Where are they?! Coming to back you up!",
+      "Show yourself! Checking that side!",
+      "Keep 'em busy, I'm coming around!",
+      "Don't let 'em slip, scanning now!"
+    ],
+    "say.variants.defensive_neutral": [
+      "Whoa, staying clear! Watch out!",
+      "Heard you, falling back to cover!",
+      "Keeping out of the way, stay safe!",
+      "Be careful, I'm hanging back!"
+    ],
+    "say.variants.defensive_shaken": [
+      "Oh no—watching out, stay safe!",
+      "Too close! Backing off now!",
+      "I heard that—staying low!",
+      "Don't let them reach us! Getting clear!"
+    ]
+  }
+}

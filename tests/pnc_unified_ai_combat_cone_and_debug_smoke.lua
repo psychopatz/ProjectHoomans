@@ -419,4 +419,163 @@ T.equal(snapCleared.selected.agitationStage, "calm")
 T.equal(snapCleared.selected.clueCount, 0)
 T.equal(snapCleared.selected.dialogueSceneId, nil)
 
+do
+    -- Verify overlay detail mode cycling, thick stroke cones, warning links, and Lab test_warn_allies.
+    local thickCalls = 0
+    isoToScreenX = function(_, x, y) return (x - y) * 32 end
+    isoToScreenY = function(_, x, y, z) return (x + y) * 16 - (z or 0) * 96 end
+    getTextManager = function()
+        return {
+            getFontHeight = function() return 12 end,
+            MeasureStringX = function(_, _, text) return #tostring(text or "") * 6 end,
+        }
+    end
+    T.stubClientUI()
+    PsychopatzCore = PsychopatzCore or {}
+    PsychopatzCore.Settings = {
+        Open = function(_, spec)
+            local values = {}
+            for k, v in pairs((spec and spec.defaults) or {}) do values[k] = v end
+            return {
+                values = values,
+                Get = function(_, k, fb) return values[k] == nil and fb or values[k] end,
+                Set = function(_, k, v) values[k] = v end,
+            }
+        end,
+    }
+    PNC.Nameplates = PNC.Nameplates or {}
+    PNC.Translation = PNC.Translation or { GetKey = function(_, fb) return fb end }
+    local drawnText = {}
+    PNC.NameplatePresentation = PNC.NameplatePresentation or {}
+    PNC.NameplatePresentation.Fonts = PNC.NameplatePresentation.Fonts or { debug = "Small" }
+    PNC.NameplatePresentation.DrawOutlinedText = function(_, text)
+        drawnText[#drawnText + 1] = tostring(text)
+    end
+    PNC.NameplateRenderer = PNC.NameplateRenderer or { Internal = {} }
+    T.load("ProjectHoomans", "client", "PNC/UI/PNC_Nameplates_Settings.lua")
+    T.load("ProjectHoomans", "client", "PNC/UI/PNC_Nameplates_OverlayToggles.lua")
+    T.load("ProjectHoomans", "client", "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_WorldPrimitives.lua")
+    T.load("ProjectHoomans", "client", "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_DebugText.lua")
+    T.load("ProjectHoomans", "client", "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_CombatDebug.lua")
+    T.load("ProjectHoomans", "client", "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_CombatDebug_Render.lua")
+
+    local np = PNC.Nameplates
+    T.equal(np.GetCombatDebugDetailMode(), "cones", "default combat debug detail mode must be cones")
+    T.equal(np.CycleCombatDebugDetailMode(), "compact", "cycle 1 -> compact")
+    T.equal(np.CycleCombatDebugDetailMode(), "full", "cycle 2 -> full")
+    T.equal(np.CycleCombatDebugDetailMode(), "cones", "cycle 3 -> cones")
+
+    local renderer = PNC.NameplateRenderer
+    local origThick = renderer.Internal and renderer.Internal.DrawWorldThickLine
+    T.truthy(type(origThick) == "function", "DrawWorldThickLine must be installed")
+    renderer.Internal.DrawWorldThickLine = function(...)
+        thickCalls = thickCalls + 1
+        return origThick(...)
+    end
+
+    local textSpyCalls = {}
+    local origBuildVision = renderer.BuildVisionDebugLines
+    renderer.BuildVisionDebugLines = function(...)
+        local out = origBuildVision(...)
+        textSpyCalls[#textSpyCalls + 1] = out
+        return out
+    end
+
+    local lineCalls, shadowLineCalls = 0, 0
+    local rectCalls = 0
+    local manager = {
+        playerIndex = 0, x = 0, y = 0,
+        drawLine2 = function(_, _, _, _, _, _, r, g, b)
+            lineCalls = lineCalls + 1
+            if r == 0 and g == 0 and b == 0 then
+                shadowLineCalls = shadowLineCalls + 1
+            end
+        end,
+        drawRect = function() rectCalls = rectCalls + 1 end,
+    }
+    local function mkZombie(x, y)
+        return {
+            isDead = function() return false end,
+            getX = function() return x end,
+            getY = function() return y end,
+            getZ = function() return 0 end,
+            getForwardDirection = function() return { getX = function() return 1 end, getY = function() return 0 end } end,
+        }
+    end
+    local entryA = {
+        uuid = "dbg-a",
+        zombie = mkZombie(10, 10),
+        snapshot = {
+            id = "dbg-a",
+            attackMode = true,
+            combatDebugState = {
+                coneRadius = 12,
+                coneHalfAngleDegrees = 55,
+                agitationStage = "alerted",
+                secondaryAlertLevel = "tense",
+                warnedBy = "dbg-b",
+                warningLink = {
+                    kind = "zombie", role = "recipient", actorId = "dbg-b",
+                    x = 14, y = 10, z = 0, at = 1000, expiresAt = 3500,
+                },
+                target = { kind = "zombie", id = "z1", x = 15, y = 10, z = 0, visible = true },
+            },
+        },
+    }
+    local entryB = {
+        uuid = "dbg-b",
+        zombie = mkZombie(12, 10),
+        snapshot = {
+            id = "dbg-b",
+            combatDebugState = {
+                coneRadius = 10,
+                coneHalfAngleDegrees = 55,
+            },
+        },
+    }
+
+    -- In "cones" mode with dbg-a selected, only dbg-a gets vision debug text.
+    np.SetCombatDebugDetailMode("cones")
+    PNC.Network = PNC.Network or {}
+    PNC.Network.ClientState = { unifiedAIDebug = { selectedId = "dbg-a" } }
+    local settings = { combatDebugDetailMode = np.GetCombatDebugDetailMode() }
+    local renderState = { usedLabelRects = {} }
+    lineCalls, shadowLineCalls, textSpyCalls, drawnText = 0, 0, {}, {}
+    renderer.RenderCombatDebug(manager, entryA, settings, renderState)
+    renderer.RenderCombatDebug(manager, entryB, settings, renderState)
+    T.truthy(shadowLineCalls > 0 and lineCalls > 40,
+        "combat overlay should draw thick dark-backed strokes for cones, rings, and warning link")
+    T.equal(#textSpyCalls, 1, "cones mode must render detailed text only for focused NPC")
+    T.truthy(rectCalls > 0, "combat text backdrop drawRect must be rendered")
+
+    np.SetCombatDebugDetailMode("full")
+    settings.combatDebugDetailMode = "full"
+    textSpyCalls = {}
+    renderer.RenderCombatDebug(manager, entryA, settings, { usedLabelRects = {} })
+    renderer.RenderCombatDebug(manager, entryB, settings, { usedLabelRects = {} })
+    T.equal(#textSpyCalls, 2, "full mode draws full debug/vision text for both NPCs")
+    np.SetCombatDebugDetailMode("cones")
+
+    -- Verify UnifiedAIDebugService test_warn_allies action triggers warning and telemetry.
+    if PNC.Perception and PNC.Perception.PublishAllyThreatWarning then
+        local npcA = { id = "dbg-a", name = "Alpha", x = 10, y = 10, z = 0, alive = true, factionID = "survivors", runtime = { facingDirX = 1, facingDirY = 0 } }
+        local npcB = { id = "dbg-b", name = "Bravo", x = 12, y = 10, z = 0, alive = true, factionID = "survivors", runtime = {} }
+        PNC.Registry = PNC.Registry or { Data = {} }
+        PNC.Registry.Data = { ["dbg-a"] = npcA, ["dbg-b"] = npcB }
+        PNC.Registry.Get = function(id) return PNC.Registry.Data[tostring(id)] end
+        PNC.Registry.ForEachLive = function(cb)
+            for _, rec in pairs(PNC.Registry.Data) do cb(rec) end
+        end
+        PNC.UnifiedAIDebugService = PNC.UnifiedAIDebugService
+            or T.load("ProjectHoomans", "server", "PNC/Tasking/PNC_UnifiedAIDebugService.lua")
+        local snap, status = PNC.UnifiedAIDebugService.PerformAction(nil, {
+            debugAction = "test_warn_allies",
+            npcId = "dbg-a",
+        })
+        T.contains(status, "warn_allies:", "UnifiedAI test_warn_allies must report warned count")
+        T.truthy(snap and snap.globals and snap.globals.allyWarningStats,
+            "UnifiedAI snapshot must expose allyWarningStats")
+    end
+end
+
 T.finish("pnc_unified_ai_combat_cone_and_debug_smoke")

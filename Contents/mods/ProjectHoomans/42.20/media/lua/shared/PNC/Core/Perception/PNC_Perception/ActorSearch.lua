@@ -36,13 +36,29 @@ function Perception.FindNearestEnemyPlayer(record, radius)
     local observer = useCone and Registry and Registry.GetLiveZombie
         and Registry.GetLiveZombie(record.id) or nil
     local profile = useCone and svc.GetProfile and svc.GetProfile(record) or nil
+    local recent = record and record.runtime and record.runtime.recentThreat or nil
+    local activeTarget = record and record.runtime and record.runtime.target or nil
     for i = 1, #players do
         player = players[i]
         visible = false
         visibilityKind = nil
         if player then
+            local pOid = player.getOnlineID and player:getOnlineID() or nil
+            local pUname = player.getUsername and player:getUsername() or nil
+            local isEngaged = (recent and recent.kind == "player"
+                    and ((pOid ~= nil and tostring(recent.onlineID or "") == tostring(pOid))
+                        or (pUname ~= nil and tostring(recent.username or "") == tostring(pUname))))
+                or (activeTarget and activeTarget.kind == "player"
+                    and ((pOid ~= nil and tostring(activeTarget.onlineID or "") == tostring(pOid))
+                        or (pUname ~= nil and tostring(activeTarget.username or "") == tostring(pUname))))
+                or (Perception.IsWarnedThreat ~= nil
+                    and ((pOid ~= nil and Perception.IsWarnedThreat(record, "player", pOid) == true)
+                        or (pUname ~= nil and Perception.IsWarnedThreat(record, "player", pUname) == true)))
             local inCone = not useCone
-                or svc.PassesBodyVisionCone(record, player, profile, observer, { radius = radius })
+                or svc.PassesBodyVisionCone(record, player, profile, observer, {
+                    radius = radius,
+                    bypassCone = isEngaged == true,
+                })
             if inCone then
                 visible, visibilityKind = Perception.CanSeeWorldObject(record, player)
             end
@@ -118,7 +134,12 @@ function Perception.FindNearestEnemyNPC(record, radius)
         visibilityKind = nil
         if targetZombie then
             local tid = tostring(target.id or "")
-            local isEngaged = tid ~= "" and (tid == recentNpcId or tid == activeNpcId)
+            local isEngaged = tid ~= "" and (
+                tid == recentNpcId
+                or tid == activeNpcId
+                or (Perception.IsWarnedThreat ~= nil
+                    and Perception.IsWarnedThreat(record, "npc", tid) == true)
+            )
             local inCone = not useCone
                 or svc.PassesBodyVisionCone(record, targetZombie, profile, observer, {
                     radius = radius,

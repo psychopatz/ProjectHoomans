@@ -12,6 +12,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open(
             showCampDebug = false,
             showPathDebug = false,
             showCombatDebug = false,
+            combatDebugDetailMode = "cones",
             showZombieDebug = false,
             showFactionDebug = false,
             showCommunityDebug = false,
@@ -73,6 +74,12 @@ for _, key in ipairs({
     "showAnimationSceneDebug",
 }) do
     if Settings[key] == nil then Settings[key] = false end
+end
+if Settings.combatDebugDetailMode ~= "cones"
+    and Settings.combatDebugDetailMode ~= "compact"
+    and Settings.combatDebugDetailMode ~= "full"
+then
+    Settings.combatDebugDetailMode = "cones"
 end
 for key, value in pairs({
     debugShowPresence = true,

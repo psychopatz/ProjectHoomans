@@ -411,8 +411,40 @@ function Renderer.BuildVisionDebugLines(debugState, outLines)
             .. ' sec=' .. tostring(debugState.secondaryAlertLevel or 'calm')
             .. '/' .. tostring(debugState.secondaryPosture or 'relaxed')
             .. (debugState.secondaryState ~= nil and (' [' .. tostring(debugState.secondaryState) .. ']') or '')
+            .. (debugState.warnedBy ~= nil and (' warn<-' .. tostring(debugState.warnedBy)) or '')
     end
     return lines
+end
+
+function Renderer.BuildCompactCombatDebugLines(debugState, currentTargetDistance)
+    if type(debugState) ~= 'table' then return {} end
+    local state = tostring(
+        debugState.target and 'COMBAT'
+            or debugState.warningLink and 'WARNED'
+            or (debugState.secondaryAlertLevel and debugState.secondaryAlertLevel ~= 'calm'
+                and string.upper(tostring(debugState.secondaryAlertLevel)))
+            or 'CALM'
+    )
+    local target = debugState.target
+    local targetPart = ''
+    if type(target) == 'table' then
+        local dist = rounded(
+            currentTargetDistance
+                or (target.distSq and math.sqrt(tonumber(target.distSq) or 0)),
+            1
+        ) or '-'
+        targetPart = ' -> ' .. tostring(target.kind or '?') .. '@' .. tostring(dist) .. 'm'
+    elseif type(debugState.warningLink) == 'table' then
+        targetPart = ' <- ' .. tostring(debugState.warningLink.kind or 'warn')
+    end
+    local fov = tonumber(debugState.coneHalfAngleDegrees)
+    local fovStr = fov and (tostring(math.floor(fov * 2 + 0.5)) .. 'd') or '-'
+    local rangeStr = tostring(debugState.coneRadius or '-') .. 'm'
+    local line1 = state .. targetPart .. ' | ' .. fovStr .. '/' .. rangeStr
+    if tonumber(debugState.clueCount) and tonumber(debugState.clueCount) > 0 then
+        line1 = line1 .. ' c=' .. tostring(tonumber(debugState.clueCount))
+    end
+    return { line1 }
 end
 
 function Renderer.BuildCombatDebugLines(debugState, currentTargetDistance)

@@ -226,6 +226,21 @@ local function poolFor(spec)
     then
         return "semantic.companion.reaction"
     end
+    if eventType == "combat_ally_warn_callout" then
+        if tostring(context.semanticThreatClass or "") == "zombie" then
+            return "semantic.combat.ally_warn.callout.zombie"
+        end
+        return "semantic.combat.ally_warn.callout.hostile"
+    end
+    if eventType == "combat_ally_warn_reply_engaging" then
+        return "semantic.combat.ally_warn.reply.engaging"
+    end
+    if eventType == "combat_ally_warn_reply_alerted" then
+        return "semantic.combat.ally_warn.reply.alerted"
+    end
+    if eventType == "combat_ally_warn_reply_defensive" then
+        return "semantic.combat.ally_warn.reply.defensive"
+    end
     if string.find(eventType, "combat", 1, true)
         or string.find(eventType, "kill", 1, true)
         or string.find(eventType, "horde", 1, true)

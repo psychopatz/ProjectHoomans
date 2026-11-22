@@ -1,0 +1,43 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.ally_warn.callout",
+  "locale": "EN",
+  "entries": {
+    "say.variants.zombie_neutral": [
+      "Heads up, dead ones closing in!",
+      "Zombies nearby, stay sharp!",
+      "Walkers incoming, watch your back!",
+      "Got dead moving on us, get ready!"
+    ],
+    "say.variants.zombie_tactical": [
+      "Visual on infected! Weapons up!",
+      "Walkers advancing on our position, engage!",
+      "Contact dead! Converge and clear!",
+      "Multiple walkers closing, hold formation!"
+    ],
+    "say.variants.zombie_hostile": [
+      "Dead meat wandering into our turf! Drop them!",
+      "Rotters nearby, shut them up fast!",
+      "Watch your flank, walkers creeping in!",
+      "Infected close! Cut them down!"
+    ],
+    "say.variants.hostile_neutral": [
+      "Watch out, hostile target spotted!",
+      "Got trouble nearby, stay on guard!",
+      "Enemy contact! Watch yourself!",
+      "Someone's coming for us, get ready!"
+    ],
+    "say.variants.hostile_tactical": [
+      "Hostile contact spotted! Weapons ready!",
+      "Armed threat in sector, engage!",
+      "Enemy closing in, eyes front and engage!",
+      "Threat confirmed in range, take them down!"
+    ],
+    "say.variants.hostile_hostile": [
+      "Got an intruder! Flush them out!",
+      "Fresh target! Tear them apart!",
+      "Enemy right here! No mercy!",
+      "Kill them before they run!"
+    ]
+  }
+}

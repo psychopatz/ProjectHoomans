@@ -26,6 +26,20 @@ local EVENT_REACTION_TEMPLATES = {
     "conversation.safety.danger",
     "conversation.safety.default",
     "social.reaction.default",
+    "combat.ally_warn.callout.zombie_neutral",
+    "combat.ally_warn.callout.zombie_tactical",
+    "combat.ally_warn.callout.zombie_hostile",
+    "combat.ally_warn.callout.hostile_neutral",
+    "combat.ally_warn.callout.hostile_tactical",
+    "combat.ally_warn.callout.hostile_hostile",
+    "combat.ally_warn.reply.engaging_neutral",
+    "combat.ally_warn.reply.engaging_tactical",
+    "combat.ally_warn.reply.engaging_hostile",
+    "combat.ally_warn.reply.alerted_neutral",
+    "combat.ally_warn.reply.alerted_tactical",
+    "combat.ally_warn.reply.alerted_hostile",
+    "combat.ally_warn.reply.defensive_neutral",
+    "combat.ally_warn.reply.defensive_shaken",
 }
 
 for _, templateID in ipairs(EVENT_REACTION_TEMPLATES) do

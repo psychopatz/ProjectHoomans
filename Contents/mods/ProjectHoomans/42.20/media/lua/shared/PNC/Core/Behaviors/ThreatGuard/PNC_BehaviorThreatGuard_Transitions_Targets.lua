@@ -145,6 +145,18 @@ function Internal.RefreshTarget(record, state, threatContext, now)
             return candidate
         end
     end
+    if PNC.Perception and PNC.Perception.FindAllyThreatAlert then
+        candidate = PNC.Perception.FindAllyThreatAlert(
+            record,
+            threatContext.radius,
+            false
+        )
+        if Internal.IsThreat(candidate, threatContext) then
+            auditDecision("target_acquired", record, nil, candidate,
+                "ally_threat_warning")
+            return candidate
+        end
+    end
     options = {
         areaDefense = threatContext.targetPolicy ~= "owner",
     }

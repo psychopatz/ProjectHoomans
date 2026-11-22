@@ -19,6 +19,12 @@ return {
         ["recordCount"] = 14,
     },
     {
+        ["domain"] = "combat_ally_warning",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatAllyWarning",
+        ["recordCount"] = 2,
+    },
+    {
         ["domain"] = "combat_horde",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatHorde",

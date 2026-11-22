@@ -196,6 +196,8 @@ function Perception.GetVisibleZombieEntries(record, requestedRadius)
             zId = zombieEntryId(entry.zombie)
             local isEngaged = zId ~= nil and (
                 zId == recentID or zId == attackerID or zId == activeTargetID
+                or (Perception.IsWarnedThreat ~= nil
+                    and Perception.IsWarnedThreat(record, "zombie", zId) == true)
             )
             local inCone = true
             if useConeFilter then

@@ -58,6 +58,25 @@ function Parts.BuildCombatDebugAttackPayload(context)
         and runtime.secondaryChannel or nil
     local frameRejected = runtime and type(runtime.perceptionFrame) == "table"
         and tonumber(runtime.perceptionFrame.coneRejectedCount) or 0
+    local rawWarnLink = runtime and type(runtime.lastWarningLink) == "table"
+        and runtime.lastWarningLink or nil
+    local warningLink = nil
+    if rawWarnLink and now < (tonumber(rawWarnLink.expiresAt) or 0)
+        and rawWarnLink.x ~= nil and rawWarnLink.y ~= nil
+    then
+        warningLink = {
+            kind = rawWarnLink.kind,
+            role = rawWarnLink.role,
+            actorId = rawWarnLink.actorId,
+            threatKind = rawWarnLink.threatKind,
+            x = rawWarnLink.x,
+            y = rawWarnLink.y,
+            z = rawWarnLink.z or 0,
+        }
+    end
+    local allyAlert = runtime and type(runtime.allyThreatAlert) == "table"
+        and now < (tonumber(runtime.allyThreatAlert.expiresAt) or 0)
+        and runtime.allyThreatAlert or nil
 
     return {
         aimConfidence = aim.confidence,
@@ -140,6 +159,9 @@ function Parts.BuildCombatDebugAttackPayload(context)
         secondaryAlertLevel = sc and sc.alertLevel or nil,
         secondaryPosture = sc and sc.posture or nil,
         secondaryState = sc and sc.secondaryState or nil,
+        warningLink = warningLink,
+        warnedBy = allyAlert and allyAlert.callerId or nil,
+        warnedThreatKind = allyAlert and allyAlert.kind or nil,
     }
 end
 

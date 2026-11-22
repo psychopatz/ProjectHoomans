@@ -49,6 +49,10 @@ function H.BuildCombatDebugDelta(record, inCombat, now, firearmState)
         or false
     local sc = record.runtime and record.runtime.secondaryChannel or nil
     local clues = record.runtime and record.runtime.clueMemory or nil
+    local rawWarnLink = record.runtime and record.runtime.lastWarningLink or nil
+    local warnActive = type(rawWarnLink) == "table"
+        and now < (tonumber(rawWarnLink.expiresAt) or 0) or false
+    local warnAt = warnActive and tonumber(rawWarnLink.at or rawWarnLink.expiresAt) or 0
     local agState = record.id ~= nil
         and PNC.AgitationService
         and type(PNC.AgitationService.GetState) == "function"
@@ -58,11 +62,13 @@ function H.BuildCombatDebugDelta(record, inCombat, now, firearmState)
         .. ":" .. tostring(sc and sc.alertLevel or "calm")
         .. ":" .. tostring(sc and sc.posture or "relaxed")
         .. ":" .. tostring(sc and sc.secondaryState or "")
+        .. ":" .. tostring(warnAt)
     local reactivityTransitioned = record.runtime
         and record.runtime.lastReactivityDebugSig ~= reactivitySignature
         or false
     local reactivityActive = (agState and agState.active == true)
         or (clues and #clues > 0)
+        or warnActive
         or (sc ~= nil and (sc.alertLevel ~= "calm" or sc.posture ~= "relaxed" or (sc.secondaryState or "") ~= ""))
     local combatDebugState
     if lastCombatDebugAt <= 0
