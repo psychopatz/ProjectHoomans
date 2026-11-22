@@ -109,11 +109,14 @@ function Internal.ApplyZombieWoundDamage(
         and Core.DeepCopy(body.wounds[part.id]) or nil
     local previousInfection = body.infection
         and Core.DeepCopy(body.infection) or nil
+    local hitAt = Core.Now()
     local wound, damage = Internal.AddWound(
         record,
         part,
         woundType,
-        Core.Now()
+        hitAt,
+        nil,
+        { zombieWound = true, attackerKind = "zombie" }
     )
     local applied = wound and PNC.Health.ApplyDamage(record, npcBody, {
         amount = damage,
@@ -136,6 +139,14 @@ function Internal.ApplyZombieWoundDamage(
             outcome = "damage_rejected",
             partId = part.id,
         }
+    end
+    if type(Internal.NotifyWoundCallout) == "function" then
+        Internal.NotifyWoundCallout(record, part.id, wound, damage, hitAt, {
+            woundType = woundType,
+            attackerKind = "zombie",
+            attackerID = attackerZombieId,
+            attackType = "zombie",
+        })
     end
     return wound, nil, damage
 end
