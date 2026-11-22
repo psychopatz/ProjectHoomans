@@ -26,6 +26,27 @@
       },
       {
         "id": "hostile_hostile"
+      },
+      {
+        "id": "crawler_callout"
+      },
+      {
+        "id": "blindside_callout"
+      },
+      {
+        "id": "last_one_callout"
+      },
+      {
+        "id": "bandaging_self_callout"
+      },
+      {
+        "id": "bandaging_ally_callout"
+      },
+      {
+        "id": "checkin_injured_callout"
+      },
+      {
+        "id": "checkin_clear_callout"
       }
     ]
   },

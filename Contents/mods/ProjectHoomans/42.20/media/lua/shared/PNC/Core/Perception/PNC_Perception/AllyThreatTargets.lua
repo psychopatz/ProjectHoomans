@@ -67,8 +67,9 @@ function Perception.NormalizeThreatDescriptor(target, at)
         username = info.username or target.username, provider = target.provider,
         actorId = target.actorId or target.id, generation = target.generation,
         x = x, y = y, z = z, semanticClass = info.semanticClass, observedAt = now,
-        displayName = m.displayName, enemyType = m.enemyType, factionName = m.factionName,
-        roomName = m.roomName, isIndoors = m.isIndoors, enemyCount = m.enemyCount or 1,
+        displayName = m.displayName, enemyType = m.enemyType, enemyPosture = m.enemyPosture,
+        factionName = m.factionName, roomName = m.roomName, isIndoors = m.isIndoors,
+        enemyCount = m.enemyCount or 1,
     }, info
 end
 

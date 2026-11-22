@@ -17,6 +17,19 @@ Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RELATIONSHIP,
         local hasChangeMetadata
         if type(summary) ~= "table" or not summary.npcID then return end
         npcID = tostring(summary.npcID)
+        if summary.lightweightBark == true then
+            local speechPresentation = PNC.SemanticSpeechPresentation
+            if args.ambientFlavor and not speechPresentation then
+                pcall(require, "PNC/Conversation/PNC_SemanticSpeechPresentation")
+                speechPresentation = PNC.SemanticSpeechPresentation
+            end
+            if args.ambientFlavor and speechPresentation
+                and speechPresentation.Receive
+            then
+                speechPresentation.Receive(args.ambientFlavor, summary, args)
+            end
+            return
+        end
         delta = args.relationshipDelta or args.delta
         before = args.relationshipBefore or args.before
         after = args.relationshipAfter or args.after or summary

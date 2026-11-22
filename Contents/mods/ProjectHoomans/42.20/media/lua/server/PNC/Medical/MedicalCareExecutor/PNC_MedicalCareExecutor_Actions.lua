@@ -168,6 +168,10 @@ local function beginTreatment(lease, task, record, body, patient, patientBody, n
     record.runtime.forceSyncEvent = "medical_care_treating"
     Service.SetPhase(task.id, Status.TREATING, { actorId = lease.npcId })
     setLeasePhase(lease, "WORKING")
+    local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil
+    if callouts and type(callouts.OnAllyBandagingUnderThreat) == "function" then
+        callouts.OnAllyBandagingUnderThreat(record, patient, now)
+    end
     return true
 end
 

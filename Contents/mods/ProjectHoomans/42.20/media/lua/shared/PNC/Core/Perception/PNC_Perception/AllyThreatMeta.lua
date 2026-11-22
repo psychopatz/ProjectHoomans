@@ -74,9 +74,19 @@ function Internal.ExtractThreatMeta(kind, spec, info, x, y, z)
         end
     end
     local rName, indoors = roomInfoAt(obj, x, y, z, spec.roomName or (res and res.roomName))
+    local posture = nil
+    if eType == "zombie" then
+        local isCrawl = spec.isCrawler == true
+            or (obj and obj.isCrawling and obj:isCrawling() == true)
+            or (obj and obj.isProne and obj:isProne() == true)
+        local isSprint = spec.isSprinter == true
+            or (obj and obj.getSpeedType and tonumber(obj:getSpeedType()) == 1)
+        posture = isCrawl and "crawler" or (isSprint and "sprinter" or nil)
+    end
     return {
         displayName = dName,
         enemyType = eType,
+        enemyPosture = posture,
         factionName = fName,
         roomName = rName,
         isIndoors = indoors,

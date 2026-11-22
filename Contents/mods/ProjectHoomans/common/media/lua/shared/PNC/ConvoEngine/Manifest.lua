@@ -525,7 +525,7 @@ return {
             ["sourceShard"] = "behavior/scene/task_work/scene_task_work_assigned.json",
         },
         {
-            ["bytes"] = 41188,
+            ["bytes"] = 62668,
             ["domain"] = "combat_ally_warning",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatAllyWarning",
@@ -4718,5 +4718,5 @@ return {
             ["sourceShard"] = "@index/director/core",
         },
     },
-    ["wholeModelFingerprint"] = "9176faf6f51a6d8f197c50fca92fa450bf5f8c6d29ba75691ee325b3eabcc764",
+    ["wholeModelFingerprint"] = "b73da90148f395d6be2bca109cc08d6cc592507372f3f24eab89ace1a51703ad",
 }

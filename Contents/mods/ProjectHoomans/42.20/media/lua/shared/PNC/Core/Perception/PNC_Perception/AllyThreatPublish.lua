@@ -1,11 +1,13 @@
--- Spatial threat-warning broadcast with cooldown, team dedup, and ShockBus telemetry.
+-- Spatial threat-warning broadcast with skirmish dedup, unaware-ally gate, and blindside detection.
 
 PNC = PNC or {}
 PNC.Perception = PNC.Perception or {}
 PNC.Perception.Internal = PNC.Perception.Internal or {}
 
 local Perception, Internal = PNC.Perception, PNC.Perception.Internal
-local Core, Const, Spatial, Registry = PNC.Core, PNC.Const or {}, PNC.SpatialIndex, PNC.Registry
+local Core, Const = PNC.Core, PNC.Const or {}
+if not Perception.GetTeamKey then require "PNC/Core/Perception/PNC_Perception/AllyThreatSkirmish" end
+
 local DEFAULT_WARNING_RADIUS, MAX_WARN_ALLIES, CALLER_COOLDOWN_MS = 16.0, 8, 6000
 local TEAM_THREAT_DEDUP_MS, WARNING_LINK_TTL_MS, MAX_DEDUP_KEYS = 9000, 2500, 128
 
@@ -28,28 +30,6 @@ local function distSq(x1, y1, x2, y2)
     return dx * dx + dy * dy
 end
 
-local function rememberKey(map, order, key, at)
-    if map[key] == nil then
-        while #order >= MAX_DEDUP_KEYS do
-            local old = table.remove(order, 1)
-            if old ~= nil then map[old] = nil end
-        end
-        order[#order + 1] = key
-    end
-    map[key] = at
-end
-
-local function teamKeyOf(caller)
-    local fid = Internal.AllyWarningFactionIdOf and Internal.AllyWarningFactionIdOf(caller) or nil
-    if fid then return "faction:" .. fid end
-    local field = Internal.AllyWarningOwnerField
-    local oid = field and field(caller, "ownerOnlineID") or nil
-    if oid ~= nil then return "owner:" .. tostring(oid) end
-    local ouser = field and field(caller, "ownerUsername") or nil
-    if ouser ~= nil then return "owner:" .. tostring(ouser) end
-    return "actor:" .. tostring(caller and caller.id or "")
-end
-
 local function failRes(reason, teamKey, desc)
     return { emitted = false, reason = reason, descriptor = desc, teamKey = teamKey, notified = {} }
 end
@@ -65,9 +45,11 @@ function Perception.PublishAllyThreatWarning(caller, target, opts)
         Perception.AllyWarningStats.hopBlocked = Perception.AllyWarningStats.hopBlocked + 1
         return failRes("hop_limit")
     end
-    local now, callerKey, teamKey = nowMs(opts.at), tostring(caller.id), teamKeyOf(caller)
+    local now = nowMs(opts.at)
+    local callerKey, teamKey = tostring(caller.id), Perception.GetTeamKey(caller)
     local fastKey = Internal.FastTargetKey and Internal.FastTargetKey(target) or nil
-    if opts.ignoreCooldown ~= true and (now < (tonumber(Perception.AllyWarningCallerAt[callerKey]) or 0)
+    local activeSk = opts.ignoreCooldown ~= true and Perception.GetActiveSkirmish(teamKey, now) or nil
+    if opts.ignoreCooldown ~= true and activeSk == nil and (now < (tonumber(Perception.AllyWarningCallerAt[callerKey]) or 0)
         or (fastKey and now < (tonumber(Perception.AllyWarningTeamThreatAt[teamKey .. "|" .. fastKey]) or 0)))
     then
         Perception.AllyWarningStats.throttled = Perception.AllyWarningStats.throttled + 1
@@ -80,8 +62,11 @@ function Perception.PublishAllyThreatWarning(caller, target, opts)
     if not descriptor then return failRes("invalid_threat_target") end
     descriptor.callerId = callerKey
 
+    local sameSkirmish = activeSk ~= nil
+        and math.abs((tonumber(descriptor.z) or 0) - activeSk.z) < 1
+        and distSq(activeSk.anchorX, activeSk.anchorY, descriptor.x, descriptor.y) <= 196
     local dedupKey = teamKey .. "|" .. descriptor.key
-    if opts.ignoreCooldown ~= true and not fastKey
+    if opts.ignoreCooldown ~= true and not sameSkirmish and not fastKey
         and now < (tonumber(Perception.AllyWarningTeamThreatAt[dedupKey]) or 0)
     then
         Perception.AllyWarningStats.throttled = Perception.AllyWarningStats.throttled + 1
@@ -90,41 +75,41 @@ function Perception.PublishAllyThreatWarning(caller, target, opts)
 
     local cx, cy, cz = tonumber(caller.x) or descriptor.x, tonumber(caller.y) or descriptor.y, tonumber(caller.z) or descriptor.z
     local baseRadius = math.max(1, tonumber(opts.radius) or tonumber(Const.ALLY_WARNING_RADIUS) or DEFAULT_WARNING_RADIUS)
-    local raw = (Spatial and type(Spatial.QueryNPCs) == "function" and Spatial.QueryNPCs(cx, cy, baseRadius)) or {}
-    if not Spatial or type(Spatial.QueryNPCs) ~= "function" then
-        for _, rec in pairs(Registry and Registry.Data or {}) do raw[#raw + 1] = rec end
+    local raw = Internal.QueryWarningNPCs and Internal.QueryWarningNPCs(cx, cy, baseRadius) or {}
+    if not sameSkirmish or (activeSk.initialCount >= 3 and not activeSk.lastOneSpoken) then
+        descriptor.enemyCount = Internal.EstimateThreatCount and Internal.EstimateThreatCount(caller, descriptor, raw) or 1
     end
-    descriptor.enemyCount = Internal.EstimateThreatCount and Internal.EstimateThreatCount(caller, descriptor, raw) or 1
     descriptor.callerName = tostring(caller.name or caller.fullName or "")
 
-    local sorted = {}
-    for i = 1, #raw do
-        local cand = raw[i]
-        local ok, relKind, tierRad = Perception.AreWarningAllies(caller, cand)
-        if ok then
-            local prof = PNC.PerceptionService and PNC.PerceptionService.GetProfile and PNC.PerceptionService.GetProfile(cand) or nil
-            local effRad = math.min(baseRadius, tonumber(tierRad) or baseRadius, tonumber(prof and prof.hearingRange) or 34.0)
-            local dSq = distSq(cx, cy, tonumber(cand.x) or cx, tonumber(cand.y) or cy)
-            if dSq <= effRad * effRad then
-                sorted[#sorted + 1] = { record = cand, distSq = dSq, relationKind = relKind, effRadius = effRad }
-            end
-        end
+    local sorted, blindsideAlly, firstAlly = {}, nil, nil
+    if Internal.CollectWarningAllies then
+        sorted, blindsideAlly, firstAlly = Internal.CollectWarningAllies(
+            caller, raw, cx, cy, baseRadius, descriptor, now, opts, sameSkirmish
+        )
     end
-    table.sort(sorted, function(a, b)
-        if a.distSq ~= b.distSq then return a.distSq < b.distSq end
-        return tostring(a.record.id or "") < tostring(b.record.id or "")
-    end)
-
     local notified = {}
     for i = 1, math.min(MAX_WARN_ALLIES, #sorted) do
         local ally = sorted[i].record
         local nextAt = tonumber(ally.runtime and ally.runtime.allyWarnedCooldownUntil) or 0
-        if (opts.ignoreCooldown == true or now >= nextAt) and Internal.ApplyAllyThreatAlert then
+        if (opts.ignoreCooldown == true or sameSkirmish or now >= nextAt) and Internal.ApplyAllyThreatAlert then
             notified[#notified + 1] = Internal.ApplyAllyThreatAlert(callerKey, sorted[i], descriptor, now, #notified, resolvedInfo)
         end
     end
 
+    if sameSkirmish then
+        local updated = Perception.RecordSkirmishContact(teamKey, descriptor, now, false)
+        local lastOne = updated ~= nil and updated.initialCount >= 3 and (descriptor.enemyCount or 1) == 1
+            and not updated.lastOneSpoken and (now - (updated.lastBeatAt or 0)) >= 4000
+        return {
+            emitted = false, reason = "skirmish_active", skirmish = updated, skirmishPhase = "in_fight",
+            descriptor = descriptor, teamKey = teamKey, blindsideAlly = blindsideAlly,
+            notifiedAlly = notified[1] and notified[1].record or firstAlly,
+            silentNotified = notified, lastOneReady = lastOne, notified = {},
+        }
+    end
+
     if #notified > 0 then
+        Perception.RecordSkirmishContact(teamKey, descriptor, now, true)
         caller.runtime = type(caller.runtime) == "table" and caller.runtime or {}
         caller.runtime.lastWarningLink = {
             kind = descriptor.semanticClass, role = "caller", actorId = tostring(notified[1].record.id or ""),
@@ -132,8 +117,11 @@ function Perception.PublishAllyThreatWarning(caller, target, opts)
             y = notified[1].record.y or descriptor.y, z = notified[1].record.z or descriptor.z,
             at = now, expiresAt = now + WARNING_LINK_TTL_MS,
         }
-        rememberKey(Perception.AllyWarningCallerAt, Perception.AllyWarningCallerKeys, callerKey, now + CALLER_COOLDOWN_MS)
-        rememberKey(Perception.AllyWarningTeamThreatAt, Perception.AllyWarningTeamKeys, dedupKey, now + TEAM_THREAT_DEDUP_MS)
+        local rem = Internal.AllyRememberKey
+        if rem then
+            rem(Perception.AllyWarningCallerAt, Perception.AllyWarningCallerKeys, callerKey, now + CALLER_COOLDOWN_MS, MAX_DEDUP_KEYS)
+            rem(Perception.AllyWarningTeamThreatAt, Perception.AllyWarningTeamKeys, dedupKey, now + TEAM_THREAT_DEDUP_MS, MAX_DEDUP_KEYS)
+        end
         Perception.AllyWarningStats.published = Perception.AllyWarningStats.published + 1
         Perception.AllyWarningStats.notified = Perception.AllyWarningStats.notified + #notified
         local bus = PsychopatzCore and PsychopatzCore.ShockingEventBus or nil
@@ -146,7 +134,7 @@ function Perception.PublishAllyThreatWarning(caller, target, opts)
     end
     return {
         emitted = #notified > 0, reason = #notified > 0 and "warned" or "no_eligible_allies",
-        descriptor = descriptor, teamKey = teamKey, notified = notified,
+        skirmishPhase = "initial_contact", descriptor = descriptor, teamKey = teamKey, notified = notified,
     }
 end
 

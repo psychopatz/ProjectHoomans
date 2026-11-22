@@ -32,6 +32,13 @@ local EVENT_REACTION_TEMPLATES = {
     "combat.ally_warn.callout.hostile_neutral",
     "combat.ally_warn.callout.hostile_tactical",
     "combat.ally_warn.callout.hostile_hostile",
+    "combat.ally_warn.callout.crawler_callout",
+    "combat.ally_warn.callout.blindside_callout",
+    "combat.ally_warn.callout.last_one_callout",
+    "combat.ally_warn.callout.bandaging_self_callout",
+    "combat.ally_warn.callout.bandaging_ally_callout",
+    "combat.ally_warn.callout.checkin_injured_callout",
+    "combat.ally_warn.callout.checkin_clear_callout",
     "combat.ally_warn.reply.engaging_neutral",
     "combat.ally_warn.reply.engaging_tactical",
     "combat.ally_warn.reply.engaging_hostile",
@@ -48,6 +55,14 @@ local EVENT_REACTION_TEMPLATES = {
     "combat.ally_warn.reply.wingman_defensive",
     "combat.ally_warn.reply.anchor_combat",
     "combat.ally_warn.reply.anchor_tactical",
+    "combat.ally_warn.reply.blindside_reply",
+    "combat.ally_warn.reply.last_one_reply",
+    "combat.ally_warn.reply.cover_bandage_reply",
+    "combat.ally_warn.reply.injured_has_bandage_reply",
+    "combat.ally_warn.reply.injured_no_bandage_reply",
+    "combat.ally_warn.reply.medic_has_bandage_reply",
+    "combat.ally_warn.reply.medic_no_bandage_reply",
+    "combat.ally_warn.reply.checkin_ok_reply",
 }
 
 for _, templateID in ipairs(EVENT_REACTION_TEMPLATES) do

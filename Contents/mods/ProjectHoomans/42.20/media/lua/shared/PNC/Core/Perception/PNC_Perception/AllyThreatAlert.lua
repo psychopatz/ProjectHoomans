@@ -44,8 +44,9 @@ function Internal.ApplyAllyThreatAlert(callerKey, item, desc, now, staggerIdx, r
         username = desc.username, provider = desc.provider, actorId = desc.actorId, generation = desc.generation,
         x = desc.x, y = desc.y, z = desc.z, semanticClass = desc.semanticClass, callerId = callerKey,
         callerName = desc.callerName, displayName = desc.displayName, enemyType = desc.enemyType,
-        factionName = desc.factionName, roomName = desc.roomName, isIndoors = desc.isIndoors, enemyCount = desc.enemyCount,
-        relationKind = item.relationKind, observedAt = now, expiresAt = now + 6000, viaAllyWarning = true,
+        enemyPosture = desc.enemyPosture, factionName = desc.factionName, roomName = desc.roomName,
+        isIndoors = desc.isIndoors, enemyCount = desc.enemyCount, relationKind = item.relationKind,
+        observedAt = now, expiresAt = now + 6000, viaAllyWarning = true,
         canEngage = canEngage, engageReason = engageReason, alertRadius = item.effRadius,
     }
     ally.runtime.allyThreatAlertCheckAt, ally.runtime.allyThreatAlertVisible = 0, false
@@ -139,6 +140,7 @@ function Perception.ResetAllyThreatWarnings()
     Perception.AllyWarningCallerAt, Perception.AllyWarningTeamThreatAt = {}, {}
     Perception.AllyWarningCallerKeys, Perception.AllyWarningTeamKeys = {}, {}
     Perception.AllyWarningStats = { published = 0, notified = 0, throttled = 0, hopBlocked = 0 }
+    if Perception.ResetSkirmishes then Perception.ResetSkirmishes() end
 end
 
 return Perception

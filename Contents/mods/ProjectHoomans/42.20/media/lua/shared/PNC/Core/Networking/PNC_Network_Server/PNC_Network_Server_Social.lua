@@ -278,6 +278,25 @@ function Network.SendConversationRelationshipForNPC(
     local buildReason
     local context = type(relationshipContext) == "table"
         and relationshipContext or {}
+    if context.lightweightBark == true then
+        local id = tostring(npcID or "")
+        local reg = PNC.Registry
+        local rec = reg and type(reg.Get) == "function" and reg.Get(id) or nil
+        summary = {
+            npcID = id,
+            name = rec and (rec.name or rec.fullName) or nil,
+            lightweightBark = true,
+        }
+        context.npcID = id
+        local sent = Network.SendConversationRelationship(
+            targetPlayer,
+            summary,
+            reason or "combat_bark",
+            context
+        )
+        return sent == true, sent and nil or "relationship_transport_unavailable",
+            summary
+    end
     ensureNPCSpeechInteraction(targetPlayer, npcID, reason, context)
     if Presentation and Presentation.BuildForConversation then
         summary, buildReason = Presentation.BuildForConversation(

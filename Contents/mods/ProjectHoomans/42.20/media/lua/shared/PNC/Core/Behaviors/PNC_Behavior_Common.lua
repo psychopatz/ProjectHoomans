@@ -192,6 +192,14 @@ function Common.ClearCombatTarget(record, reason, zombie)
         equipmentInfo.combatModeResolved or tostring(record.weaponMode or "melee"),
         equipmentInfo.weaponStatus or record.runtime.weaponStatus
     )
+    if previousTarget ~= nil and record and record.alive ~= false then
+        local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil
+        if callouts and type(callouts.OnTargetCleared) == "function" then
+            callouts.OnTargetCleared(
+                record, previousTarget, reason, Core and Core.Now and Core.Now() or 0
+            )
+        end
+    end
 end
 
 local function expectedOwnerCharacterUUID(record, orderSpec)

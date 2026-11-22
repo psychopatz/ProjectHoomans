@@ -98,6 +98,54 @@
       "Segurado ang paligid natin, {addressee.name}, malaya kang sumugod!",
       "Hawak ko ang tanaw sa likuran, {addressee.name}!",
       "Sarado ang mga gilid natin, {addressee.name}, sulong!"
+    ],
+    "say.variants.blindside_reply": [
+      "Buti nakita mo, {addressee.name}! Haharapin ko na!",
+      "Salamat, {addressee.name}, muntik ko nang hindi mapansin!",
+      "Sige, {addressee.name}, lilingon na ako!",
+      "Muntik na! Salamat sa babala, {addressee.name}!"
+    ],
+    "say.variants.last_one_reply": [
+      "Tapusin na natin, {addressee.name}, nasa likod mo ako!",
+      "Kasabay mo ako, {addressee.name}, patumbahin ang huling ito!",
+      "Tapusin na natin ang laban, {addressee.name}!",
+      "Ibaba mo na, {addressee.name}, halos tapos na rito!"
+    ],
+    "say.variants.cover_bandage_reply": [
+      "Bantay ko ang paligid, {addressee.name}! Magbendahe ka lang!",
+      "Gamutin mo na, {addressee.name}, walang makakalusot sa akin!",
+      "Yumuko ka muna, {addressee.name}, binabantayan ko ang magkabila!",
+      "Sige lang, {addressee.name}, haharangin ko sila!"
+    ],
+    "say.variants.injured_has_bandage_reply": [
+      "Dumurugo nang kaunti, {addressee.name}, pero may bendahe ako at tatalian ko ito.",
+      "Mahapdi nang kaunti, {addressee.name}, buti may bendahe pa ako.",
+      "Ayos lang ako, {addressee.name}, babalutin ko lang ng bendahe.",
+      "Nadaplisan ako, {addressee.name}, kumukuha na ako ng bendahe ngayon."
+    ],
+    "say.variants.injured_no_bandage_reply": [
+      "Dumurugo ako, {addressee.name}, at ubos na ang bendahe ko!",
+      "Hindi maganda, {addressee.name}, wala na akong natirang bendahe!",
+      "Kailangan ko ng tulong, {addressee.name}, walang bendahe sa bag ko!",
+      "Nauubusan ako ng dugo, {addressee.name}, may bendahe ka ba diyan?"
+    ],
+    "say.variants.medic_has_bandage_reply": [
+      "Teka, {addressee.name}, may extrang bendahe pa ako! Huwag kang gumalaw!",
+      "Huwag magalala, {addressee.name}, may mga bendahe ako rito.",
+      "Dito ka lang, {addressee.name}, gagamitin ko ang bendahe ko sa iyo.",
+      "May malinis akong pambalot para sa iyo, {addressee.name}, sandali!"
+    ],
+    "say.variants.medic_no_bandage_reply": [
+      "Wala na rin ako, {addressee.name}! Diinan mo muna habang naghahanap tayo ng bendahe!",
+      "Ubos na rin sa akin, {addressee.name}! Kailangan nating maghanap ng bendahe agad!",
+      "Walang laman din bag ko, {addressee.name}! Kapit lang hanggang makahanap ng malinis na tela!",
+      "Walang natira sa bag ko, {addressee.name}! Sumunod ka para makahanap ng gamit!"
+    ],
+    "say.variants.checkin_ok_reply": [
+      "Ayos lang ako rito, {addressee.name}, ni hindi halos pinagpawisan.",
+      "Buo pa rin, {addressee.name}, handa nang lumakad.",
+      "Ayos ako, {addressee.name}, walang ni isang galos.",
+      "Maayos naman dito, {addressee.name}, magandang laban."
     ]
   }
 }

@@ -38,6 +38,48 @@
       "Tear them apart, {target.name} caught {scene.location}!",
       "Right over there! Drop {target.name} {scene.location}!",
       "Don't let them slip, keep eyes on {target.name} {scene.location}!"
+    ],
+    "say.variants.crawler_callout": [
+      "Watch your feet! Got {target.name} dragging {scene.location}!",
+      "Low contact! {target.name} crawling {scene.location}!",
+      "Don't trip, got {target.name} {scene.location}!",
+      "Check low, {target.name} sneaking {scene.location}!"
+    ],
+    "say.variants.blindside_callout": [
+      "Look out, {addressee.name}! Got {target.name} right behind you!",
+      "Behind you, {addressee.name}! Watch {target.name}!",
+      "Turn around, {addressee.name}! {target.name} closing on you!",
+      "{addressee.name}, watch your back! {target.name} right on you!"
+    ],
+    "say.variants.last_one_callout": [
+      "Just this last one left! Put {target.name} down!",
+      "That's almost all of them, just {target.name} left!",
+      "One left, finish off {target.name}!",
+      "Last straggler! Clean up {target.name}!"
+    ],
+    "say.variants.bandaging_self_callout": [
+      "Cover me, {addressee.name}, I'm bandaging up!",
+      "Hold them back, {addressee.name}, wrapping this wound!",
+      "{addressee.name}, keep eyes up while I tie this bandage!",
+      "Buy me a second, {addressee.name}, patching myself up!"
+    ],
+    "say.variants.bandaging_ally_callout": [
+      "Cover us, {addressee.name}, I'm bandaging {target.name}!",
+      "Keep them off us, {addressee.name}, treating {target.name} now!",
+      "Hold the line, {addressee.name}! I'm patching {target.name} up!",
+      "Watch our backs, {addressee.name}, wrapping {target.name} now!"
+    ],
+    "say.variants.checkin_injured_callout": [
+      "All clear! Are you okay, {addressee.name}?",
+      "Looks clear here. {addressee.name}, how bad did they get you?",
+      "We got them. You holding up, {addressee.name}?",
+      "Hold up, {addressee.name}, you're bleeding! You alright?"
+    ],
+    "say.variants.checkin_clear_callout": [
+      "That's the last of them, {addressee.name}. Everybody good?",
+      "All clear, {addressee.name}. Everyone still standing?",
+      "We handled that well, {addressee.name}. Anyone hurt?",
+      "Area's clear, {addressee.name}. You good over there?"
     ]
   }
 }

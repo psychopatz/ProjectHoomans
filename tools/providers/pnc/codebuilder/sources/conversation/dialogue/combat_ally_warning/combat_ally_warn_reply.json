@@ -56,6 +56,30 @@
       },
       {
         "id": "anchor_tactical"
+      },
+      {
+        "id": "blindside_reply"
+      },
+      {
+        "id": "last_one_reply"
+      },
+      {
+        "id": "cover_bandage_reply"
+      },
+      {
+        "id": "injured_has_bandage_reply"
+      },
+      {
+        "id": "injured_no_bandage_reply"
+      },
+      {
+        "id": "medic_has_bandage_reply"
+      },
+      {
+        "id": "medic_no_bandage_reply"
+      },
+      {
+        "id": "checkin_ok_reply"
       }
     ]
   },

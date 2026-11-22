@@ -120,4 +120,41 @@ function Perception.AreWarningAllies(caller, candidate)
     return false, "unrelated"
 end
 
+function Internal.CollectWarningAllies(caller, raw, cx, cy, baseRadius, desc, now, opts, checkBlindside)
+    local sorted, blindsideAlly, firstAlly = {}, nil, nil
+    local includeAware = opts.includeAware == true
+    local dFn = PNC.Core and PNC.Core.DistanceSq
+    for i = 1, #raw do
+        local cand = raw[i]
+        local ok, relKind, tierRad = Perception.AreWarningAllies(caller, cand)
+        if ok then
+            local prof = PNC.PerceptionService and PNC.PerceptionService.GetProfile and PNC.PerceptionService.GetProfile(cand) or nil
+            local effRad = math.min(baseRadius, tonumber(tierRad) or baseRadius, tonumber(prof and prof.hearingRange) or 34.0)
+            local ax, ay = tonumber(cand.x) or cx, tonumber(cand.y) or cy
+            local dSq = dFn and dFn(cx, cy, ax, ay) or ((ax - cx) * (ax - cx) + (ay - cy) * (ay - cy))
+            if dSq <= effRad * effRad then
+                if not firstAlly then firstAlly = cand end
+                local aware = Perception.IsAllyAlreadyAware and Perception.IsAllyAlreadyAware(cand, desc, now) == true
+                if aware then
+                    if checkBlindside and not blindsideAlly and Perception.CheckBlindsideThreat(cand, desc) then
+                        blindsideAlly = cand
+                    end
+                    if includeAware then
+                        sorted[#sorted + 1] = { record = cand, distSq = dSq, relationKind = relKind, effRadius = effRad }
+                    end
+                else
+                    sorted[#sorted + 1] = { record = cand, distSq = dSq, relationKind = relKind, effRadius = effRad }
+                end
+            end
+        end
+    end
+    if #sorted > 1 then
+        table.sort(sorted, function(a, b)
+            if a.distSq ~= b.distSq then return a.distSq < b.distSq end
+            return tostring(a.record.id or "") < tostring(b.record.id or "")
+        end)
+    end
+    return sorted, blindsideAlly, firstAlly
+end
+
 return Perception

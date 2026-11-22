@@ -168,6 +168,7 @@ T.load("ProjectHoomans", "shared", "PNC/Core/Compatibility/PNC_Compatibility_API
 T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/Visibility.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/AllyThreatEligibility.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/AllyThreatMeta.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/AllyThreatSkirmish.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/AllyThreatTargets.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/AllyThreatAlert.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Perception/PNC_Perception/AllyThreatPublish.lua")
@@ -560,7 +561,7 @@ do
     T.truthy(okZ, "multi-zombie warning must emit")
     assertNoRawTokens(deliveredBarks[1].text, "5b zombie callout")
     assertNoLLMHyphens(deliveredBarks[1].text, "5b zombie callout")
-    T.contains(deliveredBarks[1].text, "4 walkers", "callout must state exact nearby zombie count + type")
+    T.contains(deliveredBarks[1].text, "a few walkers", "callout must use natural few-walkers phrasing")
     T.contains(deliveredBarks[1].text, "o'clock", "tactical callout must include clock bearing")
 
     nowMs = nowMs + 1500
@@ -569,7 +570,7 @@ do
     assertNoRawTokens(deliveredBarks[2].text, "5b zombie reply")
     assertNoLLMHyphens(deliveredBarks[2].text, "5b zombie reply")
     T.contains(deliveredBarks[2].text, "Clay", "reply must address caller Clay")
-    T.contains(deliveredBarks[2].text, "4 walkers", "reply must repeat enemy count + type")
+    T.contains(deliveredBarks[2].text, "a few walkers", "reply must repeat natural enemy phrasing")
 
     -- 5c. Modded foreign_npc group (bandits x2) + ConvoEngine variant rotation across waves.
     deliveredBarks = {}
@@ -613,7 +614,7 @@ do
     local bText2 = deliveredBarks[#deliveredBarks].text
     assertNoRawTokens(bText2, "5c foreign_npc callout 2")
     assertNoLLMHyphens(bText2, "5c foreign_npc callout 2")
-    T.contains(bText2, "2 bandits", "unnamed bandit pair must mention count and provider enemy type")
+    T.contains(bText2, "a couple of bandits", "unnamed bandit pair must mention couple of bandits")
     T.truthy(bText1 ~= bText2, "variant rotation must vary callout wording across events")
 
     -- 5d. 5-person squad coherent 3-beat reply chain (Spotter -> Lead -> Wingman -> Anchor), zero shock spam.
@@ -665,7 +666,7 @@ do
     assertNoRawTokens(deliveredBarks[2].text, "5d beat1 lead")
     assertNoLLMHyphens(deliveredBarks[2].text, "5d beat1 lead")
     T.contains(deliveredBarks[2].text, "Sammie", "Beat 1 Lead must address spotter Sammie")
-    T.contains(deliveredBarks[2].text, "3 walkers", "Beat 1 Lead must name 3 walkers")
+    T.contains(deliveredBarks[2].text, "a few walkers", "Beat 1 Lead must use natural few-walkers phrasing")
     T.contains(deliveredBarks[2].text, "o'clock", "Beat 1 Lead must include location")
 
     nowMs = nowMs + 700
@@ -674,7 +675,7 @@ do
     assertNoRawTokens(deliveredBarks[3].text, "5d beat2 wingman")
     assertNoLLMHyphens(deliveredBarks[3].text, "5d beat2 wingman")
     T.contains(deliveredBarks[3].text, "Adrienne", "Beat 2 Wingman must chain directly off Lead Adrienne")
-    T.contains(deliveredBarks[3].text, "3 walkers", "Beat 2 Wingman must reference 3 walkers")
+    T.contains(deliveredBarks[3].text, "a few walkers", "Beat 2 Wingman must reference natural threat phrasing")
 
     nowMs = nowMs + 800
     T.equal(Callouts.PumpPendingReplies(nowMs), 1, "Beat 3 Anchor reply must fire at +2300ms")
@@ -691,6 +692,253 @@ do
             eventType = "shock.ally_threat_warning", x = 10, y = 10, z = 0, radius = 16,
         }), 0, "ShockingReactionTaskProvider must skip duplicate shock.ally_threat_warning fanout")
     end
+
+    -- 5e. Mid-fight target switching (already-aware squad + active skirmish) produces zero countdown spam.
+    deliveredBarks = {}
+    sqAdrienne.runtime.target = { kind = "zombie", zombieId = "z-101" }
+    sqClay.runtime.target = { kind = "zombie", zombieId = "z-101" }
+    sqVonda.runtime.target = { kind = "zombie", zombieId = "z-101" }
+    sqDante.runtime.target = { kind = "zombie", zombieId = "z-101" }
+    sqSammie.runtime.perceptionFrame.entries = {
+        { zombie = zombieWorld },
+        { zombie = zNear(18.5, 10) },
+    }
+    nowMs = nowMs + 2000
+    local okSw, reasonSw = Callouts.OnTargetChanged({
+        target = { kind = "zombie", zombieId = "z-102", x = 18.5, y = 10, z = 0 },
+        at = nowMs,
+    }, sqSammie)
+    T.falsy(okSw, "mid-fight switch within active skirmish must not emit countdown callout")
+    T.equal(reasonSw, "skirmish_already_active", "mid-fight switch must return skirmish_already_active")
+    T.equal(#deliveredBarks, 0, "zero barks allowed when teammates are already fighting same skirmish")
+
+    -- Verify 2-walker phrasing produces "a couple of stragglers" when a fresh skirmish starts with 2 normal walkers.
+    PNC.Perception.ResetAllyThreatWarnings()
+    Callouts.ResetRuntime()
+    sqAdrienne.runtime.target = nil
+    sqClay.runtime.target = nil
+    nowMs = nowMs + 20000
+    local okPair = Callouts.OnTargetChanged({
+        target = { kind = "zombie", zombieId = "z-101", x = 18, y = 10, z = 0 },
+        at = nowMs, ignoreWarningCooldown = true,
+    }, sqSammie)
+    T.truthy(okPair, "2-zombie warning must emit")
+    assertNoRawTokens(deliveredBarks[#deliveredBarks].text, "5e couple stragglers")
+    assertNoLLMHyphens(deliveredBarks[#deliveredBarks].text, "5e couple stragglers")
+    T.contains(deliveredBarks[#deliveredBarks].text, "a couple of stragglers", "2 walkers must say a couple of stragglers")
+
+    -- 5f. Crawler posture detection, blindside save warning, and Last Straggler beat.
+    npcStore, liveBodies, deliveredBarks = {}, {}, {}
+    PNC.Registry.Data = npcStore
+    PNC.Perception.ResetAllyThreatWarnings()
+    Callouts.ResetRuntime()
+    nowMs = 170000
+
+    local crawlSammie = makeNPC("cr-sammie", {
+        x = 10, y = 10, factionID = "survivors", tactical = true,
+        runtime = { facingDirX = 1, facingDirY = 0, perceptionFrame = { entries = {
+            { zombie = zombieWorld }, { zombie = zNear(18.5, 10) }, { zombie = zNear(19, 10.5) },
+        } } },
+    })
+    crawlSammie.name = "Sammie"
+    local crawlClay = makeNPC("cr-clay", { x = 12, y = 10, factionID = "survivors", tactical = true })
+    crawlClay.name = "Clay"
+    local origZ = zombieWorld.isCrawling
+    zombieWorld.isCrawling = function() return true end
+    local okCr = Callouts.OnTargetChanged({
+        target = { kind = "zombie", zombieId = "z-101", x = 18, y = 10, z = 0 },
+        at = nowMs,
+    }, crawlSammie)
+    zombieWorld.isCrawling = origZ
+    T.truthy(okCr, "crawler warning must emit")
+    assertNoRawTokens(deliveredBarks[1].text, "5f crawler")
+    assertNoLLMHyphens(deliveredBarks[1].text, "5f crawler")
+    T.contains(deliveredBarks[1].text, "crawler", "crawling zombie target must mention crawler")
+
+    -- Blindside save inside active skirmish (enemy at x=10.5, y=10 behind Clay facing east at x=12, y=10).
+    deliveredBarks = {}
+    Callouts.ResetRuntime()
+    crawlClay.runtime.target = { kind = "zombie", zombieId = "z-101" }
+    crawlClay.runtime.facingDirX, crawlClay.runtime.facingDirY = 1, 0
+    nowMs = nowMs + 7000
+    local okBl, reasonBl = Callouts.OnTargetChanged({
+        target = { kind = "zombie", zombieId = "z-behind", x = 10.5, y = 10, z = 0 },
+        at = nowMs,
+    }, crawlSammie)
+    T.truthy(okBl, "blindside threat behind ally cone must emit warning")
+    T.equal(reasonBl, "blindside_warning", "blindside save reason must be blindside_warning")
+    assertNoRawTokens(deliveredBarks[1].text, "5f blindside callout")
+    assertNoLLMHyphens(deliveredBarks[1].text, "5f blindside callout")
+    T.contains(deliveredBarks[1].text, "Clay", "blindside callout must warn Clay directly")
+    T.truthy(crawlClay.runtime.facingDirX < -0.5, "blindside warning must turn ally toward rear threat")
+
+    nowMs = nowMs + 700
+    T.equal(Callouts.PumpPendingReplies(nowMs), 1, "blindsided ally must reply")
+    assertNoRawTokens(deliveredBarks[2].text, "5f blindside reply")
+    assertNoLLMHyphens(deliveredBarks[2].text, "5f blindside reply")
+    T.contains(deliveredBarks[2].text, "Sammie", "blindside reply must thank Sammie")
+
+    -- Last straggler beat when multi-enemy skirmish drops to 1 remaining walker.
+    deliveredBarks = {}
+    crawlSammie.runtime.perceptionFrame.entries = { { zombie = zNear(15, 10) } }
+    nowMs = nowMs + 7000
+    local okLast, reasonLast = Callouts.OnTargetChanged({
+        target = { kind = "zombie", zombieId = "z-last", x = 15, y = 10, z = 0 },
+        at = nowMs,
+    }, crawlSammie)
+    T.truthy(okLast, "dropping to 1 remaining enemy from initialCount>=3 must emit last_straggler")
+    T.equal(reasonLast, "last_straggler")
+    assertNoRawTokens(deliveredBarks[1].text, "5f last_one callout")
+    assertNoLLMHyphens(deliveredBarks[1].text, "5f last_one callout")
+    nowMs = nowMs + 700
+    T.equal(Callouts.PumpPendingReplies(nowMs), 1, "last straggler beat must trigger 1 ally reply")
+    assertNoRawTokens(deliveredBarks[2].text, "5f last_one reply")
+    assertNoLLMHyphens(deliveredBarks[2].text, "5f last_one reply")
+    -- Repeating with 1 remaining enemy must NOT fire last_straggler twice.
+    local okLastRep, rLastRep = Callouts.OnTargetChanged({
+        target = { kind = "zombie", zombieId = "z-last", x = 15, y = 10, z = 0 },
+        at = nowMs + 5000,
+    }, crawlSammie)
+    T.falsy(okLastRep)
+    T.equal(rLastRep, "skirmish_already_active", "last_straggler must fire at most once per skirmish")
+
+    -- 5g. Mid-fight bandaging cover callout + bandage-aware post-fight check-ins.
+    local bandages = {}
+    PNC.Treatment = {
+        HasNPCBandage = function(rec) return bandages[tostring(rec and rec.id or "")] == true end,
+    }
+    -- Calm base: bandaging emits nothing.
+    npcStore, liveBodies, deliveredBarks = {}, {}, {}
+    PNC.Registry.Data = npcStore
+    PNC.Perception.ResetAllyThreatWarnings()
+    Callouts.ResetRuntime()
+    nowMs = 220000
+    local medSam = makeNPC("med-sam", { x = 10, y = 10, factionID = "survivors", tactical = true })
+    medSam.name = "Sammie"
+    local medAdri = makeNPC("med-adri", { x = 11, y = 10, factionID = "survivors", tactical = true })
+    medAdri.name = "Adrienne"
+    local medClay = makeNPC("med-clay", { x = 12, y = 10, factionID = "survivors", tactical = true })
+    medClay.name = "Clay"
+    T.falsy(Callouts.OnAllyBandagingUnderThreat(medSam, medSam, nowMs), "calm bandaging must not shout cover callout")
+    T.equal(#deliveredBarks, 0)
+
+    -- Under threat: bandaging self asks teammate to cover -> teammate replies.
+    PNC.Perception.RecordSkirmishContact("faction:survivors", { x = 16, y = 10, z = 0, enemyCount = 3 }, nowMs, true)
+    medAdri.runtime.target = { kind = "zombie", zombieId = "z-201" }
+    T.truthy(Callouts.OnAllyBandagingUnderThreat(medSam, medSam, nowMs), "bandaging under threat must request cover")
+    assertNoRawTokens(deliveredBarks[1].text, "5g bandaging_self")
+    assertNoLLMHyphens(deliveredBarks[1].text, "5g bandaging_self")
+    T.contains(deliveredBarks[1].text, "Adrienne", "bandaging cover request must address teammate")
+    nowMs = nowMs + 700
+    T.equal(Callouts.PumpPendingReplies(nowMs), 1)
+    assertNoRawTokens(deliveredBarks[2].text, "5g cover_bandage")
+    assertNoLLMHyphens(deliveredBarks[2].text, "5g cover_bandage")
+    T.contains(deliveredBarks[2].text, "Sammie", "covering reply must reassure Sammie")
+
+    -- Post-fight check-in subcase A: injured teammate HAS bandage.
+    deliveredBarks = {}
+    Callouts.ResetRuntime()
+    medAdri.runtime.target = nil
+    medSam.health = { bleeding = true, state = "injured" }
+    bandages["med-sam"] = true
+    nowMs = nowMs + 1000
+    T.truthy(Callouts.OnTargetCleared(medAdri, { kind = "zombie", zombieId = "z-201" }, "no_target", nowMs),
+        "clearing last target must start post-fight medical check-in")
+    assertNoRawTokens(deliveredBarks[1].text, "5g checkin_injured")
+    assertNoLLMHyphens(deliveredBarks[1].text, "5g checkin_injured")
+    T.contains(deliveredBarks[1].text, "Sammie", "check-in must address injured Sammie")
+    nowMs = nowMs + 700
+    T.equal(Callouts.PumpPendingReplies(nowMs), 1)
+    assertNoRawTokens(deliveredBarks[2].text, "5g injured_has_bandage")
+    assertNoLLMHyphens(deliveredBarks[2].text, "5g injured_has_bandage")
+    T.contains(string.lower(deliveredBarks[2].text), "bandage", "injured ally with bandage must confirm bandage")
+
+    -- Post-fight check-in subcase B: injured has NO bandage, teammate DOES -> 3-beat offer.
+    deliveredBarks = {}
+    Callouts.ResetRuntime()
+    nowMs = nowMs + 2000
+    bandages["med-sam"] = false
+    bandages["med-adri"] = true
+    PNC.Perception.RecordSkirmishContact("faction:survivors", { x = 16, y = 10, z = 0, enemyCount = 2 }, nowMs, true)
+    T.truthy(Callouts.OnTargetCleared(medAdri, { kind = "zombie", zombieId = "z-202" }, "no_target", nowMs))
+    nowMs = nowMs + 700
+    T.equal(Callouts.PumpPendingReplies(nowMs), 1, "injured without bandage replies")
+    assertNoRawTokens(deliveredBarks[2].text, "5g injured_no_bandage")
+    assertNoLLMHyphens(deliveredBarks[2].text, "5g injured_no_bandage")
+    nowMs = nowMs + 900
+    T.equal(Callouts.PumpPendingReplies(nowMs), 1, "teammate with bandage offers spare wrap")
+    assertNoRawTokens(deliveredBarks[3].text, "5g medic_has_bandage")
+    assertNoLLMHyphens(deliveredBarks[3].text, "5g medic_has_bandage")
+    T.contains(deliveredBarks[3].text, "Sammie", "medic offer must address injured Sammie")
+
+    -- Post-fight check-in subcase C: NOBODY has bandages -> scavenge/pressure line.
+    deliveredBarks = {}
+    Callouts.ResetRuntime()
+    nowMs = nowMs + 2000
+    bandages["med-sam"], bandages["med-adri"], bandages["med-clay"] = false, false, false
+    PNC.Perception.RecordSkirmishContact("faction:survivors", { x = 16, y = 10, z = 0, enemyCount = 2 }, nowMs, true)
+    T.truthy(Callouts.OnTargetCleared(medAdri, { kind = "zombie", zombieId = "z-203" }, "no_target", nowMs))
+    nowMs = nowMs + 1600
+    T.equal(Callouts.PumpPendingReplies(nowMs), 2)
+    assertNoRawTokens(deliveredBarks[3].text, "5g medic_no_bandage")
+    assertNoLLMHyphens(deliveredBarks[3].text, "5g medic_no_bandage")
+    T.contains(deliveredBarks[3].text, "Sammie", "no-bandage follow-up must address injured Sammie")
+
+    -- Post-fight check-in subcase D: everyone unhurt after 3+ enemies -> clean area check-in.
+    deliveredBarks = {}
+    Callouts.ResetRuntime()
+    nowMs = nowMs + 2000
+    medSam.health = { bleeding = false, state = "healthy" }
+    PNC.Perception.RecordSkirmishContact("faction:survivors", { x = 16, y = 10, z = 0, enemyCount = 4 }, nowMs, true)
+    T.truthy(Callouts.OnTargetCleared(medAdri, { kind = "zombie", zombieId = "z-204" }, "no_target", nowMs))
+    assertNoRawTokens(deliveredBarks[1].text, "5g checkin_clear")
+    assertNoLLMHyphens(deliveredBarks[1].text, "5g checkin_clear")
+    nowMs = nowMs + 1500
+    T.equal(Callouts.PumpPendingReplies(nowMs), 2, "unhurt team replies all clear")
+    assertNoRawTokens(deliveredBarks[2].text, "5g checkin_ok_1")
+    assertNoLLMHyphens(deliveredBarks[2].text, "5g checkin_ok_1")
+    assertNoRawTokens(deliveredBarks[3].text, "5g checkin_ok_2")
+    assertNoLLMHyphens(deliveredBarks[3].text, "5g checkin_ok_2")
+
+    -- 5h. Lightweight transient bark fast-path skips full conversation assembly & relationship UI sync.
+    local presCalls, relUiCalls, recvCalls, cmdHandlers = 0, 0, {}, {}
+    local savedPNC = PNC
+    PNC = {
+        Const = { MODULE = "PNC", CMD_CONVERSATION_RELATIONSHIP = "ConvRel" },
+        Core = { Now = function() return 300000 end },
+        Registry = { Get = function(id) return { id = id, name = "Sammie" } end },
+        RelationshipPresentation = {
+            BuildForConversation = function() presCalls = presCalls + 1; return { npcID = "s1" } end,
+        },
+        Network = { ClientState = {} },
+        Conversation = { Relationship = { ReceivePresentation = function() relUiCalls = relUiCalls + 1 end } },
+        SemanticSpeechPresentation = {
+            Receive = function(af, summary) recvCalls[#recvCalls + 1] = { af = af, summary = summary } end,
+        },
+        Client = {
+            Internal = {
+                RegisterServerCommand = function(cmd, fn) cmdHandlers[cmd] = fn end,
+            },
+        },
+    }
+    PNC.Network.SendConversationRelationship = function(_, summary, _, ctx)
+        cmdHandlers[PNC.Const.CMD_CONVERSATION_RELATIONSHIP]({
+            summary = summary, ambientFlavor = ctx and ctx.ambientFlavor,
+        })
+        return true
+    end
+    T.load("ProjectHoomans", "shared", "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Social.lua")
+    T.load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_RelationshipResult.lua")
+    local sentFast, _, stubSummary = PNC.Network.SendConversationRelationshipForNPC(
+        playerWorldObj, "s1", "combat_ally_warn_callout",
+        { lightweightBark = true, ambientFlavor = { observerOnly = true, text = "Test bark!" } }
+    )
+    PNC = savedPNC
+    T.truthy(sentFast, "lightweightBark server helper must send cleanly")
+    T.equal(stubSummary.lightweightBark, true, "server stub must carry lightweightBark flag")
+    T.equal(presCalls, 0, "lightweightBark must skip Presentation.BuildForConversation")
+    T.equal(relUiCalls, 0, "lightweightBark must skip client Relationship UI update")
+    T.equal(#recvCalls, 1, "lightweightBark must route directly to SemanticSpeechPresentation.Receive")
 end
 
 T.finish("pnc_ally_threat_warning_smoke")

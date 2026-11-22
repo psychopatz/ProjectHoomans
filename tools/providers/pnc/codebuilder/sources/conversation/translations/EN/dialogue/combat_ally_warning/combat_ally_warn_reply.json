@@ -98,6 +98,54 @@
       "Securing our perimeter, {addressee.name}, you're clear to engage!",
       "Holding overwatch on our six, {addressee.name}!",
       "Flanks locked down, {addressee.name}, advance!"
+    ],
+    "say.variants.blindside_reply": [
+      "Whoa, good catch, {addressee.name}! I'm on it!",
+      "Thanks, {addressee.name}, almost missed that!",
+      "Got it, {addressee.name}, turning around now!",
+      "Close call! Appreciate the heads up, {addressee.name}!"
+    ],
+    "say.variants.last_one_reply": [
+      "Finish it off, {addressee.name}, I've got your back!",
+      "Right with you, {addressee.name}, drop this last one!",
+      "Let's wrap this up, {addressee.name}!",
+      "Put it down, {addressee.name}, area's almost clear!"
+    ],
+    "say.variants.cover_bandage_reply": [
+      "I've got you covered, {addressee.name}! Take your time!",
+      "Patch up, {addressee.name}, nothing gets past me!",
+      "Stay low, {addressee.name}, watching both angles for you!",
+      "Go ahead, {addressee.name}, I'll keep them back!"
+    ],
+    "say.variants.injured_has_bandage_reply": [
+      "I'm bleeding a bit, {addressee.name}, got bandages on me so I'll patch it up.",
+      "Stings a little, {addressee.name}, good thing I still have a bandage.",
+      "I'll be fine, {addressee.name}, just need to wrap this with my bandage.",
+      "Caught a hit, {addressee.name}, pulling out a bandage now."
+    ],
+    "say.variants.injured_no_bandage_reply": [
+      "I'm bleeding, {addressee.name}, and I'm out of bandages!",
+      "Not great, {addressee.name}, I don't have any bandages left!",
+      "Could use help, {addressee.name}, no bandages in my pack!",
+      "I'm losing blood, {addressee.name}, do you have a bandage?"
+    ],
+    "say.variants.medic_has_bandage_reply": [
+      "Hang on, {addressee.name}, I've got a spare bandage! Hold still!",
+      "Don't worry, {addressee.name}, I have bandages right here.",
+      "Stay right there, {addressee.name}, using my bandage on you.",
+      "I've got clean wraps for you, {addressee.name}, hold tight!"
+    ],
+    "say.variants.medic_no_bandage_reply": [
+      "I'm out too, {addressee.name}! Keep pressure on it while we look for bandages!",
+      "No bandages on me either, {addressee.name}! We need to scavenge some fast!",
+      "Empty here too, {addressee.name}! Stay steady till we find clean cloth or bandages!",
+      "Nothing left in my bag, {addressee.name}! Stick close so we find supplies!"
+    ],
+    "say.variants.checkin_ok_reply": [
+      "All good here, {addressee.name}, barely broke a sweat.",
+      "Still in one piece, {addressee.name}, ready to move.",
+      "I'm fine, {addressee.name}, no scratches on me.",
+      "Doing okay over here, {addressee.name}, good fight."
     ]
   }
 }
