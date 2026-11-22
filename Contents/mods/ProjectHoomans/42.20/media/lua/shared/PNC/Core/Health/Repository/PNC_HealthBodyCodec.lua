@@ -1,8 +1,8 @@
 -- Health-owned body schema normalization; no lifecycle or engine authority.
 local Codec = require "PNC/Core/Base/PNC_RecordCodec"
+local WoundCodec = require "PNC/Core/Health/Repository/PNC_HealthWoundCodec"
 local Internal = { normalizeString = Codec.normalizeString, normalizeNumber = Codec.normalizeNumber }
 local Core = PNC.Core
-local Const = PNC.Const
 
 Internal.HEALTH_PART_IDS = {
     "Head", "Neck", "Torso_Upper", "Torso_Lower", "Groin",
@@ -11,147 +11,72 @@ Internal.HEALTH_PART_IDS = {
     "LowerLeg_L", "LowerLeg_R", "Foot_L", "Foot_R",
 }
 
-function Internal.sanitizeHealthBody(rawBody)
-    local source = type(rawBody) == "table" and rawBody or {}
-    local wounds = {}
-    local parts = {}
-    local basePart = source.partBase
-    local partId
-    local wound
-    local bleedingRate = 0
-    local openWoundCount = 0
-    local bandagedWoundCount = 0
-    local totalPartHealth = 0
-    local totalPartMax = 0
-    local partCount = 0
-    for partId, wound in pairs(type(source.wounds) == "table" and source.wounds or {}) do
-        if type(wound) == "table" then
-            partId = tostring(wound.partId or partId)
-            wounds[partId] = {
-                partId = partId,
-                type = tostring(wound.type or "scratch"),
-                severity = math.max(0, Internal.normalizeNumber(wound.severity, 0)),
-                damage = math.max(0, Internal.normalizeNumber(wound.damage, wound.severity or 0)),
-                bleedingRate = math.max(0, Internal.normalizeNumber(wound.bleedingRate, 0)),
-                bandaged = wound.bandaged == true,
-                createdAt = Internal.normalizeNumber(wound.createdAt, 0),
-                bandagedAt = Internal.normalizeNumber(wound.bandagedAt, 0),
-                healAtWorldHour = Internal.normalizeNumber(wound.healAtWorldHour, 0),
-            }
-            if wounds[partId].bandaged then
-                bandagedWoundCount = bandagedWoundCount + 1
-            else
-                openWoundCount = openWoundCount + 1
-                bleedingRate = bleedingRate + wounds[partId].bleedingRate
-            end
-        end
+local function normalizePart(partHealth)
+    local num = Internal.normalizeNumber
+    if type(partHealth) == "number" then
+        return { current = Core.Clamp(num(partHealth, 100), 0, 100), max = 100 }
     end
-    local function normalizePart(partHealth)
-        local maximum
-        if type(partHealth) == "number" then
-            maximum = 100
-            return {
-                current = Core.Clamp(Internal.normalizeNumber(partHealth, maximum), 0, maximum),
-                max = maximum,
-            }
-        end
-        if type(partHealth) ~= "table" then return nil end
-        maximum = math.max(1, Internal.normalizeNumber(
-            partHealth.max or partHealth.m,
-            100
-        ))
-        return {
-            current = Core.Clamp(Internal.normalizeNumber(
-                partHealth.current or partHealth.c,
-                maximum
-            ), 0, maximum),
-            max = maximum,
-        }
-    end
-    if basePart ~= nil then
-        local normalizedBase = normalizePart(basePart)
-        if normalizedBase then
-            for i = 1, #Internal.HEALTH_PART_IDS do
-                parts[Internal.HEALTH_PART_IDS[i]] = {
-                    current = normalizedBase.current,
-                    max = normalizedBase.max,
-                }
-            end
-        end
-    end
-    for partId, partHealth in pairs(type(source.parts) == "table"
-        and source.parts or {})
-    do
-        partHealth = normalizePart(partHealth)
-        if partHealth then
-            parts[tostring(partId)] = partHealth
-        end
-    end
-    for _, partHealth in pairs(parts) do
-        totalPartHealth = totalPartHealth + math.max(
-            0, tonumber(partHealth.current) or 0
-        )
-        totalPartMax = totalPartMax + math.max(
-            1, tonumber(partHealth.max) or 100
-        )
-        partCount = partCount + 1
-    end
-    local infectionSource = type(source.infection) == "table" and source.infection or nil
-    local infection = infectionSource and {
-        active = infectionSource.active == true,
-        fatal = infectionSource.fatal == true,
-        pendingFatal = infectionSource.pendingFatal == true,
-        sourcePart = Internal.normalizeString(infectionSource.sourcePart),
-        infectedAtWorldHour = Internal.normalizeNumber(infectionSource.infectedAtWorldHour, 0),
-        fatalAtWorldHour = Internal.normalizeNumber(infectionSource.fatalAtWorldHour, 0),
-        reanimateAtWorldHour = Internal.normalizeNumber(infectionSource.reanimateAtWorldHour, 0),
-        progress = Core.Clamp(Internal.normalizeNumber(infectionSource.progress, 0), 0, 1),
-        stage = tostring(infectionSource.stage or "incubating"),
-        fever = Core.Clamp(Internal.normalizeNumber(infectionSource.fever, 0), 0, 100),
-        temperatureC = Core.Clamp(Internal.normalizeNumber(infectionSource.temperatureC, 37), 30, 45),
-        lastUpdatedWorldHour = Internal.normalizeNumber(infectionSource.lastUpdatedWorldHour, 0),
-        lastDamageWorldHour = Internal.normalizeNumber(infectionSource.lastDamageWorldHour, 0),
-    } or nil
-    local wholeBodyAilments = {}
-    for ailmentID, ailment in pairs(
-        type(source.wholeBodyAilments) == "table"
-            and source.wholeBodyAilments or {}
-    ) do
-        local severity = type(ailment) == "table"
-            and tonumber(ailment.severity) or tonumber(ailment)
+    if type(partHealth) ~= "table" then return nil end
+    local maximum = math.max(1, num(partHealth.max or partHealth.m, 100))
+    return { current = Core.Clamp(num(partHealth.current or partHealth.c, maximum), 0, maximum), max = maximum }
+end
+
+local function normalizeAilments(rawAilments)
+    local result = {}
+    for ailmentID, ailment in pairs(type(rawAilments) == "table" and rawAilments or {}) do
+        local severity = type(ailment) == "table" and tonumber(ailment.severity) or tonumber(ailment)
         if severity and severity > 1 then severity = severity / 1000 end
         if severity and severity > 0 then
-            wholeBodyAilments[tostring(ailmentID)] = {
-                severity = Core.Clamp(severity, 0, 1),
-            }
-        elseif type(ailment) == "table"
-            and ailment.active == true
-            and ailment.flavorOnly == true
-        then
-            wholeBodyAilments[tostring(ailmentID)] = {
-                active = true,
-                flavorOnly = true,
-            }
+            result[tostring(ailmentID)] = { severity = Core.Clamp(severity, 0, 1) }
+        elseif type(ailment) == "table" and ailment.active == true and ailment.flavorOnly == true then
+            result[tostring(ailmentID)] = { active = true, flavorOnly = true }
         end
+    end
+    return result
+end
+
+function Internal.sanitizeHealthBody(rawBody)
+    local source = type(rawBody) == "table" and rawBody or {}
+    local wounds, parts = {}, {}
+    local bleedingRate, openWoundCount, bandagedWoundCount = 0, 0, 0
+    for partId, wound in pairs(type(source.wounds) == "table" and source.wounds or {}) do
+        if type(wound) == "table" then
+            local entry = WoundCodec.sanitizeWound(partId, wound)
+            wounds[entry.partId] = entry
+            if entry.bandaged then bandagedWoundCount = bandagedWoundCount + 1
+            else openWoundCount = openWoundCount + 1; bleedingRate = bleedingRate + entry.bleedingRate end
+        end
+    end
+    local normalizedBase = source.partBase ~= nil and normalizePart(source.partBase) or nil
+    if normalizedBase then
+        for i = 1, #Internal.HEALTH_PART_IDS do
+            parts[Internal.HEALTH_PART_IDS[i]] = { current = normalizedBase.current, max = normalizedBase.max }
+        end
+    end
+    for partId, partHealth in pairs(type(source.parts) == "table" and source.parts or {}) do
+        local normalized = normalizePart(partHealth)
+        if normalized then parts[tostring(partId)] = normalized end
+    end
+    local totalPartHealth, totalPartMax, partCount = 0, 0, 0
+    for _, partHealth in pairs(parts) do
+        totalPartHealth = totalPartHealth + math.max(0, tonumber(partHealth.current) or 0)
+        totalPartMax = totalPartMax + math.max(1, tonumber(partHealth.max) or 100)
+        partCount = partCount + 1
     end
     return {
         wounds = wounds,
         parts = parts,
-        infection = infection,
-        wholeBodyAilments = wholeBodyAilments,
-        totalPartHealth = partCount > 0 and totalPartHealth
-            or math.max(0, Internal.normalizeNumber(source.totalPartHealth, 0)),
-        totalPartMax = partCount > 0 and totalPartMax
-            or math.max(0, Internal.normalizeNumber(source.totalPartMax, 0)),
-        overallPercent = partCount > 0
-            and Core.Clamp(totalPartMax > 0
-                and totalPartHealth / totalPartMax * 100 or 0, 0, 100)
+        infection = WoundCodec.sanitizeInfection(source.infection),
+        physiology = WoundCodec.sanitizePhysiology(source.physiology),
+        knoxExposureState = Internal.normalizeString(source.knoxExposureState),
+        wholeBodyAilments = normalizeAilments(source.wholeBodyAilments),
+        totalPartHealth = partCount > 0 and totalPartHealth or math.max(0, Internal.normalizeNumber(source.totalPartHealth, 0)),
+        totalPartMax = partCount > 0 and totalPartMax or math.max(0, Internal.normalizeNumber(source.totalPartMax, 0)),
+        overallPercent = partCount > 0 and Core.Clamp(totalPartMax > 0 and totalPartHealth / totalPartMax * 100 or 0, 0, 100)
             or Core.Clamp(Internal.normalizeNumber(source.overallPercent, 100), 0, 100),
         bleedingRate = bleedingRate,
         openWoundCount = openWoundCount,
         bandagedWoundCount = bandagedWoundCount,
-        -- Wall-clock values do not survive a process restart. Bleeding resumes
-        -- from the next health tick instead of charging an offline time jump.
         lastBleedAt = 0,
     }
 end

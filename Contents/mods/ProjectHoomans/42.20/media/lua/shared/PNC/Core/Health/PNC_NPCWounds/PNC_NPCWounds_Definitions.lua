@@ -2,55 +2,49 @@ PNC = PNC or {}
 PNC.NPCWounds = PNC.NPCWounds or {}
 PNC.NPCWounds.Internal = PNC.NPCWounds.Internal or {}
 
+require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_PartCatalog"
+
 local Wounds = PNC.NPCWounds
 local Internal = Wounds.Internal
 local Core = PNC.Core
 local Settings = PNC.Sandbox
 
-Wounds.Parts = {
-    Head = { id = "Head", label = "Head", engine = "Head", x = 0.50, y = 0.08, weight = 5 },
-    Neck = { id = "Neck", label = "Neck", engine = "Neck", x = 0.50, y = 0.16, weight = 3 },
-    Torso_Upper = { id = "Torso_Upper", label = "Upper Torso", engine = "Torso_Upper", x = 0.50, y = 0.28, weight = 18 },
-    Torso_Lower = { id = "Torso_Lower", label = "Lower Torso", engine = "Torso_Lower", x = 0.50, y = 0.42, weight = 14 },
-    Groin = { id = "Groin", label = "Groin", engine = "Groin", x = 0.50, y = 0.51, weight = 5 },
-    UpperArm_L = { id = "UpperArm_L", label = "Left Upper Arm", engine = "UpperArm_L", x = 0.24, y = 0.30, weight = 6 },
-    UpperArm_R = { id = "UpperArm_R", label = "Right Upper Arm", engine = "UpperArm_R", x = 0.76, y = 0.30, weight = 6 },
-    ForeArm_L = { id = "ForeArm_L", label = "Left Forearm", engine = "ForeArm_L", x = 0.15, y = 0.45, weight = 5 },
-    ForeArm_R = { id = "ForeArm_R", label = "Right Forearm", engine = "ForeArm_R", x = 0.85, y = 0.45, weight = 5 },
-    Hand_L = { id = "Hand_L", label = "Left Hand", engine = "Hand_L", x = 0.09, y = 0.58, weight = 3 },
-    Hand_R = { id = "Hand_R", label = "Right Hand", engine = "Hand_R", x = 0.91, y = 0.58, weight = 3 },
-    UpperLeg_L = { id = "UpperLeg_L", label = "Left Thigh", engine = "UpperLeg_L", x = 0.39, y = 0.62, weight = 8 },
-    UpperLeg_R = { id = "UpperLeg_R", label = "Right Thigh", engine = "UpperLeg_R", x = 0.61, y = 0.62, weight = 8 },
-    LowerLeg_L = { id = "LowerLeg_L", label = "Left Shin", engine = "LowerLeg_L", x = 0.39, y = 0.80, weight = 6 },
-    LowerLeg_R = { id = "LowerLeg_R", label = "Right Shin", engine = "LowerLeg_R", x = 0.61, y = 0.80, weight = 6 },
-    Foot_L = { id = "Foot_L", label = "Left Foot", engine = "Foot_L", x = 0.36, y = 0.96, weight = 2 },
-    Foot_R = { id = "Foot_R", label = "Right Foot", engine = "Foot_R", x = 0.64, y = 0.96, weight = 2 },
-}
-
-Wounds.PartOrder = {
-    "Head", "Neck", "Torso_Upper", "Torso_Lower", "Groin",
-    "UpperArm_L", "UpperArm_R", "ForeArm_L", "ForeArm_R",
-    "Hand_L", "Hand_R", "UpperLeg_L", "UpperLeg_R",
-    "LowerLeg_L", "LowerLeg_R", "Foot_L", "Foot_R",
-}
-
--- These parts are the health system's only instant-death boundary. All other
--- body-part depletion remains compatible with the incapacitated flow.
-Wounds.VitalPartOrder = {
-    "Head", "Torso_Upper", "Torso_Lower",
-}
-
-Wounds.LocomotionPartOrder = {
-    left = { "UpperLeg_L", "LowerLeg_L", "Foot_L" },
-    right = { "UpperLeg_R", "LowerLeg_R", "Foot_R" },
-}
-
+-- Physical trauma severity is independent from Knox transmission risk:
+-- `priority` orders dominant wound selection; `physicalSeverityRank` measures acute trauma.
 Internal.WoundStats = {
-    scratch = { priority = 1, damage = 4, bleedingRate = 0.018 },
-    laceration = { priority = 2, damage = 8, bleedingRate = 0.055 },
-    bite = { priority = 3, damage = 12, bleedingRate = 0.085 },
-    bullet = { priority = 4, damage = 14, bleedingRate = 0.095 },
+    scratch = { priority = 2, tier = "least", physicalSeverityRank = 1, damage = 4, bleedingRate = 0.018, canInfectOrdinary = true, canTransmitKnoxFromZombie = true },
+    laceration = { priority = 3, tier = "moderate", physicalSeverityRank = 3, damage = 8, bleedingRate = 0.055, canInfectOrdinary = true, canTransmitKnoxFromZombie = true },
+    burn = { priority = 4, tier = "severe", physicalSeverityRank = 3, damage = 9, bleedingRate = 0.020, burned = true, canInfectOrdinary = true, canTransmitKnoxFromZombie = false },
+    fracture = { priority = 4, tier = "severe", physicalSeverityRank = 4, damage = 10, bleedingRate = 0.010, fractured = true, canInfectOrdinary = false, canTransmitKnoxFromZombie = false },
+    deep_wound = { priority = 4, tier = "severe", physicalSeverityRank = 4, damage = 10, bleedingRate = 0.070, deepWounded = true, canInfectOrdinary = true, canTransmitKnoxFromZombie = false },
+    deep_wound_glass = { priority = 4, tier = "severe", physicalSeverityRank = 4, damage = 11, bleedingRate = 0.075, deepWounded = true, haveGlass = true, canInfectOrdinary = true, canTransmitKnoxFromZombie = false },
+    bullet = { priority = 5, tier = "critical", physicalSeverityRank = 5, damage = 14, bleedingRate = 0.095, haveBullet = true, canInfectOrdinary = true, canTransmitKnoxFromZombie = false },
+    bite = { priority = 6, tier = "worst", physicalSeverityRank = 3, damage = 12, bleedingRate = 0.065, bitten = true, canInfectOrdinary = true, canTransmitKnoxFromZombie = true },
 }
+Internal.WoundAliases = {
+    scratched = "scratch",
+    cut = "laceration",
+    bitten = "bite",
+    glass = "deep_wound_glass",
+    deepwound = "deep_wound",
+    deep_wounded = "deep_wound",
+    burned = "burn",
+    fractured = "fracture",
+    gunshot = "bullet",
+}
+
+function Wounds.NormalizeWoundType(rawType)
+    local key = string.lower(tostring(rawType or ""))
+    if key == "" then return nil end
+    key = Internal.WoundAliases[key] or key
+    return Internal.WoundStats[key] and key or nil
+end
+
+function Wounds.GetWoundStats(woundType)
+    local normalized = Wounds.NormalizeWoundType(woundType)
+    return normalized and Internal.WoundStats[normalized] or nil
+end
+
 Internal.BandageQuality = {
     ["Base.AlcoholBandage"] = 1.35,
     ["Base.Bandage"] = 1.20,
@@ -89,16 +83,12 @@ function Internal.RandomPercent()
 end
 
 function Internal.ChoosePart()
-    local total = 0
-    local roll
-    local i
-    local part
+    local total, part, roll = 0, nil, 0
     for i = 1, #Wounds.PartOrder do
         part = Wounds.Parts[Wounds.PartOrder[i]]
         total = total + (tonumber(part.weight) or 1)
     end
-    roll = ZombRand and ZombRand(math.max(1, total))
-        or math.floor(math.random() * total)
+    roll = ZombRand and ZombRand(math.max(1, total)) or math.floor(math.random() * total)
     for i = 1, #Wounds.PartOrder do
         part = Wounds.Parts[Wounds.PartOrder[i]]
         roll = roll - (tonumber(part.weight) or 1)

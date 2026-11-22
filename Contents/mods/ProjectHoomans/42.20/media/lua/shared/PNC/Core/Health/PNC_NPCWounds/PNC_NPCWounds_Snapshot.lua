@@ -1,14 +1,39 @@
 PNC = PNC or {}
+require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Projection"
+
 local Wounds = PNC.NPCWounds
 local Core = PNC.Core
 
+function Wounds.ClassifyCombatInjuryState(record, preferredPartId, preferredWoundType)
+    if type(record) ~= "table" or record.alive == false then return nil end
+    local proj = Wounds.GetOrBuildProjection(record, {
+        preferredPartId = preferredPartId,
+        preferredWoundType = preferredWoundType,
+    })
+    if not proj or proj.injured ~= true then return nil end
+    return proj
+end
+
 function Wounds.BuildStatusSummary(record)
-    local body = Wounds.Recalculate(record)
+    local body = (type(Wounds.Recalculate) == "function" and Wounds.Recalculate(record))
+        or (record and record.health and record.health.body)
+        or {}
     local bleedingRate = tonumber(body.bleedingRate) or 0
+    local openCount = tonumber(body.openWoundCount) or 0
+    local bandagedCount = tonumber(body.bandagedWoundCount) or 0
+    local patchedCount = tonumber(body.patchedWoundCount) or bandagedCount
+    local proj = (record and record.health) and Wounds.GetOrBuildProjection(record) or nil
+    local patchState = (openCount > 0 or bleedingRate > 0 or (proj and proj.hasDirtyBandage)) and "with_wounds"
+        or (patchedCount > 0 and "patched_up" or "none")
     return {
         bleeding = bleedingRate > 0,
-        openWoundCount = tonumber(body.openWoundCount) or 0,
-        bandagedWoundCount = tonumber(body.bandagedWoundCount) or 0,
+        openWoundCount = openCount,
+        bandagedWoundCount = bandagedCount,
+        patchedWoundCount = patchedCount,
+        patchState = patchState,
+        physicalSeverityBand = proj and proj.physicalSeverityBand or "none",
+        knoxExposure = proj and proj.knoxExposure or "impossible",
+        treatmentState = proj and proj.treatmentState or "uninjured",
     }
 end
 
@@ -19,8 +44,8 @@ function Wounds.BuildSnapshot(record)
         openWoundCount = body.openWoundCount,
         bandagedWoundCount = body.bandagedWoundCount,
         infected = Wounds.HasActiveInfection(record),
-        infection = body.infection
-            and Core.DeepCopy(body.infection) or nil,
+        infection = body.infection and Core.DeepCopy(body.infection) or nil,
+        physiology = body.physiology and Core.DeepCopy(body.physiology) or nil,
         wholeBodyAilments = Core.DeepCopy(body.wholeBodyAilments or {}),
         wounds = {},
         parts = Core.DeepCopy(body.parts),
@@ -28,15 +53,10 @@ function Wounds.BuildSnapshot(record)
         totalPartMax = body.totalPartMax,
         overallPercent = body.overallPercent,
     }
-    local i
-    local partId
-    local wound
     for i = 1, #Wounds.PartOrder do
-        partId = Wounds.PartOrder[i]
-        wound = body.wounds[partId]
-        if wound then
-            output.wounds[partId] = Core.DeepCopy(wound)
-        end
+        local partId = Wounds.PartOrder[i]
+        local wound = body.wounds[partId]
+        if wound then output.wounds[partId] = Core.DeepCopy(wound) end
     end
     return output
 end
