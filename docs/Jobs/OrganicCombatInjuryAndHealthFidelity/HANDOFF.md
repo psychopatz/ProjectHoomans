@@ -4,18 +4,18 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "H9"
-phase_commit_message: "phase(H9): H9: add deterministic Build 42 wound, physiology, Beat-to-Scene, bite conflict, and 200-NPC scale tests"
-state: "CLEAN_CHECKPOINT"
-parent_status: "IN_PROGRESS"
-phase: "H10"
-chunk: "Final job documentation reconciliation, repo_guard check, checkpoint verify, and developer-side closure commit"
+phase_commit_phase: "H10"
+phase_commit_message: "phase(H10): H10: finalize OrganicCombatInjuryAndHealthFidelity docs, guards, and developer-side closure"
+state: "USER_ACCEPTANCE"
+parent_status: "USER_ACCEPTANCE_PENDING"
+phase: "H11"
+chunk: "User-owned live Project Zomboid Build 42 SP/MP acceptance testing"
 retrieval_tier: "verify"
 phase_commit_vector: "psychopatz-core=1a67819822909751090f1a68ef02faa50d667beb;project-hoomans=self;dynamic-trading=62757d0b7fc1c114873735387827ccad9d828077"
 phase_residual_vector: "psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=f8a3016d89344add854593d73e4170362efc8de00531cffdb129f3b976936188"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 codebase_memory_indexed_commit: "0e35ae37deb6e385a806136bfa1edbca9acfe8e6"
-updated_at: "2026-11-22T23:25:29.603717Z"
+updated_at: "2026-11-22T23:26:35.832535Z"
 ---
 
 
@@ -24,20 +24,20 @@ updated_at: "2026-11-22T23:25:29.603717Z"
 
 ## What became true
 
-- H9 complete: `tests/pnc_organic_health_physiology_and_injury_scene_smoke.lua` and `tests/pnc_combat_wound_callouts_and_branching_smoke.lua` verify Build 42 wound/treatment/transmission/mortality parity, `Groin -> pelvis_groin`, ordinary wound infection, Live/Abstract physiology parity, O(1) cached projection hits, Beat -> Suggestions -> FlowKernel -> LocalResponse -> Scene handoff, `Wounds.EvaluateBiteConflictPolicy`, MP authority rejection, and 200-NPC scale performance.
+- All mandatory developer-side phases (`H0` through `H10`) of `OrganicCombatInjuryAndHealthFidelity` are complete, verified, and locally committed on `main` across `ProjectHoomans` and `psychopatzCore`.
+- Build 42 17-part (`Groin -> pelvis_groin`) wound/treatment/codec fidelity, `ZombieLore.Transmission` (`1`–`4`) & `Mortality == 7` parity, ordinary wound infection (`0..10`), Live+Abstract physiology parity, O(1) dirty-cached health projections, Director-style 1-vs-2 ally reaction arbitration (`<= 4` participants), Beat -> hard-constrained player suggestions -> `DialogueFlowKernel` -> `LocalResponse` -> multi-actor `Scene` handoff, `Wounds.EvaluateBiteConflictPolicy`, EN/TL realizations (`reconcile.py --check` clean), and 200-NPC scale tests are all verified.
 
 ## Remaining
 
-- Execute H10 final documentation reconciliation, repository guard, and developer-side closure commit on `main`.
+- `H11` — User-owned live Project Zomboid Build 42 SP/MP acceptance testing.
 
 ## Resume
 
-1. Update `ARCHITECTURE.md`, `AUDIT.md`, `ROADMAP.md`, `PROGRESS.md`, and `HANDOFF.md` for H10 closure (`H11` user live SP/MP acceptance pending).
-2. Run `reconcile.py --check`, `file_token_bloat_scan.py --threshold 2000`, `pz_verify.py --kahlua`, `repo_guard.py check`, and commit H10 via `phase_commit.py`.
+1. Launch Project Zomboid Build 42 SP/MP with `PsychopatzCore` and `ProjectHoomans` enabled to perform live `H11` acceptance (verify combat wound received beats, fighting-while-injured open vs patched callouts, pelvic/groin variants, bite possible/confirmed/non-transmissible variants under different Sandbox transmission settings, ally reaction arbitration, interactive triage exchange choices, and cold/fever/wetness progression).
 
 ## Evidence
 
-- `TEST_VERIFIED`: `tests/run_tests.py` (`7/7` Lua smoke suites PASS) and Python `unittest` (`38/38` authority/eligibility/domain tests PASS).
+- `TEST_VERIFIED`: `reconcile.py --check` (`clean = true, drifted = 0, stale = 0`), `file_token_bloat_scan.py --threshold 2000` (`0` production modules over 2000 tokens), `pz_verify.py --kahlua` (`0` issues), `tests/run_tests.py` (`7/7` targeted Lua smoke suites PASS), Python `unittest` (`38/38` authority/eligibility/domain tests PASS), `repo_guard.py check` PASS, and `checkpoint.py verify` PASS.
 
 ## Blockers / open decisions
 
@@ -45,4 +45,4 @@ updated_at: "2026-11-22T23:25:29.603717Z"
 
 ## Acceptance
 
-H10 passes when all job docs reflect the completed `H0`–`H10` architecture and commits, `reconcile.py --check` and `repo_guard.py check` pass, and `checkpoint.py verify` confirms a clean committed handoff ready for `H11` user live SP/MP acceptance.
+Ready for user-owned `H11` live SP/MP runtime acceptance.
