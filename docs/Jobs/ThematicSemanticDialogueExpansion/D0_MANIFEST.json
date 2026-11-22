@@ -1,0 +1,795 @@
+{
+  "manifest_version": "1.0",
+  "phase": "D0",
+  "status": "FROZEN",
+  "generated_at": "2026-11-22T20:14:00+08:00",
+  "baselines": {
+    "ProjectHoomans": {
+      "branch": "main",
+      "head": "2b9d579df8cd67c623027fde3715a77ec4219d90",
+      "tracked_files": 8176,
+      "tree_sha256": "f76e02eb1fcce4e154290827eb111a8b6c681a7f057ce597d70641906d7d21cb"
+    },
+    "psychopatzCore": {
+      "branch": "main",
+      "head": "89f7b85add7ff317bbac3c66bb004d35fda24f4a",
+      "tracked_files": 2202,
+      "tree_sha256": "2dc7eb061f88015bb0e10ce85860545796250a3a01ec280be888f000645855ee"
+    },
+    "DynamicTrading": {
+      "branch": "main",
+      "head": "976e240e527602326c735722d724d6334fe8a464",
+      "tracked_files": 351,
+      "tree_sha256": "7d8d0edba9aa4ed201413501d16246f9763e3e9b9d5614b969d3819de6f19a22"
+    }
+  },
+  "corpus_summary": {
+    "total_definitions": 494,
+    "by_owner": {
+      "ProjectHoomans": 369,
+      "PsychopatzCore": 125
+    },
+    "by_kind": {
+      "Interactive Scene": 21,
+      "Transient Beat": 409,
+      "Shared Realization/Behavior": 64
+    },
+    "by_domain": {
+      "social": 231,
+      "companion_commands": 68,
+      "<none>": 54,
+      "combat": 50,
+      "ui": 22,
+      "memory": 13,
+      "scene": 9,
+      "needs": 8,
+      "integration": 8,
+      "medical": 6,
+      "navigation": 5,
+      "settlement_relationship": 5,
+      "world": 5,
+      "quest": 4,
+      "activity": 3,
+      "task": 2,
+      "world_event": 1
+    },
+    "by_directory": {
+      "dialogue/static_suggestion_text": 22,
+      "dialogue/social_greetings": 21,
+      "dialogue/task_tool_replies": 21,
+      "dialogue/social_emotes": 19,
+      "dialogue/core_semantic_responses": 16,
+      "dialogue/event_reactions_farewell": 15,
+      "dialogue/companion_commands_player": 14,
+      "dialogue/wellbeing_content": 12,
+      "dialogue/companion_commands_replies": 11,
+      "dialogue/core_text_memory_gossip_reactions": 11,
+      "dialogue/social_tool_replies_affirmation": 10,
+      "realization/social_warning_wellbeing": 10,
+      "dialogue/core_text_social_recruitment": 9,
+      "realization/social_challenge": 9,
+      "text/memory/backstory": 9,
+      "dialogue/combat_player_assault_reactions": 8,
+      "dialogue/compatibility_content": 8,
+      "dialogue/social_tool_replies_boundary_identity": 8,
+      "dialogue/task_lifecycle": 8,
+      "dialogue/social_check_in": 7,
+      "dialogue/social_interaction_scene_horde_work": 7,
+      "dialogue/social_interaction_scene_travel_news": 7,
+      "dialogue/social_reactions_ack_dispute": 7,
+      "dialogue/social_reactions_hostile_offer_threat": 7,
+      "behavior/scene/excursion": 6,
+      "dialogue/conversation_greeting": 6,
+      "dialogue/event_reactions_leader_loss": 6,
+      "dialogue/core_check_in": 6,
+      "realization/social_affirmation": 6,
+      "realization/social_identity_closure": 6,
+      "dialogue/companion_commands_combat": 5,
+      "dialogue/companion_commands_lifecycle": 5,
+      "dialogue/conversation_whats_up": 5,
+      "dialogue/medical_distress": 5,
+      "dialogue/navigation": 5,
+      "dialogue/core_text_memory_gossip_corpse_ordinary": 5,
+      "patterns/common": 5,
+      "behavior/scene/horde": 4,
+      "dialogue/conversation_needs": 4,
+      "dialogue/quest_content": 4,
+      "dialogue/social_apology": 4,
+      "dialogue/social_companion_topics": 4,
+      "behavior/social/acknowledgement": 4,
+      "behavior/social/repair": 4,
+      "dialogue/core_identity": 4,
+      "dialogue/core_text_needs_gifts": 4,
+      "realization/social_lexemes": 4,
+      "behavior/scene/news": 3,
+      "dialogue/companion_check_in": 3,
+      "dialogue/event_reactions_combat": 3,
+      "dialogue/needs_support": 3,
+      "dialogue/social_ask_about": 3,
+      "dialogue/social_interaction_memory": 3,
+      "dialogue/social_settlement_admission": 3,
+      "behavior/social/conflict": 3,
+      "dialogue/core_text_memory_gossip_corpse_revenge": 3,
+      "dialogue/core_text_social_departure": 3,
+      "behavior/scene/task_work": 2,
+      "dialogue/combat_ally_warning": 2,
+      "dialogue/combat_horde": 2,
+      "dialogue/companion_flows": 2,
+      "dialogue/core_knowledge_facts": 2,
+      "dialogue/event_reactions_corpse": 2,
+      "dialogue/event_reactions_safety": 2,
+      "dialogue/health_content": 2,
+      "dialogue/question_relationship_status": 2,
+      "dialogue/social_interaction_argument": 2,
+      "dialogue/social_interaction_scene_combat": 2,
+      "dialogue/world_event_beats": 2,
+      "behavior/social/context": 2,
+      "dialogue/core_knowledge_activity": 2,
+      "dialogue/core_text_memory_gossip_death": 2,
+      "dialogue/core_text_social_goodbye": 2,
+      "dialogue/social": 2,
+      "behavior/scene/post_combat": 1,
+      "dialogue/combat_human_banter_human_kill_aggressive": 1,
+      "dialogue/combat_human_banter_human_kill_brave": 1,
+      "dialogue/combat_human_banter_human_kill_cold": 1,
+      "dialogue/combat_human_banter_human_kill_practical": 1,
+      "dialogue/combat_human_banter_human_kill_reserved": 1,
+      "dialogue/combat_human_banter_human_kill_shaken": 1,
+      "dialogue/combat_human_banter_human_kill_supportive": 1,
+      "dialogue/combat_kill": 1,
+      "dialogue/combat_kill_killer_aggressive": 1,
+      "dialogue/combat_kill_killer_brave": 1,
+      "dialogue/combat_kill_killer_cold": 1,
+      "dialogue/combat_kill_killer_practical": 1,
+      "dialogue/combat_kill_killer_reserved": 1,
+      "dialogue/combat_kill_killer_shaken": 1,
+      "dialogue/combat_kill_killer_supportive": 1,
+      "dialogue/combat_kill_witness_aggressive": 1,
+      "dialogue/combat_kill_witness_brave": 1,
+      "dialogue/combat_kill_witness_cold": 1,
+      "dialogue/combat_kill_witness_practical": 1,
+      "dialogue/combat_kill_witness_reserved": 1,
+      "dialogue/combat_kill_witness_shaken": 1,
+      "dialogue/combat_kill_witness_supportive": 1,
+      "dialogue/combat_tactical_spatial": 1,
+      "dialogue/companion_reaction": 1,
+      "dialogue/conversation_context": 1,
+      "dialogue/event_reactions_social": 1,
+      "dialogue/identity_exchange": 1,
+      "dialogue/medical_event_treatment": 1,
+      "dialogue/question_backstory": 1,
+      "dialogue/question_residence": 1,
+      "dialogue/social_interaction_context": 1,
+      "dialogue/social_interaction_first_contact": 1,
+      "dialogue/social_interaction_news": 1,
+      "behavior/social/world_events": 1,
+      "beat/social/conflict": 1,
+      "beat/social/first_contact": 1,
+      "beat/social/repair": 1,
+      "dialogue/core_knowledge_gossip": 1,
+      "dialogue/core_knowledge_identity": 1,
+      "dialogue/core_text_social_greetings": 1,
+      "dialogue/core_text_social_identity": 1,
+      "patterns": 1
+    },
+    "with_flow": 5,
+    "total_flow_nodes": 11,
+    "total_branch_offers": 1,
+    "total_on_unrelated": 6,
+    "total_variants": 1082,
+    "actor_encoded_count": 107,
+    "style_encoded_count": 40,
+    "overpacked_or_flagged_count": 48
+  },
+  "manifests_and_recipes": {
+    "core_conversation_manifest": "/home/psychopatz/Zomboid/Workshop/psychopatzCore/tools/semantic_harness/codebuilder/sources/conversation/manifest.json",
+    "core_conversation_package": "/home/psychopatz/Zomboid/Workshop/psychopatzCore/tools/semantic_harness/codebuilder/sources/conversation/package.json",
+    "ph_conversation_package": "/home/psychopatz/Zomboid/Workshop/ProjectHoomans/tools/providers/pnc/codebuilder/sources/conversation/package.json",
+    "pz_packages_registry": "/home/psychopatz/Zomboid/Workshop/psychopatzCore/tools/semantic_harness/codebuilder/targets/pz_packages.json",
+    "ph_other_codebuilder_sources": {
+      "autonomy_ad": 3,
+      "reaction_policy": 2,
+      "social_policy": 3,
+      "work_scenario": 2
+    }
+  },
+  "top_clusters": {
+    "ProjectHoomans/dialogue/static_suggestion_text": {
+      "files": 22,
+      "variants": 33,
+      "flows": 0,
+      "style_files": 1,
+      "actor_files": 2
+    },
+    "ProjectHoomans/dialogue/task_tool_replies": {
+      "files": 21,
+      "variants": 46,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 2
+    },
+    "ProjectHoomans/dialogue/social_greetings": {
+      "files": 21,
+      "variants": 20,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 6
+    },
+    "ProjectHoomans/dialogue/social_emotes": {
+      "files": 19,
+      "variants": 30,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 8
+    },
+    "ProjectHoomans/dialogue/core_semantic_responses": {
+      "files": 16,
+      "variants": 34,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 0
+    },
+    "ProjectHoomans/behavior/scene": {
+      "files": 16,
+      "variants": 0,
+      "flows": 0,
+      "style_files": 2,
+      "actor_files": 0
+    },
+    "ProjectHoomans/dialogue/event_reactions_farewell": {
+      "files": 15,
+      "variants": 15,
+      "flows": 0,
+      "style_files": 3,
+      "actor_files": 10
+    },
+    "ProjectHoomans/dialogue/companion_commands_player": {
+      "files": 14,
+      "variants": 14,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 14
+    },
+    "PsychopatzCore/behavior/social": {
+      "files": 14,
+      "variants": 0,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 0
+    },
+    "ProjectHoomans/dialogue/wellbeing_content": {
+      "files": 12,
+      "variants": 21,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 0
+    },
+    "ProjectHoomans/dialogue/companion_commands_replies": {
+      "files": 11,
+      "variants": 11,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 1
+    },
+    "PsychopatzCore/dialogue/core_text_memory_gossip_reactions": {
+      "files": 11,
+      "variants": 11,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 2
+    },
+    "ProjectHoomans/dialogue/social_tool_replies_affirmation": {
+      "files": 10,
+      "variants": 25,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 0
+    },
+    "PsychopatzCore/realization/social_warning_wellbeing": {
+      "files": 10,
+      "variants": 0,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 1
+    },
+    "PsychopatzCore/dialogue/core_text_social_recruitment": {
+      "files": 9,
+      "variants": 29,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 3
+    },
+    "PsychopatzCore/realization/social_challenge": {
+      "files": 9,
+      "variants": 0,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 0
+    },
+    "PsychopatzCore/text/memory": {
+      "files": 9,
+      "variants": 0,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 1
+    },
+    "ProjectHoomans/dialogue/task_lifecycle": {
+      "files": 8,
+      "variants": 40,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 0
+    },
+    "ProjectHoomans/dialogue/compatibility_content": {
+      "files": 8,
+      "variants": 27,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 3
+    },
+    "ProjectHoomans/dialogue/social_tool_replies_boundary_identity": {
+      "files": 8,
+      "variants": 21,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 1
+    },
+    "ProjectHoomans/dialogue/combat_player_assault_reactions": {
+      "files": 8,
+      "variants": 16,
+      "flows": 0,
+      "style_files": 5,
+      "actor_files": 8
+    },
+    "ProjectHoomans/dialogue/social_reactions_ack_dispute": {
+      "files": 7,
+      "variants": 29,
+      "flows": 0,
+      "style_files": 2,
+      "actor_files": 1
+    },
+    "ProjectHoomans/dialogue/social_interaction_scene_horde_work": {
+      "files": 7,
+      "variants": 28,
+      "flows": 0,
+      "style_files": 2,
+      "actor_files": 0
+    },
+    "ProjectHoomans/dialogue/social_interaction_scene_travel_news": {
+      "files": 7,
+      "variants": 28,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 0
+    },
+    "ProjectHoomans/dialogue/social_reactions_hostile_offer_threat": {
+      "files": 7,
+      "variants": 28,
+      "flows": 0,
+      "style_files": 2,
+      "actor_files": 3
+    },
+    "ProjectHoomans/dialogue/social_check_in": {
+      "files": 7,
+      "variants": 3,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 4
+    },
+    "ProjectHoomans/dialogue/conversation_greeting": {
+      "files": 6,
+      "variants": 17,
+      "flows": 1,
+      "style_files": 0,
+      "actor_files": 0
+    },
+    "ProjectHoomans/dialogue/event_reactions_leader_loss": {
+      "files": 6,
+      "variants": 6,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 6
+    },
+    "PsychopatzCore/dialogue/core_check_in": {
+      "files": 6,
+      "variants": 6,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 0
+    },
+    "PsychopatzCore/realization/social_affirmation": {
+      "files": 6,
+      "variants": 0,
+      "flows": 0,
+      "style_files": 0,
+      "actor_files": 0
+    }
+  },
+  "actor_encoded_count": 107,
+  "style_encoded_count": 40,
+  "overpacked_pools_count": 48,
+  "overpacked_variant_pools": [
+    {
+      "id": "combat.ally_warn.reply",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/combat_ally_warning/combat_ally_warn_reply.json",
+      "variants_count": 32,
+      "classification": "overpacked",
+      "recommended_target_family": "combat.callout.<tactical_or_condition_event> (split combat vs weather vs stamina vs medical)"
+    },
+    {
+      "id": "combat.kill.killer",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/combat_kill/combat_kill_killer.json",
+      "variants_count": 26,
+      "classification": "overpacked",
+      "recommended_target_family": "combat.kill.<reaction_or_banter> (collapse style/role into disposition + role slots)"
+    },
+    {
+      "id": "combat.ally_warn.callout",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/combat_ally_warning/combat_ally_warn_callout.json",
+      "variants_count": 18,
+      "classification": "overpacked",
+      "recommended_target_family": "combat.callout.<tactical_or_condition_event> (split combat vs weather vs stamina vs medical)"
+    },
+    {
+      "id": "ui.suggestion.group",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/static_suggestion_text/ui_suggestion_group.json",
+      "variants_count": 13,
+      "classification": "overpacked",
+      "recommended_target_family": "ui.suggestion.group"
+    },
+    {
+      "id": "command.camp",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/companion_commands_lifecycle/command_camp.json",
+      "variants_count": 12,
+      "classification": "overpacked",
+      "recommended_target_family": "command.general.camp"
+    },
+    {
+      "id": "question.health_state",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/health_content/question_health_state.json",
+      "variants_count": 12,
+      "classification": "overpacked",
+      "recommended_target_family": "question.health.state"
+    },
+    {
+      "id": "question.medical_bite",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/health_content/question_medical_bite.json",
+      "variants_count": 12,
+      "classification": "overpacked",
+      "recommended_target_family": "question.medical.bite"
+    },
+    {
+      "id": "response.goodbye",
+      "owner": "PsychopatzCore",
+      "rel_path": "dialogue/core_text_social_goodbye/response_goodbye.json",
+      "variants_count": 11,
+      "classification": "overpacked",
+      "recommended_target_family": "response.general.goodbye"
+    },
+    {
+      "id": "flow.greeting.opening",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/conversation_greeting/flow_greeting_opening.json",
+      "variants_count": 10,
+      "classification": "overpacked",
+      "recommended_target_family": "flow.greeting.opening"
+    },
+    {
+      "id": "recruitment.reject.relationship",
+      "owner": "PsychopatzCore",
+      "rel_path": "dialogue/core_text_social_recruitment/recruitment_reject_relationship.json",
+      "variants_count": 10,
+      "classification": "overpacked",
+      "recommended_target_family": "recruitment.reject.relationship"
+    },
+    {
+      "id": "combat.horde.ack",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/combat_horde/combat_horde_ack.json",
+      "variants_count": 9,
+      "classification": "overpacked",
+      "recommended_target_family": "combat.horde.ack"
+    },
+    {
+      "id": "medical.distress.call",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/medical_distress/medical_distress_call.json",
+      "variants_count": 8,
+      "classification": "overpacked",
+      "recommended_target_family": "medical.distress.call"
+    },
+    {
+      "id": "medical.distress.repeat",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/medical_distress/medical_distress_repeat.json",
+      "variants_count": 8,
+      "classification": "overpacked",
+      "recommended_target_family": "medical.distress.repeat"
+    },
+    {
+      "id": "medical.distress.update",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/medical_distress/medical_distress_update.json",
+      "variants_count": 8,
+      "classification": "overpacked",
+      "recommended_target_family": "medical.distress.update"
+    },
+    {
+      "id": "question.backstory.known",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/question_backstory/question_backstory_known.json",
+      "variants_count": 8,
+      "classification": "overpacked",
+      "recommended_target_family": "question.backstory.known"
+    },
+    {
+      "id": "social.acknowledged",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/social_reactions_ack_dispute/social_acknowledged.json",
+      "variants_count": 8,
+      "classification": "overpacked",
+      "recommended_target_family": "social.general.acknowledged"
+    },
+    {
+      "id": "social.offer_friendly",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/social_reactions_hostile_offer_threat/social_offer_friendly.json",
+      "variants_count": 8,
+      "classification": "overpacked",
+      "recommended_target_family": "social.general.offer"
+    },
+    {
+      "id": "world.beats.television",
+      "owner": "ProjectHoomans",
+      "rel_path": "dialogue/world_event_beats/world_beats_television.json",
+      "variants_count": 8,
+      "classification": "overpacked",
+      "recommended_target_family": "world.event.<beat_topic>"
+    },
+    {
+      "id": "question.knowledge",
+      "owner": "PsychopatzCore",
+      "rel_path": "dialogue/core_knowledge_facts/question_knowledge.json",
+      "variants_count": 8,
+      "classification": "overpacked",
+      "recommended_target_family": "question.general.knowledge"
+    },
+    {
+      "id": "gossip.unknown",
+      "owner": "PsychopatzCore",
+      "rel_path": "dialogue/core_knowledge_gossip/gossip_unknown.json",
+      "variants_count": 8,
+      "classification": "overpacked",
+      "recommended_target_family": "gossip.general.unknown"
+    }
+  ],
+  "disposition_and_lanes": {
+    "part_a_summary": "Personality and traits are currently evaluated across 6+ disconnected seams with trait double-counting, vanilla-vs-pnc_* trait ID mismatches, divergent threshold ladders, and no unified temporary demeanor layer.",
+    "part_a_seams_count": 8,
+    "part_b_summary": "Non-combat world/weather/stamina/medical beats currently route through CombatTargetCallouts delivery and combat_ally_warn_* event IDs; hardcoded Lua ResponseCatalog role matrices duplicate ConvoEngine definitions; interactive Scene turns and transient Beat threads collide in Core SocialFlavorClient.",
+    "part_b_adopters_count": 9,
+    "part_b_hardcoded_pools_count": 6,
+    "part_b_arbitrator_count": 2
+  },
+  "events_and_dt_pillars": [
+    "chronology_and_bounded_schedulers",
+    "scoped_world_events_and_causal_seams",
+    "dynamic_trading_economic_projection",
+    "world_knowledge_and_memory_provenance"
+  ],
+  "surfaces_and_perf": {
+    "input_presentation_surfaces": 12,
+    "semantic_lab_seams": 6,
+    "codebuilder_reconcile": {
+      "script": "psychopatzCore/tools/semantic_harness/codebuilder/reconcile.py",
+      "recipe": "psychopatzCore/tools/semantic_harness/codebuilder/generation_recipe.json",
+      "commands": {
+        "check": "python3 tools/semantic_harness/codebuilder/reconcile.py --recipe tools/semantic_harness/codebuilder/generation_recipe.json --check",
+        "apply": "python3 tools/semantic_harness/codebuilder/reconcile.py --recipe tools/semantic_harness/codebuilder/generation_recipe.json --apply"
+      }
+    },
+    "declarative_semantic_tests": {
+      "cli": "python3 -m tools.semantic_harness.testing.cli",
+      "modules": [
+        "psychopatzCore/tools/semantic_harness/testing/cli.py",
+        "psychopatzCore/tools/semantic_harness/testing/executor.py",
+        "psychopatzCore/tools/semantic_harness/testing/resolver.py",
+        "psychopatzCore/tools/semantic_harness/testing/schema.py",
+        "psychopatzCore/tools/semantic_harness/testing/operations.py"
+      ],
+      "fixture_root": "ProjectHoomans/tools/providers/pnc/fixtures/v1"
+    },
+    "test_suites": {
+      "ProjectHoomans": "python3 tests/run_tests.py --suite lua|python|all --jobs 4",
+      "psychopatzCore_acceptance": "python3 -m tools.semantic_harness.testing.acceptance --jobs 4",
+      "acceptance_required_suites": [
+        "core_python",
+        "core_lua",
+        "hoomans_lua",
+        "hoomans_provider_python",
+        "real_provider_worker",
+        "tk_xvfb_gui",
+        "dynamic_trading",
+        "convo_audit",
+        "kahlua_static"
+      ],
+      "DynamicTrading": "python3 tests/run_tests.py"
+    },
+    "kahlua_and_verify": {
+      "core_kahlua_verifier": "psychopatzCore/tools/semantic_harness/kahlua_verifier/verify.py",
+      "core_kahlua_test": "ProjectHoomans/tools/providers/pnc/tests/test_kahlua_verifier.py",
+      "pz_verify_cli": "python3 /home/psychopatz/Desktop/Projects/Zomboid-devSkills/.agents/skills/pz-verify/scripts/pz_verify.py --mod-dir <mod-root> --kahlua --severity ERROR --no-snippets"
+    }
+  },
+  "phase_work_items": [
+    {
+      "id": "D1-01",
+      "phase": "D1",
+      "severity": "high",
+      "repo": "ProjectHoomans",
+      "target": "social.farewell.* (event_reactions_farewell 15->canonical)",
+      "classification": "duplicated+actor-specific+misleading-flow",
+      "gen_impact": true
+    },
+    {
+      "id": "D1-02",
+      "phase": "D1",
+      "severity": "high",
+      "repo": "ProjectHoomans",
+      "target": "combat.assault.* (combat_player_assault_reactions 8->actor-agnostic)",
+      "classification": "actor-specific",
+      "gen_impact": true
+    },
+    {
+      "id": "D1-03",
+      "phase": "D1",
+      "severity": "high",
+      "repo": "ProjectHoomans",
+      "target": "combat.callout.* & combat.kill.* (overpacked pools + empty style dirs)",
+      "classification": "overpacked+style-split",
+      "gen_impact": true
+    },
+    {
+      "id": "D1-04",
+      "phase": "D1",
+      "severity": "high",
+      "repo": "ProjectHoomans",
+      "target": "world.event.* (world_event_beats split by semantic topic)",
+      "classification": "overpacked",
+      "gen_impact": true
+    },
+    {
+      "id": "D1-05",
+      "phase": "D1",
+      "severity": "medium",
+      "repo": "psychopatzCore",
+      "target": "CodeBuilder/Semantic linter rules for anti-duplication & anti-overpacking",
+      "classification": "guardrail",
+      "gen_impact": false
+    },
+    {
+      "id": "D2-01",
+      "phase": "D2",
+      "severity": "high",
+      "repo": "ProjectHoomans",
+      "target": "Unified Disposition Projection (ActorAdapter + ChoicePolicy + GeneratedAffordanceProvider + AffordanceResponder)",
+      "classification": "trait-double-count",
+      "gen_impact": false
+    },
+    {
+      "id": "D2-02",
+      "phase": "D2",
+      "severity": "high",
+      "repo": "ProjectHoomans",
+      "target": "Unified Style/Reaction Classifier (SemanticCombatReactionProfile + BeatContext + SpeechStyleContext + Conditions)",
+      "classification": "divergent-classifier",
+      "gen_impact": false
+    },
+    {
+      "id": "D3-01",
+      "phase": "D3",
+      "severity": "high",
+      "repo": "psychopatzCore",
+      "target": "SocialFlavorClient sceneID vs threadID lane isolation & priority floor",
+      "classification": "scene-beat-collision",
+      "gen_impact": false
+    },
+    {
+      "id": "D3-02",
+      "phase": "D3",
+      "severity": "high",
+      "repo": "ProjectHoomans",
+      "target": "Domain-neutral SemanticSpeechTransport + decouple DialogueBeats from CombatTargetCallouts + Scene priority floor",
+      "classification": "domain-leak",
+      "gen_impact": false
+    },
+    {
+      "id": "D4-01",
+      "phase": "D4",
+      "severity": "high",
+      "repo": "ProjectHoomans",
+      "target": "Declarative thematic interactive branching across 8 themes (stance vs outcome, recommend/goto/resume/end)",
+      "classification": "branching-expansion",
+      "gen_impact": true
+    },
+    {
+      "id": "D5-01",
+      "phase": "D5",
+      "severity": "high",
+      "repo": "ProjectHoomans",
+      "target": "Grounded constraints (hard predicates vs soft utility), structured meaning/provenance, WorldKnowledge epistemic gating",
+      "classification": "grounding-provenance",
+      "gen_impact": true
+    },
+    {
+      "id": "D5A-01",
+      "phase": "D5A",
+      "severity": "high",
+      "repo": "psychopatzCore",
+      "target": "Reusable bounded ScopedWorldEvent registry/contract + community regionID + WorldKnowledge provenance bridge",
+      "classification": "shared-contract",
+      "gen_impact": false
+    },
+    {
+      "id": "D5A-02",
+      "phase": "D5A",
+      "severity": "high",
+      "repo": "ProjectHoomans",
+      "target": "Chronology milestones (watermarks/coarse pump), deterministic world-event director (food_crisis/bandit_bonanza), causal Needs/Scavenge/GroupGenerator hooks, transient demeanor projection",
+      "classification": "simulation-chronology",
+      "gen_impact": true
+    },
+    {
+      "id": "D5A-03",
+      "phase": "D5A",
+      "severity": "high",
+      "repo": "DynamicTrading",
+      "target": "One-way Hoomans->DT MarketEvent adapter (hoomans-world-event: prefix), regionID bridge, caravanRisk modifier, loop prevention",
+      "classification": "economic-projection",
+      "gen_impact": false
+    },
+    {
+      "id": "D6-01",
+      "phase": "D6",
+      "severity": "high",
+      "repo": "ProjectHoomans",
+      "target": "Migrate hardcoded Lua Beat/Reaction pools & role matrices to declarative ConvoEngine definitions + 1990s Kentucky voice normalization + EN/TL parity",
+      "classification": "declarative-beats+voice",
+      "gen_impact": true
+    },
+    {
+      "id": "D7-01",
+      "phase": "D7",
+      "severity": "medium",
+      "repo": "ProjectHoomans",
+      "target": "Input/presentation parity tests (InlineChat, Full UI, Group 2/3/4 actors, farewell, fuzzy/clicked, TTS/PBrainZ)",
+      "classification": "parity",
+      "gen_impact": false
+    },
+    {
+      "id": "D7-02",
+      "phase": "D7",
+      "severity": "medium",
+      "repo": "psychopatzCore",
+      "target": "Extend Semantic Lab / Observatory inspector for family granularity, sceneID/threadID, disposition, grounding, provenance, 2/3/4 roles",
+      "classification": "observability",
+      "gen_impact": false
+    },
+    {
+      "id": "D8-01",
+      "phase": "D8",
+      "severity": "high",
+      "repo": "ProjectHoomans+psychopatzCore+DynamicTrading",
+      "target": "Full acceptance matrix, CodeBuilder reconcile --check, Kahlua lint, cross-mod suites, performance regression benchmarks, static guards",
+      "classification": "acceptance-gate",
+      "gen_impact": false
+    }
+  ]
+}
