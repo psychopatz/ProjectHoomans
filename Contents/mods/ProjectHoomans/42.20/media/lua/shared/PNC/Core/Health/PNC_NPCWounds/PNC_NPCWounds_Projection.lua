@@ -68,7 +68,11 @@ local function computeProjection(record, preferredPartId, preferredWoundType)
     local knoxExp, knoxStg, knoxNL = Dims.NormalizeKnoxState(body, f.transmissible)
     local saliva = Dims.ResolveSalivaTransmissible()
     local effectiveTier = resolvedType
-    if f.bite or resolvedType == "bite" then effectiveTier = saliva and "bite_lethal" or "bite_non_transmissible" end
+    if f.bite or resolvedType == "bite" then
+        if knoxExp == "impossible" then effectiveTier = "bite_non_transmissible"
+        elseif knoxExp == "confirmed" then effectiveTier = "bite_confirmed_symptomatic"
+        else effectiveTier = "bite_possible_exposure" end
+    end
     local partDef = Wounds.Parts and Wounds.Parts[bestPartId] or nil
     return {
         injured = injured,
