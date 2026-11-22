@@ -604,7 +604,7 @@ return {
         ["domain"] = "world_event_beats",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/WorldEventBeats",
-        ["recordCount"] = 4,
+        ["recordCount"] = 8,
     },
     {
         ["domain"] = "social_reactions_hostile_offer_threat",

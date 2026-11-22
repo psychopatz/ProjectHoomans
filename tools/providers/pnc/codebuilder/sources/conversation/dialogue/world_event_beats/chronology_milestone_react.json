@@ -1,0 +1,51 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "chronology.milestone.react",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      { "id": "first_week_steady" },
+      { "id": "first_week_warm" },
+      { "id": "first_week_guarded" },
+      { "id": "first_month_steady" },
+      { "id": "first_month_warm" },
+      { "id": "first_month_guarded" },
+      { "id": "first_season_steady" },
+      { "id": "first_season_warm" },
+      { "id": "first_season_guarded" },
+      { "id": "first_year_steady" },
+      { "id": "first_year_warm" },
+      { "id": "first_year_guarded" },
+      { "id": "anniversary_steady" },
+      { "id": "anniversary_warm" },
+      { "id": "anniversary_guarded" }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [ "actor" ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [ "actor" ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "social_interaction",
+      "domain": "social"
+    }
+  ]
+}

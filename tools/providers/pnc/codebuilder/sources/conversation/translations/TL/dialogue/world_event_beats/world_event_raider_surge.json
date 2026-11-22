@@ -1,0 +1,32 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "world.event.raider_surge",
+  "locale": "TL",
+  "entries": {
+    "say.variants.experienced": [
+      "Nakaengkwentro ko mismo ang mga armadong grupo sa kalsada, {addressee.name}. Hindi sila nagtatanong nang maayos.",
+      "May nagpaputok malapit sa overpass kanina, {addressee.name}. Tinitira ng mga tulisan ang sinumang may dalang gamit.",
+      "Hindi tsismis ang mga bandidong 'yan, {addressee.name}—muntik na kaming maipit sa harang nila kaninang umaga."
+    ],
+    "say.variants.witnessed": [
+      "Nakita ko ang mga armadong grupo sa highway mula sa kakahuyan, {addressee.name}. Yumuko ka at mag-ingat.",
+      "Nakita kong dumaan ang tatlong trak ng mga armadong lalaki sa sangandaan, {addressee.name}. Iwasan ang kalsada.",
+      "May nakita akong mga bantay sa bubong ng gasolinahan, {addressee.name}. Nagkalat ang mga tulisan."
+    ],
+    "say.variants.rumor": [
+      "Balita ko may mga armadong grupong nag-aabang sa highway, {addressee.name}. Mas mabuting dumaan sa likod-daan.",
+      "Sabi mula sa tabing-ilog, tinatambangan daw ng mga bandido ang mga naghahakot ng suplay, {addressee.name}.",
+      "Usap-usapan na maraming tulisan ngayon sa mga pangunahing ruta, {addressee.name}."
+    ],
+    "say.variants.uncertain": [
+      "Hindi ko tiyak kung gaano sila kaorganisado, {addressee.name}, pero may naririnig akong mga harang sa labas ng bayan.",
+      "Baka takot lang ang mga nagbabalita, {addressee.name}, pero wala nang dumadaan sa malaking kalsada.",
+      "Mahirap tiyakin, {addressee.name}, pero may usap-usapang nanghaharang malapit sa tulay."
+    ],
+    "say.variants.reply": [
+      "Nakuha ko, {addressee.name}. Ihanda ang armas at iwasan ang bukas na kalsada.",
+      "Salamat sa babala, {addressee.name}. Sa kakahuyan tayo dadaan at magmasid sa gilid.",
+      "Dinig ko, {addressee.name}. Hindi sulit maambus para lang sa ilang lata ng pagkain."
+    ]
+  }
+}

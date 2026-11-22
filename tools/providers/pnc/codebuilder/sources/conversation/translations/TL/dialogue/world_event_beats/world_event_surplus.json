@@ -1,0 +1,27 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "world.event.surplus",
+  "locale": "TL",
+  "entries": {
+    "say.variants.experienced": [
+      "Bumabawi na ang mga taniman natin, {addressee.name}. Unang maayos na ani natin sa loob ng ilang linggo.",
+      "Mas puno ang imbakan ngayon kumpara nitong nakaraang buwan, {addressee.name}. Maraming sariwang gulay.",
+      "Maayos ang laman ng mga kahon ng suplay, {addressee.name}. Nakakagaan ng loob kahit papaano."
+    ],
+    "say.variants.rumor": [
+      "Balita sa labas ng bayan, maganda raw ang ani sa mga bukid, {addressee.name}. Makakaluwag-luwag daw sa lahat.",
+      "Naririnig ko sa mga mangangalakal na umiikot na ulit ang sariwang ani sa kalsada, {addressee.name}.",
+      "Sabi ng mga tao, bumuhos daw ang ani sa lambak ngayong linggo, {addressee.name}. Magandang balita sa wakas."
+    ],
+    "say.variants.uncertain": [
+      "Hindi ko alam kung gaano katagal, {addressee.name}, pero may balitang may sobrang ani raw sa mga kampo.",
+      "Baka kuwento lang, {addressee.name}, pero hindi na ganoon kadesperado tingnan ang mga biyahero ngayon.",
+      "May narinig akong usap-usapan tungkol sa sariwang ani mula sa tabing-ilog, {addressee.name}. Sana totoo."
+    ],
+    "say.variants.reply": [
+      "Mabuting marinig 'yan, {addressee.name}. Iimbak na natin ang kaya bago masira.",
+      "Sa wakas may magandang balita rin, {addressee.name}. Mas kalmado ang mga tao kapag may laman ang tiyan.",
+      "Ang sarap pakinggan, {addressee.name}. Magtabi na tayo para sa mga gipit na linggo."
+    ]
+  }
+}

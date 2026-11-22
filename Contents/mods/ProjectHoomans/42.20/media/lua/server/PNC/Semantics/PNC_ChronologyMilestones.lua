@@ -274,6 +274,45 @@ local function emitMilestoneFact(record, milestone, nowHours, ageHours)
     return fact
 end
 
+local function resolveSocialStyle(record)
+    local style = type(record) == "table" and tostring(record.socialStyle or "") or ""
+    if style == "friendly" or style == "protective" or style == "warm" then
+        return "warm"
+    end
+    if style == "withdrawn" or style == "guarded" or style == "hostile" then
+        return "guarded"
+    end
+    local p = type(record) == "table" and type(record.personality) == "table"
+        and record.personality or nil
+    if p then
+        local warmth = (tonumber(p.friendliness) or tonumber(p.empathy) or 50)
+        local caution = (tonumber(p.caution) or tonumber(p.paranoia) or 50)
+        if warmth >= 65 then return "warm" end
+        if caution >= 65 then return "guarded" end
+    end
+    return "steady"
+end
+
+local function resolveMilestoneStage(milestone)
+    local kind = tostring(milestone and milestone.kind or "survival_age")
+    if kind == "anniversary" then return "anniversary" end
+    local id = tostring(milestone and milestone.id or "")
+    if id == "first_week" or id == "first_month"
+        or id == "first_season" or id == "first_year"
+    then
+        return id
+    end
+    return "first_week"
+end
+
+local function resolveAddresseeName(record)
+    local envBeats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if envBeats and type(envBeats.FindNearestPlayerName) == "function" then
+        return tostring(envBeats.FindNearestPlayerName(record.x, record.y) or "friend")
+    end
+    return "friend"
+end
+
 local function deliverMilestoneBeat(record, milestone, fact, nowMs, opts)
     local transport = PNC.Semantics and PNC.Semantics.SpeechTransport
     if not transport or type(transport.Deliver) ~= "function" then
@@ -281,9 +320,13 @@ local function deliverMilestoneBeat(record, milestone, fact, nowMs, opts)
     end
     local role = tostring(milestone.kind or "survival_age") == "anniversary"
         and "chronology_anniversary" or "chronology_milestone"
+    local stage = resolveMilestoneStage(milestone)
+    local socialStyle = resolveSocialStyle(record)
+    local addresseeName = resolveAddresseeName(record)
     local sent = transport.Deliver(record, nowMs, {
         eventType = "chronology_milestone_beat",
         eventRef = "milestone:" .. tostring(milestone.id) .. ":" .. tostring(record.id),
+        poolID = "semantic.world.chronology.milestone",
         domain = "chronology",
         topic = "chronology",
         channel = "chronology",
@@ -293,15 +336,16 @@ local function deliverMilestoneBeat(record, milestone, fact, nowMs, opts)
         priority = tonumber(milestone.beatPriority) or 44,
         role = role,
         factRefs = fact and { fact.factID } or {},
-        text = milestone.summary,
         tokens = {
-            ["milestone.label"] = tostring(milestone.label or milestone.id),
+            ["addressee.name"] = addresseeName,
             ["npc.name"] = tostring(record.name or "Survivor"),
         },
         context = {
             combatReactionRole = role,
             milestoneID = tostring(milestone.id),
+            milestoneStage = stage,
             milestoneKind = tostring(milestone.kind or "survival_age"),
+            socialStyle = socialStyle,
         },
     })
     if (tonumber(sent) or 0) > 0 then

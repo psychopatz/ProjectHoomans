@@ -1,0 +1,32 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "world.event.raider_surge",
+  "locale": "EN",
+  "entries": {
+    "say.variants.experienced": [
+      "Ran into armed crews along the road myself, {addressee.name}. They aren't asking polite questions.",
+      "Took shots near the overpass earlier, {addressee.name}. Raiders are hitting anybody moving gear.",
+      "Those highwaymen aren't rumors, {addressee.name}—we barely slipped past a roadblock this morning."
+    ],
+    "say.variants.witnessed": [
+      "Saw armed crews working the highway from the treeline, {addressee.name}. Keep your head down.",
+      "Watched three trucks full of gunmen roll past the crossroads, {addressee.name}. Stay off the blacktop.",
+      "Spotted lookout scouts perched on the gas station roof, {addressee.name}. Raiders are out in force."
+    ],
+    "say.variants.rumor": [
+      "Heard armed crews are working the highway, {addressee.name}. Best we stick to the back roads.",
+      "Word from the river road is bandits have been ambushing supply runs all week, {addressee.name}.",
+      "Folks say raider gangs are thick along the main routes right now, {addressee.name}."
+    ],
+    "say.variants.uncertain": [
+      "Not sure how organized they are, {addressee.name}, but I keep hearing talk of roadblocks past town.",
+      "Could be just scared travelers talking, {addressee.name}, though nobody's taking the interstate lately.",
+      "Hard to confirm, {addressee.name}, but word is somebody's been shaking down scavengers near the bridge."
+    ],
+    "say.variants.reply": [
+      "Copy that, {addressee.name}. Keep a shell chambered and stay off the open pavement.",
+      "Good looking out, {addressee.name}. We'll stick to the woods and watch the flanks.",
+      "I hear you, {addressee.name}. No sense walking into an ambush for a few cans of beans."
+    ]
+  }
+}

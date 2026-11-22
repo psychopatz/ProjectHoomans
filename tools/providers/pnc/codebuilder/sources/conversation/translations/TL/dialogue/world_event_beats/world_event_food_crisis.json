@@ -1,0 +1,27 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "world.event.food_crisis",
+  "locale": "TL",
+  "entries": {
+    "say.variants.experienced": [
+      "Simot na ang nasa paminggalan natin dito, {addressee.name}. Kailangan nating pagkasyahin ang bawat lata.",
+      "Sinilip ko ang mga kahon kaninang umaga at manipis na ang laman, {addressee.name}. Paubos na ang pagkain.",
+      "Simot na ang lahat ng aparador sa blokeng ito, {addressee.name}. Kailangan na nating maghanap ng suplay."
+    ],
+    "say.variants.rumor": [
+      "Balita sa daan, nagkakaubusan na raw ng pagkain, {addressee.name}. Nag-aagawan na raw sa mga de-lata.",
+      "Naririnig ko sa mga dumadaan na tuyot na raw ang mga imbakan sa kabilang bayan, {addressee.name}.",
+      "Sabi ng mga tao sa highway, mabilis daw nauubos ang rasyon sa paligid, {addressee.name}."
+    ],
+    "say.variants.uncertain": [
+      "Hindi ko matiyak, {addressee.name}, pero usap-usapan na mahirap nang makahanap ng pagkain sa kabila.",
+      "Mahirap pang sabihin kung gaano kalala, {addressee.name}, pero mukhang gutom ang mga napapadaan.",
+      "Baka sabi-sabi lang, {addressee.name}, pero nag-iipon na lahat ng de-lata na parang taglamig na."
+    ],
+    "say.variants.reply": [
+      "Oo, {addressee.name}, napansin ko ring numinipis ang rasyon natin. Tipirin natin ang natitira.",
+      "Kung gano'n, bantayan natin ang mga bitag at maghanap ng anumang de-lata, {addressee.name}.",
+      "Tama, {addressee.name}. Tipirin ang tuyong pagkain at tingnan ang mga kusina sa likod."
+    ]
+  }
+}

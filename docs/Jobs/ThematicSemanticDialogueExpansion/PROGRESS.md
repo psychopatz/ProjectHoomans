@@ -1,14 +1,14 @@
 # Progress — Thematic Semantic Dialogue Expansion
 
-**Status:** D5 & D5A COMPLETE; proceeding into D6.
+**Status:** D6 & D7 COMPLETE; proceeding into D8 (Exhaustive Acceptance + Adversarial Verification + Performance Regression).
 **Primary repository:** /home/psychopatz/Zomboid/Workshop/ProjectHoomans
 **Participants:** /home/psychopatz/Zomboid/Workshop/psychopatzCore when reusable ConvoEngine/world-event contracts change; /home/psychopatz/Zomboid/Workshop/DynamicTrading when D5A economic world-event projection requires DTCommon/DTHoomans changes.
 **Branch policy:** existing main only; no new branch.
-**Current ProjectHoomans HEAD:** 91ee62cd9 (pre-D5/D5A commit)
-**Current psychopatzCore HEAD:** b7b5e59
-**Current DynamicTrading HEAD:** 44bc24ef
-**Current phase:** D6 — Declarative transient Beat migration + world/voice normalization.
-**Next Chunk:** Migrate remaining hard-coded Lua Beat/Reaction pools & role matrices into canonical declarative ConvoEngine Beat/Dialogue definitions (including chronology milestone & world-event beats) and run the corpus-level 1990s Kentucky survivor voice normalization pass with EN/TL parity.
+**Current ProjectHoomans HEAD:** 32143d78a (pre-D6/D7 commit)
+**Current psychopatzCore HEAD:** cf8a1d4
+**Current DynamicTrading HEAD:** c176e171
+**Current phase:** D8 — Exhaustive developer acceptance, adversarial verification, and performance regression proof.
+**Next Chunk:** Run full cross-mod acceptance tests, CodeBuilder `--check`, Kahlua lint, performance benchmarks, static anti-regression guards, and independent adversarial verification across all D0–D7 deliverables, then stop at D9 with the user SP/MP checklist.
 
 ## Completed phases
 
@@ -21,6 +21,10 @@
   - `psychopatzCore` (`b7b5e59`): Added bounded `PsychopatzScopedWorldEvents` registry (`MAX_ACTIVE_EVENTS=32`, `MAX_HISTORY=64`, scope-indexed `QueryActive`/`AggregateEffects`/`PruneExpired`, `OnEventRegistered`/`OnEventExpired` with loop-guard `excludeSource`), `regionID` on `SurvivorWorldTypesCommunity`, and `ResolveEpistemicStatus` (`known`/`uncertain`/`unknown`) across `WorldKnowledge` (10 Core smoke suites + 0 Kahlua warnings).
   - `DynamicTrading` (`b02ff50b`, `44bc24ef`): Added `regionID` bridge in `DTCommon_CoreSettlementDirectoryProvider`, loop-free one-way `DTHoomans_WorldEventProjection` (`hoomans-world-event:` prefix into `DTCommon.MarketEvents`), and bounded `caravanRisk` penalty in `DTHoomans_CommercialMobility` (24/24 DT tests + `dt_world_event_projection_smoke.lua` + 0 Kahlua warnings).
   - `ProjectHoomans`: Added data-driven `PNC_ChronologyMilestones` (scalar watermarks, coarse bounded pump, `experienced` facts, Beat delivery), deterministic `PNC_ScopedWorldEventDirector` (`worldSeed+scope+timeBucket`, `food_crisis`/`agricultural_surplus`/`bandit_bonanza`/`severe_weather`/`epidemic`/`trade_disruption`, transient demeanor projection without mutating `social.personality`), causal simulation hooks (`PNC_GroupNeeds_Update`, `PNC_AbstractScavengeResolver`, `PNC_GroupGenerator_Selection`), and `WorldKnowledge` epistemic gating (14 PH smoke suites + 0 Kahlua warnings).
+- **D6 & D7 (CODE_VERIFIED, TEST_VERIFIED):**
+  - Authored canonical declarative Beat families `chronology.milestone.react`, `world.event.food_crisis`, `world.event.raider_surge`, and `world.event.surplus` with grounded 1990s Kentucky EN/TL translations; wired into `PNC_ChronologyMilestones`, `ResponseCatalog`, and `Social/Reaction`; cleaned immersion-breaking `"Charm cooldown"` jargon; raised `DialogueFlowRegistry.DEFAULT_MAX_FLOWS` (32->64) to accommodate the 8 thematic flows cleanly; reconciled CodeBuilder (`ok=true, clean=true`).
+  - Extended Core Semantic Lab / Observatory (`cf8a1d4`) with D7 lane ownership (`sceneID`/`threadID`), inline hygiene badges, disposition/demeanor breakdown, grounding/provenance/epistemic status, and N-actor role bindings (16/16 Core Python tests OK).
+  - Verified full D7 input/presentation parity (`pnc_input_presentation_parity_smoke.lua` + InlineChat/Group/Farewell/VoiceGateway/PBrainZ/declarative beats smoke suites passing).
 
 ## Re-audit findings
 

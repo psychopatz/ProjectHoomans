@@ -32,6 +32,7 @@ Core.CONDITION_FIELDS = {
     "combatSkillBand", "combatHitZone", "combatWoundType",
     "combatWeaponNamed", "assaultKind", "friendlyPushTier", "lootCategory",
     "hordePhase", "socialRole", "farewellSpeaker",
+    "milestoneStage", "worldEventType", "epistemicProvenance",
 }
 
 function Core.copy(value, depth)
@@ -291,6 +292,9 @@ function Core.conditionContext(context)
         hordePhase = context.hordePhase,
         socialRole = context.socialRole or social.role,
         farewellSpeaker = context.farewellSpeaker,
+        milestoneStage = context.milestoneStage,
+        worldEventType = context.worldEventType,
+        epistemicProvenance = context.epistemicProvenance or context.provenance,
     }
 end
 

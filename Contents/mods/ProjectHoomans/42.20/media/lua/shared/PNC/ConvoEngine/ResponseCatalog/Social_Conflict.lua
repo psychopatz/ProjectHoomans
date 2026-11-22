@@ -2,6 +2,8 @@ PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 PNC.ConvoEngine = PNC.ConvoEngine or {}
 
+require "PNC/ConvoEngine/ResponseCatalog/EventReactions_Core"
+
 local Catalog = PNC.ConvoEngine.ResponseCatalog
 if type(Catalog) ~= "table" or type(Catalog.Register) ~= "function" then
     return false
@@ -398,159 +400,179 @@ Catalog.Register("semantic.combat.assault.hostile_taunt", {
     },
 })
 
+local WORLD_EVENTS_OWNER = "projecthoomans.dialogue_content.events"
+
+local function worldVariant(poolID, templateID, suffix, when, priority)
+    return {
+        id = poolID .. "." .. suffix,
+        templateID = templateID,
+        contentOwner = WORLD_EVENTS_OWNER,
+        when = when,
+        priority = priority or 6,
+    }
+end
+
 Catalog.Register("semantic.world.alarm.react", {
     variants = {
-        {
-            id = "semantic.world.alarm.react.house_alarm_open",
-            templateID = "world.alarm.react.house_alarm_open",
-            fallback = "Burglar alarm just tripped! {addressee.name}, get ready for company!",
-            when = { combatReactionRole = "house_alarm_open" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.alarm.react.house_alarm_reply",
-            templateID = "world.alarm.react.house_alarm_reply",
-            fallback = "I hear it, {addressee.name}. Weapons up and keep moving away from that noise.",
-            when = { combatReactionRole = "house_alarm_reply" },
-            priority = 6,
-        },
+        worldVariant("semantic.world.alarm.react", "world.alarm.react.house_alarm_open",
+            "house_alarm_open", { combatReactionRole = "house_alarm_open" }, 6),
+        worldVariant("semantic.world.alarm.react", "world.alarm.react.house_alarm_reply",
+            "house_alarm_reply", { combatReactionRole = "house_alarm_reply" }, 6),
     },
 })
 
 Catalog.Register("semantic.world.utility.outage", {
     variants = {
-        {
-            id = "semantic.world.utility.outage.power_shutoff_open",
-            templateID = "world.utility.outage.power_shutoff_open",
-            fallback = "The lights aren't coming back on. The grid gave out today, {addressee.name}.",
-            when = { combatReactionRole = "power_shutoff_open" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.utility.outage.power_shutoff_reply",
-            templateID = "world.utility.outage.power_shutoff_reply",
-            fallback = "I felt the hum stop too, {addressee.name}. Flashlights and generators from here on out.",
-            when = { combatReactionRole = "power_shutoff_reply" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.utility.outage.water_shutoff_open",
-            templateID = "world.utility.outage.water_shutoff_open",
-            fallback = "Pipes just ran dry today, {addressee.name}. Water system finally quit on us.",
-            when = { combatReactionRole = "water_shutoff_open" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.utility.outage.water_shutoff_reply",
-            templateID = "world.utility.outage.water_shutoff_reply",
-            fallback = "Got it, {addressee.name}. Rain collectors and pots are top priority now.",
-            when = { combatReactionRole = "water_shutoff_reply" },
-            priority = 6,
-        },
+        worldVariant("semantic.world.utility.outage", "world.utility.outage.power_shutoff_open",
+            "power_shutoff_open", { combatReactionRole = "power_shutoff_open" }, 6),
+        worldVariant("semantic.world.utility.outage", "world.utility.outage.power_shutoff_reply",
+            "power_shutoff_reply", { combatReactionRole = "power_shutoff_reply" }, 6),
+        worldVariant("semantic.world.utility.outage", "world.utility.outage.water_shutoff_open",
+            "water_shutoff_open", { combatReactionRole = "water_shutoff_open" }, 6),
+        worldVariant("semantic.world.utility.outage", "world.utility.outage.water_shutoff_reply",
+            "water_shutoff_reply", { combatReactionRole = "water_shutoff_reply" }, 6),
     },
 })
 
 Catalog.Register("semantic.world.object.notice", {
     variants = {
-        {
-            id = "semantic.world.object.notice.tv_reminisce_open",
-            templateID = "world.object.notice.tv_reminisce_open",
-            fallback = "Seeing an old TV still sitting there hits strange, {addressee.name}.",
-            when = { combatReactionRole = "tv_reminisce_open" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.object.notice.tv_reminisce_reply",
-            templateID = "world.object.notice.tv_reminisce_reply",
-            fallback = "Yeah, {addressee.name}, feels like a lifetime ago when that was our biggest worry.",
-            when = { combatReactionRole = "tv_reminisce_reply" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.object.notice.tv_power_out_open",
-            templateID = "world.object.notice.tv_power_out_open",
-            fallback = "Dead screen and dark tubes, {addressee.name}. Without the grid, that TV's just furniture.",
-            when = { combatReactionRole = "tv_power_out_open" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.object.notice.tv_power_out_reply",
-            templateID = "world.object.notice.tv_power_out_reply",
-            fallback = "Feels eerie seeing every screen dead like that, {addressee.name}.",
-            when = { combatReactionRole = "tv_power_out_reply" },
-            priority = 6,
-        },
+        worldVariant("semantic.world.object.notice", "world.object.notice.tv_reminisce_open",
+            "tv_reminisce_open", { combatReactionRole = "tv_reminisce_open" }, 6),
+        worldVariant("semantic.world.object.notice", "world.object.notice.tv_reminisce_reply",
+            "tv_reminisce_reply", { combatReactionRole = "tv_reminisce_reply" }, 6),
+        worldVariant("semantic.world.object.notice", "world.object.notice.tv_power_out_open",
+            "tv_power_out_open", { combatReactionRole = "tv_power_out_open" }, 6),
+        worldVariant("semantic.world.object.notice", "world.object.notice.tv_power_out_reply",
+            "tv_power_out_reply", { combatReactionRole = "tv_power_out_reply" }, 6),
     },
 })
 
 Catalog.Register("semantic.world.media.broadcast", {
     variants = {
-        {
-            id = "semantic.world.media.broadcast.tv_watching_life_and_living_open",
-            templateID = "world.media.broadcast.tv_watching_life_and_living_open",
-            fallback = "Shh, {addressee.name}, keep watching {slot.show.name}! You can learn solid survival tricks from this.",
-            when = { combatReactionRole = "tv_watching_life_and_living_open" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.media.broadcast.tv_watching_life_and_living_reply",
-            templateID = "world.media.broadcast.tv_watching_life_and_living_reply",
-            fallback = "Taking mental notes already, {addressee.name}. Keep the volume down just in case.",
-            when = { combatReactionRole = "tv_watching_life_and_living_reply" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.media.broadcast.tv_watching_show_open",
-            templateID = "world.media.broadcast.tv_watching_show_open",
-            fallback = "Still weird hearing voices on {slot.show.name}, {addressee.name}.",
-            when = { combatReactionRole = "tv_watching_show_open" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.media.broadcast.tv_watching_show_reply",
-            templateID = "world.media.broadcast.tv_watching_show_reply",
-            fallback = "Feels oddly grounding listening to {slot.show.name} with you, {addressee.name}.",
-            when = { combatReactionRole = "tv_watching_show_reply" },
-            priority = 6,
-        },
+        worldVariant("semantic.world.media.broadcast",
+            "world.media.broadcast.tv_watching_life_and_living_open",
+            "tv_watching_life_and_living_open",
+            { combatReactionRole = "tv_watching_life_and_living_open" }, 6),
+        worldVariant("semantic.world.media.broadcast",
+            "world.media.broadcast.tv_watching_life_and_living_reply",
+            "tv_watching_life_and_living_reply",
+            { combatReactionRole = "tv_watching_life_and_living_reply" }, 6),
+        worldVariant("semantic.world.media.broadcast",
+            "world.media.broadcast.tv_watching_show_open",
+            "tv_watching_show_open",
+            { combatReactionRole = "tv_watching_show_open" }, 6),
+        worldVariant("semantic.world.media.broadcast",
+            "world.media.broadcast.tv_watching_show_reply",
+            "tv_watching_show_reply",
+            { combatReactionRole = "tv_watching_show_reply" }, 6),
     },
 })
 
 Catalog.Register("semantic.world.weather.rain", {
     variants = {
-        {
-            id = "semantic.world.weather.rain.weather_rain_open",
-            templateID = "world.weather.rain_warn.rain_open",
-            fallback = "Great, it's starting to pour, {addressee.name}. We might want some cover soon.",
-            when = { combatReactionRole = "weather_rain_open" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.weather.rain.weather_rain_reply",
-            templateID = "world.weather.rain_reply.rain_reply",
-            fallback = "Tell me about it, {addressee.name}. Keep your eyes peeled, rain hides their footsteps.",
-            when = { combatReactionRole = "weather_rain_reply" },
-            priority = 6,
-        },
+        worldVariant("semantic.world.weather.rain", "world.weather.rain_warn.rain_open",
+            "weather_rain_open", { combatReactionRole = "weather_rain_open" }, 6),
+        worldVariant("semantic.world.weather.rain", "world.weather.rain_reply.rain_reply",
+            "weather_rain_reply", { combatReactionRole = "weather_rain_reply" }, 6),
     },
 })
 
+local MILESTONE_STAGES = {
+    "first_week",
+    "first_month",
+    "first_season",
+    "first_year",
+    "anniversary",
+}
+
+local chronologyVariants = {}
+for i = 1, #MILESTONE_STAGES do
+    local stage = MILESTONE_STAGES[i]
+    chronologyVariants[#chronologyVariants + 1] = worldVariant(
+        "semantic.world.chronology.milestone",
+        "chronology.milestone.react." .. stage .. "_warm",
+        stage .. "_warm",
+        { milestoneStage = stage, socialStyle = { "warm", "friendly", "protective" } },
+        10
+    )
+    chronologyVariants[#chronologyVariants + 1] = worldVariant(
+        "semantic.world.chronology.milestone",
+        "chronology.milestone.react." .. stage .. "_guarded",
+        stage .. "_guarded",
+        { milestoneStage = stage, socialStyle = { "guarded", "withdrawn", "hostile" } },
+        10
+    )
+    chronologyVariants[#chronologyVariants + 1] = worldVariant(
+        "semantic.world.chronology.milestone",
+        "chronology.milestone.react." .. stage .. "_steady",
+        stage .. "_steady",
+        { milestoneStage = stage },
+        8
+    )
+end
+chronologyVariants[#chronologyVariants + 1] = worldVariant(
+    "semantic.world.chronology.milestone",
+    "chronology.milestone.react.anniversary_steady",
+    "anniversary_role_fallback",
+    { combatReactionRole = "chronology_anniversary" },
+    4
+)
+chronologyVariants[#chronologyVariants + 1] = worldVariant(
+    "semantic.world.chronology.milestone",
+    "chronology.milestone.react.first_week_steady",
+    "survival_role_fallback",
+    { combatReactionRole = "chronology_milestone" },
+    2
+)
+
 Catalog.Register("semantic.world.chronology.milestone", {
+    variants = chronologyVariants,
+})
+
+Catalog.Register("semantic.world.event.food_crisis", {
     variants = {
-        {
-            id = "semantic.world.chronology.milestone.survival",
-            templateID = "world.chronology.milestone.survival",
-            fallback = "Hard to believe we've made it this far—{milestone.label}.",
-            when = { combatReactionRole = "chronology_milestone" },
-            priority = 6,
-        },
-        {
-            id = "semantic.world.chronology.milestone.anniversary",
-            templateID = "world.chronology.milestone.anniversary",
-            fallback = "Days like this bring old memories back. Feels like an anniversary.",
-            when = { combatReactionRole = "chronology_anniversary" },
-            priority = 6,
-        },
+        worldVariant("semantic.world.event.food_crisis", "world.event.food_crisis.reply",
+            "reply", { combatReactionRole = "world_event_reply" }, 12),
+        worldVariant("semantic.world.event.food_crisis", "world.event.food_crisis.experienced",
+            "experienced", { epistemicProvenance = { "experienced", "witnessed" } }, 10),
+        worldVariant("semantic.world.event.food_crisis", "world.event.food_crisis.uncertain",
+            "uncertain", { epistemicProvenance = "uncertain" }, 9),
+        worldVariant("semantic.world.event.food_crisis", "world.event.food_crisis.rumor",
+            "rumor", { epistemicProvenance = { "rumor", "told", "public" } }, 8),
+        worldVariant("semantic.world.event.food_crisis", "world.event.food_crisis.rumor",
+            "default", nil, 2),
+    },
+})
+
+Catalog.Register("semantic.world.event.raider_surge", {
+    variants = {
+        worldVariant("semantic.world.event.raider_surge", "world.event.raider_surge.reply",
+            "reply", { combatReactionRole = "world_event_reply" }, 12),
+        worldVariant("semantic.world.event.raider_surge", "world.event.raider_surge.experienced",
+            "experienced", { epistemicProvenance = "experienced" }, 10),
+        worldVariant("semantic.world.event.raider_surge", "world.event.raider_surge.witnessed",
+            "witnessed", { epistemicProvenance = "witnessed" }, 10),
+        worldVariant("semantic.world.event.raider_surge", "world.event.raider_surge.uncertain",
+            "uncertain", { epistemicProvenance = "uncertain" }, 9),
+        worldVariant("semantic.world.event.raider_surge", "world.event.raider_surge.rumor",
+            "rumor", { epistemicProvenance = { "rumor", "told", "public" } }, 8),
+        worldVariant("semantic.world.event.raider_surge", "world.event.raider_surge.rumor",
+            "default", nil, 2),
+    },
+})
+
+Catalog.Register("semantic.world.event.surplus", {
+    variants = {
+        worldVariant("semantic.world.event.surplus", "world.event.surplus.reply",
+            "reply", { combatReactionRole = "world_event_reply" }, 12),
+        worldVariant("semantic.world.event.surplus", "world.event.surplus.experienced",
+            "experienced", { epistemicProvenance = { "experienced", "witnessed" } }, 10),
+        worldVariant("semantic.world.event.surplus", "world.event.surplus.uncertain",
+            "uncertain", { epistemicProvenance = "uncertain" }, 9),
+        worldVariant("semantic.world.event.surplus", "world.event.surplus.rumor",
+            "rumor", { epistemicProvenance = { "rumor", "told", "public" } }, 8),
+        worldVariant("semantic.world.event.surplus", "world.event.surplus.rumor",
+            "default", nil, 2),
     },
 })
 

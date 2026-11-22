@@ -157,6 +157,27 @@ local function poolFor(spec)
     if eventType == "chronology_milestone_beat" then
         return "semantic.world.chronology.milestone"
     end
+    if eventType == "world_event_food_crisis" then
+        return "semantic.world.event.food_crisis"
+    end
+    if eventType == "world_event_raider_surge" then
+        return "semantic.world.event.raider_surge"
+    end
+    if eventType == "world_event_surplus" then
+        return "semantic.world.event.surplus"
+    end
+    if eventType == "world_scoped_event_beat" then
+        local worldEventType = string.lower(tostring(context.worldEventType or ""))
+        if worldEventType == "food_crisis" then
+            return "semantic.world.event.food_crisis"
+        end
+        if worldEventType == "bandit_bonanza" or worldEventType == "raider_surge" then
+            return "semantic.world.event.raider_surge"
+        end
+        if worldEventType == "agricultural_surplus" or worldEventType == "surplus" then
+            return "semantic.world.event.surplus"
+        end
+    end
     if eventType == "zombie_kill_witnessed"
         or eventType == "zombie_kill_self"
     then

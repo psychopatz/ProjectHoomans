@@ -12,7 +12,7 @@ local BranchOffers = PNC.ConvoEngine.DialogueBranchOffers
     or require "PNC/ConvoEngine/Dialogue/BranchOffers"
 
 Registry.VERSION = 1
-Registry.DEFAULT_MAX_FLOWS = 32
+Registry.DEFAULT_MAX_FLOWS = 64
 Registry.MAX_NODES = 32
 Registry.MAX_TRIGGERS = 8
 Registry.MAX_ACCEPTS = 16
