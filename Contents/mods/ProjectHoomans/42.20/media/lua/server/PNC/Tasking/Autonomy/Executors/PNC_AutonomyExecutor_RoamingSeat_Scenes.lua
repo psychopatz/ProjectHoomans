@@ -1,15 +1,8 @@
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
-local Service = PNC.RoamingSeat
+local Service = PNC.AutonomyExecutors.RoamingSeat
 local Internal = Service.Internal or {}
-local Core = PNC.Core
-local Const = PNC.Const or {}
-local Common = PNC.BehaviorCommon
-local Jobs = PNC.FacilityJobs
-local Resources = PNC.FacilityResources
-local Targets = PNC.FacilityInteractionTargets
-local Reservations = PNC.FacilityReservations
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 local ActorControl = PNC.ActorControl
     or require "PNC/Core/ActorControl/PNC_ActorControl"
@@ -20,6 +13,7 @@ local currentTime = Internal.currentTime
 local isSeatOrder = Internal.isSeatOrder
 local finish = Internal.finish
 local stop = Internal.stop
+
 function Service.OnSceneTick(record, zombie, scene, at)
     local runtime = record and record.runtime or nil
     local state = runtime and runtime.roamingSeat or nil
@@ -36,8 +30,6 @@ function Service.OnSceneTick(record, zombie, scene, at)
         return false
     end
     if state.floorSeating == true and state.seatEntered ~= true then
-        -- A released floor seat must not be kept alive by the persistent
-        -- scene. The scene owner will perform the normal stop cleanup.
         return false
     end
     local jobs = facilityJobs()
@@ -113,4 +105,3 @@ end
 function Service.Stop(record, zombie, reason)
     return stop(record, zombie, reason or "roaming_seat_stopped")
 end
-

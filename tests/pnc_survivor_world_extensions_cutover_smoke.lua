@@ -327,26 +327,13 @@ PNC.AbstractLocations = {
     end,
 }
 
-roots["PNC_Factions"] = {
-    schemaVersion = PNC.FactionConstants.REGISTRY_SCHEMA_VERSION,
-    importFixture = true,
-}
-roots["PNC_Communities"] = {
-    schemaVersion = PNC.CommunityConstants.REGISTRY_SCHEMA_VERSION,
-    importFixture = true,
-}
-roots["PNC_AbstractWorld_v1"] = {
-    schemaVersion = PNC.DirectorConfig.SCHEMA_VERSION,
-    importFixture = true,
-}
-
 PNC.CoreSurvivorWorldAuthority = {
     Registry = core,
     World = World,
     RefreshStatus = function()
         return {
             active = true,
-            needsImport = false,
+            coreEmpty = false,
         }
     end,
 }
@@ -425,23 +412,19 @@ T.truthy(locationExt.occupants,
     "Hoomans occupancy remains extension state")
 
 T.equal(
-    next(roots[
-        "PNC_Factions"
-    ]),
+    roots["PNC_Factions"],
     nil,
-    "faction import source retired"
+    "faction legacy root is neither read nor created"
 )
 T.equal(
-    next(roots[
-        "PNC_Communities"
-    ]),
+    roots["PNC_Communities"],
     nil,
-    "community import source retired"
+    "community legacy root is neither read nor created"
 )
 T.equal(
-    next(roots["PNC_AbstractWorld_v1"]),
+    roots["PNC_AbstractWorld_v1"],
     nil,
-    "abstract-world import source retired"
+    "abstract-world legacy root is neither read nor created"
 )
 
 T.equal(PNC.Factions.Registry.byID.faction_ext.name,
@@ -540,11 +523,19 @@ T.truthy(
     "reload restores group extension state"
 )
 T.equal(
-    next(roots[
-        "PNC_Factions"
-    ]),
+    roots["PNC_Factions"],
     nil,
-    "reload does not resurrect retired faction root"
+    "reload does not create legacy faction root"
+)
+T.equal(
+    roots["PNC_Communities"],
+    nil,
+    "reload does not create legacy community root"
+)
+T.equal(
+    roots["PNC_AbstractWorld_v1"],
+    nil,
+    "reload does not create legacy abstract-world root"
 )
 
 -- Regression: a newly created player faction with unsaved Hoomans-only

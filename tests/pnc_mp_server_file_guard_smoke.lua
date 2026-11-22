@@ -164,8 +164,7 @@ listing:close()
 -- cutover adapter, the one-way pre-SurvivorWorld import reader, and six
 -- modular Hoomans-extension persistence files are server-only and retain the
 -- same early runtime-role guard.
--- Two guarded public LLM require forwarders retain legacy paths after the
--- twelve implementations move to Conversation; each new path keeps its guard.
+-- Two legacy LLM forwarder paths retired (loaded directly under Conversation/).
 -- Twenty-four unified WorkOutputService, WorkZoneService, WorkToilRunner,
 -- FishingWorkAdapter, and FarmingWorkAdapter/FarmingService modules share
 -- the standard server guard.
@@ -175,9 +174,12 @@ listing:close()
 -- PNC_Tasking_Claims and Phase U3/U4/U5 modules are server-only, guarded by
 -- AllowsServerCode(), and loaded by PNC_Tasking / PNC_TaskProviders /
 -- PNC_SemanticEventRuntime.
+-- Sixteen Autonomy/Executors modules folded from legacy Settlement/FacilityJobs
+-- modules, with 2 retired LLM forwarders and PNC_SurvivorWorldImportSource
+-- removed (guarded by AllowsServerCode(), net 1070 files).
 -- PNC_UnifiedAIDebugService is server-only, guarded by AllowsServerCode(),
 -- and loaded by PNC_ServerComposition.
-T.equal(#serverOnlyFiles, 1072,
+T.equal(#serverOnlyFiles, 1070,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

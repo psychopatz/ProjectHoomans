@@ -28,7 +28,7 @@ local count = 0
 for _ in pairs(PNC.Const) do count = count + 1 end
 -- Change detector: update this when a constant is intentionally added or
 -- removed so the growth is reviewed instead of silent.
-T.equal(count, 676, "constant key count")
+T.equal(count, 678, "constant key count")
 T.equal(PNC.Const.PERSISTENCE_VERSION, 16, "persistence contract")
 T.equal(PNC.Const.NETWORK_PAYLOAD_BUDGET_BYTES, 786432,
     "server payload budget contract")
@@ -66,6 +66,10 @@ T.equal(PNC.Const.CMD_PUPPET_OPERA_STATE, "PuppetOperaState",
     "Puppet Opera state contract")
 T.equal(PNC.Const.CMD_PUPPET_OPERA_TRACE, "PuppetOperaTrace",
     "Puppet Opera trace contract")
+T.equal(PNC.Const.CMD_UNIFIED_AI_DEBUG_REQUEST, "RequestUnifiedAIDebug",
+    "unified AI debug request contract")
+T.equal(PNC.Const.CMD_UNIFIED_AI_DEBUG, "UnifiedAIDebug",
+    "unified AI debug snapshot contract")
 T.equal(PNC.Const.TRAVEL_SCHEMA_VERSION, 2, "travel contract")
 T.equal(PNC.Const.TRAVEL_LIVE_PROGRESS_TIMEOUT_MS, 12000,
     "live travel watchdog contract")

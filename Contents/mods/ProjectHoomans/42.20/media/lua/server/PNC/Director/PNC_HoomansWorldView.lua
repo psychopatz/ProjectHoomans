@@ -1,5 +1,5 @@
 -- Hoomans runtime view over Core SurvivorWorld plus Hoomans-only extension state.
--- It is not a persistence authority; pre-SurvivorWorld data is read only for cutover.
+-- It is not a persistence authority.
 
 if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
@@ -8,12 +8,7 @@ PNC.HoomansWorldView = PNC.HoomansWorldView or {}
 
 local Store = PNC.HoomansWorldView
 local Types = PNC.AbstractWorldTypes
-local Config = PNC.DirectorConfig
 local Core = PNC.Core
-local Reset = PNC.ModDataStore
-    or require "PNC/Core/Persistence/PNC_ModDataStore"
-local ImportSource = PNC.SurvivorWorldImportSource
-    or require "PNC/Director/PNC_SurvivorWorldImportSource"
 
 Store.Registry = Store.Registry or Types.NewRegistry()
 Store.Loaded = Store.Loaded or false
@@ -47,24 +42,10 @@ function Store.Load()
         return true, false
     end
 
-    -- Before cutover, this view may be populated from the frozen old root so
-    -- the one-way importer can capture Hoomans-only extension fields. After
-    -- cutover the branch above is the only supported reload path.
-    local raw, reason, sourceRaw =
-        ImportSource.Read("abstractWorld")
-    Store.Registry = Types.NormalizeRegistry(raw)
+    Store.Registry = Types.NormalizeRegistry(nil)
     Store.Loaded = true
-    Store.Dirty = reason ~= nil and reason ~= "empty_state"
-    if Store.Dirty then
-        Reset.Mark(
-            Store,
-            sourceRaw,
-            Config.SCHEMA_VERSION,
-            reason,
-            "hoomans_world_view_import"
-        )
-    end
-    return true, Store.Dirty
+    Store.Dirty = false
+    return true, false
 end
 
 function Store.EnsureLoaded()

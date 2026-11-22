@@ -34,16 +34,13 @@ local function holdSeatedGuard(record, zombie)
 end
 
 local function tryGuardSeat(record, zombie, order)
-    local service = PNC.RoamingSeat
     local anchorX = tonumber(order and order.x) or record.anchorX or record.x
     local anchorY = tonumber(order and order.y) or record.anchorY or record.y
     local bodyX = zombie and zombie.getX and zombie:getX() or record.x
     local bodyY = zombie and zombie.getY and zombie:getY() or record.y
     local stopDistance = tonumber(Const.GUARD_STOP_DISTANCE)
         or tonumber(Const.GUARD_REACHED_DISTANCE) or 0.55
-    if not zombie or not service or not service.TryStartGuard
-        or not Core or not Core.Distance
-    then
+    if not zombie or not Core or not Core.Distance then
         return false
     end
     if Core.Distance(bodyX, bodyY, anchorX, anchorY)
@@ -52,22 +49,14 @@ local function tryGuardSeat(record, zombie, order)
         return false
     end
     local tasking = PNC.Tasking
-    if tasking and tasking.Providers and tasking.Providers.autonomy
-        and tasking.Events and type(tasking.Events.Emit) == "function"
-    then
+    if tasking and tasking.Events and type(tasking.Events.Emit) == "function" then
         tasking.Events.Emit("AMBIENT_OPPORTUNITY", {
             record = record,
             source = "Behavior.GuardAnchor",
             cause = "guard_seat",
         })
-        return false
     end
-    return service.TryStartGuard(
-        record,
-        zombie,
-        order,
-        Core.Now and Core.Now() or 0
-    ) == true
+    return false
 end
 
 function Internal.TickGuardAnchor(record, zombie)

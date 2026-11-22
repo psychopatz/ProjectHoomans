@@ -146,13 +146,6 @@ PNC = {
         end,
     },
     Relationships = {
-        MigrateTargetKey = function(_, legacyKey, canonicalKey)
-            relationshipKeys[#relationshipKeys + 1] = {
-                legacy = legacyKey,
-                canonical = canonicalKey,
-            }
-            return false, "source_not_found"
-        end,
         SetInitialBaseline = function(_, targetKey, standing)
             relationshipCount = relationshipCount + 1
             relationshipKeys[#relationshipKeys + 1] = targetKey
@@ -286,18 +279,6 @@ T.equal(brother.identity.survivor.skinColor.r, 0.44,
     "existing blood relative receives player skin color")
 T.equal(brother.identity.survivor.skinTexture, "MaleBody03",
     "existing blood relative receives player skin texture")
-
-record.startingCompanions.grants.PNC_HasSister.relationshipKeyVersion = nil
-granted, reason = PNC.StartingCompanions.Ensure(
-    player, record.uuid, 14
-)
-T.equal(granted, true, "existing grant repairs its relationship key")
-T.equal(reason, "granted", "relationship key repair result")
-T.equal(
-    record.startingCompanions.grants.PNC_HasSister.relationshipKeyVersion,
-    1,
-    "relationship key repair persists its version marker"
-)
 
 granted, reason = PNC.StartingCompanions.Ensure(
     player, record.uuid, 15

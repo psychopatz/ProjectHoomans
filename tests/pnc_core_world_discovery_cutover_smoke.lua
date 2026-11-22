@@ -39,7 +39,6 @@ PNC = {
         end,
     },
 }
-require "PNC/Core/Persistence/PNC_ModDataStore"
 require "PNC/Core/Discovery/PNC_WorldDiscoveryTypes"
 
 PNC.WorldDiscovery = {
@@ -56,7 +55,25 @@ PNC.WorldDiscovery = {
 require "PNC/WorldDiscovery/PNC_WorldDiscovery_Storage"
 
 local Types = PNC.WorldDiscoveryTypes
-roots["PNC_WorldDiscovery_v1"] = {
+local World = require
+    "PsychopatzCore/SurvivorWorld/PsychopatzSurvivorWorld"
+World.RuntimeStore.ResetForTests()
+local core = assert(World.NewRegistry({
+    worldSeed = 9191,
+}))
+assert(World.RuntimeStore.Replace(
+    core:Snapshot(),
+    "cutover_fixture"
+))
+PNC.CoreSurvivorWorldAuthority = {
+    Registry = World.GetRuntimeRegistry(),
+    World = World,
+}
+
+local Adapter = require
+    "PNC/WorldDiscovery/PNC_CoreWorldDiscoveryAdapter"
+
+assert(World.GetRuntimeRegistry():SetDiscovery(Adapter.ToCore({
     schemaVersion = Types.SCHEMA_VERSION,
     revision = 4,
     players = {
@@ -70,7 +87,7 @@ roots["PNC_WorldDiscovery_v1"] = {
                         entityID = "community_cutover",
                         kind = "settlement",
                         phase = Types.PHASE_LOCATED,
-                        source = "legacy",
+                        source = "visit",
                         discoveredAt = 10,
                         updatedAt = 15,
                         x = 100, y = 200, z = 0,
@@ -98,72 +115,55 @@ roots["PNC_WorldDiscovery_v1"] = {
             },
         },
     },
-}
+})))
+assert(World.RuntimeStore.MarkDirty("cutover_seed"))
+assert(World.RuntimeStore.Save())
 
-assert(PNC.WorldDiscovery.Load())
-assert(PNC.WorldDiscovery.Registry.players
-    ["character:cutover"].entities.settlement
-    .community_cutover, "legacy source did not load")
-
-local World = require
-    "PsychopatzCore/SurvivorWorld/PsychopatzSurvivorWorld"
-World.RuntimeStore.ResetForTests()
-local core = assert(World.NewRegistry({
-    worldSeed = 9191,
-}))
-assert(World.RuntimeStore.Replace(
-    core:Snapshot(),
-    "cutover_fixture"
-))
-PNC.CoreSurvivorWorldAuthority = {
-    Registry = World.GetRuntimeRegistry(),
-    World = World,
-}
-
-local Adapter = require
-    "PNC/WorldDiscovery/PNC_CoreWorldDiscoveryAdapter"
 local active, reason = Adapter.ActivateCutover()
 T.truthy(active, reason)
 T.truthy(Adapter.Active, "cutover active")
+T.truthy(Adapter.LastCutover and Adapter.LastCutover.accepted,
+    "cutover recorded acceptance")
+T.equal(reason, "cutover_active", "canonical cutover activation reason")
 
 local canonical =
     World.GetRuntimeRegistry():GetDiscovery()
 local player = canonical.players["character:cutover"]
-T.truthy(player, "legacy player discovery not imported")
+T.truthy(player, "Core player discovery present")
 T.truthy(player.entities.community.community_cutover,
-    "legacy settlement did not map to Core community")
+    "Core community discovery present")
 T.truthy(player.entities.group.group_cutover,
-    "legacy mobile group did not map to Core group")
+    "Core group discovery present")
 T.equal(
     player.entities.community.community_cutover.phase,
     Types.PHASE_LOCATED,
-    "community phase changed during migration"
+    "community phase preserved in Core"
 )
 T.equal(
     player.entities.community.community_cutover.searchedAt,
     15,
-    "arrival timestamp changed during migration"
+    "arrival timestamp preserved in Core"
 )
 T.equal(
-    next(roots["PNC_WorldDiscovery_v1"]),
+    roots["PNC_WorldDiscovery_v1"],
     nil,
-    "legacy PNC discovery root was not retired"
+    "legacy PNC discovery root was not created"
 )
 T.truthy(
     roots["PsychopatzCore.SurvivorWorld"]
         and roots["PsychopatzCore.SurvivorWorld"].registry,
-    "Core SurvivorWorld was not persisted"
+    "Core SurvivorWorld was persisted"
 )
 
 local alias = PNC.WorldDiscovery.Registry.players
     ["character:cutover"]
 T.truthy(alias.entities.settlement.community_cutover,
-    "PNC compatibility settlement view missing")
+    "PNC view rebuilt settlement from Core")
 T.truthy(alias.entities.mobile_group.group_cutover,
-    "PNC compatibility group view missing")
+    "PNC view rebuilt group from Core")
 
--- Core supports discovery kinds the legacy PNC view does not. Compatibility
--- saves must preserve them rather than treating the PNC view as total truth.
+-- Core supports discovery kinds the PNC view does not. Saves must preserve
+-- them rather than treating the PNC view as total truth.
 assert(World.Discovery.RegisterEntityProvider(
     "cutover_signal_fixture",
     {
@@ -200,18 +200,18 @@ T.equal(
         .players["character:cutover"]
         .entities.group.group_cutover.phase,
     Types.PHASE_CONTACTED,
-    "compatibility mutation did not update Core discovery"
+    "view mutation did not update Core discovery"
 )
 T.equal(
-    next(roots["PNC_WorldDiscovery_v1"]),
+    roots["PNC_WorldDiscovery_v1"],
     nil,
-    "compatibility save resurrected legacy discovery root"
+    "view save must not allocate legacy discovery root"
 )
 T.truthy(
     World.GetRuntimeRegistry():GetDiscovery()
         .players["character:cutover"]
         .entities.signal["signal:cutover"],
-    "PNC compatibility save erased Core-only signal discovery"
+    "PNC view save erased Core-only signal discovery"
 )
 
 PNC.WorldDiscovery.Registry = {

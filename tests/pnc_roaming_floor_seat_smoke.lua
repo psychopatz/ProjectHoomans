@@ -142,7 +142,10 @@ PNC.FacilityJobs = {
 }
 
 local RoamingSeat = T.load("ProjectHoomans", "server",
-    "PNC/Settlement/FacilityJobs/PNC_RoamingSeatService.lua")
+    "PNC/Tasking/Autonomy/Executors/PNC_AutonomyExecutor_RoamingSeat.lua")
+T.equal(PNC.RoamingSeat, nil, "legacy PNC.RoamingSeat global must be retired")
+T.equal(RoamingSeat.TryStart, nil, "retired polling TryStart must not exist on RoamingSeat executor")
+T.equal(RoamingSeat.TryStartGuard, nil, "retired polling TryStartGuard must not exist on RoamingSeat executor")
 local record = {
     id = "roamer-floor-seat",
     alive = true,
@@ -153,8 +156,10 @@ local record = {
     orderSpec = { kind = "roam" },
 }
 
-T.truthy(RoamingSeat.TryStart(
-    record, body, record.orderSpec, record.runtime.roaming, now),
+T.truthy(RoamingSeat.CanAttempt(record, body, record.runtime.roaming, now),
+    "idle roamer must be eligible for RoamingSeat executor")
+local floorCandidate = RoamingSeat.FindCandidate(record, body)
+T.truthy(RoamingSeat.StartCandidate(record, body, floorCandidate, now, "roam"),
     "idle roamer starts a ground sitting fallback without a chair")
 local state = record.runtime.roamingSeat
 T.truthy(state and state.floorSeating,
@@ -203,10 +208,26 @@ local guardRecord = {
     },
 }
 PNC.BehaviorCompanion = { Internal = {} }
+local guardAmbientOpportunities = {}
+PNC.Tasking = {
+    Events = {
+        Emit = function(ev, payload)
+            if ev == "AMBIENT_OPPORTUNITY" then
+                guardAmbientOpportunities[#guardAmbientOpportunities + 1] = payload
+            end
+        end,
+    },
+}
 T.load("ProjectHoomans", "shared",
     "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion_StaticOrders.lua")
-T.truthy(PNC.BehaviorCompanion.Internal.TickGuardAnchor(
-    guardRecord, body),
+PNC.BehaviorCompanion.Internal.TickGuardAnchor(guardRecord, body)
+T.equal(#guardAmbientOpportunities, 1,
+    "TickGuardAnchor emits AMBIENT_OPPORTUNITY to Tasking instead of calling legacy TryStartGuard")
+T.equal(guardAmbientOpportunities[1].cause, "guard_seat")
+T.truthy(RoamingSeat.CanAttemptGuard(guardRecord, body, guardRecord.orderSpec, now),
+    "guard order must pass CanAttemptGuard at its anchor")
+local guardCandidate = RoamingSeat.FindCandidate(guardRecord, body)
+T.truthy(RoamingSeat.StartCandidate(guardRecord, body, guardCandidate, now, "guard"),
     "guard order starts the ground sitting fallback at its anchor")
 local guardState = guardRecord.runtime.roamingSeat
 T.truthy(guardState and guardState.floorSeating
@@ -262,13 +283,11 @@ local chairRecord = {
     },
     orderSpec = { kind = "roam" },
 }
-T.truthy(RoamingSeat.TryStart(
-    chairRecord,
-    body,
-    chairRecord.orderSpec,
-    chairRecord.runtime.roaming,
-    now + 2000
-), "roaming service did not select a valid nearby chair")
+T.truthy(RoamingSeat.CanAttempt(chairRecord, body, chairRecord.runtime.roaming, now + 2000),
+    "chair record must be eligible for RoamingSeat executor")
+local chairCandidate = RoamingSeat.FindCandidate(chairRecord, body)
+T.truthy(RoamingSeat.StartCandidate(chairRecord, body, chairCandidate, now + 2000, "roam"),
+    "roaming service did not select a valid nearby chair")
 local chairState = chairRecord.runtime.roamingSeat
 T.equal(chairState.resourceKind, "seating_surface",
     "a valid chair must win before the floor fallback")

@@ -1,16 +1,8 @@
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
-local Service = PNC.RoamingSeat
+local Service = PNC.AutonomyExecutors.RoamingSeat
 local Internal = Service.Internal or {}
-local Core = PNC.Core
-local Const = PNC.Const or {}
-local Common = PNC.BehaviorCommon
-local Jobs = PNC.FacilityJobs
-local Resources = PNC.FacilityResources
-local Targets = PNC.FacilityInteractionTargets
-local Reservations = PNC.FacilityReservations
-local Diagnostics = PNC.PerformanceScalingDiagnostics
 local ActorControl = PNC.ActorControl
     or require "PNC/Core/ActorControl/PNC_ActorControl"
 
@@ -18,22 +10,7 @@ local facilityJobs = Internal.facilityJobs
 local currentTime = Internal.currentTime
 local distanceTo = Internal.distanceTo
 local isSeatOrder = Internal.isSeatOrder
-local canAttempt = Internal.canAttempt
-local canAttemptGuard = Internal.canAttemptGuard
-local startSeat = Internal.startSeat
 local stop = Internal.stop
-function Service.TryStart(record, zombie, order, roaming, at)
-    at = currentTime(at)
-    if not canAttempt(record, zombie, roaming, at) then return false end
-    return startSeat(record, zombie, at, "roam")
-end
-
-function Service.TryStartGuard(record, zombie, order, at)
-    at = currentTime(at)
-    local allowed = canAttemptGuard(record, zombie, order, at)
-    if not allowed then return false end
-    return startSeat(record, zombie, at, "guard")
-end
 
 function Service.Tick(record, zombie, at)
     local runtime = record and record.runtime or nil
@@ -105,17 +82,25 @@ function Service.Tick(record, zombie, at)
         or math.abs((tonumber(zombie:getZ()) or 0)
             - (tonumber(state.z) or 0)) >= 0.5
     then
+        local common = PNC.BehaviorCommon
         state.phase = "TRAVELLING"
         record.activeBehavior = "Roam:seat:travel"
-        Common.ClearCombatTarget(record, "roaming_seat_travel", zombie)
-        Common.MoveRecord(record, zombie, state.x, state.y, state.z,
-            "walk", tonumber(state.seatStopDistance) or 0.10,
-            "roaming_seat")
+        if common and common.ClearCombatTarget then
+            common.ClearCombatTarget(record, "roaming_seat_travel", zombie)
+        end
+        if common and common.MoveRecord then
+            common.MoveRecord(record, zombie, state.x, state.y, state.z,
+                "walk", tonumber(state.seatStopDistance) or 0.10,
+                "roaming_seat")
+        end
         return true
     end
     if state.arrivalSettled ~= true then
+        local common = PNC.BehaviorCommon
         seating.ResetPath(record, zombie, "roaming_seat_arrival")
-        Common.HaltMovement(record, zombie, "roaming_seat_arrival")
+        if common and common.HaltMovement then
+            common.HaltMovement(record, zombie, "roaming_seat_arrival")
+        end
         state.arrivalSettled = true
     end
     if not state.floorSeating and state.positioned ~= true then

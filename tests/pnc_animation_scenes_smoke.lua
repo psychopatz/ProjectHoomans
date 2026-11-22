@@ -153,14 +153,16 @@ T.truthy(livingScene.steps[1].loop == true
     "ground sitting variants must remain looped while selected")
 local roamingSceneTicked = false
 local roamingSceneStopped = false
-PNC.RoamingSeat = {
-    OnSceneTick = function()
-        roamingSceneTicked = true
-        return true
-    end,
-    OnSceneStopped = function()
-        roamingSceneStopped = true
-    end,
+PNC.AutonomyExecutors = {
+    RoamingSeat = {
+        OnSceneTick = function()
+            roamingSceneTicked = true
+            return true
+        end,
+        OnSceneStopped = function()
+            roamingSceneStopped = true
+        end,
+    },
 }
 local roamingSceneRecord = { runtime = { roamingSeat = { seating = true } } }
 T.truthy(livingScene.onTick(
@@ -171,7 +173,7 @@ livingScene.onStop(
 )
 T.truthy(roamingSceneTicked and roamingSceneStopped,
     "ground scene did not route roaming stop cleanup to its owner")
-PNC.RoamingSeat = nil
+PNC.AutonomyExecutors = nil
 local furnitureScene = PNC.AnimationScenes.Get("facility.living.sitFurniture")
 T.truthy(furnitureScene and furnitureScene.repeatMode == "loop"
         and #furnitureScene.steps == 1

@@ -31,61 +31,6 @@ function H.ResolvePlayerTargetKey(player, character, context)
     return targetKey, targetKey and "fallback" or "player_entity_key_invalid"
 end
 
-function H.LegacyPlayerTargetKey(character)
-    if not character or not character.accountIdentity
-        or not character.uuid
-    then
-        return nil
-    end
-    return EntityRef.ForPlayerIdentity(
-        character.accountIdentity,
-        character.uuid
-    )
-end
-
-function H.RepairRelationshipKey(player, character, grant, at)
-    local targetKey
-    local legacyTargetKey
-    local reason
-    local migrated
-    if type(grant) ~= "table" then
-        return false, "starting_companion_grant_missing"
-    end
-    if (tonumber(grant.relationshipKeyVersion) or 0)
-        >= Starting.RELATIONSHIP_KEY_VERSION
-    then
-        return false, "already_repaired"
-    end
-    targetKey, reason = H.ResolvePlayerTargetKey(player, character, {
-        callback = "starting_companion_relationship_key_repair",
-        worldAgeHours = at,
-    })
-    if not targetKey then return false, reason end
-    legacyTargetKey = H.LegacyPlayerTargetKey(character)
-    if not legacyTargetKey or legacyTargetKey == targetKey then
-        grant.relationshipKeyVersion = Starting.RELATIONSHIP_KEY_VERSION
-        return true, "same_target_key"
-    end
-    if not PNC.Relationships
-        or not PNC.Relationships.MigrateTargetKey
-    then
-        return false, "relationship_service_unavailable"
-    end
-    migrated, reason = PNC.Relationships.MigrateTargetKey(
-        grant.npcID,
-        legacyTargetKey,
-        targetKey,
-        at
-    )
-    if not migrated and reason ~= "source_not_found"
-        and reason ~= "target_exists"
-    then
-        return false, reason
-    end
-    grant.relationshipKeyVersion = Starting.RELATIONSHIP_KEY_VERSION
-    return true, reason or "migrated"
-end
-
 function H.HasCanonicalAssignment(player, record)
     if not H.OwnerMatches(record, player)
         or not PNC.Factions or not PNC.Factions.GetPlayerFaction
@@ -108,16 +53,6 @@ function H.ApplyLifelongKnowledge(player, character, npcID, spec, at)
         callback = "starting_companion_relationship",
         worldAgeHours = at,
     })
-    local legacyTargetKey = H.LegacyPlayerTargetKey(character)
-    if targetKey and legacyTargetKey
-        and targetKey ~= legacyTargetKey
-        and PNC.Relationships
-        and PNC.Relationships.MigrateTargetKey
-    then
-        PNC.Relationships.MigrateTargetKey(
-            npcID, legacyTargetKey, targetKey, at
-        )
-    end
     if targetKey and PNC.Relationships
         and PNC.Relationships.SetInitialBaseline
     then

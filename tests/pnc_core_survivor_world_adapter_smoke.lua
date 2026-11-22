@@ -9,7 +9,6 @@ local World = require
 local registry = assert(World.NewRegistry({ worldSeed = 7007 }))
 
 local dirtyReasons = {}
-local migrationCalls = 0
 local fakeWorld = {
     RuntimeStore = {
         MarkDirty = function(reason)
@@ -28,17 +27,9 @@ PNC.CoreSurvivorWorldAuthority = {
     end,
     RefreshStatus = function()
         return {
-            needsImport = migrationCalls == 0,
+            active = true,
+            coreEmpty = false,
         }
-    end,
-    ImportPreSurvivorWorld = function()
-        migrationCalls = migrationCalls + 1
-        assert(registry:UpsertFaction({
-            factionID = "faction_import",
-            name = "Imported Faction",
-            archetypeID = "survivor",
-        }))
-        return registry, "imported"
     end,
 }
 
@@ -60,10 +51,6 @@ local faction = assert(Adapter.CommitFaction({
     },
 }, "test_faction"))
 
-T.equal(migrationCalls, 1,
-    "first canonical mutation must import pre-SurvivorWorld data once")
-T.truthy(registry:GetFaction("faction_import"),
-    "imported faction must survive cutover")
 T.equal(faction.leaderActorID, "actor_leader",
     "PNC leader alias must normalize into Core")
 T.equal(#faction.memberActorIDs, 2,
@@ -135,8 +122,6 @@ T.equal(#group.memberActorIDs, 2, "group members")
 
 T.truthy(#dirtyReasons >= 4,
     "every canonical mutation must dirty Core persistence")
-T.equal(migrationCalls, 1,
-    "later mutations must not repeat import")
 
 T.truthy(Adapter.RemoveGroup("agroup_new", "test_remove"))
 T.equal(registry:GetGroup("agroup_new"), nil,

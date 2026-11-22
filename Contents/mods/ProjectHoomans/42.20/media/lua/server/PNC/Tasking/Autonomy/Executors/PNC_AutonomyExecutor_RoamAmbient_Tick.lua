@@ -3,10 +3,10 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
-PNC.RoamAmbient = PNC.RoamAmbient or {}
+PNC.AutonomyExecutors = PNC.AutonomyExecutors or {}
+PNC.AutonomyExecutors.RoamAmbient = PNC.AutonomyExecutors.RoamAmbient or {}
 
-local Service = PNC.RoamAmbient
-local Common = PNC.BehaviorCommon
+local Service = PNC.AutonomyExecutors.RoamAmbient
 local ActorControl = PNC.ActorControl
     or require "PNC/Core/ActorControl/PNC_ActorControl"
 
@@ -48,9 +48,6 @@ function Service.Tick(record, zombie, at)
     if ActorControl and ActorControl.IsPuppetOwned
         and ActorControl.IsPuppetOwned(record)
     then
-        -- The owner lease pauses the provider rather than treating its
-        -- suspension as a combat preemption. Its runtime is restored when the
-        -- Puppet Opera session releases the actor.
         return false
     end
     if not canContinue(record, zombie, state, at) then
@@ -87,21 +84,23 @@ function Service.Tick(record, zombie, at)
         or math.abs((tonumber(zombie:getZ()) or 0)
             - (tonumber(state.target.z) or 0)) >= 0.5
     then
+        local common = PNC.BehaviorCommon
         state.phase = "TRAVELLING"
         record.activeBehavior = "Roam:ambient:sleep:travel"
-        if Common and Common.ClearCombatTarget then
-            Common.ClearCombatTarget(record, "roam_ambient_sleep_travel", zombie)
+        if common and common.ClearCombatTarget then
+            common.ClearCombatTarget(record, "roam_ambient_sleep_travel", zombie)
         end
-        if Common and Common.MoveRecord then
-            Common.MoveRecord(record, zombie, state.target.x, state.target.y,
+        if common and common.MoveRecord then
+            common.MoveRecord(record, zombie, state.target.x, state.target.y,
                 state.target.z, "walk", 0.70, "roam_ambient_sleep")
         end
         return true
     end
     if state.arrivalSettled ~= true then
+        local common = PNC.BehaviorCommon
         Service.ResetPath(record, zombie, "roam_ambient_sleep_arrival")
-        if Common and Common.HaltMovement then
-            Common.HaltMovement(record, zombie, "roam_ambient_sleep_arrival")
+        if common and common.HaltMovement then
+            common.HaltMovement(record, zombie, "roam_ambient_sleep_arrival")
         end
         state.arrivalSettled = true
     end

@@ -24,14 +24,7 @@ end
 function Adapter.EnsureCanonical()
     local current, reason = registry()
     if not current then return nil, reason end
-
-    local status = Authority.RefreshStatus()
-    if status and status.needsImport == true then
-        current, reason = Authority.ImportPreSurvivorWorld({
-            reason = "project_hoomans_survivor_world_cutover",
-        })
-        if not current then return nil, reason end
-    end
+    Authority.RefreshStatus()
     return current
 end
 

@@ -33,7 +33,7 @@ PNC = {
 }
 
 T.load("ProjectHoomans", "shared", "PNC/Conversation/PNC_ConversationLLMTools.lua")
-T.load("ProjectHoomans", "server", "PNC/Networking/PNC_LLMSocialReactionPolicy.lua")
+T.load("ProjectHoomans", "server", "PNC/Conversation/PNC_LLMSocialReactionPolicy.lua")
 
 local Policy = PNC.Conversation.LLMSocialReactionPolicy
 local relationship = {

@@ -1,11 +1,12 @@
--- Seeded daily eating, drinking, and sleep windows.
+-- Seeded daily eating, drinking, and sleep windows for roaming ambience.
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
-PNC.RoamAmbient = PNC.RoamAmbient or {}
+PNC.AutonomyExecutors = PNC.AutonomyExecutors or {}
+PNC.AutonomyExecutors.RoamAmbient = PNC.AutonomyExecutors.RoamAmbient or {}
 
-local Service = PNC.RoamAmbient
+local Service = PNC.AutonomyExecutors.RoamAmbient
 
 local function identitySeed(record)
     local identity = record and record.identity or nil

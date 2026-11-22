@@ -2,16 +2,75 @@ local T = require "tests/support/test"
 
 T.load("tests/pnc_npc_foundation_parity_baseline_smoke.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Travel/PNC_Travel.lua")
-local Fixtures = require
-    "tests/support/pnc_npc_foundation_import_plan_fixtures"
 local Core = require "PsychopatzCore/Actors/PsychopatzActors"
 local CoreSocial = PsychopatzCore.Social
 local Adapter = PNC.Persistence.CoreSocial
 
+local function deepCopy(value)
+    if type(value) ~= "table" then return value end
+    local copy = {}
+    for key, item in pairs(value) do
+        copy[key] = deepCopy(item)
+    end
+    return copy
+end
+
+local function equalValue(left, right, seen)
+    if type(left) ~= type(right) then return false end
+    if type(left) ~= "table" then return left == right end
+    if left == right then return true end
+    seen = seen or {}
+    seen[left] = seen[left] or {}
+    if seen[left][right] then return true end
+    seen[left][right] = true
+    for key, value in pairs(left) do
+        if not equalValue(value, right[key], seen) then return false end
+    end
+    for key in pairs(right) do
+        if left[key] == nil then return false end
+    end
+    return true
+end
+
+local function prepareSourceRecord(id)
+    local record = PNC.Types.NewRecord({
+        id = id,
+        displayName = "Parity Merchant",
+        identitySeed = 731,
+        archetypeID = "parity_merchant",
+        uniqueDefinitionVersion = 1,
+        tacticalClass = "neutral",
+        x = 104.5,
+        y = 208.25,
+        z = 0,
+        anchorX = 100,
+        anchorY = 200,
+        anchorZ = 0,
+        equipment = { worn = {}, attached = {} },
+    })
+    local targetKey = "npc:p0b_friend"
+    local relationship = PNC.RelationshipTypes.NewRelationship(targetKey)
+    relationship.memories = {
+        PNC.RelationshipTypes.NewMemory({
+            id = "memory:p0b:friend",
+            type = "trade_helped",
+            aboutKey = targetKey,
+            createdAt = 14,
+            lastEvaluatedAt = 14,
+            approvalEffect = 11,
+            respectEffect = 7,
+            strength = 1,
+            knowledgeSource = "experienced",
+        }),
+    }
+    record.social.relationships[targetKey] = relationship
+    record.social.revision = 3
+    return record, targetKey
+end
+
 T.truthy(Adapter, "Core social adapter was not registered")
-local sourceRecord, targetKey = Fixtures.PrepareContinuitySourceRecord(
-    "npc:p4:social")
-local originalSocial = PNC.Persistence.ImportPlan.Copy(sourceRecord.social)
+local sourceRecord, targetKey = prepareSourceRecord("npc:p4:social")
+local originalSocial = deepCopy(sourceRecord.social)
 local projected, projectReason = Adapter.Project(sourceRecord, PsychopatzCore)
 T.truthy(projected, projectReason)
 local projMemories = CoreSocial.GetMemoriesForTarget(projected, targetKey)
@@ -24,7 +83,7 @@ T.equal(projected.relationships[targetKey].targetKey, targetKey,
 T.equal(projected.revision, sourceRecord.social.revision,
     "social revision projected")
 T.truthy(projected.personality, "personality projected")
-T.truthy(Fixtures.EqualValue(sourceRecord.social, originalSocial),
+T.truthy(equalValue(sourceRecord.social, originalSocial),
     "projection changed Hoomans source social state")
 
 local event = {

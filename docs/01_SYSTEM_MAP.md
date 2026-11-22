@@ -229,9 +229,14 @@
 - `PNC_WorkService` & `PNC_WorkToilRunner`: `O(dirty)` colony work reconciler
   and 5-step dual executor unifying `FARMING`, `FISHING`, `LUMBER`, and
   `CORPSE_HAUL` adapters with `AbortOrder` claim/input/tool cleanup
-- `PNC_AutonomyScorer`, `PNC_AutonomyTaskProvider`, `PNC_CoPresenceService`,
-  and `PNC_ScenarioScheduler`: compiled-IR `OPTIONAL`/`IDLE` autonomy scoring,
-  hysteresis, co-presence situations, and time-of-day scenario chaining
+- `PNC_AutonomyScorer`, `PNC_AutonomyTaskProvider`, `PNC.AutonomyExecutors`
+  (`server/PNC/Tasking/Autonomy/Executors/`, 16 modular files folding retired
+  `Settlement/FacilityJobs` ambient/seat loops into `PNC.Tasking` with zero
+  polling bypasses), `PNC_CoPresenceService`, and `PNC_ScenarioScheduler`:
+  compiled-IR `OPTIONAL`/`IDLE` autonomy scoring, hysteresis, co-presence
+  situations, and time-of-day scenario chaining (with canonical Core-backed
+  persistence, SurvivorWorld, and social adapters without pre-publication
+  migration shims)
 - `PNC_AgitationService`, `PNC_ReactionPolicyEvaluator`, and
   `PNC_ShockingReactionTaskProvider`: sparse lazy-decay agitation and 5-intent
   non-lethal reactivity (`StopAndAssess`, `BackAway`, `Investigate`,

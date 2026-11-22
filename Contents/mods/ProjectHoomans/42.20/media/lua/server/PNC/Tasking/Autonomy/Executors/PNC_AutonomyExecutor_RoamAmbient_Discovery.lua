@@ -3,12 +3,10 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
-PNC.RoamAmbient = PNC.RoamAmbient or {}
+PNC.AutonomyExecutors = PNC.AutonomyExecutors or {}
+PNC.AutonomyExecutors.RoamAmbient = PNC.AutonomyExecutors.RoamAmbient or {}
 
-local Service = PNC.RoamAmbient
-local Resources = PNC.FacilityResources
-local Targets = PNC.FacilityInteractionTargets
-local Reservations = PNC.FacilityReservations
+local Service = PNC.AutonomyExecutors.RoamAmbient
 
 Service.SEARCH_RADIUS = 6
 Service.MAX_OBJECTS = 96
@@ -36,19 +34,22 @@ local function distanceTo(zombie, x, y)
 end
 
 local function reserved(resource, target)
+    local reservations = PNC.FacilityReservations
     local key = tostring(resource and resource.resourceKey or "")
-    if target and target.sleepSlotId and Reservations
-        and Reservations.IsResourceAvailable
+    if target and target.sleepSlotId and reservations
+        and reservations.IsResourceAvailable
     then
-        return not Reservations.IsResourceAvailable(
+        return not reservations.IsResourceAvailable(
             resource, target.sleepSlotId)
     end
-    return key ~= "" and Reservations and Reservations.ByResource
-        and Reservations.ByResource[key] ~= nil
+    return key ~= "" and reservations and reservations.ByResource
+        and reservations.ByResource[key] ~= nil
 end
 
 function Service.FindSleepSurface(zombie)
     local cell = type(getCell) == "function" and getCell() or nil
+    local resources = PNC.FacilityResources
+    local targetsSvc = PNC.FacilityInteractionTargets
     local detectorIDs = { "bed", "sofa" }
     local originX = math.floor(zombie:getX())
     local originY = math.floor(zombie:getY())
@@ -56,14 +57,14 @@ function Service.FindSleepSurface(zombie)
     local best
     local examined = 0
     local detectorIndex
-    if not cell or not cell.getGridSquare or not Resources
-        or not Resources.GetDetector or not Targets
-        or not Targets.ResolveResource
+    if not cell or not cell.getGridSquare or not resources
+        or not resources.GetDetector or not targetsSvc
+        or not targetsSvc.ResolveResource
     then
         return nil
     end
     for detectorIndex = 1, #detectorIDs do
-        local detector = Resources.GetDetector(detectorIDs[detectorIndex])
+        local detector = resources.GetDetector(detectorIDs[detectorIndex])
         if detector and type(detector.matches) == "function"
             and type(detector.describe) == "function"
         then
@@ -86,7 +87,7 @@ function Service.FindSleepSurface(zombie)
                             if type(resource) ~= "table" then
                                 return
                             end
-                            local targets = Targets.ResolveResource(resource, {
+                            local targets = targetsSvc.ResolveResource(resource, {
                                 abstract = false, character = zombie,
                             })
                             local target

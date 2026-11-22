@@ -58,20 +58,6 @@ function H.EnsureOne(player, character, state, spec, index, at, options)
         and record
         and H.HasCanonicalAssignment(player, record)
     then
-        if (tonumber(grant.relationshipKeyVersion) or 0)
-            < Starting.RELATIONSHIP_KEY_VERSION
-        then
-            local repaired, repairReason = H.RepairRelationshipKey(
-                player, character, grant, at
-            )
-            if not repaired then return false, repairReason end
-            local recorded, recordReason = H.UpdateState(
-                character.uuid,
-                state,
-                "starting_companion_relationship_key_repair"
-            )
-            if not recorded then return false, recordReason end
-        end
         return true, "granted"
     end
     if not record then

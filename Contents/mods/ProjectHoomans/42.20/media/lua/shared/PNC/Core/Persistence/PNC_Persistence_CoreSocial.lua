@@ -9,9 +9,6 @@ local Persistence = PNC.Persistence
 local Adapter = Persistence.CoreSocial or {}
 Persistence.CoreSocial = Adapter
 
-Adapter.MIGRATION_ID = "core_social_single_authority"
-Adapter.MIGRATION_VERSION = 1
-
 local function service(core)
     return core and core.Actors and core.Actors.Social
 end
@@ -27,6 +24,16 @@ local function hasEntries(value)
     if type(value) ~= "table" then return false end
     for _ in pairs(value) do return true end
     return false
+end
+
+local function isEmptyCoreSocial(coreSocial)
+    if type(coreSocial) ~= "table" then return true end
+    if (tonumber(coreSocial.revision) or 0) > 0 then return false end
+    if hasEntries(coreSocial.relationships) then return false end
+    if type(coreSocial.memoryBank) == "table" and #coreSocial.memoryBank > 0 then
+        return false
+    end
+    return true
 end
 
 function Adapter.ResolveCoreActorID(record)
@@ -475,14 +482,6 @@ function Adapter.SyncToCore(record, core, changeSpec)
         lastEvaluatedAt = tonumber(record.social.lastEvaluatedAt) or 0,
     }
 
-    if type(changeSpec) == "table"
-        and changeSpec.kind == "relationship_key_migrated"
-        and type(changeSpec.legacyTargetKey) == "string"
-        and type(currentSocial.relationships) == "table"
-    then
-        currentSocial.relationships[changeSpec.legacyTargetKey] = nil
-    end
-
     -- 2. Non-destructively merge relationships and actor-level memoryBank
     currentSocial.memoryBank = currentSocial.memoryBank or {}
     if type(changeSpec) == "table"
@@ -651,9 +650,6 @@ function Adapter.SyncToCore(record, core, changeSpec)
         return false, commitReason
     end
 
-    record.persistenceRepairVersions = type(record.persistenceRepairVersions) == "table"
-        and record.persistenceRepairVersions or {}
-    record.persistenceRepairVersions[Adapter.MIGRATION_ID] = Adapter.MIGRATION_VERSION
     if type(record.runtime) == "table" then
         record.runtime.coreSocialHydrationPending = nil
     end
@@ -699,6 +695,19 @@ function Adapter.EnsureRuntimeView(record, core)
         Adapter.SyncFromCore(record, core)
     end
     return record.social
+end
+
+function Adapter.SeedEmptyCoreSocial(record, core)
+    core = core or PsychopatzCore
+    local actor = Adapter.ResolveCoreActor(record, core)
+    if actor
+        and isEmptyCoreSocial(actor.social)
+        and type(record) == "table"
+        and Adapter.HasGenericSocialPayload(record.social)
+    then
+        return Adapter.SyncToCore(record, core)
+    end
+    return Adapter.EnsureRuntimeView(record, core)
 end
 
 function Adapter.BuildExtensionEnvelope(record, actorID)
@@ -753,7 +762,6 @@ function Adapter.BuildExtensionEnvelope(record, actorID)
     return {
         schemaVersion = Constants and Constants.SOCIAL_SCHEMA_VERSION or 4,
         authority = "core",
-        coreSocialMigrationVersion = Adapter.MIGRATION_VERSION,
         coreActorID = tostring(actorID),
         morale = tonumber(social.morale) or 0,
         moraleBaseline = tonumber(social.moraleBaseline) or 0,
@@ -765,86 +773,24 @@ function Adapter.BuildExtensionEnvelope(record, actorID)
     }
 end
 
-function Adapter.MigrateLegacyRecordToCore(record, rawSocial, core)
-    core = core or PsychopatzCore
-    if type(record) ~= "table" then
-        return false, "record_missing"
-    end
-    local actor = Adapter.ResolveCoreActor(record, core)
-    if not actor then
-        return false, "core_actor_not_found"
-    end
-    record.persistenceRepairVersions = type(record.persistenceRepairVersions) == "table"
-        and record.persistenceRepairVersions or {}
-    local version = tonumber(record.persistenceRepairVersions[Adapter.MIGRATION_ID])
-        or (type(record.runtime) == "table" and tonumber(record.runtime.coreSocialMigratedVersion))
-        or 0
-    local sourceSocial = type(rawSocial) == "table" and rawSocial or record.social
-    if version >= Adapter.MIGRATION_VERSION
-        or (type(sourceSocial) == "table" and sourceSocial.authority == "core")
-    then
-        record.persistenceRepairVersions[Adapter.MIGRATION_ID] =
-            math.max(version, Adapter.MIGRATION_VERSION)
-        Adapter.SyncFromCore(record, core)
-        return false, "already_migrated"
-    end
-
-    if type(sourceSocial) == "table" and sourceSocial ~= record.social then
-        if PNC.RelationshipTypes
-            and type(PNC.RelationshipTypes.NormalizeSocialState) == "function"
-        then
-            record.social = PNC.RelationshipTypes.NormalizeSocialState(
-                sourceSocial,
-                record.identitySeed,
-                record.archetypeID
-            )
-        else
-            record.social = clone(sourceSocial)
-        end
-    end
-
-    if type(record.social) == "table" then
-        local ok, reason = Adapter.SyncToCore(record, core)
-        if not ok then
-            return false, reason
-        end
-    else
-        Adapter.SyncFromCore(record, core)
-    end
-
-    record.persistenceRepairVersions[Adapter.MIGRATION_ID] = Adapter.MIGRATION_VERSION
-    record.runtime = type(record.runtime) == "table" and record.runtime or {}
-    record.runtime.coreSocialMigratedVersion = Adapter.MIGRATION_VERSION
-    record.runtime.coreSocialHydrationPending = nil
-    if PNC.Registry and type(PNC.Registry.MarkDirty) == "function" then
-        PNC.Registry.MarkDirty(record, Adapter.MIGRATION_ID)
-    end
-    return true, "migrated_to_core"
-end
-
 function Adapter.SerializeRecord(record, core)
     core = core or PsychopatzCore
     local actor, actorID = Adapter.ResolveCoreActor(record, core)
     if not actor then
         return nil, "not_core_backed"
     end
-    record.persistenceRepairVersions = type(record.persistenceRepairVersions) == "table"
-        and record.persistenceRepairVersions or {}
-    local migratedVersion = tonumber(record.persistenceRepairVersions[Adapter.MIGRATION_ID]) or 0
     local localSocial = type(record.social) == "table" and record.social or {}
     local coreSocial = type(actor.social) == "table" and actor.social or {}
     local localRev = tonumber(localSocial.revision) or 0
     local coreRev = tonumber(coreSocial.revision) or 0
-    local needsSync = (migratedVersion < Adapter.MIGRATION_VERSION
-            and Adapter.HasGenericSocialPayload(localSocial))
-        or (localSocial.authority ~= "core" and localRev > coreRev)
-        or (localSocial.authority ~= "core"
-            and hasEntries(localSocial.relationships)
-            and not hasEntries(coreSocial.relationships))
+    local needsSync = localSocial.authority ~= "core"
+        and (Adapter.HasGenericSocialPayload(localSocial)
+            or localRev > coreRev
+            or (hasEntries(localSocial.relationships)
+                and not hasEntries(coreSocial.relationships)))
     if needsSync then
         Adapter.SyncToCore(record, core)
     end
-    record.persistenceRepairVersions[Adapter.MIGRATION_ID] = Adapter.MIGRATION_VERSION
     return Adapter.BuildExtensionEnvelope(record, actorID)
 end
 
@@ -858,12 +804,6 @@ function Adapter.RestoreRecord(record, raw, core)
         if type(rawSocial.coreActorID) == "string" and rawSocial.coreActorID ~= "" then
             record.coreActorID = record.coreActorID or rawSocial.coreActorID
         end
-        record.persistenceRepairVersions = type(record.persistenceRepairVersions) == "table"
-            and record.persistenceRepairVersions or {}
-        record.persistenceRepairVersions[Adapter.MIGRATION_ID] = math.max(
-            tonumber(record.persistenceRepairVersions[Adapter.MIGRATION_ID]) or 0,
-            tonumber(rawSocial.coreSocialMigrationVersion) or Adapter.MIGRATION_VERSION
-        )
         record.social = type(record.social) == "table" and record.social or {}
         record.social.authority = "core"
         record.social.relationshipExtensions = clone(rawSocial.relationshipExtensions or {})
@@ -888,16 +828,15 @@ function Adapter.RestoreRecord(record, raw, core)
         record.runtime.coreSocialHydrationPending = true
         return true, "core_hydration_deferred"
     elseif type(rawSocial) == "table" then
-        local migratedVersion = tonumber(
-            record.persistenceRepairVersions
-                and record.persistenceRepairVersions[Adapter.MIGRATION_ID]
-        ) or 0
-        if Adapter.IsCoreBacked(record, core) then
-            if migratedVersion >= Adapter.MIGRATION_VERSION then
-                Adapter.SyncFromCore(record, core)
-                return true, "already_migrated_hydrated"
+        local actor = Adapter.ResolveCoreActor(record, core)
+        if actor then
+            if isEmptyCoreSocial(actor.social)
+                and Adapter.HasGenericSocialPayload(record.social)
+            then
+                return Adapter.SyncToCore(record, core)
             end
-            return Adapter.MigrateLegacyRecordToCore(record, rawSocial, core)
+            Adapter.SyncFromCore(record, core)
+            return true, "hydrated_from_core"
         end
         return false, "standalone_record"
     end

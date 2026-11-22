@@ -1,18 +1,9 @@
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
-local Service = PNC.RoamingSeat
+local Service = PNC.AutonomyExecutors.RoamingSeat
 local Internal = Service.Internal or {}
-local Core = PNC.Core
-local Const = PNC.Const or {}
-local Common = PNC.BehaviorCommon
-local Jobs = PNC.FacilityJobs
-local Resources = PNC.FacilityResources
-local Targets = PNC.FacilityInteractionTargets
-local Reservations = PNC.FacilityReservations
-local Diagnostics = PNC.PerformanceScalingDiagnostics
-local ActorControl = PNC.ActorControl
-    or require "PNC/Core/ActorControl/PNC_ActorControl"
+
 local facilityJobs = Internal.facilityJobs
 local facilityReservations = Internal.facilityReservations
 local currentTime = Internal.currentTime
@@ -75,8 +66,6 @@ local function finish(record, zombie, reason, preserveIdleDwell)
     end
     runtime.roamingSeat = nil
     resetRoam(record, preserveIdleDwell ~= false)
-    Service.NextAttemptAt[tostring(record.id)] =
-        currentTime() + Service.CADENCE_MS
     return true
 end
 
@@ -101,28 +90,8 @@ local function stop(record, zombie, reason)
     return finish(record, zombie, reason or "roaming_seat_stopped")
 end
 
-local function beginAttempt(id, at)
-    if at < (tonumber(Service.NextAttemptAt[id]) or 0) then
-        return false
-    end
-    if Service.AttemptAt ~= at then
-        Service.AttemptAt = at
-        Service.AttemptCount = 0
-    end
-    if (tonumber(Service.AttemptCount) or 0)
-        >= Service.MAX_ATTEMPTS_PER_TICK
-    then
-        return false
-    end
-    Service.AttemptCount = (tonumber(Service.AttemptCount) or 0) + 1
-    Service.NextAttemptAt[id] = at + Service.CADENCE_MS
-    return true
-end
-
-
 Internal.release = release
 Internal.resetRoam = resetRoam
 Internal.finish = finish
 Internal.stop = stop
-Internal.beginAttempt = beginAttempt
 Service.Stop = stop

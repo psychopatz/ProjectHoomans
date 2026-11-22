@@ -253,25 +253,12 @@ function AtCamp.Tick(record, zombie)
     end
     if order.ambientVisit == true then
         local tasking = PNC.Tasking
-        if tasking and tasking.Providers and tasking.Providers.autonomy
-            and tasking.Events and type(tasking.Events.Emit) == "function"
-        then
+        if tasking and tasking.Events and type(tasking.Events.Emit) == "function" then
             tasking.Events.Emit("AMBIENT_OPPORTUNITY", {
                 record = record,
                 source = "Behavior.AtCamp",
                 cause = "camp_ambient_visit",
             })
-            return true
-        end
-        if PNC.RoamAmbient
-            and PNC.RoamAmbient.TryStartAmbient
-            and PNC.RoamAmbient.TryStartAmbient(
-                record,
-                zombie,
-                Core and Core.Now and Core.Now() or 0
-            )
-        then
-            return true
         end
     end
     return true

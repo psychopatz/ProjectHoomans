@@ -105,37 +105,4 @@ T.equal(newRelationship.familiarity, 100,
 T.equal(PNC.Relationships.Get(newNPCRecord.id, legacyKey), nil,
     "new companion does not write the legacy player key")
 
-local migratedNPC = newNPC("npc_migrated_companion")
-PNC.Relationships.SetInitialBaseline(
-    migratedNPC.id,
-    legacyKey,
-    { approval = 85, respect = 70, familiarity = 100 },
-    12
-)
-local grant = { npcID = migratedNPC.id }
-local repaired, repairReason = H.RepairRelationshipKey(
-    player,
-    character,
-    grant,
-    13
-)
-T.equal(repaired, true, "legacy companion relationship is repaired")
-T.equal(repairReason, "migrated", "legacy relationship repair result")
-T.equal(grant.relationshipKeyVersion, 1,
-    "legacy relationship repair is versioned")
-local migratedRelationship = PNC.Relationships.Get(
-    migratedNPC.id,
-    playerKey
-)
-T.truthy(migratedRelationship,
-    "migrated relationship is visible through canonical lookup")
-T.equal(migratedRelationship.approval, 85,
-    "migration preserves approval for the conversation UI")
-T.equal(migratedRelationship.respect, 70,
-    "migration preserves respect for the conversation UI")
-T.equal(migratedRelationship.familiarity, 100,
-    "migration preserves familiarity for the conversation UI")
-T.equal(PNC.Relationships.Get(migratedNPC.id, legacyKey), nil,
-    "migration removes the stale lookup key")
-
 T.finish("pnc_starting_companion_relationship_key_continuity_smoke")

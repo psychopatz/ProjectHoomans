@@ -9,10 +9,6 @@ local Constants = PNC.FactionConstants
 local Types = PNC.FactionTypes
 local Archetypes = PNC.FactionArchetypes
 local EntityRef = PNC.EntityRef
-local Reset = PNC.ModDataStore
-    or require "PNC/Core/Persistence/PNC_ModDataStore"
-local ImportSource = PNC.SurvivorWorldImportSource
-    or require "PNC/Director/PNC_SurvivorWorldImportSource"
 
 local function refreshCoreViews()
     local extensions = PNC.SurvivorWorldExtensions
@@ -65,9 +61,6 @@ function Factions.ReconcileLoadedView(reason, canonicalMembership)
 end
 
 function Factions.Load()
-    local raw
-    local sourceRaw
-    local normalized
     if not Internal.authority() then return false, "not_authority" end
     if PNC.Registry and PNC.Registry.EnsureLoaded then
         PNC.Registry.EnsureLoaded()
@@ -77,27 +70,14 @@ function Factions.Load()
         return false, refreshReason
     end
     if not refreshed then
-        local reason
-        raw, reason, sourceRaw = ImportSource.Read("factions")
-        normalized = Types.NormalizeFactionRegistry(raw)
-        Factions.Registry = normalized
+        Factions.Registry = Types.NormalizeFactionRegistry(nil)
         Factions.Loaded = true
-        Factions.Dirty = (reason ~= nil and reason ~= "empty_state")
-            or (reason == nil and not Types.AreEqual(raw, normalized))
-        if reason ~= nil and reason ~= "empty_state" then
-            Reset.Mark(
-                Factions,
-                sourceRaw,
-                Constants.REGISTRY_SCHEMA_VERSION,
-                reason,
-                "faction_world_view_import"
-            )
-        end
+        Factions.Dirty = false
         if cutoverPending() then
             Factions.Ready = false
             Factions.LoadDeferred = true
             Factions.LastLoadReason = "cutover_pending"
-            return true, Factions.Dirty
+            return true, false
         end
         return Factions.ReconcileLoadedView("registry_load")
     end

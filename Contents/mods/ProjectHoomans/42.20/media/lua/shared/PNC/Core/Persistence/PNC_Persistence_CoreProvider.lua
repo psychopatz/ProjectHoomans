@@ -331,16 +331,8 @@ function Adapter.EnsureActor(record, core)
     local ok, result = Adapter.AnnotateExistingCoreRecord(record, core)
     if ok and PNC.Persistence and PNC.Persistence.CoreSocial then
         local coreSocial = PNC.Persistence.CoreSocial
-        local migratedVersion = tonumber(
-            record.persistenceRepairVersions
-                and record.persistenceRepairVersions[coreSocial.MIGRATION_ID or "core_social_single_authority"]
-        ) or 0
-        if migratedVersion < (coreSocial.MIGRATION_VERSION or 1)
-            and type(coreSocial.HasGenericSocialPayload) == "function"
-            and coreSocial.HasGenericSocialPayload(record.social)
-            and type(coreSocial.MigrateLegacyRecordToCore) == "function"
-        then
-            coreSocial.MigrateLegacyRecordToCore(record, record.social, core)
+        if type(coreSocial.SeedEmptyCoreSocial) == "function" then
+            coreSocial.SeedEmptyCoreSocial(record, core)
         elseif type(coreSocial.EnsureRuntimeView) == "function" then
             coreSocial.EnsureRuntimeView(record, core)
         end

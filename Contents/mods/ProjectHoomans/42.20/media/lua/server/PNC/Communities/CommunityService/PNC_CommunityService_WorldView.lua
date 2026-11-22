@@ -18,10 +18,6 @@ local assignTable = Internal.assignTable
 local rebuildDerivedIndexes = Internal.rebuildDerivedIndexes
 local reconcileLeaders = Internal.reconcileLeaders
 local reconcileNPCReferences = Internal.reconcileNPCReferences
-local Reset = PNC.ModDataStore
-    or require "PNC/Core/Persistence/PNC_ModDataStore"
-local ImportSource = PNC.SurvivorWorldImportSource
-    or require "PNC/Director/PNC_SurvivorWorldImportSource"
 
 local function refreshCoreViews()
     local extensions = PNC.SurvivorWorldExtensions
@@ -63,9 +59,6 @@ function Communities.ReconcileLoadedView(reason, canonicalMembership)
 end
 
 function Communities.Load()
-    local raw
-    local sourceRaw
-    local normalized
     if not authority() then return false, "not_authority" end
     if PNC.Registry and PNC.Registry.EnsureLoaded then
         PNC.Registry.EnsureLoaded()
@@ -78,27 +71,14 @@ function Communities.Load()
         return false, refreshReason
     end
     if not refreshed then
-        local reason
-        raw, reason, sourceRaw = ImportSource.Read("communities")
-        normalized = Types.NormalizeRegistry(raw)
-        Communities.Registry = normalized
+        Communities.Registry = Types.NormalizeRegistry(nil)
         Communities.Loaded = true
-        Communities.Dirty = (reason ~= nil and reason ~= "empty_state")
-            or (reason == nil and not Types.AreEqual(raw, normalized))
-        if reason ~= nil and reason ~= "empty_state" then
-            Reset.Mark(
-                Communities,
-                sourceRaw,
-                Constants.REGISTRY_SCHEMA_VERSION,
-                reason,
-                "community_world_view_import"
-            )
-        end
+        Communities.Dirty = false
         if cutoverPending() then
             Communities.Ready = false
             Communities.LoadDeferred = true
             Communities.LastLoadReason = "cutover_pending"
-            return true, Communities.Dirty
+            return true, false
         end
         return Communities.ReconcileLoadedView("registry_load")
     end

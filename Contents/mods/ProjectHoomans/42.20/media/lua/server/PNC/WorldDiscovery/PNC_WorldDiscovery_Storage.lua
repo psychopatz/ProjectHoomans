@@ -5,10 +5,6 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeR
 local Discovery = PNC.WorldDiscovery
 local Internal = Discovery.Internal
 local Types = PNC.WorldDiscoveryTypes
-local Reset = PNC.ModDataStore
-    or require "PNC/Core/Persistence/PNC_ModDataStore"
-local ImportSource = PNC.SurvivorWorldImportSource
-    or require "PNC/Director/PNC_SurvivorWorldImportSource"
 
 local function copy(value, seen)
     if type(value) ~= "table" then return value end
@@ -49,14 +45,9 @@ function Discovery.Load()
     then
         return adapter.SyncFromCore()
     end
-    local raw, reason, sourceRaw = ImportSource.Read("discovery")
-    Discovery.Registry = Types.NormalizeRegistry(raw)
+    Discovery.Registry = Types.NormalizeRegistry(nil)
     Discovery.Loaded = true
-    Discovery.Dirty = reason ~= nil and reason ~= "empty_state"
-    if Discovery.Dirty then
-        Reset.Mark(Discovery, sourceRaw, Types.SCHEMA_VERSION, reason,
-            "world_discovery")
-    end
+    Discovery.Dirty = false
     return true
 end
 

@@ -11,20 +11,6 @@ PNC.CoreSurvivorWorldAuthority =
 local Authority = PNC.CoreSurvivorWorldAuthority
 local World = require
     "PsychopatzCore/SurvivorWorld/PsychopatzSurvivorWorld"
-local ImportSource = PNC.SurvivorWorldImportSource
-    or require "PNC/Director/PNC_SurvivorWorldImportSource"
-
-local function copy(value)
-    if PNC.Core and PNC.Core.DeepCopy then
-        return PNC.Core.DeepCopy(value)
-    end
-    if type(value) ~= "table" then return value end
-    local output = {}
-    for key, child in pairs(value) do
-        output[copy(key)] = copy(child)
-    end
-    return output
-end
 
 local function countMap(value)
     local count = 0
@@ -32,18 +18,6 @@ local function countMap(value)
         count = count + 1
     end
     return count
-end
-
-function Authority.BuildImportSource()
-    return copy(ImportSource.Build())
-end
-
-function Authority.PreviewImport(options)
-    local source = Authority.BuildImportSource()
-    local snapshot, reason =
-        World.Import.FromPNC(source, options)
-    if not snapshot then return nil, reason end
-    return snapshot, source
 end
 
 local function snapshotCounts(snapshot)
@@ -86,61 +60,13 @@ function Authority.RefreshStatus()
     end
 
     local coreSnapshot = registry:Snapshot()
-    local preview, previewReason = Authority.PreviewImport()
     local status = {
         active = true,
         core = snapshotCounts(coreSnapshot),
         coreEmpty = isEmpty(coreSnapshot),
-        previewReason = previewReason,
     }
-    if preview then
-        status.importSource = snapshotCounts(preview)
-        status.importSourceEmpty = isEmpty(preview)
-        status.needsImport =
-            status.coreEmpty and not status.importSourceEmpty
-    else
-        status.importSource = {}
-        status.importSourceEmpty = true
-        status.needsImport = false
-    end
     Authority.LastStatus = status
     return status
-end
-
-function Authority.ImportPreSurvivorWorld(options)
-    options = type(options) == "table" and options or {}
-    local registry, reason = Authority.Activate()
-    if not registry then return nil, reason end
-
-    local current = registry:Snapshot()
-    if not isEmpty(current) and options.force ~= true then
-        return nil, "core_survivor_world_not_empty"
-    end
-
-    local snapshot
-    snapshot, reason = Authority.PreviewImport(options)
-    if not snapshot then return nil, reason end
-
-    registry, reason = World.RuntimeStore.Replace(
-        snapshot,
-        options.reason or "project_hoomans_pre_survivor_world_import"
-    )
-    if not registry then return nil, reason end
-
-    local saved
-    saved, reason = World.RuntimeStore.Save()
-    if not saved and reason ~= "not_dirty" then
-        return nil, reason
-    end
-
-    Authority.Registry = registry
-    Authority.LastImport = {
-        accepted = true,
-        revision = registry:Revision(),
-        counts = snapshotCounts(snapshot),
-    }
-    Authority.RefreshStatus()
-    return registry, "imported"
 end
 
 Authority.World = World

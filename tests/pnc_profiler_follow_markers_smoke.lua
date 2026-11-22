@@ -98,13 +98,13 @@ PNC = {
         end,
     },
     BehaviorRoaming = { Tick = callback("roaming_tick") },
-    RoamAmbient = {
-        Tick = callback("ambient_tick"),
-        TryStart = callback("ambient_start"),
-    },
-    RoamingSeat = {
-        Tick = callback("seat_tick"),
-        TryStart = callback("seat_start"),
+    AutonomyExecutors = {
+        RoamAmbient = {
+            Tick = callback("ambient_tick"),
+        },
+        RoamingSeat = {
+            Tick = callback("seat_tick"),
+        },
     },
     Network = {
         BroadcastRecord = callback("broadcast"),
@@ -164,14 +164,10 @@ local targets = {
         "ProjectHoomans.Server.Update.NPC.Pathing.NativeClear" },
     { PNC.BehaviorRoaming, "Tick",
         "ProjectHoomans.Server.Update.NPC.Roaming.Tick" },
-    { PNC.RoamAmbient, "Tick",
+    { PNC.AutonomyExecutors.RoamAmbient, "Tick",
         "ProjectHoomans.Server.Update.NPC.Roaming.Ambient.Tick" },
-    { PNC.RoamAmbient, "TryStart",
-        "ProjectHoomans.Server.Update.NPC.Roaming.Ambient.TryStart" },
-    { PNC.RoamingSeat, "Tick",
+    { PNC.AutonomyExecutors.RoamingSeat, "Tick",
         "ProjectHoomans.Server.Update.NPC.Roaming.Seat.Tick" },
-    { PNC.RoamingSeat, "TryStart",
-        "ProjectHoomans.Server.Update.NPC.Roaming.Seat.TryStart" },
 }
 
 local originals = {}

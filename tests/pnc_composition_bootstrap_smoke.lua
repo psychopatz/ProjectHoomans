@@ -132,8 +132,6 @@ T.equal(serverCalls[settlementIndex - 1], "PNC/Communities/PNC_CommunityExcursio
     "server Settlement initialization predecessor")
 local facilityJobsIndex = indexOf(serverCalls,
     "PNC/Settlement/FacilityJobs/PNC_FacilityJobs_Service")
-local roamingSeatIndex = indexOf(serverCalls,
-    "PNC/Settlement/FacilityJobs/PNC_RoamingSeatService")
 local nearbyResourceIndex = indexOf(serverCalls,
     "PNC/World/PNC_NearbyResourceLocator")
 local nearbyWaterIndex = indexOf(serverCalls,
@@ -148,11 +146,8 @@ local workFatigueGateIndex = indexOf(
 local productionIndex = indexOf(serverCalls, "PNC/Production/PNC_Production")
 T.truthy(workFatigueGateIndex < productionIndex,
     "server production loads after the shared fatigue gate")
-T.equal(serverCalls[facilityJobsIndex + 1],
-    "PNC/Settlement/FacilityJobs/PNC_RoamingSeatService",
-    "roaming seat service loads after facility jobs")
-T.truthy(nearbyResourceIndex > roamingSeatIndex,
-    "nearby resource services load after roaming seat service")
+T.truthy(nearbyResourceIndex > facilityJobsIndex,
+    "nearby resource services load after facility jobs")
 T.truthy(nearbyResourceIndex < nearbyWaterIndex,
     "nearby water loads after nearby resources")
 T.truthy(nearbyWaterIndex < campResourceIndex,

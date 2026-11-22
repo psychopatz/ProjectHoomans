@@ -9,6 +9,12 @@ local Provider = PNC.AutonomyTaskProvider
 local Scorer = PNC.AutonomyScorer or require "PNC/Tasking/Autonomy/PNC_AutonomyScorer"
 local CoPresence = PNC.CoPresenceService
     or require "PNC/Tasking/Autonomy/PNC_CoPresenceService"
+local Executors = PNC.AutonomyExecutors
+    or require "PNC/Tasking/Autonomy/Executors/PNC_AutonomyExecutors"
+
+local function executors()
+    return PNC.AutonomyExecutors or Executors or {}
+end
 
 Provider.DOMAIN = "autonomy"
 Provider.DEFAULT_CLAIM_TTL_MS = 30000
@@ -37,17 +43,15 @@ end
 local function buildContextMap(record, at)
     local contexts = {}
     local live = liveZombie(record.id)
-    local ambient = PNC.AmbientFacilityService or PNC.LivingRoomService
-    local roamingSeat = PNC.RoamingSeat
-    local roamAmbient = PNC.RoamAmbient
+    local exec = executors()
+    local ambient = exec.FacilitySeat
+    local roamingSeat = exec.RoamingSeat
+    local roamAmbient = exec.RoamAmbient
 
     if ambient and type(ambient.IsEligible) == "function"
         and type(ambient.PreviewSeat) == "function"
     then
-        local allowed, camp, base = ambient.IsEligible(record, at, {
-            allowActiveAutonomyLease = true,
-            ignoreCadence = true,
-        })
+        local allowed, camp, base = ambient.IsEligible(record)
         if allowed then
             local preview = ambient.PreviewSeat(record, live, camp, base)
             if preview then
@@ -239,7 +243,8 @@ function Provider.Assign(intent)
     local claims = PNC.Tasking and PNC.Tasking.Claims or nil
     local live = liveZombie(intent.npcId)
     local acquired = nil
-    local ambient = PNC.AmbientFacilityService or PNC.LivingRoomService
+    local exec = executors()
+    local ambient = exec.FacilitySeat
     local claimKey = tostring(ctx.claimKey or intent.claimKey or ("autonomy:" .. adId .. ":" .. tostring(intent.npcId)))
 
     if ctx.kind == "facility_seat" then
@@ -284,16 +289,12 @@ function Provider.Assign(intent)
             ok, startReason = ambient.StartSeat(record, acquired, ctx.camp, live)
         end
     elseif ctx.kind == "roaming_seat" then
-        local roamingSeat = PNC.RoamingSeat
+        local roamingSeat = exec.RoamingSeat
         if roamingSeat and type(roamingSeat.StartCandidate) == "function" then
             ok, startReason = roamingSeat.StartCandidate(record, live, ctx.candidate, at, ctx.ownerKind or "roam")
-        elseif roamingSeat and ctx.ownerKind == "guard" and roamingSeat.TryStartGuard then
-            ok = roamingSeat.TryStartGuard(record, live, record.orderSpec, at) == true
-        elseif roamingSeat and roamingSeat.TryStart then
-            ok = roamingSeat.TryStart(record, live, record.orderSpec, record.runtime and record.runtime.roaming, at) == true
         end
     elseif ctx.kind == "roam_ambient" then
-        local roamAmbient = PNC.RoamAmbient
+        local roamAmbient = exec.RoamAmbient
         if roamAmbient then
             local plan = ctx.plan
             if plan and plan.action == "sleep" and roamAmbient.StartSleep and ctx.sleepCandidate then
@@ -422,8 +423,9 @@ function Provider.Tick(lease)
         if not runtime.roamingSeat then
             return PNC.Tasking.Commands.Complete(lease.leaseId, "AUTONOMY_SEAT_COMPLETE")
         end
-        if PNC.RoamingSeat and type(PNC.RoamingSeat.Tick) == "function" then
-            PNC.RoamingSeat.Tick(record, live, at)
+        local roamingSeat = executors().RoamingSeat
+        if roamingSeat and type(roamingSeat.Tick) == "function" then
+            roamingSeat.Tick(record, live, at)
         end
         if not runtime.roamingSeat then
             return PNC.Tasking.Commands.Complete(lease.leaseId, "AUTONOMY_SEAT_COMPLETE")
@@ -434,8 +436,9 @@ function Provider.Tick(lease)
         if not runtime.roamAmbient then
             return PNC.Tasking.Commands.Complete(lease.leaseId, "AUTONOMY_AMBIENT_COMPLETE")
         end
-        if PNC.RoamAmbient and type(PNC.RoamAmbient.Tick) == "function" then
-            PNC.RoamAmbient.Tick(record, live, at)
+        local roamAmbient = executors().RoamAmbient
+        if roamAmbient and type(roamAmbient.Tick) == "function" then
+            roamAmbient.Tick(record, live, at)
         end
         if not runtime.roamAmbient then
             return PNC.Tasking.Commands.Complete(lease.leaseId, "AUTONOMY_AMBIENT_COMPLETE")
@@ -461,20 +464,21 @@ local function cleanupLeaseState(lease, reason, isAbort)
         local live = liveZombie(lease.npcId)
         local kind = meta and meta.kind or runtime.autonomyKind
         local adId = meta and meta.adId or runtime.autonomyAdId or lease.sourceRef
+        local exec = executors()
         if kind == "facility_seat" and runtime.facilityActivity then
-            local ambient = PNC.AmbientFacilityService or PNC.LivingRoomService
+            local ambient = exec.FacilitySeat
             if ambient and type(ambient.StopSeat) == "function" then
                 ambient.StopSeat(record, reason or "autonomy_cancelled")
             elseif PNC.FacilityJobs and type(PNC.FacilityJobs.Stop) == "function" then
                 PNC.FacilityJobs.Stop(record, reason or "autonomy_cancelled")
             end
         elseif kind == "roaming_seat" and runtime.roamingSeat then
-            if PNC.RoamingSeat and type(PNC.RoamingSeat.Stop) == "function" then
-                PNC.RoamingSeat.Stop(record, live, reason or "autonomy_cancelled")
+            if exec.RoamingSeat and type(exec.RoamingSeat.Stop) == "function" then
+                exec.RoamingSeat.Stop(record, live, reason or "autonomy_cancelled")
             end
         elseif kind == "roam_ambient" and runtime.roamAmbient then
-            if PNC.RoamAmbient and type(PNC.RoamAmbient.Stop) == "function" then
-                PNC.RoamAmbient.Stop(record, live, reason or "autonomy_cancelled", "task_preempted")
+            if exec.RoamAmbient and type(exec.RoamAmbient.Stop) == "function" then
+                exec.RoamAmbient.Stop(record, live, reason or "autonomy_cancelled", "task_preempted")
             end
         end
         if runtime.taskLeaseId == lease.leaseId then
@@ -502,19 +506,20 @@ function Provider.RollbackAssignment(intent, assignment, reason)
     local live = intent and liveZombie(intent.npcId) or nil
     local kind = assignment and assignment.kind or nil
     if record and record.runtime then
+        local exec = executors()
         if kind == "facility_seat" and record.runtime.facilityActivity then
-            local ambient = PNC.AmbientFacilityService or PNC.LivingRoomService
+            local ambient = exec.FacilitySeat
             if ambient and type(ambient.StopSeat) == "function" then
                 ambient.StopSeat(record, reason or "autonomy_rollback")
             end
         elseif kind == "roaming_seat" and record.runtime.roamingSeat
-            and PNC.RoamingSeat and PNC.RoamingSeat.Stop
+            and exec.RoamingSeat and exec.RoamingSeat.Stop
         then
-            PNC.RoamingSeat.Stop(record, live, reason or "autonomy_rollback")
+            exec.RoamingSeat.Stop(record, live, reason or "autonomy_rollback")
         elseif kind == "roam_ambient" and record.runtime.roamAmbient
-            and PNC.RoamAmbient and PNC.RoamAmbient.Stop
+            and exec.RoamAmbient and exec.RoamAmbient.Stop
         then
-            PNC.RoamAmbient.Stop(record, live, reason or "autonomy_rollback", "rollback")
+            exec.RoamAmbient.Stop(record, live, reason or "autonomy_rollback", "rollback")
         end
     end
     if intent and intent.npcId and (intent.adId or intent.sourceRef) then

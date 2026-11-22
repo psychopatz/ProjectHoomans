@@ -96,11 +96,11 @@ PNC = {
 T.load(SHARED .. "PNC/Core/Needs/PNC_NeedsDefinitions.lua")
 T.load(SHARED .. "PNC/Conversation/PNC_ConversationLLMTools.lua")
 T.load(SERVER .. "PNC/Networking/PNC_ServerCommandRouter.lua")
-T.load(SERVER .. "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler.lua")
+local LoadedAuthority = T.load(SERVER .. "PNC/Conversation/PNC_LLMSocialReactionService.lua")
 
 local Authority = PNC.Conversation.Authority
-T.equal(require "PNC/Conversation/PNC_LLMSocialReactionService", Authority,
-    "legacy handler path returns the same Conversation authority")
+T.equal(LoadedAuthority, Authority,
+    "Conversation LLM social reaction service populates PNC.Conversation.Authority")
 local accepted = Authority.HandleLLMSocialReaction(player, {
     requestID = "request-1",
     callID = "call-1",

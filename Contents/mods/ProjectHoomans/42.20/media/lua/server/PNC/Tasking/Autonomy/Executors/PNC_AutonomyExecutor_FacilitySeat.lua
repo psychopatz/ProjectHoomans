@@ -1,21 +1,14 @@
--- Ambient, non-work facility activities. Seating is the first activity in
--- this service; later needs can reuse the same context, discovery, and
--- reservation seams without adding another idle behavior fork.
+-- Autonomy executor for camp/home living-room facility seating (no standalone polling).
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
-PNC.AmbientFacilityService = PNC.AmbientFacilityService or {}
+PNC.AutonomyExecutors = PNC.AutonomyExecutors or {}
+PNC.AutonomyExecutors.FacilitySeat = PNC.AutonomyExecutors.FacilitySeat or {}
 
-local Service = PNC.AmbientFacilityService
-Service.NextAttemptAt = Service.NextAttemptAt or {}
-Service.CADENCE_MS = 5000
+local Service = PNC.AutonomyExecutors.FacilitySeat
 local ActorControl = PNC.ActorControl
     or require "PNC/Core/ActorControl/PNC_ActorControl"
-
-local function now()
-    return PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
-end
 
 local function isCamp(record)
     local order = record and record.orderSpec or nil
@@ -48,9 +41,7 @@ local function sleepActionable(record)
         and fatigue >= (tonumber(policy.actionable) or 0.70)
 end
 
-local function eligible(record, currentTime, opts)
-    opts = type(opts) == "table" and opts or nil
-    local allowAutonomy = opts ~= nil and opts.allowActiveAutonomyLease == true
+function Service.IsEligible(record)
     if not record or record.alive == false
         or not PNC.CompanionCommands
         or not PNC.CompanionCommands.IsCompanion(record)
@@ -58,29 +49,21 @@ local function eligible(record, currentTime, opts)
     if ActorControl and ActorControl.IsPuppetOwned
         and ActorControl.IsPuppetOwned(record)
     then
-        -- Ambient seating is an independent server pump. It must yield before
-        -- acquiring a reservation or starting a facility activity for an
-        -- actor temporarily owned by Puppet Opera.
         return false
     end
     local currentLease = PNC.TaskLeaseService
         and PNC.TaskLeaseService.ForNPC(record.id) or nil
-    if currentLease and not (allowAutonomy
-        and tostring(currentLease.sourceDomain or "") == "autonomy")
+    if currentLease
+        and tostring(currentLease.sourceDomain or "") ~= "autonomy"
     then
         return false
     end
-    local hasAutonomyActivity = allowAutonomy
-        and record.runtime
+    local hasAutonomyActivity = record.runtime
         and record.runtime.autonomyAdId ~= nil
         and record.runtime.facilityActivity ~= nil
     if record.runtime and (record.runtime.workOrderId
         or (record.runtime.facilityActivity and not hasAutonomyActivity))
     then
-        -- An automatic living-room activity may have been started in the same
-        -- server tick that fatigue crossed the sleep threshold. End that idle
-        -- presentation immediately; otherwise it can hold the chair until the
-        -- task inbox gets its next reevaluation.
         if sleepActionable(record)
             and record.runtime.facilityActivity
             and record.runtime.facilityActivity.automatic == true
@@ -92,22 +75,11 @@ local function eligible(record, currentTime, opts)
         end
         return false
     end
-    -- Needs emits the sleep wake-up before tasking consumes it. Keep the idle
-    -- service from reserving a dining chair during that arbitration window.
     if sleepActionable(record) then return false end
-    -- AtHome/AtCamp can keep their durable order while responding to a
-    -- nearby threat. Ambient seating is only an idle presentation and must
-    -- yield while the shared combat target is live.
     if record.runtime and record.runtime.target then return false end
     local camp = isCamp(record)
     local base = not camp and homeBase(record) or nil
     if not camp and not isHome(record, base) then return false end
-    if not (opts and opts.ignoreCadence == true) then
-        local key = tostring(record.id)
-        if currentTime < (tonumber(Service.NextAttemptAt[key]) or 0) then
-            return false
-        end
-    end
     return true, camp, base
 end
 
@@ -131,57 +103,11 @@ local function campSeat(record, live)
     if not PNC.CampResourceService
         or not PNC.CampResourceService.AcquireSeat
     then return nil end
-    local acquired = PNC.CampResourceService.AcquireSeat(record, {
+    return PNC.CampResourceService.AcquireSeat(record, {
         abstract = live == nil,
         character = live,
     })
-    return acquired
 end
-
-local function start(record, acquired, camp, live)
-    if not acquired or not acquired.target
-        or not PNC.FacilityJobs or not PNC.FacilityJobs.Start
-    then return false end
-    local facility = acquired.facility
-    if not facility then
-        facility = {
-            id = acquired.facilityId,
-            baseId = "ambient",
-            definitionId = "ambient",
-        }
-    end
-    local ok = PNC.FacilityJobs.Start(record, facility, "living", {
-        acquired = acquired,
-        nearby = camp == true,
-        automatic = true,
-        abstract = live == nil,
-        campActivity = camp == true,
-        campId = acquired.campId,
-        campX = acquired.campX,
-        campY = acquired.campY,
-        campZ = acquired.campZ,
-        campRadius = acquired.campRadius,
-        resourceRadius = acquired.resourceRadius,
-        seating = true,
-        floorSeating = acquired.floorSeating == true
-            or acquired.resourceKind == "floor_seating"
-            or acquired.target and acquired.target.floorSeating == true,
-        approachCandidates = acquired.approachCandidates
-            or acquired.targets,
-        resourceKind = acquired.resourceKind,
-        resourceKey = acquired.resourceKey,
-    })
-    if not ok and PNC.FacilityReservations
-        and acquired.reservationId
-        and PNC.FacilityReservations.Release
-    then
-        PNC.FacilityReservations.Release(
-            acquired.reservationId, "ambient_start_failed")
-    end
-    return ok == true
-end
-
-Service.IsEligible = eligible
 
 function Service.PreviewSeat(record, _, camp, base)
     if camp then
@@ -231,7 +157,48 @@ function Service.AcquireSeat(record, live, camp, base)
     return acquired, camp, base
 end
 
-Service.StartSeat = start
+function Service.StartSeat(record, acquired, camp, live)
+    if not acquired or not acquired.target
+        or not PNC.FacilityJobs or not PNC.FacilityJobs.Start
+    then return false end
+    local facility = acquired.facility
+    if not facility then
+        facility = {
+            id = acquired.facilityId,
+            baseId = "ambient",
+            definitionId = "ambient",
+        }
+    end
+    local ok = PNC.FacilityJobs.Start(record, facility, "living", {
+        acquired = acquired,
+        nearby = camp == true,
+        automatic = true,
+        abstract = live == nil,
+        campActivity = camp == true,
+        campId = acquired.campId,
+        campX = acquired.campX,
+        campY = acquired.campY,
+        campZ = acquired.campZ,
+        campRadius = acquired.campRadius,
+        resourceRadius = acquired.resourceRadius,
+        seating = true,
+        floorSeating = acquired.floorSeating == true
+            or acquired.resourceKind == "floor_seating"
+            or acquired.target and acquired.target.floorSeating == true,
+        approachCandidates = acquired.approachCandidates
+            or acquired.targets,
+        resourceKind = acquired.resourceKind,
+        resourceKey = acquired.resourceKey,
+    })
+    if not ok and PNC.FacilityReservations
+        and acquired.reservationId
+        and PNC.FacilityReservations.Release
+    then
+        PNC.FacilityReservations.Release(
+            acquired.reservationId, "ambient_start_failed")
+    end
+    return ok == true
+end
 
 function Service.StopSeat(record, reason)
     if not record or not PNC.FacilityJobs or not PNC.FacilityJobs.Stop then
@@ -239,33 +206,6 @@ function Service.StopSeat(record, reason)
     end
     return PNC.FacilityJobs.Stop(
         record, reason or "ambient_seat_stopped") == true
-end
-
-function Service.Pump(currentTime)
-    currentTime = tonumber(currentTime) or now()
-    if not PNC.Registry then return 0 end
-    local started = 0
-    local function consider(record)
-        local allowed, camp, base = eligible(record, currentTime)
-        if not allowed then return end
-        Service.NextAttemptAt[tostring(record.id)] =
-            currentTime + Service.CADENCE_MS
-        local live = liveBody(record)
-        local acquired
-        if camp then
-            acquired = campSeat(record, live)
-        else
-            acquired = homeSeat(record, base, live)
-        end
-        if start(record, acquired, camp, live) then
-            started = started + 1
-        end
-    end
-    if PNC.Registry.ForEach then PNC.Registry.ForEach(consider)
-    else
-        for _, record in pairs(PNC.Registry.Data or {}) do consider(record) end
-    end
-    return started
 end
 
 return Service

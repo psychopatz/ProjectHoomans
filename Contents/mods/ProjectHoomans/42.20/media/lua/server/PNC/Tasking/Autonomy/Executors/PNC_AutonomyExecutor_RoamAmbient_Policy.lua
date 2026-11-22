@@ -3,18 +3,17 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 PNC = PNC or {}
-PNC.RoamAmbient = PNC.RoamAmbient or {}
+PNC.AutonomyExecutors = PNC.AutonomyExecutors or {}
+PNC.AutonomyExecutors.RoamAmbient = PNC.AutonomyExecutors.RoamAmbient or {}
 
-local Service = PNC.RoamAmbient
+local Service = PNC.AutonomyExecutors.RoamAmbient
 local Core = PNC.Core
 local Const = PNC.Const or {}
 local ActorControl = PNC.ActorControl
     or require "PNC/Core/ActorControl/PNC_ActorControl"
 
 Service.NextAttemptAt = Service.NextAttemptAt or {}
-Service.CADENCE_MS = 5000
 Service.MIN_IDLE_MS = 1200
-Service.MAX_ATTEMPTS_PER_TICK = 4
 Service.ACTION_COOLDOWN_MS = 30000
 Service.SCHEDULE_WINDOW_HOURS = 0.75
 Service.NIGHT_START_HOUR = 22
@@ -67,9 +66,6 @@ function Service.IsRoamOrder(record)
 end
 
 function Service.IsUnowned(record)
-    -- A temporary ambient visit is explicitly authorized by the server
-    -- lease. It may belong to an AI faction, so the normal player-ownership
-    -- test is intentionally not used for this narrow presentation path.
     if PNC.AmbientVisitService
         and PNC.AmbientVisitService.IsActive
         and PNC.AmbientVisitService.IsActive(record)

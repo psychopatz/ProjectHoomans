@@ -245,14 +245,23 @@ PNC.FacilityJobs = {
         return true
     end,
 }
-local Ambient = T.load("ProjectHoomans", "server",
-    "PNC/Settlement/FacilityJobs/PNC_AmbientFacilityService.lua")
+local FacilitySeat = T.load("ProjectHoomans", "server",
+    "PNC/Tasking/Autonomy/Executors/PNC_AutonomyExecutor_FacilitySeat.lua")
+T.equal(PNC.LivingRoomService, nil, "legacy LivingRoomService global must be retired")
+T.equal(PNC.AmbientFacilityService, nil, "legacy AmbientFacilityService global must be retired")
+T.equal(FacilitySeat.Pump, nil, "retired polling Pump must not exist on FacilitySeat executor")
+
 PNC.CampResourceService.AcquireSeat = function() return nil end
-T.equal(Ambient.Pump(900), 0,
+local eligible1, camp1, base1 = FacilitySeat.IsEligible(ambientRecord)
+T.truthy(eligible1 and camp1 == true, "camp companion must be eligible for FacilitySeat")
+T.equal(FacilitySeat.AcquireSeat(ambientRecord, nil, camp1, base1), nil,
     "camp seating does not fall through to the home-seat resolver")
+
 PNC.CampResourceService.AcquireSeat = function() return campSeat end
-T.equal(Ambient.Pump(6000), 1,
-    "idle camp companion starts an ambient seating activity")
+local eligible2, camp2, base2 = FacilitySeat.IsEligible(ambientRecord)
+local acquiredCamp = eligible2 and FacilitySeat.AcquireSeat(ambientRecord, nil, camp2, base2) or nil
+T.truthy(acquiredCamp and FacilitySeat.StartSeat(ambientRecord, acquiredCamp, camp2, nil),
+    "idle camp companion starts a FacilitySeat autonomy activity")
 T.truthy(ambientStartOptions and ambientStartOptions.campActivity,
     "ambient seating marks the activity as camp-owned")
 T.truthy(ambientStartOptions and ambientStartOptions.seating,
@@ -261,7 +270,7 @@ T.truthy(ambientStartOptions and ambientStartOptions.seating,
 PNC.IndividualNeeds = {
     Queries = { GetSleepIntent = function() return { urgency = 1 } end },
 }
-T.equal(Ambient.Pump(12000), 0,
+T.falsy(FacilitySeat.IsEligible(ambientRecord),
     "actionable sleep prevents ambient dining-chair selection")
 PNC.IndividualNeeds = nil
 

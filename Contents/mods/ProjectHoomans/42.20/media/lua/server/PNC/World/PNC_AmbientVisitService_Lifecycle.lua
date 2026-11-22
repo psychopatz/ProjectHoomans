@@ -31,10 +31,11 @@ function Service.Release(recordOrID, reason, at)
         record = PNC.Registry.Get(id)
     end
     body = record and liveBody(record) or nil
+    local roamAmbient = PNC.AutonomyExecutors and PNC.AutonomyExecutors.RoamAmbient or nil
     if record and record.runtime and record.runtime.roamAmbient
-        and PNC.RoamAmbient and PNC.RoamAmbient.Stop
+        and roamAmbient and roamAmbient.Stop
     then
-        pcall(PNC.RoamAmbient.Stop, record, body,
+        pcall(roamAmbient.Stop, record, body,
             reason or "ambient_visit_released", "movement")
     end
     current = record and record.orderSpec or nil

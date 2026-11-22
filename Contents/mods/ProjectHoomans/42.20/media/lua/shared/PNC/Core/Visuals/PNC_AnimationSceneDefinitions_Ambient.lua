@@ -10,7 +10,8 @@ local DRINK_STEPS = Internal.DRINK_STEPS or {}
 
 
 local function ambientRoamTick(record, zombie, scene, now)
-    local service = PNC and PNC.RoamAmbient
+    local service = PNC and PNC.AutonomyExecutors
+        and PNC.AutonomyExecutors.RoamAmbient
     if service and service.OnSceneTick then
         return service.OnSceneTick(record, zombie, scene, now)
     end
@@ -18,7 +19,8 @@ local function ambientRoamTick(record, zombie, scene, now)
 end
 
 local function ambientRoamStopped(record, zombie, scene, reason)
-    local service = PNC and PNC.RoamAmbient
+    local service = PNC and PNC.AutonomyExecutors
+        and PNC.AutonomyExecutors.RoamAmbient
     if service and service.OnSceneStopped then
         service.OnSceneStopped(record, zombie, scene, reason)
     end

@@ -11,8 +11,6 @@ PNC.CoreWorldDiscoveryAdapter =
 local Adapter = PNC.CoreWorldDiscoveryAdapter
 local Discovery = PNC.WorldDiscovery
 local Types = PNC.WorldDiscoveryTypes
-local ImportSource = PNC.SurvivorWorldImportSource
-    or require "PNC/Director/PNC_SurvivorWorldImportSource"
 local World = require
     "PsychopatzCore/SurvivorWorld/PsychopatzSurvivorWorld"
 
@@ -147,94 +145,6 @@ function Adapter.ToPNC(raw)
     return output
 end
 
-local function mergeEntry(current, incoming)
-    if not current then return copy(incoming), true end
-    local changed = false
-    if (tonumber(incoming.phase) or 0)
-        > (tonumber(current.phase) or 0)
-    then
-        current.phase = incoming.phase
-        changed = true
-    end
-    for _, field in ipairs({
-        "source", "discoveredAt", "updatedAt",
-        "x", "y", "z", "arrivalState",
-        "searchedAt", "contactedAt",
-        "presenceStatus", "factionKnown",
-        "factionID", "factionName",
-    }) do
-        local incomingValue = incoming[field]
-        if incomingValue ~= nil then
-            if field == "searchedAt"
-                or field == "contactedAt"
-                or field == "updatedAt"
-            then
-                if (tonumber(incomingValue) or 0)
-                    > (tonumber(current[field]) or 0)
-                then
-                    current[field] = copy(incomingValue)
-                    changed = true
-                end
-            elseif current[field] == nil then
-                current[field] = copy(incomingValue)
-                changed = true
-            elseif field == "factionKnown"
-                and incomingValue == true
-                and current[field] ~= true
-            then
-                current[field] = true
-                changed = true
-            end
-        end
-    end
-    return current, changed
-end
-
-function Adapter.Merge(core, legacy)
-    core = type(core) == "table" and copy(core)
-        or { revision = 0, players = {} }
-    legacy = Adapter.ToCore(legacy)
-    core.players = core.players or {}
-    local changed = false
-
-    for key, incomingPlayer in pairs(legacy.players or {}) do
-        local current = core.players[key]
-        if not current then
-            core.players[key] = copy(incomingPlayer)
-            changed = true
-        else
-            current.entities = current.entities or {
-                community = {}, group = {}, signal = {},
-            }
-            for _, kind in ipairs({
-                "community", "group", "signal",
-            }) do
-                current.entities[kind] =
-                    current.entities[kind] or {}
-                for entityID, incoming in pairs(
-                    incomingPlayer.entities[kind] or {}
-                ) do
-                    local merged, didChange = mergeEntry(
-                        current.entities[kind][entityID],
-                        incoming
-                    )
-                    current.entities[kind][entityID] = merged
-                    changed = changed or didChange
-                end
-            end
-            current.lastRadioScanAt = math.max(
-                tonumber(current.lastRadioScanAt) or 0,
-                tonumber(incomingPlayer.lastRadioScanAt) or 0
-            )
-            current.radioScanCount = math.max(
-                tonumber(current.radioScanCount) or 0,
-                tonumber(incomingPlayer.radioScanCount) or 0
-            )
-        end
-    end
-    return core, changed
-end
-
 local function registry()
     local authority = PNC.CoreSurvivorWorldAuthority
     local current = authority and authority.Registry
@@ -329,41 +239,9 @@ function Adapter.ActivateCutover()
     if not current then
         return false, "core_survivor_world_unavailable"
     end
-    if Discovery.Loaded ~= true
-        and Discovery.Load
-    then
-        Discovery.Load()
-    end
-
-    local legacy = copy(Discovery.Registry or {})
-    local merged, changed = Adapter.Merge(
-        current:GetDiscovery(),
-        legacy
-    )
-    if changed then
-        current:SetDiscovery(merged)
-        World.RuntimeStore.MarkDirty(
-            "pnc_world_discovery_legacy_import"
-        )
-        local saved, reason =
-            World.RuntimeStore.Save()
-        if saved == false and reason ~= "not_dirty" then
-            return false, reason
-        end
-    end
 
     Adapter.Active = true
     Adapter.SyncFromCore()
-
-    if ImportSource.HasData("discovery") then
-        local retired, retireReason =
-            ImportSource.Retire("discovery")
-        if not retired
-            and retireReason ~= "already_empty"
-        then
-            return false, "discovery_import_source_retire_failed"
-        end
-    end
 
     local server =
         PsychopatzCore.SurvivorWorldDiscoveryServer
@@ -384,11 +262,8 @@ function Adapter.ActivateCutover()
 
     Adapter.LastCutover = {
         accepted = true,
-        importedPreSurvivorWorld = changed == true,
     }
-    return true, changed
-        and "import_cutover_complete"
-        or "cutover_active"
+    return true, "cutover_active"
 end
 
 local function onInitGlobalModData()

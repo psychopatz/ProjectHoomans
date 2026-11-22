@@ -239,7 +239,7 @@ local pncPayload = assert(PNC.Persistence.SerializeRecord(p10Record))
 
 -- PNC save envelope keeps ONLY PNC-specific extensions; zero generic social graph!
 T.equal(pncPayload.social.authority, "core", "PNC social envelope records core authority")
-T.equal(pncPayload.social.coreSocialMigrationVersion, 1, "PNC social envelope records migration version 1")
+T.equal(pncPayload.social.coreSocialMigrationVersion, nil, "PNC social envelope omits retired migration version")
 T.equal(pncPayload.social.relationships, nil, "PNC save payload omits generic relationships table")
 T.equal(pncPayload.social.recentEventIDs, nil, "PNC save payload omits generic recentEventIDs")
 T.equal(pncPayload.social.personality, nil, "PNC save payload omits generic personality")
@@ -286,83 +286,6 @@ T.equal(reloadedRel.baselineApproval, 5, "Reloaded baselineApproval comes from C
 T.equal(#reloadedRel.memories, 2, "Reloaded memories come from Core authority")
 T.equal(reloadedRel.bond.class, "friend", "Reloaded bond comes from PNC extension envelope")
 T.equal(#reloadedRel.interactionJournal, 1, "Reloaded interactionJournal comes from PNC extension envelope")
-
--- Supported legacy/pre-P10 save migrates into Core exactly once, then saves in new shape
-local legacyActor = assert(freshReg:Create({
-    actorId = "actor:p10:legacy",
-    identitySeed = "p10-legacy-seed",
-    providerLease = { leaseID = "lease:p10:legacy", provider = "ProjectHoomans", owner = "ProjectHoomans" },
-}))
-local legacyRaw = PNC.Persistence.ImportPlan.Copy(pncPayload)
-legacyRaw.id = "actor:p10:legacy"
-legacyRaw.repairVersions = nil
-legacyRaw.social = {
-    schemaVersion = 4,
-    revision = 3,
-    morale = 9,
-    moraleBaseline = 2,
-    lastEvaluatedAt = 50,
-    recentEventIDs = { "ev:legacy:1" },
-    relationships = {
-        [playerKey] = {
-            approval = 18,
-            respect = 11,
-            familiarity = 14,
-            baselineApproval = 8,
-            baselineRespect = 4,
-            state = "neutral",
-            revision = 3,
-            bond = { schemaVersion = 1, class = "friend", establishedAt = 50, source = "legacy" },
-            interactionJournal = {
-                { eventID = "legacy:int:1", interactionType = "conversation", at = 50, worldAgeHours = 50, applied = true },
-            },
-            interactionRevision = 1,
-            memories = {
-                {
-                    id = "legacy:pre_p10:mem_1",
-                    type = "treated_wound",
-                    aboutKey = playerKey,
-                    createdAt = 50,
-                    lastEvaluatedAt = 50,
-                    approvalEffect = 10,
-                    respectEffect = 7,
-                    strength = 1,
-                    decayPerDay = 0.05,
-                    knowledgeSource = "experienced",
-                    retentionClass = "LONG",
-                    salience = 140,
-                },
-            },
-        },
-    },
-}
-
-local migrated = assert(PNC.Persistence.DeserializeRecord(legacyRaw, "actor:p10:legacy"))
-T.equal(migrated.persistenceRepairVersions.core_social_single_authority, 1,
-    "Legacy pre-P10 save records single-authority migration version")
-local migratedCoreActor = assert(freshReg:Get("actor:p10:legacy"))
-local migratedCoreRel = assert(CoreActors.Social.Get(migratedCoreActor.social, playerKey))
-T.equal(migratedCoreRel.approval, 18, "Legacy approval imported into Core")
-T.equal(migratedCoreRel.baselineApproval, 8, "Legacy baselineApproval imported into Core")
-T.equal(#migratedCoreRel.memories, 1, "Legacy memory imported into Core")
-T.equal(migratedCoreRel.memories[1].id, "legacy:pre_p10:mem_1", "Legacy memory ID preserved in Core")
-
-local secondMigOk, secondMigReason = PNC.Persistence.CoreSocial.MigrateLegacyRecordToCore(
-    migrated, legacyRaw.social, PsychopatzCore
-)
-T.equal(secondMigOk, false, "Second legacy migration does not rerun")
-T.equal(secondMigReason, "already_migrated", "Second migration reports already_migrated")
-T.equal(#CoreActors.Social.Get(freshReg:Get("actor:p10:legacy").social, playerKey).memories, 1,
-    "Legacy memory imported into Core exactly once")
-
-local nextSavePayload = assert(PNC.Persistence.SerializeRecord(migrated))
-T.equal(nextSavePayload.social.authority, "core", "Next save after migration uses core authority shape")
-T.equal(nextSavePayload.social.relationships, nil, "Next save after migration omits generic relationships")
-T.equal(nextSavePayload.social.morale, 9, "Next save preserves legacy morale")
-T.equal(nextSavePayload.social.relationshipExtensions[playerKey].bond.class, "friend",
-    "Next save preserves legacy bond extension")
-T.equal(#nextSavePayload.social.relationshipExtensions[playerKey].interactionJournal, 1,
-    "Next save preserves legacy interactionJournal extension")
 
 PsychopatzCore.Actors.DefaultRegistry = registry
 

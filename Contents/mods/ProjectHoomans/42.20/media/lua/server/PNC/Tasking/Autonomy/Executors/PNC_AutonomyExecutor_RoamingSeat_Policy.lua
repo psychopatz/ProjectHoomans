@@ -1,16 +1,14 @@
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
-local Service = PNC.RoamingSeat
+local Service = PNC.AutonomyExecutors.RoamingSeat
 local Internal = Service.Internal or {}
 local Core = PNC.Core
 local Const = PNC.Const or {}
-local Common = PNC.BehaviorCommon
 local Jobs = PNC.FacilityJobs
 local Resources = PNC.FacilityResources
 local Targets = PNC.FacilityInteractionTargets
 local Reservations = PNC.FacilityReservations
-local Diagnostics = PNC.PerformanceScalingDiagnostics
 local ActorControl = PNC.ActorControl
     or require "PNC/Core/ActorControl/PNC_ActorControl"
 
@@ -31,7 +29,8 @@ local function facilityReservations()
 end
 
 local function currentTime(value)
-    return tonumber(value) or Core.Now()
+    local core = PNC.Core or Core
+    return tonumber(value) or (core and core.Now and core.Now() or 0)
 end
 
 local function orderKind(record)
@@ -40,13 +39,11 @@ local function orderKind(record)
 end
 
 local function isRoamOrder(record)
-    local kind = orderKind(record)
-    return kind == tostring(Const.ORDER_ROAM or "roam")
+    return orderKind(record) == tostring(Const.ORDER_ROAM or "roam")
 end
 
 local function isGuardOrder(record)
-    local kind = orderKind(record)
-    return kind == tostring(Const.ORDER_GUARD or "guard")
+    return orderKind(record) == tostring(Const.ORDER_GUARD or "guard")
 end
 
 local function isSeatOrder(record, state)
@@ -80,7 +77,8 @@ local function isReserved(resource)
 end
 
 local function distanceTo(zombie, x, y)
-    return Core.Distance(zombie:getX(), zombie:getY(), x, y)
+    local core = PNC.Core or Core
+    return core.Distance(zombie:getX(), zombie:getY(), x, y)
 end
 
 local function hasActivePath(record)
@@ -103,7 +101,8 @@ end
 local function canAttempt(record, zombie, roaming, at)
     local runtime = record and record.runtime or nil
     local target = runtime and runtime.target or nil
-    if not Core.IsAuthority() or not record or not zombie
+    local core = PNC.Core or Core
+    if (core and core.IsAuthority and not core.IsAuthority()) or not record or not zombie
         or record.alive == false or not isRoamOrder(record)
         or not roaming or roaming.phase ~= "idle"
     then
@@ -126,11 +125,6 @@ local function canAttempt(record, zombie, roaming, at)
     then
         return false
     end
-    if ActorControl and ActorControl.IsPuppetOwned
-        and ActorControl.IsPuppetOwned(record)
-    then
-        return false
-    end
     if type(target) == "table" and target.kind ~= nil then return false end
     return runtime.animationScene == nil and not hasActivePath(record)
 end
@@ -150,7 +144,8 @@ local function canAttemptGuard(record, zombie, order, at)
         or record and record.y or 0
     local stopDistance = tonumber(Const.GUARD_STOP_DISTANCE)
         or tonumber(Const.GUARD_REACHED_DISTANCE) or 0.55
-    if not Core.IsAuthority() or not record or not zombie
+    local core = PNC.Core or Core
+    if (core and core.IsAuthority and not core.IsAuthority()) or not record or not zombie
         or record.alive == false or not isGuardOrder(record)
     then
         return false
@@ -166,7 +161,7 @@ local function canAttemptGuard(record, zombie, order, at)
     if runtime.animationScene ~= nil or hasActivePath(record) then
         return false
     end
-    local distance = Core.Distance(bodyX, bodyY, anchorX, anchorY)
+    local distance = core.Distance(bodyX, bodyY, anchorX, anchorY)
     return distance <= math.max(0.45, stopDistance)
 end
 
@@ -179,7 +174,6 @@ local function idHash(value, modulus)
     end
     return hash
 end
-
 
 Internal.facilityJobs = facilityJobs
 Internal.facilityResources = facilityResources

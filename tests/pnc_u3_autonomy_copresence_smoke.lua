@@ -325,14 +325,6 @@ PNC.FacilityJobs = {
     end,
 }
 
-local LivingRoomAlias = T.load("ProjectHoomans", "server", "PNC/Settlement/FacilityJobs/PNC_LivingRoomService.lua")
-T.truthy(LivingRoomAlias == PNC.AmbientFacilityService,
-    "PNC_LivingRoomService must alias PNC.AmbientFacilityService")
-local livingRoomSrc = T.read("ProjectHoomans", "server",
-    "PNC/Settlement/FacilityJobs/PNC_LivingRoomService.lua")
-T.falsy(livingRoomSrc:find("Registry.ForEach", 1, true),
-    "PNC_LivingRoomService must not retain dead Registry.ForEach polling loop")
-
 package.preload["PNC/Tasking/PNC_WorkTaskProvider"] = function() return {} end
 package.preload["PNC/Tasking/PNC_CorpseHaulService"] = function() return {} end
 package.preload["PNC/Tasking/PNC_TaskRequestService"] = function() return {} end
@@ -340,6 +332,14 @@ T.load("ProjectHoomans", "server", "PNC/Tasking/PNC_TaskPriority.lua")
 T.load("ProjectHoomans", "server", "PNC/Tasking/PNC_TaskLeaseService.lua")
 T.load("ProjectHoomans", "server", "PNC/Tasking/PNC_Tasking.lua")
 T.load("ProjectHoomans", "server", "PNC/Tasking/PNC_TaskProviders.lua")
+
+T.equal(PNC.LivingRoomService, nil, "legacy PNC.LivingRoomService must be retired")
+T.equal(PNC.AmbientFacilityService, nil, "legacy PNC.AmbientFacilityService must be retired")
+T.equal(PNC.RoamingSeat, nil, "legacy PNC.RoamingSeat must be retired")
+T.equal(PNC.RoamAmbient, nil, "legacy PNC.RoamAmbient must be retired")
+T.truthy(PNC.AutonomyExecutors and PNC.AutonomyExecutors.FacilitySeat
+    and PNC.AutonomyExecutors.RoamingSeat and PNC.AutonomyExecutors.RoamAmbient,
+    "AutonomyTaskProvider must fold FacilitySeat, RoamingSeat, RoamAmbient under PNC.AutonomyExecutors")
 
 T.truthy(PNC.Tasking.WATCHDOG_DOMAINS.autonomy == true,
     "autonomy must be registered in WATCHDOG_DOMAINS")
@@ -443,9 +443,9 @@ PNC.AnimationScenes = {
     Interrupt = function(rec) rec.runtime.animationScene = nil end,
     ClearScene = function(rec) rec.runtime.animationScene = nil end,
 }
-T.load("ProjectHoomans", "server", "PNC/Settlement/FacilityJobs/PNC_RoamAmbientService.lua")
-PNC.RoamAmbient.GetWorldAgeHours = function() return 8.0 end
-PNC.RoamAmbient.LiveEligible = function(rec) return rec ~= nil and rec.alive ~= false end
+local roamExec = PNC.AutonomyExecutors.RoamAmbient
+roamExec.GetWorldAgeHours = function() return 8.0 end
+roamExec.LiveEligible = function(rec) return rec ~= nil and rec.alive ~= false end
 
 local roamEvalOk, roamLease = PNC.Tasking.Commands.Reevaluate(roamNpc.id, "roam_idle")
 T.truthy(roamEvalOk and roamLease and roamLease.sourceDomain == "autonomy",
@@ -465,8 +465,8 @@ end
 T.load("ProjectHoomans", "shared",
     "PNC/Core/Behaviors/PNC_BehaviorSystem_Tick_Ownership.lua")
 local directTicks = 0
-local origRoamTick = PNC.RoamAmbient.Tick
-PNC.RoamAmbient.Tick = function(...)
+local origRoamTick = roamExec.Tick
+roamExec.Tick = function(...)
     directTicks = directTicks + 1
     return origRoamTick(...)
 end
@@ -480,10 +480,10 @@ roamNpc.runtime.roamAmbient.taskLeaseId = "dead-lease-999"
 tickRun(roamNpc, nil, now)
 T.equal(roamNpc.runtime.roamAmbient, nil,
     "TickOwnership.Run must stop orphaned roamAmbient whose taskLeaseId was released")
-PNC.RoamAmbient.Tick = origRoamTick
+roamExec.Tick = origRoamTick
 PNC.Tasking.Commands.CancelLease(roamLease.leaseId, "test_roam_done")
 
--- 5. Behavior callers route through AMBIENT_OPPORTUNITY when autonomy registered & Pump skips LivingRoomService
+-- 5. Behavior callers route solely through AMBIENT_OPPORTUNITY & Server_SubsystemPumps has zero LivingRoomService fallback
 local emittedAmbientEvents = 0
 local unsub = PNC.Tasking.Events.Subscribe("AMBIENT_OPPORTUNITY", function()
     emittedAmbientEvents = emittedAmbientEvents + 1
@@ -525,8 +525,8 @@ T.equal(emittedAmbientEvents, 1,
 if unsub then PNC.Tasking.Events.Unsubscribe(unsub) end
 
 local serverPumpSrc = T.read("ProjectHoomans", "server", "PNC/Server/Server/PNC_Server_SubsystemPumps.lua")
-T.contains(serverPumpSrc, "PNC.Tasking.Providers",
-    "Server_SubsystemPumps must guard LivingRoomService.Pump behind autonomy provider check")
+T.falsy(serverPumpSrc:find("LivingRoomService", 1, true),
+    "Server_SubsystemPumps must not contain retired LivingRoomService fallback")
 
 -- 6. Colonist Debug UI rows + ColonistWindow debug tab taskBrainNpcID request
 local DebugRows = T.load("ProjectHoomans", "client", "PNC/UI/Colonist/PNC_ColonistDebugRows.lua")

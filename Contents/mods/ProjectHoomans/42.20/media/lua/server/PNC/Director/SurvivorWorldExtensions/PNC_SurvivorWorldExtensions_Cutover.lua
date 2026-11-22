@@ -6,21 +6,6 @@ end
 
 local Extensions = PNC.SurvivorWorldExtensions
 local I = Extensions.Internal
-local ImportSource = PNC.SurvivorWorldImportSource
-    or require "PNC/Director/PNC_SurvivorWorldImportSource"
-
-local IMPORT_KINDS = {
-    "factions",
-    "communities",
-    "abstractWorld",
-}
-
-local function hasImportSources()
-    for _, kind in ipairs(IMPORT_KINDS) do
-        if ImportSource.HasData(kind) then return true end
-    end
-    return false
-end
 
 local function currentCore()
     local adapter = PNC.CoreSurvivorWorldAdapter
@@ -194,20 +179,6 @@ function Extensions.RebuildAll(coreSnapshot)
     return true
 end
 
-local function retireImportSources()
-    for _, kind in ipairs(IMPORT_KINDS) do
-        if ImportSource.HasData(kind) then
-            local retired, reason = ImportSource.Retire(kind)
-            if not retired
-                and reason ~= "already_empty"
-            then
-                return false, reason
-            end
-        end
-    end
-    return true
-end
-
 function Extensions.ActivateCutover()
     if Extensions.Activating then
         return false, "survivor_world_cutover_reentrant"
@@ -225,12 +196,7 @@ function Extensions.ActivateCutover()
     end
 
     local loaded = Extensions.Load()
-    local importPresent = hasImportSources()
 
-    -- The first cutover captures only Hoomans-owned extension state while
-    -- pre-SurvivorWorld import sources still contain the complete old view.
-    -- Existing extension roots are authoritative on later loads and must not
-    -- be replaced from retired import sources.
     if loaded ~= true then
         Extensions.Registry = Extensions.CaptureAll()
         Extensions.Dirty = true
@@ -238,9 +204,7 @@ function Extensions.ActivateCutover()
 
     Extensions.Active = true
 
-    -- Persist Core first, then the Hoomans-only extension root. Import sources
-    -- are retired only after both durable targets are safe.
-    if importPresent or Extensions.Dirty then
+    if Extensions.Dirty then
         local saved
         saved, reason = Extensions.Save()
         if not saved and reason ~= "not_dirty" then
@@ -267,25 +231,14 @@ function Extensions.ActivateCutover()
         return false, reason
     end
 
-    local retired
-    retired, reason = retireImportSources()
-    if not retired then
-        Extensions.Active = false
-        Extensions.Activating = false
-        return false, reason
-    end
-
     Extensions.Activating = false
     Extensions.LastCutover = {
         accepted = true,
         coreRevision = core:Revision(),
         extensionRevision =
             tonumber(Extensions.Registry.revision) or 0,
-        importedPreSurvivorWorld = importPresent == true,
     }
-    return true, importPresent
-        and "import_cutover_complete"
-        or "cutover_active"
+    return true, "cutover_active"
 end
 
 function Extensions.RefreshFromCore()

@@ -46,99 +46,6 @@ PNC = {
     Core = { DeepCopy = deepCopy },
 }
 
-roots.PNC_Factions = {
-    schemaVersion = 6,
-    revision = 1,
-    byID = {
-        faction_import = {
-            id = "faction_import",
-            name = "Imported Faction",
-            archetypeID = "survivor",
-            memberIDs = {
-                actor_import = true,
-            },
-        },
-    },
-}
-roots.PNC_Communities = {
-    schemaVersion = 2,
-    revision = 1,
-    byID = {
-        community_import = {
-            id = "community_import",
-            factionID = "faction_import",
-            name = "Imported Camp",
-            mode = "settled",
-            status = "active",
-            home = {
-                x = 100, y = 200, z = 0, radius = 20,
-            },
-            memberIDs = {
-                actor_import = true,
-            },
-        },
-    },
-    sitesByID = {},
-}
-roots.PNC_AbstractWorld_v1 = {
-    schemaVersion = 1,
-    revision = 4,
-    locationsByID = {
-        aloc_import = {
-            id = "aloc_import",
-            type = "SETTLEMENT",
-            x = 100, y = 200, z = 0,
-        },
-    },
-    groupsByID = {
-        agroup_import = {
-            id = "agroup_import",
-            factionId = "faction_import",
-            homeCommunityId = "community_import",
-            groupType = "CARAVAN",
-            memberIds = { "actor_import" },
-            leaderId = "actor_import",
-            location = {
-                id = "aloc_import",
-                type = "SETTLEMENT",
-                x = 100, y = 200, z = 0,
-            },
-        },
-    },
-    encounters = {},
-    encounterCooldowns = {},
-    population = {
-        worldSeed = 5150,
-        sectors = {},
-    },
-}
-roots.PNC_WorldDiscovery_v1 = {
-    schemaVersion = 2,
-    revision = 1,
-    players = {
-        player_import = {
-            revision = 1,
-            entities = {
-                settlement = {
-                    community_import = {
-                        phase = 3,
-                        source = "visit",
-                        x = 100, y = 200, z = 0,
-                    },
-                },
-                mobile_group = {},
-            },
-        },
-    },
-}
-
-local before = deepCopy({
-    factions = roots.PNC_Factions,
-    communities = roots.PNC_Communities,
-    abstractWorld = roots.PNC_AbstractWorld_v1,
-    discovery = roots.PNC_WorldDiscovery_v1,
-})
-
 local Authority = T.load(
     "ProjectHoomans",
     "server",
@@ -150,66 +57,57 @@ T.truthy(Authority.Registry,
 T.equal(roots["PsychopatzCore.SurvivorWorld"], nil,
     "activation must not allocate Core ModData before init")
 
-local preview, source = Authority.PreviewImport()
-T.truthy(preview and source, "import preview must succeed")
-T.equal(preview.worldSeed, 5150, "imported world seed")
-T.truthy(preview.factions.faction_import, "faction preview")
-T.truthy(preview.communities.community_import, "community preview")
-T.truthy(preview.groups.agroup_import, "group preview")
-T.truthy(
-    preview.discovery.players.player_import,
-    "discovery preview"
-)
-
 local status = Authority.RefreshStatus()
+T.truthy(status.active, "Core SurvivorWorld status active")
 T.truthy(status.coreEmpty, "Core begins empty")
-T.truthy(status.needsImport,
-    "pre-SurvivorWorld data must report pending import")
+T.equal(status.needsImport, nil, "pre-SurvivorWorld import state omitted")
 
 for _, callback in ipairs(initCallbacks) do callback() end
 status = Authority.RefreshStatus()
-T.truthy(status.needsImport,
-    "init must not auto-import or dual-write source data")
+T.truthy(status.active, "init keeps Core SurvivorWorld active")
+T.truthy(status.coreEmpty, "init alone keeps empty Core state")
 
-local registry, reason = Authority.ImportPreSurvivorWorld({
-    reason = "test_cutover",
-})
-T.truthy(registry, reason)
-T.truthy(registry:GetFaction("faction_import"),
-    "imported faction missing")
-T.truthy(registry:GetCommunity("community_import"),
-    "imported community missing")
-T.truthy(registry:GetGroup("agroup_import"),
-    "imported group missing")
-
-local root = roots["PsychopatzCore.SurvivorWorld"]
-T.truthy(root and type(root.registry) == "string",
-    "import must persist the Core world root")
-
-T.equal(
-    roots.PNC_Factions.byID.faction_import.name,
-    before.factions.byID.faction_import.name,
-    "faction import source must remain read-only"
-)
-T.equal(
-    roots.PNC_AbstractWorld_v1.revision,
-    before.abstractWorld.revision,
-    "abstract-world import source must remain read-only"
-)
-
-local duplicate, duplicateReason =
-    Authority.ImportPreSurvivorWorld()
-T.falsy(duplicate,
-    "non-empty Core world must reject accidental re-import")
-T.equal(
-    duplicateReason,
-    "core_survivor_world_not_empty",
-    "re-import rejection reason"
-)
+assert(Authority.Registry:UpsertFaction({
+    id = "faction_canon",
+    name = "Canonical Faction",
+    archetypeID = "survivor",
+    memberActorIDs = { "actor_canon" },
+}))
+assert(Authority.Registry:UpsertCommunity({
+    id = "community_canon",
+    factionID = "faction_canon",
+    name = "Canonical Camp",
+    mode = "settled",
+    status = "active",
+    home = { x = 100, y = 200, z = 0, radius = 20 },
+    memberActorIDs = { "actor_canon" },
+}))
+assert(Authority.Registry:UpsertLocation({
+    id = "aloc_canon",
+    kind = "SETTLEMENT",
+    x = 100, y = 200, z = 0,
+}))
+assert(Authority.Registry:UpsertGroup({
+    id = "agroup_canon",
+    factionID = "faction_canon",
+    homeCommunityID = "community_canon",
+    groupType = "CARAVAN",
+    memberActorIDs = { "actor_canon" },
+    leaderActorID = "actor_canon",
+    location = {
+        id = "aloc_canon",
+        kind = "SETTLEMENT",
+        x = 100, y = 200, z = 0,
+    },
+}))
 
 status = Authority.RefreshStatus()
-T.falsy(status.coreEmpty, "Core should now be authoritative candidate")
-T.falsy(status.needsImport,
-    "completed import should clear import need")
+T.truthy(status.active, "populated Core stays active")
+T.falsy(status.coreEmpty, "populated Core is no longer empty")
+T.equal(status.core.factions, 1, "Core faction count reported")
+T.equal(status.core.communities, 1, "Core community count reported")
+T.equal(status.core.locations, 1, "Core location count reported")
+T.equal(status.core.groups, 1, "Core group count reported")
+T.equal(status.core.discoveryPlayers, 0, "Core discovery count reported")
 
 T.finish("pnc_core_survivor_world_authority_smoke")

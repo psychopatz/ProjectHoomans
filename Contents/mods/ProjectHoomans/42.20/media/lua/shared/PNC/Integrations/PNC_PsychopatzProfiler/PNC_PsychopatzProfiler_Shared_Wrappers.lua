@@ -119,14 +119,12 @@ function Internal.InstallDeepSharedPerformanceWrappers()
     -- subsystem owns the actor.
     Internal.Wrap(PNC.BehaviorRoaming, "Tick",
         "ProjectHoomans.Server.Update.NPC.Roaming.Tick")
-    Internal.Wrap(PNC.RoamAmbient, "Tick",
-        "ProjectHoomans.Server.Update.NPC.Roaming.Ambient.Tick")
-    Internal.Wrap(PNC.RoamAmbient, "TryStart",
-        "ProjectHoomans.Server.Update.NPC.Roaming.Ambient.TryStart")
-    Internal.Wrap(PNC.RoamingSeat, "Tick",
-        "ProjectHoomans.Server.Update.NPC.Roaming.Seat.Tick")
-    Internal.Wrap(PNC.RoamingSeat, "TryStart",
-        "ProjectHoomans.Server.Update.NPC.Roaming.Seat.TryStart")
+    if PNC.AutonomyExecutors then
+        Internal.Wrap(PNC.AutonomyExecutors.RoamAmbient, "Tick",
+            "ProjectHoomans.Server.Update.NPC.Roaming.Ambient.Tick")
+        Internal.Wrap(PNC.AutonomyExecutors.RoamingSeat, "Tick",
+            "ProjectHoomans.Server.Update.NPC.Roaming.Seat.Tick")
+    end
 
     -- Combat orchestration markers. These are installed only while explicit
     -- time-bounded deep capture is enabled and restore on expiry or stop.

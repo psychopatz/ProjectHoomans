@@ -1,30 +1,19 @@
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
-local Service = PNC.RoamingSeat
+local Service = PNC.AutonomyExecutors.RoamingSeat
 local Internal = Service.Internal or {}
-local Core = PNC.Core
-local Const = PNC.Const or {}
-local Common = PNC.BehaviorCommon
-local Jobs = PNC.FacilityJobs
-local Resources = PNC.FacilityResources
-local Targets = PNC.FacilityInteractionTargets
-local Reservations = PNC.FacilityReservations
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 local ActorControl = PNC.ActorControl
     or require "PNC/Core/ActorControl/PNC_ActorControl"
 
-local facilityJobs = Internal.facilityJobs
 local facilityResources = Internal.facilityResources
 local facilityReservations = Internal.facilityReservations
-local currentTime = Internal.currentTime
-local findSeat = Internal.findSeat
 local SCENE_ID = Internal.SCENE_ID
 local FLOOR_SCENE_ID = Internal.FLOOR_SCENE_ID
 local AMBIENT_FACILITY_ID = Internal.AMBIENT_FACILITY_ID
 local RESERVATION_PURPOSE = Internal.RESERVATION_PURPOSE
 local GUARD_RESERVATION_PURPOSE = Internal.GUARD_RESERVATION_PURPOSE
-local beginAttempt = Internal.beginAttempt
 
 local function startCandidate(record, zombie, candidate, at, ownerKind)
     local resourcesService = facilityResources()
@@ -55,6 +44,7 @@ local function startCandidate(record, zombie, candidate, at, ownerKind)
         })
     if not ok or type(reservation) ~= "table" then return false end
     runtime = record.runtime or {}
+    record.runtime = runtime
     floorSeating = candidate.resource.floorSeating == true
         or candidate.target.floorSeating == true
         or tostring(candidate.resource.resourceKind or "") == "floor_seating"
@@ -126,17 +116,4 @@ local function startCandidate(record, zombie, candidate, at, ownerKind)
     return Service.Tick(record, zombie, at)
 end
 
-local function startSeat(record, zombie, at, ownerKind)
-    local id = tostring(record and record.id or "")
-    if ActorControl and ActorControl.IsPuppetOwned
-        and ActorControl.IsPuppetOwned(record)
-    then
-        return false
-    end
-    if not beginAttempt(id, at) then return false end
-    local candidate = findSeat(record, zombie)
-    return startCandidate(record, zombie, candidate, at, ownerKind)
-end
-
 Service.StartCandidate = startCandidate
-Internal.startSeat = startSeat

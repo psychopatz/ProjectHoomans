@@ -517,8 +517,8 @@ T.equal(PNC.FactionTelemetry.GetRecent(512)[1].result,
     "accepted", "telemetry reads copied")
 T.equal(Factions.Registry.revision, telemetryRevision,
     "telemetry revision neutral")
-T.equal(globalData.PNC_Factions.telemetry, nil,
-    "telemetry never enters faction ModData")
+T.equal(globalData.PNC_Factions, nil,
+    "legacy faction ModData root is never allocated")
 
 -- Isolated scenarios are deterministic and never touch persistence.
 local scenarioRevision = Factions.Registry.revision

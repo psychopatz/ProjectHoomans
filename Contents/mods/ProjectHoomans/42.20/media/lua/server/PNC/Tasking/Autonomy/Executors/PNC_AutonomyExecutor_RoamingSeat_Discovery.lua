@@ -1,28 +1,18 @@
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
-local Service = PNC.RoamingSeat
+local Service = PNC.AutonomyExecutors.RoamingSeat
 local Internal = Service.Internal or {}
-local Core = PNC.Core
-local Const = PNC.Const or {}
-local Common = PNC.BehaviorCommon
-local Jobs = PNC.FacilityJobs
-local Resources = PNC.FacilityResources
-local Targets = PNC.FacilityInteractionTargets
-local Reservations = PNC.FacilityReservations
-local Diagnostics = PNC.PerformanceScalingDiagnostics
-local ActorControl = PNC.ActorControl
-    or require "PNC/Core/ActorControl/PNC_ActorControl"
 
 local facilityResources = Internal.facilityResources
 local interactionTargets = Internal.interactionTargets
-local facilityReservations = Internal.facilityReservations
 local eachObject = Internal.eachObject
 local isReserved = Internal.isReserved
 local idHash = Internal.idHash
 local distanceTo = Internal.distanceTo
 local AMBIENT_FACILITY_ID = Internal.AMBIENT_FACILITY_ID
 local FLOOR_SCENE_ID = Internal.FLOOR_SCENE_ID
+
 local function floorSquareUsable(square, allowOccupied, x, y, z)
     local pathService
     local checked
@@ -32,9 +22,6 @@ local function floorSquareUsable(square, allowOccupied, x, y, z)
     if square.isSolidTrans and square:isSolidTrans() == true then
         return false
     end
-    -- Outdoor terrain is valid sitting ground even when the square has no
-    -- room-floor object. Solid/occupancy/path checks below are the actual
-    -- movement safety boundary.
     if allowOccupied == true then return true end
     pathService = PNC.PathService
     if pathService and pathService.IsSquareWalkable then
@@ -137,9 +124,6 @@ local function findSeat(record, zombie)
                             object
                         )
                         if not called or matched ~= true then return end
-                        -- Count only seat-like objects. Decorative clutter in
-                        -- a square should never consume the physical-chair
-                        -- search budget before the floor fallback is allowed.
                         if examined >= Service.MAX_OBJECTS then return end
                         examined = examined + 1
                         described, resource = pcall(
@@ -188,7 +172,6 @@ local function findSeat(record, zombie)
     end
     return best or floorSeatCandidate(record, zombie, cell)
 end
-
 
 Internal.findSeat = findSeat
 Service.FindCandidate = findSeat

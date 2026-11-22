@@ -211,7 +211,10 @@ end
 local Scenes = T.load("ProjectHoomans", "shared",
     "PNC/Core/Visuals/PNC_AnimationSceneDefinitions.lua")
 local Ambient = T.load("ProjectHoomans", "server",
-    "PNC/Settlement/FacilityJobs/PNC_RoamAmbientService.lua")
+    "PNC/Tasking/Autonomy/Executors/PNC_AutonomyExecutor_RoamAmbient.lua")
+T.equal(PNC.RoamAmbient, nil, "legacy PNC.RoamAmbient global must be retired")
+T.equal(Ambient.TryStart, nil, "retired polling TryStart must not exist on RoamAmbient executor")
+T.equal(Ambient.TryStartAmbient, nil, "retired polling TryStartAmbient must not exist on RoamAmbient executor")
 Ambient.GetWorldAgeHours = function() return worldHours end
 
 T.truthy(Scenes.Get("ambient.roam.eat"),
@@ -236,8 +239,9 @@ T.truthy(planA.scheduledAt ~= planB.scheduledAt,
 
 worldHours = 8.0
 local bodyA = newBody(10, 20)
-T.truthy(Ambient.TryStart(recordA, bodyA, recordA.orderSpec,
-    recordA.runtime.roaming, now),
+T.truthy(Ambient.CanAttempt(recordA, bodyA, recordA.runtime.roaming, now),
+    "idle unowned roamer must be eligible for ambient eating")
+T.truthy(Ambient.StartInstantAction(recordA, bodyA, planA, now),
     "idle unowned roamer did not start visual eating")
 T.equal(recordA.runtime.roamAmbient.action, "eat",
     "visual eating did not create ambient runtime state")
@@ -253,8 +257,7 @@ T.equal(requestedScenes[1], "ambient.roam.eat",
 Ambient.Stop(recordA, bodyA, "test_complete")
 now = 40000
 recordA.runtime.target = { kind = "zombie" }
-T.falsy(Ambient.TryStart(recordA, bodyA, recordA.orderSpec,
-    recordA.runtime.roaming, now),
+T.falsy(Ambient.CanAttempt(recordA, bodyA, recordA.runtime.roaming, now),
     "combat target did not block ambient eating")
 recordA.runtime.target = nil
 
@@ -262,8 +265,13 @@ worldHours = 22.0
 now = 100000
 local recordSleep = newRecord("ambient_sleep", "seed_a")
 local bodySleep = newBody(10, 20)
-T.truthy(Ambient.TryStart(recordSleep, bodySleep, recordSleep.orderSpec,
-    recordSleep.runtime.roaming, now),
+T.truthy(Ambient.CanAttempt(recordSleep, bodySleep, recordSleep.runtime.roaming, now),
+    "night-time roamer must be eligible for sleep ambience")
+local sleepPlan = Ambient.GetActionPlan(recordSleep, worldHours)
+local sleepCandidate = Ambient.FindSleepSurface(bodySleep)
+T.truthy(sleepPlan and sleepPlan.action == "sleep" and sleepCandidate ~= nil,
+    "night-time roamer must discover a nearby sleep surface")
+T.truthy(Ambient.StartSleep(recordSleep, bodySleep, sleepPlan, sleepCandidate, now),
     "night-time roamer did not acquire a nearby sleep surface")
 T.equal(recordSleep.runtime.roamAmbient.action, "sleep",
     "night-time ambience selected the wrong action")

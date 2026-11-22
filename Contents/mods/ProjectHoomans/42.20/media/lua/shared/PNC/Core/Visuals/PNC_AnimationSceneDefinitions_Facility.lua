@@ -133,7 +133,8 @@ Scenes.Register("facility.living.sit", {
         abstract = true,
     },
     onTick = function(record, zombie, scene, now)
-        local roaming = PNC and PNC.RoamingSeat
+        local roaming = PNC and PNC.AutonomyExecutors
+            and PNC.AutonomyExecutors.RoamingSeat
         if record and record.runtime and record.runtime.roamingSeat then
             if roaming and roaming.OnSceneTick then
                 return roaming.OnSceneTick(record, zombie, scene, now)
@@ -147,7 +148,8 @@ Scenes.Register("facility.living.sit", {
         return true
     end,
     onStop = function(record, zombie, scene, reason)
-        local roaming = PNC and PNC.RoamingSeat
+        local roaming = PNC and PNC.AutonomyExecutors
+            and PNC.AutonomyExecutors.RoamingSeat
         if record and record.runtime and record.runtime.roamingSeat then
             if roaming and roaming.OnSceneStopped then
                 roaming.OnSceneStopped(record, zombie, scene, reason)
@@ -249,7 +251,8 @@ Scenes.Register("ambient.roam.sitFurniture", {
         abstract = true,
     },
     onTick = function(record, zombie, scene, now)
-        local service = PNC and PNC.RoamingSeat
+        local service = PNC and PNC.AutonomyExecutors
+            and PNC.AutonomyExecutors.RoamingSeat
         if service and service.OnSceneTick then
             return service.OnSceneTick(record, zombie, scene, now)
         end
@@ -259,7 +262,8 @@ Scenes.Register("ambient.roam.sitFurniture", {
         return true
     end,
     onStop = function(record, zombie, scene, reason)
-        local service = PNC and PNC.RoamingSeat
+        local service = PNC and PNC.AutonomyExecutors
+            and PNC.AutonomyExecutors.RoamingSeat
         if service and service.OnSceneStopped then
             service.OnSceneStopped(record, zombie, scene, reason)
         end
