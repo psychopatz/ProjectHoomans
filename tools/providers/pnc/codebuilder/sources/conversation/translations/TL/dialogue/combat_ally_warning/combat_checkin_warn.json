@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.checkin.warn",
+  "locale": "TL",
+  "entries": {
+    "say.variants.injured": [
+      "Ligtas na! Ayos ka lang ba, {addressee.name}?",
+      "Tahimik na rito. {addressee.name}, malala ba tama mo?",
+      "Napatumba natin sila. Kaya pa ba, {addressee.name}?",
+      "Teka, {addressee.name}, dumurugo ka! Ayos ka lang ba?"
+    ],
+    "say.variants.clear": [
+      "Wala na sila, {addressee.name}. Ayos ba ang lahat?",
+      "Ligtas na, {addressee.name}. Nakatayo pa ba lahat?",
+      "Maayos ang laban, {addressee.name}. May nasugatan ba?",
+      "Tahimik na ang paligid, {addressee.name}. Ayos ka lang diyan?"
+    ]
+  }
+}

@@ -1,75 +1,39 @@
 -- Generated Conversation discovery index; do not edit by hand.
 return {
-    ["combat.player_assaulted.aggressive"] = {
+    ["combat.assault.betrayal"] = {
         ["domain"] = "combat_player_assault_reactions",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
         },
-        ["id"] = "combat.player_assaulted.aggressive",
+        ["id"] = "combat.assault.betrayal",
         ["kind"] = "dialogue",
-        ["source"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_aggressive.json",
+        ["source"] = "dialogue/combat_player_assault_reactions/combat_assault_betrayal.json",
     },
-    ["combat.player_assaulted.brave"] = {
+    ["combat.assault.friendly_fire"] = {
         ["domain"] = "combat_player_assault_reactions",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
         },
-        ["id"] = "combat.player_assaulted.brave",
+        ["id"] = "combat.assault.friendly_fire",
         ["kind"] = "dialogue",
-        ["source"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_brave.json",
+        ["source"] = "dialogue/combat_player_assault_reactions/combat_assault_friendly_fire.json",
     },
-    ["combat.player_assaulted.default"] = {
+    ["combat.assault.hostile_taunt"] = {
         ["domain"] = "combat_player_assault_reactions",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
         },
-        ["id"] = "combat.player_assaulted.default",
+        ["id"] = "combat.assault.hostile_taunt",
         ["kind"] = "dialogue",
-        ["source"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_default.json",
+        ["source"] = "dialogue/combat_player_assault_reactions/combat_assault_hostile_taunt.json",
     },
-    ["combat.player_assaulted.friendly_push"] = {
+    ["combat.assault.react"] = {
         ["domain"] = "combat_player_assault_reactions",
         ["generated"] = {
             "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
         },
-        ["id"] = "combat.player_assaulted.friendly_push",
+        ["id"] = "combat.assault.react",
         ["kind"] = "dialogue",
-        ["source"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_friendly_push.json",
-    },
-    ["combat.player_assaulted.looter_taunt"] = {
-        ["domain"] = "combat_player_assault_reactions",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
-        },
-        ["id"] = "combat.player_assaulted.looter_taunt",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_looter_taunt.json",
-    },
-    ["combat.player_assaulted.neutral_turned_hostile"] = {
-        ["domain"] = "combat_player_assault_reactions",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
-        },
-        ["id"] = "combat.player_assaulted.neutral_turned_hostile",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_neutral_turned_hostile.json",
-    },
-    ["combat.player_assaulted.reserved"] = {
-        ["domain"] = "combat_player_assault_reactions",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
-        },
-        ["id"] = "combat.player_assaulted.reserved",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_reserved.json",
-    },
-    ["combat.player_assaulted.shaken"] = {
-        ["domain"] = "combat_player_assault_reactions",
-        ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions",
-        },
-        ["id"] = "combat.player_assaulted.shaken",
-        ["kind"] = "dialogue",
-        ["source"] = "dialogue/combat_player_assault_reactions/combat_player_assaulted_shaken.json",
+        ["source"] = "dialogue/combat_player_assault_reactions/combat_assault_react.json",
     },
 }

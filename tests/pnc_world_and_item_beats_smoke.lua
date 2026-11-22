@@ -323,7 +323,7 @@ T.truthy(Beats.RegisterObjectBeatHook("test.acoustic_guitar", {
         return Beats.BuildWorldThread(anchor, partner, {
             refPrefix = "world:custom_guitar",
             family = "world_house_alarm",
-            poolID = "semantic.world_beats.television",
+            poolID = "semantic.world.object.notice",
             eventType = "world_television_beat",
             openRole = "tv_reminisce_open",
             priority = 40,

@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.assault.hostile_taunt",
+  "locale": "EN",
+  "entries": {
+    "say.variants.backpack": [
+      "Nice {slot.loot.name} on your back! Drop it before I pry it off you!",
+      "That {slot.loot.name} looks heavy. Let me relieve you of it!",
+      "Bet that {slot.loot.name} is stuffed with supplies. Empty it!",
+      "Looks like {slot.loot.name} is mine once you hit the dirt!"
+    ],
+    "say.variants.weapon": [
+      "Nice {slot.loot.name} you've got there! It'll look better in my hands!",
+      "Gonna pry that {slot.loot.name} right out of your cold fingers!",
+      "Hey, thanks for bringing me a {slot.loot.name}! Drop it now!",
+      "A clean {slot.loot.name} like that shouldn't go to waste on you!"
+    ],
+    "say.variants.money": [
+      "Still carrying {slot.loot.name} around like banks still matter? Drop your pack!",
+      "Got {slot.loot.name} or real supplies in those pockets? Hand it all over!",
+      "Empty your pockets! All that {slot.loot.name} and gear is ours now!",
+      "Let's see what else you're hoarding besides {slot.loot.name}!"
+    ],
+    "say.variants.general": [
+      "Empty your pockets now or bleed for every scrap you're carrying!",
+      "Nice haul you've got on you. Everything you're wearing is mine!",
+      "Stop running and hand over everything you've scavenged!",
+      "Looks like today's payday. Drop your gear and maybe you walk away!"
+    ]
+  }
+}

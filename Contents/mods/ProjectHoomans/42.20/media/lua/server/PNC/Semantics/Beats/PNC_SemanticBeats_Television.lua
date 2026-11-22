@@ -75,12 +75,14 @@ local function resolveShowInfo(dd, codes, line)
     return isLifeAndLiving and "life_and_living" or "show", showName
 end
 
-local function buildTelevisionPlan(anchor, partner, openRole, replyRole, fam, refPrefix, showName)
+local function buildTelevisionPlan(anchor, partner, openRole, replyRole, fam, refPrefix, showName, poolID)
     if type(Beats.BuildWorldThread) ~= "function" then return nil end
     return Beats.BuildWorldThread(anchor, partner, {
         refPrefix = refPrefix,
         family = fam,
-        poolID = "semantic.world_beats.television",
+        poolID = poolID or (string.sub(tostring(openRole or ""), 1, 11) == "tv_watching"
+            and "semantic.world.media.broadcast"
+            or "semantic.world.object.notice"),
         eventType = "world_television_beat",
         topic = "television",
         openAct = "CHAT",

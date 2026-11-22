@@ -1,0 +1,37 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.callout.reply_alerted",
+  "locale": "EN",
+  "entries": {
+    "say.variants.alerted_neutral": [
+      "Heard you, {addressee.name}! Looking for {target.name} {scene.location} now!",
+      "Turning to cover you, {addressee.name}, watch out for {target.name} {scene.location}!",
+      "Copy, {addressee.name}, backing you up against {target.name} {scene.location}!",
+      "Moving over, {addressee.name}, ready for {target.name} {scene.location}!"
+    ],
+    "say.variants.alerted_tactical": [
+      "Copy contact, {addressee.name}! Scanning for {target.name} {scene.location}!",
+      "Covering you, {addressee.name}, no visual on {target.name} {scene.location} yet!",
+      "On alert, {addressee.name}, moving for eyes on {target.name} {scene.location}!",
+      "Roger, {addressee.name}, moving to spot {target.name} {scene.location}!"
+    ],
+    "say.variants.alerted_hostile": [
+      "Keep {target.name} busy {scene.location}, {addressee.name}! Coming over now!",
+      "Don't let {target.name} slip {scene.location}, {addressee.name}, I'm coming in!",
+      "Hold {target.name} there {scene.location}, {addressee.name}, coming to drop them!",
+      "Pin {target.name} down {scene.location}, {addressee.name}, I'm coming around!"
+    ],
+    "say.variants.blindside_reply": [
+      "Whoa, good catch, {addressee.name}! I'm on it!",
+      "Thanks, {addressee.name}, almost missed that!",
+      "Got it, {addressee.name}, turning around now!",
+      "Close call! Appreciate the heads up, {addressee.name}!"
+    ],
+    "say.variants.last_one_reply": [
+      "Finish it off, {addressee.name}, I've got your back!",
+      "Right with you, {addressee.name}, drop this last one!",
+      "Let's wrap this up, {addressee.name}!",
+      "Put it down, {addressee.name}, area's almost clear!"
+    ]
+  }
+}

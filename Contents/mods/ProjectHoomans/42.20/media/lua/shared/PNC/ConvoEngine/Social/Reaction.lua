@@ -130,18 +130,26 @@ local function poolFor(spec)
     if eventType == "player_assaulted_npc" then
         local assaultKind = tostring(context.assaultKind or "")
         if assaultKind == "friendly_push" then
-            return "semantic.player_assaulted.friendly_push"
+            return "semantic.combat.assault.friendly_fire"
         end
         if assaultKind == "looter_taunt" then
-            return "semantic.player_assaulted.looter_taunt"
+            return "semantic.combat.assault.hostile_taunt"
         end
-        return "semantic.player_assaulted_npc"
+        return "semantic.combat.assault.react"
     end
     if eventType == "world_event_beat" then
-        return "semantic.world_beats.events"
+        local role = tostring(context.combatReactionRole or "")
+        if string.sub(role, 1, 11) == "house_alarm" then
+            return "semantic.world.alarm.react"
+        end
+        return "semantic.world.utility.outage"
     end
     if eventType == "world_television_beat" then
-        return "semantic.world_beats.television"
+        local role = tostring(context.combatReactionRole or "")
+        if string.sub(role, 1, 11) == "tv_watching" then
+            return "semantic.world.media.broadcast"
+        end
+        return "semantic.world.object.notice"
     end
     if eventType == "zombie_kill_witnessed"
         or eventType == "zombie_kill_self"

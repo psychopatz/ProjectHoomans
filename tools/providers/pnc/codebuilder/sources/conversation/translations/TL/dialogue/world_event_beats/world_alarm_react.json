@@ -1,0 +1,17 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "world.alarm.react",
+  "locale": "TL",
+  "entries": {
+    "say.variants.house_alarm_open": [
+      "Lintek, may alarma! {addressee.name}, maririnig ng lahat ng patay sa paligid 'yan!",
+      "Tumunog ang burglar alarm! {addressee.name}, maghanda na sa dadating!",
+      "Bwisit, ang ingay ng sirena! Mag-alerto, {addressee.name}, susugurin nila ang bahay na 'yon!"
+    ],
+    "say.variants.house_alarm_reply": [
+      "Dinig ko, {addressee.name}. Ihanda ang sandata at lumayo tayo sa ingay.",
+      "Ayos lang ang kailangan natin, {addressee.name}, mas marami pang gulo. Bantayan ang paligid.",
+      "Sige, {addressee.name}. Umalis na tayo rito bago sila magdagsaan."
+    ]
+  }
+}

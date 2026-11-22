@@ -1,0 +1,37 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.callout.reply_alerted",
+  "locale": "TL",
+  "entries": {
+    "say.variants.alerted_neutral": [
+      "Narinig kita, {addressee.name}! Hinahanap ko na ang {target.name} {scene.location}!",
+      "Lilingon ako para bantayan ka, {addressee.name}, ingat sa {target.name} {scene.location}!",
+      "Sige, {addressee.name}, susuporta ako laban sa {target.name} {scene.location}!",
+      "Papunta ako, {addressee.name}! Handa na laban sa {target.name} {scene.location}!"
+    ],
+    "say.variants.alerted_tactical": [
+      "Kopyado ang kontak, {addressee.name}! Nagmamasid {scene.location} para sa {target.name}!",
+      "Bantay ko ang likod mo, {addressee.name}, wala pang linaw ang {target.name} {scene.location}!",
+      "Alerto, {addressee.name}, humahanap ng tanaw sa {target.name} {scene.location}!",
+      "Sige, {addressee.name}, hahanapin ko ang {target.name} {scene.location}!"
+    ],
+    "say.variants.alerted_hostile": [
+      "Libangin ang {target.name} {scene.location}, {addressee.name}! Papunta na ako!",
+      "Huwag pakawalan ang {target.name} {scene.location}, {addressee.name}, papasok ako!",
+      "Pigilan mo ang {target.name} {scene.location}, {addressee.name}, pupuntahan ko na!",
+      "Ipitin ang {target.name} {scene.location}, {addressee.name}, umiikot na ako!"
+    ],
+    "say.variants.blindside_reply": [
+      "Buti nakita mo, {addressee.name}! Haharapin ko na!",
+      "Salamat, {addressee.name}, muntik ko nang hindi mapansin!",
+      "Sige, {addressee.name}, lilingon na ako!",
+      "Muntik na! Salamat sa babala, {addressee.name}!"
+    ],
+    "say.variants.last_one_reply": [
+      "Tapusin na natin, {addressee.name}, nasa likod mo ako!",
+      "Kasabay mo ako, {addressee.name}, patumbahin ang huling ito!",
+      "Tapusin na natin ang laban, {addressee.name}!",
+      "Ibaba mo na, {addressee.name}, halos tapos na rito!"
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "world.media.broadcast",
+  "locale": "TL",
+  "entries": {
+    "say.variants.tv_watching_life_and_living_open": [
+      "Teka, {addressee.name}, manood muna sa {slot.show.name}! Maraming matututunan sa kaligtasan dito.",
+      "Buti naabutan natin ang {slot.show.name}, {addressee.name}. Makinig mabuti, mahalaga bawat payo diyan.",
+      "Sandali lang, {addressee.name}, palabas ang {slot.show.name}! Sulitin natin habang may broadcast pa."
+    ],
+    "say.variants.tv_watching_life_and_living_reply": [
+      "Nakatutok na ako, {addressee.name}. Hinaan lang natin ang volume para di makaakit ng kalaban.",
+      "Tama ka, {addressee.name}. Malaking tulong talaga sa atin itong mga taga Life and Living.",
+      "Oo nga, {addressee.name}. Di ko inakalang palabas sa TV pala ang magsasanay sa atin."
+    ],
+    "say.variants.tv_watching_show_open": [
+      "Nakakapanibago pa ring makarinig ng boses sa {slot.show.name}, {addressee.name}. Parang normal saglit.",
+      "Mas okay na panoorin natin itong {slot.show.name}, {addressee.name}, kaysa makinig sa ungol sa labas.",
+      "Tingnan mo, tumutugtog pa rin ang {slot.show.name}, {addressee.name}. Hinaan lang nang kaunti."
+    ],
+    "say.variants.tv_watching_show_reply": [
+      "Nakakagaan kahit papaano makinig sa {slot.show.name} kasama ka, {addressee.name}.",
+      "Nakikinig ako sa palabas habang nakabantay sa bintana, {addressee.name}.",
+      "Masarap makarinig ng ibang tunog bukod sa hangin at static, {addressee.name}."
+    ]
+  }
+}

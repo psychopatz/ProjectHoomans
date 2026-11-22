@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "medical.bandage.cover_warn",
+  "locale": "TL",
+  "entries": {
+    "say.variants.self": [
+      "Bantayan mo ako, {addressee.name}, nagbibendahe muna ako!",
+      "Pigilan mo sila, {addressee.name}, tinatalian ko ang sugat ko!",
+      "{addressee.name}, magmatyag muna habang naglalagay ako ng bendahe!",
+      "Bigyan mo ako ng sandali, {addressee.name}, ginagamot ko sarili ko!"
+    ],
+    "say.variants.ally": [
+      "Bantayan mo kami, {addressee.name}, binibendahe ko si {target.name}!",
+      "Ilayo mo sila, {addressee.name}, ginagamot ko na si {target.name}!",
+      "Hawakan ang linya, {addressee.name}! Tinatalian ko sugat ni {target.name}!",
+      "Bantay sa likod namin, {addressee.name}, ginagamot si {target.name}!"
+    ]
+  }
+}

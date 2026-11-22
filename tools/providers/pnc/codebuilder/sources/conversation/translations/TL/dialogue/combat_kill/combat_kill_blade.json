@@ -1,0 +1,67 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.kill.blade",
+  "locale": "TL",
+  "entries": {
+    "say.variants.aggressive.blade_head": [
+      "Tanggal ang ulo.",
+      "Biyak ang bungo.",
+      "Naputol ang gulugod. Tapos.",
+      "Walang tatayo kapag walang ulo.",
+      "Bumaon diretso sa bulok na buto.",
+      "Putol ang leeg. Diyan ka lang.",
+      "Hiniwa hanggang bumagsak sa lupa.",
+      "Dire-diretso ang talim."
+    ],
+    "say.variants.brave.blade_head": [
+      "Malinis na hiwa. Sunod.",
+      "Pugot ang ulo. Sulong.",
+      "Tumama nang tumpak ang talim. Hawakan ang linya.",
+      "Isang hampas. Tuloy.",
+      "Bumagsak nang hindi nahihinto ang hakbang.",
+      "Napugutan. Linisin ang daan.",
+      "Banta bagsak na. Manatiling alerto.",
+      "Matatag na hampas. Pasulong."
+    ],
+    "say.variants.cold.blade_head": [
+      "Nawasak ang ulo. Tuloy.",
+      "Nahiwa sa leeg. Tuloy.",
+      "Winasak ang ulo nang buo.",
+      "Tumigil ang galaw. Sunod.",
+      "Basag ang bungo. Pasulong.",
+      "Wala nang buhay. Malinis.",
+      "Hiwa ang leeg. Tapos.",
+      "Walang natitirang kilos. Abante."
+    ],
+    "say.variants.practical.blade": [
+      "Ginawa ng talim ang trabaho nito. Tuloy.",
+      "Malinis na hiwa. Tignan ang talim.",
+      "Bagsak nang hindi gumagawa ng ingay.",
+      "Tahimik na patay. Panatilihing matalas ang mata.",
+      "Hiwa nang malinis. Huwag ibaba ang depensa.",
+      "Isang tahimik na pagbagsak. Tuloy ang hakbang.",
+      "Maayos pa ang talim. Pasulong.",
+      "Tahimik na naitumba ang target. Suriin ang pasilyo."
+    ],
+    "say.variants.reserved.blade": [
+      "Nahati.",
+      "Pugot.",
+      "Bagsak.",
+      "Tapos.",
+      "Malinis.",
+      "Yari.",
+      "Tanggal.",
+      "Bumagsak."
+    ],
+    "say.variants.shaken.blade_head": [
+      "Diyos ko... may dugo kahit saan.",
+      "Pira-piraso na... kailangan ko ng saglit.",
+      "Ang amoy... Diyos ko, masusuka yata ako.",
+      "Ramdam ko pa rin ang lagutok...",
+      "Diretso sa akin... kailangan kong hiwain.",
+      "Ayaw tumigil ng panginginig ng mga kamay ko...",
+      "Patay na ba talaga? Tingnan mo...",
+      "Kakila-kilabot 'yon... pero tapos na."
+    ]
+  }
+}

@@ -74,9 +74,9 @@ T.equal(replacement.responsePlan.turns[1].segments[1].text, firstText,
     "renderer replacement cannot change the selected response plan")
 
 local direct = Authority.Resolve({
-    poolID = "semantic.flow.farewell",
-    responsePlanID = "semantic.flow.farewell",
-    realizationFamily = "semantic.flow.farewell",
+    poolID = "semantic.social.farewell.depart",
+    responsePlanID = "semantic.social.farewell.depart",
+    realizationFamily = "semantic.social.farewell.depart",
     act = "FAREWELL",
     topic = "farewell",
     context = { npcID = "npc-mara", socialStyle = "friendly" },
@@ -112,11 +112,11 @@ representative("greeting", "semantic.flow.greeting.opening", function()
     })
 end)
 
-representative("farewell", "semantic.flow.farewell", function()
+representative("farewell", "semantic.social.farewell.depart", function()
     return Authority.Resolve({
-        poolID = "semantic.flow.farewell",
-        responsePlanID = "semantic.flow.farewell",
-        realizationFamily = "semantic.flow.farewell",
+        poolID = "semantic.social.farewell.depart",
+        responsePlanID = "semantic.social.farewell.depart",
+        realizationFamily = "semantic.social.farewell.depart",
         act = "FAREWELL",
         topic = "farewell",
         context = { npcID = "npc-mara", socialStyle = "friendly" },

@@ -1,15 +1,15 @@
 ---
 handoff_schema: 1
-updated_at: "2026-11-22T12:15:00Z"
+updated_at: "2026-11-22T12:24:30Z"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-participant_psychopatzCore_head: "89f7b85add7ff317bbac3c66bb004d35fda24f4a"
-participant_dynamicTrading_head: "976e240e527602326c735722d724d6334fe8a464"
+participant_psychopatzCore_head: "569e169"
+participant_dynamicTrading_head: "04febebf"
 state: "CLEAN_CHECKPOINT"
 parent_status: "IN_PROGRESS"
-phase: "D1"
-chunk: "Canonical semantic-family normalization (farewell, player_assault, overpacked combat/world pools, Core lint rules)"
+phase: "D2"
+chunk: "Unified actor disposition/personality projection across ActorAdapter, ChoicePolicy, Affordances, CombatReactionProfile, BeatContext, SpeechStyleContext"
 retrieval_tier: "verify"
 ---
 
@@ -17,16 +17,12 @@ retrieval_tier: "verify"
 
 ## What became true
 
-- **D0 Complete (CODE_VERIFIED, TEST_VERIFIED):** Froze `docs/Jobs/ThematicSemanticDialogueExpansion/D0_MANIFEST.json` against live heads (`ProjectHoomans`, `psychopatzCore`, `DynamicTrading`).
-- Verified baseline CodeBuilder `reconcile.py --check` is clean (`ok=true, clean=true`, 468 desired artifacts, 0 drifted/stale/missing).
-- Audited all 494 canonical definitions (369 PH, 125 Core): 409 transient beats, 64 shared behaviors/realizations, 21 interactive scenes; 5 flows (11 nodes); 107 actor-encoded IDs; 40 style-encoded IDs; 48 overpacked pools; 7 empty style dirs.
-- Mapped exact D2 disposition double-counting seams (`ChoicePolicy`, `GeneratedAffordanceProvider`, `SemanticCombatReactionProfile`, `BeatContext`, `SpeechStyleContext`, `ConversationRules_Conditions`), D3 transport leakage (`DialogueBeats` -> `CombatTargetCallouts` + `SocialFlavorClient` scene/thread collision + priority inversion), and D5A chronology/world-event/DynamicTrading projection seams.
+- **D1 Complete (CODE_VERIFIED, TEST_VERIFIED):**
+  - `psychopatzCore` (`569e169`): Added deterministic `convo_engine_hygiene_audit.py` + `hygiene-audit` CLI + unit tests (14/14 OK) and refreshed `FoundationRegistry.lua`.
+  - `DynamicTrading` (`04febebf`): Refreshed generated `DTCommon/ConvoEngine/{Manifest,Registry}.lua`.
+  - `ProjectHoomans`: Consolidated 15 `flow.farewell.*` -> `social.farewell.depart`; normalized 8 `combat.player_assaulted.*` -> 4 actor-agnostic `combat.assault.*` families; split `world.beats.*` -> 4 topic families; split overpacked `combat.ally_warn.*` (18+32) -> 14 cohesive families and `combat.kill.killer` (26) -> 4 weapon-domain families; pruned 7 empty `combat_banter_weapon_kill_*` dirs; reconciled CodeBuilder (`ok=true, clean=true`, 470 desired artifacts, 0 drift); verified 7 Lua smoke suites + 19 Python authority/reachability tests passing.
 
 ## Resume
 
-1. Execute **D1** (Canonical semantic-family normalization): consolidate `event_reactions_farewell`, `combat_player_assault_reactions`, split overpacked `combat.ally_warn.*` / `combat.kill.*` / `world_event_beats` pools, remove empty style dirs, migrate callers, run CodeBuilder `reconcile.py --apply` + `--check`, and add anti-duplication/anti-overpacking audit rules in `psychopatzCore`.
-2. Proceed sequentially through D2 -> D3 -> D4 -> D5 -> D5A -> D6 -> D7 -> D8, committing each accepted phase locally on `main` and stopping at D9.
-
-## Acceptance
-
-Developer acceptance requires D0–D8. D9 remains user-owned native SP/MP acceptance.
+1. Execute **D2** (Unified actor disposition/personality projection): converge `ActorAdapter_ProjectHoomans`, `ChoicePolicy`, `GeneratedAffordanceProvider`, `AffordanceResponder`, `SemanticCombatReactionProfile`, `BeatContext`, `SpeechStyleContext`, and literal trait predicates onto one resolved numeric disposition projection + transient demeanor overlay seam, with full D2 gate tests.
+2. Proceed sequentially through D3 -> D4 -> D5 -> D5A -> D6 -> D7 -> D8, stopping at D9.

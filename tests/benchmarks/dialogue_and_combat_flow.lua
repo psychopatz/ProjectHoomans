@@ -239,8 +239,8 @@ local sampleCtx = {
     combatReactionStyle = "tactical", combatReactionRole = "lead", inCombat = true,
 }
 local sampleResp = {
-    selectionID = "combat.ally_warn.callout.zombie_tactical",
-    templateID = "combat.ally_warn.callout.zombie_tactical",
+    selectionID = "combat.callout.threat.zombie_tactical",
+    templateID = "combat.callout.threat.zombie_tactical",
     fallback = "Eyes up!",
     plan = { schemaVersion = 1, kind = "dialogue_act_plan", dialogueAct = "WARN", turns = {} },
 }
@@ -578,7 +578,7 @@ local roles = { "hostile", "wary", "neutral", "colonist", "friend", "family", "l
 local seenFarewellTexts = {}
 local distinctRoleTexts = 0
 for _, r in ipairs(roles) do
-    local sel = Catalog.Select("semantic.flow.farewell", { socialRole = r, farewellSpeaker = "npc", npcID = "npc-" .. r }, 1)
+    local sel = Catalog.Select("semantic.social.farewell.depart", { socialRole = r, farewellSpeaker = "npc", npcID = "npc-" .. r }, 1)
     local ap = sel and SpeechRealization.Apply({
         selectionID = sel.id, templateID = sel.templateID, fallback = sel.fallback,
     }, { npcID = "npc-" .. r, socialRole = r, phraseSalt = "bench:" .. r }) or nil

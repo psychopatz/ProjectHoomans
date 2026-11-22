@@ -1,0 +1,49 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.callout.reply_wingman",
+  "locale": "EN",
+  "entries": {
+    "say.variants.engaging_neutral": [
+      "Right behind you, {addressee.name}! I'll flank {target.name}!",
+      "Got your back, {addressee.name}, pushing up on {target.name}!",
+      "With you, {addressee.name}! Let's stop {target.name} together!",
+      "Moving up beside you, {addressee.name}, watch {target.name}!"
+    ],
+    "say.variants.engaging_tactical": [
+      "Flanking wide, {addressee.name}, keep {target.name} pinned!",
+      "Stacking up behind you, {addressee.name}! Engaging {target.name}!",
+      "Covering your flank, {addressee.name}! Moving on {target.name}!",
+      "Closing the gap with you, {addressee.name}, locking down {target.name}!"
+    ],
+    "say.variants.engaging_hostile": [
+      "Save some of {target.name} for me, {addressee.name}! Going around!",
+      "Right behind you, {addressee.name}, let's drop {target.name}!",
+      "Cutting off {target.name} from the side, {addressee.name}!",
+      "Pushing in with you, {addressee.name}! Finish {target.name}!"
+    ],
+    "say.variants.shaken": [
+      "Oh shit, there's more? Stay close, {addressee.name}!",
+      "Keep them off me, {addressee.name}, watching behind us!"
+    ],
+    "say.variants.brave": [
+      "I'm ready too, {addressee.name}. Let's finish them.",
+      "Holding strong beside you, {addressee.name}, keep pushing!"
+    ],
+    "say.variants.aggressive": [
+      "Save one for me, {addressee.name}!",
+      "Coming around fast, {addressee.name}, let's wreck {target.name}!"
+    ],
+    "say.variants.alerted_neutral": [
+      "Moving up behind you, {addressee.name}! Watching for {target.name}!",
+      "Right with you, {addressee.name}, keeping an eye out for {target.name}!",
+      "Got your sides, {addressee.name}! Tell me if {target.name} breaks through!",
+      "Closing in behind you, {addressee.name}, ready for {target.name}!"
+    ],
+    "say.variants.alerted_tactical": [
+      "Covering your six, {addressee.name}, scanning for {target.name}!",
+      "Moving to support you, {addressee.name}, tracking {target.name}!",
+      "On your shoulder, {addressee.name}! Ready to engage {target.name}!",
+      "Holding the side angle, {addressee.name}, watching for {target.name}!"
+    ]
+  }
+}

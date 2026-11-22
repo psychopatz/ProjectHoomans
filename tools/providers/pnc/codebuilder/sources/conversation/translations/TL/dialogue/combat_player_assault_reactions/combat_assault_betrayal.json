@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.assault.betrayal",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": [
+      "Hindi naman ako naghahanap ng away, {addressee.name}! Ngayon lagot ka!",
+      "Pinabayaan na kita tapos inatake mo pa ako?! Sige, magbabayad ka!",
+      "Sumobra ka na, {addressee.name}. Papatumbahin kita!",
+      "Mali ang ginawa mong umatake kung pwede naman sanang lumayo na lang!"
+    ],
+    "say.variants.shaken": [
+      "Bakit mo ako inaatake?! Lumayo ka! Lalaban ako kung kailangan!",
+      "Ayoko ng gulo, {addressee.name}! Huwag kang lalapit!",
+      "Parang awa mo na, umatras ka! Pinilit mo akong lumaban!",
+      "Huwag kang lalapit! Hindi ako tatayo lang dito para mamatay!"
+    ],
+    "say.variants.brave": [
+      "Malaking pagkakamali ang atakehin ang taong nananahimik!",
+      "Wala akong ginagawang masama, {addressee.name}. Ngayon tatapusin kita.",
+      "Maling tao ang hinamon mo ng gulo ngayon!",
+      "O sige! Ikaw ang nagsimula nito, ako ang tatapos!"
+    ],
+    "say.variants.aggressive": [
+      "Akala mo madali akong isahan ha?! Lagot ka sa akin!",
+      "Pinapabayaan na kitang mabuhay, {addressee.name}. Mali ang una mong tira!",
+      "Gusto mo ng gulo? Sige! Tingnan natin ang tapang mo!",
+      "Dapat lumakad ka na lang palayo! Ngayon wawasakin kita!"
+    ]
+  }
+}

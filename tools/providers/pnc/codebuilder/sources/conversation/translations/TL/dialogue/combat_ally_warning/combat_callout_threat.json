@@ -1,0 +1,61 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.callout.threat",
+  "locale": "TL",
+  "entries": {
+    "say.variants.zombie_neutral": [
+      "Bantay, may {target.name} na gumagalaw {scene.location}!",
+      "Ingat! May {target.name} {scene.location}!",
+      "Maging alerto, nakita ang {target.name} {scene.location}!",
+      "Parating na! May {target.name} {scene.location}!"
+    ],
+    "say.variants.zombie_tactical": [
+      "Kontak {scene.location}! {target.name}, itaas ang sandata!",
+      "Kumpirmado ang {target.name} na sumusulong {scene.location}, laban!",
+      "{target.name} {scene.location}! Magtipon at linisin!",
+      "Hawakan ang linya, may {target.name} {scene.location}!"
+    ],
+    "say.variants.zombie_hostile": [
+      "Patumbahin! {target.name} ang gumagala {scene.location}!",
+      "Tapusin agad ang {target.name} {scene.location} bago dumami!",
+      "Bantayan ang gilid, may {target.name} {scene.location}!",
+      "Hayan na! {target.name} ang nahuli {scene.location}, tirahin!"
+    ],
+    "say.variants.hostile_neutral": [
+      "Ingat, nakita ang {target.name} {scene.location}!",
+      "May gulo! {target.name} ang kumikilos {scene.location}!",
+      "Alerto! May {target.name} {scene.location}!",
+      "Bantay lang! Namataan ang {target.name} {scene.location}!"
+    ],
+    "say.variants.hostile_tactical": [
+      "Kalabang kontak! {target.name} {scene.location}, ihanda ang sandata!",
+      "Armadong banta, {target.name} {scene.location}, sumugod!",
+      "Nakita ko ang {target.name} na lumalapit {scene.location}!",
+      "Kumpirmado ang banta, {target.name} {scene.location}, kumubli!"
+    ],
+    "say.variants.hostile_hostile": [
+      "Palabasin 'yan! May {target.name} {scene.location}!",
+      "Durugin sila, {target.name} ang nahuli {scene.location}!",
+      "Hayan na! Patumbahin ang {target.name} {scene.location}!",
+      "Huwag pakawalan, bantayan ang {target.name} {scene.location}!"
+    ],
+    "say.variants.crawler": [
+      "Bantay sa paa! May {target.name} na gumagapang {scene.location}!",
+      "Mababang kontak! {target.name} gumagapang {scene.location}!",
+      "Huwag madapa, may {target.name} {scene.location}!",
+      "Tingin sa baba, may {target.name} {scene.location}!"
+    ],
+    "say.variants.blindside": [
+      "Ingat, {addressee.name}! May {target.name} sa likod mo mismo!",
+      "Sa likod mo, {addressee.name}! Bantayan ang {target.name}!",
+      "Lumingon ka, {addressee.name}! Papalapit sa iyo ang {target.name}!",
+      "{addressee.name}, bantay sa likod! Nakalapit na ang {target.name}!"
+    ],
+    "say.variants.last_one": [
+      "Huling isa na lang 'to! Patumbahin ang {target.name}!",
+      "Halos ubos na sila, itong {target.name} na lang ang natitira!",
+      "Isa na lang, tapusin na ang {target.name}!",
+      "Huling ligaw! Linisin na ang {target.name}!"
+    ]
+  }
+}

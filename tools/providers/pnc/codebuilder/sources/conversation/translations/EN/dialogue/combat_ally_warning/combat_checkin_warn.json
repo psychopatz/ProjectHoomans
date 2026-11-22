@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.checkin.warn",
+  "locale": "EN",
+  "entries": {
+    "say.variants.injured": [
+      "All clear! Are you okay, {addressee.name}?",
+      "Looks clear here. {addressee.name}, how bad did they get you?",
+      "We got them. You holding up, {addressee.name}?",
+      "Hold up, {addressee.name}, you're bleeding! You alright?"
+    ],
+    "say.variants.clear": [
+      "That's the last of them, {addressee.name}. Everybody good?",
+      "All clear, {addressee.name}. Everyone still standing?",
+      "We handled that well, {addressee.name}. Anyone hurt?",
+      "Area's clear, {addressee.name}. You good over there?"
+    ]
+  }
+}

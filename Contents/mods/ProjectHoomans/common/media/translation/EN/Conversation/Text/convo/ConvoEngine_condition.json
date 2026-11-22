@@ -1,0 +1,17 @@
+{
+  "convo.condition.stamina.reply.say.1.cover_winded": "I've got you covered, {addressee.name}! Catch your breath!",
+  "convo.condition.stamina.reply.say.1.cover_winded.1": "I've got you covered, {addressee.name}! Catch your breath!",
+  "convo.condition.stamina.reply.say.1.cover_winded.2": "Step back, {addressee.name}, I'll hold them off for a minute!",
+  "convo.condition.stamina.reply.say.1.cover_winded.3": "Take a breather, {addressee.name}, I got this side!",
+  "convo.condition.stamina.reply.say.1.cover_winded.4": "Don't push it, {addressee.name}! Stay behind me and recover!",
+  "convo.condition.stamina.warn.say.1.exhausted": "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!",
+  "convo.condition.stamina.warn.say.1.exhausted.1": "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!",
+  "convo.condition.stamina.warn.say.1.exhausted.2": "{addressee.name}, my arms feel like lead! Need a moment to recover!",
+  "convo.condition.stamina.warn.say.1.exhausted.3": "Zero stamina left, {addressee.name}, I can barely swing!",
+  "convo.condition.stamina.warn.say.1.exhausted.4": "Falling back a step, {addressee.name}, I'm totally spent!",
+  "convo.condition.stamina.warn.say.1.winded": "Whoa, {addressee.name}, give me a second to catch my breath.",
+  "convo.condition.stamina.warn.say.1.winded.1": "Whoa, {addressee.name}, give me a second to catch my breath.",
+  "convo.condition.stamina.warn.say.1.winded.2": "{addressee.name}, my legs are burning. Slowing down for a beat.",
+  "convo.condition.stamina.warn.say.1.winded.3": "Running low on wind here, {addressee.name}.",
+  "convo.condition.stamina.warn.say.1.winded.4": "Hold up a sec, {addressee.name}, I'm getting winded."
+}

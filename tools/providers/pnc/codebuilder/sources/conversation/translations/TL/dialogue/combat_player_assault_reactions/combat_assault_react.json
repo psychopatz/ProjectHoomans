@@ -1,0 +1,67 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.assault.react",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": [
+      "Bakit mo ginawa iyon?!",
+      "Ano bang problema mo?!",
+      "Hoy! Tingnan mo ang ginagawa mo!",
+      "Hinataw mo ba ako?!",
+      "Gusto mo ba akong patayin?!",
+      "Ano bang iniisip mo?! Tigil!",
+      "Teka! Atras!",
+      "Huwag mo akong saktan! Ano bang nangyayari sa'yo?!",
+      "Huwag mo akong pagbantaan!",
+      "Umatras ka palayo sa akin!"
+    ],
+    "say.variants.aggressive": [
+      "Malaking pagkakamali ang ginawa mo.",
+      "Sige. Gusto mo ng laban, makukuha mo.",
+      "Sinaktan mo ako? Pagsisisihan mo 'yan.",
+      "Ulitin mo pa at tignan natin ang mangyayari.",
+      "Maling tao ang binangga mo.",
+      "Gusto mo pala ng gulo?! Halika rito!",
+      "Huling libreng tira mo na 'yon.",
+      "Ililibing kita sa ginawa mo.",
+      "Hinataw mo ako? Malaking mali.",
+      "Gusto mo talagang gawin 'to? Tara."
+    ],
+    "say.variants.brave": [
+      "Tama na. Tapos ka na.",
+      "Maling desisyon. Ipagtanggol mo ang sarili mo.",
+      "Hindi mo dapat ginawa 'yon.",
+      "Binigyan kita ng puwang. Ipagtanggol mo sarili mo ngayon.",
+      "Diyan na nagtatapos 'to.",
+      "Pumili ka na ng kahihinatnan mo.",
+      "Hindi kita hahayaang saktan ako. Sumuko ka o lumaban.",
+      "Hindi katanggap-tanggap. Ibaba mo ang sandata mo.",
+      "Lumagpas ka sa linya.",
+      "Tumigil ka ngayon din, o tatapusin ko 'to."
+    ],
+    "say.variants.reserved": [
+      "Lumayo ka. Ngayon na.",
+      "Tama na. Lumayo ka sa akin.",
+      "Umatras ka.",
+      "Huwag mong uulitin 'yon.",
+      "Huwag mo akong hahawakan.",
+      "Huling babala.",
+      "Diyan ka lang sa malayo.",
+      "Ibaba mo 'yan.",
+      "Dumistansya ka.",
+      "Isang hakbang pabalik. Ngayon na."
+    ],
+    "say.variants.shaken": [
+      "Ano ba?! Lumayo ka!",
+      "Bakit mo ako inaatake?! Lumayo ka!",
+      "Tigil! Ano bang ginagawa mo?!",
+      "Huwag mo akong hawakan! Nababaliw ka na ba?!",
+      "Umalis ka sa harap ko ngayon din!",
+      "Diyos ko, atras! Ibaba mo 'yan!",
+      "Bakit mo ako sinaktan?! Lumayo ka!",
+      "Lumayo ka sa akin! Huwag mong gawin 'to!",
+      "Nawawala ka na ba sa sarili mo?! Tigil!",
+      "Atras! Huwag kang lalapit pa!"
+    ]
+  }
+}

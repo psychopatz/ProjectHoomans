@@ -1,0 +1,59 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "medical.bandage.cover_warn",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "WARN"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "self"
+      },
+      {
+        "id": "ally"
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "target": {
+      "cardinality": "OPTIONAL_ONE",
+      "kinds": [
+        "actor",
+        "entity"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "medical",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "medical_care",
+      "domain": "medical"
+    }
+  ],
+  "events": [
+    {
+      "id": "medical_event",
+      "kind": "medical_event"
+    }
+  ]
+}

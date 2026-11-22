@@ -1,0 +1,86 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "combat.kill.heavy_melee",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:combat_kill",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "aggressive.axe_head"
+      },
+      {
+        "id": "aggressive.blunt"
+      },
+      {
+        "id": "aggressive.spear"
+      },
+      {
+        "id": "brave.axe"
+      },
+      {
+        "id": "brave.spear"
+      },
+      {
+        "id": "cold.heavy_melee"
+      },
+      {
+        "id": "practical.axe_spear"
+      },
+      {
+        "id": "practical.blunt"
+      },
+      {
+        "id": "supportive.melee"
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "target": {
+      "cardinality": "OPTIONAL_ONE",
+      "kinds": [
+        "actor",
+        "entity"
+      ]
+    }
+  },
+  "slots": {
+    "weapon": {
+      "type": "entity.item",
+      "required": false
+    }
+  },
+  "domains": [
+    {
+      "domain": "combat",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "combat_reaction",
+      "domain": "combat"
+    }
+  ],
+  "events": [
+    {
+      "id": "combat_event",
+      "kind": "combat_event"
+    }
+  ]
+}

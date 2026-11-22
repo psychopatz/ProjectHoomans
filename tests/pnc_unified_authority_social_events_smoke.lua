@@ -59,8 +59,8 @@ local function resolve(eventType, eventID, context)
 end
 
 local farewell = Authority.Resolve({
-    poolID = "semantic.flow.farewell",
-    responsePlanID = "semantic.flow.farewell",
+    poolID = "semantic.social.farewell.depart",
+    responsePlanID = "semantic.social.farewell.depart",
     realizationFamily = "farewell",
     act = "FAREWELL",
     topic = "farewell",

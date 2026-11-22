@@ -1,0 +1,49 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.callout.reply_wingman",
+  "locale": "TL",
+  "entries": {
+    "say.variants.engaging_neutral": [
+      "Kasunod mo na ako, {addressee.name}! Uusad ako sa gilid ng {target.name}!",
+      "Bantay ko likod mo, {addressee.name}, sasabay sa {target.name}!",
+      "Kasama mo ako, {addressee.name}! Pigilan natin ang {target.name}!",
+      "Lalapit sa tabi mo, {addressee.name}, bantayan ang {target.name}!"
+    ],
+    "say.variants.engaging_tactical": [
+      "Umiikot sa gilid, {addressee.name}, ipitin ang {target.name}!",
+      "Nasa likod mo na ako, {addressee.name}! Lulusob sa {target.name}!",
+      "Bantay sa tagiliran mo, {addressee.name}! Aabante sa {target.name}!",
+      "Sasara sa tabi mo, {addressee.name}, ikulong ang {target.name}!"
+    ],
+    "say.variants.engaging_hostile": [
+      "Magtira ng {target.name} para sa akin, {addressee.name}! Iikot ako!",
+      "Nasa likod mo na ako, {addressee.name}, patumbahin ang {target.name}!",
+      "Haharangin ko sa gilid ang {target.name}, {addressee.name}!",
+      "Sasabay sa sugod mo, {addressee.name}! Tapusin ang {target.name}!"
+    ],
+    "say.variants.shaken": [
+      "Puta, may kasunod pa? Dikit lang tayo, {addressee.name}!",
+      "Ilayo mo sila sa akin, {addressee.name}, bantay ako sa likod!"
+    ],
+    "say.variants.brave": [
+      "Handa na rin ako, {addressee.name}. Tapusin na natin sila.",
+      "Matatag sa tabi mo, {addressee.name}, tuloy lang!"
+    ],
+    "say.variants.aggressive": [
+      "Magtira ka ng isa para sa akin, {addressee.name}!",
+      "Mabilis akong iikot, {addressee.name}, durugin ang {target.name}!"
+    ],
+    "say.variants.alerted_neutral": [
+      "Aabante sa likod mo, {addressee.name}! Abang sa {target.name}!",
+      "Kasabay mo na ako, {addressee.name}, nagmamatyag sa {target.name}!",
+      "Hawakan ko gilid mo, {addressee.name}! Sabihin mo kung sumugod ang {target.name}!",
+      "Lalapit sa likod mo, {addressee.name}, handa sa {target.name}!"
+    ],
+    "say.variants.alerted_tactical": [
+      "Bantay sa likod mo, {addressee.name}, nagmamasid sa {target.name}!",
+      "Susuporta sa iyo, {addressee.name}, sinusundan ang {target.name}!",
+      "Nasa balikat mo na ako, {addressee.name}! Handang bumaril sa {target.name}!",
+      "Hawakan ko ang gilid, {addressee.name}, bantay sa {target.name}!"
+    ]
+  }
+}

@@ -114,7 +114,7 @@ local RESPONSE_TEMPLATES = {
         fallback = "Hey there.",
     },
     FAREWELL_ACKNOWLEDGED = {
-        templateID = "flow.farewell.default",
+        templateID = "social.farewell.depart.default",
         fallback = "Take care.",
     },
     OFFER_RECEIVED = {

@@ -1,0 +1,27 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "world.utility.outage",
+  "locale": "TL",
+  "entries": {
+    "say.variants.power_shutoff_open": [
+      "Bigla bang namatay ang ilaw? Mukhang tuluyan nang bumigay ang kuryente ngayong araw, {addressee.name}.",
+      "Hindi na babalik ang ilaw. Nawalan na ng kuryente ang buong lugar ngayon, {addressee.name}.",
+      "Wala na talagang kuryente ngayon, {addressee.name}. Importante na ang generator at pagkaing di nasisira."
+    ],
+    "say.variants.power_shutoff_reply": [
+      "Oo nga, {addressee.name}, wala nang libreng kuryente. Bantayan natin ang mga pagkain at gasolina.",
+      "Naramdaman ko ring tumigil ang ugong, {addressee.name}. Flashlight at generator na ang aasahan.",
+      "Mahirap 'yan, {addressee.name}, pero inaasahan na natin 'to. Mag-adjust na lang tayo."
+    ],
+    "say.variants.water_shutoff_open": [
+      "Natuyo na ang mga gripo ngayong araw, {addressee.name}. Huminto na ang linya ng tubig.",
+      "Wala nang tulo sa gripo mula ngayon, {addressee.name}. Kunin na lahat ng bote at drum na makita.",
+      "Tuluyan nang nawala ang tubig ngayon, {addressee.name}. Kailangan na nating magtipid sa inumin."
+    ],
+    "say.variants.water_shutoff_reply": [
+      "Sige, {addressee.name}. Mahalaga na ang mga ipunan ng tubig-ulan at lalagyan mula ngayon.",
+      "Patay tayo d'yan, {addressee.name}, kailangan nang tipirin ang bawat patak ng tubig.",
+      "Tama ka, {addressee.name}. Silipin natin ang mga bathtub at maglagay ng pang-ipon ng ulan."
+    ]
+  }
+}

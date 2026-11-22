@@ -1,18 +1,19 @@
 # Progress — Thematic Semantic Dialogue Expansion
 
-**Status:** D0 COMPLETE (frozen manifest verified); proceeding into D1.
+**Status:** D1 COMPLETE; proceeding into D2.
 **Primary repository:** /home/psychopatz/Zomboid/Workshop/ProjectHoomans
 **Participants:** /home/psychopatz/Zomboid/Workshop/psychopatzCore when reusable ConvoEngine/world-event contracts change; /home/psychopatz/Zomboid/Workshop/DynamicTrading when D5A economic world-event projection requires DTCommon/DTHoomans changes.
 **Branch policy:** existing main only; no new branch.
-**Current ProjectHoomans HEAD:** 2b9d579df8cd67c623027fde3715a77ec4219d90
-**Current psychopatzCore HEAD:** 89f7b85add7ff317bbac3c66bb004d35fda24f4a
-**Current DynamicTrading HEAD:** 976e240e527602326c735722d724d6334fe8a464
-**Current phase:** D1 — Canonical semantic-family normalization.
-**Next Chunk:** Execute D1 normalization across `event_reactions_farewell`, `combat_player_assault_reactions`, overpacked `combat.ally_warn.*` / `combat.kill.*` / `world_event_beats` pools, and Core anti-duplication/anti-overpacking semantic lint rules.
+**Current ProjectHoomans HEAD:** 962d79f7c (pre-D1 commit)
+**Current psychopatzCore HEAD:** 569e169
+**Current DynamicTrading HEAD:** 04febebf
+**Current phase:** D2 — Unified actor disposition/personality projection.
+**Next Chunk:** Converge `ActorAdapter`, `ChoicePolicy`, `GeneratedAffordanceProvider`, `AffordanceResponder`, `SemanticCombatReactionProfile`, `BeatContext`, `SpeechStyleContext`, and condition predicates onto one resolved numeric disposition projection (with temporary demeanor overlay seam).
 
 ## Completed phases
 
 - **D0 (CODE_VERIFIED, TEST_VERIFIED):** Built and froze exhaustive machine-readable manifest at `docs/Jobs/ThematicSemanticDialogueExpansion/D0_MANIFEST.json` against live heads (`PH:2b9d579d`, `Core:89f7b85a`, `DT:976e240e`). Verified clean CodeBuilder baseline (`reconcile.py --check`: `ok=true, clean=true`, 468 desired artifacts, 0 drift). Audited 494 canonical definitions (369 PH, 125 Core), 107 actor-encoded IDs, 40 style-encoded IDs, 48 overpacked pools, 7 empty style dirs, disposition projection double-counting across 8 seams, `DialogueBeats`->`CombatTargetCallouts` transport leakage, `SocialFlavorClient` scene/thread collision, and D5A chronology/world-event/DT projection seams.
+- **D1 (CODE_VERIFIED, TEST_VERIFIED):** Normalized `event_reactions_farewell` (15 `flow.farewell.*` -> 1 `social.farewell.depart`), `combat_player_assault_reactions` (8 `combat.player_assaulted.*` -> 4 actor-agnostic `combat.assault.{friendly_fire,betrayal,hostile_taunt,react}`), `world_event_beats` (2 multi-meaning packs -> 4 `world.{alarm.react,utility.outage,object.notice,media.broadcast}`), `combat_ally_warning` (2 overpacked pools 18+32 -> 14 cohesive families), and `combat_kill` (26-variant `combat.kill.killer` -> 4 weapon-domain families); removed 7 empty `combat_banter_weapon_kill_*` dirs; added `convo_engine_hygiene_audit.py` (`hygiene-audit` CLI + 14 unit tests OK) in `psychopatzCore`; ran CodeBuilder `reconcile.py --apply` + `--check` (`ok=true, clean=true`, 470 desired artifacts, 0 drift); verified 7 targeted Lua smoke suites + 19 Python authority/reachability tests passing.
 
 ## Re-audit findings
 

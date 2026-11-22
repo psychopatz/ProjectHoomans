@@ -169,22 +169,22 @@ class SweepReachabilityTests(WarmWorkerTestMixin, unittest.TestCase):
         with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             analyzer = ReachabilityAnalyzer(worker)
 
-            # Analyze pool semantic.flow.farewell where initially no rows exist
+            # Analyze pool semantic.social.farewell.depart where initially no rows exist
             report = analyzer.analyze_reachability(
                 [],
                 worker=worker,
-                target_pools=["semantic.flow.farewell"],
+                target_pools=["semantic.social.farewell.depart"],
             )
-            rec_map = {r.variant_id: r for r in report.pool_records["semantic.flow.farewell"]}
+            rec_map = {r.variant_id: r for r in report.pool_records["semantic.social.farewell.depart"]}
 
-            # Both variants should be reached/classified through frontier evaluation
-            self.assertIn("semantic.flow.farewell.default", rec_map)
-            self.assertIn("semantic.flow.farewell.friendly", rec_map)
+            # Variants should be reached/classified through frontier evaluation
+            self.assertIn("semantic.social.farewell.depart.player_default", rec_map)
+            self.assertIn("semantic.social.farewell.depart.hostile", rec_map)
 
-            # semantic.flow.farewell.friendly requires socialStyle='friendly', which condition synthesis solves!
-            friendly_rec = rec_map["semantic.flow.farewell.friendly"]
-            self.assertEqual(friendly_rec.status, VariantReachabilityState.SELECTED)
-            self.assertFalse(friendly_rec.global_unreachable_claim)
+            # semantic.social.farewell.depart.hostile requires socialStyle='hostile', which condition synthesis solves!
+            hostile_rec = rec_map["semantic.social.farewell.depart.hostile"]
+            self.assertEqual(hostile_rec.status, VariantReachabilityState.SELECTED)
+            self.assertFalse(hostile_rec.global_unreachable_claim)
 
             # Report includes ledger metadata
             self.assertIn("ledger", report.to_dict())
@@ -224,19 +224,19 @@ class SweepReachabilityTests(WarmWorkerTestMixin, unittest.TestCase):
         with self.warm_worker(deepcopy(DEFAULT_SCENARIO)) as worker:
             ledger = ObservedVariantLedger()
             # Only record default
-            ledger.entries["semantic.flow.farewell.default"] = True
+            ledger.entries["semantic.social.farewell.depart.default"] = True
 
             targets = find_frontier_targets(
                 worker,
                 ledger,
-                pool_ids=["semantic.flow.farewell"],
+                pool_ids=["semantic.social.farewell.depart"],
                 limit=5,
             )
             self.assertGreaterEqual(len(targets), 1)
             target = targets[0]
-            self.assertEqual(target["poolID"], "semantic.flow.farewell")
-            self.assertEqual(target["variantID"], "semantic.flow.farewell.friendly")
-            self.assertIn("socialStyle", target["context"])
+            self.assertEqual(target["poolID"], "semantic.social.farewell.depart")
+            self.assertEqual(target["variantID"], "semantic.social.farewell.depart.hostile")
+            self.assertTrue("socialRole" in target["context"] or "socialStyle" in target["context"])
 
 
 if __name__ == "__main__":

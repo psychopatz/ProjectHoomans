@@ -1,0 +1,62 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "combat.assault.friendly_fire",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "first"
+      },
+      {
+        "id": "warn"
+      },
+      {
+        "id": "penalty"
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "target": {
+      "cardinality": "OPTIONAL_ONE",
+      "kinds": [
+        "actor",
+        "entity"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "combat",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "combat_reaction",
+      "domain": "combat"
+    }
+  ],
+  "events": [
+    {
+      "id": "combat_event",
+      "kind": "combat_event"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.callout.reply_engage",
+  "locale": "EN",
+  "entries": {
+    "say.variants.engaging_neutral": [
+      "I see {target.name} {scene.location}, {addressee.name}! Moving in!",
+      "Got eyes on {target.name} {scene.location}, right behind you, {addressee.name}!",
+      "On my way, {addressee.name}! Holding {target.name} {scene.location}!",
+      "Copy that, {addressee.name}, jumping on {target.name} {scene.location}!"
+    ],
+    "say.variants.engaging_tactical": [
+      "Visual confirmed on {target.name} {scene.location}, {addressee.name}, engaging!",
+      "Copy, {addressee.name}! Moving to flank {target.name} {scene.location}!",
+      "I've got a bead on {target.name} {scene.location}, advancing with you, {addressee.name}!",
+      "Roger, {addressee.name}, converging on {target.name} {scene.location}!"
+    ],
+    "say.variants.engaging_hostile": [
+      "Got {target.name} in my sights {scene.location}, {addressee.name}! Finishing this!",
+      "Yeah, {addressee.name}, I see {target.name} {scene.location}! Going in!",
+      "Leave some of {target.name} for me, {addressee.name}, pushing {scene.location}!",
+      "Locked on {target.name} {scene.location}, {addressee.name}! Time to drop them!"
+    ],
+    "say.variants.engaging_shaken": [
+      "Oh shit, {addressee.name}, {target.name}?! Stay right by me!",
+      "Aw hell, {target.name} {scene.location}! Don't leave me behind, {addressee.name}!",
+      "Shit, {addressee.name}, I'm shaking here, watch my back!"
+    ],
+    "say.variants.engaging_brave": [
+      "I'm ready, {addressee.name}. Let's drop {target.name}.",
+      "Bring them on, {addressee.name}. I've got this side.",
+      "Steady, {addressee.name}, I'm right beside you."
+    ],
+    "say.variants.engaging_aggressive": [
+      "Hell yeah, {addressee.name}, save {target.name} for me!",
+      "About time! Coming in hot, {addressee.name}!",
+      "They picked the wrong crew, {addressee.name}, pushing in!"
+    ],
+    "say.variants.engaging_supportive": [
+      "Stay behind me if it gets ugly, {addressee.name}!",
+      "I've got your back, {addressee.name}, stick together!",
+      "Watch your footing, {addressee.name}, we'll clear {target.name} together!"
+    ],
+    "say.variants.engaging_exhausted": [
+      "I'm beat, {addressee.name}, but I'll still watch your flank.",
+      "Still hurting here, {addressee.name}, don't let {target.name} slip past!",
+      "Running low on steam, {addressee.name}, let's finish {target.name} quick!"
+    ],
+    "say.variants.anchor_combat": [
+      "I've got the rear covered, {addressee.name}!",
+      "Watching our backs! Keep pushing, {addressee.name}!",
+      "Nobody gets behind us, {addressee.name}, stay on them!",
+      "Holding the perimeter, {addressee.name}, keep pressing!"
+    ],
+    "say.variants.anchor_tactical": [
+      "Rear guard set, {addressee.name}, push forward!",
+      "Securing our perimeter, {addressee.name}, you're clear to engage!",
+      "Holding overwatch on our six, {addressee.name}!",
+      "Flanks locked down, {addressee.name}, advance!"
+    ]
+  }
+}

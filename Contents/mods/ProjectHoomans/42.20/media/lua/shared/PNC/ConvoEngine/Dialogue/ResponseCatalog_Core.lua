@@ -129,7 +129,7 @@ local function contentOwnerForPool(poolID)
         or string.find(poolID, "semantic.companion.", 1, true) == 1
         or string.find(poolID, "semantic.conversation.safety", 1, true) == 1
         or string.find(poolID, "semantic.corpse.", 1, true) == 1
-        or string.find(poolID, "semantic.flow.farewell", 1, true) == 1
+        or string.find(poolID, "semantic.social.farewell.depart", 1, true) == 1
         or string.find(poolID, "semantic.social.reaction", 1, true) == 1
     then
         return "projecthoomans.dialogue_content.events"

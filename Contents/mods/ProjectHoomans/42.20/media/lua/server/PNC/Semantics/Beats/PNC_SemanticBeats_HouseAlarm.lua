@@ -88,7 +88,7 @@ Beats.RegisterHook("environment.house_alarm", {
         return Beats.BuildWorldThread(a, b, {
             refPrefix = "world:house_alarm",
             family = "world_house_alarm",
-            poolID = "semantic.world_beats.events",
+            poolID = "semantic.world.alarm.react",
             eventType = "world_event_beat",
             topic = "world_event",
             openAct = "WARN",

@@ -223,8 +223,8 @@ T.equal(ok1, false, "friendly colonist damage blocked")
 T.equal(r1, "colonist_protected", "friendly protection preserved")
 T.equal(#deliveredBarks, 1, "first friendly shove emits dialogue")
 T.equal(#recordedSocialEvents, 0, "first shove does not apply penalty")
-T.equal(deliveredBarks[1].ambientFlavor.realizationFamily, "semantic.player_assaulted.friendly_push", "uses friendly_push family")
-T.equal(deliveredBarks[1].ambientFlavor.realizationID, "semantic.player_assaulted.friendly_push.first", "push 1 selects first variant")
+T.equal(deliveredBarks[1].ambientFlavor.realizationFamily, "semantic.combat.assault.friendly_fire", "uses friendly_push family")
+T.equal(deliveredBarks[1].ambientFlavor.realizationID, "semantic.combat.assault.friendly_fire.first", "push 1 selects first variant")
 T.equal(deliveredBarks[1].ambientFlavor.context.friendlyPushTier, "first", "push 1 tier is first")
 assertCleanLine(deliveredBarks[1].ambientFlavor.text, "push 1 line")
 
@@ -232,7 +232,7 @@ nowMs = nowMs + 2000
 PNC.PlayerDamage.Apply(colonist, colonistBody, activePlayer, nil, 0, "player_weapon_event", { isShove = true })
 T.equal(#deliveredBarks, 2, "second friendly shove emits warning dialogue")
 T.equal(#recordedSocialEvents, 0, "second shove still warns without penalty")
-T.equal(deliveredBarks[2].ambientFlavor.realizationID, "semantic.player_assaulted.friendly_push.warn", "push 2 selects warn variant")
+T.equal(deliveredBarks[2].ambientFlavor.realizationID, "semantic.combat.assault.friendly_fire.warn", "push 2 selects warn variant")
 T.equal(deliveredBarks[2].ambientFlavor.context.friendlyPushTier, "warn", "push 2 tier is warn")
 assertCleanLine(deliveredBarks[2].ambientFlavor.text, "push 2 line")
 
@@ -247,7 +247,7 @@ PNC.PlayerDamage.Apply(colonist, colonistBody, activePlayer, nil, 0, "player_wea
 T.equal(#deliveredBarks, 3, "third shove emits penalty dialogue")
 T.equal(#recordedSocialEvents, 1, "third shove same day records player_harassed_friendly_npc")
 T.equal(recordedSocialEvents[1].type, "player_harassed_friendly_npc", "emits player_harassed_friendly_npc")
-T.equal(deliveredBarks[3].ambientFlavor.realizationID, "semantic.player_assaulted.friendly_push.penalty", "push 3 selects penalty variant")
+T.equal(deliveredBarks[3].ambientFlavor.realizationID, "semantic.combat.assault.friendly_fire.penalty", "push 3 selects penalty variant")
 T.equal(deliveredBarks[3].ambientFlavor.context.friendlyPushTier, "penalty", "push 3 tier is penalty")
 assertCleanLine(deliveredBarks[3].ambientFlavor.text, "push 3 line")
 
@@ -296,9 +296,9 @@ T.equal(neutral.hostility.provokedByPlayer, true, "hostility records provokedByP
 T.equal(Assault.ResolveHostileArchetype(neutral), "neutral_turned_hostile", "archetype identifies provoked neutral")
 T.equal(#deliveredBarks, bCountBefore + 1, "neutral-turned-hostile emits assault line")
 local neutralLine = deliveredBarks[#deliveredBarks].ambientFlavor
-T.equal(neutralLine.realizationFamily, "semantic.player_assaulted_npc", "uses player_assaulted_npc family")
+T.equal(neutralLine.realizationFamily, "semantic.combat.assault.react", "uses combat.assault.react family")
 T.equal(neutralLine.context.assaultKind, "neutral_turned_hostile", "carries assaultKind=neutral_turned_hostile")
-T.truthy(string.find(tostring(neutralLine.realizationID), "neutral_turned_hostile", 1, true), "selects neutral_turned_hostile variant")
+T.truthy(string.find(tostring(neutralLine.realizationID), "betrayal", 1, true), "selects betrayal variant")
 assertCleanLine(neutralLine.text, "neutral turned hostile line")
 
 -- Further hit or target acquisition on provoked neutral STILL avoids looter taunt
@@ -343,9 +343,9 @@ local function testLootCategory(playerOpts, expectedCategory, expectedSubstring)
     }, looter)
     T.equal(#deliveredBarks, before + 1, "looter taunt emitted for " .. expectedCategory)
     local flav = deliveredBarks[#deliveredBarks].ambientFlavor
-    T.equal(flav.realizationFamily, "semantic.player_assaulted.looter_taunt", "uses looter_taunt family")
-    T.equal(flav.realizationID, "semantic.player_assaulted.looter_taunt." .. expectedCategory,
-        "selects looter_taunt variant for " .. expectedCategory)
+    T.equal(flav.realizationFamily, "semantic.combat.assault.hostile_taunt", "uses hostile_taunt family")
+    T.equal(flav.realizationID, "semantic.combat.assault.hostile_taunt." .. expectedCategory,
+        "selects hostile_taunt variant for " .. expectedCategory)
     T.equal(flav.context.lootCategory, expectedCategory, "selects loot category " .. expectedCategory)
     assertCleanLine(flav.text, "looter " .. expectedCategory .. " line")
     if expectedSubstring then

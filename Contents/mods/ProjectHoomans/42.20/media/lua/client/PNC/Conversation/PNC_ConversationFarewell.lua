@@ -226,8 +226,8 @@ function Farewell.Schedule(spec, state, reason)
     local topic = context.currentTopic or context.conversationTopic or "farewell"
     seed = "conversation-farewell:" .. npcID .. ":" .. tostring(state.token or current)
     npcRealization = RealizationAuthority.Resolve({
-        poolID = "semantic.flow.farewell",
-        responsePlanID = "semantic.flow.farewell",
+        poolID = "semantic.social.farewell.depart",
+        responsePlanID = "semantic.social.farewell.depart",
         realizationFamily = "farewell",
         act = "FAREWELL",
         topic = topic,
@@ -241,8 +241,8 @@ function Farewell.Schedule(spec, state, reason)
     for k, v in pairs(npcFarewellCtx) do playerFarewellCtx[k] = v end
     playerFarewellCtx.farewellSpeaker = "player"
     playerRealization = RealizationAuthority.Resolve({
-        poolID = "semantic.flow.farewell",
-        responsePlanID = "semantic.flow.farewell",
+        poolID = "semantic.social.farewell.depart",
+        responsePlanID = "semantic.social.farewell.depart",
         realizationFamily = "farewell",
         act = "FAREWELL",
         topic = topic,

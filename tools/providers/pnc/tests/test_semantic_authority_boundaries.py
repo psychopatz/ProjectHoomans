@@ -116,7 +116,7 @@ class SemanticAuthorityBoundaryTests(unittest.TestCase):
             ),
             "farewell": (
                 LUA / "client/PNC/Conversation/PNC_ConversationFarewell.lua",
-                ("RealizationAuthority", "semantic.flow.farewell"),
+                ("RealizationAuthority", "semantic.social.farewell.depart"),
             ),
             "emote": (
                 LUA / "server/PNC/Networking/Handlers/"

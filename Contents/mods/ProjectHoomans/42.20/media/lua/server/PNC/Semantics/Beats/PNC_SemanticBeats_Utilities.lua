@@ -33,7 +33,7 @@ local function makeUtilityHook(id, eventName, openRole, replyRole, fam, refPrefi
             return Beats.BuildWorldThread(a, b, {
                 refPrefix = refPrefix,
                 family = fam,
-                poolID = "semantic.world_beats.events",
+                poolID = "semantic.world.utility.outage",
                 eventType = "world_event_beat",
                 topic = "world_event",
                 openAct = "REACT",

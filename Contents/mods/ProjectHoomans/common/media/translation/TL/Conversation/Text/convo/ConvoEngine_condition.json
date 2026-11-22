@@ -1,0 +1,17 @@
+{
+  "convo.condition.stamina.reply.say.1.cover_winded": "Ako na bahala sa'yo, {addressee.name}! Huminga ka muna!",
+  "convo.condition.stamina.reply.say.1.cover_winded.1": "Ako na bahala sa'yo, {addressee.name}! Huminga ka muna!",
+  "convo.condition.stamina.reply.say.1.cover_winded.2": "Umatras ka muna, {addressee.name}, haharangin ko muna sila!",
+  "convo.condition.stamina.reply.say.1.cover_winded.3": "Bawi ka muna ng lakas, {addressee.name}, ako na rito!",
+  "convo.condition.stamina.reply.say.1.cover_winded.4": "Huwag mong pilitin, {addressee.name}! Dito ka sa likod ko habang nagpapahinga!",
+  "convo.condition.stamina.warn.say.1.exhausted": "Ubos na ubos na ako, {addressee.name}! Bantayan mo ako habang naghahabol ng hininga!",
+  "convo.condition.stamina.warn.say.1.exhausted.1": "Ubos na ubos na ako, {addressee.name}! Bantayan mo ako habang naghahabol ng hininga!",
+  "convo.condition.stamina.warn.say.1.exhausted.2": "{addressee.name}, hindi ko na maiangat braso ko! Kailangan kong bumawi!",
+  "convo.condition.stamina.warn.say.1.exhausted.3": "Wala na akong lakas, {addressee.name}, hindi na ako makapalo!",
+  "convo.condition.stamina.warn.say.1.exhausted.4": "Aatras muna ako nang kaunti, {addressee.name}, sagad na lakas ko!",
+  "convo.condition.stamina.warn.say.1.winded": "Teka lang, {addressee.name}, hinihingal na ako rito.",
+  "convo.condition.stamina.warn.say.1.winded.1": "Teka lang, {addressee.name}, hinihingal na ako rito.",
+  "convo.condition.stamina.warn.say.1.winded.2": "{addressee.name}, bumibigat na hininga ko. Pahinga muna saglit.",
+  "convo.condition.stamina.warn.say.1.winded.3": "Nauubusan na ako ng hangin, {addressee.name}.",
+  "convo.condition.stamina.warn.say.1.winded.4": "Sandali lang, {addressee.name}, pagod na pagod na ako."
+}

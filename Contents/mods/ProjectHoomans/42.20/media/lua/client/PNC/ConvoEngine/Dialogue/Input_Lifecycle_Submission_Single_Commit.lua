@@ -49,7 +49,7 @@ local function deliverClosingFarewellReply(view, result, context)
     local role = FarewellRole.ResolveFromContext(context, npcID)
     client.Enqueue({
         eventID = "semantic-farewell:" .. npcID .. ":" .. tostring(result and result.sequence or 0),
-        flavorID = first.renderTemplateID or first.templateID or "semantic.flow.farewell",
+        flavorID = first.renderTemplateID or first.templateID or "semantic.social.farewell.depart",
         text = text,
         semanticOwned = true,
         family = "conversation_farewell",

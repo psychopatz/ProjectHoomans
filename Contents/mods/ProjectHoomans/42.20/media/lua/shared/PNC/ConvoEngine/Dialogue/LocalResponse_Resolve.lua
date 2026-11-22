@@ -146,7 +146,7 @@ function Response.Resolve(ir, state, context, branch)
         elseif role == "lover" or role == "family" or role == "friend" or role == "colonist" then
             farewellCtx.socialStyle = "friendly"
         end
-        return catalogResponse("semantic.flow.farewell", ir, state, farewellCtx, {
+        return catalogResponse("semantic.social.farewell.depart", ir, state, farewellCtx, {
             topic = "farewell",
         })
     end

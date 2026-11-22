@@ -1,0 +1,19 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "medical.bandage.cover_warn",
+  "locale": "EN",
+  "entries": {
+    "say.variants.self": [
+      "Cover me, {addressee.name}, I'm bandaging up!",
+      "Hold them back, {addressee.name}, wrapping this wound!",
+      "{addressee.name}, keep eyes up while I tie this bandage!",
+      "Buy me a second, {addressee.name}, patching myself up!"
+    ],
+    "say.variants.ally": [
+      "Cover us, {addressee.name}, I'm bandaging {target.name}!",
+      "Keep them off us, {addressee.name}, treating {target.name} now!",
+      "Hold the line, {addressee.name}! I'm patching {target.name} up!",
+      "Watch our backs, {addressee.name}, wrapping {target.name} now!"
+    ]
+  }
+}

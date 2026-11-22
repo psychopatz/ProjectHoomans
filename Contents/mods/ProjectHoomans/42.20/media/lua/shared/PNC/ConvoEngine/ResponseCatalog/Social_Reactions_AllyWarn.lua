@@ -34,18 +34,25 @@ local function makeVariant(poolID, templateID, variantID, when, priority, act)
     }
 end
 
-local CALLOUT_ROLES = {
-    "crawler", "blindside", "last_one", "bandaging_self",
-    "bandaging_ally", "checkin_injured", "checkin_clear", "weather_rain_open",
-    "stamina_winded", "stamina_exhausted",
+local CALLOUT_SITUATIONS = {
+    { role = "crawler", tpl = "combat.callout.threat.crawler" },
+    { role = "blindside", tpl = "combat.callout.threat.blindside" },
+    { role = "last_one", tpl = "combat.callout.threat.last_one" },
+    { role = "bandaging_self", tpl = "medical.bandage.cover_warn.self" },
+    { role = "bandaging_ally", tpl = "medical.bandage.cover_warn.ally" },
+    { role = "checkin_injured", tpl = "combat.checkin.warn.injured" },
+    { role = "checkin_clear", tpl = "combat.checkin.warn.clear" },
+    { role = "weather_rain_open", tpl = "world.weather.rain_warn.rain_open" },
+    { role = "stamina_winded", tpl = "condition.stamina.warn.winded" },
+    { role = "stamina_exhausted", tpl = "condition.stamina.warn.exhausted" },
 }
 
 local function registerCalloutPool(poolID, templatePrefix)
     local vars = {}
-    for _, role in ipairs(CALLOUT_ROLES) do
+    for _, s in ipairs(CALLOUT_SITUATIONS) do
         vars[#vars + 1] = makeVariant(
-            poolID, "combat.ally_warn.callout." .. role .. "_callout", role,
-            { combatReactionRole = role }, 95, "WARN"
+            poolID, s.tpl, s.role,
+            { combatReactionRole = s.role }, 95, "WARN"
         )
     end
     vars[#vars + 1] = makeVariant(poolID, templatePrefix .. "_hostile", "hostile", { combatReactionStyle = "hostile" }, 80, "WARN")
@@ -54,11 +61,47 @@ local function registerCalloutPool(poolID, templatePrefix)
     Catalog.Register(poolID, { variants = vars })
 end
 
-registerCalloutPool("semantic.combat.ally_warn.callout.zombie", "combat.ally_warn.callout.zombie")
-registerCalloutPool("semantic.combat.ally_warn.callout.hostile", "combat.ally_warn.callout.hostile")
+registerCalloutPool("semantic.combat.ally_warn.callout.zombie", "combat.callout.threat.zombie")
+registerCalloutPool("semantic.combat.ally_warn.callout.hostile", "combat.callout.threat.hostile")
+
+local REPLY_TEMPLATE_MAP = {
+    engaging_neutral = "combat.callout.reply_engage.engaging_neutral",
+    engaging_tactical = "combat.callout.reply_engage.engaging_tactical",
+    engaging_hostile = "combat.callout.reply_engage.engaging_hostile",
+    engaging_shaken = "combat.callout.reply_engage.engaging_shaken",
+    engaging_brave = "combat.callout.reply_engage.engaging_brave",
+    engaging_aggressive = "combat.callout.reply_engage.engaging_aggressive",
+    engaging_supportive = "combat.callout.reply_engage.engaging_supportive",
+    engaging_exhausted = "combat.callout.reply_engage.engaging_exhausted",
+    anchor_combat = "combat.callout.reply_engage.anchor_combat",
+    anchor_tactical = "combat.callout.reply_engage.anchor_tactical",
+    alerted_neutral = "combat.callout.reply_alerted.alerted_neutral",
+    alerted_tactical = "combat.callout.reply_alerted.alerted_tactical",
+    alerted_hostile = "combat.callout.reply_alerted.alerted_hostile",
+    blindside_reply = "combat.callout.reply_alerted.blindside_reply",
+    last_one_reply = "combat.callout.reply_alerted.last_one_reply",
+    defensive_neutral = "combat.callout.reply_defensive.defensive_neutral",
+    defensive_shaken = "combat.callout.reply_defensive.defensive_shaken",
+    wingman_defensive = "combat.callout.reply_defensive.wingman_defensive",
+    wingman_engaging_neutral = "combat.callout.reply_wingman.engaging_neutral",
+    wingman_engaging_tactical = "combat.callout.reply_wingman.engaging_tactical",
+    wingman_engaging_hostile = "combat.callout.reply_wingman.engaging_hostile",
+    wingman_shaken = "combat.callout.reply_wingman.shaken",
+    wingman_brave = "combat.callout.reply_wingman.brave",
+    wingman_aggressive = "combat.callout.reply_wingman.aggressive",
+    wingman_alerted_neutral = "combat.callout.reply_wingman.alerted_neutral",
+    wingman_alerted_tactical = "combat.callout.reply_wingman.alerted_tactical",
+    cover_bandage_reply = "medical.bandage.cover_reply.cover_bandage",
+    injured_has_bandage_reply = "medical.injury.status_reply.injured_has_bandage",
+    injured_no_bandage_reply = "medical.injury.status_reply.injured_no_bandage",
+    medic_has_bandage_reply = "medical.injury.status_reply.medic_has_bandage",
+    medic_no_bandage_reply = "medical.injury.status_reply.medic_no_bandage",
+    checkin_ok_reply = "combat.checkin.reply.ok",
+}
 
 local function replyVar(poolID, name, when, priority, act)
-    return makeVariant(poolID, "combat.ally_warn.reply." .. name, name, when, priority, act)
+    local templateID = REPLY_TEMPLATE_MAP[name] or ("combat.callout.reply_engage." .. name)
+    return makeVariant(poolID, templateID, name, when, priority, act)
 end
 
 local REPLY_SITUATIONS = {
@@ -77,11 +120,11 @@ local function appendReplySituations(vars, poolID, act)
         vars[#vars + 1] = replyVar(poolID, s.tpl, { combatReactionRole = s.role }, s.pri, act)
     end
     vars[#vars + 1] = makeVariant(
-        poolID, "combat.ally_warn.callout.weather_rain_reply_callout",
+        poolID, "world.weather.rain_reply.rain_reply",
         "weather_rain_reply", { combatReactionRole = "weather_rain_reply" }, 97, act
     )
     vars[#vars + 1] = makeVariant(
-        poolID, "combat.ally_warn.callout.cover_winded_reply_callout",
+        poolID, "condition.stamina.reply.cover_winded",
         "cover_winded", { combatReactionRole = "cover_winded" }, 97, act
     )
 end

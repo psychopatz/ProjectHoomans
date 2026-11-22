@@ -1,0 +1,52 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "world.object.notice",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "tv_reminisce_open"
+      },
+      {
+        "id": "tv_reminisce_reply"
+      },
+      {
+        "id": "tv_power_out_open"
+      },
+      {
+        "id": "tv_power_out_reply"
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "social_interaction",
+      "domain": "social"
+    }
+  ]
+}

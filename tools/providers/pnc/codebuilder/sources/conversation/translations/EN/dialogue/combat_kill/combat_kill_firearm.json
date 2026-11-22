@@ -1,0 +1,97 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.kill.firearm",
+  "locale": "EN",
+  "entries": {
+    "say.variants.aggressive.firearm_high_named.say.1": [
+      "This {slot.weapon.name} still shoots straight.",
+      "Nothing beats this {slot.weapon.name} when it counts.",
+      "Good old {slot.weapon.name}. Never lets me down.",
+      "Told you this {slot.weapon.name} has stopping power.",
+      "That {slot.weapon.name} put it right in the dirt.",
+      "Clean work with the {slot.weapon.name}.",
+      "This {slot.weapon.name} punched right through.",
+      "Glad I had this {slot.weapon.name} ready."
+    ],
+    "say.variants.aggressive.firearm_high_named.say.2": [
+      "Right where I wanted it. Down.",
+      "Dropped it in one shot. Beautiful.",
+      "Right between the eyes. Got him.",
+      "That's how you put one down.",
+      "Dead on arrival. Love it.",
+      "Drilled that one clean.",
+      "Saw the opening and took it.",
+      "Dropped like a stone."
+    ],
+    "say.variants.brave.firearm_high": [
+      "Dead center. Keep moving.",
+      "Clean hit. Advance.",
+      "Downed. Scanning the next sector.",
+      "One shot, one down. Keep pace.",
+      "Target eliminated. Form up.",
+      "Precise shot. Push through.",
+      "Threat neutralized. Eyes ahead.",
+      "Confirmed kill. Move forward."
+    ],
+    "say.variants.cold.firearm_high": [
+      "Clean shot.",
+      "Target expired. Moving.",
+      "Zero waste. Proceed.",
+      "Bullet found the brain. Next.",
+      "Dropped efficiently.",
+      "Threat terminated.",
+      "Simple precision.",
+      "One less obstacle."
+    ],
+    "say.variants.practical.firearm_high": [
+      "Good shot placement. Check the lane.",
+      "One round spent. Check your corners.",
+      "Target down. Scan before advancing.",
+      "Clean shot. Keep ammunition in mind.",
+      "Dropped it cleanly. Watch for flankers.",
+      "Down. Keep your weapon raised.",
+      "Threat eliminated. Count your rounds.",
+      "Solid hit. Keep moving methodically."
+    ],
+    "say.variants.practical.firearm_low": [
+      "Hit it. Don't count on luck twice.",
+      "Took two shots, but it's down.",
+      "Messy hit, but it did the job.",
+      "Downed. Check remaining ammo now.",
+      "Wasted a round there. Settle your aim.",
+      "It's on the floor. Reload if needed.",
+      "Hit the mark eventually. Stay focused.",
+      "Threat down. Don't get sloppy."
+    ],
+    "say.variants.reserved.firearm": [
+      "Hit.",
+      "Down.",
+      "Target neutral.",
+      "One round.",
+      "Clear.",
+      "Eliminated.",
+      "Dropped.",
+      "Shot connected."
+    ],
+    "say.variants.shaken.firearm_low": [
+      "Jesus... I actually hit it.",
+      "My hands are shaking... but it's down.",
+      "Did I get it? God, I think it's dead.",
+      "That was way too close...",
+      "I panicked and fired... thank God.",
+      "Is it dead? Please tell me it's dead.",
+      "Heart's beating out of my chest...",
+      "I didn't think that shot would land."
+    ],
+    "say.variants.supportive.firearm": [
+      "Got it. You good?",
+      "Threat's down. Check yourself.",
+      "Downed that one. I've got your back.",
+      "Clear! You hurt anywhere?",
+      "Got him off us. Stay close.",
+      "Dropped that one. Keep your eyes open.",
+      "Took care of it. Are you alright?",
+      "Shot landed. You safe?"
+    ]
+  }
+}

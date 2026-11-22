@@ -1,0 +1,85 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "social.farewell.depart",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "FAREWELL"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "default"
+      },
+      {
+        "id": "friendly"
+      },
+      {
+        "id": "hostile"
+      },
+      {
+        "id": "wary"
+      },
+      {
+        "id": "colonist"
+      },
+      {
+        "id": "friend"
+      },
+      {
+        "id": "family"
+      },
+      {
+        "id": "lover"
+      },
+      {
+        "id": "player_default"
+      },
+      {
+        "id": "player_hostile"
+      },
+      {
+        "id": "player_wary"
+      },
+      {
+        "id": "player_colonist"
+      },
+      {
+        "id": "player_friend"
+      },
+      {
+        "id": "player_family"
+      },
+      {
+        "id": "player_lover"
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "social_interaction",
+      "domain": "social"
+    }
+  ],
+  "owner": "ProjectHoomans"
+}

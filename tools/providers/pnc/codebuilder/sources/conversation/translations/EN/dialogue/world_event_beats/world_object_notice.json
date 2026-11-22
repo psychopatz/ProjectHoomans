@@ -1,0 +1,27 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "world.object.notice",
+  "locale": "EN",
+  "entries": {
+    "say.variants.tv_reminisce_open": [
+      "Seeing an old TV still sitting there hits strange, {addressee.name}. Miss lazy nights on the couch.",
+      "Hard to believe I used to complain nothing was on TV, {addressee.name}.",
+      "Sometimes I miss catching a late-night show with actual noise in the room, {addressee.name}."
+    ],
+    "say.variants.tv_reminisce_reply": [
+      "Yeah, {addressee.name}, feels like a lifetime ago when that was our biggest worry.",
+      "Same here, {addressee.name}. Funny how quiet houses make you miss commercials.",
+      "Maybe once we're settled safely we can hook one up to a generator, {addressee.name}."
+    ],
+    "say.variants.tv_power_out_open": [
+      "Dead screen and dark tubes, {addressee.name}. Without the grid, that TV's just furniture.",
+      "Power's out for good, {addressee.name}. Even if anything's broadcasting, nothing lights up here.",
+      "Another quiet box collecting dust without power, {addressee.name}."
+    ],
+    "say.variants.tv_power_out_reply": [
+      "Feels eerie seeing every screen dead like that, {addressee.name}.",
+      "Nothing left on the air anyway, {addressee.name}, unless we wire a generator to tapes.",
+      "At least it won't draw any undead while it's dead, {addressee.name}."
+    ]
+  }
+}

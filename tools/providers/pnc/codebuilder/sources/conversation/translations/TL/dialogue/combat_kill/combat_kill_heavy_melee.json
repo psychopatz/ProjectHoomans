@@ -1,0 +1,97 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.kill.heavy_melee",
+  "locale": "TL",
+  "entries": {
+    "say.variants.aggressive.axe_head": [
+      "Biyak na biyak ang bulok na ulo.",
+      "Bumaon nang malalim ang palakol sa bungo.",
+      "Biyak sa dalawa. Manatili ka sa lupa.",
+      "Ibaon ang palakol sa gitna ng tenga nito.",
+      "Mabigat na hataw. Tapos magpakailanman.",
+      "Durog ang tuktok sa isang taga.",
+      "Walang laban ang bungong 'yon.",
+      "Bumasag diretso sa buto."
+    ],
+    "say.variants.aggressive.blunt": [
+      "Ramdam ko ang pag-crack no'n.",
+      "Durog ang bungo sa pira-piraso.",
+      "Pinitpit ang ulo na parang pakwan.",
+      "Walang tatayo pagkatapos ng gano'ng hampas.",
+      "Basag ang bawat buto sa mukha.",
+      "Ramdam hanggang braso ang impact.",
+      "Lubog ang bulok na bungo papasok.",
+      "Mabigat na tama. Huwag ka nang babangon."
+    ],
+    "say.variants.aggressive.spear": [
+      "Kaya gusto ko ang abot nito.",
+      "Tumagos sa butas ng mata.",
+      "Dumistansya at itinarak pabagsak.",
+      "Sibat sa utak. Tapos.",
+      "Itinarak bago pa ako mahawakan.",
+      "Diretsong saksak. Bagsak agad.",
+      "Bumutas sa bungo nang malinis.",
+      "Tinuhog at ibinagsak. Susunod na target."
+    ],
+    "say.variants.brave.axe": [
+      "Isang taga. Tapos.",
+      "Mabigat na taga. Sulong sa unahan.",
+      "Nabasag ang gulugod sa isang palo. Kilos.",
+      "Biyak ang bungo. Banta nawala na.",
+      "Solido ang tama. Susunod na target.",
+      "Bagsak agad. Tuloy ang lakad.",
+      "Nagawa ng palakol ang trabaho. Abante.",
+      "Malinis na bumaon sa buto. Tuloy."
+    ],
+    "say.variants.brave.spear": [
+      "Napanatili ko siya sa tamang distansya.",
+      "Diretsong ulos. Bagsak ang target.",
+      "Distansya nahawakan, patay kumpirmado.",
+      "Tumagos ang sibat. Abante.",
+      "Itinarak at tinapos. Kilos.",
+      "Malinis na tama mula sa ligtas na layo.",
+      "Naitumba mula sa malayo. Tuloy.",
+      "Walang peligrong kinuha. Lusot."
+    ],
+    "say.variants.cold.heavy_melee": [
+      "Dinurog.",
+      "Basag ang istruktura ng bungo. Tapos.",
+      "Durog na. Tuloy.",
+      "Sapat ang lakas ng tama. Sunod.",
+      "Tumigil ang lahat ng galaw.",
+      "Pinitpit.",
+      "Nabasag ang mga buto. Malinis.",
+      "Naitama ang bigat. Tapos."
+    ],
+    "say.variants.practical.axe_spear": [
+      "Maganda ang abot. Panatilihin ang linya.",
+      "Nanatili sa ligtas na layo. Epektibo 'yon.",
+      "Lakas at abot ang tumapos. Sulong.",
+      "Ligtas na distansya napanatili. Sunod.",
+      "Magandang distansya ng sandata. Bantayan ang gilid.",
+      "Malinis na bumaon. Tignan ang hawakan.",
+      "Tinamaan bago makalapit. Ayusin ang hanay.",
+      "Ligtas tayo dahil sa distansya. Magpatuloy."
+    ],
+    "say.variants.practical.blunt": [
+      "Dinurog. Bantayan ang susunod.",
+      "Basag ang bungo. Tignan ang gasgas ng sandata.",
+      "Mabigat na hampas. Sulong sa unahan.",
+      "Mabisang palo. Patatagin ang tindig.",
+      "Bagsak. Huwag magpakapagod sa paghataw.",
+      "Bumasag nang tuluyan. Suriin ang paligid.",
+      "Mabigat na palo ang tumapos. Abante.",
+      "Naitumba ng lakas ang banta. Tignan ang mga sulok."
+    ],
+    "say.variants.supportive.melee": [
+      "Bagsak na. Dumikit ka lang.",
+      "Nailayo ko sa'yo. Ayos ka lang?",
+      "Ibinagsak ko na. Tignan ang sulok mo.",
+      "Nandito lang ako kasama mo. Patay na.",
+      "Dinurog bago pa makalapit.",
+      "Manatili sa likod ko. Tapos na 'yon.",
+      "Ibinagsak ko na. Huminga ka muna.",
+      "Patay sa sahig. Nakakayanan mo pa?"
+    ]
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "world.weather.rain_warn",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "WARN"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "rain_open"
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "world",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "weather_reaction",
+      "domain": "world"
+    }
+  ],
+  "events": [
+    {
+      "id": "world_event",
+      "kind": "world_event"
+    }
+  ]
+}

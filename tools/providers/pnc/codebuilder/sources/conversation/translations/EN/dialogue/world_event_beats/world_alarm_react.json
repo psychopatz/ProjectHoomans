@@ -1,0 +1,17 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "world.alarm.react",
+  "locale": "EN",
+  "entries": {
+    "say.variants.house_alarm_open": [
+      "Shit, an alarm! {addressee.name}, every deadhead in blocks is gonna hear that!",
+      "Burglar alarm just tripped! {addressee.name}, get ready for company!",
+      "Damn it, listen to that siren! Stay sharp, {addressee.name}, they'll swarm that building!"
+    ],
+    "say.variants.house_alarm_reply": [
+      "I hear it, {addressee.name}. Weapons up and keep moving away from that noise.",
+      "Great, just what we needed, {addressee.name}. Keep eyes on every doorway.",
+      "Copy that, {addressee.name}. Let's clear out before the whole street pours in."
+    ]
+  }
+}

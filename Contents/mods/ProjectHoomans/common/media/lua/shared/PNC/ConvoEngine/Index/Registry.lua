@@ -22,7 +22,7 @@ return {
         ["domain"] = "combat_ally_warning",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatAllyWarning",
-        ["recordCount"] = 2,
+        ["recordCount"] = 14,
     },
     {
         ["domain"] = "combat_horde",
@@ -76,7 +76,7 @@ return {
         ["domain"] = "combat_kill",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatKill",
-        ["recordCount"] = 1,
+        ["recordCount"] = 4,
     },
     {
         ["domain"] = "combat_kill_killer_aggressive",
@@ -166,7 +166,7 @@ return {
         ["domain"] = "combat_player_assault_reactions",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatPlayerAssaultReactions",
-        ["recordCount"] = 8,
+        ["recordCount"] = 4,
     },
     {
         ["domain"] = "combat_tactical_spatial",
@@ -364,7 +364,7 @@ return {
         ["domain"] = "event_reactions_farewell",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/EventReactionsFarewell",
-        ["recordCount"] = 15,
+        ["recordCount"] = 1,
     },
     {
         ["domain"] = "event_reactions_leader_loss",
@@ -598,7 +598,7 @@ return {
         ["domain"] = "world_event_beats",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/WorldEventBeats",
-        ["recordCount"] = 2,
+        ["recordCount"] = 4,
     },
     {
         ["domain"] = "social_reactions_hostile_offer_threat",

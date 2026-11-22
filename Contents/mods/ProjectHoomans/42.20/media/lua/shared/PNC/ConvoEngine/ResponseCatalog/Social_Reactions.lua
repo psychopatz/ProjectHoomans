@@ -147,37 +147,37 @@ local function response(
     }
 end
 
-Catalog.Register("semantic.flow.farewell", {
+Catalog.Register("semantic.social.farewell.depart", {
     variants = {
-        response("semantic.flow.farewell", "player_hostile",
+        response("semantic.social.farewell.depart", "player_hostile",
             { farewellSpeaker = "player", socialRole = "hostile" }, 16, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "player_wary",
+        response("semantic.social.farewell.depart", "player_wary",
             { farewellSpeaker = "player", socialRole = "wary" }, 15, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "player_lover",
+        response("semantic.social.farewell.depart", "player_lover",
             { farewellSpeaker = "player", socialRole = "lover" }, 16, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "player_family",
+        response("semantic.social.farewell.depart", "player_family",
             { farewellSpeaker = "player", socialRole = "family" }, 16, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "player_friend",
+        response("semantic.social.farewell.depart", "player_friend",
             { farewellSpeaker = "player", socialRole = "friend" }, 15, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "player_colonist",
+        response("semantic.social.farewell.depart", "player_colonist",
             { farewellSpeaker = "player", socialRole = "colonist" }, 14, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "player_default",
+        response("semantic.social.farewell.depart", "player_default",
             { farewellSpeaker = "player" }, 10, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "hostile",
+        response("semantic.social.farewell.depart", "hostile",
             { socialRole = "hostile" }, 6, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "wary",
+        response("semantic.social.farewell.depart", "wary",
             { socialRole = "wary" }, 5, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "lover",
+        response("semantic.social.farewell.depart", "lover",
             { socialRole = "lover" }, 6, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "family",
+        response("semantic.social.farewell.depart", "family",
             { socialRole = "family" }, 6, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "friend",
+        response("semantic.social.farewell.depart", "friend",
             { socialRole = "friend" }, 5, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "colonist",
+        response("semantic.social.farewell.depart", "colonist",
             { socialRole = "colonist" }, 4, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "friendly",
+        response("semantic.social.farewell.depart", "friendly",
             { socialStyle = { "friendly", "protective" } }, 2, "FAREWELL", "farewell"),
-        response("semantic.flow.farewell", "default",
+        response("semantic.social.farewell.depart", "default",
             nil, 0, "FAREWELL", "farewell"),
     },
 })
@@ -391,15 +391,32 @@ local KILLER_WEAPON_VARIANTS = {
         } },
     },
 }
+local KILL_VARIANT_FAMILY = {
+    blade_head = "combat.kill.blade",
+    blade = "combat.kill.blade",
+    axe_head = "combat.kill.heavy_melee",
+    blunt = "combat.kill.heavy_melee",
+    spear = "combat.kill.heavy_melee",
+    axe = "combat.kill.heavy_melee",
+    heavy_melee = "combat.kill.heavy_melee",
+    axe_spear = "combat.kill.heavy_melee",
+    melee = "combat.kill.heavy_melee",
+    firearm_high = "combat.kill.firearm",
+    firearm_low = "combat.kill.firearm",
+    firearm = "combat.kill.firearm",
+    unarmed = "combat.kill.unarmed",
+}
+
 local function killerWeaponTemplateID(style, variantID)
     if variantID == "firearm_high_named_01" then
-        return "combat.kill.killer." .. style .. ".firearm_high_named.say.1"
+        return "combat.kill.firearm." .. style .. ".firearm_high_named.say.1"
     end
     if variantID == "firearm_high_named_02" then
-        return "combat.kill.killer." .. style .. ".firearm_high_named.say.2"
+        return "combat.kill.firearm." .. style .. ".firearm_high_named.say.2"
     end
     local stripped = string.gsub(tostring(variantID or ""), "_01$", "")
-    return "combat.kill.killer." .. style .. "." .. stripped
+    local family = KILL_VARIANT_FAMILY[stripped] or "combat.kill.heavy_melee"
+    return family .. "." .. style .. "." .. stripped
 end
 
 for _, role in ipairs({ "witness", "killer" }) do

@@ -1,0 +1,61 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.callout.threat",
+  "locale": "EN",
+  "entries": {
+    "say.variants.zombie_neutral": [
+      "Heads up, {target.name} moving {scene.location}!",
+      "Watch it! Got {target.name} {scene.location}!",
+      "Stay sharp, {target.name} spotted {scene.location}!",
+      "Incoming! We've got {target.name} {scene.location}!"
+    ],
+    "say.variants.zombie_tactical": [
+      "Contact, {scene.location}! {target.name}, weapons up!",
+      "Visual on {target.name} advancing {scene.location}, engage!",
+      "{target.name}, {scene.location}! Converge and clear!",
+      "Hold formation, got {target.name} {scene.location}!"
+    ],
+    "say.variants.zombie_hostile": [
+      "Drop them! {target.name} prowling {scene.location}!",
+      "Cut down {target.name} {scene.location} before they swarm!",
+      "Watch your flank! Got {target.name} {scene.location}!",
+      "Fresh meat! {target.name} caught {scene.location}!"
+    ],
+    "say.variants.hostile_neutral": [
+      "Watch out, {target.name} spotted {scene.location}!",
+      "Got trouble! {target.name} moving {scene.location}!",
+      "Heads up, we've got {target.name} {scene.location}!",
+      "Stay on guard! Spotted {target.name} {scene.location}!"
+    ],
+    "say.variants.hostile_tactical": [
+      "Hostile contact! {target.name} {scene.location}, weapons ready!",
+      "Armed threat, {target.name} {scene.location}, engage!",
+      "Eyes on {target.name} closing {scene.location}!",
+      "Threat confirmed, {target.name} spotted {scene.location}, take cover!"
+    ],
+    "say.variants.hostile_hostile": [
+      "Flush them out! Got {target.name} {scene.location}!",
+      "Tear them apart, {target.name} caught {scene.location}!",
+      "Right over there! Drop {target.name} {scene.location}!",
+      "Don't let them slip, keep eyes on {target.name} {scene.location}!"
+    ],
+    "say.variants.crawler": [
+      "Watch your feet! Got {target.name} dragging {scene.location}!",
+      "Low contact! {target.name} crawling {scene.location}!",
+      "Don't trip, got {target.name} {scene.location}!",
+      "Check low, {target.name} sneaking {scene.location}!"
+    ],
+    "say.variants.blindside": [
+      "Look out, {addressee.name}! Got {target.name} right behind you!",
+      "Behind you, {addressee.name}! Watch {target.name}!",
+      "Turn around, {addressee.name}! {target.name} closing on you!",
+      "{addressee.name}, watch your back! {target.name} right on you!"
+    ],
+    "say.variants.last_one": [
+      "Just this last one left! Put {target.name} down!",
+      "That's almost all of them, just {target.name} left!",
+      "One left, finish off {target.name}!",
+      "Last straggler! Clean up {target.name}!"
+    ]
+  }
+}

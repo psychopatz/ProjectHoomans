@@ -1041,30 +1041,30 @@ do
             {
                 id = "j-shaken",
                 opts = { attackType = "auto", social = { personality = { bravery = 0.15 } }, conditionStats = { panic = 75 } },
-                style = "shaken", engTpl = "combat.ally_warn.reply.engaging_shaken",
-                altTpl = "combat.ally_warn.reply.engaging_shaken", wingTpl = "combat.ally_warn.reply.wingman_shaken",
+                style = "shaken", engTpl = "combat.callout.reply_engage.engaging_shaken",
+                altTpl = "combat.callout.reply_engage.engaging_shaken", wingTpl = "combat.callout.reply_wingman.shaken",
             },
             {
                 id = "j-brave",
                 opts = { attackType = "auto", social = { personality = { bravery = 0.90 } } },
-                style = "brave", engTpl = "combat.ally_warn.reply.engaging_brave",
-                wingTpl = "combat.ally_warn.reply.wingman_brave",
+                style = "brave", engTpl = "combat.callout.reply_engage.engaging_brave",
+                wingTpl = "combat.callout.reply_wingman.brave",
             },
             {
                 id = "j-agg",
                 opts = { attackType = "auto", social = { personality = { aggression = 0.85 } } },
-                style = "aggressive", engTpl = "combat.ally_warn.reply.engaging_aggressive",
-                wingTpl = "combat.ally_warn.reply.wingman_aggressive",
+                style = "aggressive", engTpl = "combat.callout.reply_engage.engaging_aggressive",
+                wingTpl = "combat.callout.reply_wingman.aggressive",
             },
             {
                 id = "j-exh",
                 opts = { attackType = "auto", conditionStats = { fatigue = 0.85, bleeding = true } },
-                style = "exhausted", engTpl = "combat.ally_warn.reply.engaging_exhausted",
+                style = "exhausted", engTpl = "combat.callout.reply_engage.engaging_exhausted",
             },
             {
                 id = "j-sup",
                 opts = { attackType = "auto", social = { personality = { compassion = 0.88 } } },
-                style = "supportive", engTpl = "combat.ally_warn.reply.engaging_supportive",
+                style = "supportive", engTpl = "combat.callout.reply_engage.engaging_supportive",
             },
         }
         local callerStub = { id = "j-caller", name = "Sammie" }

@@ -1,0 +1,49 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "condition.stamina.reply",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "ACK"
+  },
+  "say": {
+    "variants": [
+      {
+        "id": "cover_winded"
+      }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "condition",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "stamina_status",
+      "domain": "condition"
+    }
+  ],
+  "events": [
+    {
+      "id": "condition_event",
+      "kind": "condition_event"
+    }
+  ]
+}
