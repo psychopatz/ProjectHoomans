@@ -7,6 +7,9 @@ PNC.ConvoEngine = PNC.ConvoEngine or {}
 local Choice = PNC.ConvoEngine.SocialChoicePolicy or {}
 PNC.ConvoEngine.SocialChoicePolicy = Choice
 
+local DispositionProjection = PNC.ConvoEngine.DispositionProjection
+    or require "PNC/ConvoEngine/DispositionProjection"
+
 Choice.VERSION = 1
 Choice.MAX_CANDIDATES = 8
 Choice.DEFAULT_SILENCE_THRESHOLD = 0.50
@@ -61,25 +64,6 @@ local function upper(value)
     return string.upper(tostring(value or ""))
 end
 
-local function traitListHas(traits, trait)
-    if type(traits) ~= "table" then return false end
-    if traits[trait] == true then return true end
-    for key, value in pairs(traits) do
-        if type(key) == "string" and value == true
-            and tostring(key) == trait
-        then
-            return true
-        end
-        if tostring(value) == trait then return true end
-        if type(value) == "table"
-            and tostring(value.id or value.type or value.name or "") == trait
-        then
-            return true
-        end
-    end
-    return false
-end
-
 local function projection(context)
     context = type(context) == "table" and context or {}
     local p = type(context.responderProjection) == "table"
@@ -91,12 +75,29 @@ local function projection(context)
     return actor, relationship
 end
 
-local function disposition(actor, key, fallback)
-    local values = type(actor.disposition) == "table"
-        and actor.disposition or {}
-    local value = tonumber(values[key])
-    if value == nil then value = fallback end
-    return clamp(value or 0.5, 0, 1)
+local function resolveEffectiveUnit(actor, context)
+    local resolveOpts = {
+        temporaryDemeanor = type(context) == "table"
+            and context.temporaryDemeanor or nil,
+        personality = type(context) == "table"
+            and context.personality or nil,
+    }
+    if type(actor.effectiveDisposition) == "table" then
+        resolveOpts.baseDisposition = actor.effectiveDisposition
+        resolveOpts.condition = type(context) == "table"
+            and context.condition or {}
+    elseif actor.providerID == "projecthoomans.managed_npc"
+        and type(actor.disposition) == "table"
+    then
+        -- Adapter already applied actor.condition to actor.disposition.
+        resolveOpts.baseDisposition = actor.disposition
+        resolveOpts.condition = type(context) == "table"
+            and context.condition or {}
+    elseif type(context) == "table" and type(context.condition) == "table" then
+        resolveOpts.condition = context.condition
+    end
+    local resolved = DispositionProjection.Resolve(actor, resolveOpts)
+    return DispositionProjection.ToUnitDisposition(resolved.effectiveDisposition)
 end
 
 local function candidateAllowed(candidate, context)
@@ -133,11 +134,14 @@ local function scoreCandidate(candidate, context)
     local score = 0.45
     local modifiers = {}
 
-    local aggression = disposition(actor, "aggression", 0.5)
-    local confidence = disposition(actor, "confidence", 0.5)
-    local empathy = disposition(actor, "empathy", 0.5)
-    local forgiveness = disposition(actor, "forgiveness", 0.5)
-    local sociability = disposition(actor, "sociability", 0.5)
+    local d = resolveEffectiveUnit(actor, context)
+    local aggression = d.aggression
+    local confidence = d.confidence
+    local bravery = d.bravery
+    local compassion = d.compassion
+    local forgiveness = d.forgiveness
+    local sociability = d.sociability
+    local loyalty = d.loyalty
 
     if AGGRESSIVE[strategy] then
         local delta = (aggression - 0.5) * 0.32
@@ -148,7 +152,7 @@ local function scoreCandidate(candidate, context)
             delta = delta,
         }
     elseif REPAIR[strategy] then
-        local delta = (empathy - 0.5) * 0.28
+        local delta = (compassion - 0.5) * 0.28
             + (forgiveness - 0.5) * 0.18
         score = score + delta
         modifiers[#modifiers + 1] = {
@@ -157,7 +161,7 @@ local function scoreCandidate(candidate, context)
         }
     elseif CURIOUS[strategy] then
         local delta = (sociability - 0.5) * 0.24
-            + (empathy - 0.5) * 0.08
+            + (compassion - 0.5) * 0.08
         score = score + delta
         modifiers[#modifiers + 1] = {
             reason = "curiosity_disposition",
@@ -196,28 +200,25 @@ local function scoreCandidate(candidate, context)
         }
     end
 
-    local traits = type(actor.traits) == "table" and actor.traits or {}
-    local traitDelta = 0
-    if (strategy == "CALL_BLUFF" or strategy == "CHALLENGE")
-        and (traitListHas(traits, "Brave")
-            or traitListHas(traits, "Desensitized"))
-    then
-        traitDelta = traitDelta + 0.14
-    end
-    if (strategy == "COMFORT" or strategy == "DEESCALATE")
-        and (traitListHas(traits, "Empathetic")
-            or traitListHas(traits, "Kind")
-            or traitListHas(traits, "KindHearted")
-            or traitListHas(traits, "Pacifist"))
-    then
-        traitDelta = traitDelta + 0.16
-    end
-    if traitDelta ~= 0 then
-        score = score + traitDelta
-        modifiers[#modifiers + 1] = {
-            reason = "trait_fit",
-            delta = traitDelta,
-        }
+    if strategy == "CALL_BLUFF" or strategy == "CHALLENGE" then
+        local courageDelta = ((bravery + confidence) * 0.5 - 0.5) * 0.18
+        if courageDelta ~= 0 then
+            score = score + courageDelta
+            modifiers[#modifiers + 1] = {
+                reason = "courage_disposition",
+                delta = courageDelta,
+            }
+        end
+    elseif strategy == "COMFORT" or strategy == "DEESCALATE" then
+        local careDelta = (compassion - 0.5) * 0.14
+            + (loyalty - 0.5) * 0.08
+        if careDelta ~= 0 then
+            score = score + careDelta
+            modifiers[#modifiers + 1] = {
+                reason = "care_disposition",
+                delta = careDelta,
+            }
+        end
     end
 
     local relevance = clamp(context.relevance or 1, 0, 1)

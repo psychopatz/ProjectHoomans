@@ -498,23 +498,24 @@ function Provider.collect(context)
         add(output, seen, candidate(
             "ASK_WHY", "NEUTRAL", context, "hostility_followup"
         ))
-        local challengeTrait = Responder.HasAnyTrait(
-            context, { "Brave", "Desensitized" }
-        )
-        if challengeTrait then
+        local effective = Responder.EffectiveDisposition(context)
+        if (tonumber(effective.bravery) or 50) >= 65
+            and (tonumber(effective.confidence) or 50) >= 65
+        then
             add(output, seen, candidate(
                 "CALL_BLUFF", "NEGATIVE", context,
-                Responder.TraitReason(context, challengeTrait)
+                Responder.DispositionReason(
+                    context, "courage", { "Brave", "Desensitized" }
+                )
             ))
         end
-        local empathyTrait = Responder.HasAnyTrait(
-            context,
-            { "Empathetic", "Kind", "KindHearted", "Pacifist" }
-        )
-        if empathyTrait then
+        if (tonumber(effective.compassion) or 50) >= 65 then
             add(output, seen, candidate(
                 "COMFORT", "POSITIVE", context,
-                Responder.TraitReason(context, empathyTrait)
+                Responder.DispositionReason(
+                    context, "compassion",
+                    { "Empathetic", "Kind", "KindHearted", "Pacifist" }
+                )
             ))
         end
         return output

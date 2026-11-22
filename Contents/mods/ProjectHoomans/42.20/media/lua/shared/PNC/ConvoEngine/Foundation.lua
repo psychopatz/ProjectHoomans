@@ -1,5 +1,6 @@
 -- Domain registration: Semantics. Ordered startup only; no gameplay policy.
 require "PNC/Semantics/PNC_SemanticDiagnostics"
+require "PNC/ConvoEngine/DispositionProjection"
 require "PNC/Semantics/PNC_SemanticWorldTargetCatalog"
 require "PNC/Semantics/PNC_SemanticCampSite"
 require "PNC/Semantics/PNC_SemanticCampSiteGeometry"

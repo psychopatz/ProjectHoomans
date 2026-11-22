@@ -5,6 +5,10 @@
 -- semantic frontier to be requested for an explicit NPC/scene responder.
 local Responder = {}
 
+local DispositionProjection = PNC and PNC.ConvoEngine
+    and PNC.ConvoEngine.DispositionProjection
+    or require "PNC/ConvoEngine/DispositionProjection"
+
 local function copyShallow(value)
     if type(value) ~= "table" then return value end
     local output = {}
@@ -88,6 +92,42 @@ function Responder.Project(context)
     end
     if legacyPlayer then aliases.player = true end
 
+    local actorInput = {
+        id = actorID,
+        identitySeed = source.identitySeed or source.seed
+            or player.identitySeed or context.identitySeed,
+        personality = source.personality or context.responderPersonality
+            or player.personality or context.playerPersonality,
+        socialProfile = source.socialProfile or player.socialProfile,
+        social = source.social or player.social,
+        disposition = source.disposition or player.disposition,
+        baseDisposition = source.baseDisposition,
+        temporaryDemeanor = source.temporaryDemeanor
+            or player.temporaryDemeanor,
+        condition = source.condition or source.conditionStats
+            or player.condition or player.conditionStats,
+        runtime = source.runtime or player.runtime,
+        traits = traits,
+    }
+    local resolveOpts = {
+        temporaryDemeanor = context.temporaryDemeanor,
+        condition = context.condition or context.conditionStats,
+        traits = traits,
+    }
+    if type(source.effectiveDisposition) == "table" then
+        resolveOpts.baseDisposition = source.effectiveDisposition
+        if type(context.condition) ~= "table"
+            and type(context.conditionStats) ~= "table"
+        then
+            resolveOpts.condition = {}
+            actorInput.condition = {}
+        end
+    end
+    local resolvedDisposition = DispositionProjection.Resolve(
+        actorInput,
+        resolveOpts
+    )
+
     return {
         actorID = actorID,
         turnSpeaker = turnSpeaker,
@@ -97,7 +137,37 @@ function Responder.Project(context)
         recipient = recipient,
         legacyPlayer = legacyPlayer,
         speakerAliases = aliases,
+        baseDisposition = resolvedDisposition.baseDisposition,
+        temporaryDemeanor = resolvedDisposition.temporaryDemeanor,
+        effectiveDisposition = resolvedDisposition.effectiveDisposition,
+        dispositionStyle = resolvedDisposition.styleProfile,
+        dispositionProjection = resolvedDisposition,
     }
+end
+
+function Responder.Disposition(context)
+    return Responder.Project(context).dispositionProjection
+end
+
+function Responder.EffectiveDisposition(context)
+    return Responder.Project(context).effectiveDisposition
+end
+
+function Responder.DispositionReason(context, kind, fallbackTraits)
+    local projected = Responder.Project(context)
+    local disp = projected.dispositionProjection
+    if type(disp) == "table" and disp.derivedFromTraits == true
+        and type(fallbackTraits) == "table"
+    then
+        for _, trait in ipairs(fallbackTraits) do
+            if traitListHas(projected.traits, trait) then
+                return Responder.TraitReason(context, trait)
+            end
+        end
+    end
+    local prefix = projected.legacyPlayer
+        and "player_disposition:" or "responder_disposition:"
+    return prefix .. tostring(kind or "effective")
 end
 
 function Responder.HasTrait(context, trait)

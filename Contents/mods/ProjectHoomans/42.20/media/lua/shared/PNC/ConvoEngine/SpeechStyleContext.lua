@@ -15,8 +15,20 @@ Style.SCHEMA = "speech.style.context.v1"
 
 local ActorContext = PNC.Semantics.ActorConversationContext
     or require "PNC/Semantics/PNC_ActorConversationContext"
-local NPCTraits = PNC.NPCTraits
-    or require "PNC/Core/Traits/PNC_NPCTraitRegistry"
+
+local function resolveDispositionProjection()
+    local dp = PNC and PNC.ConvoEngine and PNC.ConvoEngine.DispositionProjection
+    if type(dp) == "table" and type(dp.Resolve) == "function" then
+        return dp
+    end
+    if type(require) == "function" then
+        local ok, loaded = pcall(require, "PNC/ConvoEngine/DispositionProjection")
+        if ok and type(loaded) == "table" and type(loaded.Resolve) == "function" then
+            return loaded
+        end
+    end
+    return nil
+end
 
 local DIMENSIONS = {
     "warmth", "formality", "directness", "verbosity", "hostility",
@@ -34,11 +46,6 @@ local function add(values, field, delta)
     values[field] = (values[field] or 0.5) + (tonumber(delta) or 0)
 end
 
-local function text(value)
-    value = tostring(value or "")
-    return value ~= "" and value or nil
-end
-
 local function number(value, fallback)
     value = tonumber(value)
     if value == nil or value ~= value
@@ -49,52 +56,6 @@ end
 
 local function normalizedSigned(value)
     return math.max(0, math.min(1, (number(value, 0) + 100) / 200))
-end
-
-local PERSONALITY_TO_SPEECH = {
-    compassion = { warmth = 0.28 },
-    sociability = { warmth = 0.20, openness = 0.24, verbosity = 0.16 },
-    forgiveness = { warmth = 0.22, openness = 0.18, hostility = -0.10 },
-    bravery = { directness = 0.16, deference = -0.05 },
-    materialism = { formality = 0.16 },
-    aggression = { hostility = 0.22, directness = 0.16, openness = -0.10,
-        verbosity = -0.08 },
-    loyalty = { deference = 0.16, warmth = 0.04 },
-}
-
-local function applyTrait(values, provenance, trait)
-    local definition = NPCTraits
-        and type(NPCTraits.GetDefinition) == "function"
-        and NPCTraits.GetDefinition(trait) or nil
-    if type(definition) ~= "table" then return end
-    local modifiers = definition.speechStyle
-    if type(modifiers) ~= "table" then
-        local personality = definition.effects
-            and definition.effects.personality or nil
-        if type(personality) == "table" then
-            modifiers = {}
-            for personalityField, value in pairs(personality) do
-                local mappings = PERSONALITY_TO_SPEECH[personalityField]
-                if mappings then
-                    for dimension, coefficient in pairs(mappings) do
-                        modifiers[dimension] = (modifiers[dimension] or 0)
-                            + tonumber(value or 0) * coefficient
-                    end
-                end
-            end
-        end
-    end
-    if type(modifiers) ~= "table" then return end
-    local applied = false
-    for dimension, delta in pairs(modifiers) do
-        if values[dimension] ~= nil and tonumber(delta) ~= nil then
-            add(values, dimension, delta)
-            applied = true
-        end
-    end
-    if applied then
-        provenance[#provenance + 1] = tostring(definition.id or trait)
-    end
 end
 
 local function variant(values)
@@ -129,26 +90,91 @@ function Style.Resolve(source)
         personality = {},
         relationship = {},
         traits = {},
+        temporaryDemeanor = {},
         roles = {},
         situation = {},
         bond = {},
     }
     for index = 1, #DIMENSIONS do values[DIMENSIONS[index]] = 0.5 end
 
-    add(values, "warmth", (number(personality.compassion, 0.5) - 0.5) * 0.30)
-    add(values, "warmth", (number(personality.sociability, 0.5) - 0.5) * 0.22)
-    add(values, "openness", (number(personality.sociability, 0.5) - 0.5) * 0.30)
-    add(values, "formality", (number(personality.materialism, 0.5) - 0.5) * 0.14)
-    add(values, "directness", (number(personality.aggression, 0.5) - 0.5) * 0.18)
-    add(values, "hostility", (number(personality.aggression, 0.5) - 0.5) * 0.24)
-    add(values, "deference", (number(personality.loyalty, 0.5) - 0.5) * 0.16)
-    add(values, "verbosity", (number(personality.sociability, 0.5) - 0.5) * 0.22)
-    provenance.personality[#provenance.personality + 1] = "social_profile"
-    add(values, "warmth", (number(personality.forgiveness, 0.5) - 0.5) * 0.22)
-    add(values, "openness", (number(personality.forgiveness, 0.5) - 0.5) * 0.18)
-    add(values, "hostility", (number(personality.forgiveness, 0.5) - 0.5) * -0.10)
-    add(values, "directness", (number(personality.bravery, 0.5) - 0.5) * 0.16)
-    add(values, "deference", (number(personality.bravery, 0.5) - 0.5) * -0.05)
+    local DP = resolveDispositionProjection()
+    local proj = type(context.dispositionProjection) == "table"
+        and context.dispositionProjection
+        or nil
+    if not proj and DP then
+        local record = type(context.npcRecord) == "table" and context.npcRecord
+            or (type(context.actor) == "table" and context.actor or actor)
+        proj = DP.Resolve(record, {
+            personality = type(context.npcPersonality) == "table"
+                and context.npcPersonality or personality,
+            traits = actor.traits or context.npcTraits,
+            playerTraits = context.playerTraits,
+            condition = context.condition
+                or (type(context.npcRecord) == "table"
+                    and context.npcRecord.conditionStats)
+                or nil,
+            temporaryDemeanor = context.temporaryDemeanor
+                or actor.temporaryDemeanor,
+            relationshipState = relationship.state,
+            isHostile = roles.hostile == true,
+            tactical = roles.role == "guard" or roles.role == "soldier"
+                or roles.role == "scout",
+            identitySeed = context.identitySeed,
+        })
+    end
+
+    local effective = personality
+    if proj and type(proj.effectiveDisposition) == "table" then
+        if DP and type(DP.ToUnitDisposition) == "function" then
+            effective = DP.ToUnitDisposition(proj.effectiveDisposition)
+        else
+            local e = proj.effectiveDisposition
+            effective = {
+                compassion = number(e.compassion, 50) / 100,
+                sociability = number(e.sociability, 50) / 100,
+                materialism = number(e.materialism, 50) / 100,
+                aggression = number(e.aggression, 50) / 100,
+                loyalty = number(e.loyalty, 50) / 100,
+                forgiveness = number(e.forgiveness, 50) / 100,
+                bravery = number(e.bravery, 50) / 100,
+            }
+        end
+        provenance.personality[#provenance.personality + 1] =
+            "disposition_projection"
+        if proj.derivedFromTraits == true
+            and type(proj.appliedTraits) == "table"
+        then
+            for index = 1, #proj.appliedTraits do
+                provenance.traits[#provenance.traits + 1] =
+                    tostring(proj.appliedTraits[index])
+            end
+        end
+        if type(proj.temporaryDemeanor) == "table" then
+            for axis, delta in pairs(proj.temporaryDemeanor) do
+                if (tonumber(delta) or 0) ~= 0 then
+                    provenance.temporaryDemeanor[#provenance.temporaryDemeanor + 1] =
+                        tostring(axis)
+                end
+            end
+            table.sort(provenance.temporaryDemeanor)
+        end
+    else
+        provenance.personality[#provenance.personality + 1] = "social_profile"
+    end
+
+    add(values, "warmth", (number(effective.compassion, 0.5) - 0.5) * 0.30)
+    add(values, "warmth", (number(effective.sociability, 0.5) - 0.5) * 0.22)
+    add(values, "openness", (number(effective.sociability, 0.5) - 0.5) * 0.30)
+    add(values, "formality", (number(effective.materialism, 0.5) - 0.5) * 0.14)
+    add(values, "directness", (number(effective.aggression, 0.5) - 0.5) * 0.18)
+    add(values, "hostility", (number(effective.aggression, 0.5) - 0.5) * 0.24)
+    add(values, "deference", (number(effective.loyalty, 0.5) - 0.5) * 0.16)
+    add(values, "verbosity", (number(effective.sociability, 0.5) - 0.5) * 0.22)
+    add(values, "warmth", (number(effective.forgiveness, 0.5) - 0.5) * 0.22)
+    add(values, "openness", (number(effective.forgiveness, 0.5) - 0.5) * 0.18)
+    add(values, "hostility", (number(effective.forgiveness, 0.5) - 0.5) * -0.10)
+    add(values, "directness", (number(effective.bravery, 0.5) - 0.5) * 0.16)
+    add(values, "deference", (number(effective.bravery, 0.5) - 0.5) * -0.05)
     local socialStyle = string.lower(tostring(personality.socialStyle or ""))
     if socialStyle == "friendly" or socialStyle == "protective" then
         add(values, "warmth", 0.14)
@@ -206,10 +232,6 @@ function Style.Resolve(source)
         provenance.relationship[#provenance.relationship + 1] = "untrustworthy"
     end
 
-    for index = 1, #(actor.traits or {}) do
-        applyTrait(values, provenance.traits, actor.traits[index])
-    end
-
     if bond.class == "family" then
         add(values, "warmth", 0.08)
         add(values, "openness", 0.05)
@@ -265,11 +287,16 @@ function Style.Resolve(source)
     for index = 1, #DIMENSIONS do
         values[DIMENSIONS[index]] = clamp(values[DIMENSIONS[index]])
     end
+    local resolvedVariant = variant(values)
     return {
         schemaVersion = Style.VERSION,
         schema = Style.SCHEMA,
-        variant = variant(values),
-        reason = variant(values) == "guarded"
+        variant = resolvedVariant,
+        styleProfile = proj and proj.styleProfile or nil,
+        baseDisposition = proj and proj.baseDisposition or nil,
+        temporaryDemeanor = proj and proj.temporaryDemeanor or nil,
+        effectiveDisposition = proj and proj.effectiveDisposition or nil,
+        reason = resolvedVariant == "guarded"
             and "hostile_or_defensive_context"
             or "actor_context_style_resolution",
         dimensions = values,

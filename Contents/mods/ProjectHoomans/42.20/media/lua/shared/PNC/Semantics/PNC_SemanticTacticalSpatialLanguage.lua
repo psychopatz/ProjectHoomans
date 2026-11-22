@@ -27,6 +27,8 @@ local TACTICAL_ROLES = {
     enforcer = true,
 }
 
+-- Direct trait check retained intentionally: clock-face bearing callouts reflect
+-- specialized combat/military training capability, not generic temperament.
 local TACTICAL_TRAITS = {
     pnc_veteran = true,
     pnc_disciplined_fighter = true,

@@ -18,6 +18,45 @@ local TraitContext = PNC.NPCTraitContext
 local Style = PNC.ConvoEngine.SpeechStyleContext
     or require "PNC/ConvoEngine/SpeechStyleContext"
 
+local function resolveDispositionProjection()
+    local dp = PNC and PNC.ConvoEngine and PNC.ConvoEngine.DispositionProjection
+    if type(dp) == "table" and type(dp.Resolve) == "function" then
+        return dp
+    end
+    if type(require) == "function" then
+        local ok, loaded = pcall(require, "PNC/ConvoEngine/DispositionProjection")
+        if ok and type(loaded) == "table" and type(loaded.Resolve) == "function" then
+            return loaded
+        end
+    end
+    return nil
+end
+
+local function hasEntries(tbl)
+    if type(tbl) ~= "table" then return false end
+    for _ in pairs(tbl) do return true end
+    return false
+end
+
+local function demeanorSignature(record, options)
+    local d = type(options) == "table" and type(options.temporaryDemeanor) == "table"
+        and options.temporaryDemeanor
+        or (type(record) == "table" and type(record.temporaryDemeanor) == "table" and record.temporaryDemeanor)
+        or (type(record) == "table" and type(record.runtime) == "table"
+            and type(record.runtime.temporaryDemeanor) == "table"
+            and record.runtime.temporaryDemeanor)
+        or nil
+    if type(d) ~= "table" then return "" end
+    return table.concat({
+        tostring(tonumber(d.moraleHope) or 0),
+        tostring(tonumber(d.scarcityAnxiety) or 0),
+        tostring(tonumber(d.vigilanceFear) or 0),
+        tostring(tonumber(d.hostilityIrritability) or 0),
+        tostring(tonumber(d.griefStress) or 0),
+        tostring(tonumber(d.confidencePressure) or 0),
+    }, ",")
+end
+
 local function number(value, fallback)
     value = tonumber(value)
     if value == nil or value ~= value
@@ -141,16 +180,35 @@ function Profile.Build(record, playerKey, options)
         or number(h and h.bleedingRate, 0) > 0
         or number(h and h.openWoundCount, 0) > 0
         or false
+    local tRole = tostring(type(record) == "table" and (record.tacticalRole or record.role) or "")
+    local isTactical = (type(record) == "table" and record.tactical == true)
+        or tRole == "guard" or tRole == "soldier" or tRole == "scout"
+    local isHostile = (type(record) == "table"
+        and (record.activeBehavior == "hostile"
+            or record.behavior == "hostile"
+            or record.isHostile == true))
+        or state == "enemy"
+    local stState = string.lower(tostring(
+        type(record) == "table" and type(record.stamina) == "table"
+            and record.stamina.state or ""
+    ))
+    local passiveCombat = tostring(type(record) == "table" and record.combatPolicy or "") == "passive"
+        or tostring(type(record) == "table" and record.attackType or "") == "none"
+
     local rt = type(record) == "table" and type(record.runtime) == "table" and record.runtime or nil
     local now = PNC and PNC.Core and type(PNC.Core.Now) == "function"
         and tonumber(PNC.Core.Now()) or nil
     local cacheSig = nil
-    if rt and options.noCache ~= true and now ~= nil and now > 0 then
+    if rt and options.noCache ~= true and type(options.temporaryDemeanor) ~= "table"
+        and now ~= nil and now > 0
+    then
         cacheSig = table.concat({
             playerId, role, actorKind, tostring(inCombat), health, pressure,
             tostring(nearbyCount), tostring(math.floor(panic / 15)),
             tostring(math.floor(stress * 4)), tostring(math.floor(fatigue * 4)),
             tostring(math.floor(pain / 20)), tostring(bleeding), state,
+            tostring(isHostile), tostring(isTactical), tostring(passiveCombat),
+            stState, demeanorSignature(record, options),
         }, "|")
         local c = rt._combatProfileCache
         if type(c) == "table" and c.sig == cacheSig and now < (tonumber(c.expiresAt) or 0) then
@@ -161,15 +219,38 @@ function Profile.Build(record, playerKey, options)
     local personality = personalityFor(record)
     local traits = TraitContext and TraitContext.Collect
         and TraitContext.Collect(record) or {}
-    local bravery = unit(personality.bravery, 0.5)
-    local aggression = unit(personality.aggression, 0.5)
-    local compassion = unit(personality.compassion, 0.5)
     local socialStyle = tostring(personality.socialStyle or "neutral")
+    local DP = resolveDispositionProjection()
+    local proj = DP and DP.Resolve(record, {
+        personality = hasEntries(personality) and personality or nil,
+        traits = traits,
+        condition = condition,
+        temporaryDemeanor = options.temporaryDemeanor,
+        relationshipState = state,
+        isHostile = isHostile,
+        tactical = isTactical,
+    }) or nil
+
+    local eff = proj and proj.effectiveDisposition or nil
+    local unitDisp = (proj and DP and DP.ToUnitDisposition)
+        and DP.ToUnitDisposition(eff) or nil
+    local bravery = unitDisp and unitDisp.bravery
+        or (eff and unit(eff.bravery / 100, 0.5))
+        or unit(personality.bravery, 0.5)
+    local aggression = unitDisp and unitDisp.aggression
+        or (eff and unit(eff.aggression / 100, 0.5))
+        or unit(personality.aggression, 0.5)
+    local compassion = unitDisp and unitDisp.compassion
+        or (eff and unit(eff.compassion / 100, 0.5))
+        or unit(personality.compassion, 0.5)
+
     local styleProjection = Style.Resolve({
         npcID = record and record.id,
         npcRecord = record,
         npcTraits = traits,
         npcPersonality = personality,
+        temporaryDemeanor = options.temporaryDemeanor,
+        dispositionProjection = proj,
         relationship = relationship,
         relationshipState = state,
         dialogueSituation = {
@@ -187,79 +268,69 @@ function Profile.Build(record, playerKey, options)
     if panic >= 70 then mood = "panicked"
     elseif stress >= 0.75 or panic >= 45 then mood = "tense" end
 
-    local dangerousPressure = pressure == "several"
-        or pressure == "horde" or pressure == "massive_horde"
-    local aggressiveTrait = traits.pnc_berserker == true
-        or traits.pnc_reckless == true
-        or traits.pnc_trigger_happy == true
-        or traits.pnc_brawler == true
-    local shakenTrait = traits.pnc_cowardly == true
-        or traits.pnc_nervous_fighter == true
-        or traits.pnc_frayednerves == true
-    local braveTrait = traits.pnc_veteran == true
-        or traits.pnc_ironnerves == true
-        or traits.pnc_disciplined_fighter == true
-    local supportiveTrait = traits.pnc_friendly == true
-        or traits.pnc_peacemaker == true
-    local reservedTrait = traits.pnc_reserved == true
-        or traits.pnc_withdrawn == true
-
     local reactionStyle
-    if state == "enemy" or state == "rival" then
-        reactionStyle = "cold"
-    elseif (mood == "panicked" or mood == "tense"
-            or (shakenTrait and dangerousPressure))
-        and not braveTrait
-    then
-        reactionStyle = "shaken"
-    elseif aggressiveTrait or aggression >= 0.72 then
-        reactionStyle = "aggressive"
-    elseif supportiveTrait
-        or compassion >= 0.66
+    local allyWarnStyle
+    if proj then
+        local unifiedStyle = tostring(proj.styleProfile or "default")
+        reactionStyle = unifiedStyle == "default" and "practical" or unifiedStyle
+        if isHostile then
+            allyWarnStyle = "hostile"
+        elseif unifiedStyle == "shaken" or passiveCombat then
+            allyWarnStyle = "shaken"
+        elseif bleeding == true or pain >= 55 or fatigue >= 0.80 or stState == "exhausted" then
+            allyWarnStyle = "exhausted"
+        elseif unifiedStyle == "aggressive" or unifiedStyle == "brave" or unifiedStyle == "supportive" then
+            allyWarnStyle = unifiedStyle
+        elseif isTactical then
+            allyWarnStyle = "tactical"
+        else
+            allyWarnStyle = "neutral"
+        end
+    else
+        -- Safe fallback when DispositionProjection is not yet loaded:
+        -- use resolved numeric disposition only (no trait double-counting).
+        if state == "enemy" or state == "rival" then
+            reactionStyle = "cold"
+        elseif mood == "panicked" or mood == "tense" or bravery <= 0.32 then
+            reactionStyle = "shaken"
+        elseif aggression >= 0.70 then
+            reactionStyle = "aggressive"
+        elseif (compassion >= 0.66)
             and (state == "friend"
                 or relationshipTier(relationship) ~= "reserved")
-    then
-        reactionStyle = "supportive"
-    elseif braveTrait or bravery >= 0.72 then
-        reactionStyle = "brave"
-    elseif speechVariant == "terse" or socialStyle == "withdrawn"
-        or reservedTrait
-    then
-        reactionStyle = "reserved"
-    else
-        reactionStyle = "practical"
+        then
+            reactionStyle = "supportive"
+        elseif bravery >= 0.68 then
+            reactionStyle = "brave"
+        elseif speechVariant == "terse" or socialStyle == "withdrawn" then
+            reactionStyle = "reserved"
+        else
+            reactionStyle = "practical"
+        end
+
+        if isHostile then
+            allyWarnStyle = "hostile"
+        elseif reactionStyle == "shaken" or passiveCombat then
+            allyWarnStyle = "shaken"
+        elseif bleeding == true or pain >= 55 or fatigue >= 0.80 or stState == "exhausted" then
+            allyWarnStyle = "exhausted"
+        elseif reactionStyle == "aggressive" or reactionStyle == "brave" or reactionStyle == "supportive" then
+            allyWarnStyle = reactionStyle
+        elseif isTactical then
+            allyWarnStyle = "tactical"
+        else
+            allyWarnStyle = "neutral"
+        end
     end
 
-    local tRole = tostring(type(record) == "table" and (record.tacticalRole or record.role) or "")
-    local isTactical = (type(record) == "table" and record.tactical == true)
-        or tRole == "guard" or tRole == "soldier" or tRole == "scout"
-    local isCowardly = shakenTrait or bravery <= 0.30 or panic >= 55
-    local isBrave = braveTrait or bravery >= 0.72
-    local isExhausted = fatigue >= 0.75 or pain >= 50 or health == "injured" or bleeding == true
-    local allyWarnStyle
-    if (type(record) == "table" and (record.activeBehavior == "hostile" or record.isHostile == true))
-        or state == "enemy"
-    then
-        allyWarnStyle = "hostile"
-    elseif (mood == "panicked" or shakenTrait or bravery <= 0.30
-            or tostring(type(record) == "table" and record.combatPolicy or "") == "passive"
-            or tostring(type(record) == "table" and record.attackType or "") == "none")
-        and not braveTrait
-    then
-        allyWarnStyle = "shaken"
-    elseif bleeding == true or pain >= 55 or fatigue >= 0.80 then
-        allyWarnStyle = "exhausted"
-    elseif aggressiveTrait or aggression >= 0.72 then
-        allyWarnStyle = "aggressive"
-    elseif isBrave then
-        allyWarnStyle = "brave"
-    elseif isTactical then
-        allyWarnStyle = "tactical"
-    elseif supportiveTrait or compassion >= 0.66 then
-        allyWarnStyle = "supportive"
-    else
-        allyWarnStyle = "neutral"
-    end
+    local isCowardly = eff
+        and ((proj.styleProfile == "shaken") or eff.bravery <= 32 or eff.confidence <= 32 or panic >= 55)
+        or (bravery <= 0.32 or panic >= 55)
+    local isBrave = eff
+        and ((proj.styleProfile == "brave") or (eff.bravery >= 68 and eff.confidence >= 65))
+        or (bravery >= 0.68)
+    local isExhausted = fatigue >= 0.75 or pain >= 50 or health == "injured"
+        or bleeding == true or stState == "exhausted"
 
     local curHp, maxHp = tonumber(h and h.current), tonumber(h and h.max)
     local hpRatio = (curHp and maxHp and maxHp > 0) and unit(curHp / maxHp, 1)
@@ -277,6 +348,10 @@ function Profile.Build(record, playerKey, options)
         combatReactionRole = role,
         combatReactionStyle = reactionStyle,
         combatReactionMood = mood,
+        styleProfile = proj and proj.styleProfile or reactionStyle,
+        baseDisposition = proj and proj.baseDisposition or nil,
+        temporaryDemeanor = proj and proj.temporaryDemeanor or nil,
+        effectiveDisposition = eff,
         combatPressure = pressure,
         killerActorKind = actorKind,
         relationshipState = state,
@@ -303,7 +378,8 @@ function Profile.Build(record, playerKey, options)
         isExhausted = isExhausted == true,
         allyWarnStyle = allyWarnStyle,
         provenance = {
-            personality = "social.personality",
+            personality = proj and "DispositionProjection" or "social.personality",
+            disposition = proj and "DispositionProjection" or "fallback",
             traits = "NPCTraitContext",
             condition = "conditionStats",
             relationship = "directed_relationship",

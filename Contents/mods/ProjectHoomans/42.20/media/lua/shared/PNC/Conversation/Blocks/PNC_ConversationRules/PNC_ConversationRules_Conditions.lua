@@ -49,13 +49,129 @@ local function skillLevel(context, gate)
     return 0
 end
 
+local function resolveDispositionProjection()
+    local dp = PNC and PNC.ConvoEngine and PNC.ConvoEngine.DispositionProjection
+    if type(dp) == "table" and type(dp.Resolve) == "function" then
+        return dp
+    end
+    if type(require) == "function" then
+        local ok, loaded = pcall(require, "PNC/ConvoEngine/DispositionProjection")
+        if ok and type(loaded) == "table" and type(loaded.Resolve) == "function" then
+            return loaded
+        end
+    end
+    return nil
+end
+
+-- Generic temperament traits route through resolved numeric disposition so
+-- literal trait tags cannot override seeded personality, temporary demeanor,
+-- or situational condition pressure. Unique capability/identity traits (e.g.
+-- pnc_veteran, pnc_disciplined_fighter, pnc_heavysleeper, pnc_hasbrother,
+-- Doctor, Burglar) fall through to direct trait lookup in hasTrait().
+local TEMPERAMENT_TRAIT_GATES = {
+    brave = { axis = "bravery", operator = ">=", value = 0.65 },
+    desensitized = { axis = "bravery", operator = ">=", value = 0.65 },
+    pnc_brave = { axis = "bravery", operator = ">=", value = 0.65 },
+    pnc_ironnerves = { axis = "bravery", operator = ">=", value = 0.65 },
+    cowardly = { axis = "bravery", operator = "<=", value = 0.35 },
+    pnc_cowardly = { axis = "bravery", operator = "<=", value = 0.35 },
+    pnc_nervous_fighter = { axis = "bravery", operator = "<=", value = 0.35 },
+    pnc_frayednerves = { axis = "bravery", operator = "<=", value = 0.35 },
+    aggressive = { axis = "aggression", operator = ">=", value = 0.65 },
+    pnc_berserker = { axis = "aggression", operator = ">=", value = 0.65 },
+    pnc_reckless = { axis = "aggression", operator = ">=", value = 0.65 },
+    pnc_trigger_happy = { axis = "aggression", operator = ">=", value = 0.65 },
+    pnc_brawler = { axis = "aggression", operator = ">=", value = 0.65 },
+    pnc_cautious_fighter = { axis = "aggression", operator = "<=", value = 0.38 },
+    empathetic = { axis = "compassion", operator = ">=", value = 0.62 },
+    kind = { axis = "compassion", operator = ">=", value = 0.62 },
+    kindhearted = { axis = "compassion", operator = ">=", value = 0.62 },
+    pacifist = { axis = "compassion", operator = ">=", value = 0.62 },
+    pnc_peacemaker = { axis = "compassion", operator = ">=", value = 0.62 },
+    cold = { axis = "compassion", operator = "<=", value = 0.35 },
+    friendly = { axis = "sociability", operator = ">=", value = 0.62 },
+    pnc_friendly = { axis = "sociability", operator = ">=", value = 0.62 },
+    reserved = { axis = "sociability", operator = "<=", value = 0.38 },
+    withdrawn = { axis = "sociability", operator = "<=", value = 0.38 },
+    pnc_reserved = { axis = "sociability", operator = "<=", value = 0.38 },
+    pnc_withdrawn = { axis = "sociability", operator = "<=", value = 0.38 },
+    loyal = { axis = "loyalty", operator = ">=", value = 0.65 },
+    greedy = { axis = "materialism", operator = ">=", value = 0.65 },
+    generous = { axis = "materialism", operator = "<=", value = 0.35 },
+}
+
+local function rawPersonalityTable(context, actor)
+    if actor == "npc" then
+        return context.npcPersonality
+            or (type(context.npcRecord) == "table"
+                and (context.npcRecord.personality
+                    or (type(context.npcRecord.social) == "table"
+                        and context.npcRecord.social.personality)))
+            or nil
+    end
+    return context.playerPersonality
+        or (type(context.playerSocialProfile) == "table"
+            and (context.playerSocialProfile.personality
+                or context.playerSocialProfile))
+        or nil
+end
+
+local function resolvedDisposition(context, actor, traitName)
+    local DP = resolveDispositionProjection()
+    if not DP then return nil end
+    local rawValues = rawPersonalityTable(context, actor)
+    if actor == "npc" then
+        local record = type(context.npcRecord) == "table" and context.npcRecord or nil
+        local proj = DP.Resolve(record, {
+            personality = rawValues,
+            traits = context.npcTraits,
+            condition = context.npcCondition or context.condition
+                or (record and record.conditionStats),
+            temporaryDemeanor = context.temporaryDemeanor,
+            relationshipState = context.relationshipState,
+        })
+        if proj and type(proj.effectiveDisposition) == "table" then
+            if type(DP.ToUnitDisposition) == "function" then
+                return DP.ToUnitDisposition(proj.effectiveDisposition)
+            end
+            return proj.effectiveDisposition
+        end
+        return nil
+    end
+    local playerTraits = context.playerTraits
+        or (type(context.playerSocialProfile) == "table"
+            and context.playerSocialProfile.sourceTraits)
+        or nil
+    if type(playerTraits) ~= "table" and type(traitName) == "string"
+        and traitName ~= "" and context.player and context.player.HasTrait
+    then
+        if context.player:HasTrait(traitName) == true then
+            playerTraits = { [traitName] = true }
+        end
+    end
+    local proj = DP.Resolve(type(context.player) == "table" and context.player or nil, {
+        personality = rawValues,
+        playerTraits = playerTraits,
+        condition = context.playerCondition or context.condition,
+        temporaryDemeanor = context.playerTemporaryDemeanor
+            or context.temporaryDemeanor,
+    })
+    if proj and type(proj.effectiveDisposition) == "table" then
+        if type(DP.ToUnitDisposition) == "function" then
+            return DP.ToUnitDisposition(proj.effectiveDisposition)
+        end
+        return proj.effectiveDisposition
+    end
+    return nil
+end
+
 local function personalityValue(context, gate)
     local actor = gate.actor == "player" and "player" or "npc"
-    local values = actor == "npc"
-        and (context.npcPersonality
-            or context.npcRecord and context.npcRecord.personality)
-        or (context.playerPersonality or context.playerSocialProfile)
-    return tableValue(values, gate.key or gate.dimension)
+    local key = gate.key or gate.dimension
+    local disp = resolvedDisposition(context, actor)
+    local resolved = tableValue(disp, key)
+    if resolved ~= nil then return resolved end
+    return tableValue(rawPersonalityTable(context, actor), key)
 end
 
 local function hasTrait(context, gate)
@@ -78,6 +194,22 @@ local function hasTrait(context, gate)
     player = context.player
     return gate.actor ~= "npc" and player and player.HasTrait
         and player:HasTrait(gate.trait) == true or false
+end
+
+local function traitMatches(context, gate)
+    local traitID = tostring(gate.trait or "")
+    local mapped = TEMPERAMENT_TRAIT_GATES[string.lower(traitID)]
+    if mapped then
+        local actor = gate.actor == "player" and "player" or "npc"
+        local disp = resolvedDisposition(context, actor, traitID)
+        local actual = tableValue(disp, mapped.axis)
+        if actual ~= nil then
+            return Internal.Compare(actual, mapped.operator, mapped.value)
+        end
+    end
+    -- Direct trait lookup preserved for unique capability/identity traits
+    -- (and as a safe fallback if DispositionProjection is unavailable).
+    return hasTrait(context, gate)
 end
 
 local function timeMatches(context, gate)
@@ -160,7 +292,7 @@ local BUILTINS = {
         )
     end,
     ["pnc:trait"] = function(context, gate)
-        return hasTrait(context, gate) == (gate.present ~= false)
+        return traitMatches(context, gate) == (gate.present ~= false)
     end,
     ["pnc:personality"] = function(context, gate)
         return Internal.Compare(

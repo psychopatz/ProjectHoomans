@@ -8,6 +8,9 @@ PNC.ConvoEngine = PNC.ConvoEngine or {}
 local Adapter = PNC.ConvoEngine.InteractionActorAdapterProjectHoomans or {}
 PNC.ConvoEngine.InteractionActorAdapterProjectHoomans = Adapter
 
+local DispositionProjection = PNC.ConvoEngine.DispositionProjection
+    or require "PNC/ConvoEngine/DispositionProjection"
+
 Adapter.ID = "projecthoomans.managed_npc"
 Adapter.PRIORITY = 100
 
@@ -186,7 +189,17 @@ function Adapter.ProjectActor(actor)
     local profile = personality(record)
     local state = condition(record)
     local actorNeeds = needs(record)
+    local actorTraits = traits(record)
     local current = tostring(activity(record))
+    local projectedDisposition = DispositionProjection.Resolve(record, {
+        personality = profile,
+        traits = actorTraits,
+        condition = state,
+        needs = actorNeeds,
+    })
+    local unitDisposition = DispositionProjection.ToUnitDisposition(
+        projectedDisposition.effectiveDisposition
+    )
     return {
         id = tostring(record.id),
         capabilities = {
@@ -198,13 +211,17 @@ function Adapter.ProjectActor(actor)
             gameplayIntent = record.alive ~= false,
         },
         disposition = {
-            aggression = unit(profile.aggression),
-            confidence = unit(profile.bravery),
-            forgiveness = unit(profile.forgiveness),
-            sociability = unit(profile.sociability),
-            empathy = unit(profile.compassion),
-            riskTolerance = unit(profile.bravery),
+            aggression = unitDisposition.aggression,
+            confidence = unitDisposition.confidence,
+            forgiveness = unitDisposition.forgiveness,
+            sociability = unitDisposition.sociability,
+            empathy = unitDisposition.empathy,
+            riskTolerance = unitDisposition.riskTolerance,
         },
+        baseDisposition = projectedDisposition.baseDisposition,
+        temporaryDemeanor = projectedDisposition.temporaryDemeanor,
+        effectiveDisposition = projectedDisposition.effectiveDisposition,
+        dispositionStyle = projectedDisposition.styleProfile,
         condition = {
             panic = unit(state.panic, 100),
             stress = unit(state.stress),
@@ -217,7 +234,7 @@ function Adapter.ProjectActor(actor)
             currentTask = current,
             idle = current == "" or current == "idle",
         },
-        traits = traits(record),
+        traits = actorTraits,
     }
 end
 

@@ -159,35 +159,130 @@ local function isRecordIndoors(sp)
     return sq ~= nil and sq.getRoom and sq:getRoom() ~= nil
 end
 
-local function statsFromFallback(sp)
-    if type(sp) ~= "table" then return { style = "neutral" } end
+local function resolveDispositionProjection()
+    local dp = PNC and PNC.ConvoEngine and PNC.ConvoEngine.DispositionProjection
+    if type(dp) == "table" and type(dp.Resolve) == "function" then
+        return dp
+    end
+    if type(require) == "function" then
+        local ok, loaded = pcall(require, "PNC/ConvoEngine/DispositionProjection")
+        if ok and type(loaded) == "table" and type(loaded.Resolve) == "function" then
+            return loaded
+        end
+    end
+    return nil
+end
+
+local function hasEntries(tbl)
+    if type(tbl) ~= "table" then return false end
+    for _ in pairs(tbl) do return true end
+    return false
+end
+
+local function statsFromFallback(sp, opts)
+    if type(sp) ~= "table" then return { style = "neutral", styleProfile = "default" } end
+    opts = type(opts) == "table" and opts or {}
     local p = (type(sp.social) == "table" and sp.social.personality) or sp.personality or sp.socialProfile or {}
     local c = type(sp.conditionStats) == "table" and sp.conditionStats or {}
     local h = type(sp.health) == "table" and sp.health or {}
-    local bravery = tonumber(p.bravery) or 0.5
-    local aggression = tonumber(p.aggression) or 0.5
-    local compassion = tonumber(p.compassion) or 0.5
+    local body = type(h.body) == "table" and h.body or {}
+    local b = tostring(sp.activeBehavior or sp.behavior or "")
+    local tRole = tostring(sp.tacticalRole or sp.role or "")
+    local isTactical = sp.tactical == true or tRole == "guard" or tRole == "soldier" or tRole == "scout"
+    local isHostile = b == "hostile" or sp.isHostile == true
+    local passiveCombat = tostring(sp.combatPolicy or "") == "passive" or tostring(sp.attackType or "") == "none"
+    local stState = string.lower(tostring(sp.stamina and sp.stamina.state or ""))
+
     local panic = tonumber(c.panic) or 0
+    local stress = tonumber(c.stress) or 0
     local fatigue = tonumber(c.fatigue) or tonumber(sp.needs and sp.needs.fatigue) or 0
     local pain = tonumber(c.pain) or 0
     local bleeding = h.bleeding == true
-    local stState = string.lower(tostring(sp.stamina and sp.stamina.state or ""))
+        or (tonumber(body.bleedingRate) or 0) > 0
+        or (tonumber(body.openWoundCount) or 0) > 0
+        or (tonumber(h.bleedingRate) or 0) > 0
+        or (tonumber(h.openWoundCount) or 0) > 0
+
+    local hState = tostring(h.state or "okay")
+    local curHp, maxHp = tonumber(h.current), tonumber(h.max)
+    local hpRatio = (curHp and maxHp and maxHp > 0) and math.max(0, math.min(1, curHp / maxHp))
+        or ((hState == "injured" or hState == "wounded" or hState == "critical") and 0.6 or 1)
+
+    local DP = resolveDispositionProjection()
+    local proj = DP and DP.Resolve(sp, {
+        personality = hasEntries(p) and p or nil,
+        condition = c,
+        temporaryDemeanor = opts.temporaryDemeanor,
+        isHostile = isHostile,
+        tactical = isTactical,
+    }) or nil
+
+    local eff = proj and proj.effectiveDisposition or nil
+    local unitDisp = (proj and DP and DP.ToUnitDisposition)
+        and DP.ToUnitDisposition(eff) or nil
+    local bravery = unitDisp and unitDisp.bravery
+        or (eff and (eff.bravery / 100))
+        or tonumber(p.bravery) or 0.5
+    local aggression = unitDisp and unitDisp.aggression
+        or (eff and (eff.aggression / 100))
+        or tonumber(p.aggression) or 0.5
+    local compassion = unitDisp and unitDisp.compassion
+        or (eff and (eff.compassion / 100))
+        or tonumber(p.compassion) or 0.5
+
+    local styleProfile = proj and tostring(proj.styleProfile or "default") or nil
+    local combatReactionStyle
     local style = "neutral"
-    local b = tostring(sp.activeBehavior or sp.behavior or "")
-    local tRole = tostring(sp.tacticalRole or sp.role or "")
-    if b == "hostile" or sp.isHostile == true then style = "hostile"
-    elseif panic >= 70 or bravery <= 0.30 or tostring(sp.combatPolicy or "") == "passive" or tostring(sp.attackType or "") == "none" then style = "shaken"
-    elseif bleeding or pain >= 55 or fatigue >= 0.80 or stState == "exhausted" then style = "exhausted"
-    elseif aggression >= 0.72 then style = "aggressive"
-    elseif bravery >= 0.72 then style = "brave"
-    elseif sp.tactical == true or tRole == "guard" or tRole == "soldier" or tRole == "scout" then style = "tactical"
-    elseif compassion >= 0.66 then style = "supportive" end
+
+    if proj then
+        combatReactionStyle = styleProfile == "default" and "practical" or styleProfile
+        if isHostile then
+            style = "hostile"
+        elseif styleProfile == "shaken" or passiveCombat then
+            style = "shaken"
+        elseif bleeding or pain >= 55 or fatigue >= 0.80 or stState == "exhausted" then
+            style = "exhausted"
+        elseif styleProfile == "aggressive" or styleProfile == "brave" or styleProfile == "supportive" then
+            style = styleProfile
+        elseif isTactical then
+            style = "tactical"
+        else
+            style = "neutral"
+        end
+    else
+        if isHostile then style = "hostile"
+        elseif panic >= 65 or stress >= 0.80 or bravery <= 0.32 or passiveCombat then style = "shaken"
+        elseif bleeding or pain >= 55 or fatigue >= 0.80 or stState == "exhausted" then style = "exhausted"
+        elseif aggression >= 0.70 then style = "aggressive"
+        elseif bravery >= 0.68 then style = "brave"
+        elseif isTactical then style = "tactical"
+        elseif compassion >= 0.66 then style = "supportive" end
+        styleProfile = (style == "neutral" or style == "tactical" or style == "exhausted") and "default"
+            or (style == "hostile" and "cold" or style)
+        combatReactionStyle = styleProfile == "default" and "practical" or styleProfile
+    end
+
+    local isCowardly = eff
+        and ((styleProfile == "shaken") or eff.bravery <= 32 or eff.confidence <= 32 or panic >= 55)
+        or (bravery <= 0.32 or panic >= 55)
+    local isBrave = eff
+        and ((styleProfile == "brave") or (eff.bravery >= 68 and eff.confidence >= 65))
+        or (bravery >= 0.68)
+    local isExhausted = fatigue >= 0.75 or pain >= 50 or bleeding or stState == "exhausted"
+        or hState == "injured" or hState == "wounded" or hState == "critical"
+
     return {
-        style = style, bravery = bravery, aggression = aggression, compassion = compassion,
-        panic = panic, stress = tonumber(c.stress) or 0, fatigue = fatigue, pain = pain,
-        bleeding = bleeding, healthState = tostring(h.state or "okay"), hpRatio = 1,
-        isCowardly = bravery <= 0.30 or panic >= 55, isBrave = bravery >= 0.72,
-        isExhausted = fatigue >= 0.75 or pain >= 50 or bleeding or stState == "exhausted",
+        style = style,
+        styleProfile = styleProfile,
+        combatReactionStyle = combatReactionStyle,
+        baseDisposition = proj and proj.baseDisposition or nil,
+        temporaryDemeanor = proj and proj.temporaryDemeanor or nil,
+        effectiveDisposition = eff,
+        bravery = bravery, aggression = aggression, compassion = compassion,
+        panic = panic, stress = stress, fatigue = fatigue, pain = pain,
+        bleeding = bleeding, healthState = hState, hpRatio = hpRatio,
+        isCowardly = isCowardly == true, isBrave = isBrave == true,
+        isExhausted = isExhausted == true,
     }
 end
 
@@ -200,16 +295,22 @@ BC.RegisterProvider("actor_stats", function(ctx, sp, _, opts)
             role = opts and opts.role or "witness",
             actorKind = "npc",
             inCombat = opts and opts.inCombat == true,
+            temporaryDemeanor = opts and opts.temporaryDemeanor,
         })
         st = {
             style = pr.allyWarnStyle or pr.combatReactionStyle or "neutral",
+            styleProfile = pr.styleProfile or pr.combatReactionStyle or "default",
+            combatReactionStyle = pr.combatReactionStyle,
+            baseDisposition = pr.baseDisposition,
+            temporaryDemeanor = pr.temporaryDemeanor,
+            effectiveDisposition = pr.effectiveDisposition,
             bravery = pr.bravery, aggression = pr.aggression, compassion = pr.compassion,
             panic = pr.panic, stress = pr.stress, fatigue = pr.fatigue, pain = pr.pain,
             bleeding = pr.bleeding, healthState = pr.healthState, hpRatio = pr.hpRatio,
             isCowardly = pr.isCowardly, isBrave = pr.isBrave, isExhausted = pr.isExhausted,
         }
     else
-        st = statsFromFallback(sp)
+        st = statsFromFallback(sp, opts)
     end
     local rt = type(sp.runtime) == "table" and sp.runtime or nil
     local wFam = rt and rt.combatWeaponFamily or nil
