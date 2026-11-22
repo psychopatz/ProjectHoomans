@@ -376,6 +376,17 @@ function Adapter.RenderFact(fact, reference, options)
         local channel = tostring(payload.channelID or "emergency radio")
         return "I caught a radio broadcast over " .. channel .. "."
     end
+    if string.sub(tostring(fact.kind or ""), 1, 10) == "discovery." then
+        local label = tostring(payload.storyLabel or "something unusual")
+        local locLabel = payload.locationLabel or (type(fact.location) == "table" and fact.location.name) or "nearby"
+        if provenance == "radio" then
+            return "Radio traffic mentioned a " .. label .. " near " .. tostring(locLabel) .. "."
+        end
+        if epistemic == "uncertain" or provenance == "told" then
+            return "Someone told me they found a " .. label .. " near " .. tostring(locLabel) .. ", though I haven't seen it myself."
+        end
+        return "I came across a " .. label .. " near " .. tostring(locLabel) .. "."
+    end
     return nil
 end
 
@@ -413,6 +424,8 @@ function Adapter.QueryActorFact(record, querySpec, nowHours)
                     or string.lower(subjID) == wantedTopic
                     or string.lower(subjName) == wantedTopic
                     or string.lower(tostring(payload.semanticType or "")) == wantedTopic
+                    or string.lower(tostring(payload.storyLabel or "")) == wantedTopic
+                    or string.lower(tostring(payload.animalType or "")) == wantedTopic
                     or string.lower(tostring(payload.utility or "")) == wantedTopic
                     or string.lower(tostring(payload.eventType or "")) == wantedTopic
                     or string.lower(tostring(payload.milestoneID or "")) == wantedTopic

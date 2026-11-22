@@ -376,13 +376,14 @@ function Adapter.SyncLiveEventPerception(x, y, factID, radius, nowHours, opts)
             local indoors = Adapter.IsRecordIndoors(rec, opts)
             local existing = core.ActorKnowledge.Get(core.KnowledgeState, actorID, factID)
             if not existing then
-                local provenance = indoors and "environmental" or "witnessed"
+                local witnessed = opts.forceWitnessed == true or not indoors
+                local provenance = witnessed and "witnessed" or "environmental"
                 local ok = core.Acquire(actorID, factID, {
                     authorized = true,
                     provenance = provenance,
-                    source = indoors and "ambient_sound" or "ambient_nearby",
-                    acquisitionPath = indoors and "indoor_audio" or "outdoor_nearby",
-                    confidence = indoors and 0.70 or 0.90,
+                    source = witnessed and "ambient_nearby" or "ambient_sound",
+                    acquisitionPath = witnessed and "outdoor_nearby" or "indoor_audio",
+                    confidence = witnessed and 0.90 or 0.70,
                     learnedAt = tonumber(nowHours) or now(),
                 })
                 if ok then acquired = acquired + 1 end
@@ -394,7 +395,13 @@ end
 
 function Adapter.OnCoreWorldEventRegistered(ev)
     if type(ev) ~= "table" then return 0 end
-    local radius = LIVE_EVENT_PERCEPTION_RADII[tostring(ev.eventType or "")]
+    local eventType = tostring(ev.eventType or "")
+    local radius = LIVE_EVENT_PERCEPTION_RADII[eventType]
+    local isDiscovery = false
+    if not radius and string.sub(eventType, 1, 10) == "discovery_" then
+        radius = 90
+        isDiscovery = true
+    end
     if not radius then return 0 end
     local meta = type(ev.metadata) == "table" and ev.metadata or {}
     local semType = tostring(meta.semanticType or "")
@@ -410,11 +417,48 @@ function Adapter.OnCoreWorldEventRegistered(ev)
         end
     end
     if not factID then return 0 end
-    return Adapter.SyncLiveEventPerception(x, y, factID, radius, ev.startsAt)
+    return Adapter.SyncLiveEventPerception(x, y, factID, radius, ev.startsAt, {
+        forceWitnessed = isDiscovery,
+    })
+end
+
+function Adapter.DiscoverNearbyStories(recordOrPoint, radius, nowHours, opts)
+    opts = type(opts) == "table" and opts or {}
+    local discovery = PsychopatzCore and PsychopatzCore.VanillaDiscoveryAdapter or nil
+    if type(discovery) ~= "table" or type(discovery.DiscoverNearPoint) ~= "function" then
+        return {}
+    end
+    local x = tonumber(type(recordOrPoint) == "table" and (recordOrPoint.x or (recordOrPoint.getX and recordOrPoint:getX())) or nil)
+    local y = tonumber(type(recordOrPoint) == "table" and (recordOrPoint.y or (recordOrPoint.getY and recordOrPoint:getY())) or nil)
+    if x == nil or y == nil then return {} end
+    local promoted = discovery.DiscoverNearPoint(x, y, radius, {
+        nowHours = nowHours,
+        provenance = "witnessed",
+        resolveLocation = opts.resolveLocation,
+    })
+    local core = Adapter.Core
+    local actorID = type(recordOrPoint) == "table" and Adapter.ActorID(recordOrPoint) or nil
+    if core and actorID then
+        for i = 1, #promoted do
+            local res = promoted[i]
+            if res and res.factID then
+                core.Acquire(actorID, res.factID, {
+                    authorized = true,
+                    provenance = "witnessed",
+                    source = "world_story_discovery",
+                    acquisitionPath = "direct_discovery",
+                    confidence = 0.95,
+                    learnedAt = tonumber(nowHours) or now(),
+                })
+            end
+        end
+    end
+    return promoted
 end
 
 function Adapter.InstallCoreEventPerceptionHook()
     local _ = PsychopatzCore and PsychopatzCore.WorldEventAdapter
+    local _disc = PsychopatzCore and PsychopatzCore.VanillaDiscoveryAdapter
     local scoped = PsychopatzCore and PsychopatzCore.ScopedWorldEvents or nil
     if type(scoped) ~= "table" or type(scoped.OnEventRegistered) ~= "function" then
         return false
