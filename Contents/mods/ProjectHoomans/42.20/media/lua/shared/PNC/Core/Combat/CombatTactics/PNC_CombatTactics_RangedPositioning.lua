@@ -30,6 +30,9 @@ function Tactics.RepositionForClearShot(record, zombie, target)
     if Internal.ContinueLockedRetreat(record, zombie, target, state, now) then
         return true, state.reason or "clearing_fire_lane"
     end
+    if now < (tonumber(state.retryAt) or 0) then
+        return false, "retreat_stalled"
+    end
     dx = target.x - record.x
     dy = target.y - record.y
     length = math.sqrt((dx * dx) + (dy * dy))
@@ -55,10 +58,25 @@ function Tactics.RepositionForClearShot(record, zombie, target)
     state.goalZ = z
     state.goalMode = "walk"
     state.goalStopDistance = 0.25
+    state.recoveryMode = nil
+    state.safetyRadius = nil
+    state.reengagePending = false
+    state.refreshAt = now + 220
+    state.startedAt = now
+    state.lastProgressAt = now
+    state.lastX = zombie and zombie.getX and zombie:getX()
+        or tonumber(record.x) or 0
+    state.lastY = zombie and zombie.getY and zombie:getY()
+        or tonumber(record.y) or 0
     Internal.SetRetreatState(record, true, nil)
     Internal.RequestMove(
         record, zombie, candidateX, candidateY, z,
-        "walk", 0.25, "clearing_fire_lane"
+        "walk", 0.25, "clearing_fire_lane", {
+            source = "combat_retreat",
+            priority = 100,
+            lockKey = "combat_retreat",
+            lockUntil = state.lockUntil,
+        }
     )
     return true, "clearing_fire_lane"
 end

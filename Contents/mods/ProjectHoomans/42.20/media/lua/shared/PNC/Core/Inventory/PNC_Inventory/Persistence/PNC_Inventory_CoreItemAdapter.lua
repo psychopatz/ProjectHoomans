@@ -19,6 +19,11 @@ local PSEUDO_ITEM_STATE_FIELDS = {
     "foodLastAgedHours", "foodCreatedAtHours", "foodRottenAtHours",
 }
 
+local PSEUDO_ITEM_STATE_FIELD_SET = {}
+for i = 1, #PSEUDO_ITEM_STATE_FIELDS do
+    PSEUDO_ITEM_STATE_FIELD_SET[PSEUDO_ITEM_STATE_FIELDS[i]] = true
+end
+
 local PSEUDO_ITEM_METHODS = {
     getFluidContainer = function(self) return self.fluidState end,
     getFullType = function(self) return self.type end,
@@ -101,12 +106,17 @@ local function buildPseudoItemData(item, state)
         wetness = state.wetness, bloodLevel = state.bloodLevel,
         dirtyness = state.dirtyness,
         actualWeight = Internal.getItemWeight(item.type),
-        extraState = Util.copy(state),
     }
-    for i = 1, #PSEUDO_ITEM_STATE_FIELDS do
-        pseudo.extraState[PSEUDO_ITEM_STATE_FIELDS[i]] = nil
+    local extraState
+    local key
+    local value
+    for key, value in pairs(state) do
+        if not PSEUDO_ITEM_STATE_FIELD_SET[key] then
+            if not extraState then extraState = {} end
+            extraState[key] = Util.copy(value)
+        end
     end
-    if Internal.countMapEntries(pseudo.extraState) <= 0 then pseudo.extraState = nil end
+    pseudo.extraState = extraState
     if state.fluidAmount ~= nil or state.fluidType ~= nil
         or state.fluidCapacity ~= nil or state.fluids ~= nil
     then
@@ -115,11 +125,7 @@ local function buildPseudoItemData(item, state)
     return pseudo
 end
 
-local function attachPseudoItemMethods(pseudo)
-    for name, method in pairs(PSEUDO_ITEM_METHODS) do
-        pseudo[name] = method
-    end
-end
+local PSEUDO_ITEM_MT = { __index = PSEUDO_ITEM_METHODS }
 
 local function setPseudoItemCapabilities(pseudo, profile)
     local capabilities = profile and profile.capabilities or {}
@@ -157,7 +163,7 @@ function ItemAdapter.pseudoItem(item)
     local state = type(item.itemState) == "table" and item.itemState or {}
     local profile = Profiles.Get(item.type)
     local pseudo = buildPseudoItemData(item, state)
-    attachPseudoItemMethods(pseudo)
+    setmetatable(pseudo, PSEUDO_ITEM_MT)
     setPseudoItemCapabilities(pseudo, profile)
     return pseudo
 end

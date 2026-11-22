@@ -31,6 +31,29 @@ function Internal.copyDescriptor(source, item, createReason)
     }
 end
 
+local BAREHAND_DESCRIPTOR = {
+    fullType = nil,
+    primaryType = "barehand",
+    resolvedMode = "melee",
+    hasWeapon = false,
+    hasUsableFirearm = false,
+    weaponStatus = "barehand",
+    item = nil,
+}
+
+function Internal.peekWeaponDescriptor(fullType)
+    local cached
+    if not fullType or fullType == "" then
+        return BAREHAND_DESCRIPTOR
+    end
+    cached = Equipment.DescriptorCache[fullType]
+    if cached then
+        return cached
+    end
+    local resolved = Internal.buildWeaponDescriptor(fullType, false)
+    return Equipment.DescriptorCache[fullType] or resolved
+end
+
 function Internal.buildWeaponDescriptor(fullType, includeItem)
     local item
     local primaryType

@@ -77,10 +77,19 @@ if PNC.IndividualNeeds and PNC.IndividualNeeds.RegisterListener then
         end)
 end
 
+local IGNORED_COMBAT_REASONS = {
+    combat_round_fired = true,
+    combat_condition = true,
+    combat_magazine_init = true,
+    combat_magazine_clamp = true,
+    combat_reload_unlimited_reserve = true,
+}
+
 -- Provision pickup changes the personal-supply candidates without changing
 -- need severity. Wake tasking on that inventory event so a newly delivered
 -- item is consumed immediately instead of waiting for NeedsScheduler.
-local function onInventoryChanged(record)
+local function onInventoryChanged(record, _, reason)
+    if reason and IGNORED_COMBAT_REASONS[reason] then return end
     if record and TaskEvents and TaskEvents.Emit
     then
         TaskEvents.Emit("NPC_INVENTORY_CHANGED", {

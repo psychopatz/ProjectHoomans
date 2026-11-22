@@ -348,19 +348,33 @@ function MoveIntent.Hold(record, reason, owner)
         )
     end
     intent = runtime.moveIntent
+    local normalizedReason = reason or "hold"
+    local requestedByJob = tostring(record.activeJob or "none")
+    local requestedByBehavior = tostring(
+        record.activeBehavior or record.activeJob or "none"
+    )
+    local requestedOrder = tostring(
+        record.orderSpec and record.orderSpec.kind or "none"
+    )
+    local unchanged = intent ~= nil
+        and intent.kind == "hold"
+        and intent.reason == normalizedReason
+        and intent.ownerKind == ownerKind
+        and intent.ownerSessionId == ownerSessionID
+        and intent.requestedByJob == requestedByJob
+        and intent.requestedByBehavior == requestedByBehavior
+        and intent.requestedOrder == requestedOrder
+        and intent.source == nil
+        and (tonumber(intent.lockUntil) or 0) == 0
     if not intent or intent.kind ~= "hold" then
         intent = {}
         runtime.moveIntent = intent
     end
     intent.kind = "hold"
-    intent.reason = reason or "hold"
-    intent.requestedByJob = tostring(record.activeJob or "none")
-    intent.requestedByBehavior = tostring(
-        record.activeBehavior or record.activeJob or "none"
-    )
-    intent.requestedOrder = tostring(
-        record.orderSpec and record.orderSpec.kind or "none"
-    )
+    intent.reason = normalizedReason
+    intent.requestedByJob = requestedByJob
+    intent.requestedByBehavior = requestedByBehavior
+    intent.requestedOrder = requestedOrder
     intent.ownerKind = ownerKind
     intent.ownerSessionId = ownerSessionID
     intent.puppetOperaSessionId = ownerKind == "puppet_opera"
@@ -370,7 +384,9 @@ function MoveIntent.Hold(record, reason, owner)
     intent.lockKey = nil
     intent.lockUntil = 0
     intent.updatedAt = Core.Now()
-    intent.revision = (tonumber(intent.revision) or 0) + 1
+    if not unchanged then
+        intent.revision = (tonumber(intent.revision) or 0) + 1
+    end
     return true
 end
 

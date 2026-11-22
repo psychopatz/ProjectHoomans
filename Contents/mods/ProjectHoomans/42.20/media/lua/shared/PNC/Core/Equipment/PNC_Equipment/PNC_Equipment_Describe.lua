@@ -31,7 +31,9 @@ function Equipment.Describe(record)
         return cached.value
     end
 
-    descriptor = Internal.buildWeaponDescriptor(fullType, false)
+    descriptor = Internal.peekWeaponDescriptor
+        and Internal.peekWeaponDescriptor(fullType)
+        or Internal.buildWeaponDescriptor(fullType, false)
     combatModeResolved = configuredMode
     weaponStatus = descriptor.weaponStatus
 

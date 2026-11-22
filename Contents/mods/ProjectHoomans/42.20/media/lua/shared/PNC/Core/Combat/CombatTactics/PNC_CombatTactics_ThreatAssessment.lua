@@ -46,9 +46,11 @@ function Internal.CountZombiesNearPoint(x, y, z, radius, cacheKey)
 end
 
 function Internal.CountVisibleZombies(record, radius)
-    local entries
+    if Perception and Perception.CountVisibleZombiesInFrame then
+        return Perception.CountVisibleZombiesInFrame(record, radius)
+    end
     if Perception and Perception.GetVisibleZombieEntries then
-        entries = Perception.GetVisibleZombieEntries(record, radius)
+        local entries = Perception.GetVisibleZombieEntries(record, radius)
         return #entries
     end
     return Perception and Perception.CountEnemyZombies

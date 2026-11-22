@@ -102,24 +102,32 @@ end
 -- attachment's lateral and vertical terms are deliberately unused: they were
 -- previously applied on the wrong axes, which is part of why the muzzle never
 -- sat on the barrel line.
+local boreLengthCache = {}
+local boreLengthCacheScriptManager = nil
+
 local function modelBoreLength(weapon)
     local staticModel = weapon and readMethod(weapon, "getStaticModel") or nil
-    local manager
-    local model
-    local attachment
-    local offset
-    local length
     if not staticModel or not getScriptManager then return nil end
-    manager = getScriptManager()
-    model = manager and readMethod(manager, "getModelScript", staticModel) or nil
-    attachment = model and readMethod(model, "getAttachmentById", "muzzle") or nil
-    offset = attachment and readMethod(attachment, "getOffset") or nil
-    length = offset and tonumber(readMethod(offset, "y")) or nil
+    if boreLengthCacheScriptManager ~= getScriptManager then
+        boreLengthCache = {}
+        boreLengthCacheScriptManager = getScriptManager
+    end
+    local cached = boreLengthCache[staticModel]
+    if cached ~= nil then
+        return cached ~= false and cached or nil
+    end
+    local manager = getScriptManager()
+    local model = manager and readMethod(manager, "getModelScript", staticModel) or nil
+    local attachment = model and readMethod(model, "getAttachmentById", "muzzle") or nil
+    local offset = attachment and readMethod(attachment, "getOffset") or nil
+    local length = offset and tonumber(readMethod(offset, "y")) or nil
     if length and length >= BORE_MIN_MODEL_LENGTH
         and length <= BORE_MAX_MODEL_LENGTH
     then
+        boreLengthCache[staticModel] = length
         return length
     end
+    boreLengthCache[staticModel] = false
     return nil
 end
 

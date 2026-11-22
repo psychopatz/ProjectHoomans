@@ -3,11 +3,22 @@ local Internal = PNC.Combat.Internal
 local Inventory = PNC.Inventory
 local Skills = PNC.Skills
 
-function Firearms.PrepareShot(record, weaponItem)
+function Firearms.PrepareShot(record, weaponItem, existingMagazine)
     local magazine
     local reason
     local roundsRequired
-    magazine, reason = Firearms.GetMagazineState(record, weaponItem)
+    if type(existingMagazine) == "table"
+        and (existingMagazine.ammoNotRequired == true
+            or existingMagazine.itemID ~= nil)
+    then
+        magazine = existingMagazine
+        reason = existingMagazine.ammoNotRequired == true
+            and "ammo_not_required" or "magazine_ready"
+    else
+        magazine, reason = Firearms.GetMagazineState(record, weaponItem, {
+            skipLooseAmmoWhenLoaded = true,
+        })
+    end
     if not magazine then return false, reason end
     if magazine.ammoNotRequired == true then
         return true, reason, magazine
@@ -17,6 +28,13 @@ function Firearms.PrepareShot(record, weaponItem)
         math.floor(tonumber(magazine.descriptor and magazine.descriptor.ammoPerShot) or 1)
     )
     if (tonumber(magazine.count) or 0) < roundsRequired then
+        if magazine.unlimitedReserve ~= true and magazine.looseAmmo == nil then
+            magazine.looseAmmo = Internal.CountLooseAmmo(
+                record and record.inventory,
+                magazine.ammoType,
+                magazine.itemID
+            )
+        end
         if magazine.unlimitedReserve == true
             or (tonumber(magazine.looseAmmo) or 0) > 0
         then

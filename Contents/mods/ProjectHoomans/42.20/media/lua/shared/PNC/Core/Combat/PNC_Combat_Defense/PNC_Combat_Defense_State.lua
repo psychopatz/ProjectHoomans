@@ -70,6 +70,16 @@ function Defense.CountNearbyZombies(record, npcBody, radius)
     radius = tonumber(radius)
         or tonumber(Const.NPC_ZOMBIE_DEFENSE_RADIUS) or 2.2
     x, y, z = Internal.BodyPosition(record, npcBody)
+    if record
+        and Perception
+        and type(Perception.CountZombiesInFrame) == "function"
+        and record.x ~= nil
+        and record.y ~= nil
+        and Core.DistanceSq(x, y, record.x, record.y) <= 0.25
+        and math.abs(z - (tonumber(record.z) or z)) < 1
+    then
+        return Perception.CountZombiesInFrame(record, radius)
+    end
     if not Perception or not Perception.GetZombieCandidatesAt then return 0 end
     zombies = Perception.GetZombieCandidatesAt(
         x,

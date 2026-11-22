@@ -56,6 +56,9 @@ function Effects.Play(payload)
         return false
     end
     if shotId ~= "" then
+        if not Effects.SeenShots[shotId] then
+            Effects.SeenShotCount = (tonumber(Effects.SeenShotCount) or 0) + 1
+        end
         Effects.SeenShots[shotId] = (PNC.Core and PNC.Core.Now and PNC.Core.Now()) or 0
     end
     body = resolveBody(payload)

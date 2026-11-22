@@ -1,5 +1,6 @@
 local Engagement = PNC.CombatEngagement
 local Internal = Engagement.Internal
+local Core = PNC.Core
 local Const = PNC.Const
 local Combat = PNC.Combat
 local Equipment = PNC.Equipment
@@ -203,7 +204,16 @@ end
 local function handleRanged(context, debugMode, stopFactor)
     local attacked
     local reason
-    if context.distance <= (tonumber(Const.RANGED_RANGE) or 8.5) then
+    local rangedRange = tonumber(Const.RANGED_RANGE) or 8.5
+    local runtime = context.record and context.record.runtime or nil
+    local retreatState = runtime and runtime.combatRetreat or nil
+    local now = Core and Core.Now and Core.Now() or 0
+    local activeReposition = retreatState ~= nil
+        and (retreatState.phase == "retreat" or retreatState.phase == "strafe")
+        and retreatState.goalX ~= nil
+        and retreatState.goalY ~= nil
+        and now < (tonumber(retreatState.lockUntil) or 0)
+    if not activeReposition and context.distance <= rangedRange then
         holdRangedAim(context)
     end
     attacked, reason = Combat.TryRanged(
@@ -251,6 +261,9 @@ local function handleRanged(context, debugMode, stopFactor)
         "maintaining_range"
     ) then
         return true
+    end
+    if activeReposition and context.distance <= rangedRange then
+        holdRangedAim(context)
     end
     setDebug(context, reason, debugMode)
     logBlocked(context, debugMode .. " ranged", reason)

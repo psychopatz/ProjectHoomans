@@ -127,7 +127,9 @@ function Internal.ContinueLockedRetreat(record, zombie, target, state, now)
     local recoveryRetreat
     local reengagePending
     local targetDistance
-    if not state or state.phase ~= "retreat" then return false, nil end
+    if not state or (state.phase ~= "retreat" and state.phase ~= "strafe") then
+        return false, nil
+    end
     if state.goalX == nil or state.goalY == nil then return false, nil end
     currentX = zombie and zombie.getX and zombie:getX()
         or tonumber(record and record.x) or 0

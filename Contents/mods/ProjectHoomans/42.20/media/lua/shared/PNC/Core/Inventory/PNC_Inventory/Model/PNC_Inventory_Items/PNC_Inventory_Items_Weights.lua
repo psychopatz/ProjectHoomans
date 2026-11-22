@@ -151,6 +151,20 @@ function Internal.findItemByTemplateKey(inv, templateKey)
     return nil
 end
 
+function Internal.updateSignature(record, inv)
+    if not inv then return nil end
+    inv.signature = table.concat({
+        tostring(inv.revision or 0),
+        tostring(inv.itemCount or 0),
+        tostring(math.floor((tonumber(inv.cachedWeight) or 0) * 10)),
+        tostring(record and record.equipment
+            and record.equipment.primaryFullType or ""),
+        tostring(record and record.equipment
+            and record.equipment.secondaryFullType or ""),
+    }, ":")
+    return inv.signature
+end
+
 function Inventory.RebuildCaches(record)
     local inv
     if not record or type(record.inventory) ~= "table" then return nil end
@@ -166,18 +180,11 @@ function Inventory.RebuildCaches(record)
         (tonumber(inv.maxWeight) or 0)
             - (tonumber(inv.cachedWeight) or 0)
     )
-    inv.signature = table.concat({
-        tostring(inv.revision or 0),
-        tostring(inv.itemCount or 0),
-        tostring(math.floor((tonumber(inv.cachedWeight) or 0) * 10)),
-        tostring(record.equipment
-            and record.equipment.primaryFullType or ""),
-        tostring(record.equipment
-            and record.equipment.secondaryFullType or ""),
-    }, ":")
+    Internal.updateSignature(record, inv)
     -- The map is the gameplay projection; PsychopatzCore remains canonical.
     if Inventory.CoreBridge and Inventory.CoreBridge.refreshCanonical then
         Inventory.CoreBridge.refreshCanonical(record, inv)
+        inv.coreCanonicalDirty = false
     end
     return inv
 end

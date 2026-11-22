@@ -8,25 +8,33 @@ local Firearms = PNC.Firearms
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local function shouldEmitFailedHitAudit(record, target, reason, detailReason, now)
-    local normalizedReason = tostring(detailReason or reason or "")
+    local detailStr = detailReason ~= nil and tostring(detailReason) or ""
+    local normalizedReason = detailStr ~= "" and detailStr or tostring(reason or "")
     local expected = normalizedReason == "npc_damage_rejected"
         or normalizedReason == "npc_target_not_allowed"
         or normalizedReason == "alert_missing_or_expired"
         or normalizedReason == "alert_sequence_mismatch"
         or normalizedReason == "target_not_visible"
         or normalizedReason == "target_out_of_range_at_hit"
+        or normalizedReason == "invalid_zombie_target"
     local runtime
     local key
     local lastAt
-    if not expected or not target or target.kind ~= "npc" then
+    local kind
+    local targetKey
+    local windowMs
+    if not expected then
         return true
     end
     runtime = record and record.runtime
     if not runtime then return true end
     runtime.npcHitAuditThrottle = runtime.npcHitAuditThrottle or {}
-    key = tostring(target.id or "") .. "|" .. normalizedReason
-    lastAt = tonumber(runtime.npcHitAuditThrottle[key]) or 0
-    if now - lastAt < 1000 then
+    kind = target and target.kind or "unknown"
+    targetKey = target and (target.id or target.zombieId or target.onlineID) or ""
+    key = tostring(kind) .. ":" .. tostring(targetKey) .. "|" .. normalizedReason
+    windowMs = kind == "zombie" and 3000 or 1000
+    lastAt = tonumber(runtime.npcHitAuditThrottle[key])
+    if lastAt ~= nil and now - lastAt < windowMs then
         return false
     end
     runtime.npcHitAuditThrottle[key] = now
@@ -98,63 +106,37 @@ function Combat.PumpAttackAction(record, zombie)
             and action.lastReason ~= "melee_miss"
             and Core and Core.Log
         then
-            local detailOutcome = ""
-            local detailPart = ""
-            local detailReason = ""
-            local detailHealthState = ""
-            local detailHealthCurrent = ""
-            local detailHealthMax = ""
-            local detailBodyState = ""
-            local detailAuthorization = ""
-            local detailAttackType = ""
-            local detailAttackKind = ""
-            local detailWoundType = ""
-            local detailWeaponFullType = ""
-            local emitFailureAudit
-            local targetId = target and (
-                target.id or target.onlineID or target.zombieId
-            ) or "nil"
-            if type(action.lastDetail) == "table" then
-                detailOutcome = tostring(action.lastDetail.outcome or "")
-                detailPart = tostring(action.lastDetail.partId or "")
-                detailReason = tostring(action.lastDetail.reason or "")
-                detailHealthState = tostring(
-                    action.lastDetail.healthState or ""
-                )
-                detailHealthCurrent = tostring(
-                    action.lastDetail.healthCurrent or ""
-                )
-                detailHealthMax = tostring(
-                    action.lastDetail.healthMax or ""
-                )
-                detailBodyState = tostring(
-                    action.lastDetail.bodyState
-                        or action.lastDetail.targetBodyState or ""
-                )
-                detailAuthorization = tostring(
-                    action.lastDetail.ownerDefenseReason or ""
-                )
-                detailAttackType = tostring(
-                    action.lastDetail.attackType or ""
-                )
-                detailAttackKind = tostring(
-                    action.lastDetail.attackKind or ""
-                )
-                detailWoundType = tostring(
-                    action.lastDetail.woundType or ""
-                )
-                detailWeaponFullType = tostring(
-                    action.lastDetail.weaponFullType or ""
-                )
-            end
-            emitFailureAudit = shouldEmitFailedHitAudit(
+            local detail = type(action.lastDetail) == "table" and action.lastDetail or nil
+            local detailReasonRaw = detail and detail.reason or nil
+            local npcAuditEnabled = target and target.kind == "npc"
+                and Diagnostics
+                and Diagnostics.NPCThreatAuditEnabled == true
+                and Diagnostics.LogNPCThreatAudit ~= nil
+            local emitFailureAudit = shouldEmitFailedHitAudit(
                 record,
                 target,
                 action.lastReason,
-                detailReason,
+                detailReasonRaw,
                 now
             )
             if emitFailureAudit then
+                local detailOutcome = detail and tostring(detail.outcome or "") or ""
+                local detailPart = detail and tostring(detail.partId or "") or ""
+                local detailReason = detailReasonRaw ~= nil and tostring(detailReasonRaw) or ""
+                local detailHealthState = detail and tostring(detail.healthState or "") or ""
+                local detailHealthCurrent = detail and tostring(detail.healthCurrent or "") or ""
+                local detailHealthMax = detail and tostring(detail.healthMax or "") or ""
+                local detailBodyState = detail and tostring(
+                    detail.bodyState or detail.targetBodyState or ""
+                ) or ""
+                local detailAuthorization = detail and tostring(detail.ownerDefenseReason or "") or ""
+                local detailAttackType = detail and tostring(detail.attackType or "") or ""
+                local detailAttackKind = detail and tostring(detail.attackKind or "") or ""
+                local detailWoundType = detail and tostring(detail.woundType or "") or ""
+                local detailWeaponFullType = detail and tostring(detail.weaponFullType or "") or ""
+                local targetId = target and (
+                    target.id or target.onlineID or target.zombieId
+                ) or "nil"
                 Core.Log(
                     "WARN",
                     "attack_hit_failed npc="
@@ -175,33 +157,28 @@ function Combat.PumpAttackAction(record, zombie)
                         .. " body=" .. detailBodyState
                         .. " authorization=" .. detailAuthorization
                 )
-            end
-            if target and target.kind == "npc"
-                and Diagnostics
-                and Diagnostics.NPCThreatAuditEnabled == true
-                and Diagnostics.LogNPCThreatAudit
-                and emitFailureAudit
-            then
-                Diagnostics.LogNPCThreatAudit("npc_damage_rejected", {
-                    "npc=" .. tostring(record and record.id or ""),
-                    "targetId=" .. tostring(target.id or ""),
-                    "reason=" .. tostring(action.lastReason or ""),
-                    "outcome=" .. detailOutcome,
-                    "detailReason=" .. detailReason,
-                    "partId=" .. detailPart,
-                    "attackType=" .. detailAttackType,
-                    "attackKind=" .. detailAttackKind,
-                    "woundType=" .. detailWoundType,
-                    "weapon=" .. detailWeaponFullType,
-                    "healthState=" .. detailHealthState,
-                    "health=" .. detailHealthCurrent
-                        .. "/" .. detailHealthMax,
-                    "body=" .. detailBodyState,
-                    "authorization=" .. detailAuthorization,
-                    "damage=" .. tostring(action.damage or ""),
-                    "targetX=" .. tostring(target.x or ""),
-                    "targetY=" .. tostring(target.y or ""),
-                })
+                if npcAuditEnabled then
+                    Diagnostics.LogNPCThreatAudit("npc_damage_rejected", {
+                        "npc=" .. tostring(record and record.id or ""),
+                        "targetId=" .. tostring(target.id or ""),
+                        "reason=" .. tostring(action.lastReason or ""),
+                        "outcome=" .. detailOutcome,
+                        "detailReason=" .. detailReason,
+                        "partId=" .. detailPart,
+                        "attackType=" .. detailAttackType,
+                        "attackKind=" .. detailAttackKind,
+                        "woundType=" .. detailWoundType,
+                        "weapon=" .. detailWeaponFullType,
+                        "healthState=" .. detailHealthState,
+                        "health=" .. detailHealthCurrent
+                            .. "/" .. detailHealthMax,
+                        "body=" .. detailBodyState,
+                        "authorization=" .. detailAuthorization,
+                        "damage=" .. tostring(action.damage or ""),
+                        "targetX=" .. tostring(target.x or ""),
+                        "targetY=" .. tostring(target.y or ""),
+                    })
+                end
             end
         end
         if action.lastResult == true

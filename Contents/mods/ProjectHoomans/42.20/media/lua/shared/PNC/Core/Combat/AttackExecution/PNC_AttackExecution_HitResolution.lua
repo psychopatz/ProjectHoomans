@@ -105,10 +105,10 @@ local function resolveMeleeOutcome(record, target, action)
         action.meleeOutcome.profile
 end
 
-local function commitMeleeSwingResources(record, action)
+local function commitMeleeSwingResources(record, zombie, action, weaponItem)
     if action.meleeResourcesCommitted == true then return end
     action.meleeResourcesCommitted = true
-    AttackExecution.applyWeaponWear(record)
+    AttackExecution.applyWeaponWear(record, zombie, weaponItem)
     if Stamina and Stamina.SpendAttack then
         Stamina.SpendAttack(record, "melee", action.skillID)
     end
@@ -193,7 +193,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
             resolveMeleeOutcome(record, target, action)
         if not meleeReady then
             if meleeReason ~= "not_authority" then
-                commitMeleeSwingResources(record, action)
+                commitMeleeSwingResources(record, zombie, action, weaponItem)
             end
             return false, meleeReason or "melee_miss", meleeProfile
         end
@@ -211,7 +211,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 })
             if attackApplied then
                 commitMeleeImpactAudio(record, action, target)
-                AttackExecution.applyWeaponWear(record)
+                AttackExecution.applyWeaponWear(record, zombie, weaponItem)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
                 end
@@ -238,7 +238,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
             )
             if attackApplied then
                 commitMeleeImpactAudio(record, action, target)
-                AttackExecution.applyWeaponWear(record)
+                AttackExecution.applyWeaponWear(record, zombie, weaponItem)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
                 end
@@ -261,7 +261,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 })
             if attackApplied then
                 commitMeleeImpactAudio(record, action, target)
-                AttackExecution.applyWeaponWear(record)
+                AttackExecution.applyWeaponWear(record, zombie, weaponItem)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
                 end
@@ -274,10 +274,12 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
             return false, attackReason or "foreign_damage_rejected"
         end
         if target.kind == "zombie" then
-            attackApplied, attackReason = Internal.applyDamageToZombie(record, zombie, target, action.damage, "melee")
+            attackApplied, attackReason = Internal.applyDamageToZombie(
+                record, zombie, target, action.damage, "melee", weaponItem, weaponFullType
+            )
             if attackApplied then
                 commitMeleeImpactAudio(record, action, target)
-                AttackExecution.applyWeaponWear(record)
+                AttackExecution.applyWeaponWear(record, zombie, weaponItem)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
                 end
@@ -301,7 +303,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     weaponFullType = weaponFullType,
                 })
             if attackApplied then
-                AttackExecution.applyWeaponWear(record)
+                AttackExecution.applyWeaponWear(record, zombie, weaponItem)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "ranged", action.skillID or "Aiming")
                 end
@@ -327,7 +329,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 }
             )
             if attackApplied then
-                AttackExecution.applyWeaponWear(record)
+                AttackExecution.applyWeaponWear(record, zombie, weaponItem)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "ranged", action.skillID or "Aiming")
                 end
@@ -349,7 +351,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     weaponFullType = weaponFullType,
                 })
             if attackApplied then
-                AttackExecution.applyWeaponWear(record)
+                AttackExecution.applyWeaponWear(record, zombie, weaponItem)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "ranged", action.skillID or "Aiming")
                 end
@@ -362,9 +364,11 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
             return false, attackReason or "foreign_damage_rejected"
         end
         if target.kind == "zombie" then
-            attackApplied, attackReason = Internal.applyDamageToZombie(record, zombie, target, action.damage, "ranged")
+            attackApplied, attackReason = Internal.applyDamageToZombie(
+                record, zombie, target, action.damage, "ranged", weaponItem, weaponFullType
+            )
             if attackApplied then
-                AttackExecution.applyWeaponWear(record)
+                AttackExecution.applyWeaponWear(record, zombie, weaponItem)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "ranged", action.skillID or "Aiming")
                 end

@@ -41,7 +41,7 @@ local function investigateHiddenTarget(context)
     setDebug(context, reason)
 end
 
-maintainRangedSpacing = function(context)
+local maintainRangedSpacing = function(context)
     local moved
     local reason
     if context.mode ~= "ranged"

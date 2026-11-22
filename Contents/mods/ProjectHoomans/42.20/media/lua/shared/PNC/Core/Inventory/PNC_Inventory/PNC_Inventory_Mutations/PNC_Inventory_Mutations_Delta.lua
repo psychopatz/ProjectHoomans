@@ -122,6 +122,56 @@ local function applyInventoryOperation(record, inv, op)
     return nil
 end
 
+local function isScalarItemUpdateOnly(ops)
+    local i
+    local op
+    if type(ops) ~= "table" or #ops <= 0 then
+        return false
+    end
+    for i = 1, #ops do
+        op = ops[i]
+        if type(op) ~= "table"
+            or op.op ~= "update"
+            or op.stack ~= nil
+            or op.itemState ~= nil
+        then
+            return false
+        end
+    end
+    return true
+end
+
+local function captureScalarItemState(inv, op, scalarUndo)
+    local itemID = Internal.normalizeString(op and op.itemID)
+    local item = itemID and inv and inv.items and inv.items[op.itemID] or nil
+    if not item then return end
+    scalarUndo[#scalarUndo + 1] = {
+        item = item,
+        uses = item.uses,
+        cond = item.cond,
+        ammoCount = item.ammoCount,
+        fav = item.fav,
+        interactionLocked = item.interactionLocked,
+        interactionLockReason = item.interactionLockReason,
+    }
+end
+
+local function restoreScalarUndo(scalarUndo)
+    local i
+    local saved
+    local item
+    for i = #scalarUndo, 1, -1 do
+        saved = scalarUndo[i]
+        item = saved.item
+        item.uses = saved.uses
+        item.cond = saved.cond
+        item.ammoCount = saved.ammoCount
+        item.fav = saved.fav
+        item.interactionLocked = saved.interactionLocked
+        item.interactionLockReason = saved.interactionLockReason
+    end
+end
+
 function Inventory.ApplyDelta(record, ops, reason, options)
     local ensureOptions = {
         reconcileWaterContainer = false,
@@ -132,19 +182,33 @@ function Inventory.ApplyDelta(record, ops, reason, options)
             options.skipHydrationLifecycle == true
     end
     local inv = Inventory.EnsureRecordInventory(record, ensureOptions)
-    local snapshot = PNC.Core and PNC.Core.DeepCopy
-        and PNC.Core.DeepCopy(inv) or nil
+    if not inv or type(ops) ~= "table" then return false, {} end
+    local scalarOnly = isScalarItemUpdateOnly(ops)
+    local scalarUndo = scalarOnly and {} or nil
+    local snapshot = nil
+    if not scalarOnly and PNC.Core and PNC.Core.DeepCopy then
+        local prevCoreStore = inv.coreStore
+        local prevCoreMetadata = inv.coreMetadata
+        inv.coreStore = nil
+        inv.coreMetadata = nil
+        snapshot = PNC.Core.DeepCopy(inv)
+        inv.coreStore = prevCoreStore
+        inv.coreMetadata = prevCoreMetadata
+    end
     local appliedOps = {}
     local applied
     local i
-    local revisionBefore
+    local revisionBefore = tonumber(inv.revision) or 0
     local revisionAfter
-    if type(ops) ~= "table" then return false, {} end
-    revisionBefore = tonumber(inv.revision) or 0
     for i = 1, #ops do
+        if scalarUndo then
+            captureScalarItemState(inv, ops[i], scalarUndo)
+        end
         applied = applyInventoryOperation(record, inv, ops[i])
         if not applied then
-            if snapshot then
+            if scalarUndo then
+                restoreScalarUndo(scalarUndo)
+            elseif snapshot then
                 record.inventory = snapshot
                 Inventory.RebuildCaches(record)
             end
@@ -157,8 +221,21 @@ function Inventory.ApplyDelta(record, ops, reason, options)
     if inv.persistenceMode ~= "FULL" then
         inv.persistenceMode = "BASELINE_DELTA"
     end
-    Inventory.SyncEquipmentFromInventory(record)
-    Inventory.RebuildCaches(record)
+    if scalarOnly then
+        if Internal.updateSignature then
+            Internal.updateSignature(record, inv)
+        end
+        inv.coreCanonicalDirty = true
+    else
+        Inventory.SyncEquipmentFromInventory(record)
+        Inventory.RebuildCaches(record)
+    end
+    local runtimeState = record.runtime and record.runtime.inventory or nil
+    if runtimeState and runtimeState.hydratedInventory == inv then
+        runtimeState.hydratedRevision = tonumber(inv.revision) or 0
+        runtimeState.hydratedItems = inv.items
+        runtimeState.hydratedContainers = inv.containers
+    end
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "inventory")
     end

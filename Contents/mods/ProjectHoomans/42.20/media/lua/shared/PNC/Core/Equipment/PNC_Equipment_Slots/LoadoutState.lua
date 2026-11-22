@@ -29,7 +29,21 @@ function Equipment.EnsureRecordEquipment(record)
     if not record then
         return Equipment.NormalizeLoadoutSpec(nil)
     end
-    record.equipment = Equipment.NormalizeLoadoutSpec(record.equipment)
+    local runtime = type(record.runtime) == "table" and record.runtime or nil
+    local equipment = record.equipment
+    if runtime
+        and runtime._normalizedEquipmentRef == equipment
+        and type(equipment) == "table"
+        and type(equipment.worn) == "table"
+        and type(equipment.wornVisuals) == "table"
+        and type(equipment.attached) == "table"
+    then
+        return equipment
+    end
+    record.equipment = Equipment.NormalizeLoadoutSpec(equipment)
+    if runtime then
+        runtime._normalizedEquipmentRef = record.equipment
+    end
     return record.equipment
 end
 
@@ -44,6 +58,9 @@ function Equipment.SetLoadout(record, loadoutSpec)
         return false
     end
     record.equipment = Equipment.NormalizeLoadoutSpec(loadoutSpec)
+    if type(record.runtime) == "table" then
+        record.runtime._normalizedEquipmentRef = record.equipment
+    end
     refreshPortrait(record)
     return true
 end

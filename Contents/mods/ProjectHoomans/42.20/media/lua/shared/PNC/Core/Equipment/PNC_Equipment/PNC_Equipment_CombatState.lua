@@ -41,7 +41,7 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
     then
         primaryFullType = workPresentation.fullType
     end
-    descriptor = Internal.buildWeaponDescriptor(primaryFullType, false)
+    descriptor = Internal.peekWeaponDescriptor(primaryFullType)
     handStateCurrent = Internal.isPrimaryHandStateCurrent(
         zombie,
         descriptor,
@@ -76,7 +76,7 @@ function Equipment.EnsureCombatHands(zombie, record, options)
         return Equipment.ApplyReplicaHands(zombie, record, options)
     end
     equipment = Equipment.EnsureRecordEquipment(record)
-    descriptor = Internal.buildWeaponDescriptor(equipment.primaryFullType, false)
+    descriptor = Internal.peekWeaponDescriptor(equipment.primaryFullType)
     current = Internal.isPrimaryHandStateCurrent(zombie, descriptor, true)
     if current == true then
         return true, "unchanged"
@@ -107,7 +107,7 @@ function Equipment.EnsureWorkHands(zombie, record, options)
 end
 
 function Equipment.ResolveWeaponMode(fullType)
-    return Internal.buildWeaponDescriptor(fullType, false).resolvedMode
+    return Internal.peekWeaponDescriptor(fullType).resolvedMode
 end
 
 local function temporaryFallbackRange(reason)
@@ -151,7 +151,7 @@ function Equipment.ActivateMeleeFallback(record, zombie, fallbackReason)
         if itemID ~= currentID and state
             and (state.cond == nil or tonumber(state.cond) == nil or tonumber(state.cond) > 0)
         then
-            descriptor = Internal.buildWeaponDescriptor(state.type, false)
+            descriptor = Internal.peekWeaponDescriptor(state.type)
             if descriptor.hasWeapon == true and descriptor.resolvedMode == "melee" then
                 candidates[#candidates + 1] = {
                     id = itemID,
@@ -230,7 +230,7 @@ function Equipment.RestoreRangedFallback(record, zombie)
         and inv.items[runtime.weaponFallbackFromID]
         or nil
     descriptor = sourceItem
-        and Internal.buildWeaponDescriptor(sourceItem.type, false)
+        and Internal.peekWeaponDescriptor(sourceItem.type)
         or nil
     if not sourceItem or not descriptor
         or descriptor.hasUsableFirearm ~= true

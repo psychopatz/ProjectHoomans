@@ -74,6 +74,30 @@ local function logInventoryHydration(
     return true
 end
 
+local function markHydratedState(
+    record,
+    inv,
+    currentGenerator,
+    canonicalRepaired,
+    waterReconciled
+)
+    if not record or type(inv) ~= "table" then return end
+    local runtimeState = Internal.getRuntimeState(record)
+    if type(runtimeState) ~= "table" then return end
+    local sameInv = runtimeState.hydratedInventory == inv
+    runtimeState.hydratedInventory = inv
+    runtimeState.hydratedItems = inv.items
+    runtimeState.hydratedContainers = inv.containers
+    runtimeState.hydratedRevision = tonumber(inv.revision) or 0
+    runtimeState.hydratedGenerator = tonumber(currentGenerator)
+        or runtimeState.hydratedGenerator
+        or (PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1)
+    runtimeState.hydratedCanonicalRepaired = canonicalRepaired == true
+        or (sameInv and runtimeState.hydratedCanonicalRepaired == true)
+    runtimeState.hydratedWaterReconciled = waterReconciled == true
+        or (sameInv and runtimeState.hydratedWaterReconciled == true)
+end
+
 local function finalizeRecordInventory(
     record,
     inv,
@@ -90,11 +114,12 @@ local function finalizeRecordInventory(
     local dirtyReason
     local dirtyMarked = false
     local waterReconciled = false
+    local canonicalRepaired = options.skipCanonicalRepair ~= true
     local legacyIdentityRemoved
     Internal.normalizeLegacyBagSlot(inv)
     Internal.getRuntimeState(record)
     Internal.refreshNextItemSerial(record, inv)
-    if options.skipCanonicalRepair ~= true then
+    if canonicalRepaired then
         legacyIdentityRemoved = Internal.removeLegacyIdentityItems(
             record,
             inv,
@@ -126,6 +151,13 @@ local function finalizeRecordInventory(
         Inventory.ReconcileWaterContainer(record)
         waterReconciled = true
     end
+    markHydratedState(
+        record,
+        record.inventory,
+        currentGenerator,
+        canonicalRepaired,
+        waterReconciled
+    )
     if auditEnabled then
         logInventoryHydration(
             record,
@@ -176,6 +208,13 @@ function Inventory.RepairCanonicalIdentityItems(record)
     end
     local removed = Internal.removeLegacyIdentityItems(record, record.inventory)
     Inventory.RebuildCaches(record)
+    local runtimeState = record.runtime and record.runtime.inventory or nil
+    if runtimeState and runtimeState.hydratedInventory == record.inventory then
+        runtimeState.hydratedItems = record.inventory.items
+        runtimeState.hydratedContainers = record.inventory.containers
+        runtimeState.hydratedRevision = tonumber(record.inventory.revision) or 0
+        runtimeState.hydratedCanonicalRepaired = true
+    end
     if removed and PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "inventory_identity_metadata_only")
     end
@@ -197,12 +236,35 @@ function Inventory.EnsureRecordInventory(record, options)
         return finalizePersistedInventory(record, persistedInventory, options)
     end
     if type(record.inventory) ~= "table"
-        or not record.inventory.items
-        or not record.inventory.containers
+        or type(record.inventory.items) ~= "table"
+        or type(record.inventory.containers) ~= "table"
     then
         return Inventory.CreateFromTemplate(record, options)
     end
     local inv = record.inventory
+    local currentGenerator = PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1
+    if options.forceHydration ~= true then
+        local runtimeState = record.runtime and record.runtime.inventory or nil
+        if runtimeState
+            and runtimeState.hydratedInventory == inv
+            and runtimeState.hydratedItems == inv.items
+            and runtimeState.hydratedContainers == inv.containers
+            and runtimeState.hydratedRevision == (tonumber(inv.revision) or 0)
+            and runtimeState.hydratedGenerator == currentGenerator
+            and (options.skipCanonicalRepair == true
+                or runtimeState.hydratedCanonicalRepaired == true)
+        then
+            if options.reconcileWaterContainer ~= false
+                and runtimeState.hydratedWaterReconciled ~= true
+                and Inventory.ReconcileWaterContainer
+            then
+                Inventory.ReconcileWaterContainer(record)
+                runtimeState.hydratedWaterReconciled = true
+                runtimeState.hydratedRevision = tonumber(inv.revision) or 0
+            end
+            return inv
+        end
+    end
     local structureChanged = false
     local rawItems
     local auditEnabled = inventoryAuditEnabled()
@@ -211,7 +273,6 @@ function Inventory.EnsureRecordInventory(record, options)
     local containerMembershipChanged
     local generatorVersion = inv.template
         and tonumber(inv.template.generatorVersion) or 0
-    local currentGenerator = PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1
     if type(inv.items) == "table" then
         rawItems = inv.items
     else

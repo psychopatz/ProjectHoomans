@@ -6,6 +6,8 @@ function Effects.Reset()
     Effects.ActiveTracers = {}
     Effects.ActiveMuzzleFlashes = {}
     Effects.SeenShots = {}
+    Effects.SeenShotCount = 0
+    Effects.LastSeenShotsPruneAt = 0
     Effects.DrawAuditState = {}
     Effects.DebugSimulation = nil
     Effects.LightWindowAt = 0

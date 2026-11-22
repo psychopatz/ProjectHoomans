@@ -29,7 +29,8 @@ function H.TryHandle(record, zombie, now)
         return false, nil
     end
     retreatState = CombatTactics.Internal.EnsureRetreatState(record)
-    retreatWasActive = retreatState and retreatState.phase == "retreat"
+    retreatWasActive = retreatState
+        and (retreatState.phase == "retreat" or retreatState.phase == "strafe")
     if not retreatWasActive then
         return false, retreatState
     end

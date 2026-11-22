@@ -23,14 +23,53 @@ function Firearms.HasUnlimitedReserve(record)
 end
 
 function Firearms.Describe(record, weaponItem, character)
+    local core = PNC and PNC.Core or nil
+    local now = core and type(core.Now) == "function" and tonumber(core.Now()) or nil
+    local runtime = type(record) == "table" and record.runtime or nil
+    if type(record) == "table" and not runtime then
+        runtime = {}
+        record.runtime = runtime
+    end
+    local skills = PNC and PNC.Skills or nil
+    local reloadLevel = skills and skills.GetLevel
+        and math.max(0, math.min(10, tonumber(skills.GetLevel(record, "Reloading")) or 0))
+        or 0
+    local primaryFullType = record and record.equipment
+        and record.equipment.primaryFullType or nil
+    local hasChar = character ~= nil
+    local scriptManagerFn = getScriptManager
+    local cached = runtime and runtime.firearmDescriptorCache or nil
+    if cached
+        and weaponItem ~= nil
+        and cached.weaponItem == weaponItem
+        and cached.primaryFullType == primaryFullType
+        and cached.hasCharacter == hasChar
+        and cached.reloadLevel == reloadLevel
+        and cached.scriptManagerFn == scriptManagerFn
+        and ((now == nil and cached.noClock == true)
+            or (now ~= nil and now < (tonumber(cached.expiresAt) or 0)))
+    then
+        return cached.descriptor
+    end
     local fullType = Internal.FullTypeOf(record, weaponItem)
+    if not fullType then return nil end
+    if cached
+        and cached.fullType == fullType
+        and cached.weaponItem == weaponItem
+        and cached.hasCharacter == hasChar
+        and cached.reloadLevel == reloadLevel
+        and cached.scriptManagerFn == scriptManagerFn
+        and ((now == nil and cached.noClock == true)
+            or (now ~= nil and now < (tonumber(cached.expiresAt) or 0)))
+    then
+        return cached.descriptor
+    end
     local scriptItem = Internal.ScriptItemFor(fullType)
     local weaponFamily
     local reloadFamily
     local ammoType
     local manuallyRemoveSpentRounds
     local maxRange
-    if not fullType then return nil end
     weaponFamily, reloadFamily = Internal.ResolveFamily(fullType, scriptItem)
     ammoType = Internal.SafeMethod(weaponItem, "getAmmoType")
         or Internal.SafeMethod(scriptItem, "getAmmoType")
@@ -44,7 +83,7 @@ function Firearms.Describe(record, weaponItem, character)
     maxRange = tonumber(maxRange)
         or tonumber(Internal.SafeMethod(weaponItem, "getMaxRange"))
         or tonumber(Internal.SafeMethod(scriptItem, "getMaxRange"))
-    return {
+    local descriptor = {
         fullType = fullType,
         -- Build 42 returns an ItemKey here, while older/modded weapons may
         -- return a full-type string. Canonicalizing through getItemKey keeps
@@ -86,12 +125,28 @@ function Firearms.Describe(record, weaponItem, character)
         rackAfterShoot = Internal.SafeMethod(weaponItem, "isRackAfterShoot") == true
             or Internal.SafeMethod(scriptItem, "isRackAfterShoot") == true,
     }
+    if runtime then
+        runtime.firearmDescriptorCache = {
+            fullType = fullType,
+            primaryFullType = primaryFullType,
+            weaponItem = weaponItem,
+            hasCharacter = hasChar,
+            reloadLevel = reloadLevel,
+            scriptManagerFn = scriptManagerFn,
+            noClock = now == nil,
+            expiresAt = now and (now + 2000) or 0,
+            descriptor = descriptor,
+        }
+    end
+    return descriptor
 end
 
-function Firearms.GetMagazineState(record, weaponItem)
+function Firearms.GetMagazineState(record, weaponItem, options)
     local descriptor
     local state
     local reason
+    local unlimitedReserve
+    local looseAmmo
     descriptor = Firearms.Describe(record, weaponItem)
     if not descriptor or not descriptor.ammoType or descriptor.ammoType == "" then
         return {
@@ -103,14 +158,29 @@ function Firearms.GetMagazineState(record, weaponItem)
     end
     state, reason = Internal.EnsureMagazine(record, descriptor, weaponItem)
     if not state then return nil, reason end
+    unlimitedReserve = Firearms.HasUnlimitedReserve(record)
+    if unlimitedReserve then
+        looseAmmo = 0
+    elseif type(options) == "table"
+        and options.skipLooseAmmoWhenLoaded == true
+        and (tonumber(state.count) or 0) > 0
+    then
+        looseAmmo = nil
+    else
+        looseAmmo = Internal.CountLooseAmmo(
+            state.inventory,
+            descriptor.ammoType,
+            state.itemID
+        )
+    end
     return {
         ammoNotRequired = false,
-        unlimitedReserve = Firearms.HasUnlimitedReserve(record),
+        unlimitedReserve = unlimitedReserve,
         count = state.count,
         capacity = descriptor.capacity,
         ammoType = descriptor.ammoType,
         itemID = state.itemID,
-        looseAmmo = Internal.CountLooseAmmo(state.inventory, descriptor.ammoType, state.itemID),
+        looseAmmo = looseAmmo,
         descriptor = descriptor,
     }, "magazine_ready"
 end

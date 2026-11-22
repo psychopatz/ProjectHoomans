@@ -174,5 +174,5 @@ function AttackExecution.isCommittedMeleeTargetInRange(zombie, target)
     dy = (tonumber(target.y) or zombie:getY()) - zombie:getY()
     dz = math.abs((tonumber(target.z) or zombie:getZ()) - zombie:getZ())
     range = (tonumber(Const.MELEE_RANGE) or 1.3) + (tonumber(Const.MELEE_HIT_TOLERANCE) or 0.12)
-    return dz <= 0.25 and ((dx * dx) + (dy * dy)) <= (range * range)
+    return dz <= 0.5 and ((dx * dx) + (dy * dy)) <= (range * range)
 end

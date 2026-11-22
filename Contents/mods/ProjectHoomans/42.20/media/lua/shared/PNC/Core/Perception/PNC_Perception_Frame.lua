@@ -133,13 +133,8 @@ local function zombieEntryId(zombie)
     return nil
 end
 
-function Perception.GetVisibleZombieEntries(record, requestedRadius)
-    local frame = Perception.GetZombieFrame(record, requestedRadius)
+local function ensureVisibleEntries(record, frame)
     local output
-    local filtered
-    local requestedRadiusSq = (tonumber(requestedRadius)
-        or tonumber(Const.ZOMBIE_TARGET_RADIUS)
-        or 12) ^ 2
     local limit
     local startIndex
     local lastChecked
@@ -158,7 +153,7 @@ function Perception.GetVisibleZombieEntries(record, requestedRadius)
     local coneRejected = 0
     local checked = 0
     local losCount = 0
-    if not frame then return {} end
+    if not frame then return nil end
     if not frame.visibleEntries then
         output = {}
         limit = math.max(1, math.floor(
@@ -262,14 +257,43 @@ function Perception.GetVisibleZombieEntries(record, requestedRadius)
         end
         frame.visibleEntries = output
     end
-    filtered = {}
-    for i = 1, #frame.visibleEntries do
-        entry = frame.visibleEntries[i]
+    return frame.visibleEntries
+end
+
+function Perception.GetVisibleZombieEntries(record, requestedRadius)
+    local frame = Perception.GetZombieFrame(record, requestedRadius)
+    local visibleEntries = ensureVisibleEntries(record, frame)
+    if not visibleEntries then return {} end
+    local requestedRadiusSq = (tonumber(requestedRadius)
+        or tonumber(Const.ZOMBIE_TARGET_RADIUS)
+        or 12) ^ 2
+    local filtered = {}
+    local i
+    local entry
+    for i = 1, #visibleEntries do
+        entry = visibleEntries[i]
         if entry.distSq <= requestedRadiusSq then
             filtered[#filtered + 1] = entry
         end
     end
     return filtered
+end
+
+function Perception.CountVisibleZombiesInFrame(record, requestedRadius)
+    local frame = Perception.GetZombieFrame(record, requestedRadius)
+    local visibleEntries = ensureVisibleEntries(record, frame)
+    if not visibleEntries then return 0 end
+    local requestedRadiusSq = (tonumber(requestedRadius)
+        or tonumber(Const.ZOMBIE_TARGET_RADIUS)
+        or 12) ^ 2
+    local count = 0
+    local i
+    for i = 1, #visibleEntries do
+        if visibleEntries[i].distSq <= requestedRadiusSq then
+            count = count + 1
+        end
+    end
+    return count
 end
 
 function Perception.CountZombiesInFrame(record, radius)

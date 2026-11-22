@@ -75,12 +75,12 @@ end
 
 local function countLooseAmmo(inv, ammoType, weaponItemID)
     local total = 0
-    local ids = looseAmmoEntries(inv, ammoType, weaponItemID)
-    local i
+    local id
     local item
-    for i = 1, #ids do
-        item = inv.items[ids[i]]
-        total = total + math.max(1, math.floor(tonumber(item and item.stack) or 1))
+    for id, item in pairs(inv and inv.items or {}) do
+        if id ~= weaponItemID and item and Internal.SameItemType(item.type, ammoType) then
+            total = total + math.max(1, math.floor(tonumber(item.stack) or 1))
+        end
     end
     return total
 end

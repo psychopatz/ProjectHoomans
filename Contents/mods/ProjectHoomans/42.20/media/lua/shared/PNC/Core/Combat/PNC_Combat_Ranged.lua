@@ -92,9 +92,9 @@ function Combat.TryRanged(record, zombie, target)
     local dist
     local equipmentInfo = Equipment.Describe(record)
     local skillID = "Aiming"
-    local aimingLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, "Aiming") or 0
+    local aimingLevel
     local anim
-    local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record, zombie) or nil
+    local weaponItem
     local ammoReady
     local ammoReason
     local magazine
@@ -103,8 +103,6 @@ function Combat.TryRanged(record, zombie, target)
     local shotReady
     local shotReason
     local shotProfile
-
-    firearmModifiers, cooldownMs = resolveFirearmTiming(record, profile)
 
     if not target then
         return false, "no_target"
@@ -115,6 +113,7 @@ function Combat.TryRanged(record, zombie, target)
     if equipmentInfo.combatModeResolved ~= "ranged" and equipmentInfo.combatModeResolved ~= "mixed" then
         return false, equipmentInfo.weaponStatus or "ranged_weapon_unavailable"
     end
+    weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record, zombie) or nil
     if not weaponItem or not weaponItem.IsWeapon or not weaponItem:IsWeapon() then
         return false, "ranged_weapon_instance_unavailable"
     end
@@ -126,7 +125,9 @@ function Combat.TryRanged(record, zombie, target)
     -- releases. Do not make a double-barrel wait through its attack cooldown
     -- before it is even allowed to start the reload animation.
     if Firearms and Firearms.GetMagazineState then
-        magazine, ammoReason = Firearms.GetMagazineState(record, weaponItem)
+        magazine, ammoReason = Firearms.GetMagazineState(record, weaponItem, {
+            skipLooseAmmoWhenLoaded = true,
+        })
         if not magazine then
             return false, ammoReason or "magazine_unavailable"
         end
@@ -148,6 +149,7 @@ function Combat.TryRanged(record, zombie, target)
             return false, "out_of_ammo"
         end
     end
+    firearmModifiers, cooldownMs = resolveFirearmTiming(record, profile)
     if not Internal.canAttack(record, now, cooldownMs) then
         return false, "cooldown_active"
     end
@@ -169,7 +171,7 @@ function Combat.TryRanged(record, zombie, target)
     shotProfile = buildShotProfile(record, target, firearmModifiers, dist)
 
     if Firearms and Firearms.PrepareShot then
-        ammoReady, ammoReason, magazine = Firearms.PrepareShot(record, weaponItem)
+        ammoReady, ammoReason, magazine = Firearms.PrepareShot(record, weaponItem, magazine)
         if not ammoReady then
             if ammoReason == "reload_required" and Firearms.StartReload then
                 reloadStarted, reloadReason = Firearms.StartReload(record, zombie, target, weaponItem)
@@ -182,6 +184,7 @@ function Combat.TryRanged(record, zombie, target)
         end
     end
 
+    aimingLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, "Aiming") or 0
     if Resolution and Resolution.GetAttackDamage and Resolution.IsWeaponDamageEnabled and Resolution.IsWeaponDamageEnabled() then
         damage = Resolution.GetAttackDamage(record, "ranged", weaponItem, damage, aimingLevel)
     else

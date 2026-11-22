@@ -174,6 +174,7 @@ local function holdRangedAction(context, reason, mode)
     then
         return false
     end
+    clearRetreatFor(context)
     holdRangedAim(context)
     setDebug(
         context,

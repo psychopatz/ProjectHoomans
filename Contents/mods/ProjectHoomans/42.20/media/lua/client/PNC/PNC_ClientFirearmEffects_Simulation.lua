@@ -91,9 +91,18 @@ function Effects.OnTick()
             Effects.StopSimulation()
         end
     end
-    for shotId, seenAt in pairs(Effects.SeenShots) do
-        if now - (tonumber(seenAt) or 0) > 10000 then
-            Effects.SeenShots[shotId] = nil
+    if (tonumber(Effects.SeenShotCount) or 0) > 0
+        and now - (tonumber(Effects.LastSeenShotsPruneAt) or 0) >= 1000
+    then
+        Effects.LastSeenShotsPruneAt = now
+        local remaining = 0
+        for shotId, seenAt in pairs(Effects.SeenShots) do
+            if now - (tonumber(seenAt) or 0) > 10000 then
+                Effects.SeenShots[shotId] = nil
+            else
+                remaining = remaining + 1
+            end
         end
+        Effects.SeenShotCount = remaining
     end
 end

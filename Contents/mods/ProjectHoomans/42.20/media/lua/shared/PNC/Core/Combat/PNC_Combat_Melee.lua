@@ -25,38 +25,17 @@ function Combat.TryMelee(record, zombie, target)
     local profile = record.combatProfile or {}
     local damage = tonumber(profile.meleeDamage) or 10
     local dist
-    local equipmentInfo = Equipment.Describe(record)
+    local equipmentInfo
     local zombieTarget
     local anim
-    local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record, zombie) or nil
-    local isFirearm = equipmentInfo
-        and equipmentInfo.hasUsableFirearm == true
-        or false
-    if not isFirearm
-        and Internal.isFirearmWeapon
-    then
-        isFirearm = Internal.isFirearmWeapon(
-            record,
-            weaponItem,
-            equipmentInfo
-        ) == true
-    end
-    if isFirearm then
-        weaponItem = nil
-    end
-    -- WeaponType is primarily an animation-family resolver and may classify a
-    -- valid modded weapon as barehand. Combat capability follows the actual
-    -- equipped InventoryItem instead. Firearms are deliberately excluded from
-    -- this lane even if a stale hand item survives a logical weapon switch.
-    local isBarehand = isFirearm
-        or not (weaponItem and weaponItem.IsWeapon and weaponItem:IsWeapon())
-    local cooldownMs = isBarehand and (tonumber(profile.unarmedCooldownMs) or Const.UNARMED_COOLDOWN_MS) or (tonumber(profile.meleeCooldownMs) or 900)
-    local skillID = Skills and Skills.ResolveWeaponSkill and Skills.ResolveWeaponSkill(record, record.equipment and record.equipment.primaryFullType, "melee") or "Strength"
-    local skillLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, skillID) or 0
-    local strengthLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, "Strength") or 0
-    local meleeModifiers = TraitEffects
-        and TraitEffects.ResolveMeleeModifiers
-        and TraitEffects.ResolveMeleeModifiers(record) or {}
+    local weaponItem
+    local isFirearm
+    local isBarehand
+    local cooldownMs
+    local skillID
+    local skillLevel
+    local strengthLevel
+    local meleeModifiers
     local groundSafe
     local liveTarget
     local emergencyMelee
@@ -65,13 +44,6 @@ function Combat.TryMelee(record, zombie, target)
     local hitDelay
     local duration
     local strikeProfile
-
-    if Resolution and Resolution.GetMeleeCooldown then
-        cooldownMs = Resolution.GetMeleeCooldown(record, cooldownMs,
-            meleeModifiers, {
-                actionDurationMs = Internal.ATTACK_TIMINGS.melee.duration,
-            })
-    end
 
     if not target then
         return false, "no_target"
@@ -102,9 +74,48 @@ function Combat.TryMelee(record, zombie, target)
     ) then
         return false, "target_out_of_range"
     end
+
+    equipmentInfo = Equipment.Describe(record)
+    weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record, zombie) or nil
+    isFirearm = equipmentInfo
+        and equipmentInfo.hasUsableFirearm == true
+        or false
+    if not isFirearm
+        and Internal.isFirearmWeapon
+    then
+        isFirearm = Internal.isFirearmWeapon(
+            record,
+            weaponItem,
+            equipmentInfo
+        ) == true
+    end
+    if isFirearm then
+        weaponItem = nil
+    end
+    -- WeaponType is primarily an animation-family resolver and may classify a
+    -- valid modded weapon as barehand. Combat capability follows the actual
+    -- equipped InventoryItem instead. Firearms are deliberately excluded from
+    -- this lane even if a stale hand item survives a logical weapon switch.
+    isBarehand = isFirearm
+        or not (weaponItem and weaponItem.IsWeapon and weaponItem:IsWeapon())
+    cooldownMs = isBarehand
+        and (tonumber(profile.unarmedCooldownMs) or Const.UNARMED_COOLDOWN_MS)
+        or (tonumber(profile.meleeCooldownMs) or 900)
+    meleeModifiers = TraitEffects
+        and TraitEffects.ResolveMeleeModifiers
+        and TraitEffects.ResolveMeleeModifiers(record) or {}
+    if Resolution and Resolution.GetMeleeCooldown then
+        cooldownMs = Resolution.GetMeleeCooldown(record, cooldownMs,
+            meleeModifiers, {
+                actionDurationMs = Internal.ATTACK_TIMINGS.melee.duration,
+            })
+    end
     if not Internal.canAttack(record, now, cooldownMs) then
         return false, "cooldown_active"
     end
+    skillID = Skills and Skills.ResolveWeaponSkill
+        and Skills.ResolveWeaponSkill(record, record.equipment and record.equipment.primaryFullType, "melee")
+        or "Strength"
     emergencyMelee = target.kind == "zombie"
         and record.runtime
         and now <= (
@@ -117,6 +128,8 @@ function Combat.TryMelee(record, zombie, target)
     then
         return false, "stamina_exhausted"
     end
+    skillLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, skillID) or 0
+    strengthLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, "Strength") or 0
 
     if not isBarehand and Resolution and Resolution.GetAttackDamage and Resolution.IsWeaponDamageEnabled and Resolution.IsWeaponDamageEnabled() then
         damage = Resolution.GetAttackDamage(record, "melee", weaponItem, damage, skillLevel)
