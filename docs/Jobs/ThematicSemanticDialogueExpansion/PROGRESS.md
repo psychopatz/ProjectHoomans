@@ -1,14 +1,27 @@
 # Progress — Thematic Semantic Dialogue Expansion
 
-**Status:** D0–D8 COMPLETE (ALL DEVELOPER ACCEPTANCE GATES PASSED, 0 MANDATORY FINDINGS); READY FOR D9 USER NATIVE SP/MP ACCEPTANCE.
+**Status:** REOPENED BY 2026-11-22 RE-AUDIT AND USER SCOPE EXPANSION. Prior D0–D8 implementation remains baseline evidence, but D9 is deferred until the Core-owned `UnifiedVanillaWorldEventSemantics` V0–V8 extension closes.
 **Primary repository:** /home/psychopatz/Zomboid/Workshop/ProjectHoomans
-**Participants:** /home/psychopatz/Zomboid/Workshop/psychopatzCore (`cf8a1d4`), /home/psychopatz/Zomboid/Workshop/DynamicTrading (`c176e171`).
+**Cross-repo primary for new extension:** /home/psychopatz/Zomboid/Workshop/psychopatzCore (`Docs/Jobs/UnifiedVanillaWorldEventSemantics/`)
+**Participants:** /home/psychopatz/Zomboid/Workshop/psychopatzCore, /home/psychopatz/Zomboid/Workshop/DynamicTrading.
 **Branch policy:** existing main only; no new branch.
-**Current ProjectHoomans HEAD:** 765345614 (pre-D8 commit)
-**Current psychopatzCore HEAD:** cf8a1d4
-**Current DynamicTrading HEAD:** c176e171
-**Current phase:** D9 — User-owned native Project Zomboid SP/MP acceptance.
-**Next Chunk:** User native SP/MP verification checklist (no further autonomous developer edits until user feedback).
+**Re-audit heads:** ProjectHoomans `7847ccfb833425a2553bd9602aebaf958f76d7ed`; psychopatzCore `fecc800b05d0874e94a8600833880a77cd967e8d`; DynamicTrading `feee4da8fe4cab1ff4dcc1066ef1d4548b5728bb`.
+**Current phase:** Cross-repo prerequisite/extension — Core `UnifiedVanillaWorldEventSemantics` V0.
+**Next Chunk:** Do not add another Hoomans event authority. Let the Core job establish exhaustive vanilla-event coverage, shared location/event persistence and capture contracts first; then execute its V7 Hoomans branch-depth/knowledge adoption.
+
+## 2026-11-22 re-audit correction and superseding extension
+
+The previous D8 completion statement was too strong for the newly audited/current scope. Current Core hygiene audit evidence reports remaining semantic-family cleanup findings, and the user expanded the parent objective to require materially deeper branch/outcome variety plus broad vanilla Project Zomboid event coverage. The previously accepted architecture/tests remain useful baseline evidence; they are not deleted or re-litigated wholesale.
+
+The reusable event portion is now owned by `psychopatzCore/Docs/Jobs/UnifiedVanillaWorldEventSemantics/` so Hoomans and DynamicTrading consume one Core stream. The extension requires:
+- initial global world events limited to authoritative vanilla water/electricity cutoff;
+- regional/local helicopter episodes with coarse location history and indoor/outdoor epistemic differences;
+- all authoritative vanilla ambient/meta events covered through the shared pipeline where feasible;
+- exhaustive installed-build coverage of randomized building/dead-survivor/vehicle/zone/ranch stories, including ambulance crash and analogous location-grounded discoveries;
+- reuse of the shared location system and bounded WorldKnowledge refs rather than per-NPC duplicated event data;
+- deeper Hoomans semantic branching using grounded constraints and numeric utility, not giant static trees.
+
+D9 user acceptance resumes only after the Core job's V0–V8 developer objective is accepted.
 
 ## Completed phases
 

@@ -254,6 +254,16 @@ Performance acceptance explicitly preserves the recent lag fixes:
 
 Gate: D0–D8 developer objective complete with measured regression evidence.
 
+## Cross-repo extension — Unified Vanilla World Event Semantics
+
+A 2026-11-22 re-audit and user scope expansion supersedes the assumption that D5A world events are primarily Hoomans-generated. The reusable world-event authority is now a dedicated Core-owned goal at `psychopatzCore/Docs/Jobs/UnifiedVanillaWorldEventSemantics/`.
+
+This thematic roadmap remains authoritative for Hoomans dialogue/social adoption, but its world-event work now depends on the Core goal. Required changes include exhaustive installed-build vanilla-event coverage, shared location-aware discovery facts (including ambulance/randomized-world stories), persistent bounded scoped-event lifecycle, helicopter regional/indoor-outdoor provenance, and broader live meta-event ingestion. Initial global events are restricted to authoritative vanilla water/electricity cutoff.
+
+The Core goal's V7 phase owns the additional Hoomans branch-depth/variety pass: richer reusable semantic affordances, more contextual hard constraints, numeric utility, multiple semantic outcomes, epistemic corroboration/contradiction/source questioning, multi-actor interjections and increased realization variety while preserving existing caps.
+
+Do not build a second Hoomans-only vanilla event ledger, location store, or event poller. D9 is deferred until Core V0–V8 closes.
+
 ## D9 — User native SP/MP acceptance
 
 User verifies thematic coherence, NPC uniqueness from seeded personality, readable group scenes, truthful contextual/special branches, natural transient beats, InlineChat/full-conversation continuity, and no lag/save-growth regression.
