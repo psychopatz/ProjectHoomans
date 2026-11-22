@@ -332,6 +332,50 @@ function Adapter.RenderFact(fact, reference, options)
         end
         return "I saw a helicopter pass overhead."
     end
+    if fact.kind == "ambient.gunfire" then
+        local locLabel = payload.locationLabel or (type(fact.location) == "table" and fact.location.name) or "nearby"
+        local weapon = payload.weaponClass and tostring(payload.weaponClass) or "gunfire"
+        if epistemic == "uncertain" then
+            return "I heard rumors of " .. weapon .. " shots near " .. tostring(locLabel) .. "."
+        end
+        if provenance == "witnessed" then
+            return "I witnessed " .. weapon .. " gunfire erupt near " .. tostring(locLabel) .. "."
+        end
+        return "I heard " .. weapon .. " shots echo near " .. tostring(locLabel) .. "."
+    end
+    if fact.kind == "ambient.scream" then
+        local locLabel = payload.locationLabel or (type(fact.location) == "table" and fact.location.name) or "nearby"
+        if epistemic == "uncertain" then
+            return "Someone told me they heard a scream near " .. tostring(locLabel) .. "."
+        end
+        return "I heard someone screaming near " .. tostring(locLabel) .. "."
+    end
+    if fact.kind == "world.house_alarm" then
+        local locLabel = payload.locationLabel or (type(fact.location) == "table" and fact.location.name) or "nearby"
+        if epistemic == "uncertain" then
+            return "Word is a house alarm went off near " .. tostring(locLabel) .. "."
+        end
+        return "A building alarm started blaring near " .. tostring(locLabel) .. "."
+    end
+    if fact.kind == "weather.severe_storm" then
+        local stormKind = tostring(payload.stormKind or "storm")
+        local locLabel = payload.locationLabel or "the region"
+        if provenance == "radio" then
+            return "Radio reports warned of severe " .. stormKind .. " conditions around " .. tostring(locLabel) .. "."
+        end
+        return "Severe " .. stormKind .. " weather is sweeping across " .. tostring(locLabel) .. "."
+    end
+    if fact.kind == "world.fire_hazard" then
+        local locLabel = payload.locationLabel or (type(fact.location) == "table" and fact.location.name) or "nearby"
+        if epistemic == "uncertain" then
+            return "Someone reported a fire near " .. tostring(locLabel) .. "."
+        end
+        return "A fire broke out near " .. tostring(locLabel) .. "."
+    end
+    if fact.kind == "media.broadcast" then
+        local channel = tostring(payload.channelID or "emergency radio")
+        return "I caught a radio broadcast over " .. channel .. "."
+    end
     return nil
 end
 

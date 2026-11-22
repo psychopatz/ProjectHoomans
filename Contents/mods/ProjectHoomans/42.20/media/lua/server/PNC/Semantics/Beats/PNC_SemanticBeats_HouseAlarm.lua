@@ -56,6 +56,10 @@ function Beats.OnHouseAlarmSignal(x, y, z, now)
     if not markAndCheckBucket(nx, ny, now) then
         return false, "alarm_deduped"
     end
+    local coreAdapter = PsychopatzCore and PsychopatzCore.WorldEventAdapter or nil
+    if type(coreAdapter) == "table" and type(coreAdapter.OnAmbientSound) == "function" then
+        coreAdapter.OnAmbientSound("burglar2", nx, ny)
+    end
     local anchor, partner = nil, nil
     if type(Beats.FindCalmSpeakerNearPoint) == "function" then
         anchor, partner = Beats.FindCalmSpeakerNearPoint(nx, ny, ALARM_HEAR_RADIUS, now)

@@ -343,4 +343,88 @@ function Adapter.ObserveHelicopterEpisode(nowHours, opts)
     return res, status
 end
 
+local LIVE_EVENT_PERCEPTION_RADII = {
+    ambient_gunfire = 450,
+    ambient_scream = 320,
+    world_house_alarm = 400,
+    world_fire_hazard = 120,
+}
+
+function Adapter.SyncLiveEventPerception(x, y, factID, radius, nowHours, opts)
+    opts = type(opts) == "table" and opts or {}
+    local core = Adapter.Core
+    if not core or not factID or x == nil or y == nil then return 0 end
+    local spatial = opts.spatial or PNC.SpatialIndex
+    if type(spatial) ~= "table" then return 0 end
+
+    local list = nil
+    local rad = tonumber(radius) or 320
+    if type(spatial.QueryNPCs) == "function" then
+        list = spatial.QueryNPCs(x, y, rad)
+    elseif type(spatial.QueryActors) == "function" then
+        local area = spatial.QueryActors(x, y, rad)
+        list = type(area) == "table" and area.npcs or nil
+    end
+    if type(list) ~= "table" then return 0 end
+
+    local acquired = 0
+    local maxBatch = math.min(#list, tonumber(opts.maxActors) or 24)
+    for i = 1, maxBatch do
+        local rec = list[i]
+        local actorID = type(rec) == "table" and rec.alive ~= false and Adapter.ActorID(rec) or nil
+        if actorID then
+            local indoors = Adapter.IsRecordIndoors(rec, opts)
+            local existing = core.ActorKnowledge.Get(core.KnowledgeState, actorID, factID)
+            if not existing then
+                local provenance = indoors and "environmental" or "witnessed"
+                local ok = core.Acquire(actorID, factID, {
+                    authorized = true,
+                    provenance = provenance,
+                    source = indoors and "ambient_sound" or "ambient_nearby",
+                    acquisitionPath = indoors and "indoor_audio" or "outdoor_nearby",
+                    confidence = indoors and 0.70 or 0.90,
+                    learnedAt = tonumber(nowHours) or now(),
+                })
+                if ok then acquired = acquired + 1 end
+            end
+        end
+    end
+    return acquired
+end
+
+function Adapter.OnCoreWorldEventRegistered(ev)
+    if type(ev) ~= "table" then return 0 end
+    local radius = LIVE_EVENT_PERCEPTION_RADII[tostring(ev.eventType or "")]
+    if not radius then return 0 end
+    local meta = type(ev.metadata) == "table" and ev.metadata or {}
+    local semType = tostring(meta.semanticType or "")
+    local x, y = tonumber(meta.x), tonumber(meta.y)
+    if x == nil or y == nil then return 0 end
+    local factID = meta.factID
+    if not factID and semType ~= "" then
+        local core = Adapter.Core
+        if core and core.Ledger then
+            local matches = core.Ledger.Query(core.LedgerState, { kind = semType, max = 4 })
+            local latestFact = matches and matches[1] or nil
+            factID = latestFact and latestFact.factID or nil
+        end
+    end
+    if not factID then return 0 end
+    return Adapter.SyncLiveEventPerception(x, y, factID, radius, ev.startsAt)
+end
+
+function Adapter.InstallCoreEventPerceptionHook()
+    local _ = PsychopatzCore and PsychopatzCore.WorldEventAdapter
+    local scoped = PsychopatzCore and PsychopatzCore.ScopedWorldEvents or nil
+    if type(scoped) ~= "table" or type(scoped.OnEventRegistered) ~= "function" then
+        return false
+    end
+    scoped.OnEventRegistered(function(ev)
+        Adapter.OnCoreWorldEventRegistered(ev)
+    end, { id = "hoomans_core_live_event_perception" })
+    return true
+end
+
+Adapter.InstallCoreEventPerceptionHook()
+
 return Adapter
