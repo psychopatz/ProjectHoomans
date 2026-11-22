@@ -212,6 +212,13 @@ function Persistence.SerializeRecord(record)
         colonistDeparture = CompanionRecordRepository.NormalizeDeparture(
             record.colonistDeparture
         ),
+        survivalStartHours = record.survivalStartHours ~= nil
+            and Codec.normalizeNumber(record.survivalStartHours, 0) or nil,
+        lastMilestoneHours = record.lastMilestoneHours ~= nil
+            and Codec.normalizeNumber(record.lastMilestoneHours, 0) or nil,
+        milestoneCount = record.milestoneCount ~= nil and math.max(0,
+            math.floor(Codec.normalizeNumber(record.milestoneCount, 0)))
+            or nil,
         affiliation = FactionTypes
             and FactionTypes.NormalizeAffiliation(
                 record.affiliation

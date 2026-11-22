@@ -39,7 +39,73 @@ local function factTopic(ir, fact)
     return value ~= "" and value or "that"
 end
 
+local CORROBORATING_PROVENANCE = {
+    experienced = true,
+    witnessed = true,
+    public = true,
+    faction = true,
+    environmental = true,
+}
+
+local UNCERTAIN_PROVENANCE = {
+    radio = true,
+    told = true,
+    inferred = true,
+}
+
+local WORLD_KNOWLEDGE_PROVENANCE = {
+    experienced = true,
+    witnessed = true,
+    public = true,
+    faction = true,
+    environmental = true,
+    radio = true,
+    told = true,
+    inferred = true,
+}
+
+local function resolveEpistemic(fact)
+    if type(fact) ~= "table" then return "unknown" end
+    local wk = PNC.WorldKnowledge
+    local coreWKG = PsychopatzCore and PsychopatzCore.WorldKnowledge
+    local ref = type(fact.reference) == "table" and fact.reference or fact
+    if wk and type(wk.ResolveEpistemicStatus) == "function" then
+        return wk.ResolveEpistemicStatus(fact, ref)
+    end
+    if coreWKG and type(coreWKG.ResolveEpistemicStatus) == "function" then
+        return coreWKG.ResolveEpistemicStatus(fact, ref)
+    end
+    if fact.corroborated == true or CORROBORATING_PROVENANCE[fact.provenance]
+        or (ref and (ref.corroborated == true or CORROBORATING_PROVENANCE[ref.provenance]))
+    then
+        return "known"
+    end
+    if UNCERTAIN_PROVENANCE[fact.provenance] or (ref and UNCERTAIN_PROVENANCE[ref.provenance]) then
+        return "uncertain"
+    end
+    return "unknown"
+end
+
+local function isWorldKnowledgeFact(fact)
+    if type(fact) ~= "table" then return false end
+    if fact.epistemicStatus ~= nil or fact.factID ~= nil or type(fact.reference) == "table" then
+        return true
+    end
+    return WORLD_KNOWLEDGE_PROVENANCE[fact.provenance] == true
+end
+
 local function factResponse(templateID, fallback, poolID, fact, topic, refs)
+    local uncertainty = "unknown"
+    if type(fact) == "table" then
+        if fact.epistemicStatus == "known" or fact.status == "known" then
+            uncertainty = "known"
+        elseif fact.epistemicStatus == "uncertain"
+            or fact.status == "uncertain"
+            or fact.status == "suspected"
+        then
+            uncertainty = fact.epistemicStatus == "uncertain" and "uncertain" or fact.status
+        end
+    end
     return {
         templateID = templateID,
         fallback = fallback,
@@ -47,8 +113,7 @@ local function factResponse(templateID, fallback, poolID, fact, topic, refs)
         dialogueAct = "FACT_ANSWER",
         topic = topic,
         groundedFactRefs = refs or {},
-        uncertainty = fact and fact.status == "known" and "known"
-            or "unknown",
+        uncertainty = uncertainty,
         tone = "direct",
         selectionSource = "fact_provider",
         referenceTopic = topic,
@@ -115,21 +180,92 @@ local function resolveHealthStateQuestion(ir, state, context)
     )
 end
 
+local function worldKnowledgeFactFromContext(topic, context)
+    if type(context) ~= "table" then return nil end
+    local wk = PNC.WorldKnowledge
+    if wk and type(wk.QueryActorFact) == "function"
+        and type(context.npcRecord) == "table"
+    then
+        local queried = wk.QueryActorFact(context.npcRecord, { topic = topic })
+        if type(queried) == "table" and queried.fact then
+            return {
+                status = queried.status,
+                epistemicStatus = queried.epistemicStatus,
+                provenance = queried.provenance,
+                factID = queried.fact.factID,
+                reference = queried.reference,
+                value = queried.epistemicStatus ~= "unknown",
+                answer = queried.summary,
+                topic = topic,
+            }
+        end
+    end
+    local wkContext = type(context.worldKnowledge) == "table"
+        and context.worldKnowledge or nil
+    local candidates = wkContext and wkContext.candidates or nil
+    if type(candidates) == "table" then
+        local wanted = string.lower(tostring(topic or ""))
+        for i = 1, #candidates do
+            local cand = candidates[i]
+            if type(cand) == "table" and cand.factID then
+                local fid = string.lower(tostring(cand.factID))
+                if wanted == "" or string.find(fid, wanted, 1, true) then
+                    return {
+                        epistemicStatus = cand.epistemicStatus,
+                        provenance = cand.provenance,
+                        factID = cand.factID,
+                        reference = { provenance = cand.provenance },
+                        value = cand.epistemicStatus ~= "unknown",
+                        topic = topic,
+                    }
+                end
+            end
+        end
+    end
+    return nil
+end
+
 local function resolveKnowledgeQuestion(ir, state, context)
     local fact = factFor(ir)
     local topic = factTopic(ir, fact)
-    if fact and fact.status == "known" and fact.value == true then
-        local answer = tostring(fact.answer or "")
-        local fallback = "I know about " .. topic .. "."
-        if answer ~= "" then fallback = fallback .. " " .. answer end
+    if not fact then
+        fact = worldKnowledgeFactFromContext(topic, context)
+    end
+
+    local epistemic = "unknown"
+    if type(fact) == "table" then
+        if isWorldKnowledgeFact(fact) then
+            epistemic = resolveEpistemic(fact)
+            if fact.value == false then epistemic = "unknown" end
+        elseif fact.status == "known" and fact.value == true then
+            epistemic = "known"
+        elseif fact.status == "suspected" or fact.status == "uncertain" then
+            epistemic = "uncertain"
+        end
+    end
+
+    local answer = tostring(fact and (fact.answer or fact.summary) or "")
+    local refID = (fact and fact.factID) or "npc.knowledge.topic"
+    local provenance = fact and (fact.provenance
+        or (type(fact.reference) == "table" and fact.reference.provenance))
+        or nil
+
+    if epistemic == "known" then
+        local prefix = (provenance == "experienced" or provenance == "witnessed")
+            and ("I saw it myself regarding " .. topic .. ".")
+            or ("I know about " .. topic .. ".")
+        local fallback = answer ~= "" and (prefix .. " " .. answer) or prefix
         local response = factResponse(
             "question.knowledge.known",
             fallback,
             "semantic.question.knowledge",
             fact,
             "KNOWLEDGE",
-            { "npc.knowledge.topic" }
+            { refID }
         )
+        response.uncertainty = "known"
+        response.epistemicStatus = "known"
+        response.provenance = provenance
         response.args = copyArgs({
             topic = answer ~= ""
                 and (topic .. ". " .. string.gsub(answer, "[%s%.!?]+$", ""))
@@ -141,13 +277,40 @@ local function resolveKnowledgeQuestion(ir, state, context)
         response.referenceTopic = topic
         return response
     end
+
+    if epistemic == "uncertain" then
+        local fallback = "I only heard a rumor about " .. topic
+            .. ", so I can't confirm it."
+        if answer ~= "" then fallback = fallback .. " " .. answer end
+        local response = factResponse(
+            "question.knowledge.uncertain",
+            fallback,
+            "semantic.question.knowledge",
+            fact,
+            "KNOWLEDGE",
+            { refID }
+        )
+        response.uncertainty = "uncertain"
+        response.epistemicStatus = "uncertain"
+        response.provenance = provenance
+        response.tone = "cautious"
+        response.args = copyArgs({
+            topic = topic,
+            ["target.name"] = topic,
+        })
+        response.referenceTopic = topic
+        return response
+    end
+
     local response = factResponse(
         "question.knowledge.unknown",
         "I don't have reliable information about " .. topic .. ".",
         "semantic.question.knowledge",
-        fact,
+        { status = "unknown" },
         "KNOWLEDGE"
     )
+    response.uncertainty = "unknown"
+    response.epistemicStatus = "unknown"
     response.args = copyArgs({
         topic = topic,
         ["target.name"] = topic,

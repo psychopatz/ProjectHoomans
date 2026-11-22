@@ -211,25 +211,151 @@ local function localized(key, fallback, language)
     return fallback
 end
 
+local CORROBORATING_PROVENANCE = {
+    experienced = true,
+    witnessed = true,
+    public = true,
+    faction = true,
+    environmental = true,
+}
+
+local UNCERTAIN_PROVENANCE = {
+    radio = true,
+    told = true,
+    inferred = true,
+}
+
+function Adapter.ResolveEpistemicStatus(fact, reference)
+    if CoreWKG and type(CoreWKG.ResolveEpistemicStatus) == "function" then
+        return CoreWKG.ResolveEpistemicStatus(fact, reference)
+    end
+    local f = type(fact) == "table" and fact or nil
+    local r = type(reference) == "table" and reference or nil
+    if not f and not r then return "unknown" end
+    if (f and (f.corroborated == true or CORROBORATING_PROVENANCE[f.provenance]))
+        or (r and (r.corroborated == true or CORROBORATING_PROVENANCE[r.provenance]))
+    then
+        return "known"
+    end
+    local fp = f and f.provenance or nil
+    local rp = r and r.provenance or nil
+    if UNCERTAIN_PROVENANCE[fp] or UNCERTAIN_PROVENANCE[rp] then
+        return "uncertain"
+    end
+    return "unknown"
+end
+
 function Adapter.RenderFact(fact, reference, options)
-    local provenance = reference and reference.provenance or "unknown"
+    if type(fact) ~= "table" then return nil end
+    local epistemic = Adapter.ResolveEpistemicStatus(fact, reference)
+    if epistemic == "unknown" then return nil end
+    local provenance = reference and reference.provenance or fact.provenance or "unknown"
     local language = options and options.language
+    local payload = type(fact.payload) == "table" and fact.payload or {}
     if fact.kind == "zombie.pressure" then
-        if provenance == "experienced" or provenance == "witnessed" then
+        if epistemic == "known" and (provenance == "experienced" or provenance == "witnessed") then
             return localized("UI_PNC_WKG_ZombieObserved", "I saw a large group of zombies nearby.", language)
         end
         return localized("UI_PNC_WKG_ZombieHeard", "I heard there is heavy zombie pressure nearby.", language)
     end
     if fact.kind == "npc.death" then
-        if provenance == "told" or provenance == "radio" then
+        if epistemic == "uncertain" or provenance == "told" or provenance == "radio" then
             return localized("UI_PNC_WKG_Death", "I heard someone died, but I cannot confirm every detail.", language)
         end
         return localized("UI_PNC_WKG_Death", "Someone died; I do not know every detail.", language)
     end
     if fact.kind == "faction.status" or fact.kind == "faction.incident" then
+        if epistemic == "uncertain" then
+            return "I heard rumors about a faction's situation, though I can't confirm it."
+        end
         return localized("UI_PNC_WKG_Faction", "I have news about a faction's situation.", language)
     end
+    if fact.kind == "actor.milestone" then
+        local label = tostring(payload.label or payload.milestoneID or "a survival milestone")
+        local subjectName = type(fact.subject) == "table" and tostring(fact.subject.name or "someone") or "someone"
+        if epistemic == "uncertain" then
+            return "I heard " .. subjectName .. " reached " .. label .. ", though I wasn't there."
+        end
+        if provenance == "experienced" or provenance == "witnessed" then
+            return tostring(payload.summary or ("I've made it to " .. label .. "."))
+        end
+        return subjectName .. " reached " .. label .. "."
+    end
+    if fact.kind == "world.event" then
+        local label = tostring(payload.label or payload.eventType or "a world event")
+        if epistemic == "uncertain" then
+            return "I heard a rumor about " .. label .. ", though I haven't seen proof myself."
+        end
+        return tostring(payload.summary or ("Confirmed reports of " .. label .. "."))
+    end
+    if fact.kind == "world.state" then
+        local domain = tostring(payload.domain or "conditions")
+        local status = tostring(payload.status or "changed")
+        if epistemic == "uncertain" then
+            return "Word going around is that " .. domain .. " is " .. status .. ", though I can't confirm it."
+        end
+        return "I know for sure that " .. domain .. " is " .. status .. "."
+    end
     return nil
+end
+
+function Adapter.QueryActorFact(record, querySpec, nowHours)
+    if not CoreWKG or not record then
+        return { status = "unknown", epistemicStatus = "unknown" }
+    end
+    local id = actorID(record)
+    if not id then
+        return { status = "unknown", epistemicStatus = "unknown" }
+    end
+    querySpec = type(querySpec) == "table" and querySpec or {}
+    local selected = CoreWKG.ActorKnowledge.Select(
+        CoreWKG.KnowledgeState, CoreWKG.LedgerState, id, {
+            max = 32,
+            now = nowHours,
+            kind = querySpec.kind,
+        }
+    )
+    local wantedFactID = querySpec.factID and tostring(querySpec.factID) or nil
+    local wantedTopic = querySpec.topic and string.lower(tostring(querySpec.topic)) or nil
+    for i = 1, #selected do
+        local item = selected[i]
+        local fact = item and item.fact
+        local ref = item and item.reference
+        if fact and ref then
+            local payload = type(fact.payload) == "table" and fact.payload or {}
+            local matches = false
+            if wantedFactID and fact.factID == wantedFactID then
+                matches = true
+            elseif wantedTopic then
+                local subjID = type(fact.subject) == "table" and tostring(fact.subject.id or "") or tostring(fact.subject or "")
+                local subjName = type(fact.subject) == "table" and tostring(fact.subject.name or "") or ""
+                if string.lower(tostring(fact.kind or "")) == wantedTopic
+                    or string.lower(subjID) == wantedTopic
+                    or string.lower(subjName) == wantedTopic
+                    or string.lower(tostring(payload.eventType or "")) == wantedTopic
+                    or string.lower(tostring(payload.milestoneID or "")) == wantedTopic
+                    or string.lower(tostring(payload.label or "")) == wantedTopic
+                then
+                    matches = true
+                end
+            elseif not wantedFactID then
+                matches = true
+            end
+            if matches then
+                local epistemic = Adapter.ResolveEpistemicStatus(fact, ref)
+                return {
+                    status = epistemic == "known" and "known"
+                        or (epistemic == "uncertain" and "suspected" or "unknown"),
+                    epistemicStatus = epistemic,
+                    provenance = ref.provenance,
+                    fact = fact,
+                    reference = ref,
+                    summary = Adapter.RenderFact(fact, ref, querySpec),
+                }
+            end
+        end
+    end
+    return { status = "unknown", epistemicStatus = "unknown" }
 end
 
 function Adapter.BuildConversationContext(record, options)

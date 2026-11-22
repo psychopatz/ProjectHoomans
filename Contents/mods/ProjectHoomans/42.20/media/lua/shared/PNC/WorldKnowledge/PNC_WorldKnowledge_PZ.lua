@@ -186,6 +186,16 @@ function Adapter.ObserveAuthoritativeWorldState(readers, options)
     return current, facts
 end
 
+function Adapter.CheckEpistemicStatus(record, factID)
+    local core = Adapter.Core
+    local id = Adapter.ActorID(record)
+    if not core or not id or not factID then return "unknown", nil, nil end
+    local ref = core.ActorKnowledge.Get(core.KnowledgeState, id, factID)
+    local fact = core.Ledger.Get(core.LedgerState, factID)
+    if not ref or not fact then return "unknown", nil, nil end
+    return core.ResolveEpistemicStatus(fact, ref), fact, ref
+end
+
 function Adapter.AcquirePublicFact(record, factID, options)
     options = type(options) == "table" and options or {}
     if options.authorized ~= true then return nil, "public_authorization_required" end

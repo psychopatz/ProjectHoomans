@@ -273,6 +273,33 @@ function Director.Initialize(force)
         end,
         { budget = Config.DIRECTOR_JOB_BUDGET,
             startAt = now + Config.RECONCILE_INTERVAL_HOURS })
+    Scheduler.RegisterJob("ScopedWorldEvents",
+        Config.WORLD_EVENT_INTERVAL_HOURS or 6,
+        function(at, budget)
+            local eventDirector = PNC.ScopedWorldEventDirector
+            if Director.Paused or not eventDirector
+                or not eventDirector.Pump
+            then
+                return 0
+            end
+            return eventDirector.Pump(at, budget)
+        end,
+        { budget = 1,
+            startAt = now + (Config.WORLD_EVENT_INTERVAL_HOURS or 6) })
+    Scheduler.RegisterJob("ChronologyMilestones",
+        Config.CHRONOLOGY_INTERVAL_HOURS or 6,
+        function(at, budget)
+            local milestones = PNC.Semantics
+                and PNC.Semantics.ChronologyMilestones
+            if Director.Paused or not milestones
+                or not milestones.PumpBatch
+            then
+                return 0
+            end
+            return milestones.PumpBatch(at, budget)
+        end,
+        { budget = Config.CHRONOLOGY_PUMP_BUDGET or 8,
+            startAt = now + (Config.CHRONOLOGY_INTERVAL_HOURS or 6) })
     Director.Initialized = true
     return true, "initialized"
 end

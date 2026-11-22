@@ -1,14 +1,14 @@
 # Progress — Thematic Semantic Dialogue Expansion
 
-**Status:** D4 COMPLETE; proceeding into D5 & D5A.
+**Status:** D5 & D5A COMPLETE; proceeding into D6.
 **Primary repository:** /home/psychopatz/Zomboid/Workshop/ProjectHoomans
 **Participants:** /home/psychopatz/Zomboid/Workshop/psychopatzCore when reusable ConvoEngine/world-event contracts change; /home/psychopatz/Zomboid/Workshop/DynamicTrading when D5A economic world-event projection requires DTCommon/DTHoomans changes.
 **Branch policy:** existing main only; no new branch.
-**Current ProjectHoomans HEAD:** 337f1ed8d (pre-D4 commit)
-**Current psychopatzCore HEAD:** 674343e
-**Current DynamicTrading HEAD:** 3d7c2785
-**Current phase:** D5 & D5A — Grounded constraints/provenance, chronology milestones, scoped world events, demeanor integration, and DynamicTrading market projection.
-**Next Chunk:** Implement Core bounded `PsychopatzScopedWorldEvents` + community `regionID` + `WorldKnowledge` provenance/epistemic helpers, PH chronology milestones + deterministic world-event director + causal Needs/Scavenge/GroupGenerator hooks + demeanor integration, and DT one-way `hoomans-world-event:` MarketEvent adapter + `caravanRisk` modifier.
+**Current ProjectHoomans HEAD:** 91ee62cd9 (pre-D5/D5A commit)
+**Current psychopatzCore HEAD:** b7b5e59
+**Current DynamicTrading HEAD:** 44bc24ef
+**Current phase:** D6 — Declarative transient Beat migration + world/voice normalization.
+**Next Chunk:** Migrate remaining hard-coded Lua Beat/Reaction pools & role matrices into canonical declarative ConvoEngine Beat/Dialogue definitions (including chronology milestone & world-event beats) and run the corpus-level 1990s Kentucky survivor voice normalization pass with EN/TL parity.
 
 ## Completed phases
 
@@ -17,6 +17,10 @@
 - **D2 (CODE_VERIFIED, TEST_VERIFIED):** Implemented `PNC.ConvoEngine.DispositionProjection` (`baseDisposition`, 6-axis transient `temporaryDemeanor`, `effectiveDisposition`, unified `ResolveStyle`) and converged `ActorAdapter_ProjectHoomans`, `ChoicePolicy`, `GeneratedAffordanceProvider`, `AffordanceResponder`, `PNC_SemanticCombatReactionProfile`, `PNC_SemanticBeatContext`, `SpeechStyleContext`, and `PNC_ConversationRules_Conditions` onto the single resolved numeric disposition projection (eliminating trait double-counting and divergent classifiers, retaining capability-only trait checks with documented rationale). Verified 0 Kahlua errors/warnings and 20+ Lua smoke suites including `pnc_unified_disposition_projection_smoke.lua` and `pnc_semantic_combat_reaction_profile_smoke.lua`.
 - **D3 (CODE_VERIFIED, TEST_VERIFIED):** Isolated `lane="scene"` (`sceneID`, `SCENE_PRIORITY_FLOOR=80`) from transient `lane="beat"` (`threadID`, bounded `MAX_ACTIVE_THREADS=24`, TTL expiry) in Core `PsychopatzSocialFlavorClient.lua` (`3d0292a`, single queue + TTS preserved); extracted domain-neutral `PNC_SemanticSpeechTransport.lua` in ProjectHoomans; refactored `CombatTargetCallouts_Delivery` into a combat adopter; decoupled `DialogueBeats` and `environment.weather_rain` from combat delivery/event IDs; added bounded thread cleanup (`MAX_THREADS=32`), actor-unavailable cancellation, and `HandoffToScene` without ID collision; fixed interactive Scene priority floor in `ScenePresentation`/`VoiceGateway`. Verified 0 Kahlua errors/warnings and 12 Core + PH smoke suites passing.
 - **D4 (CODE_VERIFIED, TEST_VERIFIED):** Authored 8 actor-agnostic thematic interactive dialogue families under `dialogue/thematic_interactive/` (`social.greeting.first_contact`, `wellbeing.needs.checkin`, `social.identity.personal_history`, `knowledge.gossip.exchange`, `colony.work.status_exchange`, `travel.excursion.plan_exchange`, `combat.aftermath.debrief_exchange`, `social.conflict.mediate_exchange`) with bounded 4–6 node `metadata.flow` graphs, `branchOffers`, `onUnrelated="suspend"`, typed slots, separated `stance` vs `outcome`, fail-closed `statePolicy`, and 100% EN/TL translation parity in grounded 1990s Kentucky survivor voice. Reconciled CodeBuilder (`ok=true, clean=true`, 483 desired artifacts, 0 drift) and verified `tests/pnc_thematic_interactive_branching_smoke.lua` passing.
+- **D5 & D5A (CODE_VERIFIED, TEST_VERIFIED):**
+  - `psychopatzCore` (`b7b5e59`): Added bounded `PsychopatzScopedWorldEvents` registry (`MAX_ACTIVE_EVENTS=32`, `MAX_HISTORY=64`, scope-indexed `QueryActive`/`AggregateEffects`/`PruneExpired`, `OnEventRegistered`/`OnEventExpired` with loop-guard `excludeSource`), `regionID` on `SurvivorWorldTypesCommunity`, and `ResolveEpistemicStatus` (`known`/`uncertain`/`unknown`) across `WorldKnowledge` (10 Core smoke suites + 0 Kahlua warnings).
+  - `DynamicTrading` (`b02ff50b`, `44bc24ef`): Added `regionID` bridge in `DTCommon_CoreSettlementDirectoryProvider`, loop-free one-way `DTHoomans_WorldEventProjection` (`hoomans-world-event:` prefix into `DTCommon.MarketEvents`), and bounded `caravanRisk` penalty in `DTHoomans_CommercialMobility` (24/24 DT tests + `dt_world_event_projection_smoke.lua` + 0 Kahlua warnings).
+  - `ProjectHoomans`: Added data-driven `PNC_ChronologyMilestones` (scalar watermarks, coarse bounded pump, `experienced` facts, Beat delivery), deterministic `PNC_ScopedWorldEventDirector` (`worldSeed+scope+timeBucket`, `food_crisis`/`agricultural_surplus`/`bandit_bonanza`/`severe_weather`/`epidemic`/`trade_disruption`, transient demeanor projection without mutating `social.personality`), causal simulation hooks (`PNC_GroupNeeds_Update`, `PNC_AbstractScavengeResolver`, `PNC_GroupGenerator_Selection`), and `WorldKnowledge` epistemic gating (14 PH smoke suites + 0 Kahlua warnings).
 
 ## Re-audit findings
 

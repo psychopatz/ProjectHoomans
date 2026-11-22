@@ -74,6 +74,13 @@ function Types.NewRecord(definition)
                 generatedID
             ) or nil,
         followerAbandonment = nil,
+        survivalStartHours = def.survivalStartHours ~= nil
+            and tonumber(def.survivalStartHours) or nil,
+        lastMilestoneHours = def.lastMilestoneHours ~= nil
+            and tonumber(def.lastMilestoneHours) or nil,
+        milestoneCount = def.milestoneCount ~= nil
+            and math.max(0, math.floor(tonumber(def.milestoneCount) or 0))
+            or nil,
         health = {
             current = def.hpMax,
             max = def.hpMax,

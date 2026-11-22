@@ -147,6 +147,17 @@ end
 function Repository.RestoreMarkers(record, raw)
     record.followerAbandonment = Repository.NormalizeAbandonment(raw.followerAbandonment)
     record.colonistDeparture = Repository.NormalizeDeparture(raw.colonistDeparture)
+    if raw.survivalStartHours ~= nil then
+        record.survivalStartHours = Codec.normalizeNumber(raw.survivalStartHours, 0)
+    end
+    if raw.lastMilestoneHours ~= nil then
+        record.lastMilestoneHours = Codec.normalizeNumber(raw.lastMilestoneHours, 0)
+    end
+    if raw.milestoneCount ~= nil then
+        record.milestoneCount = math.max(0, math.floor(
+            Codec.normalizeNumber(raw.milestoneCount, 0)
+        ))
+    end
 end
 
 function Repository.IsFollowing(record)

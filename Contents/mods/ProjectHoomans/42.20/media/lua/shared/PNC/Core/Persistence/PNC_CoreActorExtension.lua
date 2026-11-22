@@ -349,6 +349,21 @@ function Extension.Encode(record, actor)
     put("colonistDeparture", CompanionRecordRepository.NormalizeDeparture(
         record.colonistDeparture
     ))
+    if record.survivalStartHours ~= nil then
+        put("survivalStartHours", Codec.normalizeNumber(
+            record.survivalStartHours, 0
+        ))
+    end
+    if record.lastMilestoneHours ~= nil then
+        put("lastMilestoneHours", Codec.normalizeNumber(
+            record.lastMilestoneHours, 0
+        ))
+    end
+    if record.milestoneCount ~= nil then
+        put("milestoneCount", math.max(0, math.floor(
+            Codec.normalizeNumber(record.milestoneCount, 0)
+        )))
+    end
     put("generation", sanitizeGeneration(record.generation))
 
     local ax, ay, az = actorPoint(actor)

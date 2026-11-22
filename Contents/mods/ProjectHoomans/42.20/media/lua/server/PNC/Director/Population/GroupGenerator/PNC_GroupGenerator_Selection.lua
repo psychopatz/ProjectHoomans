@@ -18,15 +18,38 @@ function H.CurrentComposition(sectorID)
     return counts
 end
 
-function Generator.ChooseArchetype(sectorID, worldAge, seed)
+local function hostileActivityMultiplier(sectorID, worldAge)
+    local director = PNC.ScopedWorldEventDirector
+    if director and type(director.AggregateEffectsForSector) == "function" then
+        local agg = director.AggregateEffectsForSector(sectorID, worldAge)
+        local mult = agg and agg.effects and tonumber(agg.effects.hostileActivityMultiplier)
+        if mult ~= nil then return math.max(0.1, mult) end
+    end
+    local swe = PsychopatzCore and PsychopatzCore.ScopedWorldEvents
+    if swe and type(swe.AggregateEffects) == "function" then
+        local agg = swe.AggregateEffects({ global = true }, worldAge)
+        local mult = agg and agg.effects and tonumber(agg.effects.hostileActivityMultiplier)
+        if mult ~= nil then return math.max(0.1, mult) end
+    end
+    return 1.0
+end
+
+function Generator.GetArchetypeWeights(sectorID, worldAge)
     local counts = H.CurrentComposition(sectorID)
     local age = PNC.PopulationBudget.WorldAgeWeights(worldAge)
+    local hostileMult = hostileActivityMultiplier(sectorID, worldAge)
     local weights = {}
     for archetype, weight in pairs(Config.GROUP_ARCHETYPE_WEIGHTS) do
         local ageWeight = archetype == "REFUGEE" and age.refugee or age.established
-        weights[archetype] = math.max(0.01, weight * ageWeight)
+        local eventMult = archetype == "LOOTER" and hostileMult or 1.0
+        weights[archetype] = math.max(0.01, weight * ageWeight * eventMult)
             / (1 + (counts[archetype] or 0) * 1.75)
     end
+    return weights
+end
+
+function Generator.ChooseArchetype(sectorID, worldAge, seed)
+    local weights = Generator.GetArchetypeWeights(sectorID, worldAge)
     return Sectors.WeightedChoice(weights, seed) or "WANDERER"
 end
 

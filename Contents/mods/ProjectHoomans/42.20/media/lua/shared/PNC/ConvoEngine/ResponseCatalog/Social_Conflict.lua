@@ -535,4 +535,23 @@ Catalog.Register("semantic.world.weather.rain", {
     },
 })
 
+Catalog.Register("semantic.world.chronology.milestone", {
+    variants = {
+        {
+            id = "semantic.world.chronology.milestone.survival",
+            templateID = "world.chronology.milestone.survival",
+            fallback = "Hard to believe we've made it this far—{milestone.label}.",
+            when = { combatReactionRole = "chronology_milestone" },
+            priority = 6,
+        },
+        {
+            id = "semantic.world.chronology.milestone.anniversary",
+            templateID = "world.chronology.milestone.anniversary",
+            fallback = "Days like this bring old memories back. Feels like an anniversary.",
+            when = { combatReactionRole = "chronology_anniversary" },
+            priority = 6,
+        },
+    },
+})
+
 return true

@@ -3,6 +3,8 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeR
 require "PNC/Semantics/PNC_SemanticCognitionEvidence"
 require "PNC/Semantics/PNC_SemanticEngineEvents_Server"
 require "PNC/Semantics/PNC_SemanticSpeechTransport"
+require "PNC/Director/PNC_ScopedWorldEventDirector"
+require "PNC/Semantics/PNC_ChronologyMilestones"
 require "PNC/Semantics/PNC_SemanticCombatReactionService"
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts"
 require "PNC/Semantics/PNC_SemanticPlayerAssaultReactions"

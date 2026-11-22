@@ -187,7 +187,9 @@ listing:close()
 -- AllowsServerCode(), and loaded by SemanticEventRuntime/DialogueBeats.
 -- PNC_SemanticSpeechTransport is server-only, guarded by AllowsServerCode(),
 -- and loaded by SemanticEventRuntime before CombatTargetCallouts and DialogueBeats.
-T.equal(#serverOnlyFiles, 1085,
+-- PNC_ChronologyMilestones and PNC_ScopedWorldEventDirector are server-only,
+-- guarded by AllowsServerCode(), and loaded by SemanticEventRuntime / Director.
+T.equal(#serverOnlyFiles, 1087,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

@@ -49,12 +49,44 @@ local function capability(group)
     return math.max(0.55, count ^ Config.Scavenging.EFFECTIVE_SCAVENGER_EXPONENT)
 end
 
+local SUPPLY_CATEGORIES = {
+    food = true,
+    water = true,
+    medical = true,
+    materials = true,
+}
+
+local function scavengeYieldMultiplier(group, location, nowHours)
+    local director = PNC.ScopedWorldEventDirector
+    if director and type(director.AggregateEffectsForGroup) == "function" then
+        local agg = director.AggregateEffectsForGroup(group, location, nowHours)
+        local mult = agg and agg.effects and tonumber(agg.effects.scavengingYieldMultiplier)
+        if mult ~= nil then return math.max(0.1, mult) end
+    end
+    local swe = PsychopatzCore and PsychopatzCore.ScopedWorldEvents
+    if swe and type(swe.AggregateEffects) == "function" then
+        local agg = swe.AggregateEffects({
+            factionID = group and group.factionId or nil,
+            settlementID = group and group.homeCommunityId or nil,
+            localAreaID = location and location.id or nil,
+            includeGlobal = true,
+        }, nowHours)
+        local mult = agg and agg.effects and tonumber(agg.effects.scavengingYieldMultiplier)
+        if mult ~= nil then return math.max(0.1, mult) end
+    end
+    return 1.0
+end
+
 function Scavenge.Calculate(group, location, action)
     local tuning = Config.Scavenging
     local needs = ResourceNeeds.Get(group) or {}
     local before = math.max(0, math.min(100, tonumber(location.scavengedLevel) or 0))
     local remaining = math.max(tuning.MIN_REMAINING_FACTOR, 1 - before / 100)
     local scavengerFactor = capability(group)
+    local at = tonumber(action and (action.completedAt or action.startedAt))
+        or (Store and Store.WorldAgeHours and Store.WorldAgeHours())
+        or nil
+    local worldYieldMult = scavengeYieldMultiplier(group, location, at)
     local yields, components, total = {}, {}, 0
     for _, category in ipairs(Config.RESOURCE_CATEGORIES) do
         local potential = math.max(0, tonumber(location.resourcePotential
@@ -63,8 +95,9 @@ function Scavenge.Calculate(group, location, action)
             * (tuning.VARIANCE_MAX - tuning.VARIANCE_MIN)
         local needFactor = 1 + (tonumber(needs[category]) or 0)
             * tuning.NEED_YIELD_BONUS
+        local eventFactor = SUPPLY_CATEGORIES[category] and worldYieldMult or 1.0
         local raw = potential * remaining * scavengerFactor
-            * tuning.BASE_YIELD_SCALE * needFactor * variance
+            * tuning.BASE_YIELD_SCALE * needFactor * variance * eventFactor
         local amount = math.max(0, math.min(tuning.MAX_YIELD_PER_RESOURCE,
             math.floor(raw + 0.5)))
         yields[category] = amount
@@ -72,7 +105,8 @@ function Scavenge.Calculate(group, location, action)
         components[category] = { potential = potential,
             need = tonumber(needs[category]) or 0, remainingFactor = remaining,
             scavengerFactor = scavengerFactor, needFactor = needFactor,
-            variance = variance, raw = raw, yield = amount }
+            variance = variance, scavengingYieldMultiplier = eventFactor,
+            raw = raw, yield = amount }
     end
     local after = total > 0 and math.min(100, before + tuning.DEPLETION_BASE
         + total * tuning.DEPLETION_PER_YIELD) or before
