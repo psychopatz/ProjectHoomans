@@ -916,13 +916,21 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
     then
         local localRev = tonumber(record.social.revision) or 0
         local coreRev = tonumber(actor.social and actor.social.revision) or 0
+        local runtime = type(record.runtime) == "table" and record.runtime or nil
+        local syncedRev = runtime and tonumber(runtime._coreSyncedSocialRev) or nil
+        local dirtyDomains = PNC.Registry and PNC.Registry.DirtyDomains
+            and PNC.Registry.DirtyDomains[record.id] or nil
+        local socialDomainDirty = type(dirtyDomains) == "table"
+            and dirtyDomains.social == true or false
         local needsSocialSync = (
-                record.social.authority ~= "core"
+                (coreRev == 0 or syncedRev == nil)
+                and record.social.authority ~= "core"
                 and type(coreSocialAdapter.HasGenericSocialPayload) == "function"
                 and coreSocialAdapter.HasGenericSocialPayload(record.social)
             )
             or localRev > coreRev
-            or (type(record.runtime) == "table" and record.runtime.coreSocialDirty == true)
+            or socialDomainDirty
+            or (runtime and runtime.coreSocialDirty == true)
         if needsSocialSync then
             local ok, reason = coreSocialAdapter.SyncToCore(record, core)
             if not ok then
@@ -938,6 +946,9 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
             if not actor then
                 return false, "core_actor_not_found", OUTCOME_TERMINAL
             end
+        elseif syncedRev == nil then
+            record.runtime = type(record.runtime) == "table" and record.runtime or {}
+            record.runtime._coreSyncedSocialRev = coreRev
         end
     end
 

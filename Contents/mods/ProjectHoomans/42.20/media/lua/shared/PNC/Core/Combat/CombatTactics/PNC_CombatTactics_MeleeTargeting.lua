@@ -12,6 +12,27 @@ local Perception = PNC.Perception
 local Spatial = PNC.SpatialIndex
 local TraversalQuery = PNC.TraversalQuery
 
+local MELEE_SLOT_ANGLE_OFFSETS = {
+    0,
+    math.pi / 4,
+    -math.pi / 4,
+    math.pi / 2,
+    -math.pi / 2,
+    3 * math.pi / 4,
+    -3 * math.pi / 4,
+    math.pi,
+}
+local HARD_STEP_BLOCK_REASONS = {
+    wall = true,
+    window = true,
+    door = true,
+    fence = true,
+    blocked_edge = true,
+    unloaded = true,
+    vehicle = true,
+}
+local ALLY_SLOT_CROWD_DIST_SQ = 0.65 * 0.65
+
 local function targetObject(target)
     if not target then return nil end
     if target.kind == "zombie" then
@@ -68,14 +89,60 @@ function Tactics.ResolveMeleeApproach(record, dist)
         preferredMode
 end
 
+local function isValidMeleeSlot(cx, cy, slotZ, tx, ty)
+    local canOccupy = TraversalQuery and TraversalQuery.CanOccupy or nil
+    local canStep = TraversalQuery and TraversalQuery.CanStep or nil
+    local stepped
+    local stepReason
+    if canOccupy and not canOccupy(cx, cy, slotZ) then
+        return false
+    end
+    if canStep then
+        stepped, stepReason = canStep(cx, cy, slotZ, tx, ty, slotZ)
+        if not stepped and HARD_STEP_BLOCK_REASONS[stepReason] then
+            return false
+        end
+    end
+    return true
+end
+
+local function countNearbySlotAllies(record, target, candidates, cx, cy)
+    local crowded = 0
+    local other
+    local ox
+    local oy
+    local dx
+    local dy
+    local j
+    for j = 1, #candidates do
+        other = candidates[j]
+        if Internal.IsProtectedNPC(record, other, target)
+            and math.abs((tonumber(other.z) or record.z) - record.z) < 1
+        then
+            ox = tonumber(other.x)
+            oy = tonumber(other.y)
+            if ox and oy then
+                dx = ox - cx
+                dy = oy - cy
+                if ((dx * dx) + (dy * dy)) < ALLY_SLOT_CROWD_DIST_SQ then
+                    crowded = crowded + 1
+                end
+            end
+        end
+    end
+    return crowded
+end
+
 function Tactics.GetMeleeApproachPoint(record, target)
     local candidates
     local other
     local allyCount = 0
-    local angle
+    local baseAngle
     local radius
-    local x
-    local y
+    local slotZ
+    local bestX
+    local bestY
+    local bestCrowded
     local i
     if not record or not target or not Spatial or not Spatial.QueryNPCs then
         return target and target.x, target and target.y, false
@@ -93,18 +160,29 @@ function Tactics.GetMeleeApproachPoint(record, target)
         end
     end
     if allyCount <= 0 then return target.x, target.y, false end
-    angle = Internal.StableDirection(record.id)
+    baseAngle = Internal.StableDirection(record.id)
     radius = tonumber(Const.COMBAT_FORMATION_SLOT_RADIUS) or 1.05
-    x = target.x + math.cos(angle) * radius
-    y = target.y + math.sin(angle) * radius
-    if TraversalQuery and TraversalQuery.CanOccupy
-        and not TraversalQuery.CanOccupy(x, y, target.z or record.z)
-    then
-        angle = angle + math.pi
-        x = target.x + math.cos(angle) * radius
-        y = target.y + math.sin(angle) * radius
+    slotZ = target.z or record.z
+    for i = 1, #MELEE_SLOT_ANGLE_OFFSETS do
+        local angle = baseAngle + MELEE_SLOT_ANGLE_OFFSETS[i]
+        local cx = target.x + math.cos(angle) * radius
+        local cy = target.y + math.sin(angle) * radius
+        if isValidMeleeSlot(cx, cy, slotZ, target.x, target.y) then
+            local crowded = countNearbySlotAllies(
+                record, target, candidates, cx, cy
+            )
+            if crowded == 0 then
+                return cx, cy, true
+            end
+            if bestCrowded == nil or crowded < bestCrowded then
+                bestX, bestY, bestCrowded = cx, cy, crowded
+            end
+        end
     end
-    return x, y, true
+    if bestX ~= nil then
+        return bestX, bestY, true
+    end
+    return target.x, target.y, false
 end
 
 return Tactics

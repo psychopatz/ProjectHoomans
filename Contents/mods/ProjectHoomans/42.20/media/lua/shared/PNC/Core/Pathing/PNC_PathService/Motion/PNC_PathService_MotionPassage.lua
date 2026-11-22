@@ -128,6 +128,11 @@ function Internal.updateScriptedSpecialMove(zombie, record, lane, now)
             return true, traversalState or lane.ownerMode
         end
         if traversalState == "completed"
+            and Internal.releaseLanePassageReservation
+        then
+            Internal.releaseLanePassageReservation(record, zombie, lane)
+        end
+        if traversalState == "completed"
             and repairTimedOutTraversal(zombie, record, lane, now)
         then
             return true, "traversal_repaired"

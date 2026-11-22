@@ -33,16 +33,30 @@ end
 function Perception.IsActualZombieBody(body)
     local registry
     if not isIsoZombieBody(body) then return false end
+    local modData = body.getModData and body:getModData() or nil
+    if modData and (modData.PNC_Owner == "ProjectHoomans"
+        or modData.PNC_NPC == true
+        or modData.PNC_PersistedShell == true
+        or (modData.PNC_UUID ~= nil and modData.PNC_BodyKind == "live"))
+    then
+        return false
+    end
     if Core and type(Core.IsManagedNPCBody) == "function"
         and Core.IsManagedNPCBody(body) == true
     then
         return false
     end
     registry = PNC.Registry
-    if registry and type(registry.FindRecordByZombie) == "function"
-        and registry.FindRecordByZombie(body) ~= nil
-    then
-        return false
+    if registry and type(registry.FindRecordByZombie) == "function" then
+        -- Skip the second getModData() call on ordinary zombies when using
+        -- the canonical UUID-based Registry.FindRecordByZombie implementation.
+        if registry.FindRecordByZombie ~= registry._canonicalFindRecordByZombie
+            or (modData and modData.PNC_UUID ~= nil)
+        then
+            if registry.FindRecordByZombie(body) ~= nil then
+                return false
+            end
+        end
     end
     return true
 end

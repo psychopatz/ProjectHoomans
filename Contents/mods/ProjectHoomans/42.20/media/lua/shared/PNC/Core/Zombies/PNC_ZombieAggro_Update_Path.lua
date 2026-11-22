@@ -10,8 +10,8 @@ local isPursuitAuditEnabled = Internal.isPursuitAuditEnabled
 local actionStateName = Internal.actionStateName
 local isPursuitActionLocked = Internal.isPursuitActionLocked
 
-local function refreshPursuitPath(zombie, npcBody, now, npcId)
-    local modData = Internal.getZombieModData(zombie)
+local function refreshPursuitPath(zombie, npcBody, now, npcId, closeBlocked, modData)
+    modData = modData or Internal.getZombieModData(zombie)
     local targetX = npcBody:getX()
     local targetY = npcBody:getY()
     local dx = targetX - zombie:getX()
@@ -43,10 +43,14 @@ local function refreshPursuitPath(zombie, npcBody, now, npcId)
         return false
     end
     elapsed = lastAt and (now - lastAt) or math.huge
+    local hasPath2 = zombie.getPath2 and zombie:getPath2() ~= nil or false
+    local effectiveStableMs = (closeBlocked == true and hasPath2)
+        and math.max(stableRetryMs, 1500)
+        or stableRetryMs
     if modData and lastAt and (
         elapsed < refreshMs
         or (movedSq < (refreshDistance * refreshDistance)
-            and elapsed < stableRetryMs)
+            and elapsed < effectiveStableMs)
     ) then
         if isPursuitAuditEnabled and isPursuitAuditEnabled() then
             logPursuitDiagnostic(

@@ -73,6 +73,8 @@ local function beginWindowClimb(
             },
             "default"
         ) or {}
+    local travelDurationMs = tonumber(profile.travelDurationMs) or 700
+    local finishHoldMs = tonumber(profile.finishHoldMs) or 320
     if not Internal.beginTraversalAction
         or not Internal.beginTraversalAction(
             context.zombie,
@@ -87,8 +89,8 @@ local function beginWindowClimb(
                 toX = destX,
                 toY = destY,
                 toZ = destZ,
-                travelDurationMs = tonumber(profile.travelDurationMs) or 700,
-                finishHoldMs = tonumber(profile.finishHoldMs) or 320,
+                travelDurationMs = travelDurationMs,
+                finishHoldMs = finishHoldMs,
             }
         )
     then
@@ -98,6 +100,18 @@ local function beginWindowClimb(
             "object=" .. tostring(objectKey or "nil")
         )
         return false, nil, true
+    end
+    if Internal.ReservePassage then
+        Internal.ReservePassage(
+            actionKey,
+            (context.record and context.record.id) or context.zombie,
+            context.now,
+            travelDurationMs + finishHoldMs,
+            context.lane
+        )
+    end
+    if context.lane then
+        context.lane.reservedPassageKey = actionKey
     end
     Internal.rememberSpecialAction(context.lane, actionKey, context.now)
     if Internal.noteTraversalAttempt then
@@ -137,6 +151,15 @@ local function tryClimb(context, object, objectSquare, objectKey)
     end
     local actionKey = "window_climb:"
         .. Internal.describeSquare(objectSquare)
+    local ownerId = (context.record and context.record.id) or context.zombie
+    if Internal.IsPassageReservedByOther
+        and Internal.IsPassageReservedByOther(actionKey, ownerId, context.now)
+        and Internal.holdQueuedPassage
+    then
+        return Internal.holdQueuedPassage(
+            context, "window_climb", "window_reserved", objectKey
+        )
+    end
     if rejectClimbStart(context, actionKey, objectKey) then
         return false, nil, true
     end

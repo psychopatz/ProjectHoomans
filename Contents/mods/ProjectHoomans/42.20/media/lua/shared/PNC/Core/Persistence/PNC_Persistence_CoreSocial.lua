@@ -45,6 +45,30 @@ function Adapter.ResolveCoreActorID(record)
     return tostring(id)
 end
 
+local function peekCoreActor(record, core)
+    core = core or PsychopatzCore
+    if type(core) ~= "table" or type(core.Actors) ~= "table"
+        or type(core.Actors.DefaultRegistry) ~= "table"
+    then
+        return nil, "core_registry_unavailable"
+    end
+    local actorID = Adapter.ResolveCoreActorID(record)
+    if not actorID then
+        return nil, "actor_id_missing"
+    end
+    local reg = core.Actors.DefaultRegistry
+    if type(reg.Has) ~= "function" or not reg:Has(actorID) then
+        return nil, "core_actor_not_found"
+    end
+    local actor = (type(reg.Peek) == "function" and reg:Peek(actorID))
+        or (type(core.Actors.Get) == "function" and core.Actors.Get(actorID))
+        or (type(reg.Get) == "function" and reg:Get(actorID))
+    if type(actor) ~= "table" then
+        return nil, "core_actor_not_found"
+    end
+    return actor, actorID
+end
+
 function Adapter.ResolveCoreActor(record, core)
     core = core or PsychopatzCore
     if type(core) ~= "table" or type(core.Actors) ~= "table"
@@ -69,8 +93,17 @@ function Adapter.ResolveCoreActor(record, core)
 end
 
 function Adapter.IsCoreBacked(record, core)
-    local actor = Adapter.ResolveCoreActor(record, core)
-    return actor ~= nil
+    core = core or PsychopatzCore
+    if type(core) ~= "table" or type(core.Actors) ~= "table"
+        or type(core.Actors.DefaultRegistry) ~= "table"
+    then
+        return false
+    end
+    local actorID = Adapter.ResolveCoreActorID(record)
+    local reg = core.Actors.DefaultRegistry
+    return actorID ~= nil
+        and type(reg.Has) == "function"
+        and reg:Has(actorID) == true
 end
 
 function Adapter.HasGenericSocialPayload(social)
@@ -433,15 +466,9 @@ function Adapter.SyncToCore(record, core, changeSpec)
     if type(record) ~= "table" or type(record.social) ~= "table" then
         return false, "record_social_missing"
     end
-    local actorID = Adapter.ResolveCoreActorID(record)
-    if not actorID or not core.Actors.DefaultRegistry:Has(actorID) then
-        return false, "core_actor_not_found"
-    end
-
-    local actor = (core.Actors.Get and core.Actors.Get(actorID))
-        or core.Actors.DefaultRegistry:Get(actorID)
+    local actor, actorID = peekCoreActor(record, core)
     if not actor then
-        return false, "core_actor_not_found"
+        return false, actorID or "core_actor_not_found"
     end
 
     local Social = service(core)
@@ -644,20 +671,31 @@ function Adapter.SyncToCore(record, core, changeSpec)
         actorID,
         currentSocial,
         core,
-        actor.revision
+        actor.revision,
+        { returnClone = false }
     )
     if not committed then
         return false, commitReason
     end
 
-    if type(record.runtime) == "table" then
-        record.runtime.coreSocialHydrationPending = nil
-    end
-
-    local refreshed = Adapter.FromCoreSocial(committed.social or currentSocial, record.social)
+    local reg = core.Actors.DefaultRegistry
+    local savedActor = committed.social and committed
+        or (reg and type(reg.Peek) == "function" and reg:Peek(actorID))
+        or nil
+    local refreshed = Adapter.FromCoreSocial(
+        (savedActor and savedActor.social) or currentSocial,
+        record.social
+    )
     if refreshed then
         record.social = refreshed
     end
+    record.runtime = type(record.runtime) == "table" and record.runtime or {}
+    record.runtime.coreSocialHydrationPending = nil
+    record.runtime._coreSyncedSocialRev = tonumber(
+        (type(record.social) == "table" and record.social.revision)
+        or (savedActor and savedActor.social and savedActor.social.revision)
+        or currentSocial.revision
+    ) or 0
 
     return true
 end
@@ -665,7 +703,7 @@ end
 function Adapter.SyncFromCore(record, core)
     core = core or PsychopatzCore
     if type(record) ~= "table" then return false, "record_missing" end
-    local actor, actorReason = Adapter.ResolveCoreActor(record, core)
+    local actor, actorReason = peekCoreActor(record, core)
     if not actor then
         return false, actorReason == "core_registry_unavailable"
             and "core_registry_unavailable" or "core_actor_not_found"
@@ -673,15 +711,18 @@ function Adapter.SyncFromCore(record, core)
     if type(actor.social) ~= "table" then return false, "core_actor_not_found" end
     local reconstructed = Adapter.FromCoreSocial(actor.social, record.social)
     record.social = reconstructed
-    if type(record.runtime) == "table" then
-        record.runtime.coreSocialHydrationPending = nil
-    end
+    record.runtime = type(record.runtime) == "table" and record.runtime or {}
+    record.runtime.coreSocialHydrationPending = nil
+    record.runtime._coreSyncedSocialRev = tonumber(
+        (type(reconstructed) == "table" and reconstructed.revision)
+        or actor.social.revision
+    ) or 0
     return true
 end
 
 function Adapter.EnsureRuntimeView(record, core)
     core = core or PsychopatzCore
-    local actor = Adapter.ResolveCoreActor(record, core)
+    local actor = peekCoreActor(record, core)
     if not actor or type(actor.social) ~= "table" then
         return record and record.social or nil
     end
@@ -699,7 +740,7 @@ end
 
 function Adapter.SeedEmptyCoreSocial(record, core)
     core = core or PsychopatzCore
-    local actor = Adapter.ResolveCoreActor(record, core)
+    local actor = peekCoreActor(record, core)
     if actor
         and isEmptyCoreSocial(actor.social)
         and type(record) == "table"
@@ -775,7 +816,7 @@ end
 
 function Adapter.SerializeRecord(record, core)
     core = core or PsychopatzCore
-    local actor, actorID = Adapter.ResolveCoreActor(record, core)
+    local actor, actorID = peekCoreActor(record, core)
     if not actor then
         return nil, "not_core_backed"
     end

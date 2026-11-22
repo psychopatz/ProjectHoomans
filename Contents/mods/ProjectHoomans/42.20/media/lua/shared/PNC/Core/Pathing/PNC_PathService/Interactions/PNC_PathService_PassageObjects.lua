@@ -24,6 +24,31 @@ end
 local DOOR_REFUSE_BACKOFF_MS = 5000
 local DOOR_REFUSED_UNTIL = setmetatable({}, { __mode = "k" })
 
+local function invalidateTraversalEdge(square)
+    local query = PNC and PNC.TraversalQuery or nil
+    if query and query.InvalidateEdgeCache then
+        query.InvalidateEdgeCache(square)
+    end
+end
+
+function PNC.PathService.IsDoorRefused(object, now)
+    local refusedUntil
+    local checkNow
+    if not object then return false end
+    refusedUntil = tonumber(DOOR_REFUSED_UNTIL[object])
+    if not refusedUntil then return false end
+    checkNow = tonumber(now)
+        or (Internal.Core and Internal.Core.Now and tonumber(Internal.Core.Now()))
+        or 0
+    if checkNow > 0 and checkNow < refusedUntil then
+        return true
+    end
+    if checkNow >= refusedUntil then
+        DOOR_REFUSED_UNTIL[object] = nil
+    end
+    return false
+end
+
 -- The engine owns "may this character open this door": IsoDoor.couldBeOpen()
 -- folds in animals, barricades, the open-from-inside side rule, obstruction and
 -- the key rules. Ask it instead of re-deriving the rules in Lua, which is what
@@ -228,6 +253,7 @@ function PNC.PathService.OpenDoorForNPC(zombie, object)
     if method then method(square) end
     method = methodOf(square, "RecalcProperties")
     if method then method(square) end
+    invalidateTraversalEdge(square)
     method = methodOf(object, "syncIsoObject")
     if method then method(object, false, 1, nil, nil) end
     if LuaEventManager and LuaEventManager.triggerEvent then
@@ -274,6 +300,7 @@ function PNC.PathService.OpenWindowForNPC(zombie, object)
         square:InvalidateSpecialObjectPaths()
     end
     if square and square.RecalcProperties then square:RecalcProperties() end
+    invalidateTraversalEdge(square)
     if zombie and zombie.playSound then zombie:playSound("OpenWindow") end
     return true
 end
@@ -294,6 +321,7 @@ function PNC.PathService.SmashWindowForNPC(zombie, object)
         square:InvalidateSpecialObjectPaths()
     end
     if square and square.RecalcProperties then square:RecalcProperties() end
+    invalidateTraversalEdge(square)
     return true
 end
 Internal.smashWindowForNPC = PNC.PathService.SmashWindowForNPC

@@ -230,6 +230,8 @@ local function beginFenceAction(
             context.zombie
         )
     end
+    local finishHoldMs = tonumber(profile.finishHoldMs)
+        or (fence.tall == true and 420 or 320)
     local started = Internal.beginTraversalAction
         and Internal.beginTraversalAction(
             context.zombie,
@@ -257,11 +259,24 @@ local function beginFenceAction(
                 crossingDurationMs = fence.tall ~= true
                     and profile.crossingDurationMs or nil,
                 transitionSettleMs = fence.tall ~= true and 0 or nil,
-                finishHoldMs = tonumber(profile.finishHoldMs)
-                    or (fence.tall == true and 420 or 320),
+                finishHoldMs = finishHoldMs,
             }
         )
-    if started then return true end
+    if started then
+        local ownerId = (context.record and context.record.id) or context.zombie
+        local reserveMs = (tonumber(profile.travelDurationMs)
+            and (tonumber(profile.travelDurationMs) + finishHoldMs))
+            or (fence.tall == true and 1320 or 1020)
+        if Internal.ReservePassage then
+            Internal.ReservePassage(
+                fenceKey, ownerId, context.now, reserveMs, context.lane
+            )
+        end
+        if context.lane then
+            context.lane.reservedPassageKey = fenceKey
+        end
+        return true
+    end
     Internal.logTraversalReject(
         context.record, context.zombie, context.lane,
         "traversal_rejected", "fence_runtime_unavailable",
@@ -335,6 +350,9 @@ function Internal.updateVanillaFenceAction(zombie, record, lane, now)
         lane.lastProgressAt = now
         lane.lastIssueAt = now
         lane.lastTraversalFinishReason = "vanilla_fence_crossed"
+        if Internal.releaseLanePassageReservation then
+            Internal.releaseLanePassageReservation(record, zombie, lane)
+        end
         return true, "fence_vanilla_crossed"
     end
     if actionState == "climbfence"
@@ -445,6 +463,15 @@ function Internal.tryFencePassage(context)
         fenceKey
     ) then
         return false, nil, true
+    end
+    local ownerId = (context.record and context.record.id) or context.zombie
+    if Internal.IsPassageReservedByOther
+        and Internal.IsPassageReservedByOther(fenceKey, ownerId, context.now)
+        and Internal.holdQueuedPassage
+    then
+        return Internal.holdQueuedPassage(
+            context, "fence_climb", "fence_reserved", fenceKey
+        )
     end
     if not beginFenceAction(
         context,

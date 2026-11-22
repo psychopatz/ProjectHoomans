@@ -103,7 +103,8 @@ local function moveToMelee(context, reason)
             context.distance,
             approachMode or "run"
         ),
-        usingFormation and 0.2
+        usingFormation
+            and (tonumber(Const.MELEE_FORMATION_STOP_DISTANCE) or 0.45)
             or (
                 stopDistance
                 or tonumber(Const.MELEE_APPROACH_STOP_DISTANCE)

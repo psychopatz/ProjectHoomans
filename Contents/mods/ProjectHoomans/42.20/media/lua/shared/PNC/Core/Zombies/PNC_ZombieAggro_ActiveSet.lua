@@ -101,7 +101,8 @@ local function isEntryDue(entry, zombie, now, closeRangeSq)
         then
             return true
         end
-        if Core.DistanceSq
+        if entry.closeBlocked ~= true
+            and Core.DistanceSq
             and zombie.getX and zombie.getY
             and targetBody.getX and targetBody.getY
         then
@@ -300,7 +301,7 @@ function ZombieAggro.PumpActiveSet(now, callback)
                     state.holes = state.holes + 1
                 else
                     entry.urgent = false
-                    local cooldownMs, targetNpcBody =
+                    local cooldownMs, targetNpcBody, closeBlocked =
                         callback(zombie, now, true)
                     processed = processed + 1
                     if type(cooldownMs) == "number" and cooldownMs > 0 then
@@ -309,6 +310,7 @@ function ZombieAggro.PumpActiveSet(now, callback)
                         entry.nextProcessAt = nil
                     end
                     entry.targetNpcBody = targetNpcBody
+                    entry.closeBlocked = closeBlocked == true
                 end
             end
         elseif entry then

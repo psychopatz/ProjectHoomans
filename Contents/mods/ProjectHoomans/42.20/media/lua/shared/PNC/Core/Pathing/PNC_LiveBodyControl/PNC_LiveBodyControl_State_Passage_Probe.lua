@@ -28,20 +28,50 @@ function LiveBodyControl.IsTraversalBumpType(bumpType)
         or string.find(value, "climbwall", 1, true) ~= nil
 end
 
-local function passageObjectAtFeeler(zombie)
+local PASSAGE_AHEAD_CACHE = setmetatable({}, { __mode = "k" })
+
+function LiveBodyControl.InvalidatePassageAheadCache(zombie)
+    if zombie ~= nil then
+        PASSAGE_AHEAD_CACHE[zombie] = nil
+    else
+        PASSAGE_AHEAD_CACHE = setmetatable({}, { __mode = "k" })
+    end
+end
+
+local function resolveFeelerSquares(zombie)
     local current
     local feeler
-    if not zombie then return nil end
+    if not zombie then return nil, nil end
     current = zombie.getCurrentSquare and zombie:getCurrentSquare()
         or zombie.getSquare and zombie:getSquare() or nil
     feeler = zombie.getFeelerTile and zombie.getFeelersize
         and zombie:getFeelerTile(zombie:getFeelersize()) or nil
-    if not current or not feeler
-        or not current.testCollideSpecialObjects
-    then
-        return nil, current, feeler
+    return current, feeler
+end
+
+local function storePassageAheadCache(
+    zombie, now, current, feeler, object, kind, extra
+)
+    local entry
+    if not zombie or not (now > 0) then return end
+    entry = PASSAGE_AHEAD_CACHE[zombie]
+    if entry then
+        entry.at = now
+        entry.current = current
+        entry.feeler = feeler
+        entry.object = object
+        entry.kind = kind
+        entry.extra = extra
+    else
+        PASSAGE_AHEAD_CACHE[zombie] = {
+            at = now,
+            current = current,
+            feeler = feeler,
+            object = object,
+            kind = kind,
+            extra = extra,
+        }
     end
-    return current:testCollideSpecialObjects(feeler), current, feeler
 end
 
 -- IsoZombie.tryThump() runs after OnZombieUpdate and independently scans the
@@ -50,14 +80,31 @@ end
 -- same special object before the engine reaches tryThump and hand the frame
 -- back to PNC's path/traversal retry lane.
 function LiveBodyControl.GetVanillaPassageAhead(zombie)
-    local object
+    local core = PNC.Core
+    local now = core and type(core.Now) == "function"
+        and tonumber(core.Now()) or 0
     local current
     local feeler
+    local cached
+    local object
     local kind
     local query
     local fence
     local fenceTall
-    object, current, feeler = passageObjectAtFeeler(zombie)
+    if not zombie then return nil, nil end
+    current, feeler = resolveFeelerSquares(zombie)
+    if now > 0 then
+        cached = PASSAGE_AHEAD_CACHE[zombie]
+        if cached and cached.at == now
+            and cached.current == current
+            and cached.feeler == feeler
+        then
+            return cached.object, cached.kind, cached.extra
+        end
+    end
+    if current and feeler and current.testCollideSpecialObjects then
+        object = current:testCollideSpecialObjects(feeler)
+    end
     if object and instanceof then
         if instanceof(object, "IsoWindow") then
             kind = "window"
@@ -68,7 +115,12 @@ function LiveBodyControl.GetVanillaPassageAhead(zombie)
         elseif instanceof(object, "IsoDoor") then
             kind = "door"
         end
-        if kind then return object, kind end
+        if kind then
+            storePassageAheadCache(
+                zombie, now, current, feeler, object, kind, nil
+            )
+            return object, kind
+        end
     end
     -- Fences are not consistently returned by
     -- IsoGridSquare:testCollideSpecialObjects. Use the same edge query as
@@ -83,9 +135,14 @@ function LiveBodyControl.GetVanillaPassageAhead(zombie)
             feeler
         )
         if ok and fence then
-            return fence, "fence", fenceTall == true
+            local extra = fenceTall == true
+            storePassageAheadCache(
+                zombie, now, current, feeler, fence, "fence", extra
+            )
+            return fence, "fence", extra
         end
     end
+    storePassageAheadCache(zombie, now, current, feeler, nil, nil, nil)
     return nil, nil
 end
 
@@ -181,6 +238,7 @@ local function openPassageDoorAhead(zombie, object, now)
     PASSAGE_DOOR_ATTEMPT_AT[zombie] = now
     if openDoorForNPC(zombie, object) ~= true then return false end
     PASSAGE_DOOR_ATTEMPT_AT[zombie] = nil
+    LiveBodyControl.InvalidatePassageAheadCache(zombie)
     square = object.getSquare and object:getSquare() or nil
     if square and not PASSAGE_DOOR_OPEN_LOGGED[square]
         and PNC.Core and PNC.Core.LogWarn

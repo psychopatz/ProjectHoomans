@@ -77,10 +77,19 @@ function Internal.UpdateClientZombieAggro(zombie, now)
     local nativePlayerTarget
     local nativePlayerSource
     local nativePlayerAction
-    now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
     if not zombie or (zombie.isDead and zombie:isDead()) then
         return false
     end
+    -- In standalone singleplayer with the shared authority pump active, skip
+    -- per-zombie table allocations and diagnostics for ordinary zombies.
+    if isStandaloneSingleplayer()
+        and PNC.ZombieAggro
+        and type(PNC.ZombieAggro.Pump) == "function"
+    then
+        Effects.EnforceManagedSafetyGuard(zombie)
+        return false
+    end
+    now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
     entry = ensureControllerEntry(zombie)
     if entry.handlerSeen ~= true then
         entry.handlerSeen = true

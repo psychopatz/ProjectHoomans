@@ -22,20 +22,22 @@ local function publishMPTargetDirective(
 )
     return Multiplayer.publish(zombie, record, npcBody, now, approach)
 end
-local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
+local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling, modData)
     local distSq
     local dist
     local zDistance
     local zombieSquare
     local npcSquare
     local blocked
+    local closeBlocked = false
     local approach = true
     local repathClose = false
     local biteStarted
     local canWriteNative
     local nativeOwner
+    modData = modData or Internal.getZombieModData(zombie)
     canWriteNative, nativeOwner = Internal.CanWriteNativeControl(
-        zombie, "ProjectHoomans", now, 100
+        zombie, "ProjectHoomans", now, 100, nil, modData
     )
     if not canWriteNative then
         if isPursuitAuditEnabled and isPursuitAuditEnabled() then
@@ -48,7 +50,7 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
                 now
             )
         end
-        return false
+        return false, false
     end
     if not Internal.AcquirePursuitLease(
         zombie,
@@ -58,24 +60,23 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
         now,
         Const.ZOMBIE_NPC_AGGRO_LEASE_MS,
         100,
-        "hoomans_npc"
+        "hoomans_npc",
+        modData
     ) then
         if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+            local leaseOwner = Internal.GetPursuitLeaseFields
+                and Internal.GetPursuitLeaseFields(zombie, now, modData)
+                or nil
             logPursuitDiagnostic(
                 zombie,
                 record and record.id or nil,
                 "server_target",
                 "pursuit_lease_denied",
-                "owner=" .. tostring(
-                    Internal.GetPursuitLease
-                        and Internal.GetPursuitLease(zombie, now)
-                        and Internal.GetPursuitLease(zombie, now).owner
-                        or "unknown"
-                ),
+                "owner=" .. tostring(leaseOwner or "unknown"),
                 now
             )
         end
-        return
+        return nil, false
     end
     if npcBody.setZombiesDontAttack then
         -- This flag protects the IsoZombie shell from vanilla zombie attack
@@ -133,6 +134,9 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
             end
         else
             blocked = zombieSquare:isSomethingTo(npcSquare)
+            if blocked == true then
+                closeBlocked = true
+            end
         end
         if zombieSquare and npcSquare and not blocked then
             if zombie.isFacingObject and zombie:isFacingObject(npcBody, 0.3) then
@@ -201,21 +205,34 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
             end
         end
         if repathClose and not isMultiplayerServer() then
-            refreshPursuitPath(zombie, npcBody, now, record.id)
+            refreshPursuitPath(zombie, npcBody, now, record.id, closeBlocked, modData)
         end
-    elseif not isMultiplayerServer() then
-        -- SP/local authority owns the native zombie path. In MP the owning
-        -- client performs native pursuit while this server code owns only the
-        -- forced-target lease, coordinate directive, bite validation, and
-        -- damage.
-        if zombie.isUseless and zombie.setUseless
-            and zombie:isUseless()
-        then
-            -- Match Bandits for the active ordinary-zombie lane. Do this only
-            -- while a pursuit is active; distant zombies retain engine tiering.
-            zombie:setUseless(false)
+    else
+        local closeRange = (tonumber(Const.ZOMBIE_BITE_DISTANCE) or 1.2) + 1.5
+        if dist <= closeRange and zDistance < 1 then
+            zombieSquare = zombie.getSquare and zombie:getSquare() or nil
+            npcSquare = npcBody.getSquare and npcBody:getSquare() or nil
+            if zombieSquare and npcSquare and zombieSquare ~= npcSquare
+                and zombieSquare.isSomethingTo
+                and zombieSquare:isSomethingTo(npcSquare) == true
+            then
+                closeBlocked = true
+            end
         end
-        refreshPursuitPath(zombie, npcBody, now, record.id)
+        if not isMultiplayerServer() then
+            -- SP/local authority owns the native zombie path. In MP the owning
+            -- client performs native pursuit while this server code owns only the
+            -- forced-target lease, coordinate directive, bite validation, and
+            -- damage.
+            if zombie.isUseless and zombie.setUseless
+                and zombie:isUseless()
+            then
+                -- Match Bandits for the active ordinary-zombie lane. Do this only
+                -- while a pursuit is active; distant zombies retain engine tiering.
+                zombie:setUseless(false)
+            end
+            refreshPursuitPath(zombie, npcBody, now, record.id, closeBlocked, modData)
+        end
     end
     if isMultiplayerServer() then
         publishMPTargetDirective(
@@ -229,7 +246,7 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
     if PNC.Perception and PNC.Perception.PublishZombieGroupAlert then
         PNC.Perception.PublishZombieGroupAlert(record, zombie, now)
     end
-    return true
+    return true, closeBlocked
 end
 
 

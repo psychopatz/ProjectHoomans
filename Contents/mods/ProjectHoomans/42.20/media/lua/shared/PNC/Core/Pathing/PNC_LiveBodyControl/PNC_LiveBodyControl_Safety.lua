@@ -7,7 +7,7 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 local ActorControl = PNC.ActorControl
 local SAFETY_REPAIR_LOGGED = setmetatable({}, { __mode = "k" })
 
-function LiveBodyControl.EnforceManagedSafety(zombie, source)
+function LiveBodyControl.EnforceManagedSafety(zombie, source, verifiedManaged)
     local actionState
     local hadTarget
     local wasUseless
@@ -29,10 +29,15 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local bumpType
     local puppetOwned
     local puppetSafetyBoundary
-    if not zombie or not Core or not Core.IsManagedNPCBody
-        or not Core.IsManagedNPCBody(zombie)
-    then
+    if not zombie then
         return false
+    end
+    if verifiedManaged ~= true then
+        if not Core or not Core.IsManagedNPCBody
+            or not Core.IsManagedNPCBody(zombie)
+        then
+            return false
+        end
     end
     if LiveBodyControl.RefreshNativeRemoteHeartbeat then
         LiveBodyControl.RefreshNativeRemoteHeartbeat(zombie)

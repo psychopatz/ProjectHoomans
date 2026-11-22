@@ -184,36 +184,52 @@ local function clearPursuitLeaseData(modData, owner)
     end
 end
 
-function Internal.GetPursuitLease(zombie, now)
-    local modData = pursuitModData(zombie)
-    local owner
-    local expiresAt
+function Internal.GetPursuitLeaseFields(zombie, now, modData)
+    modData = modData or pursuitModData(zombie)
     if not modData then return nil end
-    owner = modData["PNC_ZombiePursuitOwner"]
-    expiresAt = tonumber(modData["PNC_ZombiePursuitUntil"])
-    now = tonumber(now) or Core.Now()
-    if owner == nil or expiresAt == nil or expiresAt <= now then
+    local owner = modData["PNC_ZombiePursuitOwner"]
+    local expiresAt = tonumber(modData["PNC_ZombiePursuitUntil"])
+    if owner == nil or expiresAt == nil then
         clearPursuitLeaseData(modData)
         return nil
     end
+    now = tonumber(now) or Core.Now()
+    if expiresAt <= now then
+        clearPursuitLeaseData(modData)
+        return nil
+    end
+    local ownerValue = tostring(owner)
+    local priority = tonumber(modData["PNC_ZombiePursuitPriority"])
+        or pursuitPriority(ownerValue, nil)
+    return ownerValue,
+        priority,
+        expiresAt,
+        modData["PNC_ZombiePursuitTarget"],
+        modData["PNC_ZombiePursuitProvider"],
+        tonumber(modData["PNC_ZombiePursuitRevision"]) or 0,
+        modData["PNC_ZombiePursuitReason"]
+end
+
+function Internal.GetPursuitLease(zombie, now, modData)
+    local ownerValue, priority, expiresAt, targetId, provider, revision, reason =
+        Internal.GetPursuitLeaseFields(zombie, now, modData)
+    if ownerValue == nil then return nil end
     return {
-        owner = tostring(owner),
-        provider = modData["PNC_ZombiePursuitProvider"],
-        targetId = modData["PNC_ZombiePursuitTarget"],
-        revision = tonumber(modData["PNC_ZombiePursuitRevision"]) or 0,
+        owner = ownerValue,
+        provider = provider,
+        targetId = targetId,
+        revision = revision,
         expiresAt = expiresAt,
-        priority = tonumber(modData["PNC_ZombiePursuitPriority"])
-            or pursuitPriority(owner, nil),
-        reason = modData["PNC_ZombiePursuitReason"],
+        priority = priority,
+        reason = reason,
         key = PURSUIT_LEASE_KEY,
     }
 end
 
 function Internal.AcquirePursuitLease(
-    zombie, owner, provider, targetId, now, ttl, priority, reason
+    zombie, owner, provider, targetId, now, ttl, priority, reason, modData
 )
-    local modData = pursuitModData(zombie)
-    local current
+    modData = modData or pursuitModData(zombie)
     local revision
     local ownerValue
     local providerValue
@@ -229,29 +245,30 @@ function Internal.AcquirePursuitLease(
     targetValue = targetId ~= nil and tostring(targetId) or nil
     priorityValue = pursuitPriority(ownerValue, priority)
     reasonValue = reason ~= nil and tostring(reason) or nil
-    current = Internal.GetPursuitLease(zombie, now)
-    if current and current.owner ~= ownerValue then
-        if priorityValue <= (tonumber(current.priority) or 0) then
+    local curOwner, curPriority, _, curTargetId, curProvider, curRev, curReason =
+        Internal.GetPursuitLeaseFields(zombie, now, modData)
+    if curOwner ~= nil and curOwner ~= ownerValue then
+        if priorityValue <= curPriority then
             logPursuitLease(
                 zombie,
                 targetValue,
                 "pursuit_lease_denied",
                 "requestOwner=" .. ownerValue
                     .. " requestPriority=" .. tostring(priorityValue)
-                    .. " currentOwner=" .. tostring(current.owner)
-                    .. " currentPriority=" .. tostring(current.priority),
+                    .. " currentOwner=" .. tostring(curOwner)
+                    .. " currentPriority=" .. tostring(curPriority),
                 now
             )
             return false
         end
     end
-    changed = not current
-        or current.owner ~= ownerValue
-        or tostring(current.provider or "") ~= tostring(providerValue or "")
-        or tostring(current.targetId or "") ~= tostring(targetValue or "")
-        or (tonumber(current.priority) or 0) ~= priorityValue
-        or tostring(current.reason or "") ~= tostring(reasonValue or "")
-    revision = tonumber(modData["PNC_ZombiePursuitRevision"]) or 0
+    changed = curOwner == nil
+        or curOwner ~= ownerValue
+        or tostring(curProvider or "") ~= tostring(providerValue or "")
+        or tostring(curTargetId or "") ~= tostring(targetValue or "")
+        or curPriority ~= priorityValue
+        or tostring(curReason or "") ~= tostring(reasonValue or "")
+    revision = curRev or tonumber(modData["PNC_ZombiePursuitRevision"]) or 0
     if changed then revision = revision + 1 end
     modData["PNC_ZombiePursuitOwner"] = ownerValue
     modData["PNC_ZombiePursuitProvider"] = providerValue
@@ -288,14 +305,15 @@ function Internal.ReleasePursuitLease(zombie, owner)
 end
 
 function Internal.ShouldYieldToPursuitOwner(
-    zombie, owner, now, requestedPriority
+    zombie, owner, now, requestedPriority, modData
 )
-    local lease = Internal.GetPursuitLease(zombie, now)
-    if not lease or lease.owner == tostring(owner or "") then
+    local leaseOwner, leasePriority = Internal.GetPursuitLeaseFields(
+        zombie, now, modData
+    )
+    if not leaseOwner or leaseOwner == tostring(owner or "") then
         return false
     end
-    return (tonumber(lease.priority) or 0)
-        >= pursuitPriority(owner, requestedPriority)
+    return leasePriority >= pursuitPriority(owner, requestedPriority)
 end
 
 -- Native target/path/lunge writes are a separate compatibility boundary from
@@ -307,19 +325,19 @@ function Internal.GetNativeTargetOwner(zombie)
 end
 
 function Internal.CanWriteNativeControl(
-    zombie, owner, now, requestedPriority, requestedIntent
+    zombie, owner, now, requestedPriority, requestedIntent, modData
 )
     local ownerValue = tostring(owner or "")
-    local lease = Internal.GetPursuitLease(zombie, now)
+    modData = modData or pursuitModData(zombie)
+    local leaseOwner, leasePriority = Internal.GetPursuitLeaseFields(
+        zombie, now, modData
+    )
     local targetOwner = nativeTargetOwner(zombie)
     local nativePlayer
-    local modData = pursuitModData(zombie)
     local requested = pursuitPriority(ownerValue, requestedPriority)
     requestedIntent = tostring(requestedIntent or "pursuit")
-    if lease and lease.owner ~= ownerValue
-        and (tonumber(lease.priority) or 0) >= requested
-    then
-        return false, lease.owner, "pursuit_lease"
+    if leaseOwner and leaseOwner ~= ownerValue and leasePriority >= requested then
+        return false, leaseOwner, "pursuit_lease"
     end
     if targetOwner and targetOwner ~= ownerValue then
         return false, targetOwner, "native_target"

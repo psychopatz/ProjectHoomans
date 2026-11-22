@@ -36,12 +36,9 @@ local function publishGroupAlert(record, zombie, now, radius)
     local recipients = 0
     if not isAuthority() or not Spatial or not Spatial.QueryNPCs
         or not record or not zombie
-        or not Perception.IsActualZombieBody(zombie)
     then
         return false
     end
-    zombieId = alertId(zombie)
-    if not zombieId then return false end
     Perception.ZombieAlertPublishAt = Perception.ZombieAlertPublishAt
         or setmetatable({}, { __mode = "k" })
     publishState = Perception.ZombieAlertPublishAt[zombie]
@@ -51,6 +48,11 @@ local function publishGroupAlert(record, zombie, now, radius)
         end
         return false
     end
+    if not Perception.IsActualZombieBody(zombie) then
+        return false
+    end
+    zombieId = alertId(zombie)
+    if not zombieId then return false end
     Perception.ZombieAlertSequence =
         (tonumber(Perception.ZombieAlertSequence) or 0) + 1
     sequence = Perception.ZombieAlertSequence
@@ -101,10 +103,16 @@ local function publishGroupAlert(record, zombie, now, radius)
             end
         end
     end
-    Perception.ZombieAlertPublishAt[zombie] = {
-        nextAt = now + (tonumber(Const.ZOMBIE_ALERT_REPUBLISH_MS) or 350),
-        sequence = sequence,
-    }
+    local republishDelay = tonumber(Const.ZOMBIE_ALERT_REPUBLISH_MS) or 350
+    if publishState then
+        publishState.nextAt = now + republishDelay
+        publishState.sequence = sequence
+    else
+        Perception.ZombieAlertPublishAt[zombie] = {
+            nextAt = now + republishDelay,
+            sequence = sequence,
+        }
+    end
     if Diagnostics and Diagnostics.Increment then
         Diagnostics.Increment("NPCThreat.GroupAlert.Published")
         Diagnostics.Increment("NPCThreat.GroupAlert.Recipients", recipients)

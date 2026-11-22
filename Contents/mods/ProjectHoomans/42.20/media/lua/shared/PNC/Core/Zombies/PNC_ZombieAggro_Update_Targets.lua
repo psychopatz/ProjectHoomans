@@ -77,51 +77,58 @@ local function acquireNearestTarget(zombie)
     return nil, nil
 end
 
-local function pursueNPCRecord(zombie, record, npcBody, now, hitSettling)
-    local lease
+local function pursueNPCRecord(zombie, record, npcBody, now, hitSettling, modData)
+    local leaseOwner, leasePriority
     local pursued
+    local closeBlocked = false
     if not record or not npcBody then
         clearMPTargetDirective(zombie, now)
-        return false
+        return false, false
     end
-    lease = Internal.GetPursuitLease
-        and Internal.GetPursuitLease(zombie, now)
-        or nil
-    if lease
-        and Internal.ShouldYieldToPursuitOwner
+    if Internal.GetPursuitLeaseFields then
+        leaseOwner, leasePriority = Internal.GetPursuitLeaseFields(
+            zombie, now, modData
+        )
+        if leaseOwner and leaseOwner ~= "ProjectHoomans"
+            and leasePriority >= 100
+        then
+            if isPursuitAuditEnabled and isPursuitAuditEnabled() then
+                logPursuitDiagnostic(
+                    zombie,
+                    record.id,
+                    "server_target",
+                    "foreign_pursuit_owner",
+                    "owner=" .. tostring(leaseOwner),
+                    now
+                )
+            end
+            return false, false
+        end
+    elseif Internal.ShouldYieldToPursuitOwner
         and Internal.ShouldYieldToPursuitOwner(
             zombie, "ProjectHoomans", now, 100
         )
     then
-        if isPursuitAuditEnabled and isPursuitAuditEnabled() then
-            logPursuitDiagnostic(
-                zombie,
-                record.id,
-                "server_target",
-                "foreign_pursuit_owner",
-                "owner=" .. tostring(lease.owner)
-                    .. " provider=" .. tostring(lease.provider),
-                now
-            )
-        end
-        return false
+        return false, false
     end
     if not Settings.CanZombieTargetRecord(record) then
         Internal.clearZombieTarget(zombie)
         clearMPTargetDirective(zombie, now)
         ZombieAggro.ClearBiteEntryForZombie(zombie, "target_protected")
-        return false
+        return false, false
     end
     if Stealth and Stealth.ShouldSuppressZombieAggro and Stealth.ShouldSuppressZombieAggro(record) then
         suppressForStealth(zombie, record)
         clearMPTargetDirective(zombie, now)
     else
-        pursued = pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
+        pursued, closeBlocked = pursueForcedTarget(
+            zombie, npcBody, record, now, hitSettling, modData
+        )
         if pursued == false then
-            return false
+            return false, false
         end
     end
-    return true
+    return true, closeBlocked == true
 end
 
 

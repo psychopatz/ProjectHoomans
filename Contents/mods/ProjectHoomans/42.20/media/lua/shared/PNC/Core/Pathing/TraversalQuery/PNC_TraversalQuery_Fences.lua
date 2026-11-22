@@ -6,6 +6,17 @@ PNC.TraversalQuery.Internal = PNC.TraversalQuery.Internal or {}
 
 local TraversalQuery = PNC.TraversalQuery
 local Internal = TraversalQuery.Internal
+local FENCE_EDGE_METHODS = {
+    "getHoppableTo",
+    "getWallHoppableTo",
+    "getHoppableThumpableTo",
+}
+local FENCE_NORTH_METHODS = {
+    "getHoppable",
+    "getHoppableWall",
+    "getThumpableWallOrHoppable",
+}
+local WALL_METHODS = { "getWall" }
 
 local FENCE_LANDING_MARGIN = 0.05
 
@@ -144,30 +155,33 @@ function TraversalQuery.GetFenceBetween(fromSquare, toSquare)
     if not Internal.CardinalDelta(fromSquare, toSquare) then
         return nil, false
     end
-    object = Internal.CallFirst(
-        fromSquare,
-        {
-            "getHoppableTo",
-            "getWallHoppableTo",
-            "getHoppableThumpableTo",
-        },
-        toSquare
-    )
+    local hit = false
+    local cachedFence
+    local cachedTall
+    if Internal.LookupEdgeCache then
+        hit, cachedFence, cachedTall = Internal.LookupEdgeCache(
+            "fence",
+            fromSquare,
+            toSquare
+        )
+    end
+    if hit then
+        return (cachedFence ~= false and cachedFence or nil), cachedTall == true
+    end
+    object = Internal.CallFirst(fromSquare, FENCE_EDGE_METHODS, toSquare)
     isFence, isTall = TraversalQuery.IsFence(object)
     if object and isFence then
+        if Internal.StoreEdgeCache then
+            Internal.StoreEdgeCache("fence", fromSquare, toSquare, object, isTall == true)
+        end
         return object, isTall
     end
-    object = Internal.CallFirst(
-        toSquare,
-        {
-            "getHoppableTo",
-            "getWallHoppableTo",
-            "getHoppableThumpableTo",
-        },
-        fromSquare
-    )
+    object = Internal.CallFirst(toSquare, FENCE_EDGE_METHODS, fromSquare)
     isFence, isTall = TraversalQuery.IsFence(object)
     if object and isFence then
+        if Internal.StoreEdgeCache then
+            Internal.StoreEdgeCache("fence", fromSquare, toSquare, object, isTall == true)
+        end
         return object, isTall
     end
     fromX = fromSquare:getX()
@@ -175,9 +189,8 @@ function TraversalQuery.GetFenceBetween(fromSquare, toSquare)
     toX = toSquare:getX()
     toY = toSquare:getY()
     northEdge = math.abs(toY - fromY) >= math.abs(toX - fromX)
-    squares = { fromSquare, toSquare }
-    for i = 1, #squares do
-        square = squares[i]
+    for i = 1, 2 do
+        square = i == 1 and fromSquare or toSquare
         -- Java ground truth (zombie.iso.IsoGridSquare, PZ 42.20): only
         -- getHoppable(boolean north), getHoppableWall(boolean),
         -- getThumpableWallOrHoppable(boolean) and getWall(boolean) accept this
@@ -186,24 +199,25 @@ function TraversalQuery.GetFenceBetween(fromSquare, toSquare)
         -- resolution; that failure corrupts Kahlua's shared MethodArguments
         -- pool and later breaks unrelated bridged calls (item creation), so
         -- they must not be probed with a boolean.
-        object = Internal.CallFirst(
-            square,
-            {
-                "getHoppable",
-                "getHoppableWall",
-                "getThumpableWallOrHoppable",
-            },
-            northEdge
-        )
+        object = Internal.CallFirst(square, FENCE_NORTH_METHODS, northEdge)
         isFence, isTall = TraversalQuery.IsFence(object)
         if object and isFence then
+            if Internal.StoreEdgeCache then
+                Internal.StoreEdgeCache("fence", fromSquare, toSquare, object, isTall == true)
+            end
             return object, isTall
         end
-        object = Internal.CallFirst(square, { "getWall" }, northEdge)
+        object = Internal.CallFirst(square, WALL_METHODS, northEdge)
         isFence, isTall = TraversalQuery.IsFence(object)
         if object and isFence then
+            if Internal.StoreEdgeCache then
+                Internal.StoreEdgeCache("fence", fromSquare, toSquare, object, isTall == true)
+            end
             return object, isTall
         end
+    end
+    if Internal.StoreEdgeCache then
+        Internal.StoreEdgeCache("fence", fromSquare, toSquare, false, false)
     end
     return nil, false
 end

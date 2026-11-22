@@ -251,3 +251,119 @@ function Internal.isDoorCollision(zombie)
         { "isCollidedThisFrame", "isCollided" }
     )
 end
+
+local PASSAGE_RESERVATION_MAX_TTL_MS = 2000
+local PASSAGE_RESERVATION_PRUNE_THRESHOLD = 64
+
+Internal.PassageReservations = Internal.PassageReservations or {}
+
+local function prunePassageReservations(now)
+    local reservations = Internal.PassageReservations
+    local count = 0
+    local key
+    local entry
+    for key, entry in pairs(reservations) do
+        if not entry or (now > 0 and (tonumber(entry.expiresAt) or 0) <= now) then
+            reservations[key] = nil
+        else
+            count = count + 1
+        end
+    end
+    if count >= PASSAGE_RESERVATION_PRUNE_THRESHOLD then
+        Internal.PassageReservations = {}
+    end
+end
+
+function Internal.IsPassageReservedByOther(key, ownerId, now)
+    if not key then return false end
+    local reservations = Internal.PassageReservations
+    local entry = reservations[key]
+    if not entry then return false end
+    local checkNow = tonumber(now) or 0
+    if checkNow > 0 and (tonumber(entry.expiresAt) or 0) <= checkNow then
+        reservations[key] = nil
+        return false
+    end
+    if entry.ownerLane ~= nil
+        and entry.ownerLane.traversalAction == nil
+        and entry.ownerLane.vanillaFenceAction == nil
+    then
+        reservations[key] = nil
+        return false
+    end
+    return entry.ownerId ~= nil and entry.ownerId ~= ownerId
+end
+
+function Internal.ReservePassage(key, ownerId, now, ttlMs, ownerLane)
+    if not key or not ownerId then return false end
+    local checkNow = tonumber(now) or 0
+    local duration = math.min(
+        PASSAGE_RESERVATION_MAX_TTL_MS,
+        math.max(100, tonumber(ttlMs) or 1200)
+    )
+    local reservations = Internal.PassageReservations
+    local existing = reservations[key]
+    if existing then
+        existing.ownerId = ownerId
+        existing.expiresAt = checkNow + duration
+        existing.ownerLane = ownerLane
+        return true
+    end
+    local count = 0
+    for _ in pairs(reservations) do
+        count = count + 1
+        if count >= PASSAGE_RESERVATION_PRUNE_THRESHOLD then
+            prunePassageReservations(checkNow)
+            reservations = Internal.PassageReservations
+            break
+        end
+    end
+    reservations[key] = {
+        ownerId = ownerId,
+        expiresAt = checkNow + duration,
+        ownerLane = ownerLane,
+    }
+    return true
+end
+
+function Internal.ReleasePassageReservation(key, ownerId)
+    if not key then return end
+    local reservations = Internal.PassageReservations
+    local entry = reservations[key]
+    if not entry then return end
+    if ownerId == nil or entry.ownerId == ownerId then
+        reservations[key] = nil
+    end
+end
+
+function Internal.ResetPassageReservations()
+    Internal.PassageReservations = {}
+end
+
+function Internal.holdQueuedPassage(context, ownerMode, reason, keyText)
+    local lane = context and context.lane or nil
+    local now = context and context.now or 0
+    if lane then
+        lane.ownerMode = ownerMode
+        lane.specialMoveUntil = now + 220
+        lane.lastProgressAt = now
+        lane.lastGoalProgressAt = now
+        lane.lastIssueAt = now
+    end
+    Internal.logMoveDebug(
+        context and context.record or nil,
+        context and context.zombie or nil,
+        lane,
+        "passage_queued",
+        reason,
+        "object=" .. tostring(keyText or "nil")
+    )
+    return true, "passage_queued", true
+end
+
+function Internal.releaseLanePassageReservation(record, zombie, lane)
+    local key = lane and lane.reservedPassageKey or nil
+    if not key then return end
+    Internal.ReleasePassageReservation(key, (record and record.id) or zombie)
+    lane.reservedPassageKey = nil
+end

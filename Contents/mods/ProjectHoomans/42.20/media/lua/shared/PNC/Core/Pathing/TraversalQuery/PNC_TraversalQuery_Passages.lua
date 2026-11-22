@@ -6,11 +6,25 @@ PNC.TraversalQuery.Internal = PNC.TraversalQuery.Internal or {}
 
 local TraversalQuery = PNC.TraversalQuery
 local Internal = TraversalQuery.Internal
+local DOOR_METHODS = { "getDoorTo" }
+local WINDOW_METHODS = { "getWindowTo", "getWindowThumpableTo" }
 
 function TraversalQuery.GetPassageBetween(fromSquare, toSquare)
     local object
     if not fromSquare or not toSquare or fromSquare == toSquare then
         return nil
+    end
+    local hit = false
+    local cached
+    if Internal.LookupEdgeCache then
+        hit, cached = Internal.LookupEdgeCache(
+            "passage",
+            fromSquare,
+            toSquare
+        )
+    end
+    if hit then
+        return cached ~= false and cached or nil
     end
     -- Java ground truth (zombie.iso.IsoGridSquare, PZ 42.20): getDoorTo(IsoGridSquare)
     -- and getWindowTo(IsoGridSquare)/getWindowThumpableTo(IsoGridSquare) exist;
@@ -18,23 +32,20 @@ function TraversalQuery.GetPassageBetween(fromSquare, toSquare)
     -- that exists with a non-matching signature is worse than a dead one: it
     -- fails overload resolution inside PZ's Kahlua bridge, which corrupts the
     -- shared MethodArguments pool and breaks unrelated bridged calls later.
-    object = Internal.CallFirst(fromSquare, { "getDoorTo" }, toSquare)
-    if object then
-        return object
+    object = Internal.CallFirst(fromSquare, DOOR_METHODS, toSquare)
+    if not object then
+        object = Internal.CallFirst(toSquare, DOOR_METHODS, fromSquare)
     end
-    object = Internal.CallFirst(toSquare, { "getDoorTo" }, fromSquare)
-    if object then
-        return object
+    if not object then
+        object = Internal.CallFirst(fromSquare, WINDOW_METHODS, toSquare)
     end
-    object = Internal.CallFirst(fromSquare, { "getWindowTo", "getWindowThumpableTo" }, toSquare)
-    if object then
-        return object
+    if not object then
+        object = Internal.CallFirst(toSquare, WINDOW_METHODS, fromSquare)
     end
-    object = Internal.CallFirst(toSquare, { "getWindowTo", "getWindowThumpableTo" }, fromSquare)
-    if object then
-        return object
+    if Internal.StoreEdgeCache then
+        Internal.StoreEdgeCache("passage", fromSquare, toSquare, object or false)
     end
-    return nil
+    return object
 end
 
 function TraversalQuery.FindPassageToward(zombie, goalX, goalY, goalZ, cell)

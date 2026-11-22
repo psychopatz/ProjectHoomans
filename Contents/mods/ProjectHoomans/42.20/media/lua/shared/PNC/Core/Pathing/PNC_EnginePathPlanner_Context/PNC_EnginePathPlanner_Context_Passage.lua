@@ -41,13 +41,18 @@ local function inspectSquareEdge(
         and query.GetPassageBetween(fromSquare, toSquare)
         or nil
     if passage then
-        -- Open doors need no owner; windows remain traversal edges.
-        if not (
-            query.IsDoor
-            and query.IsDoor(passage)
+        -- Open doors need no owner; recently refused closed doors back off
+        -- instead of repeatedly intercepting engine movement; windows remain
+        -- traversal edges.
+        local isDoor = query.IsDoor and query.IsDoor(passage)
+        local isOpenDoor = isDoor
             and query.IsClosedPassage
             and not query.IsClosedPassage(passage)
-        ) then
+        local isRefusedDoor = isDoor
+            and PNC.PathService
+            and PNC.PathService.IsDoorRefused
+            and PNC.PathService.IsDoorRefused(passage)
+        if not isOpenDoor and not isRefusedDoor then
             return cachePathPassage(
                 navigation,
                 fromSquare,
@@ -93,13 +98,8 @@ function Internal.GetUpcomingPathPassage(body, navigation)
     local secondaryY
     local directionKeyX
     local directionKeyY
-    local candidates
-    local candidate
-    local toX
-    local toY
     local toSquare
     local passage
-    local i
     if not body or not navigation then return nil end
     query = PNC.TraversalQuery
     cell = getCell and getCell() or nil
@@ -136,7 +136,16 @@ function Internal.GetUpcomingPathPassage(body, navigation)
         and navigation.inspectedBehaviorResult
             == navigation.lastBehaviorResult
     then
-        return navigation.upcomingPassage
+        local cached = navigation.upcomingPassage
+        if cached and cached.kind == "door"
+            and PNC.PathService
+            and PNC.PathService.IsDoorRefused
+            and PNC.PathService.IsDoorRefused(cached.object)
+        then
+            navigation.upcomingPassage = nil
+            return nil
+        end
+        return cached
     end
     navigation.inspectedEdgeX = bodyX
     navigation.inspectedEdgeY = bodyY
@@ -153,26 +162,17 @@ function Internal.GetUpcomingPathPassage(body, navigation)
         primaryX, primaryY = 0, directionKeyY
         secondaryX, secondaryY = directionKeyX, 0
     end
-    candidates = {
-        { primaryX, primaryY },
-        { secondaryX, secondaryY },
-    }
     fromSquare = cell:getGridSquare(bodyX, bodyY, bodyZ)
     if not fromSquare then return nil end
-    for i = 1, #candidates do
-        candidate = candidates[i]
-        if candidate[1] ~= 0 or candidate[2] ~= 0 then
-            toX = bodyX + candidate[1]
-            toY = bodyY + candidate[2]
-            toSquare = cell:getGridSquare(toX, toY, bodyZ)
-            passage = inspectSquareEdge(
-                navigation,
-                query,
-                fromSquare,
-                toSquare
-            )
-            if passage then return passage end
-        end
+    if primaryX ~= 0 or primaryY ~= 0 then
+        toSquare = cell:getGridSquare(bodyX + primaryX, bodyY + primaryY, bodyZ)
+        passage = inspectSquareEdge(navigation, query, fromSquare, toSquare)
+        if passage then return passage end
+    end
+    if secondaryX ~= 0 or secondaryY ~= 0 then
+        toSquare = cell:getGridSquare(bodyX + secondaryX, bodyY + secondaryY, bodyZ)
+        passage = inspectSquareEdge(navigation, query, fromSquare, toSquare)
+        if passage then return passage end
     end
     return nil
 end

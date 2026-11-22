@@ -98,7 +98,20 @@ local function encumbranceLevel(ratio)
 end
 
 function Inventory.GetEncumbranceState(record, inventory)
-    local inv = inventory or Inventory.EnsureRecordInventory(record)
+    local inv = inventory
+    if not inv and type(record) == "table" then
+        local existing = record.inventory
+        if type(existing) == "table"
+            and existing.items ~= nil
+            and existing.containers ~= nil
+            and existing.cachedWeight ~= nil
+            and existing.maxWeight ~= nil
+        then
+            inv = existing
+        elseif type(Inventory.EnsureRecordInventory) == "function" then
+            inv = Inventory.EnsureRecordInventory(record)
+        end
+    end
     local usedWeight
     local maxWeight
     local ratio

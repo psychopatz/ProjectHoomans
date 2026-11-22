@@ -42,9 +42,12 @@ local function hasActiveWork()
     return false
 end
 
-local function closeOrHitCooldown(zombie, npcBody, hitSettling)
-    if hitSettling == true or not npcBody then
+local function closeOrHitCooldown(zombie, npcBody, hitSettling, closeBlocked)
+    if hitSettling == true then
         return 0
+    end
+    if closeBlocked == true or not npcBody then
+        return (Const and tonumber(Const.ZOMBIE_AGGRO_PURSUIT_INTERVAL_MS)) or 150
     end
     if Core and Core.DistanceSq
         and zombie.getX and zombie.getY
@@ -77,12 +80,13 @@ local function processZombie(zombie, now, foreignChecked)
     local nativePlayerAction
     local idleInterval = (Const and tonumber(Const.ZOMBIE_AGGRO_IDLE_INTERVAL_MS)) or 250
     if foreignChecked ~= true and isForeignOwnedBody(zombie) then
-        return idleInterval, nil
+        return idleInterval, nil, false
     end
+    local modData = Internal.getZombieModData and Internal.getZombieModData(zombie) or nil
     if Internal.ShouldYieldToPursuitOwner
-        and Internal.ShouldYieldToPursuitOwner(zombie, "ProjectHoomans", now)
+        and Internal.ShouldYieldToPursuitOwner(zombie, "ProjectHoomans", now, nil, modData)
     then
-        return idleInterval, nil
+        return idleInterval, nil, false
     end
     if ZombieReaction and ZombieReaction.Pump then
         ZombieReaction.Pump(zombie, now)
@@ -191,27 +195,39 @@ local function processZombie(zombie, now, foreignChecked)
     -- Keep a valid NPC lease through player proximity. Reacquisition below
     -- falls back to players only after this NPC target is no longer eligible.
     record, npcBody = Internal.getForcedNPCBodyTarget(zombie, now)
-    if pursueNPCRecord(zombie, record, npcBody, now, hitSettling) then
-        return closeOrHitCooldown(zombie, npcBody, hitSettling), npcBody
+    local pursued, closeBlocked = pursueNPCRecord(
+        zombie, record, npcBody, now, hitSettling, modData
+    )
+    if pursued then
+        return closeOrHitCooldown(zombie, npcBody, hitSettling, closeBlocked),
+            npcBody, closeBlocked == true
     end
 
     target = zombie.getTarget and zombie:getTarget() or nil
     if Core.IsManagedNPCBody(target) then
         Internal.forceAggro(zombie, target)
         record, npcBody = Internal.getForcedNPCBodyTarget(zombie, now)
-        if pursueNPCRecord(zombie, record, npcBody, now, hitSettling) then
-            return closeOrHitCooldown(zombie, npcBody, hitSettling), npcBody
+        pursued, closeBlocked = pursueNPCRecord(
+            zombie, record, npcBody, now, hitSettling, modData
+        )
+        if pursued then
+            return closeOrHitCooldown(zombie, npcBody, hitSettling, closeBlocked),
+                npcBody, closeBlocked == true
         end
-        return idleInterval, nil
+        return idleInterval, nil, false
     end
     if Internal.isCloseLivePlayerTarget(zombie, target) then
         record, npcBody = acquireNearestTarget(zombie)
-        if not pursueNPCRecord(zombie, record, npcBody, now, hitSettling) then
+        pursued, closeBlocked = pursueNPCRecord(
+            zombie, record, npcBody, now, hitSettling, modData
+        )
+        if not pursued then
             setNoLungeAttack(zombie, false)
             clearMPTargetDirective(zombie, now)
-            return idleInterval, nil
+            return idleInterval, nil, false
         end
-        return closeOrHitCooldown(zombie, npcBody, hitSettling), npcBody
+        return closeOrHitCooldown(zombie, npcBody, hitSettling, closeBlocked),
+            npcBody, closeBlocked == true
     end
     record, npcBody = acquireNearestTarget(zombie)
     if isMultiplayerServer() then
@@ -222,9 +238,9 @@ local function processZombie(zombie, now, foreignChecked)
         end
     end
     if record and npcBody then
-        return 0, npcBody
+        return 0, npcBody, false
     end
-    return idleInterval, nil
+    return idleInterval, nil, false
 end
 
 function ZombieAggro.Pump(now)

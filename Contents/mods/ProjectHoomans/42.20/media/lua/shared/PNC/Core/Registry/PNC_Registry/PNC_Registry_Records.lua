@@ -240,3 +240,4 @@ function Registry.FindRecordByZombie(zombie)
     uuid = modData and modData.PNC_UUID or nil
     return uuid and Registry.Get(uuid) or nil
 end
+Registry._canonicalFindRecordByZombie = Registry.FindRecordByZombie

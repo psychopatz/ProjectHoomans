@@ -271,7 +271,7 @@ end
 
 function Inventory.GetWeightState(record)
     local inv = Inventory.EnsureRecordInventory(record)
-    local encumbrance = inv and Inventory.GetEncumbranceState(record) or nil
+    local encumbrance = inv and Inventory.GetEncumbranceState(record, inv) or nil
     return inv and {
         usedWeight = tonumber(inv.cachedWeight) or 0,
         maxWeight = tonumber(inv.maxWeight) or 0,

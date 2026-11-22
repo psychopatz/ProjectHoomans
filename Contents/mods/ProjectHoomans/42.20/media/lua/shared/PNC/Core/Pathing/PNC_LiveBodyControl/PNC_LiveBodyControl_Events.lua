@@ -87,6 +87,22 @@ local function findNearbyPlantFreeSquare(zombie, square)
     return nil
 end
 
+local function setPlantProtectionState(zombie, state, square)
+    if state then
+        state.square = square
+        state.x = zombie:getX()
+        state.y = zombie:getY()
+        state.z = zombie:getZ()
+    else
+        plantProtectionState[zombie] = {
+            square = square,
+            x = zombie:getX(),
+            y = zombie:getY(),
+            z = zombie:getZ(),
+        }
+    end
+end
+
 function LiveBodyControl.ProtectManagedPlant(zombie)
     local square
     local state
@@ -113,12 +129,7 @@ function LiveBodyControl.ProtectManagedPlant(zombie)
     end
     state = plantProtectionState[zombie]
     if not hasFarmingPlant(square) then
-        plantProtectionState[zombie] = {
-            square = square,
-            x = zombie:getX(),
-            y = zombie:getY(),
-            z = zombie:getZ(),
-        }
+        setPlantProtectionState(zombie, state, square)
         return false
     end
     safeSquare = state and state.square or nil
@@ -126,12 +137,7 @@ function LiveBodyControl.ProtectManagedPlant(zombie)
         safeSquare = findNearbyPlantFreeSquare(zombie, square)
     end
     if safeSquare and relocateToSquare(zombie, safeSquare) then
-        plantProtectionState[zombie] = {
-            square = safeSquare,
-            x = zombie:getX(),
-            y = zombie:getY(),
-            z = zombie:getZ(),
-        }
+        setPlantProtectionState(zombie, state, safeSquare)
         return true
     end
     return false
@@ -180,6 +186,13 @@ function LiveBodyControl.OnZombieUpdate(zombie)
     local now
     local animation = PNC.Animation
     local canPump = true
+    local isManagedFn
+    if not zombie then return end
+    isManagedFn = (PNC.Core and PNC.Core.IsManagedNPCBody)
+        or (Core and Core.IsManagedNPCBody)
+    if isManagedFn and not isManagedFn(zombie) then
+        return
+    end
     --[[
         Engine climb guard, placed before the managed-safety gate on purpose.
 
@@ -191,15 +204,13 @@ function LiveBodyControl.OnZombieUpdate(zombie)
         items for every PNC shell with a climbable window ahead removes the only
         reason that packet path fires.
     ]]
-    if PNC.Core and PNC.Core.IsManagedNPCBody
-        and PNC.Core.IsManagedNPCBody(zombie)
-        and LiveBodyControl.ClearHeavyItemsForClimbAhead
-    then
+    if isManagedFn and LiveBodyControl.ClearHeavyItemsForClimbAhead then
         LiveBodyControl.ClearHeavyItemsForClimbAhead(zombie)
     end
     if not LiveBodyControl.EnforceManagedSafety(
         zombie,
-        "zombie_update"
+        "zombie_update",
+        isManagedFn ~= nil
     ) then
         return
     end
