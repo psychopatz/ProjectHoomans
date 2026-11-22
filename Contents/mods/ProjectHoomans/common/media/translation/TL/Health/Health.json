@@ -42,5 +42,9 @@
     "UI_PNC_Wound_scratch": "gasgas",
     "UI_PNC_Health_Incapacitated": "Walang kakayahan - %1",
     "UI_PNC_Health_CriticalInjury": "malubhang pinsala",
-    "UI_PNC_Health_IncapacitatedHelp": "Bendahan ang mga sugat; tatayo sila kapag sapat na ang paggaling."
+    "UI_PNC_Health_IncapacitatedHelp": "Bendahan ang mga sugat; tatayo sila kapag sapat na ang paggaling.",
+    "UI_PNC_Health_ColdIllness": "Sipon",
+    "UI_PNC_Health_Hypothermia": "Lamig sa Katawan",
+    "UI_PNC_Health_Hyperthermia": "Sobra ang Init",
+    "UI_PNC_Health_WoundInfection": "Impeksyon sa Sugat"
 }

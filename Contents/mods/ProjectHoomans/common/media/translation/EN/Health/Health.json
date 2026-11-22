@@ -42,5 +42,9 @@
     "UI_PNC_Wound_scratch": "Scratch",
     "UI_PNC_Health_Incapacitated": "Incapacitated - %1",
     "UI_PNC_Health_CriticalInjury": "critical injury",
-    "UI_PNC_Health_IncapacitatedHelp": "Bandage the wounds; they will stand once sufficiently recovered."
+    "UI_PNC_Health_IncapacitatedHelp": "Bandage the wounds; they will stand once sufficiently recovered.",
+    "UI_PNC_Health_ColdIllness": "Cold",
+    "UI_PNC_Health_Hypothermia": "Hypothermia",
+    "UI_PNC_Health_Hyperthermia": "Heat Stress",
+    "UI_PNC_Health_WoundInfection": "Wound Infection"
 }

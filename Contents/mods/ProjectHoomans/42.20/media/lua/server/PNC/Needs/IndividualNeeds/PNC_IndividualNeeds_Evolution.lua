@@ -76,6 +76,11 @@ function Needs.Update(record, elapsedHours, reason, stateOverride,
     if consequences and consequences.Apply then
         consequences.Apply(record, beforeState, state, rates, elapsedHours)
     end
+    if PNC.NPCWounds and type(PNC.NPCWounds.UpdatePhysiology) == "function" then
+        if PNC.NPCWounds.UpdatePhysiology(record, elapsedHours, nil) then
+            anyChanged = true
+        end
+    end
     local nutrition = Needs.IsNutritionRealismEnabled()
         and Needs.EnsureNutrition(record) or nil
     if nutrition and NutritionModel then

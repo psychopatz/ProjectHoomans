@@ -119,76 +119,7 @@ Definitions.HUNGER_OVERFLOW = { maximum = 4.0 }
 Definitions.CONSEQUENCES = {
     criticalThreshold = 0.84, nonlethalHealthFloor = 10,
 }
--- Whole Body ailments are abstract conditions. Their state lives on the
--- NPC's health body rather than on a bandageable body part. Server-side need
--- consequence policies decide how each condition builds, recovers, and
--- damages health; these shared definitions describe their source and UI.
-Definitions.WHOLE_BODY_AILMENT_ORDER = {
-    "starvation", "dehydration", "knox_fever", "blood_loss",
-}
-Definitions.WHOLE_BODY_AILMENTS = {
-    starvation = {
-        id = "starvation", needType = "hunger",
-        label = "Starvation", labelKey = "UI_PNC_Health_Starvation",
-        cause = "Hunger", causeKey = "UI_PNC_Health_Hunger",
-    },
-    dehydration = {
-        id = "dehydration", needType = "thirst",
-        label = "Dehydration", labelKey = "UI_PNC_Health_Dehydration",
-        cause = "Thirst", causeKey = "UI_PNC_Health_Thirst",
-    },
-    -- Fever classes are metadata, not UI copy. A future curable fever can
-    -- use the same Whole Body slot without changing the state shape.
-    knox_fever = {
-        id = "knox_fever", label = "Fever",
-        labelKey = "UI_PNC_Health_Fever", feverClass = "incurable",
-        curable = false, severityProgression = "building",
-    },
-    blood_loss = {
-        id = "blood_loss", label = "Losing blood",
-        labelKey = "UI_PNC_Health_Losing_Blood", displayMode = "flavor",
-        flavorOnly = true, cause = "Active bleeding",
-        causeKey = "UI_PNC_Health_Active_Bleeding",
-    },
-}
-
-function Definitions.GetWholeBodyAilment(ailmentID)
-    return Definitions.WHOLE_BODY_AILMENTS[tostring(ailmentID or "")]
-end
-
-Definitions.SUPPLY = {
-    hunger = {
-        resourceKind = "FOOD", trigger = 0.25, target = 0.10,
-        priorityBase = 55, retryHours = 0.25, urgentRetryHours = 0.05,
-    },
-    thirst = {
-        resourceKind = "HYDRATION", trigger = 0.25, target = 0.10,
-        -- Manual drinking is an explicit player command. Give it a visible
-        -- sip even when the need is already below the automatic target;
-        -- automatic supply still consumes only the calculated deficit.
-        manualMinimum = 0.10,
-        priorityBase = 70, retryHours = 0.20, urgentRetryHours = 0.04,
-    },
-    medical = {
-        resourceKind = "MEDICAL", priorityBase = 95,
-        retryHours = 0.10, urgentRetryHours = 0.025,
-    },
-}
-Definitions.SUPPLY_MATERIAL_CHANGE = 0.10
-Definitions.SUPPLY_MAX_CANDIDATES = 24
-Definitions.SUPPLY_MAX_SELECTIONS = 3
-Definitions.SUPPLY_MAX_USES = 8
--- Critical need responses may exceed the normal three-item refill batch, but
--- still have a hard safety bound. Selection math stops at the actual deficit.
-Definitions.SUPPLY_MAX_STATE_AWARE_SELECTIONS = 64
--- Needs owns when sleep becomes actionable and when rest is complete. Tasking
--- consumes this policy as intent metadata; it must not duplicate thresholds.
-Definitions.SLEEP_TASK = {
-    actionable = 0.70,
-    critical = 0.80,
-    completion = 0.12,
-    recoveryPerGameHour = 0.45,
-}
+require "PNC/Core/Needs/PNC_NeedsCatalog"
 
 function Definitions.Get(needType)
     return Definitions.BY_ID[tostring(needType or "")]

@@ -1,5 +1,6 @@
 PNC = PNC or {}
 require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_OrdinaryInfection"
+require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Physiology"
 
 local Wounds = PNC.NPCWounds
 local Internal = Wounds.Internal
@@ -106,6 +107,9 @@ function Wounds.Update(record, zombie, now)
         if wbChanged then changed = true end
     end
     if body.infection and body.infection.active == true and Internal.RefreshInfectionState(record, currentHour, true, zombie) then
+        changed = true
+    end
+    if type(Wounds.UpdatePhysiology) == "function" and Wounds.UpdatePhysiology(record, nil, nil) then
         changed = true
     end
     if changed then
