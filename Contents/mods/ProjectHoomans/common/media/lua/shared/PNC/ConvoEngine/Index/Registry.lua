@@ -583,6 +583,12 @@ return {
         ["recordCount"] = 21,
     },
     {
+        ["domain"] = "thematic_interactive",
+        ["kind"] = "dialogue",
+        ["module"] = "PNC/ConvoEngine/Index/Dialogue/ThematicInteractive",
+        ["recordCount"] = 8,
+    },
+    {
         ["domain"] = "trading",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/Trading",

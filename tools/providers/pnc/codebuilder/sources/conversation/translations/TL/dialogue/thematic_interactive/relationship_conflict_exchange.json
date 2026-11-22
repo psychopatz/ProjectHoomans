@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "mediate_exchange",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": "Nagkakainitan na naman ang lahat dahil sa bantayan at sa rasyon. Kailangan nating ayusin ito bago may maglayas.",
+    "reply.reconciled.say.variants.default": "Sige. Lahat tayo pagod at kulang sa tulog. Hatiin natin nang pantay ang bantay at kalimutan na ito.",
+    "reply.deferred.say.variants.default": "Sige. Palamig muna tayo at pag-usapan kapag nakainom ng tubig at nakapahinga.",
+    "reply.acknowledged.say.variants.default": "Naiintindihan kita. Walang may gustong manlamang dito—kailangan lang ng malinaw na usapan.",
+    "reply.strained.say.variants.default": "Hayaan na. Walang kuwenta makipag-usap kung walang nakikinig."
+  }
+}

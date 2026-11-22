@@ -1,0 +1,339 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "combat.aftermath",
+  "id": "debrief_exchange",
+  "owner": "ProjectHoomans",
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "repeatable",
+  "closure": {
+    "closureClass": "resolved_episode",
+    "episodeId": "combat_aftermath_debrief_exchange"
+  },
+  "statePolicy": [
+    {
+      "id": "blocked_unsafe_or_hostile",
+      "when": {
+        "any": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "==",
+            "value": true
+          }
+        ]
+      },
+      "outcome": "blocked",
+      "reason": "hostile_combat_or_incapacitated",
+      "admission": "no_op",
+      "replyOutcome": "refused"
+    },
+    {
+      "id": "combat_aftermath_ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
+  },
+  "reply": {
+    "debriefed": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "cleared": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "shaken": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "refused": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "triggers": [
+      {
+        "intent": "QUESTION",
+        "subject": "COMBAT_AFTERMATH"
+      },
+      {
+        "intent": "INFORM",
+        "subject": "COMBAT_AFTERMATH"
+      }
+    ],
+    "flow": {
+      "id": "combat.aftermath.debrief_exchange",
+      "version": 1,
+      "owner": "ProjectHoomans",
+      "constraints": {
+        "all": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "neq",
+            "value": true
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "not_in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          }
+        ]
+      },
+      "initial": "catch_breath",
+      "nodes": {
+        "catch_breath": {
+          "slots": {
+            "threat": {
+              "type": "string",
+              "owner": "combat.aftermath.debrief_exchange",
+              "source": "slots.threat.value"
+            },
+            "location": {
+              "type": "string",
+              "owner": "combat.aftermath.debrief_exchange",
+              "source": "slots.location.value"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "combat.aftermath.check_wounds",
+              "labelKey": "UI_PNC_CombatAftermath_CheckWounds_Label",
+              "labelFallback": "Check for bites or tears",
+              "utteranceKey": "UI_PNC_CombatAftermath_CheckWounds_Utterance",
+              "utteranceFallback": "You alright? Any scratches or rips in your jacket?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "WELLBEING"
+              }
+            },
+            {
+              "id": "combat.aftermath.secure_area",
+              "labelKey": "UI_PNC_CombatAftermath_SecureArea_Label",
+              "labelFallback": "Bar the back door",
+              "utteranceKey": "UI_PNC_CombatAftermath_SecureArea_Utterance",
+              "utteranceFallback": "I'll wedge a chair under the back door while you catch your breath.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "OFFER",
+                "speechAct": "OFFER",
+                "subject": "COMBAT_AFTERMATH"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "WELLBEING"
+            },
+            {
+              "intent": "OFFER",
+              "speechAct": "OFFER",
+              "subject": "COMBAT_AFTERMATH"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "WELLBEING"
+            }
+          ],
+          "onMatch": "assess_aftermath",
+          "onRefuse": "shaken_withdrawal",
+          "onUnrelated": "suspend"
+        },
+        "assess_aftermath": {
+          "branchOffers": [
+            {
+              "id": "combat.aftermath.steady_down",
+              "labelKey": "UI_PNC_CombatAftermath_SteadyDown_Label",
+              "labelFallback": "Confirm the alley is clear",
+              "utteranceKey": "UI_PNC_CombatAftermath_SteadyDown_Utterance",
+              "utteranceFallback": "Looks like we lost the rest of them down the side street.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "COMBAT_AFTERMATH",
+                "stateValue": "clear"
+              }
+            },
+            {
+              "id": "combat.aftermath.admit_shaken",
+              "labelKey": "UI_PNC_CombatAftermath_AdmitShaken_Label",
+              "labelFallback": "Take a minute to steady",
+              "utteranceKey": "UI_PNC_CombatAftermath_AdmitShaken_Utterance",
+              "utteranceFallback": "My hands are still shaking. Just give me a minute.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "WELLBEING",
+                "stateValue": "shaken"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "COMBAT_AFTERMATH",
+              "stateValue": "clear"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "WELLBEING",
+              "stateValue": "shaken"
+            },
+            {
+              "intent": "AGREE"
+            }
+          ],
+          "onMatch": "debriefed",
+          "onRefuse": "shaken_withdrawal",
+          "onUnrelated": "suspend"
+        },
+        "debriefed": {
+          "terminal": true
+        },
+        "shaken_withdrawal": {
+          "terminal": true
+        }
+      }
+    },
+    "replySemantics": {
+      "debriefed": {
+        "stance": "positive",
+        "outcome": "debriefed"
+      },
+      "cleared": {
+        "stance": "neutral",
+        "outcome": "cleared"
+      },
+      "shaken": {
+        "stance": "contextual",
+        "outcome": "shaken"
+      },
+      "refused": {
+        "stance": "negative",
+        "outcome": "refused"
+      }
+    }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "combat",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "combat_aftermath",
+      "domain": "combat"
+    }
+  ]
+}

@@ -1,0 +1,503 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "id": "wellbeing.needs.checkin",
+  "owner": "ProjectHoomans",
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "repeatable",
+  "closure": {
+    "closureClass": "none"
+  },
+  "statePolicy": [
+    {
+      "id": "blocked_unavailable_or_hostile",
+      "when": {
+        "any": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "==",
+            "value": true
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          }
+        ]
+      },
+      "outcome": "blocked",
+      "reason": "hostile_busy_or_incapacitated",
+      "admission": "no_op",
+      "replyOutcome": "blocked"
+    },
+    {
+      "id": "wellbeing_checkin_ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "variants": [
+      {
+        "id": "default"
+      },
+      {
+        "id": "positive"
+      },
+      {
+        "id": "neutral"
+      },
+      {
+        "id": "negative"
+      },
+      {
+        "id": "contextual"
+      }
+    ]
+  },
+  "reply": {
+    "blocked": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "negative"
+          }
+        ]
+      }
+    },
+    "supported": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "positive"
+          }
+        ]
+      }
+    },
+    "deferred": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "neutral"
+          },
+          {
+            "id": "contextual"
+          }
+        ]
+      }
+    },
+    "declined": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "negative"
+          }
+        ]
+      }
+    },
+    "evasive": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "neutral"
+          }
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "category": "projecthoomans:thematic_interactive",
+    "contentOwner": "projecthoomans.dialogue_content.wellbeing",
+    "stances": [
+      "positive",
+      "neutral",
+      "negative",
+      "contextual"
+    ],
+    "outcomes": [
+      "supported",
+      "deferred",
+      "declined",
+      "evasive",
+      "blocked"
+    ],
+    "triggers": [
+      {
+        "intent": "QUESTION",
+        "subject": "WELLBEING"
+      },
+      {
+        "intent": "QUESTION",
+        "subject": "NEEDS"
+      }
+    ],
+    "flow": {
+      "id": "wellbeing.needs.checkin",
+      "version": 1,
+      "owner": "ProjectHoomans",
+      "constraints": {
+        "all": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "neq",
+            "value": true
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "not_in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          }
+        ]
+      },
+      "initial": "checkin_opening",
+      "nodes": {
+        "checkin_opening": {
+          "responsePool": "semantic.wellbeing.needs.checkin.opening",
+          "slots": {
+            "person": {
+              "type": "string",
+              "owner": "social",
+              "source": "slots.person"
+            },
+            "item": {
+              "type": "string",
+              "owner": "inventory",
+              "source": "slots.item"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "wellbeing.checkin.admit_need",
+              "labelKey": "UI_PNC_Conversation_Suggestion_WellbeingAdmitNeed_Label",
+              "labelFallback": "Ask what's running low",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_WellbeingAdmitNeed_Utterance",
+              "utteranceFallback": "Don't sugarcoat it—water, food, bandages, what are you short on?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "NEEDS"
+              }
+            },
+            {
+              "id": "wellbeing.checkin.holding_steady",
+              "labelKey": "UI_PNC_Conversation_Suggestion_WellbeingSteady_Label",
+              "labelFallback": "Say you're holding up",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_WellbeingSteady_Utterance",
+              "utteranceFallback": "Still on my feet. Tired, sure, but I've got enough to get through tonight.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "selfDirected": true,
+                "stateType": "WELLBEING",
+                "stateValue": "positive"
+              }
+            },
+            {
+              "id": "wellbeing.checkin.clarify_condition",
+              "labelKey": "UI_PNC_Conversation_Suggestion_WellbeingClarify_Label",
+              "labelFallback": "Check if injured",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_WellbeingClarify_Utterance",
+              "utteranceFallback": "You're favoring your side—is that a scrape, or are you just worn down?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "CLARIFY",
+                "speechAct": "CLARIFY",
+                "subject": "WELLBEING"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "NEEDS"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "stateType": "WELLBEING"
+            },
+            {
+              "intent": "CLARIFY",
+              "speechAct": "CLARIFY",
+              "subject": "WELLBEING"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "assess_need",
+          "onClarify": "clarify_condition",
+          "onRefuse": "declined_help",
+          "onUnrelated": "suspend"
+        },
+        "clarify_condition": {
+          "responsePool": "semantic.wellbeing.needs.checkin.clarify",
+          "slots": {
+            "item": {
+              "type": "string",
+              "owner": "inventory",
+              "source": "slots.item"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "wellbeing.checkin.name_need",
+              "labelKey": "UI_PNC_Conversation_Suggestion_WellbeingNameNeed_Label",
+              "labelFallback": "Name what's needed",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_WellbeingNameNeed_Utterance",
+              "utteranceFallback": "Clean water and a strip of cloth would go a long way right now.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "NEEDS"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "NEEDS"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "assess_need",
+          "onRefuse": "declined_help",
+          "onUnrelated": "suspend"
+        },
+        "assess_need": {
+          "responsePool": "semantic.wellbeing.needs.checkin.assess",
+          "slots": {
+            "item": {
+              "type": "string",
+              "owner": "inventory",
+              "source": "slots.item"
+            },
+            "location": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.location"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "wellbeing.checkin.offer_help",
+              "labelKey": "UI_PNC_Conversation_Suggestion_WellbeingOfferHelp_Label",
+              "labelFallback": "Offer to pitch in",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_WellbeingOfferHelp_Utterance",
+              "utteranceFallback": "I can spare a bottle or a bandage if we're splitting the load.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "PROMISE",
+                "speechAct": "PROMISE",
+                "subject": "NEEDS"
+              }
+            },
+            {
+              "id": "wellbeing.checkin.defer_rest",
+              "labelKey": "UI_PNC_Conversation_Suggestion_WellbeingDefer_Label",
+              "labelFallback": "Suggest resting first",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_WellbeingDefer_Utterance",
+              "utteranceFallback": "Let's get off the street and catch our breath before we sort supplies.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "SUGGEST",
+                "speechAct": "SUGGEST",
+                "subject": "WELLBEING"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "PROMISE",
+              "speechAct": "PROMISE",
+              "subject": "NEEDS"
+            },
+            {
+              "intent": "SUGGEST",
+              "speechAct": "SUGGEST",
+              "subject": "WELLBEING"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "resolve_checkin",
+          "onRefuse": "declined_help",
+          "onUnrelated": "suspend"
+        },
+        "resolve_checkin": {
+          "responsePool": "semantic.wellbeing.needs.checkin.resolve",
+          "branchOffers": [
+            {
+              "id": "wellbeing.checkin.confirm_support",
+              "labelKey": "UI_PNC_Conversation_Suggestion_WellbeingConfirm_Label",
+              "labelFallback": "Confirm check-in",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_WellbeingConfirm_Utterance",
+              "utteranceFallback": "Good. Sing out before things get worse—no sense toughing it out alone.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "ACCEPT",
+                "speechAct": "ACCEPT"
+              }
+            },
+            {
+              "id": "wellbeing.checkin.agree_steady",
+              "labelKey": "UI_PNC_Conversation_Suggestion_WellbeingAgree_Label",
+              "labelFallback": "Keep watching out",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_WellbeingAgree_Utterance",
+              "utteranceFallback": "Appreciate it. Stay hydrated and keep your head on a swivel.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "AGREE",
+                "speechAct": "AGREE"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "ACCEPT",
+              "speechAct": "ACCEPT"
+            },
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "complete",
+          "onRefuse": "declined_help",
+          "onUnrelated": "suspend"
+        },
+        "declined_help": {
+          "terminal": true,
+          "responsePool": "semantic.wellbeing.needs.checkin.declined"
+        },
+        "complete": {
+          "terminal": true,
+          "responsePool": "semantic.wellbeing.needs.checkin.complete"
+        }
+      }
+    }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "wellbeing",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "wellbeing",
+      "domain": "wellbeing"
+    },
+    {
+      "id": "needs",
+      "domain": "wellbeing"
+    }
+  ]
+}

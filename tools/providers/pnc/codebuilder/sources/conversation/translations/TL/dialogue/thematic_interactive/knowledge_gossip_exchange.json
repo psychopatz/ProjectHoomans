@@ -1,0 +1,38 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "knowledge.gossip.exchange",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": [
+      "May nabalitaan ka ba mula sa kabilang kalsada? Sinusubukan kong alamin kung ano pa ang ligtas puntahan.",
+      "May nasagap ka ba sa radyo o sa ibang napadaan dito?"
+    ],
+    "say.variants.positive": [
+      "Buti nagkita tayo rito—may magandang balita ka ba tungkol sa malinis na daan o gamit sa malapit?",
+      "May sandali ka ba para magpalitan ng balita? Malaking bagay kapag nagtutulungan sa impormasyon."
+    ],
+    "say.variants.neutral": [
+      "Ano'ng balita rito nitong mga nakaraang araw—may galaw ba sa highway o malapit sa bayan?",
+      "May kailangan ba akong malaman bago tumawid sa susunod na kanto?"
+    ],
+    "say.variants.negative": [
+      "Ang daming kung ano-anong kuwento ngayon. May narinig ka bang totoong mapagkakatiwalaan?",
+      "Ang hirap nang malaman kung alin ang totoo sa gawa ng takot—ano'ng sabi-sabi sa gawi n'yo?"
+    ],
+    "say.variants.contextual": [
+      "May nakita akong usok sa silangan ng ilog kanina, at nakakakaba na rin 'yong chopper nitong linggo. May balita ka ba?",
+      "Usap-usapan ang mga barikada at nilimas na botika—may katotohanan ba roon?"
+    ],
+    "reply.blocked.say.variants.default": "Hindi ito ang oras para sa tsismis—yumuko ka lang.",
+    "reply.blocked.say.variants.negative": "Itigil muna ang kuwentuhan. Bantayan mo ang kalye.",
+    "reply.known.say.variants.default": "Oo, nakita ko mismo—barado sa {slot.location}, kaya umiwas ka roon kung marunong kang mag-ingat.",
+    "reply.known.say.variants.positive": "Oo naman—{addressee.name}, sigurado ang balitang 'yan. Tandaan mo para sa lakad mo.",
+    "reply.known.say.variants.contextual": "Mapapatunayan ko ang parte niyan: may nakita akong bagong bakas at bukas na pinto malapit sa strip mall kahapon.",
+    "reply.unknown.say.variants.default": "Hindi ko masasabi. Wala akong narinig kahit ano tungkol diyan.",
+    "reply.unknown.say.variants.neutral": "Walang ideya—dito lang ako sa bloke na 'to nagbabantay, wala akong nasagap na balita.",
+    "reply.uncertain.say.variants.default": "Narinig kong pinag-uusapan ng iba, oo, pero hindi ko ipupusta ang buhay ko roon.",
+    "reply.uncertain.say.variants.contextual": "Puwedeng totoo, puwedeng may natakot lang sa anino. Ituring mo lang munang sabi-sabi hanggang makita mo.",
+    "reply.refused.say.variants.default": "Hindi ako nakikisali sa mga sabi-sabi. Sa iba ka na lang magtanong.",
+    "reply.refused.say.variants.negative": "Huwag mo akong idamay diyan. Mabilis kumalat ang balita, pati na rin ang gulo."
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "wellbeing.needs.checkin",
+  "locale": "EN",
+  "entries": {
+    "say.variants.default": [
+      "You holding up all right? You look like you've had a rough stretch.",
+      "Got a minute to check in—how are your food, water, and bandages looking?"
+    ],
+    "say.variants.positive": [
+      "Glad to see you still on your feet. Need anything while we've got a quiet moment?",
+      "You're looking steadier than most folks out here. Everything holding together?"
+    ],
+    "say.variants.neutral": [
+      "Just checking in. Running low on clean water, food, or anything to patch up with?",
+      "How's your shape today—hungry, beat, or managing okay?"
+    ],
+    "say.variants.negative": [
+      "You look half-spent. Don't tell me you're fine if you're running on empty.",
+      "Rough day? Let's make sure you're not hiding a bad cut or an empty canteen."
+    ],
+    "say.variants.contextual": [
+      "With the water pressure gone and the nights getting colder, how are you keeping up?",
+      "Long haul through these streets—you got enough left in the tank to keep going?"
+    ],
+    "reply.blocked.say.variants.default": "Can't do this right now—keep your eyes up.",
+    "reply.blocked.say.variants.negative": "Leave it. I've got bigger problems in front of me.",
+    "reply.supported.say.variants.default": "Appreciate that. Knowing someone's got an eye out helps more than you'd think.",
+    "reply.supported.say.variants.positive": "Thanks, {addressee.name}. A little help goes a long way out here.",
+    "reply.deferred.say.variants.default": "Let's get somewhere with four walls first, then we'll sort out what's short.",
+    "reply.deferred.say.variants.neutral": "Holding steady for now. Ask me again once we're off the open road.",
+    "reply.deferred.say.variants.contextual": "I'll manage until dusk—just need a quiet roof and five minutes off my feet.",
+    "reply.declined.say.variants.default": "I'm fine. Worry about your own pack.",
+    "reply.declined.say.variants.negative": "Don't fuss over me. I'll handle my own business.",
+    "reply.evasive.say.variants.default": "Getting by well enough. No sense complaining about it.",
+    "reply.evasive.say.variants.neutral": "Same as everybody else—tired, hungry, still kicking."
+  }
+}

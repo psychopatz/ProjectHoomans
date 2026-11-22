@@ -1,0 +1,38 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.identity.personal_history",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": [
+      "Ang hirap nang isipin kung ano'ng hitsura ng lugar na 'to bago mag-Hulyo. Nasaan ka noong nagsimulang magkagulo?",
+      "Kung magbabantayan tayo ng likod, naisip kong itanong—tagasaan ka bago nangyari lahat ng 'to?"
+    ],
+    "say.variants.positive": [
+      "Ang sarap kausap ng nakakaalala pa ng normal na buhay. Ano'ng trabaho mo rati rito?",
+      "Lagi kong iniisip kung sino pa ang nakalabas sa mga kalapit-bayan. Taga-Knox County ka ba talaga?"
+    ],
+    "say.variants.neutral": [
+      "Nasaan ka noong isinara ang mga kalsada?",
+      "Taga-Muldraugh o West Point ka ba, o naabutan ka lang habang bumibiyahe?"
+    ],
+    "say.variants.negative": [
+      "Hindi masyadong nagkukuwento ang mga tao rito tungkol sa dati nilang buhay. Minsan masakit lang balikan.",
+      "Hindi ako nanghihimasok—tinatanong ko lang kung tagarito ka o galing pa sa labas ng lugar."
+    ],
+    "say.variants.contextual": [
+      "Nakakapanibago pa rin tingnan ang mga bakanteng tindahan. May pamilya o trabaho ka ba rito dati?",
+      "Minsan mas mabigat pa ang katahimikan kaysa sa mga sirena noon. Sino ka bago namatay ang mga balita sa TV?"
+    ],
+    "reply.blocked.say.variants.default": "Hindi ito ang oras para sa kuwento ng buhay.",
+    "reply.blocked.say.variants.negative": "Itago mo na muna. Tumingin ka sa kalsada.",
+    "reply.shared.say.variants.default": "Nakakatawang isipin kung gaano kabilis nawalan ng saysay ang dating trabaho, 'no? Mabuti't nakilala kita kahit papaano.",
+    "reply.shared.say.variants.positive": "Nakakagaan maalala na may totoong buhay tayo noon, {addressee.name}. Salamat sa pagkukuwento.",
+    "reply.guarded.say.variants.default": "Sabihin na lang nating sanay akong magtrabaho gamit ang kamay at hanggang doon na lang muna.",
+    "reply.guarded.say.variants.neutral": "Tahimik akong namuhay noon, at mas gusto kong gano'n pa rin ngayon.",
+    "reply.guarded.say.variants.contextual": "Masyadong maraming pangalang ayoko nang banggitin nang malakas. Baka sa ibang gabi na lang.",
+    "reply.evasive.say.variants.default": "Hindi na mahalaga kung ano ako noon. Ang mahalaga lang ay kung ano'ng magpapabuhay sa atin ngayon.",
+    "reply.evasive.say.variants.neutral": "Mahabang kuwento, at wala roon ang maglalagay ng pagkain sa bag natin.",
+    "reply.refused.say.variants.default": "Mas gugustuhin kong huwag nang hukayin 'yan.",
+    "reply.refused.say.variants.negative": "Huwag mo nang itanong. Akin na lang ang nakaraan ko."
+  }
+}

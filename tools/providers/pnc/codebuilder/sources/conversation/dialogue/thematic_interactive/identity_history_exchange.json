@@ -1,0 +1,509 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "id": "social.identity.personal_history",
+  "owner": "ProjectHoomans",
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "repeatable",
+  "closure": {
+    "closureClass": "none"
+  },
+  "statePolicy": [
+    {
+      "id": "blocked_unavailable_or_hostile",
+      "when": {
+        "any": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "==",
+            "value": true
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          }
+        ]
+      },
+      "outcome": "blocked",
+      "reason": "hostile_busy_or_incapacitated",
+      "admission": "no_op",
+      "replyOutcome": "blocked"
+    },
+    {
+      "id": "personal_history_ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "variants": [
+      {
+        "id": "default"
+      },
+      {
+        "id": "positive"
+      },
+      {
+        "id": "neutral"
+      },
+      {
+        "id": "negative"
+      },
+      {
+        "id": "contextual"
+      }
+    ]
+  },
+  "reply": {
+    "blocked": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "negative"
+          }
+        ]
+      }
+    },
+    "shared": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "positive"
+          }
+        ]
+      }
+    },
+    "guarded": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "neutral"
+          },
+          {
+            "id": "contextual"
+          }
+        ]
+      }
+    },
+    "evasive": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "neutral"
+          }
+        ]
+      }
+    },
+    "refused": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "negative"
+          }
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "category": "projecthoomans:thematic_interactive",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "stances": [
+      "positive",
+      "neutral",
+      "negative",
+      "contextual"
+    ],
+    "outcomes": [
+      "shared",
+      "guarded",
+      "evasive",
+      "refused",
+      "blocked"
+    ],
+    "triggers": [
+      {
+        "intent": "QUESTION",
+        "subject": "BACKSTORY"
+      },
+      {
+        "intent": "QUESTION",
+        "subject": "IDENTITY"
+      }
+    ],
+    "flow": {
+      "id": "social.identity.personal_history",
+      "version": 1,
+      "owner": "ProjectHoomans",
+      "constraints": {
+        "all": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "neq",
+            "value": true
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "not_in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          }
+        ]
+      },
+      "initial": "ask_background",
+      "nodes": {
+        "ask_background": {
+          "responsePool": "semantic.social.identity.personal_history.opening",
+          "slots": {
+            "location": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.location"
+            },
+            "person": {
+              "type": "string",
+              "owner": "social",
+              "source": "slots.person"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "identity.history.share_roots",
+              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryShareRoots_Label",
+              "labelFallback": "Share where you're from",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryShareRoots_Utterance",
+              "utteranceFallback": "I was working over in Muldraugh when the phones went dead. What about you?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "BACKSTORY"
+              }
+            },
+            {
+              "id": "identity.history.ask_trade",
+              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryAskTrade_Label",
+              "labelFallback": "Ask what they did before",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryAskTrade_Utterance",
+              "utteranceFallback": "What did you do before Knox County went to hell?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "BACKSTORY"
+              }
+            },
+            {
+              "id": "identity.history.clarify_origin",
+              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryClarify_Label",
+              "labelFallback": "Ask which town they came from",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryClarify_Utterance",
+              "utteranceFallback": "Did you come up from Rosewood, or further east?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "CLARIFY",
+                "speechAct": "CLARIFY",
+                "subject": "BACKSTORY"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "BACKSTORY"
+            },
+            {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "BACKSTORY"
+            },
+            {
+              "intent": "CLARIFY",
+              "speechAct": "CLARIFY",
+              "subject": "BACKSTORY"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "share_history",
+          "onClarify": "clarify_origin",
+          "onRefuse": "kept_private",
+          "onUnrelated": "suspend"
+        },
+        "clarify_origin": {
+          "responsePool": "semantic.social.identity.personal_history.clarify",
+          "slots": {
+            "location": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.location"
+            },
+            "event": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.event"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "identity.history.confirm_town",
+              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryConfirmTown_Label",
+              "labelFallback": "Mention the highway",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryConfirmTown_Utterance",
+              "utteranceFallback": "Got out right before they blocked the main highway.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "BACKSTORY"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "BACKSTORY"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "share_history",
+          "onRefuse": "kept_private",
+          "onUnrelated": "suspend"
+        },
+        "share_history": {
+          "responsePool": "semantic.social.identity.personal_history.exchange",
+          "slots": {
+            "person": {
+              "type": "string",
+              "owner": "social",
+              "source": "slots.person"
+            },
+            "event": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.event"
+            },
+            "faction": {
+              "type": "string",
+              "owner": "social",
+              "source": "slots.faction"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "identity.history.connect_family",
+              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryFamily_Label",
+              "labelFallback": "Ask if anyone made it out",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryFamily_Utterance",
+              "utteranceFallback": "You still looking for anyone from back then?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "IDENTITY"
+              }
+            },
+            {
+              "id": "identity.history.acknowledge_past",
+              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryAck_Label",
+              "labelFallback": "Acknowledge the memory",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryAck_Utterance",
+              "utteranceFallback": "Feels like a lifetime ago already. Glad you made it this far.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "THANK",
+                "speechAct": "THANK"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "IDENTITY"
+            },
+            {
+              "intent": "THANK",
+              "speechAct": "THANK"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "reflect_bond",
+          "onRefuse": "kept_private",
+          "onUnrelated": "suspend"
+        },
+        "reflect_bond": {
+          "responsePool": "semantic.social.identity.personal_history.reflect",
+          "branchOffers": [
+            {
+              "id": "identity.history.close_warm",
+              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryCloseWarm_Label",
+              "labelFallback": "Respect their story",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryCloseWarm_Utterance",
+              "utteranceFallback": "Good to know who I'm standing beside out here.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "ACCEPT",
+                "speechAct": "ACCEPT"
+              }
+            },
+            {
+              "id": "identity.history.close_quiet",
+              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryCloseQuiet_Label",
+              "labelFallback": "Leave it there",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryCloseQuiet_Utterance",
+              "utteranceFallback": "Fair enough. Past is past—we've got today to worry about.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "AGREE",
+                "speechAct": "AGREE"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "ACCEPT",
+              "speechAct": "ACCEPT"
+            },
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "complete",
+          "onRefuse": "kept_private",
+          "onUnrelated": "suspend"
+        },
+        "kept_private": {
+          "terminal": true,
+          "responsePool": "semantic.social.identity.personal_history.kept_private"
+        },
+        "complete": {
+          "terminal": true,
+          "responsePool": "semantic.social.identity.personal_history.complete"
+        }
+      }
+    }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "social_interaction",
+      "domain": "social"
+    },
+    {
+      "id": "identity",
+      "domain": "social"
+    }
+  ]
+}

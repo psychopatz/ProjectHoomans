@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "debrief_exchange",
+  "locale": "EN",
+  "entries": {
+    "say.variants.default": "That got ugly fast. You catch any scratches or bites back there?",
+    "reply.debriefed.say.variants.default": "Nothing through the jacket, thank God. Door's wedged shut—let's catch our breath and check our gear.",
+    "reply.cleared.say.variants.default": "Looks like the rest of them wandered off down the alley. Keep it quiet for a minute.",
+    "reply.shaken.say.variants.default": "I'm not bit, just rattled. Give me a second to get my hands steady.",
+    "reply.refused.say.variants.default": "Don't crowd me right now. Watch the window."
+  }
+}

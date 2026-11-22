@@ -1,0 +1,12 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "status_exchange",
+  "locale": "EN",
+  "entries": {
+    "say.variants.default": "Back fence still has a loose plank, and the rain barrels need checking. How are we looking on chores?",
+    "reply.agreed.say.variants.default": "Good. Grab a hammer and some nails—we'll get it buttoned up before dark.",
+    "reply.deferred.say.variants.default": "Fair enough. Let's leave the heavy hammering until morning so we don't draw anything.",
+    "reply.checked_in.say.variants.default": "It's holding for now, just needs another pair of hands when we get a quiet hour.",
+    "reply.refused.say.variants.default": "Not the time for chores. Keep your eyes on the yard."
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "social.greeting.first_contact",
+  "locale": "EN",
+  "entries": {
+    "say.variants.default": [
+      "Hold up a second. You're still breathing—that's a good start.",
+      "Hey there. Easy with your hands—who's out on this road?"
+    ],
+    "say.variants.positive": [
+      "Thank goodness, a living face. Steady now, I'm not looking for a fight.",
+      "Hey—good to see someone else still standing around here."
+    ],
+    "say.variants.neutral": [
+      "Stop right there a moment. Just passing through this block?",
+      "Keep your hands where I can see them and tell me what brings you by."
+    ],
+    "say.variants.negative": [
+      "Stay back a step. I don't know you, and folks out here get jumpy fast.",
+      "Don't crowd me. State what you want from right where you're standing."
+    ],
+    "say.variants.contextual": [
+      "Quiet street to be walking alone. You scavenging these houses or looking for someone?",
+      "Didn't expect to cross paths with anyone on this side of town."
+    ],
+    "reply.blocked.say.variants.default": "Not now. Keep moving.",
+    "reply.blocked.say.variants.negative": "Back off—this isn't the time to talk.",
+    "reply.welcomed.say.variants.default": "All right, you seem decent enough. Watch the side alleys out here.",
+    "reply.welcomed.say.variants.positive": "Glad we didn't jump the gun, {addressee.name}. Good to know there's still decent folks left.",
+    "reply.cautious.say.variants.default": "Fair enough. You mind your business, I'll mind mine.",
+    "reply.cautious.say.variants.neutral": "All right. Keep your weapon low and we won't have a problem.",
+    "reply.cautious.say.variants.contextual": "Just keep your eyes on the treeline if you're heading down that road.",
+    "reply.declined.say.variants.default": "Suit yourself. Just keep walking.",
+    "reply.declined.say.variants.negative": "Then we're done talking. Move along before you draw the dead.",
+    "reply.evasive.say.variants.default": "Keep your secrets if you want. Just don't bring trouble my way.",
+    "reply.evasive.say.variants.neutral": "Fine, no names needed. Stay safe out there."
+  }
+}

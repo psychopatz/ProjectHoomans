@@ -1,0 +1,358 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "travel.excursion",
+  "id": "plan_exchange",
+  "owner": "ProjectHoomans",
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "repeatable",
+  "closure": {
+    "closureClass": "resolved_episode",
+    "episodeId": "travel_excursion_plan_exchange"
+  },
+  "statePolicy": [
+    {
+      "id": "blocked_unsafe_or_hostile",
+      "when": {
+        "any": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "==",
+            "value": true
+          }
+        ]
+      },
+      "outcome": "blocked",
+      "reason": "hostile_combat_or_incapacitated",
+      "admission": "no_op",
+      "replyOutcome": "refused"
+    },
+    {
+      "id": "travel_excursion_ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
+  },
+  "reply": {
+    "agreed": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "deferred": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "assessed": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "refused": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "triggers": [
+      {
+        "intent": "SUGGEST",
+        "subject": "EXCURSION"
+      },
+      {
+        "intent": "QUESTION",
+        "subject": "ROUTE"
+      }
+    ],
+    "flow": {
+      "id": "travel.excursion.plan_exchange",
+      "version": 1,
+      "owner": "ProjectHoomans",
+      "constraints": {
+        "all": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "neq",
+            "value": true
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "not_in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          }
+        ]
+      },
+      "initial": "propose_route",
+      "nodes": {
+        "propose_route": {
+          "slots": {
+            "location": {
+              "type": "string",
+              "owner": "travel.excursion.plan_exchange",
+              "source": "slots.location.value"
+            },
+            "threat": {
+              "type": "string",
+              "owner": "travel.excursion.plan_exchange",
+              "source": "slots.threat.value"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "travel.excursion.set_destination",
+              "labelKey": "UI_PNC_TravelExcursion_SetDest_Label",
+              "labelFallback": "Suggest a supply stop",
+              "utteranceKey": "UI_PNC_TravelExcursion_SetDest_Utterance",
+              "utteranceFallback": "If we hit the corner market before noon, we can be back before supper.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "ROUTE"
+              }
+            },
+            {
+              "id": "travel.excursion.ask_threat",
+              "labelKey": "UI_PNC_TravelExcursion_AskThreat_Label",
+              "labelFallback": "Ask about the road ahead",
+              "utteranceKey": "UI_PNC_TravelExcursion_AskThreat_Utterance",
+              "utteranceFallback": "You hear anything about deadheads piling up on the highway?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "THREAT"
+              }
+            },
+            {
+              "id": "travel.excursion.call_off",
+              "labelKey": "UI_PNC_TravelExcursion_CallOff_Label",
+              "labelFallback": "Call off the run",
+              "utteranceKey": "UI_PNC_TravelExcursion_CallOff_Utterance",
+              "utteranceFallback": "Doesn't feel worth the gas or the noise today.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "REFUSE",
+                "speechAct": "REFUSE",
+                "subject": "EXCURSION"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "ROUTE"
+            },
+            {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "THREAT"
+            },
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE",
+              "subject": "EXCURSION"
+            }
+          ],
+          "onMatch": "assess_risk",
+          "onClarify": "assess_risk",
+          "onRefuse": "called_off",
+          "onUnrelated": "suspend"
+        },
+        "assess_risk": {
+          "slots": {
+            "threat": {
+              "type": "string",
+              "owner": "travel.excursion.plan_exchange",
+              "source": "slots.threat.value"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "travel.excursion.confirm_departure",
+              "labelKey": "UI_PNC_TravelExcursion_Confirm_Label",
+              "labelFallback": "Head out together",
+              "utteranceKey": "UI_PNC_TravelExcursion_Confirm_Utterance",
+              "utteranceFallback": "Grab a crowbar and a spare canteen. We stick to the tree line.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "AGREE",
+                "speechAct": "AGREE",
+                "subject": "EXCURSION"
+              }
+            },
+            {
+              "id": "travel.excursion.postpone",
+              "labelKey": "UI_PNC_TravelExcursion_Postpone_Label",
+              "labelFallback": "Wait for better light",
+              "utteranceKey": "UI_PNC_TravelExcursion_Postpone_Utterance",
+              "utteranceFallback": "Let's sleep on it and check the fog at first light.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "DEFER",
+                "speechAct": "DEFER",
+                "subject": "EXCURSION"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE",
+              "subject": "EXCURSION"
+            },
+            {
+              "intent": "ACCEPT"
+            },
+            {
+              "intent": "DEFER",
+              "speechAct": "DEFER",
+              "subject": "EXCURSION"
+            }
+          ],
+          "onMatch": "departing",
+          "onRefuse": "called_off",
+          "onUnrelated": "suspend"
+        },
+        "departing": {
+          "terminal": true
+        },
+        "called_off": {
+          "terminal": true
+        }
+      }
+    },
+    "replySemantics": {
+      "agreed": {
+        "stance": "positive",
+        "outcome": "agreed"
+      },
+      "deferred": {
+        "stance": "contextual",
+        "outcome": "deferred"
+      },
+      "assessed": {
+        "stance": "neutral",
+        "outcome": "assessed"
+      },
+      "refused": {
+        "stance": "negative",
+        "outcome": "refused"
+      }
+    }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "travel",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "excursion_planning",
+      "domain": "travel"
+    }
+  ]
+}

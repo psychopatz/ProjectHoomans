@@ -1,0 +1,336 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "namespace": "social.conflict",
+  "id": "mediate_exchange",
+  "owner": "ProjectHoomans",
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "repeatable",
+  "closure": {
+    "closureClass": "resolved_episode",
+    "episodeId": "social_conflict_mediate_exchange"
+  },
+  "statePolicy": [
+    {
+      "id": "blocked_unsafe_or_hostile",
+      "when": {
+        "any": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "==",
+            "value": true
+          }
+        ]
+      },
+      "outcome": "blocked",
+      "reason": "hostile_combat_or_incapacitated",
+      "admission": "no_op",
+      "replyOutcome": "strained"
+    },
+    {
+      "id": "social_conflict_ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "variants": [
+      {
+        "id": "default"
+      }
+    ]
+  },
+  "reply": {
+    "reconciled": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "deferred": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "acknowledged": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "strained": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "triggers": [
+      {
+        "intent": "COMPLAIN",
+        "subject": "CONFLICT"
+      },
+      {
+        "intent": "MEDIATION",
+        "subject": "CONFLICT"
+      }
+    ],
+    "flow": {
+      "id": "social.conflict.mediate_exchange",
+      "version": 1,
+      "owner": "ProjectHoomans",
+      "constraints": {
+        "all": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "neq",
+            "value": true
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "not_in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          }
+        ]
+      },
+      "initial": "air_grievance",
+      "nodes": {
+        "air_grievance": {
+          "slots": {
+            "person": {
+              "type": "string",
+              "owner": "social.conflict.mediate_exchange",
+              "source": "slots.person.value"
+            },
+            "task": {
+              "type": "string",
+              "owner": "social.conflict.mediate_exchange",
+              "source": "slots.task.value"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "social.conflict.listen_calmly",
+              "labelKey": "UI_PNC_SocialConflict_ListenCalmly_Label",
+              "labelFallback": "Hear them out calmly",
+              "utteranceKey": "UI_PNC_SocialConflict_ListenCalmly_Utterance",
+              "utteranceFallback": "Alright, tell me what happened without shouting.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "CLARIFY",
+                "speechAct": "CLARIFY",
+                "subject": "CONFLICT"
+              }
+            },
+            {
+              "id": "social.conflict.push_back",
+              "labelKey": "UI_PNC_SocialConflict_PushBack_Label",
+              "labelFallback": "Push back on the blame",
+              "utteranceKey": "UI_PNC_SocialConflict_PushBack_Utterance",
+              "utteranceFallback": "That's not fair and you know it.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "DISAGREE",
+                "speechAct": "DISAGREE",
+                "subject": "CONFLICT"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "CLARIFY",
+              "speechAct": "CLARIFY",
+              "subject": "CONFLICT"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "CONFLICT"
+            },
+            {
+              "intent": "DISAGREE",
+              "speechAct": "DISAGREE",
+              "subject": "CONFLICT"
+            }
+          ],
+          "onMatch": "seek_middle_ground",
+          "onClarify": "seek_middle_ground",
+          "onRefuse": "strained",
+          "onUnrelated": "suspend"
+        },
+        "seek_middle_ground": {
+          "branchOffers": [
+            {
+              "id": "social.conflict.reconcile",
+              "labelKey": "UI_PNC_SocialConflict_Reconcile_Label",
+              "labelFallback": "Call it even",
+              "utteranceKey": "UI_PNC_SocialConflict_Reconcile_Utterance",
+              "utteranceFallback": "Fine. We both made a mess of it. Let's drop it and move on.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "AGREE",
+                "speechAct": "AGREE",
+                "subject": "CONFLICT"
+              }
+            },
+            {
+              "id": "social.conflict.cool_off",
+              "labelKey": "UI_PNC_SocialConflict_CoolOff_Label",
+              "labelFallback": "Take some space",
+              "utteranceKey": "UI_PNC_SocialConflict_CoolOff_Utterance",
+              "utteranceFallback": "Let's leave it alone until we've both had some sleep.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "DEFER",
+                "speechAct": "DEFER",
+                "subject": "CONFLICT"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE",
+              "subject": "CONFLICT"
+            },
+            {
+              "intent": "ACCEPT"
+            },
+            {
+              "intent": "DEFER",
+              "speechAct": "DEFER",
+              "subject": "CONFLICT"
+            }
+          ],
+          "onMatch": "reconciled",
+          "onRefuse": "strained",
+          "onUnrelated": "suspend"
+        },
+        "reconciled": {
+          "terminal": true
+        },
+        "strained": {
+          "terminal": true
+        }
+      }
+    },
+    "replySemantics": {
+      "reconciled": {
+        "stance": "positive",
+        "outcome": "reconciled"
+      },
+      "deferred": {
+        "stance": "contextual",
+        "outcome": "deferred"
+      },
+      "acknowledged": {
+        "stance": "neutral",
+        "outcome": "acknowledged"
+      },
+      "strained": {
+        "stance": "negative",
+        "outcome": "strained"
+      }
+    }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "relationship_conflict",
+      "domain": "social"
+    }
+  ]
+}

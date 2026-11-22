@@ -1,0 +1,529 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "id": "knowledge.gossip.exchange",
+  "owner": "ProjectHoomans",
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "repeatable",
+  "closure": {
+    "closureClass": "none"
+  },
+  "statePolicy": [
+    {
+      "id": "blocked_unavailable_or_hostile",
+      "when": {
+        "any": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "==",
+            "value": true
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          }
+        ]
+      },
+      "outcome": "blocked",
+      "reason": "hostile_busy_or_incapacitated",
+      "admission": "no_op",
+      "replyOutcome": "blocked"
+    },
+    {
+      "id": "blocked_uninformed",
+      "when": {
+        "path": "npcState.uninformed",
+        "op": "==",
+        "value": true
+      },
+      "outcome": "blocked",
+      "reason": "uninformed",
+      "admission": "no_op",
+      "replyOutcome": "unknown"
+    },
+    {
+      "id": "gossip_exchange_ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "variants": [
+      {
+        "id": "default"
+      },
+      {
+        "id": "positive"
+      },
+      {
+        "id": "neutral"
+      },
+      {
+        "id": "negative"
+      },
+      {
+        "id": "contextual"
+      }
+    ]
+  },
+  "reply": {
+    "blocked": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "negative"
+          }
+        ]
+      }
+    },
+    "known": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "positive"
+          },
+          {
+            "id": "contextual"
+          }
+        ]
+      }
+    },
+    "unknown": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "neutral"
+          }
+        ]
+      }
+    },
+    "uncertain": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "contextual"
+          }
+        ]
+      }
+    },
+    "refused": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "negative"
+          }
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "category": "projecthoomans:thematic_interactive",
+    "contentOwner": "projecthoomans.dialogue_content.knowledge",
+    "stances": [
+      "positive",
+      "neutral",
+      "negative",
+      "contextual"
+    ],
+    "outcomes": [
+      "known",
+      "unknown",
+      "uncertain",
+      "refused"
+    ],
+    "triggers": [
+      {
+        "intent": "QUESTION",
+        "subject": "NEWS"
+      },
+      {
+        "intent": "QUESTION",
+        "subject": "RUMOR"
+      }
+    ],
+    "flow": {
+      "id": "knowledge.gossip.exchange",
+      "version": 1,
+      "owner": "ProjectHoomans",
+      "constraints": {
+        "all": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "neq",
+            "value": true
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "not_in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          }
+        ]
+      },
+      "initial": "ask_word_around",
+      "nodes": {
+        "ask_word_around": {
+          "responsePool": "semantic.knowledge.gossip.exchange.opening",
+          "slots": {
+            "location": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.location"
+            },
+            "event": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.event"
+            },
+            "faction": {
+              "type": "string",
+              "owner": "social",
+              "source": "slots.faction"
+            },
+            "person": {
+              "type": "string",
+              "owner": "social",
+              "source": "slots.person"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "knowledge.gossip.ask_roads",
+              "labelKey": "UI_PNC_Conversation_Suggestion_GossipAskRoads_Label",
+              "labelFallback": "Ask about nearby roads",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipAskRoads_Utterance",
+              "utteranceFallback": "Heard any word on whether the highway north is clear or choked with wrecks?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "NEWS"
+              }
+            },
+            {
+              "id": "knowledge.gossip.share_rumor",
+              "labelKey": "UI_PNC_Conversation_Suggestion_GossipShareRumor_Label",
+              "labelFallback": "Share what you heard",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipShareRumor_Utterance",
+              "utteranceFallback": "Someone swore there's still power running in a few blocks west of here, though I haven't seen it myself.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "RUMOR"
+              }
+            },
+            {
+              "id": "knowledge.gossip.clarify_source",
+              "labelKey": "UI_PNC_Conversation_Suggestion_GossipClarifySource_Label",
+              "labelFallback": "Ask who saw it",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipClarifySource_Utterance",
+              "utteranceFallback": "Did you see that with your own eyes, or hear it secondhand?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "CLARIFY",
+                "speechAct": "CLARIFY",
+                "subject": "RUMOR"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "NEWS"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "RUMOR"
+            },
+            {
+              "intent": "CLARIFY",
+              "speechAct": "CLARIFY",
+              "subject": "RUMOR"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "weigh_rumor",
+          "onClarify": "clarify_source",
+          "onRefuse": "refused_rumor",
+          "onUnrelated": "suspend"
+        },
+        "clarify_source": {
+          "responsePool": "semantic.knowledge.gossip.exchange.clarify",
+          "slots": {
+            "person": {
+              "type": "string",
+              "owner": "social",
+              "source": "slots.person"
+            },
+            "location": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.location"
+            },
+            "event": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.event"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "knowledge.gossip.confirm_firsthand",
+              "labelKey": "UI_PNC_Conversation_Suggestion_GossipFirsthand_Label",
+              "labelFallback": "Say you saw signs yourself",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipFirsthand_Utterance",
+              "utteranceFallback": "Saw the smoke from the rooftops two days back\u2014wasn't just radio talk.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "NEWS"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "NEWS"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "weigh_rumor",
+          "onRefuse": "refused_rumor",
+          "onUnrelated": "suspend"
+        },
+        "weigh_rumor": {
+          "responsePool": "semantic.knowledge.gossip.exchange.weigh",
+          "slots": {
+            "location": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.location"
+            },
+            "event": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.event"
+            },
+            "item": {
+              "type": "string",
+              "owner": "inventory",
+              "source": "slots.item"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "knowledge.gossip.mark_known",
+              "labelKey": "UI_PNC_Conversation_Suggestion_GossipConfirm_Label",
+              "labelFallback": "Confirm the details",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipConfirm_Utterance",
+              "utteranceFallback": "Lines up with what I saw near the strip mall\u2014worth keeping in mind.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "AGREE",
+                "speechAct": "AGREE",
+                "stateValue": "known"
+              }
+            },
+            {
+              "id": "knowledge.gossip.mark_uncertain",
+              "labelKey": "UI_PNC_Conversation_Suggestion_GossipDoubt_Label",
+              "labelFallback": "Stay skeptical",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipDoubt_Utterance",
+              "utteranceFallback": "Could be true, could be folks talking out of fear. I wouldn't bet my neck on it.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "RUMOR",
+                "stateValue": "uncertain"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "RUMOR"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "close_exchange",
+          "onRefuse": "refused_rumor",
+          "onUnrelated": "suspend"
+        },
+        "close_exchange": {
+          "responsePool": "semantic.knowledge.gossip.exchange.close",
+          "branchOffers": [
+            {
+              "id": "knowledge.gossip.thank_word",
+              "labelKey": "UI_PNC_Conversation_Suggestion_GossipThanks_Label",
+              "labelFallback": "Thank for the heads-up",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipThanks_Utterance",
+              "utteranceFallback": "Good to know. If you hear anything else on the radio or the road, pass it along.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "THANK",
+                "speechAct": "THANK"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "THANK",
+              "speechAct": "THANK"
+            },
+            {
+              "intent": "ACCEPT",
+              "speechAct": "ACCEPT"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "complete",
+          "onRefuse": "refused_rumor",
+          "onUnrelated": "suspend"
+        },
+        "refused_rumor": {
+          "terminal": true,
+          "responsePool": "semantic.knowledge.gossip.exchange.refused"
+        },
+        "complete": {
+          "terminal": true,
+          "responsePool": "semantic.knowledge.gossip.exchange.complete"
+        }
+      }
+    }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "knowledge",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "news",
+      "domain": "knowledge"
+    },
+    {
+      "id": "social_interaction",
+      "domain": "social"
+    }
+  ],
+  "slots": {
+    "location": {
+      "type": "entity.location",
+      "required": false
+    }
+  }
+}

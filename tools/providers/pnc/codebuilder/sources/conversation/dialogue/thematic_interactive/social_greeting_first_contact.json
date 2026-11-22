@@ -1,0 +1,503 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "kind": "dialogue",
+  "id": "social.greeting.first_contact",
+  "owner": "ProjectHoomans",
+  "inputPolicy": "typed_parity",
+  "repeatPolicy": "repeatable",
+  "closure": {
+    "closureClass": "none"
+  },
+  "statePolicy": [
+    {
+      "id": "blocked_unavailable_or_hostile",
+      "when": {
+        "any": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "==",
+            "value": true
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          }
+        ]
+      },
+      "outcome": "blocked",
+      "reason": "hostile_busy_or_incapacitated",
+      "admission": "no_op",
+      "replyOutcome": "blocked"
+    },
+    {
+      "id": "first_contact_ready",
+      "outcome": "actionable",
+      "reason": "ready",
+      "admission": "dispatch"
+    }
+  ],
+  "say": {
+    "variants": [
+      {
+        "id": "default"
+      },
+      {
+        "id": "positive"
+      },
+      {
+        "id": "neutral"
+      },
+      {
+        "id": "negative"
+      },
+      {
+        "id": "contextual"
+      }
+    ]
+  },
+  "reply": {
+    "blocked": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "negative"
+          }
+        ]
+      }
+    },
+    "welcomed": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "positive"
+          }
+        ]
+      }
+    },
+    "cautious": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "neutral"
+          },
+          {
+            "id": "contextual"
+          }
+        ]
+      }
+    },
+    "declined": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "negative"
+          }
+        ]
+      }
+    },
+    "evasive": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "neutral"
+          }
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "category": "projecthoomans:thematic_interactive",
+    "contentOwner": "projecthoomans.dialogue_content.social",
+    "stances": [
+      "positive",
+      "neutral",
+      "negative",
+      "contextual"
+    ],
+    "outcomes": [
+      "welcomed",
+      "cautious",
+      "declined",
+      "evasive",
+      "blocked"
+    ],
+    "triggers": [
+      {
+        "intent": "GREET",
+        "speechAct": "GREET"
+      },
+      {
+        "intent": "GREET",
+        "subject": "FIRST_CONTACT"
+      }
+    ],
+    "flow": {
+      "id": "social.greeting.first_contact",
+      "version": 1,
+      "owner": "ProjectHoomans",
+      "constraints": {
+        "all": [
+          {
+            "path": "npcState.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "situation.activeBehavior",
+            "op": "not_in",
+            "values": [
+              "hostile",
+              "combat",
+              "busy",
+              "dead"
+            ]
+          },
+          {
+            "path": "roles.hostile",
+            "op": "neq",
+            "value": true
+          },
+          {
+            "path": "actorConversationContext.roles.hostile",
+            "op": "neq",
+            "value": true
+          },
+          {
+            "path": "npcState.healthState",
+            "op": "not_in",
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
+          }
+        ]
+      },
+      "initial": "first_contact_challenge",
+      "nodes": {
+        "first_contact_challenge": {
+          "responsePool": "semantic.social.greeting.first_contact.opening",
+          "branchOffers": [
+            {
+              "id": "first_contact.friendly_greet",
+              "labelKey": "UI_PNC_Conversation_Suggestion_FirstContactFriendly_Label",
+              "labelFallback": "Lower hands and greet",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_FirstContactFriendly_Utterance",
+              "utteranceFallback": "Easy—just passing through. Good to see someone still breathing.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "GREET",
+                "speechAct": "GREET",
+                "stateValue": "positive"
+              }
+            },
+            {
+              "id": "first_contact.cautious_greet",
+              "labelKey": "UI_PNC_Conversation_Suggestion_FirstContactCautious_Label",
+              "labelFallback": "Keep distance and answer",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_FirstContactCautious_Utterance",
+              "utteranceFallback": "Hands are clear. Not looking for trouble out here.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "FIRST_CONTACT",
+                "stateValue": "neutral"
+              }
+            },
+            {
+              "id": "first_contact.clarify_intent",
+              "labelKey": "UI_PNC_Conversation_Suggestion_FirstContactClarify_Label",
+              "labelFallback": "Ask who's asking",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_FirstContactClarify_Utterance",
+              "utteranceFallback": "Depends—you alone out here, or watching this block for somebody?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "CLARIFY",
+                "speechAct": "CLARIFY",
+                "subject": "FIRST_CONTACT"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "GREET",
+              "speechAct": "GREET"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "FIRST_CONTACT"
+            },
+            {
+              "intent": "CLARIFY",
+              "speechAct": "CLARIFY",
+              "subject": "FIRST_CONTACT"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "name_and_intent",
+          "onClarify": "clarify_intent",
+          "onRefuse": "guarded_parting",
+          "onUnrelated": "suspend"
+        },
+        "clarify_intent": {
+          "responsePool": "semantic.social.greeting.first_contact.clarify",
+          "slots": {
+            "location": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.location"
+            },
+            "person": {
+              "type": "string",
+              "owner": "social",
+              "source": "slots.person"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "first_contact.state_road_business",
+              "labelKey": "UI_PNC_Conversation_Suggestion_FirstContactRoad_Label",
+              "labelFallback": "Say you're scavenging",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_FirstContactRoad_Utterance",
+              "utteranceFallback": "Just checking the houses down the road for supplies.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "FIRST_CONTACT"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "FIRST_CONTACT"
+            },
+            {
+              "intent": "GREET",
+              "speechAct": "GREET"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "name_and_intent",
+          "onRefuse": "guarded_parting",
+          "onUnrelated": "suspend"
+        },
+        "name_and_intent": {
+          "responsePool": "semantic.social.greeting.first_contact.exchange",
+          "slots": {
+            "person": {
+              "type": "string",
+              "owner": "social",
+              "source": "slots.identityClaim.name"
+            },
+            "location": {
+              "type": "string",
+              "owner": "world",
+              "source": "slots.location"
+            }
+          },
+          "branchOffers": [
+            {
+              "id": "first_contact.share_name",
+              "labelKey": "UI_PNC_Conversation_Suggestion_FirstContactShareName_Label",
+              "labelFallback": "Trade names",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_FirstContactShareName_Utterance",
+              "utteranceFallback": "Fair enough. You can call me by my name—what's yours?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "subject": "IDENTITY",
+                "identityClaim": true
+              }
+            },
+            {
+              "id": "first_contact.keep_brief",
+              "labelKey": "UI_PNC_Conversation_Suggestion_FirstContactBrief_Label",
+              "labelFallback": "Keep it brief",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_FirstContactBrief_Utterance",
+              "utteranceFallback": "No need for names yet. Just glad neither of us shot first.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "THANK",
+                "speechAct": "THANK"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "INFORM",
+              "subject": "IDENTITY",
+              "identityClaim": true
+            },
+            {
+              "intent": "THANK",
+              "speechAct": "THANK"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "settle_standing",
+          "onRefuse": "guarded_parting",
+          "onUnrelated": "suspend"
+        },
+        "settle_standing": {
+          "responsePool": "semantic.social.greeting.first_contact.standing",
+          "branchOffers": [
+            {
+              "id": "first_contact.part_friendly",
+              "labelKey": "UI_PNC_Conversation_Suggestion_FirstContactWarmClose_Label",
+              "labelFallback": "Wish them luck",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_FirstContactWarmClose_Utterance",
+              "utteranceFallback": "Watch the side streets. Hope our paths cross again when it's quieter.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "ACCEPT",
+                "speechAct": "ACCEPT",
+                "stateValue": "positive"
+              }
+            },
+            {
+              "id": "first_contact.part_cautious",
+              "labelKey": "UI_PNC_Conversation_Suggestion_FirstContactCautiousClose_Label",
+              "labelFallback": "Nod and move on",
+              "utteranceKey": "UI_PNC_Conversation_Suggestion_FirstContactCautiousClose_Utterance",
+              "utteranceFallback": "All right. You watch your end of the street, I'll watch mine.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "AGREE",
+                "speechAct": "AGREE",
+                "stateValue": "neutral"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "ACCEPT",
+              "speechAct": "ACCEPT"
+            },
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ],
+          "onMatch": "complete",
+          "onRefuse": "guarded_parting",
+          "onUnrelated": "suspend"
+        },
+        "guarded_parting": {
+          "terminal": true,
+          "responsePool": "semantic.social.greeting.first_contact.guarded_parting"
+        },
+        "complete": {
+          "terminal": true,
+          "responsePool": "semantic.social.greeting.first_contact.complete"
+        }
+      }
+    }
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [
+        "actor"
+      ]
+    }
+  },
+  "domains": [
+    {
+      "domain": "social",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "greeting",
+      "domain": "social"
+    },
+    {
+      "id": "social_interaction",
+      "domain": "social"
+    }
+  ]
+}

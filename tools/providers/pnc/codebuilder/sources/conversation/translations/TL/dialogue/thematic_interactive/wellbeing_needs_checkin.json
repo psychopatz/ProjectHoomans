@@ -1,0 +1,38 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "wellbeing.needs.checkin",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": [
+      "Ayos ka pa ba? Mukhang pinahirapan ka ng lakad ngayon.",
+      "May sandali ka ba—kamusta ang pagkain, tubig, at benda mo?"
+    ],
+    "say.variants.positive": [
+      "Buti naman at nakatayo ka pa nang maayos. May kailangan ka ba habang tahimik pa?",
+      "Mas matatag ka pa tingnan kaysa sa karamihan dito. Maayos pa ba ang lagay mo?"
+    ],
+    "say.variants.neutral": [
+      "Kinukumusta lang kita. Kinakapos ka ba sa malinis na tubig, pagkain, o panlinis ng sugat?",
+      "Kamusta ang katawan mo ngayon—gutom, pagod, o kaya pa naman?"
+    ],
+    "say.variants.negative": [
+      "Mukhang sagad na sagad ka na. Huwag mong sabihing ayos ka kung wala ka nang laman sa bag.",
+      "Malas na araw? Siguraduhin lang nating wala kang tinatagong malalim na sugat o tuyong lalagyan ng tubig."
+    ],
+    "say.variants.contextual": [
+      "Ngayong wala nang tulo ang gripo at lumalamig na ang gabi, nakakaya mo pa ba?",
+      "Mahaba-haba ang nilakad natin sa mga kalyeng 'to—may lakas ka pa ba para magpatuloy?"
+    ],
+    "reply.blocked.say.variants.default": "Hindi puwede ngayon—tumingin ka sa paligid.",
+    "reply.blocked.say.variants.negative": "Tama na muna. May mas malaking problema sa harap natin.",
+    "reply.supported.say.variants.default": "Salamat. Malaking bagay nang may nagbabantay at nagtatanong.",
+    "reply.supported.say.variants.positive": "Salamat, {addressee.name}. Malaking tulong na 'yan sa panahong 'to.",
+    "reply.deferred.say.variants.default": "Humanap muna tayo ng masisilungan bago natin ayusin ang kulang sa gamit.",
+    "reply.deferred.say.variants.neutral": "Kaya pa naman sa ngayon. Tanungin mo ulit ako kapag wala na tayo sa gitna ng kalsada.",
+    "reply.deferred.say.variants.contextual": "Makakaraos ako hanggang dapithapon—kailangan ko lang ng tahimik na bubong at limang minutong pahinga.",
+    "reply.declined.say.variants.default": "Ayos lang ako. Sarili mong dala ang intindihin mo.",
+    "reply.declined.say.variants.negative": "Huwag mo akong intindihin. Kaya ko ang sarili ko.",
+    "reply.evasive.say.variants.default": "Nakakaraos naman. Wala nang saysay magreklamo pa.",
+    "reply.evasive.say.variants.neutral": "Gaya rin ng iba—pagod, gutom, pero buhay pa."
+  }
+}

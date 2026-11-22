@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/ConvoEngine/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "0c0dd14df241eb4b742a95ede0729f2131a3ac66d66cb1497ea50aff9d9e9e39"
-Registry.WHOLE_MODEL_FINGERPRINT = "953bfca41068b15435df10d3db6cac05dea4375f2edd3b3960b3cd98f134953e"
+Registry.WHOLE_MODEL_FINGERPRINT = "40a497252287198d44347599dbf6164bff4d05dae165579bda859a35c8d0e233"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -123,6 +123,7 @@ appendResponses(require "PNC/ConvoEngine/Responses/Dialogue/CoreSemanticResponse
 appendResponses(require "PNC/ConvoEngine/Responses/Dialogue/QuestionBackstory")
 appendResponses(require "PsychopatzCore/ConvoEngine/Responses/Dialogue/CoreKnowledgeIdentity")
 appendFlows(require "PNC/ConvoEngine/Flows/Dialogue/CoreSemanticResponses")
+appendFlows(require "PNC/ConvoEngine/Flows/Dialogue/ThematicInteractive")
 appendFlows(require "PNC/ConvoEngine/Flows/Semantic/Identity")
 appendFlows(require "PNC/ConvoEngine/Flows/Semantic/Needs")
 appendFlows(require "PNC/ConvoEngine/Flows/Semantic/PncDialogueFollowFlow")
@@ -211,6 +212,9 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIden
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskToolReplies")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/ThematicInteractive/ColonyWorkStatusExchangeToSocialConflictMediateExchange")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/ThematicInteractive/SocialGreetingFirstContactToTravelExcursionPlanExchange")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/ThematicInteractive/WellbeingNeedsCheckin")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/WellbeingContent")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/WorldEventBeats")
 appendConvoPlans(require "PsychopatzCore/ConvoEngine/Beat/Social/Conflict")
