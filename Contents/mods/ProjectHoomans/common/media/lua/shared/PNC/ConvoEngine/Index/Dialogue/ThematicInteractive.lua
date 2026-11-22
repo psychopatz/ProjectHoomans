@@ -24,6 +24,7 @@ return {
     },
     ["combat.aftermath.debrief_exchange"] = {
         ["dependents"] = {
+            "combat.injury.triage_exchange",
             "knowledge.gossip.exchange",
             "travel.excursion.plan_exchange",
         },
@@ -66,6 +67,7 @@ return {
     ["social.conflict.mediate_exchange"] = {
         ["dependents"] = {
             "colony.work.status_exchange",
+            "combat.injury.triage_exchange",
             "knowledge.gossip.exchange",
         },
         ["domain"] = "thematic_interactive",
@@ -136,6 +138,7 @@ return {
         ["dependents"] = {
             "colony.work.status_exchange",
             "combat.aftermath.debrief_exchange",
+            "combat.injury.triage_exchange",
             "social.conflict.mediate_exchange",
             "social.identity.personal_history",
             "travel.excursion.plan_exchange",

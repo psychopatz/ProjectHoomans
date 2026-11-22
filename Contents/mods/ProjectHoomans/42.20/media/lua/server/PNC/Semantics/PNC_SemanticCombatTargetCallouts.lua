@@ -3,9 +3,11 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+PNC.Semantics.CombatTargetCalloutsInternal = PNC.Semantics.CombatTargetCalloutsInternal or {}
 PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 local S = PNC.Semantics.CombatTargetCallouts or {}
+local I = PNC.Semantics.CombatTargetCalloutsInternal
 PNC.Semantics.CombatTargetCallouts = S
 
 S.VERSION = 2
@@ -15,8 +17,9 @@ S.WITNESS_RADIUS = tonumber(PNC.Const and PNC.Const.ZOMBIE_TARGET_RADIUS) or 12
 
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_Medical"
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_Stamina"
+require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_TargetHelpers"
 
-local Common, Core, Registry = PNC.BehaviorCommon, PNC.Core, PNC.Registry
+local Common, Core = PNC.BehaviorCommon, PNC.Core
 local Projection = PNC.TacticalSpatialProjection or require "PNC/Core/Spatial/PNC_TacticalSpatialProjection"
 local Language = PNC.Semantics.TacticalSpatialLanguage or require "PNC/Semantics/PNC_SemanticTacticalSpatialLanguage"
 local Profile = PNC.Semantics.CombatReactionProfile or require "PNC/Semantics/PNC_SemanticCombatReactionProfile"
@@ -24,32 +27,6 @@ local Profile = PNC.Semantics.CombatReactionProfile or require "PNC/Semantics/PN
 local VALID_KINDS = { zombie = true, npc = true, player = true, foreign_npc = true }
 
 local function finite(v) return S.Finite(v) end
-
-local function targetPoint(target, wr)
-    if type(target) ~= "table" then return nil end
-    local x, y, z = finite(target.x), finite(target.y), finite(target.z)
-    if x and y then return x, y, z or 0, "combat_target" end
-    local id = tostring(target.id or target.zombieId or target.actorId or "")
-    local reg = (PNC and PNC.Registry) or Registry
-    local rec = id ~= "" and reg and type(reg.Get) == "function" and reg.Get(id) or nil
-    if type(rec) == "table" then
-        x, y, z = finite(rec.x), finite(rec.y), finite(rec.z)
-        if x and y then return x, y, z or 0, "target_record" end
-    end
-    local desc = type(wr) == "table" and wr.descriptor or nil
-    if type(desc) == "table" and finite(desc.x) and finite(desc.y) then
-        return finite(desc.x), finite(desc.y), finite(desc.z) or 0, "ally_warning_descriptor"
-    end
-    return nil
-end
-
-local function eventID(ev, rec, t)
-    return table.concat({
-        "combat-target-acquired", tostring(rec and rec.id or ""),
-        tostring(t and (t.id or t.zombieId or t.actorId or t.onlineID) or ""),
-        tostring(math.floor(finite(ev and ev.at) or 0)),
-    }, ":")
-end
 
 function S.OnTargetChanged(event, record)
     if type(event) ~= "table" or type(record) ~= "table" then return false, "target_event_invalid" end
@@ -68,11 +45,12 @@ function S.OnTargetChanged(event, record)
             at = now, hopDepth = 0, ignoreCooldown = event.ignoreWarningCooldown == true,
         })
     end
+    local ref = I.TargetEventID(event, record, target)
     if wr and wr.emitted == false and wr.reason == "skirmish_active" and S.HandleSkirmishActive then
-        return S.HandleSkirmishActive(record, wr, now, eventID(event, record, target))
+        return S.HandleSkirmishActive(record, wr, now, ref)
     end
 
-    local x, y, z, source = targetPoint(target, wr)
+    local x, y, z, source = I.TargetPoint(target, wr)
     if not x and not (wr and wr.emitted) then return false, "target_position_unavailable" end
     local tCls = (kind == "zombie" or tostring(target.threatClass or "") == "zombie") and "zombie" or "human_hostile"
     local tid = target.id or target.zombieId or target.actorId or target.onlineID
@@ -83,17 +61,16 @@ function S.OnTargetChanged(event, record)
         }, { now = now, sameAreaThreshold = 0.5, maxThreatAgeMs = 2000 })
     end
 
-    local ref = eventID(event, record, target)
     local evType = (tCls == "zombie") and "combat_zombie_acquired" or "combat_hostile_acquired"
     local spID = "semantic.combat." .. ((tCls == "zombie") and "zombie_acquired" or "hostile_acquired")
-    local pCls, resolved, ctx = "TACTICAL_BARK", nil, nil
+    local pCls, ctx = "TACTICAL_BARK", nil
     if wr and wr.emitted == true then
         local tone, desc = S.ResolveAllyWarnTone(record, nil), wr.descriptor
         local toks = S.BuildRichSpeechTokens and S.BuildRichSpeechTokens(record, record, desc, now, tone, { spatial = spatial }) or nil
         local extra = (desc and desc.enemyPosture == "crawler") and { replyRole = "crawler" } or nil
         local rich, rRes = S.ResolveSemanticLine(record, "combat_ally_warn_callout", "WARN", tCls, ref, nil, toks, extra)
         if rich then
-            text, resolved, evType = rich, rRes, "combat_ally_warn_callout"
+            text, evType = rich, "combat_ally_warn_callout"
             spID = rRes and rRes.realizationID or "semantic.combat.ally_warn.callout"
             pCls = rRes and rRes.presentationClass or "BARK"
         end
@@ -105,33 +82,7 @@ function S.OnTargetChanged(event, record)
         text, textReason, pres = Language.Decorate("", tCls, spatial, mode)
     end
 
-    local hostileClass = PNC and PNC.Const and PNC.Const.TACTICAL_CLASS_HOSTILE or "hostile"
-    local assaultReactions = kind == "player"
-        and record.tacticalClass == hostileClass
-        and PNC and PNC.Semantics and PNC.Semantics.PlayerAssaultReactions or nil
-    local hostilePlayer = nil
-    if assaultReactions and type(assaultReactions.OnHostileAcquiredPlayer) == "function" then
-        hostilePlayer = target.player
-            or (core and type(core.ResolvePlayerByOnlineID) == "function"
-                and core.ResolvePlayerByOnlineID(target.onlineID or target.id))
-            or (core and type(core.ResolvePlayerByUsername) == "function"
-                and core.ResolvePlayerByUsername(target.username))
-            or (target.playerIndex ~= nil and type(getSpecificPlayer) == "function"
-                and getSpecificPlayer(target.playerIndex))
-            or nil
-    end
-
-    local tauntEmitted = false
-    if hostilePlayer and assaultReactions then
-        local okTaunt, emittedTaunt = pcall(
-            assaultReactions.OnHostileAcquiredPlayer,
-            record,
-            hostilePlayer,
-            { now = now }
-        )
-        tauntEmitted = okTaunt == true and emittedTaunt == true
-    end
-
+    local tauntEmitted = I.TryEmitHostilePlayerTaunt(record, target, kind, core, now)
     if pres or (wr and wr.emitted == true and text) then
         ctx = {
             eventType = evType, eventRef = ref, threadID = ref, targetKind = tCls, targetRef = tostring(tid or ""),
@@ -160,7 +111,14 @@ function S.OnTargetChanged(event, record)
         sec.RequestBark(record, "bark.alert_hey", now)
     end
     if wr and wr.emitted == true then S.EnqueueAllyReplies(record, wr, now, ref) end
-    local emitted = sent > 0 or (wr and wr.emitted == true)
+    local injTriggered = false
+    if not tauntEmitted and sent == 0 and (not wr or wr.emitted ~= true)
+        and type(S.OnFightingWhileInjured) == "function"
+    then
+        local okInj = S.OnFightingWhileInjured(record, target, now, { threadID = ref })
+        if okInj then injTriggered = true end
+    end
+    local emitted = sent > 0 or injTriggered or (wr and wr.emitted == true)
     return emitted, emitted and { eventRef = ref, spatial = spatial, presentation = pres, sent = sent, warning = wr } or "no_audience"
 end
 

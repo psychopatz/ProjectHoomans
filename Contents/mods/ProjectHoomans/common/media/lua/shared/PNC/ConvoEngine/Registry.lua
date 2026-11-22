@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/ConvoEngine/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "0c0dd14df241eb4b742a95ede0729f2131a3ac66d66cb1497ea50aff9d9e9e39"
-Registry.WHOLE_MODEL_FINGERPRINT = "61a1db0a97629a3a2f1e3b821a4c32050ace38f8a670edb81cb460cd731cbbf5"
+Registry.WHOLE_MODEL_FINGERPRINT = "4056380f8007b6e938b160e771c0e0d9ccbd3d6c6d693b6ac5dece6ca6c89005"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -122,6 +122,7 @@ appendResponses(require "PNC/ConvoEngine/Responses/Stay/LabStayWithYou")
 appendResponses(require "PNC/ConvoEngine/Responses/Dialogue/CoreSemanticResponses")
 appendResponses(require "PNC/ConvoEngine/Responses/Dialogue/QuestionBackstory")
 appendResponses(require "PsychopatzCore/ConvoEngine/Responses/Dialogue/CoreKnowledgeIdentity")
+appendFlows(require "PNC/ConvoEngine/Flows/Dialogue/CombatWoundCallouts")
 appendFlows(require "PNC/ConvoEngine/Flows/Dialogue/CoreSemanticResponses")
 appendFlows(require "PNC/ConvoEngine/Flows/Dialogue/ThematicInteractive")
 appendFlows(require "PNC/ConvoEngine/Flows/Semantic/Identity")
@@ -160,6 +161,7 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CombatKillWitnessShaken")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CombatKillWitnessSupportive")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CombatPlayerAssaultReactions")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CombatTacticalSpatial")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CombatWoundCallouts")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCheckIn")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCommandsCombat")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/CompanionCommandsLifecycle")

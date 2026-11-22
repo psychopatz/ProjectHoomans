@@ -1,0 +1,16 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "triage_exchange",
+  "locale": "EN",
+  "entries": {
+    "say.variants.default": "Still holding my ground, {addressee.name}, caught a hit and keeping eyes forward.",
+    "reply.patched_push_on.say.variants.default": "Dressings are tight, {addressee.name}. Stay on my side and we'll sweep the rest of them.",
+    "reply.ordered_fallback.say.variants.default": "Alright, backing up two steps behind you, {addressee.name}. Cover me while I catch my breath!",
+    "reply.covered_for_treatment.say.variants.default": "Thanks, {addressee.name}! Keep them off my back while I tie off this open bleed.",
+    "reply.reassured_bond.say.variants.default": "Heard you loud and clear, {addressee.name}. Still breathing, still swinging beside you.",
+    "reply.bite_non_lethal_stabilized.say.variants.default": "Thank god saliva doesn't carry it here, {addressee.name}. Still stings awful, wrapping it tight now.",
+    "reply.bite_quarantined.say.variants.default": "I know the rules, {addressee.name}. Help me clear the stragglers and I'll stay apart from the group.",
+    "reply.bite_psychopath_threatened.say.variants.default": "Keep that barrel down, {addressee.name}! We finish clearing the dead before anyone talks about executions.",
+    "reply.refused.say.variants.default": "Save the talk for when there aren't teeth snapping in our faces!"
+  }
+}

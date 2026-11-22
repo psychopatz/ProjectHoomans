@@ -1,0 +1,135 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.fighting.injured_callout",
+  "locale": "EN",
+  "entries": {
+    "say.variants.with_wounds_head_neck_critical": [
+      "Blood is getting in my eyes, {addressee.name}! My {slot.wound.part} is torn open, keep them off me!",
+      "Still swinging, {addressee.name}, but my {slot.wound.part} is pouring blood! Watch my angle!"
+    ],
+    "say.variants.with_wounds_head_neck": [
+      "Watch my blind side, {addressee.name}, took an open cut to my {slot.wound.part}!",
+      "Still in the fight, {addressee.name}, just bleeding from my {slot.wound.part}!"
+    ],
+    "say.variants.with_wounds_torso_critical": [
+      "Holding my ribs together, {addressee.name}! Open wound on my {slot.wound.part}, don't let them close in!",
+      "Can't take another hit on my {slot.wound.part}, {addressee.name}! Help me push them back!"
+    ],
+    "say.variants.with_wounds_torso": [
+      "Still standing, {addressee.name}, though my {slot.wound.part} is bleeding through my shirt!",
+      "Took a nasty hit on my {slot.wound.part}, {addressee.name}! Keep pressure on them with me!"
+    ],
+    "say.variants.with_wounds_pelvis_groin_severe": [
+      "My hip and {slot.wound.part} are torn open, {addressee.name}! I can barely pivot, hold my flank!",
+      "Bleeding hard from my {slot.wound.part}, {addressee.name}! Every step feels like my pelvis is giving out!"
+    ],
+    "say.variants.with_wounds_pelvis_groin": [
+      "Caught an open gash across my {slot.wound.part}, {addressee.name}, can't twist fast so watch my side!",
+      "Bleeding from my {slot.wound.part}, {addressee.name}, footwork's tight but I'm still swinging!"
+    ],
+    "say.variants.with_wounds_upper_limb_severe": [
+      "My {slot.wound.part} is bleeding bad, {addressee.name}, weapon feels heavy but I'm not stopping!",
+      "Blood's running down my {slot.wound.part}, {addressee.name}! Cover my swing!"
+    ],
+    "say.variants.with_wounds_upper_limb": [
+      "Got an open wound on my {slot.wound.part}, {addressee.name}, still fighting though!",
+      "Bleeding from my {slot.wound.part}, {addressee.name}, just keep them out of grab range!"
+    ],
+    "say.variants.with_wounds_lower_limb_severe": [
+      "My {slot.wound.part} is giving way, {addressee.name}! Can't sprint with this bleeding wound, hold the line!",
+      "Barely keeping weight on my {slot.wound.part}, {addressee.name}! Don't let them flank around us!"
+    ],
+    "say.variants.with_wounds_lower_limb": [
+      "Footwork's sluggish with this open hit on my {slot.wound.part}, {addressee.name}, stay tight with me!",
+      "My {slot.wound.part} is leaking blood, {addressee.name}, keep these walkers in front!"
+    ],
+    "say.variants.with_wounds_minor": [
+      "Still fighting through a fresh {slot.wound.label} on my {slot.wound.part}, {addressee.name}, we got this.",
+      "Got a small bleed on my {slot.wound.part}, {addressee.name}, nothing slowing my swing yet."
+    ],
+    "say.variants.with_wounds_dirty_bandage": [
+      "The dressing on my {slot.wound.part} is soaked filthy, {addressee.name}! I need a clean wrap once we clear!",
+      "Bandage on my {slot.wound.part} bled right through, {addressee.name}, cover me so it doesn't fester!"
+    ],
+    "say.variants.patched_up_head_neck_severe": [
+      "Bandages around my {slot.wound.part} are barely holding, {addressee.name}, help me finish these fast!",
+      "Patched my {slot.wound.part} up, {addressee.name}, but every swing makes my head spin!"
+    ],
+    "say.variants.patched_up_head_neck": [
+      "Dressing on my {slot.wound.part} is holding for now, {addressee.name}, keep fighting!",
+      "Got my {slot.wound.part} wrapped tight, {addressee.name}, I'm still in this fight!"
+    ],
+    "say.variants.patched_up_torso_severe": [
+      "Wraps across my {slot.wound.part} are soaking red, {addressee.name}, help me drop the rest quick!",
+      "Patched up my {slot.wound.part} so I can keep swinging, {addressee.name}, just don't leave a gap!"
+    ],
+    "say.variants.patched_up_torso": [
+      "Bandage on my {slot.wound.part} is holding, {addressee.name}, breathing hurts a bit but I'm steady.",
+      "All patched up on my {slot.wound.part}, {addressee.name}, let's finish clearing them!"
+    ],
+    "say.variants.patched_up_pelvis_groin_severe": [
+      "Bound my {slot.wound.part} as tight as I could, {addressee.name}, can't lunge far so keep them in front!",
+      "Dressing on my {slot.wound.part} is holding my hip steady, {addressee.name}, don't let them circle us!"
+    ],
+    "say.variants.patched_up_pelvis_groin": [
+      "Got my {slot.wound.part} wrapped up, {addressee.name}, stride's short but I'm holding the line!",
+      "Bandage on my {slot.wound.part} is tight, {addressee.name}, stay on my flank while we clear!"
+    ],
+    "say.variants.patched_up_upper_limb_severe": [
+      "Wrap on my {slot.wound.part} is tight, {addressee.name}, hurts like hell to swing but I'll keep swinging!",
+      "Still swinging with a patched {slot.wound.part}, {addressee.name}, back me up!"
+    ],
+    "say.variants.patched_up_upper_limb": [
+      "Bandaged my {slot.wound.part} and I'm still fighting, {addressee.name}, watch the left!",
+      "Wrap on my {slot.wound.part} is solid, {addressee.name}, keep pushing forward!"
+    ],
+    "say.variants.patched_up_lower_limb_severe": [
+      "Splints and wraps on my {slot.wound.part} are taking all I've got, {addressee.name}, stay on my shoulder!",
+      "Patched my {slot.wound.part} up, {addressee.name}, can't run fast so keep them in front of us!"
+    ],
+    "say.variants.patched_up_lower_limb": [
+      "Got my {slot.wound.part} patched up, {addressee.name}, limping a bit but still standing my ground!",
+      "Leg's wrapped on my {slot.wound.part}, {addressee.name}, just don't let them get behind me!"
+    ],
+    "say.variants.patched_up_minor": [
+      "Already patched that scrape on my {slot.wound.part}, {addressee.name}, ready to clear the rest.",
+      "Wrap on my {slot.wound.part} is holding clean, {addressee.name}, let's clean up."
+    ],
+    "say.variants.with_wounds_bite_lethal": [
+      "I'm bleeding from this bite on my {slot.wound.part}, {addressee.name}! I'll fight till I drop, keep them off me!",
+      "Bite on my {slot.wound.part} won't stop bleeding, {addressee.name}! Taking as many with me as I can!"
+    ],
+    "say.variants.with_wounds_bite_possible_exposure": [
+      "Teeth tore my {slot.wound.part}, {addressee.name}! I don't feel feverish yet, just help me fight clear so I can wrap it!",
+      "Open bite on my {slot.wound.part}, {addressee.name}! No telling if it took hold—keep swinging with me!"
+    ],
+    "say.variants.with_wounds_bite_confirmed_symptomatic": [
+      "Fever's burning and my {slot.wound.part} bite is still bleeding, {addressee.name}! Let me take these dead down with me!",
+      "I feel the sickness from this {slot.wound.part} bite, {addressee.name}, cover me while I buy you a way out!"
+    ],
+    "say.variants.with_wounds_bite_non_transmissible": [
+      "Fighting with an open bite on my {slot.wound.part}, {addressee.name}, hurts awful but saliva won't turn me!",
+      "Need to wrap this {slot.wound.part} bite soon, {addressee.name}, bleeding hard even without the fever risk!"
+    ],
+    "say.variants.patched_up_bite_lethal": [
+      "Wrapped the bite on my {slot.wound.part}, {addressee.name}, buying every minute I can to help you clear out!",
+      "Dressing is over that bite on my {slot.wound.part}, {addressee.name}, don't look at me like that, keep swinging!"
+    ],
+    "say.variants.patched_up_bite_possible_exposure": [
+      "Wrapped the bite on my {slot.wound.part} tight, {addressee.name}, praying the fever doesn't come while we clear this!",
+      "Got a dressing over that {slot.wound.part} bite, {addressee.name}, still steady on my feet so stay with me!"
+    ],
+    "say.variants.patched_up_bite_confirmed_symptomatic": [
+      "Bite on my {slot.wound.part} is wrapped, {addressee.name}, but the fever's setting in—let me hold the front for you!",
+      "Even with my {slot.wound.part} bandaged I can feel the chill, {addressee.name}, I'm fighting as long as I'm still me!"
+    ],
+    "say.variants.patched_up_bite_non_transmissible": [
+      "Got the bite on my {slot.wound.part} wrapped tight, {addressee.name}, sore as hell but I'm not turning!",
+      "Patched the {slot.wound.part} bite up, {addressee.name}, still fighting at full tilt beside you!"
+    ],
+    "say.variants.default": [
+      "Still fighting with a hit on my {slot.wound.part}, {addressee.name}, keep our spacing tight!",
+      "Hurting on my {slot.wound.part}, {addressee.name}, but I'm staying on my feet!"
+    ]
+  }
+}

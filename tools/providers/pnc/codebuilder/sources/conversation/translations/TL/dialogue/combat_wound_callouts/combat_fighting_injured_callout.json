@@ -1,0 +1,135 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.fighting.injured_callout",
+  "locale": "TL",
+  "entries": {
+    "say.variants.with_wounds_head_neck_critical": [
+      "Napupuno ng dugo ang mata ko, {addressee.name}! Bukas ang sugat sa {slot.wound.part} ko, ilayo mo sila!",
+      "Lumalaban pa rin, {addressee.name}, pero tuloy ang tulo sa {slot.wound.part} ko! Bantayan ang gilid ko!"
+    ],
+    "say.variants.with_wounds_head_neck": [
+      "Bantayan ang gilid ko, {addressee.name}, may hiwa ang {slot.wound.part} ko!",
+      "Lumalaban pa, {addressee.name}, dumurugo lang ang {slot.wound.part} ko!"
+    ],
+    "say.variants.with_wounds_torso_critical": [
+      "Hawak ko pa tagiliran ko, {addressee.name}! Bukas ang sugat sa {slot.wound.part} ko, huwag palapitin!",
+      "Hindi ko na kaya isa pang tama sa {slot.wound.part}, {addressee.name}! Tulungan mo akong itulak sila!"
+    ],
+    "say.variants.with_wounds_torso": [
+      "Nakatayo pa rin, {addressee.name}, kahit tagos sa damit ang dugo sa {slot.wound.part} ko!",
+      "Matindi tama sa {slot.wound.part} ko, {addressee.name}! Tuloy lang ang banat kasama ko!"
+    ],
+    "say.variants.with_wounds_pelvis_groin_severe": [
+      "Napunit ang balakang at {slot.wound.part} ko, {addressee.name}! Hirap akong pumihit, bantayan mo ang gilid ko!",
+      "Malakas ang dugo sa {slot.wound.part} ko, {addressee.name}! Parang bibigay ang balakang ko sa bawat hakbang!"
+    ],
+    "say.variants.with_wounds_pelvis_groin": [
+      "May bukas na hiwa sa {slot.wound.part} ko, {addressee.name}, hindi ako makapihit nang mabilis kaya alalay sa tabi!",
+      "Dumurugo ang {slot.wound.part} ko, {addressee.name}, mabigat ihakbang pero humahataw pa rin ako!"
+    ],
+    "say.variants.with_wounds_upper_limb_severe": [
+      "Malakas ang dugo sa {slot.wound.part} ko, {addressee.name}, mabigat na braso ko pero tuloy pa rin!",
+      "Tumatagas dugo sa {slot.wound.part} ko, {addressee.name}! Alalayan ang hampas ko!"
+    ],
+    "say.variants.with_wounds_upper_limb": [
+      "May bukas na sugat sa {slot.wound.part} ko, {addressee.name}, pero lumalaban pa!",
+      "Dumurugo ang {slot.wound.part} ko, {addressee.name}, huwag lang palapitin ang sakmal!"
+    ],
+    "say.variants.with_wounds_lower_limb_severe": [
+      "Bumibigay ang {slot.wound.part} ko, {addressee.name}! Hindi makatakbo sa sugat nito, hawakan ang linya!",
+      "Halos hindi na maitapak ang {slot.wound.part} ko, {addressee.name}! Huwag silang palusutin sa gilid!"
+    ],
+    "say.variants.with_wounds_lower_limb": [
+      "Mabagal kilos ko sa tama sa {slot.wound.part}, {addressee.name}, dikit lang sa akin!",
+      "Tumutulo dugo sa {slot.wound.part} ko, {addressee.name}, panatilihing nasa harap lang sila!"
+    ],
+    "say.variants.with_wounds_minor": [
+      "Lumalaban pa rin kahit bagong {slot.wound.label} sa {slot.wound.part}, {addressee.name}, kaya natin ito.",
+      "Konting dugo sa {slot.wound.part} ko, {addressee.name}, hindi nakakabagal sa hampas ko."
+    ],
+    "say.variants.with_wounds_dirty_bandage": [
+      "Basa at marumi na ang bendahe sa {slot.wound.part} ko, {addressee.name}! Kailangan ko ng malinis na pamalit pagkalinis!",
+      "Tumagos na ang dugo at dumi sa balot ng {slot.wound.part} ko, {addressee.name}, alalayan mo ako bago mamaga!"
+    ],
+    "say.variants.patched_up_head_neck_severe": [
+      "Baka bumigay bendahe sa {slot.wound.part} ko, {addressee.name}, tapusin natin agad ito!",
+      "Nakabalot na ang {slot.wound.part} ko, {addressee.name}, pero umiikot ulo ko sa bawat hataw!"
+    ],
+    "say.variants.patched_up_head_neck": [
+      "Kapit pa bendahe sa {slot.wound.part} ko, {addressee.name}, tuloy ang laban!",
+      "Mahigpit ang balot sa {slot.wound.part} ko, {addressee.name}, kasama niyo pa ako rito!"
+    ],
+    "say.variants.patched_up_torso_severe": [
+      "Tagos na pula ang bendahe sa {slot.wound.part} ko, {addressee.name}, ibagsak agad natin ang natitira!",
+      "Binalot ko muna ang {slot.wound.part} ko para makalaban, {addressee.name}, huwag magbukas ng puwang!"
+    ],
+    "say.variants.patched_up_torso": [
+      "Kapit pa balot sa {slot.wound.part} ko, {addressee.name}, masakit huminga pero matatag pa.",
+      "Naayos ko na balot sa {slot.wound.part} ko, {addressee.name}, ubusin na natin sila!"
+    ],
+    "say.variants.patched_up_pelvis_groin_severe": [
+      "Tinodo ko na ang higpit ng balot sa {slot.wound.part} ko, {addressee.name}, hindi ako makahakbang nang malayo kaya harangan mo sa harap!",
+      "Hawak pa ng bendahe ang balakang at {slot.wound.part} ko, {addressee.name}, huwag mo silang hayaang umikot sa likod!"
+    ],
+    "say.variants.patched_up_pelvis_groin": [
+      "Nakabalot na ang {slot.wound.part} ko, {addressee.name}, maikli ang hakbang ko pero hawak ko ang puwesto!",
+      "Mahigpit na ang tali sa {slot.wound.part} ko, {addressee.name}, dikit ka sa gilid ko habang nililinis natin ito!"
+    ],
+    "say.variants.patched_up_upper_limb_severe": [
+      "Mahigpit ang tali sa {slot.wound.part} ko, {addressee.name}, mahapdi humataw pero tuloy lang!",
+      "Humahataw pa rin kahit nakabendahe ang {slot.wound.part}, {addressee.name}, alalayan mo ako!"
+    ],
+    "say.variants.patched_up_upper_limb": [
+      "Nakabendahe na {slot.wound.part} ko at lumalaban pa, {addressee.name}, bantay sa kaliwa!",
+      "Matibay tali sa {slot.wound.part} ko, {addressee.name}, sulong lang!"
+    ],
+    "say.variants.patched_up_lower_limb_severe": [
+      "Pilit kong tinitiis ang splint sa {slot.wound.part} ko, {addressee.name}, dikit ka sa balikat ko!",
+      "Nakabalot na {slot.wound.part} ko, {addressee.name}, hindi ako makatakas agad kaya harapin natin!"
+    ],
+    "say.variants.patched_up_lower_limb": [
+      "Nakabendahe na {slot.wound.part} ko, {addressee.name}, iika-ika pero nakatindig pa!",
+      "May balot ang {slot.wound.part} ko, {addressee.name}, huwag lang palikod!"
+    ],
+    "say.variants.patched_up_minor": [
+      "Nabalutan ko na gasgas sa {slot.wound.part} ko, {addressee.name}, handa nang tapusin ito.",
+      "Maayos ang balot sa {slot.wound.part} ko, {addressee.name}, linisin na natin ang paligid."
+    ],
+    "say.variants.with_wounds_bite_lethal": [
+      "Dumurugo kagat sa {slot.wound.part} ko, {addressee.name}! Lalaban ako hanggang dulo, ilayo mo sila!",
+      "Walang tigil dugo sa kagat ng {slot.wound.part} ko, {addressee.name}! Magsasama ako ng marami bago bumagsak!"
+    ],
+    "say.variants.with_wounds_bite_possible_exposure": [
+      "Nakagat ang {slot.wound.part} ko, {addressee.name}! Wala pa akong lagnat, tulungan mo muna akong makalabas para mabalutan ito!",
+      "Bukas pa ang kagat sa {slot.wound.part} ko, {addressee.name}! Hindi pa tiyak kung kumapit ang sakit—laban lang sa tabi ko!"
+    ],
+    "say.variants.with_wounds_bite_confirmed_symptomatic": [
+      "Umaapoy na ang lagnat ko at dumurugo pa ang kagat sa {slot.wound.part}, {addressee.name}! Hayaan mong isama ko ang mga patay na ito!",
+      "Ramdam ko na ang lagnat mula sa kagat sa {slot.wound.part} ko, {addressee.name}, alalayan mo ako habang binubuksan ko ang daan niyo!"
+    ],
+    "say.variants.with_wounds_bite_non_transmissible": [
+      "Lumalaban kahit bukas ang kagat sa {slot.wound.part}, {addressee.name}, sobrang sakit pero di ako magiging zombie!",
+      "Kailangan ko balutin kagat sa {slot.wound.part} agad, {addressee.name}, lakas ng dugo kahit ligtas sa laway!"
+    ],
+    "say.variants.patched_up_bite_lethal": [
+      "Binalot ko ang kagat sa {slot.wound.part}, {addressee.name}, sinusulit ko bawat minuto para makaligtas kayo!",
+      "May bendahe na sa kagat ng {slot.wound.part}, {addressee.name}, huwag tumingin nang ganyan, humataw ka lang!"
+    ],
+    "say.variants.patched_up_bite_possible_exposure": [
+      "Mahigpit kong binalot ang kagat sa {slot.wound.part} ko, {addressee.name}, sana hindi lagnatin habang tinatapos natin ito!",
+      "Natakpan ko na ang kagat sa {slot.wound.part} ko, {addressee.name}, matatag pa ang tuhod ko kaya kapit lang!"
+    ],
+    "say.variants.patched_up_bite_confirmed_symptomatic": [
+      "Nakabalot na ang kagat sa {slot.wound.part} ko, {addressee.name}, pero umaakyat na ang lagnat—ako na ang haharang sa unahan!",
+      "Kahit may bendahe ang {slot.wound.part} ko ay giniginaw na ako sa lagnat, {addressee.name}, lalaban ako hangga't ako pa ito!"
+    ],
+    "say.variants.patched_up_bite_non_transmissible": [
+      "Mahigpit ang balot sa kagat sa {slot.wound.part}, {addressee.name}, masakit pero di tayo mahahawa!",
+      "Nagamot ko na kagat sa {slot.wound.part}, {addressee.name}, todo bigay pa rin sa tabi mo!"
+    ],
+    "say.variants.default": [
+      "Lumalaban pa kahit tinamaan sa {slot.wound.part}, {addressee.name}, ayusin ang puwesto!",
+      "Masakit sa {slot.wound.part} ko, {addressee.name}, pero nakatayo pa rin ako!"
+    ]
+  }
+}

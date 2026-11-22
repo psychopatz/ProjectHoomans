@@ -1,0 +1,16 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "triage_exchange",
+  "locale": "TL",
+  "entries": {
+    "say.variants.default": "Lumalaban pa rin ako, {addressee.name}, may tama pero nakabantay pa sa harap.",
+    "reply.patched_push_on.say.variants.default": "Mahigpit ang balot, {addressee.name}. Dikit ka sa tabi ko at ubusin natin sila.",
+    "reply.ordered_fallback.say.variants.default": "Sige, aatras ako nang dalawang hakbang sa likod mo, {addressee.name}. Bantayan mo ako sandali!",
+    "reply.covered_for_treatment.say.variants.default": "Salamat, {addressee.name}! Ilayo mo sila habang tinatalian ko itong sugat.",
+    "reply.reassured_bond.say.variants.default": "Rinig kita, {addressee.name}. Humihinga pa, lumalaban pa sa tabi mo.",
+    "reply.bite_non_lethal_stabilized.say.variants.default": "Buti hindi kumakalat sa laway rito, {addressee.name}. Mahapdi lang talaga, babalutin ko na nang mahigpit.",
+    "reply.bite_quarantined.say.variants.default": "Alam ko ang patakaran, {addressee.name}. Tulungan mo akong tapusin ang mga kalaban at didistansya ako.",
+    "reply.bite_psychopath_threatened.say.variants.default": "Ibaba iyang baril, {addressee.name}! Ubusin muna natin ang mga patay bago magbanta ng pagpatay!",
+    "reply.refused.say.variants.default": "Mamaya na ang usapan habang may humahabol pa sa mukha natin!"
+  }
+}

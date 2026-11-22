@@ -1,0 +1,96 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.wound.received_beat",
+  "locale": "TL",
+  "entries": {
+    "say.variants.bite_lethal": [
+      "Hindi, hindi! Nakagat ang {slot.wound.part} ko, {addressee.name}! Bumaon ang ngipin!",
+      "Aray, tinamaan ako! Malalim ang kagat sa {slot.wound.part} ko, {addressee.name}! Diyos ko, nakagat ako!",
+      "Lintik! Bumaon sa {slot.wound.part} ko, {addressee.name}! May kagat ako!"
+    ],
+    "say.variants.bite_possible_exposure": [
+      "Aray! Bumaon ang ngipin sa {slot.wound.part} ko, {addressee.name}! Tulungan mo akong lumayo para makita kung gaano kalalim!",
+      "Lintik, nakagat ang {slot.wound.part} ko, {addressee.name}! Ilayo mo sila habang tinitingnan ko itong kagat!"
+    ],
+    "say.variants.bite_confirmed_symptomatic": [
+      "Umaapoy na ang balat ko at kumikirot ang kagat sa {slot.wound.part} ko, {addressee.name}! Kumakalat na ang lagnat!",
+      "Giniginaw at nilalagnat na ako sa kagat sa {slot.wound.part} ko, {addressee.name}... dumistansya kayo pagkatapos ng laban!"
+    ],
+    "say.variants.bite_non_transmissible": [
+      "Aray! Bumaon ngipin sa {slot.wound.part} ko, {addressee.name}! Sobrang sakit, tulungan mo akong balutin pagkalinis!",
+      "Hayop na iyon, nakagat {slot.wound.part} ko, {addressee.name}! Di nakakahawa sa laway pero malakas dugo!"
+    ],
+    "say.variants.bullet": [
+      "Nabaril ako! Tinamaan ako ng bala sa {slot.wound.part}, {addressee.name}!",
+      "May tingga sa {slot.wound.part} ko, {addressee.name}! Yuko, tinamaan ako!"
+    ],
+    "say.variants.deep_wound_glass": [
+      "Aray! Bumaon bubog sa {slot.wound.part} ko, {addressee.name}, dumurugo nang todo!",
+      "Buka ang sugat may bubog sa {slot.wound.part} ko, {addressee.name}! Kailangan ko ng tiyani at tahi!"
+    ],
+    "say.variants.deep_wound": [
+      "Napunit nang malalim ang {slot.wound.part} ko, {addressee.name}! Kailangan tahiin ito pagkatapos!",
+      "Aray! Malalim ang sugat sa {slot.wound.part} ko, {addressee.name}, mabilis tulo ng dugo!"
+    ],
+    "say.variants.fracture": [
+      "Krak! May nabali sa {slot.wound.part} ko, {addressee.name}!",
+      "Basag ata buto sa {slot.wound.part} ko, {addressee.name}! Sobrang sakit igalaw!"
+    ],
+    "say.variants.burn": [
+      "Aray! Napaso ang {slot.wound.part} ko, {addressee.name}, nanginginig sa hapdi!",
+      "Grabe ang paso sa {slot.wound.part} ko, {addressee.name}! Kailangan umatras!"
+    ],
+    "say.variants.laceration": [
+      "Nahiwa nang malalim ang {slot.wound.part} ko, {addressee.name}! Ilayo mo sila!",
+      "Aray, mahabang hiwa sa {slot.wound.part} ko, {addressee.name}! Dumurugo!"
+    ],
+    "say.variants.scratch": [
+      "Tch, nadaplisan ang {slot.wound.part} ko, {addressee.name}, kalmot lang.",
+      "Nakalmot ang {slot.wound.part} ko, {addressee.name}, mababaw lang!"
+    ],
+    "say.variants.post_combat_injury_check": [
+      "Malinis na ang paligid, {addressee.name}, pero kailangan nang gamutin itong {slot.wound.label} sa {slot.wound.part} ko.",
+      "Ngayong bagsak na sila, {addressee.name}, kailangan kong tingnan itong {slot.wound.label} sa {slot.wound.part} ko."
+    ],
+    "say.variants.severity_escalation": [
+      "Lumalala ang sugat sa {slot.wound.part} ko, {addressee.name}! Nauubusan na ako ng dugo!",
+      "Lumalabo na ang paningin ko, {addressee.name}—mabilis ang tagas ng dugo sa {slot.wound.part} ko!"
+    ],
+    "say.variants.bandage_dirty": [
+      "Basa at marumi na ang bendahe sa {slot.wound.part} ko, {addressee.name}, kailangan ko ng malinis na pamalit.",
+      "Marumi at tumagos na ang dugo sa balot ng {slot.wound.part} ko, {addressee.name}."
+    ],
+    "say.variants.treatment_stabilized": [
+      "Mahigpit nang nakabalot ang {slot.wound.part} ko, {addressee.name}. Tumigil na rin ang pagdurugo.",
+      "Maayos na ang kapit ng bendahe sa {slot.wound.part} ko ngayon, {addressee.name}."
+    ],
+    "say.variants.knox_symptom_onset": [
+      "Masama ang sikmura ko at nanlalamig ang pawis ko, {addressee.name}... may mali mula sa sugat sa {slot.wound.part} ko.",
+      "Bigla akong nahilo at nilagnat, {addressee.name}. Bantayan mo ako nang mabuti."
+    ],
+    "say.variants.fever_onset": [
+      "Ang taas ng lagnat ko, {addressee.name}... kumikirot ang ulo ko at hirap akong magpokus.",
+      "Biglang tumaas ang lagnat ko, {addressee.name}, ang bigat ng bawat hininga ko."
+    ],
+    "say.variants.cold_illness_onset": [
+      "Tinamaan ako ng matinding sipon at ubo, {addressee.name}, hindi ko mapigilang bumahing.",
+      "Ang bigat ng sipon ko, {addressee.name}—kailangan kong magpatuyo at magpainit."
+    ],
+    "say.variants.hypothermia_onset": [
+      "Manhid na ang mga kamay ko at nanginginig sa ginaw, {addressee.name}! Sobrang lamig dito!",
+      "Pinapabagal ako ng matinding ginaw, {addressee.name}, kailangan natin ng masisilungan at apoy!"
+    ],
+    "say.variants.hyperthermia_onset": [
+      "Nahihilo na ako sa sobrang init, {addressee.name}... napapaso na ako sa suot ko!",
+      "Tagaktak ang pawis ko at umiikot ang paningin ko sa init, {addressee.name}, kailangan ko ng lilim at tubig!"
+    ],
+    "say.variants.soaked_chill": [
+      "Basang-basa ako at nanginginig sa lamig, {addressee.name}—lalagnatin ako kapag nanatiling ganito.",
+      "Babad sa tubig at nanlalamig ang damit ko sa balat, {addressee.name}."
+    ],
+    "say.variants.default": [
+      "Tinamaan sa {slot.wound.part}, {addressee.name}, ingat sa anggulo!",
+      "Nadaplisan sa {slot.wound.part} ko, {addressee.name}, alisto!"
+    ]
+  }
+}

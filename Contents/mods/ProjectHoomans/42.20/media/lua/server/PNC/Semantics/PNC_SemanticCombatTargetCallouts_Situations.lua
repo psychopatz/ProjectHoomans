@@ -6,54 +6,13 @@ PNC.Semantics = PNC.Semantics or {}
 PNC.Semantics.CombatTargetCalloutsInternal = PNC.Semantics.CombatTargetCalloutsInternal or {}
 PNC.ConvoEngine = PNC.ConvoEngine or {}
 
-require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_AllyReplies"
+require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_SituationQuery"
 
 local S = PNC.Semantics.CombatTargetCallouts or {}
 local I = PNC.Semantics.CombatTargetCalloutsInternal
 PNC.Semantics.CombatTargetCallouts = S
 
-local SIT_BARK_OPTS = {
-    family = "combat_ally_warn_situation", priority = 68, priorityHoldMs = 800,
-    cooldownMs = 1000, familyCooldownMs = 1000, ttlMs = 9000,
-    clientCooldowns = { familyMs = 1500, speakerMs = 1800, ambientMs = 400, mergeWindowMs = 0 },
-}
-I.SituationBarkOpts = SIT_BARK_OPTS
-
-function I.SituationNow(at)
-    if at ~= nil then return tonumber(at) or 0 end
-    return PNC.Core and type(PNC.Core.Now) == "function" and (tonumber(PNC.Core.Now()) or 0) or 0
-end
-
-local function distSq(x1, y1, x2, y2)
-    if PNC.Core and type(PNC.Core.DistanceSq) == "function" then return PNC.Core.DistanceSq(x1, y1, x2, y2) end
-    local dx, dy = (tonumber(x2) or 0) - (tonumber(x1) or 0), (tonumber(y2) or 0) - (tonumber(y1) or 0)
-    return dx * dx + dy * dy
-end
-I.DistSq = distSq
-
-function I.FindSquadmates(rec, radius)
-    local perc, sp, reg = PNC.Perception, PNC.SpatialIndex, PNC.Registry
-    if not perc or type(perc.AreWarningAllies) ~= "function" then return {} end
-    local rx, ry = tonumber(rec.x) or 0, tonumber(rec.y) or 0
-    local raw = (sp and type(sp.QueryNPCs) == "function" and sp.QueryNPCs(rx, ry, radius)) or {}
-    if not sp or type(sp.QueryNPCs) ~= "function" then
-        for _, c in pairs(reg and reg.Data or {}) do raw[#raw + 1] = c end
-    end
-    local rSq, out = radius * radius, {}
-    for i = 1, #raw do
-        local c = raw[i]
-        if type(c) == "table" and c ~= rec and tostring(c.id or "") ~= tostring(rec.id or "")
-            and c.alive ~= false and perc.AreWarningAllies(rec, c) == true
-        then
-            local d = distSq(rx, ry, tonumber(c.x) or rx, tonumber(c.y) or ry)
-            if d <= rSq then out[#out + 1] = { record = c, distSq = d } end
-        end
-    end
-    if #out > 1 then table.sort(out, function(a, b) return a.distSq < b.distSq end) end
-    local list = {}
-    for i = 1, math.min(8, #out) do list[i] = out[i].record end
-    return list
-end
+local SIT_BARK_OPTS = I.SituationBarkOpts
 
 function I.EmitSituationCallout(speaker, addr, desc, role, now, ref, extraTokens)
     local tone = S.ResolveAllyWarnTone(speaker, nil)
@@ -146,6 +105,10 @@ function S.HandleSkirmishActive(record, warningResult, now, ref)
     if warningResult.lastOneReady then
         local ok = S.TryEmitLastStragglerBeat(record, warningResult.notifiedAlly, warningResult.descriptor, now, ref)
         return ok, ok and "last_straggler" or "skirmish_already_active"
+    end
+    if type(S.OnFightingWhileInjured) == "function" then
+        local okInj, reasonInj = S.OnFightingWhileInjured(record, warningResult.descriptor, now, { threadID = ref })
+        if okInj then return true, reasonInj end
     end
     return false, "skirmish_already_active"
 end

@@ -1,0 +1,59 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.wound.ally_reaction",
+  "locale": "TL",
+  "entries": {
+    "say.variants.close_bond_bite_lethal": [
+      "Huwag ka magsalita nang ganyan, {addressee.name}! Dito ka sa tabi ko, hindi kita iiwan dito!",
+      "Kapit lang, {addressee.name}! Tapusin muna natin ito, pakiusap huwag ka sumuko!"
+    ],
+    "say.variants.close_bond_critical": [
+      "Kapit sa akin, {addressee.name}! Huwag kang babagsak habang kasama kita!",
+      "{addressee.name}, diinan ang {slot.wound.part} mo! Papunta na ako diyan!"
+    ],
+    "say.variants.close_bond_patched": [
+      "Dahan-dahan, {addressee.name}, ingat sa nakabalot na {slot.wound.part}! Dikit ka sa balikat ko!",
+      "Huwag magpabida sa sugat sa {slot.wound.part} mo, {addressee.name}! Ako na sa unahan!"
+    ],
+    "say.variants.supportive_cover_wounded": [
+      "Umatras ka sa likod ko, {addressee.name}, balutin agad yang {slot.wound.part} mo bago maubusan ng dugo!",
+      "Ako bahala sa harap, {addressee.name}! Diinan mo muna ang {slot.wound.part} mo!"
+    ],
+    "say.variants.supportive_cover_patched": [
+      "Bantayan ang bendahe sa {slot.wound.part}, {addressee.name}, sabihin mo agad kung tatagos ang dugo!",
+      "Maayos ang tali, {addressee.name}, gawa tayo ng puwang para di bumuka uli ang {slot.wound.part}!"
+    ],
+    "say.variants.tactical_cover_wounded": [
+      "Sige, {addressee.name}, umatras sa likod ng linya at talian ang {slot.wound.part} mo!",
+      "Palit tayo puwesto, {addressee.name}, pabigat ang bukas na dugo sa {slot.wound.part}!"
+    ],
+    "say.variants.tactical_cover_patched": [
+      "Protektahan ang {slot.wound.part} mo, {addressee.name}, hawakan natin puwesto!",
+      "Narinig kita, {addressee.name}, nakabendahe naman kaya kapit sa pormasyon!"
+    ],
+    "say.variants.squad_crossfire_wingman": [
+      "Pasok na rin ako sa gilid mo, {addressee.name}! Squad, sara natin linya para sa {slot.wound.part} niya!",
+      "Nandito rin ako, {addressee.name}! Walang babagsak sa grupo natin!"
+    ],
+    "say.variants.bite_non_transmissible_relief": [
+      "Hindi ka magbabago, {addressee.name}, hindi kumakalat sa laway dito! Diinan ang {slot.wound.part} at bendahe agad!",
+      "Ligtas sa lagnat ang laway, {addressee.name}! Huwag magpanic at talian agad ang {slot.wound.part}!"
+    ],
+    "say.variants.low_rel_dismissive": [
+      "Tigilan ang daing sa {slot.wound.part}, {addressee.name}, lumaban ka o tumabi ka sa daan ko.",
+      "Problema mo iyang {slot.wound.part} mo, {addressee.name}, huwag mo kaming idamay."
+    ],
+    "say.variants.low_rel_bite_execution_threat": [
+      "Nakagat ka, {addressee.name}. Dumistansya ka, sa unang senyas ng lagnat tatapusin kita.",
+      "May kagat si {addressee.name}. Tapusin itong alon, tapos huwag kang gagalaw nang bigla."
+    ],
+    "say.variants.psychopath_bite_execution_threat": [
+      "Nakagat ka, {addressee.name}. Sayang ang bendahe. Babarilin kita bago ka pa magbagong-anyo.",
+      "Pabigat ka na, {addressee.name}. Ibaba ang armas pagkatapos nito kundi sa ulo ang tama mo."
+    ],
+    "say.variants.default": [
+      "Alalay lang sa paa mo, {addressee.name}, bantayan ang {slot.wound.part}!",
+      "Rinig kita, {addressee.name}, ubusin na natin ang mga ito!"
+    ]
+  }
+}

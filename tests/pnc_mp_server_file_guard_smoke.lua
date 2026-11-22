@@ -189,11 +189,12 @@ listing:close()
 -- and loaded by SemanticEventRuntime before CombatTargetCallouts and DialogueBeats.
 -- PNC_ChronologyMilestones and PNC_ScopedWorldEventDirector are server-only,
 -- guarded by AllowsServerCode(), and loaded by SemanticEventRuntime / Director.
--- Ten combat wound/medical/transport spokes (_MedicalHelpers, _WoundProfile,
+-- Twelve combat wound/medical/transport spokes (_MedicalHelpers, _WoundProfile,
 -- _WoundArbitration, _WoundRoles, _WoundDelivery, _InjuryScene, _InjuryMemory,
--- _Wounds, _AllyReplies_Dispatch, PNC_SemanticSpeechTransport_Resolve) are
--- server-only, guarded by AllowsServerCode(), and loaded by CombatTargetCallouts / SpeechTransport.
-T.equal(#serverOnlyFiles, 1097,
+-- _Wounds, _AllyReplies_Dispatch, _SituationQuery, _TargetHelpers,
+-- PNC_SemanticSpeechTransport_Resolve) are server-only, guarded by
+-- AllowsServerCode(), and loaded by CombatTargetCallouts / SpeechTransport.
+T.equal(#serverOnlyFiles, 1099,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

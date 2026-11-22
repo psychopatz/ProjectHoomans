@@ -2,7 +2,7 @@
 
 **Primary Repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` (`main`)
 **Baseline Commit:** `4522d6e952708bf3ccb013ce620ad9d698a60cb1`
-**Active Phase:** `H8` — Compositional EN/TL Realizations & CodeBuilder Reconciliation
+**Active Phase:** `H9` — Deterministic Tests, MP Authority, Live/Abstract Parity & 200-NPC Scale Suite
 
 ## Phase Status
 
@@ -15,15 +15,15 @@
 | `H4` | Combat, Escalation, Treatment, Physiology & Post-Combat Beats | `DONE` | `e83e772070ce1f7bbf288e9c68b392b6bb92b653` |
 | `H5` | Director-Style Ally Reaction Arbitration | `DONE` | `907a626ab0813d8db3f7532ff9dcdac3d020b068` |
 | `H6` | Beat -> Player Response -> Multi-Actor Scene Handoff | `DONE` | `7458c3badcb5b4b710b40303c87cadb973d55154` |
-| `H7` | Bite Conflict Facts/Behavior Policy & Bounded Memory | `DONE` | Pending `H7` phase commit |
-| `H8` | EN/TL Realizations & CodeBuilder Reconciliation | `NEXT` | Pending |
-| `H9` | Deterministic Tests, MP Authority & 200-NPC Scale Suite | `PENDING` | Pending |
+| `H7` | Bite Conflict Facts/Behavior Policy & Bounded Memory | `DONE` | `85a9de85577ffb9e51013977bb732adc9a655c3d` |
+| `H8` | EN/TL Realizations & CodeBuilder Reconciliation | `DONE` | Pending `H8` phase commit (`psychopatzCore`: `1a67819822909751090f1a68ef02faa50d667beb`) |
+| `H9` | Deterministic Tests, MP Authority & 200-NPC Scale Suite | `NEXT` | Pending |
 | `H10` | Final Audit & Developer-Side Closure | `PENDING` | Pending |
 | `H11` | User Live SP/MP Acceptance | `USER_OWNED` | Pending user runtime test |
 
-## Completed in H7
+## Completed in H8
 
-- Removed `recommendedAction = "hostile_eliminate_bitten"` from `PNC_SemanticCombatTargetCallouts_WoundRoles.lua` and `_WoundDelivery.lua`; dialogue/callout modules now emit pure semantic `biteConflictFacts` (`challengerId`, `injuredId`, `knoxExposure`, `knoxStage`, `salivaTransmissible`, `challengerStance`, `challengerDispositions`, `relationshipApproval`, `relationshipState`, `timestamp`).
-- Created `PNC_NPCWounds_BiteConflictPolicy.lua` (required from `PNC_NPCWounds_Snapshot.lua`) implementing `Wounds.EvaluateBiteConflictPolicy(observerRecord, targetRecord, context)` returning normalized stances (`none`, `protect`, `monitor`, `quarantine`, `abandon`, `threaten`, `execute_candidate`) and downgrading `execute_candidate`/`threaten` to `monitor`/`quarantine` when `activeInjuryTriageState` reflects player protection or quarantine orders.
-- Created `PNC_SemanticCombatTargetCallouts_InjuryMemory.lua` (`S.RecordHighSalienceInjuryMemory`) recording bounded high-salience injury, bite-conflict, and triage-resolution memory provenance on `record.runtime.recentHighSalienceInjuryMemory` while keeping routine minor barks transient.
-- Decoupled `ChoicePolicy.lua` (`+ ChoicePolicy_Scoring.lua`, `ChoicePolicy_Strategies.lua`) and `Reaction.lua` (`+ Reaction_Pools.lua`) so all 11 H7 files are `< 1960` `o200k_base` tokens with `0` Kahlua issues and `H7_PROBE_OK`.
+- Authored complete EN and TL realizations across `combat_fighting_injured_callout.json` (`31` variants `<= 32`, including `pelvis_groin`, `with_wounds_dirty_bandage`, `bite_possible_exposure`, `bite_confirmed_symptomatic`), `combat_wound_received_beat.json` (`22` variants `<= 32`, including `bite_possible_exposure`, `bite_confirmed_symptomatic`, `post_combat_injury_check`, and physiology/treatment transitions), `combat_wound_ally_reaction.json`, and `combat_injury_interactive_exchange.json`.
+- Decoupled `PNC_SemanticCombatTargetCallouts.lua` (`+ _TargetHelpers.lua`) and `PNC_SemanticCombatTargetCallouts_Situations.lua` (`+ _SituationQuery.lua`) so all combat callout modules are `< 1900` `o200k_base` tokens.
+- Executed `reconcile.py --apply` and verified `reconcile.py --check` (`clean = true, drifted = 0, stale = 0, missing = 0`).
+- Committed participant repository `psychopatzCore` (`1a67819822909751090f1a68ef02faa50d667beb`) before committing `H8` in `ProjectHoomans`.

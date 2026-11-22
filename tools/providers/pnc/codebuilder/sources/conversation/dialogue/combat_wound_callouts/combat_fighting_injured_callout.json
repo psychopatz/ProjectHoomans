@@ -1,0 +1,86 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "combat.fighting.injured_callout",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "WARN"
+  },
+  "say": {
+    "variants": [
+      { "id": "with_wounds_head_neck_critical" },
+      { "id": "with_wounds_head_neck" },
+      { "id": "with_wounds_torso_critical" },
+      { "id": "with_wounds_torso" },
+      { "id": "with_wounds_pelvis_groin_severe" },
+      { "id": "with_wounds_pelvis_groin" },
+      { "id": "with_wounds_upper_limb_severe" },
+      { "id": "with_wounds_upper_limb" },
+      { "id": "with_wounds_lower_limb_severe" },
+      { "id": "with_wounds_lower_limb" },
+      { "id": "with_wounds_minor" },
+      { "id": "with_wounds_dirty_bandage" },
+      { "id": "patched_up_head_neck_severe" },
+      { "id": "patched_up_head_neck" },
+      { "id": "patched_up_torso_severe" },
+      { "id": "patched_up_torso" },
+      { "id": "patched_up_pelvis_groin_severe" },
+      { "id": "patched_up_pelvis_groin" },
+      { "id": "patched_up_upper_limb_severe" },
+      { "id": "patched_up_upper_limb" },
+      { "id": "patched_up_lower_limb_severe" },
+      { "id": "patched_up_lower_limb" },
+      { "id": "patched_up_minor" },
+      { "id": "with_wounds_bite_lethal" },
+      { "id": "with_wounds_bite_possible_exposure" },
+      { "id": "with_wounds_bite_confirmed_symptomatic" },
+      { "id": "with_wounds_bite_non_transmissible" },
+      { "id": "patched_up_bite_lethal" },
+      { "id": "patched_up_bite_possible_exposure" },
+      { "id": "patched_up_bite_confirmed_symptomatic" },
+      { "id": "patched_up_bite_non_transmissible" },
+      { "id": "default" }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [ "actor" ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [ "actor" ]
+    },
+    "witness": {
+      "cardinality": "BOUNDED_MANY",
+      "min": 0,
+      "max": 3,
+      "kinds": [ "actor" ]
+    }
+  },
+  "slots": {
+    "wound": {
+      "type": "entity.item",
+      "required": false
+    }
+  },
+  "domains": [
+    {
+      "domain": "combat",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "combat_injury",
+      "domain": "combat"
+    }
+  ],
+  "events": [
+    {
+      "id": "combat_injury_callout",
+      "kind": "combat_event"
+    }
+  ]
+}

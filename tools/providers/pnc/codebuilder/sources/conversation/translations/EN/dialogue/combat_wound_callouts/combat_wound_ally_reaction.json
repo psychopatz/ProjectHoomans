@@ -1,0 +1,59 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.wound.ally_reaction",
+  "locale": "EN",
+  "entries": {
+    "say.variants.close_bond_bite_lethal": [
+      "No! Don't talk like that, {addressee.name}! Stay beside me, I'm not leaving you out here!",
+      "Hang on, {addressee.name}! We get through this swarm first, please just stay with me!"
+    ],
+    "say.variants.close_bond_critical": [
+      "Stay with me, {addressee.name}! Don't you dare go down on my watch, I've got you!",
+      "{addressee.name}, hold that {slot.wound.part}! I'm tearing through them to get to you!"
+    ],
+    "say.variants.close_bond_patched": [
+      "Easy, {addressee.name}, watch that patched {slot.wound.part}! Stick right by my shoulder, I'm not losing you!",
+      "Don't overextend with that wrap on your {slot.wound.part}, {addressee.name}! Let me take the brunt!"
+    ],
+    "say.variants.supportive_cover_wounded": [
+      "Fall back behind me, {addressee.name}, your {slot.wound.part} needs wrapping before you bleed out!",
+      "I've got front cover, {addressee.name}! Get pressure on that {slot.wound.part}!"
+    ],
+    "say.variants.supportive_cover_patched": [
+      "Watch your dressing on that {slot.wound.part}, {addressee.name}, shout if it starts soaking through!",
+      "Good wrap, {addressee.name}, let's clear space so your {slot.wound.part} doesn't reopen!"
+    ],
+    "say.variants.tactical_cover_wounded": [
+      "Copy that, {addressee.name}, pull behind the line and tie off your {slot.wound.part}!",
+      "Rotate back, {addressee.name}, open bleed on your {slot.wound.part} makes you slower!"
+    ],
+    "say.variants.tactical_cover_patched": [
+      "Keep your {slot.wound.part} protected, {addressee.name}, we hold spacing until clear!",
+      "Understood, {addressee.name}, dressing is holding so stay in tight formation!"
+    ],
+    "say.variants.squad_crossfire_wingman": [
+      "I'm closing the gap on your flank, {addressee.name}! Squad, tighten up and cover that {slot.wound.part}!",
+      "Right beside you too, {addressee.name}! Nobody drops in this squad!"
+    ],
+    "say.variants.bite_non_transmissible_relief": [
+      "You're not turning, {addressee.name}, saliva doesn't spread it! Keep pressure on your {slot.wound.part} and keep moving!",
+      "No fever risk from saliva, {addressee.name}! Shake off the shock and bandage that {slot.wound.part} fast!"
+    ],
+    "say.variants.low_rel_dismissive": [
+      "Quit groaning about your {slot.wound.part}, {addressee.name}, either hold your corner or get out of my way.",
+      "Your {slot.wound.part} is your problem, {addressee.name}, don't drag the rest of us down."
+    ],
+    "say.variants.low_rel_bite_execution_threat": [
+      "You got bit, {addressee.name}. Stay five steps back, and the second you look feverish I'm ending you.",
+      "Bite on {addressee.name} changes everything. Finish this wave, then hands where we can see them or else."
+    ],
+    "say.variants.psychopath_bite_execution_threat": [
+      "You're bitten, {addressee.name}. Forget bandages. I'm putting you down myself before you turn on us.",
+      "Dead weight walking, {addressee.name}. Drop your weapon after this fight or I put one between your eyes."
+    ],
+    "say.variants.default": [
+      "Stay sharp on your feet, {addressee.name}, keep watching your {slot.wound.part}!",
+      "I hear you, {addressee.name}, let's finish clearing this mess!"
+    ]
+  }
+}

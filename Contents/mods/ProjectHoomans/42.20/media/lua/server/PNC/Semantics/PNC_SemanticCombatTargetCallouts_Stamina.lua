@@ -14,33 +14,10 @@ PNC.Semantics.CombatTargetCallouts = S
 
 local teamStaminaCalloutAt = {}
 
-local function distSq(x1, y1, x2, y2)
-    if type(I.DistSq) == "function" then return I.DistSq(x1, y1, x2, y2) end
-    local dx, dy = (tonumber(x2) or 0) - (tonumber(x1) or 0), (tonumber(y2) or 0) - (tonumber(y1) or 0)
-    return dx * dx + dy * dy
-end
-
 local function findNearbyPlayerAddressee(rec, radius)
-    local core = PNC.Core
-    if not (core and type(core.ForEachPlayer) == "function") then return nil end
-    local nx, ny, nz = tonumber(rec.x) or 0, tonumber(rec.y) or 0, tonumber(rec.z) or 0
-    local rSq, found, bestDist = radius * radius, nil, nil
-    core.ForEachPlayer(function(p)
-        if not p or (type(p.isDead) == "function" and p:isDead()) then return end
-        local px = type(p.getX) == "function" and tonumber(p:getX()) or nil
-        local py = type(p.getY) == "function" and tonumber(p:getY()) or nil
-        local pz = type(p.getZ) == "function" and tonumber(p:getZ()) or 0
-        if px == nil or py == nil or math.abs(pz - nz) >= 1 then return end
-        local d = distSq(nx, ny, px, py)
-        if d <= rSq and (bestDist == nil or d < bestDist) then
-            local desc = type(p.getDescriptor) == "function" and p:getDescriptor() or nil
-            local fore = desc and type(desc.getForename) == "function" and tostring(desc:getForename() or "") or ""
-            local uname = type(p.getUsername) == "function" and tostring(p.getUsername() or "") or ""
-            local pname = (fore ~= "" and fore) or (uname ~= "" and uname) or "partner"
-            found, bestDist = { id = "player", name = pname }, d
-        end
-    end)
-    return found
+    return type(I.FindNearbyPlayerAddressee) == "function"
+        and I.FindNearbyPlayerAddressee(rec, radius)
+        or nil
 end
 
 --- Emit a serialized winded/exhausted semantic callout and optional squadmate cover reply.

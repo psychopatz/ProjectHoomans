@@ -1,0 +1,76 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "combat.wound.received_beat",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      { "id": "bite_lethal" },
+      { "id": "bite_possible_exposure" },
+      { "id": "bite_confirmed_symptomatic" },
+      { "id": "bite_non_transmissible" },
+      { "id": "bullet" },
+      { "id": "deep_wound_glass" },
+      { "id": "deep_wound" },
+      { "id": "fracture" },
+      { "id": "burn" },
+      { "id": "laceration" },
+      { "id": "scratch" },
+      { "id": "post_combat_injury_check" },
+      { "id": "severity_escalation" },
+      { "id": "bandage_dirty" },
+      { "id": "treatment_stabilized" },
+      { "id": "knox_symptom_onset" },
+      { "id": "fever_onset" },
+      { "id": "cold_illness_onset" },
+      { "id": "hypothermia_onset" },
+      { "id": "hyperthermia_onset" },
+      { "id": "soaked_chill" },
+      { "id": "default" }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [ "actor" ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [ "actor" ]
+    },
+    "witness": {
+      "cardinality": "BOUNDED_MANY",
+      "min": 0,
+      "max": 3,
+      "kinds": [ "actor" ]
+    }
+  },
+  "slots": {
+    "wound": {
+      "type": "entity.item",
+      "required": false
+    }
+  },
+  "domains": [
+    {
+      "domain": "combat",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "combat_injury",
+      "domain": "combat"
+    }
+  ],
+  "events": [
+    {
+      "id": "combat_wound_received",
+      "kind": "combat_event"
+    }
+  ]
+}
