@@ -85,8 +85,16 @@ local function tryEmitUtilityEvent(eventName, day, env, now)
     }, now)
 end
 
+local function syncCoreUtilities()
+    local adapter = PsychopatzCore and PsychopatzCore.WorldEventAdapter or nil
+    if type(adapter) == "table" and type(adapter.ObserveUtilities) == "function" then
+        adapter.ObserveUtilities()
+    end
+end
+
 function Beats.CheckUtilities(now)
     now = nowMs(now)
+    syncCoreUtilities()
     local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
     if not BC or type(BC.GetWorldUtilities) ~= "function" then
         return false
@@ -133,6 +141,7 @@ end
 local function onElectricityChanged()
     local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
     local now = nowMs(nil)
+    syncCoreUtilities()
     if BC and type(BC.GetWorldUtilities) == "function" then
         BC.GetWorldUtilities(now, true)
     end

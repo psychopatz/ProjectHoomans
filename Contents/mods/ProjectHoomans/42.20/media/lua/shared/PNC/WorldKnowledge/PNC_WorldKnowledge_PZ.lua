@@ -117,6 +117,13 @@ function Adapter.DefaultAuthorityReaders()
             return nil, "power_api_unavailable"
         end,
         water = function()
+            local coreAdapter = PsychopatzCore and PsychopatzCore.WorldEventAdapter or nil
+            if coreAdapter and type(coreAdapter.ReadUtilityAuthority) == "function" then
+                local auth = coreAdapter.ReadUtilityAuthority()
+                if type(auth) == "table" and type(auth.water) == "table" and auth.water.known == true then
+                    return auth.water.on, auth.water.source
+                end
+            end
             return nil, "water_global_authority_unverified"
         end,
         season = function()

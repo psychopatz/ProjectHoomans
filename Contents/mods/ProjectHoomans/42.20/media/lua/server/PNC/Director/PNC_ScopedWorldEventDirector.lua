@@ -90,6 +90,7 @@ end
 registerBuiltIn({
     id = "food_crisis",
     label = "Food Crisis",
+    allowedScopes = { "region", "faction", "settlement", "local_area" },
     weight = 22,
     durationHours = 72,
     cooldownHours = 120,
@@ -115,6 +116,7 @@ registerBuiltIn({
 registerBuiltIn({
     id = "agricultural_surplus",
     label = "Agricultural Surplus",
+    allowedScopes = { "region", "faction", "settlement", "local_area" },
     weight = 16,
     durationHours = 72,
     cooldownHours = 120,
@@ -139,6 +141,7 @@ registerBuiltIn({
 registerBuiltIn({
     id = "bandit_bonanza",
     label = "Raider Surge",
+    allowedScopes = { "region", "faction", "settlement", "local_area" },
     weight = 20,
     durationHours = 60,
     cooldownHours = 108,
@@ -163,6 +166,7 @@ registerBuiltIn({
 registerBuiltIn({
     id = "severe_weather",
     label = "Severe Weather Front",
+    allowedScopes = { "region", "faction", "settlement", "local_area" },
     weight = 18,
     durationHours = 36,
     cooldownHours = 84,
@@ -185,6 +189,7 @@ registerBuiltIn({
 registerBuiltIn({
     id = "epidemic",
     label = "Outbreak Wave",
+    allowedScopes = { "region", "faction", "settlement", "local_area" },
     weight = 12,
     durationHours = 84,
     cooldownHours = 168,
@@ -209,6 +214,7 @@ registerBuiltIn({
 registerBuiltIn({
     id = "trade_disruption",
     label = "Trade Disruption",
+    allowedScopes = { "region", "faction", "settlement", "local_area" },
     weight = 16,
     durationHours = 60,
     cooldownHours = 108,
@@ -241,6 +247,9 @@ function Director.RegisterEventDefinition(def)
     copy.cooldownHours = math.max(0, tonumber(copy.cooldownHours) or 72)
     copy.severity = clamp(copy.severity or 0.5, 0, 1)
     copy.provenance = tostring(copy.provenance or "public")
+    if copy.allowedScopes == nil and copy.allowGlobal ~= true then
+        copy.allowedScopes = { "region", "faction", "settlement", "local_area" }
+    end
     if not Director.CATALOG[copy.id] then
         Director.CATALOG_ORDER[#Director.CATALOG_ORDER + 1] = copy.id
         table.sort(Director.CATALOG_ORDER)
@@ -320,6 +329,9 @@ local function isOnCooldown(def, scope, scopeID, nowHours, history)
 end
 
 local function scopeAllowed(def, scope)
+    if scope == "global" and def.allowGlobal ~= true then
+        return false
+    end
     if type(def.allowedScopes) ~= "table" then return true end
     for i = 1, #def.allowedScopes do
         if def.allowedScopes[i] == scope then return true end
@@ -327,10 +339,46 @@ local function scopeAllowed(def, scope)
     return def.allowedScopes[scope] == true
 end
 
+local function resolveSyntheticScope(opts)
+    opts = type(opts) == "table" and opts or {}
+    local scope = opts.scope and tostring(opts.scope) or nil
+    local scopeID = opts.scopeID and tostring(opts.scopeID) or nil
+    if scope == "global" then
+        return nil, nil, "synthetic_global_scope_forbidden"
+    end
+    if not scope then
+        if opts.settlementID then
+            scope, scopeID = "settlement", tostring(opts.settlementID)
+        elseif opts.factionID then
+            scope, scopeID = "faction", tostring(opts.factionID)
+        elseif opts.regionID then
+            scope, scopeID = "region", tostring(opts.regionID)
+        elseif opts.localAreaID then
+            scope, scopeID = "local_area", tostring(opts.localAreaID)
+        end
+    elseif not scopeID then
+        if scope == "settlement" and opts.settlementID then scopeID = tostring(opts.settlementID)
+        elseif scope == "faction" and opts.factionID then scopeID = tostring(opts.factionID)
+        elseif scope == "region" and opts.regionID then scopeID = tostring(opts.regionID)
+        elseif scope == "local_area" and opts.localAreaID then scopeID = tostring(opts.localAreaID)
+        end
+    end
+    if not scope or not scopeID or scopeID == "" then
+        return nil, nil, "non_global_scope_required"
+    end
+    return scope, scopeID, nil
+end
+
 function Director.SelectEventForBucket(worldSeed, scope, scopeID, timeBucket, opts)
     opts = type(opts) == "table" and opts or {}
-    scope = tostring(scope or "global")
-    scopeID = tostring(scopeID or (scope == "global" and "global" or "default"))
+    if scope == nil or scope == "global" then
+        return nil, scope == "global" and "synthetic_global_scope_forbidden" or "non_global_scope_required"
+    end
+    scope = tostring(scope)
+    if not scopeID or tostring(scopeID) == "" then
+        return nil, "non_global_scope_required"
+    end
+    scopeID = tostring(scopeID)
     local bucket = math.floor(tonumber(timeBucket) or 0)
     local bucketHours = math.max(1, finite(opts.bucketHours, Director.BUCKET_HOURS) or Director.BUCKET_HOURS)
     local nowHours = finite(opts.nowHours, bucket * bucketHours)
@@ -420,8 +468,10 @@ function Director.EvaluateBucket(nowHours, opts)
         return nil, "active_cap_reached"
     end
 
-    local scope = tostring(opts.scope or "global")
-    local scopeID = tostring(opts.scopeID or (scope == "global" and "global" or "default"))
+    local scope, scopeID, scopeErr = resolveSyntheticScope(opts)
+    if not scope then
+        return nil, scopeErr
+    end
     local bucket, bucketHours = Director.BucketForHours(nowHours, opts.bucketHours)
     if opts.timeBucket ~= nil then
         bucket = math.floor(tonumber(opts.timeBucket) or bucket)
@@ -481,10 +531,14 @@ function Director.Pump(nowHours, _, opts)
     opts = type(opts) == "table" and opts or {}
     nowHours = math.max(0, finite(nowHours, 0) or 0)
     local prunedCount = ScopedWorldEvents.PruneExpired(nowHours)
+    local scope, scopeID, scopeErr = resolveSyntheticScope(opts)
+    if not scope then
+        return prunedCount, nil, scopeErr
+    end
     local ev, reason = Director.EvaluateBucket(nowHours, {
         worldSeed = opts.worldSeed,
-        scope = opts.scope or "global",
-        scopeID = opts.scopeID or "global",
+        scope = scope,
+        scopeID = scopeID,
         allowQuiet = opts.allowQuiet ~= false,
         quietPercent = opts.quietPercent or 25,
         communities = opts.communities,

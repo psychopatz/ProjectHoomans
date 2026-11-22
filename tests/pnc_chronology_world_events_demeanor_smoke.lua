@@ -362,13 +362,35 @@ local evaluatedCount = Milestones.PumpBatch(725, 1)
 T.equal(evaluatedCount, 1, "PumpBatch respects bounded budget=1")
 
 -- =========================================================================
--- 3. Deterministic replay & mutual exclusion & bounded active cap
+-- 3. Deterministic replay & mutual exclusion & non-global policy & active cap
 -- =========================================================================
 resetAll()
-local evA1 = EventDirector.EvaluateBucket(240, { worldSeed = "KnoxSeed-77", scope = "global", timeBucket = 10 })
+local blockedGlobal, blockedGlobalErr = EventDirector.EvaluateBucket(240, {
+    worldSeed = "KnoxSeed-77",
+    scope = "global",
+    timeBucket = 10,
+})
+T.falsy(blockedGlobal, "synthetic world events cannot run with global scope")
+T.equal(blockedGlobalErr, "synthetic_global_scope_forbidden", "global scope rejection reason")
+
+local pumpedCount, pumpedEv, pumpedErr = EventDirector.Pump(240, 1)
+T.falsy(pumpedEv, "Pump without non-global scope never generates global synthetic crisis")
+T.equal(pumpedErr, "non_global_scope_required", "Pump fails closed without non-global scope")
+
+local evA1 = EventDirector.EvaluateBucket(240, {
+    worldSeed = "KnoxSeed-77",
+    scope = "region",
+    scopeID = "region_knox",
+    timeBucket = 10,
+})
 T.truthy(evA1, "first deterministic replay produces an event")
 resetAll()
-local evA2 = EventDirector.EvaluateBucket(240, { worldSeed = "KnoxSeed-77", scope = "global", timeBucket = 10 })
+local evA2 = EventDirector.EvaluateBucket(240, {
+    worldSeed = "KnoxSeed-77",
+    scope = "region",
+    scopeID = "region_knox",
+    timeBucket = 10,
+})
 T.truthy(evA2, "second deterministic replay produces an event")
 T.equal(evA1.eventID, evA2.eventID, "same worldSeed+scope+timeBucket yields identical eventID")
 T.equal(evA1.eventType, evA2.eventType, "same worldSeed+scope+timeBucket yields identical eventType")
@@ -377,7 +399,12 @@ T.equal(evA1.eventType, evA2.eventType, "same worldSeed+scope+timeBucket yields 
 local seenTypes = {}
 for b = 1, 15 do
     resetAll()
-    local evB = EventDirector.EvaluateBucket(b * 24, { worldSeed = "KnoxSeed-77", scope = "global", timeBucket = b })
+    local evB = EventDirector.EvaluateBucket(b * 24, {
+        worldSeed = "KnoxSeed-77",
+        scope = "region",
+        scopeID = "region_knox",
+        timeBucket = b,
+    })
     if evB then seenTypes[evB.eventType] = true end
 end
 local distinctCount = 0
@@ -388,14 +415,15 @@ T.truthy(distinctCount >= 2, "different timeBuckets yield different event types"
 resetAll()
 ScopedWorldEvents.Register({
     eventType = "food_crisis",
-    scope = "global",
+    scope = "region",
+    scopeID = "region_knox",
     startsAt = 0,
     endsAt = 72,
     source = EventDirector.SOURCE,
     effects = EventDirector.CATALOG.food_crisis.effects,
 }, { nowHours = 10 })
 for b = 1, 20 do
-    local picked = EventDirector.SelectEventForBucket("KnoxSeed-77", "global", "global", b, { nowHours = 10 })
+    local picked = EventDirector.SelectEventForBucket("KnoxSeed-77", "region", "region_knox", b, { nowHours = 10 })
     T.truthy(not picked or (picked.id ~= "agricultural_surplus" and picked.id ~= "food_crisis"),
         "mutual exclusion blocks agricultural_surplus while food_crisis is active")
 end
@@ -515,7 +543,8 @@ T.near(postWeights.LOOTER, baseWeights.LOOTER, 0.0001, "expired bandit_bonanza s
 resetAll()
 local evHist, _, histFact = EventDirector.EvaluateBucket(0, {
     worldSeed = "HistSeed",
-    scope = "global",
+    scope = "region",
+    scopeID = "region_knox",
     timeBucket = 0,
 })
 T.truthy(evHist and histFact, "world event and historical fact created")
@@ -533,7 +562,8 @@ T.truthy(CoreWKG.Ledger.Get(CoreWKG.LedgerState, histFact.factID) ~= nil,
 resetAll()
 local evCrisis, _, crisisFact = EventDirector.EvaluateBucket(24, {
     worldSeed = "EpistemicSeed",
-    scope = "global",
+    scope = "region",
+    scopeID = "region_knox",
     timeBucket = 1,
 })
 T.truthy(evCrisis and crisisFact, "world event fact published")
