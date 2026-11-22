@@ -159,6 +159,22 @@ function Policy.Process(text, state, context, options)
         )
         if type(committedFlow) == "table" then
             result.flow = committedFlow
+            if committedFlow.flowId == "combat.injury.triage_exchange" then
+                local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts
+                if type(callouts) == "table"
+                    and type(callouts.HandoffInjuryBeatToScene) == "function"
+                then
+                    local rec = type(context) == "table"
+                        and (context.npcRecord or context.record) or nil
+                    local scene, triageState = callouts.HandoffInjuryBeatToScene(rec, nil, {
+                        context = context,
+                        flow = committedFlow,
+                        ir = ir,
+                    })
+                    committedFlow.sceneID = scene and scene.id or (triageState and triageState.sceneID)
+                    committedFlow.triageState = triageState
+                end
+            end
         end
     end
     if state and type(state.CompletePending) == "function" then

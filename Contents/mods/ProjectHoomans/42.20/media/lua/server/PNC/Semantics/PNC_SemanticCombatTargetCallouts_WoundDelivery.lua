@@ -8,6 +8,7 @@ PNC.Semantics.CombatTargetCalloutsInternal = PNC.Semantics.CombatTargetCalloutsI
 PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_WoundRoles"
+require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_InjuryScene"
 
 local S = PNC.Semantics.CombatTargetCallouts or {}
 local I = PNC.Semantics.CombatTargetCalloutsInternal
@@ -109,6 +110,13 @@ function I.EmitWoundDialogue(record, evType, roleVariant, profile, hitDesc, now,
         priority = pri,
         priorityHoldMs = 900,
         ttlMs = 9000,
+        responsePlanID = res and res.responsePlanID or nil,
+        realizationID = res and res.realizationID or nil,
+        poolID = res and res.poolID or nil,
+        realizationFamily = res and res.realizationFamily or nil,
+        flowID = "combat.injury.triage_exchange",
+        observerOnly = false,
+        recipientKind = "player",
         offerIDs = res and res.offerIDs or nil,
         factRefs = { ref },
         semanticEventFacts = facts,

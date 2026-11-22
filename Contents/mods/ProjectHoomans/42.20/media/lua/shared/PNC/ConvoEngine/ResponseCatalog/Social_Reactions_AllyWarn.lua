@@ -4,6 +4,7 @@ PNC.Semantics = PNC.Semantics or {}
 PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 require "PNC/ConvoEngine/ResponseCatalog/EventReactions_Core"
+local Templates = require "PNC/ConvoEngine/ResponseCatalog/Social_Reactions_AllyWarn_Templates"
 
 local Catalog = PNC.ConvoEngine.ResponseCatalog
 if type(Catalog) ~= "table" or type(Catalog.Register) ~= "function" then
@@ -11,6 +12,9 @@ if type(Catalog) ~= "table" or type(Catalog.Register) ~= "function" then
 end
 
 local CONTENT_OWNER = "projecthoomans.dialogue_content.events"
+local CALLOUT_SITUATIONS = Templates.CALLOUT_SITUATIONS
+local REPLY_TEMPLATE_MAP = Templates.REPLY_TEMPLATE_MAP
+local REPLY_SITUATIONS = Templates.REPLY_SITUATIONS
 
 local function makeVariant(poolID, templateID, variantID, when, priority, act)
     return {
@@ -34,19 +38,6 @@ local function makeVariant(poolID, templateID, variantID, when, priority, act)
     }
 end
 
-local CALLOUT_SITUATIONS = {
-    { role = "crawler", tpl = "combat.callout.threat.crawler" },
-    { role = "blindside", tpl = "combat.callout.threat.blindside" },
-    { role = "last_one", tpl = "combat.callout.threat.last_one" },
-    { role = "bandaging_self", tpl = "medical.bandage.cover_warn.self" },
-    { role = "bandaging_ally", tpl = "medical.bandage.cover_warn.ally" },
-    { role = "checkin_injured", tpl = "combat.checkin.warn.injured" },
-    { role = "checkin_clear", tpl = "combat.checkin.warn.clear" },
-    { role = "weather_rain_open", tpl = "world.weather.rain_warn.rain_open" },
-    { role = "stamina_winded", tpl = "condition.stamina.warn.winded" },
-    { role = "stamina_exhausted", tpl = "condition.stamina.warn.exhausted" },
-}
-
 local function registerCalloutPool(poolID, templatePrefix)
     local vars = {}
     for _, s in ipairs(CALLOUT_SITUATIONS) do
@@ -64,56 +55,10 @@ end
 registerCalloutPool("semantic.combat.ally_warn.callout.zombie", "combat.callout.threat.zombie")
 registerCalloutPool("semantic.combat.ally_warn.callout.hostile", "combat.callout.threat.hostile")
 
-local REPLY_TEMPLATE_MAP = {
-    engaging_neutral = "combat.callout.reply_engage.engaging_neutral",
-    engaging_tactical = "combat.callout.reply_engage.engaging_tactical",
-    engaging_hostile = "combat.callout.reply_engage.engaging_hostile",
-    engaging_shaken = "combat.callout.reply_engage.engaging_shaken",
-    engaging_brave = "combat.callout.reply_engage.engaging_brave",
-    engaging_aggressive = "combat.callout.reply_engage.engaging_aggressive",
-    engaging_supportive = "combat.callout.reply_engage.engaging_supportive",
-    engaging_exhausted = "combat.callout.reply_engage.engaging_exhausted",
-    anchor_combat = "combat.callout.reply_engage.anchor_combat",
-    anchor_tactical = "combat.callout.reply_engage.anchor_tactical",
-    alerted_neutral = "combat.callout.reply_alerted.alerted_neutral",
-    alerted_tactical = "combat.callout.reply_alerted.alerted_tactical",
-    alerted_hostile = "combat.callout.reply_alerted.alerted_hostile",
-    blindside_reply = "combat.callout.reply_alerted.blindside_reply",
-    last_one_reply = "combat.callout.reply_alerted.last_one_reply",
-    defensive_neutral = "combat.callout.reply_defensive.defensive_neutral",
-    defensive_shaken = "combat.callout.reply_defensive.defensive_shaken",
-    wingman_defensive = "combat.callout.reply_defensive.wingman_defensive",
-    wingman_engaging_neutral = "combat.callout.reply_wingman.engaging_neutral",
-    wingman_engaging_tactical = "combat.callout.reply_wingman.engaging_tactical",
-    wingman_engaging_hostile = "combat.callout.reply_wingman.engaging_hostile",
-    wingman_shaken = "combat.callout.reply_wingman.shaken",
-    wingman_brave = "combat.callout.reply_wingman.brave",
-    wingman_aggressive = "combat.callout.reply_wingman.aggressive",
-    wingman_alerted_neutral = "combat.callout.reply_wingman.alerted_neutral",
-    wingman_alerted_tactical = "combat.callout.reply_wingman.alerted_tactical",
-    cover_bandage_reply = "medical.bandage.cover_reply.cover_bandage",
-    injured_has_bandage_reply = "medical.injury.status_reply.injured_has_bandage",
-    injured_no_bandage_reply = "medical.injury.status_reply.injured_no_bandage",
-    medic_has_bandage_reply = "medical.injury.status_reply.medic_has_bandage",
-    medic_no_bandage_reply = "medical.injury.status_reply.medic_no_bandage",
-    checkin_ok_reply = "combat.checkin.reply.ok",
-}
-
 local function replyVar(poolID, name, when, priority, act)
     local templateID = REPLY_TEMPLATE_MAP[name] or ("combat.callout.reply_engage." .. name)
     return makeVariant(poolID, templateID, name, when, priority, act)
 end
-
-local REPLY_SITUATIONS = {
-    { role = "blindside_reply", tpl = "blindside_reply", pri = 97 },
-    { role = "last_one_reply", tpl = "last_one_reply", pri = 97 },
-    { role = "cover_bandage", tpl = "cover_bandage_reply", pri = 97 },
-    { role = "injured_has_bandage", tpl = "injured_has_bandage_reply", pri = 97 },
-    { role = "injured_no_bandage", tpl = "injured_no_bandage_reply", pri = 97 },
-    { role = "medic_has_bandage", tpl = "medic_has_bandage_reply", pri = 97 },
-    { role = "medic_no_bandage", tpl = "medic_no_bandage_reply", pri = 97 },
-    { role = "checkin_ok", tpl = "checkin_ok_reply", pri = 97 },
-}
 
 local function appendReplySituations(vars, poolID, act)
     for _, s in ipairs(REPLY_SITUATIONS) do
@@ -185,5 +130,7 @@ for _, v in ipairs({
     replyVar(P_DEF, "defensive_neutral", nil, 50, "REACT"),
 }) do defVars[#defVars + 1] = v end
 Catalog.Register(P_DEF, { variants = defVars })
+
+require "PNC/ConvoEngine/ResponseCatalog/Social_Reactions_CombatInjury"
 
 return true

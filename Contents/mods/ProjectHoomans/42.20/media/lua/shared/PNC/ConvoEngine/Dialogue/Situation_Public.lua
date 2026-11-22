@@ -6,6 +6,9 @@ PNC.ConvoEngine = PNC.ConvoEngine or {}
 local Situation = PNC.ConvoEngine.DialogueSituation
 local Internal = Situation.Internal or {}
 Situation.Internal = Internal
+
+require "PNC/ConvoEngine/Dialogue/Situation_Injury"
+
 local bounded = Internal.Bounded
 local fromSource = Internal.FromSource
 local activity = Internal.Activity
@@ -25,13 +28,15 @@ function Situation.Build(context)
     local activityValue = activity(context)
     local needValue = needs(context)
     local emotionalValue = emotionalState(context)
+    local injuryValue = Internal.ResolveInjuryState(context)
     return {
         schemaVersion = Situation.VERSION,
         npc = {
             activity = activityValue,
             needs = needValue,
             emotion = emotionalValue,
-            healthState = healthState(context),
+            healthState = injuryValue.healthState or healthState(context),
+            injury = injuryValue,
             inCombat = fromSource(context, "inCombat") == true,
         },
         social = {
@@ -62,6 +67,7 @@ function Situation.Build(context)
             indoors = context.worldContext
                 and context.worldContext.environment
                 and context.worldContext.environment.indoors or nil,
+            salivaTransmissible = injuryValue.salivaTransmissible,
         },
     }
 end
