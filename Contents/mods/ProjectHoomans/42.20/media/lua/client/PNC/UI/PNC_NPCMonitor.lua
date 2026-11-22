@@ -2,7 +2,6 @@ require "PsychopatzCore/UI/PsychopatzUI"
 require "PsychopatzCore/EventMarkers/PsychopatzEventMarkerHandler"
 require "PNC/UI/NPCMonitor/PNC_NPCMonitorSupport"
 require "PNC/UI/NPCMonitor/PNC_NPCTracking"
-require "PNC/UI/SettlementManagement/PNC_SettlementManagement_ProvisionDiagnosticsModal"
 require "ISUI/ISContextMenu"
 
 PNC = PNC or {}

@@ -87,16 +87,6 @@ function ISPNCNPCMonitor:onRelationships()
     end
 end
 
-function ISPNCNPCMonitor:onProvisionDiagnostics()
-    local item = self:getSelectedDiagnostic()
-    if item and item.deathMarker ~= true
-        and PNC.ProvisionDiagnosticsUI
-        and PNC.ProvisionDiagnosticsUI.Open
-    then
-        PNC.ProvisionDiagnosticsUI.Open(item)
-    end
-end
-
 function ISPNCNPCMonitor:onOverlay()
     if PNC.Nameplates and PNC.Nameplates.ToggleNameplateDebug then
         PNC.Nameplates.ToggleNameplateDebug()
