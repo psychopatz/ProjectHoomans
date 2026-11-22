@@ -57,6 +57,37 @@ return {
             },
             ["namespace"] = "social.greeting",
             ["replies"] = {
+                ["accepted"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "social.identity.personal_history",
+                            "knowledge.gossip.exchange",
+                        },
+                    },
+                    ["outcome"] = "accepted",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Fair enough—lower the crowbar and come under the awning out of sight.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.social.greeting.first_contact.reply.accepted.say.1.default",
+                                        ["textRole"] = "response",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
                 ["blocked"] = {
                     ["outcome"] = "blocked",
                     ["say"] = {
@@ -89,6 +120,11 @@ return {
                     ["textRole"] = "response",
                 },
                 ["cautious"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "knowledge.gossip.exchange",
+                        },
+                    },
                     ["outcome"] = "cautious",
                     ["say"] = {
                         ["keyOrder"] = {
@@ -156,6 +192,31 @@ return {
                     },
                     ["textRole"] = "response",
                 },
+                ["end_conversation"] = {
+                    ["outcome"] = "end_conversation",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "No trouble here—passing along and letting you keep your corner.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.social.greeting.first_contact.reply.end_conversation.say.1.default",
+                                        ["textRole"] = "response",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
                 ["evasive"] = {
                     ["outcome"] = "evasive",
                     ["say"] = {
@@ -187,7 +248,63 @@ return {
                     },
                     ["textRole"] = "response",
                 },
+                ["rejected"] = {
+                    ["outcome"] = "rejected",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Keep walking down the shoulder. We aren't taking strangers inside tonight.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.social.greeting.first_contact.reply.rejected.say.1.default",
+                                        ["textRole"] = "response",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["reluctant"] = {
+                    ["outcome"] = "reluctant",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "You get two minutes by the curb to state your piece, nothing closer.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.social.greeting.first_contact.reply.reluctant.say.1.default",
+                                        ["textRole"] = "response",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
                 ["welcomed"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "social.identity.personal_history",
+                            "knowledge.gossip.exchange",
+                        },
+                    },
                     ["outcome"] = "welcomed",
                     ["say"] = {
                         ["keyOrder"] = {
@@ -256,6 +373,14 @@ return {
                     ["variantID"] = "contextual",
                 },
                 {
+                    ["fallback"] = "Fair enough—lower the crowbar and come under the awning out of sight.",
+                    ["outcome"] = "accepted",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.social.greeting.first_contact.reply.accepted.say.1.default",
+                    ["variantID"] = "default",
+                },
+                {
                     ["fallback"] = "Not now. Keep moving.",
                     ["outcome"] = "blocked",
                     ["realizationKey"] = "1",
@@ -312,6 +437,14 @@ return {
                     ["variantID"] = "negative",
                 },
                 {
+                    ["fallback"] = "No trouble here—passing along and letting you keep your corner.",
+                    ["outcome"] = "end_conversation",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.social.greeting.first_contact.reply.end_conversation.say.1.default",
+                    ["variantID"] = "default",
+                },
+                {
                     ["fallback"] = "Keep your secrets if you want. Just don't bring trouble my way.",
                     ["outcome"] = "evasive",
                     ["realizationKey"] = "1",
@@ -326,6 +459,22 @@ return {
                     ["role"] = "response",
                     ["templateID"] = "convo.social.greeting.first_contact.reply.evasive.say.1.neutral",
                     ["variantID"] = "neutral",
+                },
+                {
+                    ["fallback"] = "Keep walking down the shoulder. We aren't taking strangers inside tonight.",
+                    ["outcome"] = "rejected",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.social.greeting.first_contact.reply.rejected.say.1.default",
+                    ["variantID"] = "default",
+                },
+                {
+                    ["fallback"] = "You get two minutes by the curb to state your piece, nothing closer.",
+                    ["outcome"] = "reluctant",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.social.greeting.first_contact.reply.reluctant.say.1.default",
+                    ["variantID"] = "default",
                 },
                 {
                     ["fallback"] = "All right, you seem decent enough. Name's {speaker.name}—watch the side alleys out here.",
@@ -355,7 +504,7 @@ return {
             ["sourcePath"] = "dialogue/thematic_interactive/social_greeting_first_contact.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/ThematicInteractive/SocialGreetingFirstContactToTravelExcursionPlanExchange",
+        ["module"] = "PNC/ConvoEngine/Dialogue/ThematicInteractive/GreetingFirstContactToIdentityPersonalHistory",
         ["namespace"] = "social.greeting",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -431,11 +580,19 @@ return {
                                 {
                                     ["intent"] = "INFORM",
                                     ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "business",
                                     ["subject"] = "FIRST_CONTACT",
                                 },
                                 {
-                                    ["intent"] = "GREET",
-                                    ["speechAct"] = "GREET",
+                                    ["intent"] = "INFORM",
+                                    ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "peaceful",
+                                    ["subject"] = "FIRST_CONTACT",
+                                },
+                                {
+                                    ["intent"] = "QUESTION",
+                                    ["speechAct"] = "QUESTION",
+                                    ["subject"] = "FIRST_CONTACT",
                                 },
                                 {
                                     ["intent"] = "REFUSE",
@@ -450,16 +607,59 @@ return {
                                     ["frame"] = {
                                         ["intent"] = "INFORM",
                                         ["speechAct"] = "INFORM",
+                                        ["stateValue"] = "business",
                                         ["subject"] = "FIRST_CONTACT",
                                     },
                                     ["id"] = "first_contact.state_road_business",
-                                    ["labelFallback"] = "Say you're scavenging",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_FirstContactRoad_Label",
-                                    ["utteranceFallback"] = "Just checking the houses down the road for supplies.",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_FirstContactRoad_Utterance",
+                                    ["labelFallback"] = "Say where you came from",
+                                    ["labelKey"] = "UI_PNC_FirstContact_RoadBiz_Label",
+                                    ["utteranceFallback"] = "Cut across from the west highway—just checking shutters for clean water.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_RoadBiz_Utterance",
+                                },
+                                {
+                                    ["constraints"] = {
+                                        ["op"] = "eq",
+                                        ["path"] = "inventory.armed",
+                                        ["value"] = true,
+                                    },
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "INFORM",
+                                        ["speechAct"] = "INFORM",
+                                        ["stateValue"] = "peaceful",
+                                        ["subject"] = "FIRST_CONTACT",
+                                    },
+                                    ["id"] = "first_contact.show_holstered",
+                                    ["labelFallback"] = "Keep weapon slung low",
+                                    ["labelKey"] = "UI_PNC_FirstContact_Holstered_Label",
+                                    ["utteranceFallback"] = "Crowbar stays lowered at my side—just passing to the gas station.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_Holstered_Utterance",
+                                },
+                                {
+                                    ["constraints"] = {
+                                        ["op"] = "eq",
+                                        ["path"] = "environment.isIndoors",
+                                        ["value"] = true,
+                                    },
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "QUESTION",
+                                        ["speechAct"] = "QUESTION",
+                                        ["subject"] = "FIRST_CONTACT",
+                                    },
+                                    ["id"] = "first_contact.ask_shelter_indoors",
+                                    ["labelFallback"] = "Ask if room is secure inside",
+                                    ["labelKey"] = "UI_PNC_FirstContact_Indoors_Label",
+                                    ["utteranceFallback"] = "Door behind you stays barred? Just checking before we talk in the lane.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_Indoors_Utterance",
                                 },
                             },
-                            ["onMatch"] = "name_and_intent",
+                            ["onClarify"] = "name_and_intent",
+                            ["onMatch"] = "verify_trust",
                             ["onRefuse"] = "guarded_parting",
                             ["onUnrelated"] = "suspend",
                             ["responsePool"] = "semantic.social.greeting.first_contact.clarify",
@@ -485,15 +685,23 @@ return {
                                 {
                                     ["intent"] = "GREET",
                                     ["speechAct"] = "GREET",
+                                    ["stateValue"] = "positive",
                                 },
                                 {
                                     ["intent"] = "INFORM",
                                     ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "neutral",
                                     ["subject"] = "FIRST_CONTACT",
                                 },
                                 {
                                     ["intent"] = "CLARIFY",
                                     ["speechAct"] = "CLARIFY",
+                                    ["subject"] = "FIRST_CONTACT",
+                                },
+                                {
+                                    ["intent"] = "INFORM",
+                                    ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "cautious",
                                     ["subject"] = "FIRST_CONTACT",
                                 },
                                 {
@@ -513,9 +721,9 @@ return {
                                     },
                                     ["id"] = "first_contact.friendly_greet",
                                     ["labelFallback"] = "Lower hands and greet",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_FirstContactFriendly_Label",
-                                    ["utteranceFallback"] = "Easy—just passing through. Good to see someone still breathing.",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_FirstContactFriendly_Utterance",
+                                    ["labelKey"] = "UI_PNC_FirstContact_Friendly_Label",
+                                    ["utteranceFallback"] = "Easy—just passing through. Good seeing someone alive around here.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_Friendly_Utterance",
                                 },
                                 {
                                     ["consumers"] = {
@@ -529,9 +737,9 @@ return {
                                     },
                                     ["id"] = "first_contact.cautious_greet",
                                     ["labelFallback"] = "Keep distance and answer",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_FirstContactCautious_Label",
-                                    ["utteranceFallback"] = "Hands are clear. Not looking for trouble out here.",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_FirstContactCautious_Utterance",
+                                    ["labelKey"] = "UI_PNC_FirstContact_Cautious_Label",
+                                    ["utteranceFallback"] = "Hands open in plain sight. Not looking to pick a fight.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_Cautious_Utterance",
                                 },
                                 {
                                     ["consumers"] = {
@@ -543,10 +751,31 @@ return {
                                         ["subject"] = "FIRST_CONTACT",
                                     },
                                     ["id"] = "first_contact.clarify_intent",
-                                    ["labelFallback"] = "Ask who's asking",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_FirstContactClarify_Label",
-                                    ["utteranceFallback"] = "Depends—you alone out here, or watching this block for somebody?",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_FirstContactClarify_Utterance",
+                                    ["labelFallback"] = "Ask who holds the block",
+                                    ["labelKey"] = "UI_PNC_FirstContact_Clarify_Label",
+                                    ["utteranceFallback"] = "Depends—you alone out here, or watching this street for a camp?",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_Clarify_Utterance",
+                                },
+                                {
+                                    ["constraints"] = {
+                                        ["op"] = "eq",
+                                        ["path"] = "worldKnowledge.recentAlarmOrGunfire",
+                                        ["value"] = true,
+                                    },
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "INFORM",
+                                        ["speechAct"] = "INFORM",
+                                        ["stateValue"] = "cautious",
+                                        ["subject"] = "FIRST_CONTACT",
+                                    },
+                                    ["id"] = "first_contact.note_alarm_noise",
+                                    ["labelFallback"] = "Note recent shots or alarm",
+                                    ["labelKey"] = "UI_PNC_FirstContact_Alarm_Label",
+                                    ["utteranceFallback"] = "Wasn't me tripping that racket east of here—kept low until it quieted.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_Alarm_Utterance",
                                 },
                             },
                             ["onClarify"] = "clarify_intent",
@@ -564,11 +793,19 @@ return {
                                 {
                                     ["identityClaim"] = true,
                                     ["intent"] = "INFORM",
-                                    ["subject"] = "IDENTITY",
+                                    ["selfDirected"] = true,
+                                    ["speechAct"] = "INFORM",
                                 },
                                 {
-                                    ["intent"] = "THANK",
-                                    ["speechAct"] = "THANK",
+                                    ["intent"] = "INFORM",
+                                    ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "guarded",
+                                    ["subject"] = "FIRST_CONTACT",
+                                },
+                                {
+                                    ["intent"] = "QUESTION",
+                                    ["speechAct"] = "QUESTION",
+                                    ["subject"] = "NEWS",
                                 },
                                 {
                                     ["intent"] = "REFUSE",
@@ -577,20 +814,84 @@ return {
                             },
                             ["branchOffers"] = {
                                 {
+                                    ["constraints"] = {
+                                        ["op"] = "gte",
+                                        ["path"] = "relationship.trust",
+                                        ["value"] = -10,
+                                    },
                                     ["consumers"] = {
                                         "participant",
                                     },
                                     ["frame"] = {
                                         ["identityClaim"] = true,
                                         ["intent"] = "INFORM",
-                                        ["subject"] = "IDENTITY",
+                                        ["selfDirected"] = true,
+                                        ["speechAct"] = "INFORM",
                                     },
                                     ["id"] = "first_contact.share_name",
-                                    ["labelFallback"] = "Trade names",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_FirstContactShareName_Label",
-                                    ["utteranceFallback"] = "Fair enough. You can call me by my name—what's yours?",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_FirstContactShareName_Utterance",
+                                    ["labelFallback"] = "Give your name and trade notes",
+                                    ["labelKey"] = "UI_PNC_FirstContact_ShareName_Label",
+                                    ["utteranceFallback"] = "I'm no raider—just keeping track of which streets are passable and who survived.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_ShareName_Utterance",
                                 },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "INFORM",
+                                        ["speechAct"] = "INFORM",
+                                        ["stateValue"] = "guarded",
+                                        ["subject"] = "FIRST_CONTACT",
+                                    },
+                                    ["id"] = "first_contact.keep_brief",
+                                    ["labelFallback"] = "Stay anonymous for now",
+                                    ["labelKey"] = "UI_PNC_FirstContact_KeepBrief_Label",
+                                    ["utteranceFallback"] = "Call me traveler for now—just checking roads, not digging into anyone's stash.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_KeepBrief_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "QUESTION",
+                                        ["speechAct"] = "QUESTION",
+                                        ["subject"] = "NEWS",
+                                    },
+                                    ["id"] = "first_contact.ask_recent_news",
+                                    ["labelFallback"] = "Trade street condition before parting",
+                                    ["labelKey"] = "UI_PNC_FirstContact_AskNews_Label",
+                                    ["utteranceFallback"] = "Seen anything suspicious down by the crossroads today?",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_AskNews_Utterance",
+                                },
+                            },
+                            ["onMatch"] = "settle_standing",
+                            ["onRefuse"] = "guarded_parting",
+                            ["onUnrelated"] = "suspend",
+                            ["responsePool"] = "semantic.social.greeting.first_contact.exchange",
+                        },
+                        ["settle_standing"] = {
+                            ["accepts"] = {
+                                {
+                                    ["intent"] = "THANK",
+                                    ["speechAct"] = "THANK",
+                                },
+                                {
+                                    ["intent"] = "ACKNOWLEDGE",
+                                    ["speechAct"] = "ACKNOWLEDGE",
+                                },
+                                {
+                                    ["intent"] = "REFUSE",
+                                    ["speechAct"] = "REFUSE",
+                                    ["stateValue"] = "end_conversation",
+                                },
+                                {
+                                    ["intent"] = "REFUSE",
+                                    ["speechAct"] = "REFUSE",
+                                },
+                            },
+                            ["branchOffers"] = {
                                 {
                                     ["consumers"] = {
                                         "participant",
@@ -599,39 +900,64 @@ return {
                                         ["intent"] = "THANK",
                                         ["speechAct"] = "THANK",
                                     },
-                                    ["id"] = "first_contact.keep_brief",
-                                    ["labelFallback"] = "Keep it brief",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_FirstContactBrief_Label",
-                                    ["utteranceFallback"] = "No need for names yet. Just glad neither of us shot first.",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_FirstContactBrief_Utterance",
+                                    ["id"] = "first_contact.part_friendly",
+                                    ["labelFallback"] = "Leave on steady terms",
+                                    ["labelKey"] = "UI_PNC_FirstContact_PartFriendly_Label",
+                                    ["utteranceFallback"] = "Good talking. Sing out if you spot smoke or trouble down my way.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_PartFriendly_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "ACKNOWLEDGE",
+                                        ["speechAct"] = "ACKNOWLEDGE",
+                                    },
+                                    ["id"] = "first_contact.part_cautious",
+                                    ["labelFallback"] = "Keep terms cautious",
+                                    ["labelKey"] = "UI_PNC_FirstContact_PartCautious_Label",
+                                    ["utteranceFallback"] = "Remember I was clear on this street—stay safe out there.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_PartCautious_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "REFUSE",
+                                        ["speechAct"] = "REFUSE",
+                                        ["stateValue"] = "end_conversation",
+                                    },
+                                    ["id"] = "first_contact.end_short",
+                                    ["labelFallback"] = "Close contact briefly",
+                                    ["labelKey"] = "UI_PNC_FirstContact_EndShort_Label",
+                                    ["utteranceFallback"] = "Moving out before dark. Watch the corner.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_EndShort_Utterance",
                                 },
                             },
-                            ["onMatch"] = "settle_standing",
+                            ["onMatch"] = "complete",
                             ["onRefuse"] = "guarded_parting",
                             ["onUnrelated"] = "suspend",
-                            ["responsePool"] = "semantic.social.greeting.first_contact.exchange",
-                            ["slots"] = {
-                                ["location"] = {
-                                    ["owner"] = "world",
-                                    ["source"] = "slots.location",
-                                    ["type"] = "string",
-                                },
-                                ["person"] = {
-                                    ["owner"] = "social",
-                                    ["source"] = "slots.identityClaim.name",
-                                    ["type"] = "string",
-                                },
-                            },
+                            ["responsePool"] = "semantic.social.greeting.first_contact.standing",
                         },
-                        ["settle_standing"] = {
+                        ["verify_trust"] = {
                             ["accepts"] = {
+                                {
+                                    ["intent"] = "OFFER",
+                                    ["speechAct"] = "OFFER",
+                                    ["subject"] = "NEWS",
+                                },
                                 {
                                     ["intent"] = "ACCEPT",
                                     ["speechAct"] = "ACCEPT",
+                                    ["stateValue"] = "reluctant",
+                                    ["subject"] = "FIRST_CONTACT",
                                 },
                                 {
-                                    ["intent"] = "AGREE",
-                                    ["speechAct"] = "AGREE",
+                                    ["intent"] = "REFUSE",
+                                    ["speechAct"] = "REFUSE",
+                                    ["stateValue"] = "end_conversation",
                                 },
                                 {
                                     ["intent"] = "REFUSE",
@@ -644,36 +970,52 @@ return {
                                         "participant",
                                     },
                                     ["frame"] = {
-                                        ["intent"] = "ACCEPT",
-                                        ["speechAct"] = "ACCEPT",
-                                        ["stateValue"] = "positive",
+                                        ["intent"] = "OFFER",
+                                        ["speechAct"] = "OFFER",
+                                        ["subject"] = "NEWS",
                                     },
-                                    ["id"] = "first_contact.part_friendly",
-                                    ["labelFallback"] = "Wish them luck",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_FirstContactWarmClose_Label",
-                                    ["utteranceFallback"] = "Watch the side streets. Hope our paths cross again when it's quieter.",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_FirstContactWarmClose_Utterance",
+                                    ["id"] = "first_contact.offer_water_trade",
+                                    ["labelFallback"] = "Offer quick news in good faith",
+                                    ["labelKey"] = "UI_PNC_FirstContact_WaterTrade_Label",
+                                    ["utteranceFallback"] = "Road north is piled with wrecks—figure fair warning beats sneaking by.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_WaterTrade_Utterance",
                                 },
                                 {
                                     ["consumers"] = {
                                         "participant",
                                     },
                                     ["frame"] = {
-                                        ["intent"] = "AGREE",
-                                        ["speechAct"] = "AGREE",
-                                        ["stateValue"] = "neutral",
+                                        ["intent"] = "ACCEPT",
+                                        ["speechAct"] = "ACCEPT",
+                                        ["stateValue"] = "reluctant",
+                                        ["subject"] = "FIRST_CONTACT",
                                     },
-                                    ["id"] = "first_contact.part_cautious",
-                                    ["labelFallback"] = "Nod and move on",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_FirstContactCautiousClose_Label",
-                                    ["utteranceFallback"] = "All right. You watch your end of the street, I'll watch mine.",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_FirstContactCautiousClose_Utterance",
+                                    ["id"] = "first_contact.reluctant_parley",
+                                    ["labelFallback"] = "Keep talk strictly on the curb",
+                                    ["labelKey"] = "UI_PNC_FirstContact_Reluctant_Label",
+                                    ["utteranceFallback"] = "Fine—we talk from ten feet apart and move on before dark.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_Reluctant_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "REFUSE",
+                                        ["speechAct"] = "REFUSE",
+                                        ["stateValue"] = "end_conversation",
+                                    },
+                                    ["id"] = "first_contact.walk_away",
+                                    ["labelFallback"] = "Move along quietly",
+                                    ["labelKey"] = "UI_PNC_FirstContact_WalkAway_Label",
+                                    ["utteranceFallback"] = "Fair enough—no trouble. Moving along now.",
+                                    ["utteranceKey"] = "UI_PNC_FirstContact_WalkAway_Utterance",
                                 },
                             },
-                            ["onMatch"] = "complete",
+                            ["onMatch"] = "name_and_intent",
                             ["onRefuse"] = "guarded_parting",
                             ["onUnrelated"] = "suspend",
-                            ["responsePool"] = "semantic.social.greeting.first_contact.standing",
+                            ["responsePool"] = "semantic.social.greeting.first_contact.clarify",
                         },
                     },
                     ["owner"] = "ProjectHoomans",
@@ -685,6 +1027,48 @@ return {
                     "declined",
                     "evasive",
                     "blocked",
+                    "accepted",
+                    "rejected",
+                    "reluctant",
+                    "end_conversation",
+                },
+                ["replySemantics"] = {
+                    ["accepted"] = {
+                        ["outcome"] = "accepted",
+                        ["stance"] = "positive",
+                    },
+                    ["blocked"] = {
+                        ["outcome"] = "blocked",
+                        ["stance"] = "negative",
+                    },
+                    ["cautious"] = {
+                        ["outcome"] = "cautious",
+                        ["stance"] = "contextual",
+                    },
+                    ["declined"] = {
+                        ["outcome"] = "rejected",
+                        ["stance"] = "negative",
+                    },
+                    ["end_conversation"] = {
+                        ["outcome"] = "end_conversation",
+                        ["stance"] = "neutral",
+                    },
+                    ["evasive"] = {
+                        ["outcome"] = "evasive",
+                        ["stance"] = "neutral",
+                    },
+                    ["rejected"] = {
+                        ["outcome"] = "rejected",
+                        ["stance"] = "negative",
+                    },
+                    ["reluctant"] = {
+                        ["outcome"] = "reluctant",
+                        ["stance"] = "contextual",
+                    },
+                    ["welcomed"] = {
+                        ["outcome"] = "accepted",
+                        ["stance"] = "positive",
+                    },
                 },
                 ["stances"] = {
                     "positive",
@@ -705,6 +1089,35 @@ return {
             },
             ["repeatPolicy"] = "repeatable",
             ["reply"] = {
+                ["accepted"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "social.identity.personal_history",
+                            "knowledge.gossip.exchange",
+                        },
+                    },
+                    ["outcome"] = "accepted",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Fair enough—lower the crowbar and come under the awning out of sight.",
+                                        ["id"] = "default",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
                 ["blocked"] = {
                     ["outcome"] = "blocked",
                     ["say"] = {
@@ -733,6 +1146,11 @@ return {
                     ["textRole"] = "response",
                 },
                 ["cautious"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "knowledge.gossip.exchange",
+                        },
+                    },
                     ["outcome"] = "cautious",
                     ["say"] = {
                         ["keyOrder"] = {
@@ -790,6 +1208,29 @@ return {
                     },
                     ["textRole"] = "response",
                 },
+                ["end_conversation"] = {
+                    ["outcome"] = "end_conversation",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "No trouble here—passing along and letting you keep your corner.",
+                                        ["id"] = "default",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
                 ["evasive"] = {
                     ["outcome"] = "evasive",
                     ["say"] = {
@@ -817,7 +1258,59 @@ return {
                     },
                     ["textRole"] = "response",
                 },
+                ["rejected"] = {
+                    ["outcome"] = "rejected",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Keep walking down the shoulder. We aren't taking strangers inside tonight.",
+                                        ["id"] = "default",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["reluctant"] = {
+                    ["outcome"] = "reluctant",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "You get two minutes by the curb to state your piece, nothing closer.",
+                                        ["id"] = "default",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
                 ["welcomed"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "social.identity.personal_history",
+                            "knowledge.gossip.exchange",
+                        },
+                    },
                     ["outcome"] = "welcomed",
                     ["say"] = {
                         ["keyOrder"] = {
@@ -1029,6 +1522,14 @@ return {
                 ["variantID"] = "contextual",
             },
             {
+                ["fallback"] = "Fair enough—lower the crowbar and come under the awning out of sight.",
+                ["outcome"] = "accepted",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.social.greeting.first_contact.reply.accepted.say.1.default",
+                ["variantID"] = "default",
+            },
+            {
                 ["fallback"] = "Not now. Keep moving.",
                 ["outcome"] = "blocked",
                 ["realizationKey"] = "1",
@@ -1085,6 +1586,14 @@ return {
                 ["variantID"] = "negative",
             },
             {
+                ["fallback"] = "No trouble here—passing along and letting you keep your corner.",
+                ["outcome"] = "end_conversation",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.social.greeting.first_contact.reply.end_conversation.say.1.default",
+                ["variantID"] = "default",
+            },
+            {
                 ["fallback"] = "Keep your secrets if you want. Just don't bring trouble my way.",
                 ["outcome"] = "evasive",
                 ["realizationKey"] = "1",
@@ -1099,6 +1608,22 @@ return {
                 ["role"] = "response",
                 ["templateID"] = "convo.social.greeting.first_contact.reply.evasive.say.1.neutral",
                 ["variantID"] = "neutral",
+            },
+            {
+                ["fallback"] = "Keep walking down the shoulder. We aren't taking strangers inside tonight.",
+                ["outcome"] = "rejected",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.social.greeting.first_contact.reply.rejected.say.1.default",
+                ["variantID"] = "default",
+            },
+            {
+                ["fallback"] = "You get two minutes by the curb to state your piece, nothing closer.",
+                ["outcome"] = "reluctant",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.social.greeting.first_contact.reply.reluctant.say.1.default",
+                ["variantID"] = "default",
             },
             {
                 ["fallback"] = "All right, you seem decent enough. Name's {speaker.name}—watch the side alleys out here.",
@@ -1239,6 +1764,11 @@ return {
                     ["textRole"] = "response",
                 },
                 ["guarded"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "wellbeing.needs.checkin",
+                        },
+                    },
                     ["outcome"] = "guarded",
                     ["say"] = {
                         ["keyOrder"] = {
@@ -1266,6 +1796,31 @@ return {
                                         ["fallback"] = "Too many names I don't want to say out loud anymore. Maybe another night.",
                                         ["id"] = "contextual",
                                         ["templateID"] = "convo.social.identity.personal_history.reply.guarded.say.1.contextual",
+                                        ["textRole"] = "response",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["protect_source"] = {
+                    ["outcome"] = "protect_source",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Not giving names for folks who didn't ask to be dragged back into Knox County's mess.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.social.identity.personal_history.reply.protect_source.say.1.default",
                                         ["textRole"] = "response",
                                     },
                                 },
@@ -1306,7 +1861,43 @@ return {
                     },
                     ["textRole"] = "response",
                 },
+                ["reveal_source"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "knowledge.gossip.exchange",
+                        },
+                    },
+                    ["outcome"] = "reveal_source",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Alright, {addressee.name}—our old crew split near the rail yard, and that's where I got my rig.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.social.identity.personal_history.reply.reveal_source.say.1.default",
+                                        ["textRole"] = "response",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
                 ["shared"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "knowledge.gossip.exchange",
+                            "colony.work.status_exchange",
+                        },
+                    },
                     ["outcome"] = "shared",
                     ["say"] = {
                         ["keyOrder"] = {
@@ -1328,6 +1919,31 @@ return {
                                         ["fallback"] = "Feels good remembering we had real lives once, {addressee.name}. Appreciate you sharing that.",
                                         ["id"] = "positive",
                                         ["templateID"] = "convo.social.identity.personal_history.reply.shared.say.1.positive",
+                                        ["textRole"] = "response",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["withdraw"] = {
+                    ["outcome"] = "withdraw",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Enough looking back. Past won't bar tonight's windows.",
+                                        ["id"] = "default",
+                                        ["templateID"] = "convo.social.identity.personal_history.reply.withdraw.say.1.default",
                                         ["textRole"] = "response",
                                     },
                                 },
@@ -1431,6 +2047,14 @@ return {
                     ["variantID"] = "contextual",
                 },
                 {
+                    ["fallback"] = "Not giving names for folks who didn't ask to be dragged back into Knox County's mess.",
+                    ["outcome"] = "protect_source",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.social.identity.personal_history.reply.protect_source.say.1.default",
+                    ["variantID"] = "default",
+                },
+                {
                     ["fallback"] = "I'd rather not dig into all that.",
                     ["outcome"] = "refused",
                     ["realizationKey"] = "1",
@@ -1445,6 +2069,14 @@ return {
                     ["role"] = "response",
                     ["templateID"] = "convo.social.identity.personal_history.reply.refused.say.1.negative",
                     ["variantID"] = "negative",
+                },
+                {
+                    ["fallback"] = "Alright, {addressee.name}—our old crew split near the rail yard, and that's where I got my rig.",
+                    ["outcome"] = "reveal_source",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.social.identity.personal_history.reply.reveal_source.say.1.default",
+                    ["variantID"] = "default",
                 },
                 {
                     ["fallback"] = "Funny how fast a regular job turns into useless trivia, huh, {addressee.name}? Good knowing a bit about you.",
@@ -1462,6 +2094,14 @@ return {
                     ["templateID"] = "convo.social.identity.personal_history.reply.shared.say.1.positive",
                     ["variantID"] = "positive",
                 },
+                {
+                    ["fallback"] = "Enough looking back. Past won't bar tonight's windows.",
+                    ["outcome"] = "withdraw",
+                    ["realizationKey"] = "1",
+                    ["role"] = "response",
+                    ["templateID"] = "convo.social.identity.personal_history.reply.withdraw.say.1.default",
+                    ["variantID"] = "default",
+                },
             },
         },
         ["id"] = "social.identity.personal_history",
@@ -1474,7 +2114,7 @@ return {
             ["sourcePath"] = "dialogue/thematic_interactive/identity_history_exchange.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/ThematicInteractive/SocialGreetingFirstContactToTravelExcursionPlanExchange",
+        ["module"] = "PNC/ConvoEngine/Dialogue/ThematicInteractive/GreetingFirstContactToIdentityPersonalHistory",
         ["namespace"] = "social.identity",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1545,16 +2185,23 @@ return {
                                 {
                                     ["intent"] = "INFORM",
                                     ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "positive",
                                     ["subject"] = "BACKSTORY",
                                 },
                                 {
                                     ["intent"] = "QUESTION",
                                     ["speechAct"] = "QUESTION",
-                                    ["subject"] = "BACKSTORY",
+                                    ["subject"] = "IDENTITY",
                                 },
                                 {
                                     ["intent"] = "CLARIFY",
                                     ["speechAct"] = "CLARIFY",
+                                    ["subject"] = "BACKSTORY",
+                                },
+                                {
+                                    ["intent"] = "QUESTION",
+                                    ["speechAct"] = "QUESTION",
+                                    ["stateValue"] = "shared",
                                     ["subject"] = "BACKSTORY",
                                 },
                                 {
@@ -1570,13 +2217,14 @@ return {
                                     ["frame"] = {
                                         ["intent"] = "INFORM",
                                         ["speechAct"] = "INFORM",
+                                        ["stateValue"] = "positive",
                                         ["subject"] = "BACKSTORY",
                                     },
                                     ["id"] = "identity.history.share_roots",
-                                    ["labelFallback"] = "Share where you're from",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_HistoryShareRoots_Label",
-                                    ["utteranceFallback"] = "I was working over in Muldraugh when the phones went dead. What about you?",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_HistoryShareRoots_Utterance",
+                                    ["labelFallback"] = "Mention where you lived before",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_ShareRoots_Label",
+                                    ["utteranceFallback"] = "Worked garages south of Muldraugh before the highway roadblocks locked down.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_ShareRoots_Utterance",
                                 },
                                 {
                                     ["consumers"] = {
@@ -1585,13 +2233,13 @@ return {
                                     ["frame"] = {
                                         ["intent"] = "QUESTION",
                                         ["speechAct"] = "QUESTION",
-                                        ["subject"] = "BACKSTORY",
+                                        ["subject"] = "IDENTITY",
                                     },
                                     ["id"] = "identity.history.ask_trade",
-                                    ["labelFallback"] = "Ask what they did before",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_HistoryAskTrade_Label",
-                                    ["utteranceFallback"] = "What did you do before Knox County went to hell?",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_HistoryAskTrade_Utterance",
+                                    ["labelFallback"] = "Ask what work they knew",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_AskTrade_Label",
+                                    ["utteranceFallback"] = "What did you used to do before everyone ended up scavenging alleys?",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_AskTrade_Utterance",
                                 },
                                 {
                                     ["consumers"] = {
@@ -1603,10 +2251,31 @@ return {
                                         ["subject"] = "BACKSTORY",
                                     },
                                     ["id"] = "identity.history.clarify_origin",
-                                    ["labelFallback"] = "Ask which town they came from",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_HistoryClarify_Label",
-                                    ["utteranceFallback"] = "Did you come up from Rosewood, or further east?",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_HistoryClarify_Utterance",
+                                    ["labelFallback"] = "Ask which town they survived",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_ClarifyOrigin_Label",
+                                    ["utteranceFallback"] = "Muldraugh, Rosewood, or caught on the Louisville river crossing?",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_ClarifyOrigin_Utterance",
+                                },
+                                {
+                                    ["constraints"] = {
+                                        ["op"] = "eq",
+                                        ["path"] = "worldKnowledge.sharedSettlementHistory",
+                                        ["value"] = true,
+                                    },
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "QUESTION",
+                                        ["speechAct"] = "QUESTION",
+                                        ["stateValue"] = "shared",
+                                        ["subject"] = "BACKSTORY",
+                                    },
+                                    ["id"] = "identity.history.ask_shared_town",
+                                    ["labelFallback"] = "Mention shared neighborhood landmarks",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_SharedTown_Label",
+                                    ["utteranceFallback"] = "Sounded like you knew the old clinic by the rail spur—used to live that side?",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_SharedTown_Utterance",
                                 },
                             },
                             ["onClarify"] = "clarify_origin",
@@ -1635,6 +2304,17 @@ return {
                                     ["subject"] = "BACKSTORY",
                                 },
                                 {
+                                    ["intent"] = "INFORM",
+                                    ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "protect_source",
+                                    ["subject"] = "BACKSTORY",
+                                },
+                                {
+                                    ["intent"] = "DEFER",
+                                    ["speechAct"] = "DEFER",
+                                    ["subject"] = "IDENTITY",
+                                },
+                                {
                                     ["intent"] = "REFUSE",
                                     ["speechAct"] = "REFUSE",
                                 },
@@ -1650,13 +2330,50 @@ return {
                                         ["subject"] = "BACKSTORY",
                                     },
                                     ["id"] = "identity.history.confirm_town",
-                                    ["labelFallback"] = "Mention the highway",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_HistoryConfirmTown_Label",
-                                    ["utteranceFallback"] = "Got out right before they blocked the main highway.",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_HistoryConfirmTown_Utterance",
+                                    ["labelFallback"] = "Confirm crossing the checkpoint early",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_ConfirmTown_Label",
+                                    ["utteranceFallback"] = "Slipped past the cordon back in early July before the power gave out.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_ConfirmTown_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "INFORM",
+                                        ["speechAct"] = "INFORM",
+                                        ["stateValue"] = "protect_source",
+                                        ["subject"] = "BACKSTORY",
+                                    },
+                                    ["id"] = "identity.history.protect_crew_names",
+                                    ["labelFallback"] = "Leave old companions unnamed",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_ProtectCrew_Label",
+                                    ["utteranceFallback"] = "Keep old camp names out of it—some folks still prefer staying ghosts.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_ProtectCrew_Utterance",
+                                },
+                                {
+                                    ["constraints"] = {
+                                        ["op"] = "eq",
+                                        ["path"] = "scene.hasThirdPartyWitness",
+                                        ["value"] = true,
+                                    },
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "DEFER",
+                                        ["speechAct"] = "DEFER",
+                                        ["subject"] = "IDENTITY",
+                                    },
+                                    ["id"] = "identity.history.note_witness_listen",
+                                    ["labelFallback"] = "Keep talk guarded with bystanders",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_WitnessListen_Label",
+                                    ["utteranceFallback"] = "Maybe save names for later when fewer ears are standing in the doorway.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_WitnessListen_Utterance",
                                 },
                             },
-                            ["onMatch"] = "share_history",
+                            ["onClarify"] = "share_history",
+                            ["onMatch"] = "weigh_disclosure",
                             ["onRefuse"] = "kept_private",
                             ["onUnrelated"] = "suspend",
                             ["responsePool"] = "semantic.social.identity.personal_history.clarify",
@@ -1678,18 +2395,23 @@ return {
                             ["terminal"] = true,
                         },
                         ["kept_private"] = {
-                            ["responsePool"] = "semantic.social.identity.personal_history.kept_private",
+                            ["responsePool"] = "semantic.social.identity.personal_history.refused",
                             ["terminal"] = true,
                         },
                         ["reflect_bond"] = {
                             ["accepts"] = {
                                 {
+                                    ["intent"] = "THANK",
+                                    ["speechAct"] = "THANK",
+                                },
+                                {
                                     ["intent"] = "ACCEPT",
                                     ["speechAct"] = "ACCEPT",
                                 },
                                 {
-                                    ["intent"] = "AGREE",
-                                    ["speechAct"] = "AGREE",
+                                    ["intent"] = "REFUSE",
+                                    ["speechAct"] = "REFUSE",
+                                    ["stateValue"] = "withdraw",
                                 },
                                 {
                                     ["intent"] = "REFUSE",
@@ -1702,28 +2424,43 @@ return {
                                         "participant",
                                     },
                                     ["frame"] = {
-                                        ["intent"] = "ACCEPT",
-                                        ["speechAct"] = "ACCEPT",
+                                        ["intent"] = "THANK",
+                                        ["speechAct"] = "THANK",
                                     },
                                     ["id"] = "identity.history.close_warm",
-                                    ["labelFallback"] = "Respect their story",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_HistoryCloseWarm_Label",
-                                    ["utteranceFallback"] = "Good to know who I'm standing beside out here.",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_HistoryCloseWarm_Utterance",
+                                    ["labelFallback"] = "Close on warmer trust",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_CloseWarm_Label",
+                                    ["utteranceFallback"] = "Good knowing who's actually standing beside me in this mess.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_CloseWarm_Utterance",
                                 },
                                 {
                                     ["consumers"] = {
                                         "participant",
                                     },
                                     ["frame"] = {
-                                        ["intent"] = "AGREE",
-                                        ["speechAct"] = "AGREE",
+                                        ["intent"] = "ACCEPT",
+                                        ["speechAct"] = "ACCEPT",
                                     },
                                     ["id"] = "identity.history.close_quiet",
-                                    ["labelFallback"] = "Leave it there",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_HistoryCloseQuiet_Label",
-                                    ["utteranceFallback"] = "Fair enough. Past is past—we've got today to worry about.",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_HistoryCloseQuiet_Utterance",
+                                    ["labelFallback"] = "Part respectfully",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_CloseQuiet_Label",
+                                    ["utteranceFallback"] = "Understood. We stick together when the sirens start up.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_CloseQuiet_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "REFUSE",
+                                        ["speechAct"] = "REFUSE",
+                                        ["stateValue"] = "withdraw",
+                                    },
+                                    ["id"] = "identity.history.close_guarded",
+                                    ["labelFallback"] = "End past talk cleanly",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_CloseGuarded_Label",
+                                    ["utteranceFallback"] = "Enough stories for today. Keep eyes on the block.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_CloseGuarded_Utterance",
                                 },
                             },
                             ["onMatch"] = "complete",
@@ -1734,13 +2471,21 @@ return {
                         ["share_history"] = {
                             ["accepts"] = {
                                 {
-                                    ["intent"] = "QUESTION",
-                                    ["speechAct"] = "QUESTION",
+                                    ["intent"] = "AGREE",
+                                    ["speechAct"] = "AGREE",
+                                    ["stateValue"] = "shared",
+                                    ["subject"] = "BACKSTORY",
+                                },
+                                {
+                                    ["intent"] = "ACKNOWLEDGE",
+                                    ["speechAct"] = "ACKNOWLEDGE",
                                     ["subject"] = "IDENTITY",
                                 },
                                 {
-                                    ["intent"] = "THANK",
-                                    ["speechAct"] = "THANK",
+                                    ["intent"] = "INFORM",
+                                    ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "protect_source",
+                                    ["subject"] = "IDENTITY",
                                 },
                                 {
                                     ["intent"] = "REFUSE",
@@ -1749,33 +2494,56 @@ return {
                             },
                             ["branchOffers"] = {
                                 {
+                                    ["constraints"] = {
+                                        ["op"] = "gte",
+                                        ["path"] = "relationship.approval",
+                                        ["value"] = 0,
+                                    },
                                     ["consumers"] = {
                                         "participant",
                                     },
                                     ["frame"] = {
-                                        ["intent"] = "QUESTION",
-                                        ["speechAct"] = "QUESTION",
-                                        ["subject"] = "IDENTITY",
+                                        ["intent"] = "AGREE",
+                                        ["speechAct"] = "AGREE",
+                                        ["stateValue"] = "shared",
+                                        ["subject"] = "BACKSTORY",
                                     },
                                     ["id"] = "identity.history.connect_family",
-                                    ["labelFallback"] = "Ask if anyone made it out",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_HistoryFamily_Label",
-                                    ["utteranceFallback"] = "You still looking for anyone from back then?",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_HistoryFamily_Utterance",
+                                    ["labelFallback"] = "Share family or crew connection",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_ConnectFamily_Label",
+                                    ["utteranceFallback"] = "Sounds like we crossed some of the same checkpoints before they closed.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_ConnectFamily_Utterance",
                                 },
                                 {
                                     ["consumers"] = {
                                         "participant",
                                     },
                                     ["frame"] = {
-                                        ["intent"] = "THANK",
-                                        ["speechAct"] = "THANK",
+                                        ["intent"] = "ACKNOWLEDGE",
+                                        ["speechAct"] = "ACKNOWLEDGE",
+                                        ["subject"] = "IDENTITY",
                                     },
                                     ["id"] = "identity.history.acknowledge_past",
-                                    ["labelFallback"] = "Acknowledge the memory",
-                                    ["labelKey"] = "UI_PNC_Conversation_Suggestion_HistoryAck_Label",
-                                    ["utteranceFallback"] = "Feels like a lifetime ago already. Glad you made it this far.",
-                                    ["utteranceKey"] = "UI_PNC_Conversation_Suggestion_HistoryAck_Utterance",
+                                    ["labelFallback"] = "Acknowledge shared survival",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_AckPast_Label",
+                                    ["utteranceFallback"] = "Long road to still be standing here. Glad it wasn't for nothing.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_AckPast_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "INFORM",
+                                        ["speechAct"] = "INFORM",
+                                        ["stateValue"] = "protect_source",
+                                        ["subject"] = "IDENTITY",
+                                    },
+                                    ["id"] = "identity.history.guard_origin",
+                                    ["labelFallback"] = "Protect where old allies went",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_GuardOrigin_Label",
+                                    ["utteranceFallback"] = "Left them heading west—won't point anyone else after them.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_GuardOrigin_Utterance",
                                 },
                             },
                             ["onMatch"] = "reflect_bond",
@@ -1783,22 +2551,95 @@ return {
                             ["onUnrelated"] = "suspend",
                             ["responsePool"] = "semantic.social.identity.personal_history.exchange",
                             ["slots"] = {
-                                ["event"] = {
-                                    ["owner"] = "world",
-                                    ["source"] = "slots.event",
-                                    ["type"] = "string",
-                                },
                                 ["faction"] = {
                                     ["owner"] = "social",
                                     ["source"] = "slots.faction",
                                     ["type"] = "string",
                                 },
-                                ["person"] = {
-                                    ["owner"] = "social",
-                                    ["source"] = "slots.person",
-                                    ["type"] = "string",
+                            },
+                        },
+                        ["weigh_disclosure"] = {
+                            ["accepts"] = {
+                                {
+                                    ["intent"] = "INFORM",
+                                    ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "reveal_source",
+                                    ["subject"] = "IDENTITY",
+                                },
+                                {
+                                    ["intent"] = "INFORM",
+                                    ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "guarded",
+                                    ["subject"] = "BACKSTORY",
+                                },
+                                {
+                                    ["intent"] = "REFUSE",
+                                    ["speechAct"] = "REFUSE",
+                                    ["stateValue"] = "withdraw",
+                                },
+                                {
+                                    ["intent"] = "REFUSE",
+                                    ["speechAct"] = "REFUSE",
                                 },
                             },
+                            ["branchOffers"] = {
+                                {
+                                    ["constraints"] = {
+                                        ["op"] = "gte",
+                                        ["path"] = "relationship.trust",
+                                        ["value"] = 25,
+                                    },
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "INFORM",
+                                        ["speechAct"] = "INFORM",
+                                        ["stateValue"] = "reveal_source",
+                                        ["subject"] = "IDENTITY",
+                                    },
+                                    ["id"] = "identity.history.trust_with_crew",
+                                    ["labelFallback"] = "Name who taught you fieldcraft",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_TrustCrew_Label",
+                                    ["utteranceFallback"] = "My uncle ran mechanics out of Riverside—that's where I learned wiring.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_TrustCrew_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "INFORM",
+                                        ["speechAct"] = "INFORM",
+                                        ["stateValue"] = "guarded",
+                                        ["subject"] = "BACKSTORY",
+                                    },
+                                    ["id"] = "identity.history.stay_vague",
+                                    ["labelFallback"] = "Keep details light",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_StayVague_Label",
+                                    ["utteranceFallback"] = "Passed through two camps and kept moving—nothing fancy.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_StayVague_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "REFUSE",
+                                        ["speechAct"] = "REFUSE",
+                                        ["stateValue"] = "withdraw",
+                                    },
+                                    ["id"] = "identity.history.withdraw_past",
+                                    ["labelFallback"] = "Pass on sharing personal past",
+                                    ["labelKey"] = "UI_PNC_IdentityHistory_WithdrawPast_Label",
+                                    ["utteranceFallback"] = "Rather keep the past buried and focus on surviving this week.",
+                                    ["utteranceKey"] = "UI_PNC_IdentityHistory_WithdrawPast_Utterance",
+                                },
+                            },
+                            ["onMatch"] = "share_history",
+                            ["onRefuse"] = "kept_private",
+                            ["onUnrelated"] = "suspend",
+                            ["responsePool"] = "semantic.social.identity.personal_history.clarify",
                         },
                     },
                     ["owner"] = "ProjectHoomans",
@@ -1810,6 +2651,43 @@ return {
                     "evasive",
                     "refused",
                     "blocked",
+                    "reveal_source",
+                    "protect_source",
+                    "withdraw",
+                },
+                ["replySemantics"] = {
+                    ["blocked"] = {
+                        ["outcome"] = "blocked",
+                        ["stance"] = "negative",
+                    },
+                    ["evasive"] = {
+                        ["outcome"] = "evasive",
+                        ["stance"] = "neutral",
+                    },
+                    ["guarded"] = {
+                        ["outcome"] = "guarded",
+                        ["stance"] = "contextual",
+                    },
+                    ["protect_source"] = {
+                        ["outcome"] = "protect_source",
+                        ["stance"] = "contextual",
+                    },
+                    ["refused"] = {
+                        ["outcome"] = "refused",
+                        ["stance"] = "negative",
+                    },
+                    ["reveal_source"] = {
+                        ["outcome"] = "reveal_source",
+                        ["stance"] = "positive",
+                    },
+                    ["shared"] = {
+                        ["outcome"] = "shared",
+                        ["stance"] = "positive",
+                    },
+                    ["withdraw"] = {
+                        ["outcome"] = "withdraw",
+                        ["stance"] = "neutral",
+                    },
                 },
                 ["stances"] = {
                     "positive",
@@ -1885,6 +2763,11 @@ return {
                     ["textRole"] = "response",
                 },
                 ["guarded"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "wellbeing.needs.checkin",
+                        },
+                    },
                     ["outcome"] = "guarded",
                     ["say"] = {
                         ["keyOrder"] = {
@@ -1907,6 +2790,29 @@ return {
                                     {
                                         ["fallback"] = "Too many names I don't want to say out loud anymore. Maybe another night.",
                                         ["id"] = "contextual",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["protect_source"] = {
+                    ["outcome"] = "protect_source",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Not giving names for folks who didn't ask to be dragged back into Knox County's mess.",
+                                        ["id"] = "default",
                                     },
                                 },
                             },
@@ -1942,7 +2848,41 @@ return {
                     },
                     ["textRole"] = "response",
                 },
+                ["reveal_source"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "knowledge.gossip.exchange",
+                        },
+                    },
+                    ["outcome"] = "reveal_source",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Alright, {addressee.name}—our old crew split near the rail yard, and that's where I got my rig.",
+                                        ["id"] = "default",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
                 ["shared"] = {
+                    ["after"] = {
+                        ["recommend"] = {
+                            "knowledge.gossip.exchange",
+                            "colony.work.status_exchange",
+                        },
+                    },
                     ["outcome"] = "shared",
                     ["say"] = {
                         ["keyOrder"] = {
@@ -1961,6 +2901,29 @@ return {
                                     {
                                         ["fallback"] = "Feels good remembering we had real lives once, {addressee.name}. Appreciate you sharing that.",
                                         ["id"] = "positive",
+                                    },
+                                },
+                            },
+                        },
+                        ["textRole"] = "response",
+                    },
+                    ["textRole"] = "response",
+                },
+                ["withdraw"] = {
+                    ["outcome"] = "withdraw",
+                    ["say"] = {
+                        ["keyOrder"] = {
+                            "1",
+                        },
+                        ["mode"] = "single",
+                        ["realizations"] = {
+                            ["1"] = {
+                                ["key"] = "1",
+                                ["shorthand"] = true,
+                                ["variants"] = {
+                                    {
+                                        ["fallback"] = "Enough looking back. Past won't bar tonight's windows.",
+                                        ["id"] = "default",
                                     },
                                 },
                             },
@@ -2210,6 +3173,14 @@ return {
                 ["variantID"] = "contextual",
             },
             {
+                ["fallback"] = "Not giving names for folks who didn't ask to be dragged back into Knox County's mess.",
+                ["outcome"] = "protect_source",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.social.identity.personal_history.reply.protect_source.say.1.default",
+                ["variantID"] = "default",
+            },
+            {
                 ["fallback"] = "I'd rather not dig into all that.",
                 ["outcome"] = "refused",
                 ["realizationKey"] = "1",
@@ -2224,6 +3195,14 @@ return {
                 ["role"] = "response",
                 ["templateID"] = "convo.social.identity.personal_history.reply.refused.say.1.negative",
                 ["variantID"] = "negative",
+            },
+            {
+                ["fallback"] = "Alright, {addressee.name}—our old crew split near the rail yard, and that's where I got my rig.",
+                ["outcome"] = "reveal_source",
+                ["realizationKey"] = "1",
+                ["role"] = "response",
+                ["templateID"] = "convo.social.identity.personal_history.reply.reveal_source.say.1.default",
+                ["variantID"] = "default",
             },
             {
                 ["fallback"] = "Funny how fast a regular job turns into useless trivia, huh, {addressee.name}? Good knowing a bit about you.",
@@ -2241,695 +3220,12 @@ return {
                 ["templateID"] = "convo.social.identity.personal_history.reply.shared.say.1.positive",
                 ["variantID"] = "positive",
             },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "thematic_interactive",
-        ["domainPath"] = "thematic_interactive",
-        ["exchangeFamily"] = {
-            ["familyID"] = "travel.excursion.plan_exchange",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?",
-                                ["id"] = "default",
-                                ["templateID"] = "convo.travel.excursion.plan_exchange.say.1.default",
-                                ["textRole"] = "spoken_action",
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "travel.excursion",
-            ["replies"] = {
-                ["agreed"] = {
-                    ["outcome"] = "agreed",
-                    ["say"] = {
-                        ["keyOrder"] = {
-                            "1",
-                        },
-                        ["mode"] = "single",
-                        ["realizations"] = {
-                            ["1"] = {
-                                ["key"] = "1",
-                                ["shorthand"] = true,
-                                ["variants"] = {
-                                    {
-                                        ["fallback"] = "Alright, {addressee.name}. Pack light, keep the crowbar handy, and we stick to the side streets.",
-                                        ["id"] = "default",
-                                        ["templateID"] = "convo.travel.excursion.plan_exchange.reply.agreed.say.1.default",
-                                        ["textRole"] = "response",
-                                    },
-                                },
-                            },
-                        },
-                        ["textRole"] = "response",
-                    },
-                    ["textRole"] = "response",
-                },
-                ["assessed"] = {
-                    ["outcome"] = "assessed",
-                    ["say"] = {
-                        ["keyOrder"] = {
-                            "1",
-                        },
-                        ["mode"] = "single",
-                        ["realizations"] = {
-                            ["1"] = {
-                                ["key"] = "1",
-                                ["shorthand"] = true,
-                                ["variants"] = {
-                                    {
-                                        ["fallback"] = "Roads looked quiet earlier {scene.location}, {addressee.name}, though there's always a few stragglers near the gas station.",
-                                        ["id"] = "default",
-                                        ["templateID"] = "convo.travel.excursion.plan_exchange.reply.assessed.say.1.default",
-                                        ["textRole"] = "response",
-                                    },
-                                },
-                            },
-                        },
-                        ["textRole"] = "response",
-                    },
-                    ["textRole"] = "response",
-                },
-                ["deferred"] = {
-                    ["outcome"] = "deferred",
-                    ["say"] = {
-                        ["keyOrder"] = {
-                            "1",
-                        },
-                        ["mode"] = "single",
-                        ["realizations"] = {
-                            ["1"] = {
-                                ["key"] = "1",
-                                ["shorthand"] = true,
-                                ["variants"] = {
-                                    {
-                                        ["fallback"] = "Better to wait for first light. Fog's too thick out by the highway right now.",
-                                        ["id"] = "default",
-                                        ["templateID"] = "convo.travel.excursion.plan_exchange.reply.deferred.say.1.default",
-                                        ["textRole"] = "response",
-                                    },
-                                },
-                            },
-                        },
-                        ["textRole"] = "response",
-                    },
-                    ["textRole"] = "response",
-                },
-                ["refused"] = {
-                    ["outcome"] = "refused",
-                    ["say"] = {
-                        ["keyOrder"] = {
-                            "1",
-                        },
-                        ["mode"] = "single",
-                        ["realizations"] = {
-                            ["1"] = {
-                                ["key"] = "1",
-                                ["shorthand"] = true,
-                                ["variants"] = {
-                                    {
-                                        ["fallback"] = "No sense going out there right now. Stay put until it's safe.",
-                                        ["id"] = "default",
-                                        ["templateID"] = "convo.travel.excursion.plan_exchange.reply.refused.say.1.default",
-                                        ["textRole"] = "response",
-                                    },
-                                },
-                            },
-                        },
-                        ["textRole"] = "response",
-                    },
-                    ["textRole"] = "response",
-                },
-            },
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.travel.excursion.plan_exchange.say.1.default",
-                    ["variantID"] = "default",
-                },
-                {
-                    ["fallback"] = "Alright, {addressee.name}. Pack light, keep the crowbar handy, and we stick to the side streets.",
-                    ["outcome"] = "agreed",
-                    ["realizationKey"] = "1",
-                    ["role"] = "response",
-                    ["templateID"] = "convo.travel.excursion.plan_exchange.reply.agreed.say.1.default",
-                    ["variantID"] = "default",
-                },
-                {
-                    ["fallback"] = "Roads looked quiet earlier {scene.location}, {addressee.name}, though there's always a few stragglers near the gas station.",
-                    ["outcome"] = "assessed",
-                    ["realizationKey"] = "1",
-                    ["role"] = "response",
-                    ["templateID"] = "convo.travel.excursion.plan_exchange.reply.assessed.say.1.default",
-                    ["variantID"] = "default",
-                },
-                {
-                    ["fallback"] = "Better to wait for first light. Fog's too thick out by the highway right now.",
-                    ["outcome"] = "deferred",
-                    ["realizationKey"] = "1",
-                    ["role"] = "response",
-                    ["templateID"] = "convo.travel.excursion.plan_exchange.reply.deferred.say.1.default",
-                    ["variantID"] = "default",
-                },
-                {
-                    ["fallback"] = "No sense going out there right now. Stay put until it's safe.",
-                    ["outcome"] = "refused",
-                    ["realizationKey"] = "1",
-                    ["role"] = "response",
-                    ["templateID"] = "convo.travel.excursion.plan_exchange.reply.refused.say.1.default",
-                    ["variantID"] = "default",
-                },
-            },
-        },
-        ["id"] = "travel.excursion.plan_exchange",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.convo-engine.v1",
-            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "plan_exchange",
-            ["sourceId"] = "travel.excursion.plan_exchange",
-            ["sourcePath"] = "dialogue/thematic_interactive/travel_excursion_exchange.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/ThematicInteractive/SocialGreetingFirstContactToTravelExcursionPlanExchange",
-        ["namespace"] = "travel.excursion",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["closure"] = {
-                ["closureClass"] = "resolved_episode",
-                ["episodeId"] = "travel_excursion_plan_exchange",
-            },
-            ["domains"] = {
-                {
-                    ["domain"] = "travel",
-                    ["owner"] = "ProjectHoomans",
-                },
-            },
-            ["inputPolicy"] = "typed_parity",
-            ["metadata"] = {
-                ["flow"] = {
-                    ["constraints"] = {
-                        ["all"] = {
-                            {
-                                ["op"] = "not_in",
-                                ["path"] = "npcState.activeBehavior",
-                                ["values"] = {
-                                    "hostile",
-                                    "combat",
-                                    "busy",
-                                    "dead",
-                                },
-                            },
-                            {
-                                ["op"] = "not_in",
-                                ["path"] = "situation.activeBehavior",
-                                ["values"] = {
-                                    "hostile",
-                                    "combat",
-                                    "busy",
-                                    "dead",
-                                },
-                            },
-                            {
-                                ["op"] = "neq",
-                                ["path"] = "roles.hostile",
-                                ["value"] = true,
-                            },
-                            {
-                                ["op"] = "not_in",
-                                ["path"] = "npcState.healthState",
-                                ["values"] = {
-                                    "dead",
-                                    "incapacitated",
-                                },
-                            },
-                        },
-                    },
-                    ["id"] = "travel.excursion.plan_exchange",
-                    ["initial"] = "propose_route",
-                    ["nodes"] = {
-                        ["assess_risk"] = {
-                            ["accepts"] = {
-                                {
-                                    ["intent"] = "AGREE",
-                                    ["speechAct"] = "AGREE",
-                                    ["subject"] = "EXCURSION",
-                                },
-                                {
-                                    ["intent"] = "ACCEPT",
-                                },
-                                {
-                                    ["intent"] = "DEFER",
-                                    ["speechAct"] = "DEFER",
-                                    ["subject"] = "EXCURSION",
-                                },
-                            },
-                            ["branchOffers"] = {
-                                {
-                                    ["consumers"] = {
-                                        "participant",
-                                    },
-                                    ["frame"] = {
-                                        ["intent"] = "AGREE",
-                                        ["speechAct"] = "AGREE",
-                                        ["subject"] = "EXCURSION",
-                                    },
-                                    ["id"] = "travel.excursion.confirm_departure",
-                                    ["labelFallback"] = "Head out together",
-                                    ["labelKey"] = "UI_PNC_TravelExcursion_Confirm_Label",
-                                    ["utteranceFallback"] = "Grab a crowbar and a spare canteen. We stick to the tree line.",
-                                    ["utteranceKey"] = "UI_PNC_TravelExcursion_Confirm_Utterance",
-                                },
-                                {
-                                    ["consumers"] = {
-                                        "participant",
-                                    },
-                                    ["frame"] = {
-                                        ["intent"] = "DEFER",
-                                        ["speechAct"] = "DEFER",
-                                        ["subject"] = "EXCURSION",
-                                    },
-                                    ["id"] = "travel.excursion.postpone",
-                                    ["labelFallback"] = "Wait for better light",
-                                    ["labelKey"] = "UI_PNC_TravelExcursion_Postpone_Label",
-                                    ["utteranceFallback"] = "Let's sleep on it and check the fog at first light.",
-                                    ["utteranceKey"] = "UI_PNC_TravelExcursion_Postpone_Utterance",
-                                },
-                            },
-                            ["onMatch"] = "departing",
-                            ["onRefuse"] = "called_off",
-                            ["onUnrelated"] = "suspend",
-                            ["slots"] = {
-                                ["threat"] = {
-                                    ["owner"] = "travel.excursion.plan_exchange",
-                                    ["source"] = "slots.threat.value",
-                                    ["type"] = "string",
-                                },
-                            },
-                        },
-                        ["called_off"] = {
-                            ["terminal"] = true,
-                        },
-                        ["departing"] = {
-                            ["terminal"] = true,
-                        },
-                        ["propose_route"] = {
-                            ["accepts"] = {
-                                {
-                                    ["intent"] = "INFORM",
-                                    ["speechAct"] = "INFORM",
-                                    ["subject"] = "ROUTE",
-                                },
-                                {
-                                    ["intent"] = "QUESTION",
-                                    ["speechAct"] = "QUESTION",
-                                    ["subject"] = "THREAT",
-                                },
-                                {
-                                    ["intent"] = "AGREE",
-                                    ["speechAct"] = "AGREE",
-                                    ["subject"] = "EXCURSION",
-                                },
-                            },
-                            ["branchOffers"] = {
-                                {
-                                    ["consumers"] = {
-                                        "participant",
-                                    },
-                                    ["frame"] = {
-                                        ["intent"] = "INFORM",
-                                        ["speechAct"] = "INFORM",
-                                        ["subject"] = "ROUTE",
-                                    },
-                                    ["id"] = "travel.excursion.set_destination",
-                                    ["labelFallback"] = "Suggest a supply stop",
-                                    ["labelKey"] = "UI_PNC_TravelExcursion_SetDest_Label",
-                                    ["utteranceFallback"] = "If we hit the corner market before noon, we can be back before supper.",
-                                    ["utteranceKey"] = "UI_PNC_TravelExcursion_SetDest_Utterance",
-                                },
-                                {
-                                    ["consumers"] = {
-                                        "participant",
-                                    },
-                                    ["frame"] = {
-                                        ["intent"] = "QUESTION",
-                                        ["speechAct"] = "QUESTION",
-                                        ["subject"] = "THREAT",
-                                    },
-                                    ["id"] = "travel.excursion.ask_threat",
-                                    ["labelFallback"] = "Ask about the road ahead",
-                                    ["labelKey"] = "UI_PNC_TravelExcursion_AskThreat_Label",
-                                    ["utteranceFallback"] = "You hear anything about deadheads piling up on the highway?",
-                                    ["utteranceKey"] = "UI_PNC_TravelExcursion_AskThreat_Utterance",
-                                },
-                                {
-                                    ["consumers"] = {
-                                        "participant",
-                                    },
-                                    ["frame"] = {
-                                        ["intent"] = "REFUSE",
-                                        ["speechAct"] = "REFUSE",
-                                        ["subject"] = "EXCURSION",
-                                    },
-                                    ["id"] = "travel.excursion.call_off",
-                                    ["labelFallback"] = "Call off the run",
-                                    ["labelKey"] = "UI_PNC_TravelExcursion_CallOff_Label",
-                                    ["utteranceFallback"] = "Doesn't feel worth the gas or the noise today.",
-                                    ["utteranceKey"] = "UI_PNC_TravelExcursion_CallOff_Utterance",
-                                },
-                            },
-                            ["onClarify"] = "assess_risk",
-                            ["onMatch"] = "assess_risk",
-                            ["onRefuse"] = "called_off",
-                            ["onUnrelated"] = "suspend",
-                            ["slots"] = {
-                                ["location"] = {
-                                    ["owner"] = "travel.excursion.plan_exchange",
-                                    ["source"] = "slots.location.value",
-                                    ["type"] = "string",
-                                },
-                                ["threat"] = {
-                                    ["owner"] = "travel.excursion.plan_exchange",
-                                    ["source"] = "slots.threat.value",
-                                    ["type"] = "string",
-                                },
-                            },
-                        },
-                    },
-                    ["owner"] = "ProjectHoomans",
-                    ["version"] = 1,
-                },
-                ["replySemantics"] = {
-                    ["agreed"] = {
-                        ["outcome"] = "agreed",
-                        ["stance"] = "positive",
-                    },
-                    ["assessed"] = {
-                        ["outcome"] = "assessed",
-                        ["stance"] = "neutral",
-                    },
-                    ["deferred"] = {
-                        ["outcome"] = "deferred",
-                        ["stance"] = "contextual",
-                    },
-                    ["refused"] = {
-                        ["outcome"] = "refused",
-                        ["stance"] = "negative",
-                    },
-                },
-                ["triggers"] = {
-                    {
-                        ["intent"] = "SUGGEST",
-                        ["subject"] = "EXCURSION",
-                    },
-                    {
-                        ["intent"] = "QUESTION",
-                        ["subject"] = "ROUTE",
-                    },
-                },
-            },
-            ["repeatPolicy"] = "repeatable",
-            ["reply"] = {
-                ["agreed"] = {
-                    ["outcome"] = "agreed",
-                    ["say"] = {
-                        ["keyOrder"] = {
-                            "1",
-                        },
-                        ["mode"] = "single",
-                        ["realizations"] = {
-                            ["1"] = {
-                                ["key"] = "1",
-                                ["shorthand"] = true,
-                                ["variants"] = {
-                                    {
-                                        ["fallback"] = "Alright, {addressee.name}. Pack light, keep the crowbar handy, and we stick to the side streets.",
-                                        ["id"] = "default",
-                                    },
-                                },
-                            },
-                        },
-                        ["textRole"] = "response",
-                    },
-                    ["textRole"] = "response",
-                },
-                ["assessed"] = {
-                    ["outcome"] = "assessed",
-                    ["say"] = {
-                        ["keyOrder"] = {
-                            "1",
-                        },
-                        ["mode"] = "single",
-                        ["realizations"] = {
-                            ["1"] = {
-                                ["key"] = "1",
-                                ["shorthand"] = true,
-                                ["variants"] = {
-                                    {
-                                        ["fallback"] = "Roads looked quiet earlier {scene.location}, {addressee.name}, though there's always a few stragglers near the gas station.",
-                                        ["id"] = "default",
-                                    },
-                                },
-                            },
-                        },
-                        ["textRole"] = "response",
-                    },
-                    ["textRole"] = "response",
-                },
-                ["deferred"] = {
-                    ["outcome"] = "deferred",
-                    ["say"] = {
-                        ["keyOrder"] = {
-                            "1",
-                        },
-                        ["mode"] = "single",
-                        ["realizations"] = {
-                            ["1"] = {
-                                ["key"] = "1",
-                                ["shorthand"] = true,
-                                ["variants"] = {
-                                    {
-                                        ["fallback"] = "Better to wait for first light. Fog's too thick out by the highway right now.",
-                                        ["id"] = "default",
-                                    },
-                                },
-                            },
-                        },
-                        ["textRole"] = "response",
-                    },
-                    ["textRole"] = "response",
-                },
-                ["refused"] = {
-                    ["outcome"] = "refused",
-                    ["say"] = {
-                        ["keyOrder"] = {
-                            "1",
-                        },
-                        ["mode"] = "single",
-                        ["realizations"] = {
-                            ["1"] = {
-                                ["key"] = "1",
-                                ["shorthand"] = true,
-                                ["variants"] = {
-                                    {
-                                        ["fallback"] = "No sense going out there right now. Stay put until it's safe.",
-                                        ["id"] = "default",
-                                    },
-                                },
-                            },
-                        },
-                        ["textRole"] = "response",
-                    },
-                    ["textRole"] = "response",
-                },
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?",
-                                ["id"] = "default",
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["statePolicy"] = {
-                {
-                    ["admission"] = "no_op",
-                    ["id"] = "blocked_unsafe_or_hostile",
-                    ["outcome"] = "blocked",
-                    ["reason"] = "hostile_combat_or_incapacitated",
-                    ["replyOutcome"] = "refused",
-                    ["when"] = {
-                        ["any"] = {
-                            {
-                                ["op"] = "in",
-                                ["path"] = "npcState.activeBehavior",
-                                ["values"] = {
-                                    "hostile",
-                                    "combat",
-                                    "busy",
-                                    "dead",
-                                },
-                            },
-                            {
-                                ["op"] = "in",
-                                ["path"] = "situation.activeBehavior",
-                                ["values"] = {
-                                    "hostile",
-                                    "combat",
-                                    "busy",
-                                    "dead",
-                                },
-                            },
-                            {
-                                ["op"] = "in",
-                                ["path"] = "npcState.healthState",
-                                ["values"] = {
-                                    "dead",
-                                    "incapacitated",
-                                },
-                            },
-                            {
-                                ["op"] = "eq",
-                                ["path"] = "roles.hostile",
-                                ["value"] = true,
-                            },
-                        },
-                    },
-                },
-                {
-                    ["admission"] = "dispatch",
-                    ["id"] = "travel_excursion_ready",
-                    ["outcome"] = "actionable",
-                    ["reason"] = "ready",
-                },
-            },
-            ["topics"] = {
-                {
-                    ["domain"] = "travel",
-                    ["id"] = "excursion_planning",
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = nil,
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "travel.excursion.plan_exchange",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.travel.excursion.plan_exchange.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["roles"] = {
-            ["addressee"] = {
-                ["cardinality"] = "ONE",
-                ["kinds"] = {
-                    "actor",
-                },
-                ["role"] = "addressee",
-            },
-            ["speaker"] = {
-                ["cardinality"] = "ONE",
-                ["kinds"] = {
-                    "actor",
-                },
-                ["role"] = "speaker",
-            },
-        },
-        ["slots"] = {
-        },
-        ["sourceShard"] = "dialogue/thematic_interactive/travel_excursion_exchange.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
             {
-                ["fallback"] = "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.travel.excursion.plan_exchange.say.1.default",
-                ["variantID"] = "default",
-            },
-            {
-                ["fallback"] = "Alright, {addressee.name}. Pack light, keep the crowbar handy, and we stick to the side streets.",
-                ["outcome"] = "agreed",
+                ["fallback"] = "Enough looking back. Past won't bar tonight's windows.",
+                ["outcome"] = "withdraw",
                 ["realizationKey"] = "1",
                 ["role"] = "response",
-                ["templateID"] = "convo.travel.excursion.plan_exchange.reply.agreed.say.1.default",
-                ["variantID"] = "default",
-            },
-            {
-                ["fallback"] = "Roads looked quiet earlier {scene.location}, {addressee.name}, though there's always a few stragglers near the gas station.",
-                ["outcome"] = "assessed",
-                ["realizationKey"] = "1",
-                ["role"] = "response",
-                ["templateID"] = "convo.travel.excursion.plan_exchange.reply.assessed.say.1.default",
-                ["variantID"] = "default",
-            },
-            {
-                ["fallback"] = "Better to wait for first light. Fog's too thick out by the highway right now.",
-                ["outcome"] = "deferred",
-                ["realizationKey"] = "1",
-                ["role"] = "response",
-                ["templateID"] = "convo.travel.excursion.plan_exchange.reply.deferred.say.1.default",
-                ["variantID"] = "default",
-            },
-            {
-                ["fallback"] = "No sense going out there right now. Stay put until it's safe.",
-                ["outcome"] = "refused",
-                ["realizationKey"] = "1",
-                ["role"] = "response",
-                ["templateID"] = "convo.travel.excursion.plan_exchange.reply.refused.say.1.default",
+                ["templateID"] = "convo.social.identity.personal_history.reply.withdraw.say.1.default",
                 ["variantID"] = "default",
             },
         },

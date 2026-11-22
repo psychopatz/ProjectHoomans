@@ -1,8 +1,11 @@
 {
   "convo.combat.aftermath.debrief_exchange.reply.cleared.say.1.default": "Looks like the rest of them wandered off down the alley. Keep it quiet for a minute.",
+  "convo.combat.aftermath.debrief_exchange.reply.contradicted.say.1.default": "Those weren't raiders, {addressee.name}—some panicked kid set off a burglar alarm down the block.",
+  "convo.combat.aftermath.debrief_exchange.reply.corroborated.say.1.default": "Yeah, counted the same shots from the back window—there's still stragglers down that lane.",
   "convo.combat.aftermath.debrief_exchange.reply.debriefed.say.1.default": "Nothing through the jacket, thank God, {addressee.name}. Door's wedged shut—let's catch our breath and check our gear.",
   "convo.combat.aftermath.debrief_exchange.reply.refused.say.1.default": "Don't crowd me right now. Watch the window.",
   "convo.combat.aftermath.debrief_exchange.reply.shaken.say.1.default": "I'm not bit, just rattled. Give me a second to get my hands steady.",
+  "convo.combat.aftermath.debrief_exchange.reply.withdraw.say.1.default": "Talk later. Reloading first and bolting the back door.",
   "convo.combat.aftermath.debrief_exchange.say.1.default": "That got ugly fast, {addressee.name}. You catch any scratches or bites back there?",
   "convo.combat.assault.betrayal.say.1.aggressive": "Thought I was an easy target, huh?! Big mistake!",
   "convo.combat.assault.betrayal.say.1.aggressive.1": "Thought I was an easy target, huh?! Big mistake!",

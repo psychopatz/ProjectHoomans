@@ -77,6 +77,11 @@
             "id": "default"
           }
         ]
+      },
+      "after": {
+        "recommend": [
+          "wellbeing.needs.checkin"
+        ]
       }
     },
     "deferred": {
@@ -85,6 +90,11 @@
           {
             "id": "default"
           }
+        ]
+      },
+      "after": {
+        "recommend": [
+          "knowledge.gossip.exchange"
         ]
       }
     },
@@ -95,9 +105,60 @@
             "id": "default"
           }
         ]
+      },
+      "after": {
+        "recommend": [
+          "social.conflict.mediate_exchange"
+        ]
       }
     },
     "refused": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "volunteer": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
+      "after": {
+        "recommend": [
+          "wellbeing.needs.checkin"
+        ]
+      }
+    },
+    "negotiate": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
+      "after": {
+        "recommend": [
+          "social.conflict.mediate_exchange"
+        ]
+      }
+    },
+    "refuse_unsafe_work": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "reluctant": {
       "say": {
         "variants": [
           {
@@ -195,7 +256,7 @@
               "labelKey": "UI_PNC_ColonyWork_ClarifyTask_Label",
               "labelFallback": "Ask which job needs doing",
               "utteranceKey": "UI_PNC_ColonyWork_ClarifyTask_Utterance",
-              "utteranceFallback": "Are we talking about the back fence or the rain barrels?",
+              "utteranceFallback": "Are we patching the back fence or sorting the water barrels first?",
               "consumers": [
                 "participant"
               ],
@@ -206,11 +267,32 @@
               }
             },
             {
-              "id": "colony.work.defer_shift",
-              "labelKey": "UI_PNC_ColonyWork_DeferShift_Label",
-              "labelFallback": "Hold off until later",
-              "utteranceKey": "UI_PNC_ColonyWork_DeferShift_Utterance",
-              "utteranceFallback": "Better leave the hammering until morning.",
+              "id": "colony.work.volunteer_with_tools",
+              "labelKey": "UI_PNC_ColonyWork_VolunteerTools_Label",
+              "labelFallback": "Volunteer with spare hammer and nails",
+              "utteranceKey": "UI_PNC_ColonyWork_VolunteerTools_Utterance",
+              "utteranceFallback": "Already have hammer and nails clipped on my belt—let me take the hinge repair.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "OFFER",
+                "speechAct": "OFFER",
+                "subject": "COLONY_WORK",
+                "stateValue": "volunteer"
+              },
+              "constraints": {
+                "path": "inventory.hasTools",
+                "op": "eq",
+                "value": true
+              }
+            },
+            {
+              "id": "colony.work.pivot_utility_backup",
+              "labelKey": "UI_PNC_ColonyWork_UtilityBackup_Label",
+              "labelFallback": "Switch priority due to cutoff",
+              "utteranceKey": "UI_PNC_ColonyWork_UtilityBackup_Utterance",
+              "utteranceFallback": "Grid and taps are dead—rain catchment and generator fuel take priority over tidyups.",
               "consumers": [
                 "participant"
               ],
@@ -218,61 +300,241 @@
                 "intent": "SUGGEST",
                 "speechAct": "SUGGEST",
                 "subject": "COLONY_WORK",
+                "stateValue": "negotiate"
+              },
+              "constraints": {
+                "path": "worldKnowledge.powerOrWaterCutoff",
+                "op": "eq",
+                "value": true
+              }
+            },
+            {
+              "id": "colony.work.defer_shift",
+              "labelKey": "UI_PNC_ColonyWork_DeferShift_Label",
+              "labelFallback": "Hold off until later",
+              "utteranceKey": "UI_PNC_ColonyWork_DeferShift_Utterance",
+              "utteranceFallback": "Better leave heavy hammering until daylight.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "DEFER",
+                "speechAct": "DEFER",
+                "subject": "COLONY_WORK",
                 "stateValue": "deferred"
               }
-            }
-          ],
-          "accepts": [
-            {
-              "intent": "OFFER",
-              "speechAct": "OFFER",
-              "subject": "COLONY_WORK"
-            },
-            {
-              "intent": "SUGGEST",
-              "speechAct": "SUGGEST",
-              "subject": "COLONY_WORK",
-              "stateValue": "deferred"
-            },
-            {
-              "intent": "CLARIFY",
-              "speechAct": "CLARIFY",
-              "subject": "COLONY_WORK"
             }
           ],
           "onMatch": "confirm_assignment",
           "onClarify": "clarify_chore",
           "onRefuse": "declined",
-          "onUnrelated": "suspend"
-        },
-        "clarify_chore": {
-          "slots": {
-            "task": {
-              "type": "string",
-              "owner": "colony.work.status_exchange",
-              "source": "slots.task.value"
-            }
-          },
+          "onUnrelated": "suspend",
           "accepts": [
-            {
-              "intent": "INFORM",
-              "speechAct": "INFORM",
-              "subject": "COLONY_WORK"
-            },
             {
               "intent": "OFFER",
               "speechAct": "OFFER",
               "subject": "COLONY_WORK"
             },
             {
-              "intent": "AGREE",
-              "speechAct": "AGREE",
+              "intent": "CLARIFY",
+              "speechAct": "CLARIFY",
               "subject": "COLONY_WORK"
+            },
+            {
+              "intent": "OFFER",
+              "speechAct": "OFFER",
+              "subject": "COLONY_WORK",
+              "stateValue": "volunteer"
+            },
+            {
+              "intent": "SUGGEST",
+              "speechAct": "SUGGEST",
+              "subject": "COLONY_WORK",
+              "stateValue": "negotiate"
+            },
+            {
+              "intent": "DEFER",
+              "speechAct": "DEFER",
+              "subject": "COLONY_WORK",
+              "stateValue": "deferred"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ]
+        },
+        "clarify_chore": {
+          "branchOffers": [
+            {
+              "id": "colony.work.flag_outside_danger",
+              "labelKey": "UI_PNC_ColonyWork_UnsafeOutdoor_Label",
+              "labelFallback": "Refuse unsafe outside task",
+              "utteranceKey": "UI_PNC_ColonyWork_UnsafeOutdoor_Utterance",
+              "utteranceFallback": "Not banging nails outside while commotion's still active down the block.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "REFUSE",
+                "speechAct": "REFUSE",
+                "subject": "COLONY_WORK",
+                "stateValue": "refuse_unsafe_work"
+              },
+              "constraints": {
+                "path": "environment.outdoorHazard",
+                "op": "eq",
+                "value": true
+              }
+            },
+            {
+              "id": "colony.work.pick_interior_job",
+              "labelKey": "UI_PNC_ColonyWork_PickInside_Label",
+              "labelFallback": "Propose quieter indoor sorting",
+              "utteranceKey": "UI_PNC_ColonyWork_PickInside_Utterance",
+              "utteranceFallback": "Wait out the noise indoors sorting tools and boiling water instead.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "SUGGEST",
+                "speechAct": "SUGGEST",
+                "subject": "COLONY_WORK",
+                "stateValue": "negotiate"
+              }
+            },
+            {
+              "id": "colony.work.take_fence",
+              "labelKey": "UI_PNC_ColonyWork_TakeFence_Label",
+              "labelFallback": "Take perimeter reinforcement",
+              "utteranceKey": "UI_PNC_ColonyWork_TakeFence_Utterance",
+              "utteranceFallback": "Hand me planks—fence gap takes ten minutes to brace.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "OFFER",
+                "speechAct": "OFFER",
+                "subject": "COLONY_WORK",
+                "stateValue": "volunteer"
+              }
+            }
+          ],
+          "onMatch": "negotiate_terms",
+          "onClarify": "confirm_assignment",
+          "onRefuse": "refused_unsafe",
+          "onUnrelated": "suspend",
+          "accepts": [
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE",
+              "subject": "COLONY_WORK",
+              "stateValue": "refuse_unsafe_work"
+            },
+            {
+              "intent": "SUGGEST",
+              "speechAct": "SUGGEST",
+              "subject": "COLONY_WORK",
+              "stateValue": "negotiate"
+            },
+            {
+              "intent": "OFFER",
+              "speechAct": "OFFER",
+              "subject": "COLONY_WORK",
+              "stateValue": "volunteer"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ]
+        },
+        "negotiate_terms": {
+          "branchOffers": [
+            {
+              "id": "colony.work.trade_shift",
+              "labelKey": "UI_PNC_ColonyWork_TradeShift_Label",
+              "labelFallback": "Trade chore for off-watch rest",
+              "utteranceKey": "UI_PNC_ColonyWork_TradeShift_Utterance",
+              "utteranceFallback": "I'll haul the crates if you take first watch tonight.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "SUGGEST",
+                "speechAct": "SUGGEST",
+                "subject": "COLONY_WORK",
+                "stateValue": "negotiate"
+              },
+              "constraints": {
+                "path": "relationship.respect",
+                "op": "gte",
+                "value": 10
+              }
+            },
+            {
+              "id": "colony.work.admit_fatigue",
+              "labelKey": "UI_PNC_ColonyWork_Fatigue_Label",
+              "labelFallback": "Admit worn down",
+              "utteranceKey": "UI_PNC_ColonyWork_Fatigue_Utterance",
+              "utteranceFallback": "Arms are dead tired—give me lighter prep instead of timber lifting.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "COLONY_WORK",
+                "stateValue": "reluctant"
+              },
+              "constraints": {
+                "path": "npcState.fatigue",
+                "op": "gte",
+                "value": 55
+              }
+            },
+            {
+              "id": "colony.work.accept_split",
+              "labelKey": "UI_PNC_ColonyWork_AcceptSplit_Label",
+              "labelFallback": "Split the workload evenly",
+              "utteranceKey": "UI_PNC_ColonyWork_AcceptSplit_Utterance",
+              "utteranceFallback": "Pair up and we wrap both tasks in half the time.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "AGREE",
+                "speechAct": "AGREE",
+                "subject": "COLONY_WORK"
+              }
             }
           ],
           "onMatch": "confirm_assignment",
           "onRefuse": "declined",
-          "onUnrelated": "suspend"
+          "onUnrelated": "suspend",
+          "accepts": [
+            {
+              "intent": "SUGGEST",
+              "speechAct": "SUGGEST",
+              "subject": "COLONY_WORK",
+              "stateValue": "negotiate"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "COLONY_WORK",
+              "stateValue": "reluctant"
+            },
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE",
+              "subject": "COLONY_WORK"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ]
         },
         "confirm_assignment": {
           "branchOffers": [
@@ -294,19 +556,23 @@
             {
               "id": "colony.work.pause_later",
               "labelKey": "UI_PNC_ColonyWork_PauseLater_Label",
-              "labelFallback": "Pick it up later",
+              "labelFallback": "Pick it up at first light",
               "utteranceKey": "UI_PNC_ColonyWork_PauseLater_Utterance",
-              "utteranceFallback": "Keep an eye on it; we'll finish it at first light.",
+              "utteranceFallback": "Keep an eye on it; we'll button it up at first light.",
               "consumers": [
                 "participant"
               ],
               "frame": {
                 "intent": "DEFER",
                 "speechAct": "DEFER",
-                "subject": "COLONY_WORK"
+                "subject": "COLONY_WORK",
+                "stateValue": "deferred"
               }
             }
           ],
+          "onMatch": "agreed",
+          "onRefuse": "declined",
+          "onUnrelated": "suspend",
           "accepts": [
             {
               "intent": "AGREE",
@@ -314,19 +580,21 @@
               "subject": "COLONY_WORK"
             },
             {
-              "intent": "ACCEPT"
-            },
-            {
               "intent": "DEFER",
               "speechAct": "DEFER",
-              "subject": "COLONY_WORK"
+              "subject": "COLONY_WORK",
+              "stateValue": "deferred"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
             }
-          ],
-          "onMatch": "agreed",
-          "onRefuse": "declined",
-          "onUnrelated": "suspend"
+          ]
         },
         "agreed": {
+          "terminal": true
+        },
+        "refused_unsafe": {
           "terminal": true
         },
         "declined": {
@@ -350,6 +618,22 @@
       "refused": {
         "stance": "negative",
         "outcome": "refused"
+      },
+      "volunteer": {
+        "stance": "positive",
+        "outcome": "volunteer"
+      },
+      "negotiate": {
+        "stance": "contextual",
+        "outcome": "negotiate"
+      },
+      "refuse_unsafe_work": {
+        "stance": "negative",
+        "outcome": "refuse_unsafe_work"
+      },
+      "reluctant": {
+        "stance": "contextual",
+        "outcome": "reluctant"
       }
     }
   },

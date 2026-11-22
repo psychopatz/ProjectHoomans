@@ -33,6 +33,9 @@
     "reply.evasive.say.variants.default": "Hindi na mahalaga kung ano ako noon. Ang mahalaga lang ay kung ano'ng magpapabuhay sa atin ngayon.",
     "reply.evasive.say.variants.neutral": "Mahabang kuwento, at wala roon ang maglalagay ng pagkain sa bag natin.",
     "reply.refused.say.variants.default": "Mas gugustuhin kong huwag nang hukayin 'yan.",
-    "reply.refused.say.variants.negative": "Huwag mo nang itanong. Akin na lang ang nakaraan ko."
+    "reply.refused.say.variants.negative": "Huwag mo nang itanong. Akin na lang ang nakaraan ko.",
+    "reply.reveal_source.say.variants.default": "Sige, {addressee.name}—nagkahiwa-hiwalay ang dati naming grupo sa riles, roon galing ang dala ko.",
+    "reply.protect_source.say.variants.default": "Hindi ako magbibigay ng pangalan ng mga taong ayaw nang madawit pa sa gulo rito.",
+    "reply.withdraw.say.variants.default": "Tama na ang balik-tanaw. Hindi makakapagsara ng bintana ang nakaraan ngayong gabi."
   }
 }

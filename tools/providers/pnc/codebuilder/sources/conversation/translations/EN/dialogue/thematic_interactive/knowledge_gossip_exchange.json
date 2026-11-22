@@ -33,6 +33,12 @@
     "reply.uncertain.say.variants.default": "Heard folks talking about it, sure, but nobody I'd bet my boots on.",
     "reply.uncertain.say.variants.contextual": "Could be true, could be somebody spooked by shadows. Treat it like a rumor until you see it.",
     "reply.refused.say.variants.default": "I don't trade in gossip. Ask somebody else.",
-    "reply.refused.say.variants.negative": "Keep me out of it. Word gets around, and so does trouble."
+    "reply.refused.say.variants.negative": "Keep me out of it. Word gets around, and so does trouble.",
+    "reply.corroborated.say.variants.default": "That tracks with what I witnessed near {slot.location}, {addressee.name}. Same signs, same direction.",
+    "reply.corroborated.say.variants.contextual": "Both reports line up—between the emergency broadcast and firsthand sightings out by {slot.location}, we know it's real.",
+    "reply.contradicted.say.variants.default": "No, that doesn't square with what happened there. Somebody fed you a bad steer.",
+    "reply.reveal_source.say.variants.default": "I trust you enough to say it straight: spotted it with my own eyes along the shoulder past dusk.",
+    "reply.protect_source.say.variants.default": "Doesn't matter who brought word in. Take the warning, skip asking for names.",
+    "reply.withdraw.say.variants.default": "Look, drop it. We've both got ears and too much road left to argue rumor."
   }
 }

@@ -33,6 +33,12 @@
     "reply.declined.say.variants.default": "Ayos lang ako. Sarili mong dala ang intindihin mo.",
     "reply.declined.say.variants.negative": "Huwag mo akong intindihin. Kaya ko ang sarili ko.",
     "reply.evasive.say.variants.default": "Nakakaraos naman. Wala nang saysay magreklamo pa.",
-    "reply.evasive.say.variants.neutral": "Gaya rin ng iba—pagod, gutom, pero buhay pa."
+    "reply.evasive.say.variants.neutral": "Gaya rin ng iba—pagod, gutom, pero buhay pa.",
+    "reply.accept_treatment.say.variants.default": "Sige—balutin mo nang mahigpit bago madumihan. Salamat at may dala kang malinis na benda.",
+    "reply.refuse_treatment.say.variants.default": "Itabi mo muna ang benda para sa mas malala ang sugat—kaya ko ito mamaya.",
+    "reply.reluctant.say.variants.default": "Sige, tingnan mo nang mabilis, tapos balik agad sa pagbabantay.",
+    "reply.holding_up.say.variants.default": "Pagod na pagod na, oo, pero matibay pa rin ang tuhod at handang kumilos.",
+    "reply.strained.say.variants.default": "Nakakapagod na rin para sa lahat ngayong tuyo ang mga gripo, hindi lang sa akin.",
+    "reply.dismissed.say.variants.default": "Huwag mo akong asikasuhin. Hawakan mo na lang nang maayos ang sandata mo."
   }
 }

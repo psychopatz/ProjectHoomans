@@ -117,6 +117,12 @@
             "id": "contextual"
           }
         ]
+      },
+      "after": {
+        "recommend": [
+          "travel.excursion.plan_exchange",
+          "colony.work.status_exchange"
+        ]
       }
     },
     "unknown": {
@@ -141,6 +147,11 @@
             "id": "contextual"
           }
         ]
+      },
+      "after": {
+        "recommend": [
+          "social.conflict.mediate_exchange"
+        ]
       }
     },
     "refused": {
@@ -151,6 +162,70 @@
           },
           {
             "id": "negative"
+          }
+        ]
+      }
+    },
+    "corroborated": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          },
+          {
+            "id": "contextual"
+          }
+        ]
+      },
+      "after": {
+        "recommend": [
+          "travel.excursion.plan_exchange",
+          "colony.work.status_exchange"
+        ]
+      }
+    },
+    "contradicted": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
+      "after": {
+        "recommend": [
+          "combat.aftermath.debrief_exchange"
+        ]
+      }
+    },
+    "reveal_source": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
+      "after": {
+        "recommend": [
+          "social.identity.personal_history"
+        ]
+      }
+    },
+    "protect_source": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "withdraw": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
           }
         ]
       }
@@ -169,7 +244,12 @@
       "known",
       "unknown",
       "uncertain",
-      "refused"
+      "refused",
+      "corroborated",
+      "contradicted",
+      "reveal_source",
+      "protect_source",
+      "withdraw"
     ],
     "triggers": [
       {
@@ -251,10 +331,10 @@
           "branchOffers": [
             {
               "id": "knowledge.gossip.ask_roads",
-              "labelKey": "UI_PNC_Conversation_Suggestion_GossipAskRoads_Label",
+              "labelKey": "UI_PNC_Gossip_AskRoads_Label",
               "labelFallback": "Ask about nearby roads",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipAskRoads_Utterance",
-              "utteranceFallback": "Heard any word on whether the highway north is clear or choked with wrecks?",
+              "utteranceKey": "UI_PNC_Gossip_AskRoads_Utterance",
+              "utteranceFallback": "Heard any word on whether the main highway is clear or choked with wrecks?",
               "consumers": [
                 "participant"
               ],
@@ -266,10 +346,10 @@
             },
             {
               "id": "knowledge.gossip.share_rumor",
-              "labelKey": "UI_PNC_Conversation_Suggestion_GossipShareRumor_Label",
-              "labelFallback": "Share what you heard",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipShareRumor_Utterance",
-              "utteranceFallback": "Someone swore there's still power running in a few blocks west of here, though I haven't seen it myself.",
+              "labelKey": "UI_PNC_Gossip_ShareRumor_Label",
+              "labelFallback": "Pass on local rumor",
+              "utteranceKey": "UI_PNC_Gossip_ShareRumor_Utterance",
+              "utteranceFallback": "Folks down the block swore the intersection east of here isn't safe anymore.",
               "consumers": [
                 "participant"
               ],
@@ -281,10 +361,10 @@
             },
             {
               "id": "knowledge.gossip.clarify_source",
-              "labelKey": "UI_PNC_Conversation_Suggestion_GossipClarifySource_Label",
+              "labelKey": "UI_PNC_Gossip_ClarifySource_Label",
               "labelFallback": "Ask who saw it",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipClarifySource_Utterance",
-              "utteranceFallback": "Did you see that with your own eyes, or hear it secondhand?",
+              "utteranceKey": "UI_PNC_Gossip_ClarifySource_Utterance",
+              "utteranceFallback": "Did someone see that with their own eyes, or hear it secondhand?",
               "consumers": [
                 "participant"
               ],
@@ -293,8 +373,63 @@
                 "speechAct": "CLARIFY",
                 "subject": "RUMOR"
               }
+            },
+            {
+              "id": "knowledge.gossip.ask_helicopter",
+              "labelKey": "UI_PNC_Gossip_AskHeli_Label",
+              "labelFallback": "Ask about the helicopter",
+              "utteranceKey": "UI_PNC_Gossip_AskHeli_Utterance",
+              "utteranceFallback": "Did you catch which ridge the chopper banked toward before the rotortrail faded?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "NEWS",
+                "stateValue": "helicopter"
+              },
+              "constraints": {
+                "path": "worldKnowledge.hasHelicopter",
+                "op": "eq",
+                "value": true
+              }
+            },
+            {
+              "id": "knowledge.gossip.ask_cutoffs",
+              "labelKey": "UI_PNC_Gossip_AskCutoffs_Label",
+              "labelFallback": "Ask about power or water shutoff",
+              "utteranceKey": "UI_PNC_Gossip_AskCutoffs_Utterance",
+              "utteranceFallback": "Anyone still getting current or clean pressure since the grid gave out?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "NEWS",
+                "stateValue": "utility"
+              },
+              "constraints": {
+                "any": [
+                  {
+                    "path": "worldKnowledge.hasElectricityCutoff",
+                    "op": "eq",
+                    "value": true
+                  },
+                  {
+                    "path": "worldKnowledge.hasWaterCutoff",
+                    "op": "eq",
+                    "value": true
+                  }
+                ]
+              }
             }
           ],
+          "onMatch": "weigh_rumor",
+          "onClarify": "clarify_source",
+          "onRefuse": "refused_rumor",
+          "onUnrelated": "suspend",
           "accepts": [
             {
               "intent": "QUESTION",
@@ -312,41 +447,32 @@
               "subject": "RUMOR"
             },
             {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "NEWS",
+              "stateValue": "helicopter"
+            },
+            {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "NEWS",
+              "stateValue": "utility"
+            },
+            {
               "intent": "REFUSE",
               "speechAct": "REFUSE"
             }
-          ],
-          "onMatch": "weigh_rumor",
-          "onClarify": "clarify_source",
-          "onRefuse": "refused_rumor",
-          "onUnrelated": "suspend"
+          ]
         },
         "clarify_source": {
           "responsePool": "semantic.knowledge.gossip.exchange.clarify",
-          "slots": {
-            "person": {
-              "type": "string",
-              "owner": "social",
-              "source": "slots.person"
-            },
-            "location": {
-              "type": "string",
-              "owner": "world",
-              "source": "slots.location"
-            },
-            "event": {
-              "type": "string",
-              "owner": "world",
-              "source": "slots.event"
-            }
-          },
           "branchOffers": [
             {
               "id": "knowledge.gossip.confirm_firsthand",
-              "labelKey": "UI_PNC_Conversation_Suggestion_GossipFirsthand_Label",
+              "labelKey": "UI_PNC_Gossip_Firsthand_Label",
               "labelFallback": "Say you saw signs yourself",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipFirsthand_Utterance",
-              "utteranceFallback": "Saw the smoke from the rooftops two days back\u2014wasn't just radio talk.",
+              "utteranceKey": "UI_PNC_Gossip_Firsthand_Utterance",
+              "utteranceFallback": "Saw the smoke and bent guardrail from the corner—wasn't just radio static.",
               "consumers": [
                 "participant"
               ],
@@ -355,8 +481,73 @@
                 "speechAct": "INFORM",
                 "subject": "NEWS"
               }
+            },
+            {
+              "id": "knowledge.gossip.cite_radio",
+              "labelKey": "UI_PNC_Gossip_CiteRadio_Label",
+              "labelFallback": "Mention emergency broadcast",
+              "utteranceKey": "UI_PNC_Gossip_CiteRadio_Utterance",
+              "utteranceFallback": "Caught a broken relay on the emergency frequency calling it an active hazard.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "NEWS",
+                "stateValue": "radio"
+              },
+              "constraints": {
+                "path": "worldKnowledge.epistemicStatus",
+                "op": "in",
+                "values": [
+                  "known",
+                  "uncertain"
+                ]
+              }
+            },
+            {
+              "id": "knowledge.gossip.press_witness",
+              "labelKey": "UI_PNC_Gossip_PressWitness_Label",
+              "labelFallback": "Ask bystander to confirm",
+              "utteranceKey": "UI_PNC_Gossip_PressWitness_Utterance",
+              "utteranceFallback": "Hold on—they were standing right near the turnoff too. Did they see it?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "CLARIFY",
+                "speechAct": "CLARIFY",
+                "subject": "NEWS",
+                "stateValue": "witness"
+              },
+              "constraints": {
+                "path": "scene.hasThirdPartyWitness",
+                "op": "eq",
+                "value": true
+              }
+            },
+            {
+              "id": "knowledge.gossip.protect_source_ref",
+              "labelKey": "UI_PNC_Gossip_ProtectSource_Label",
+              "labelFallback": "Protect the source",
+              "utteranceKey": "UI_PNC_Gossip_ProtectSource_Utterance",
+              "utteranceFallback": "Who told me isn't the point—what matters is staying clear of that corner.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "RUMOR",
+                "stateValue": "protect_source"
+              }
             }
           ],
+          "onMatch": "probe_epistemic_basis",
+          "onClarify": "weigh_rumor",
+          "onRefuse": "refused_rumor",
+          "onUnrelated": "suspend",
           "accepts": [
             {
               "intent": "INFORM",
@@ -364,27 +555,141 @@
               "subject": "NEWS"
             },
             {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "NEWS",
+              "stateValue": "radio"
+            },
+            {
+              "intent": "CLARIFY",
+              "speechAct": "CLARIFY",
+              "subject": "NEWS",
+              "stateValue": "witness"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "RUMOR",
+              "stateValue": "protect_source"
+            },
+            {
               "intent": "REFUSE",
               "speechAct": "REFUSE"
             }
+          ]
+        },
+        "probe_epistemic_basis": {
+          "responsePool": "semantic.knowledge.gossip.exchange.clarify",
+          "branchOffers": [
+            {
+              "id": "knowledge.gossip.indoor_chopper_heard",
+              "labelKey": "UI_PNC_Gossip_IndoorHeard_Label",
+              "labelFallback": "Mention hearing it from indoors",
+              "utteranceKey": "UI_PNC_Gossip_IndoorHeard_Utterance",
+              "utteranceFallback": "Walls shook right overhead while I was shut inside, though I couldn't see its course.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "NEWS",
+                "stateValue": "environmental"
+              },
+              "constraints": {
+                "all": [
+                  {
+                    "path": "environment.isIndoors",
+                    "op": "eq",
+                    "value": true
+                  },
+                  {
+                    "path": "worldKnowledge.hasHelicopter",
+                    "op": "eq",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "id": "knowledge.gossip.outdoor_crash_seen",
+              "labelKey": "UI_PNC_Gossip_OutdoorSeen_Label",
+              "labelFallback": "Describe scene witnessed outdoors",
+              "utteranceKey": "UI_PNC_Gossip_OutdoorSeen_Utterance",
+              "utteranceFallback": "Passed the wreck out in the open—flashing lights dead, supplies scattered across the lane.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "NEWS",
+                "stateValue": "witnessed"
+              },
+              "constraints": {
+                "all": [
+                  {
+                    "path": "environment.isIndoors",
+                    "op": "eq",
+                    "value": false
+                  },
+                  {
+                    "path": "worldKnowledge.hasStoryDiscovery",
+                    "op": "eq",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "id": "knowledge.gossip.challenge_hearsay",
+              "labelKey": "UI_PNC_Gossip_ChallengeHearsay_Label",
+              "labelFallback": "Point out gaps in story",
+              "utteranceKey": "UI_PNC_Gossip_ChallengeHearsay_Utterance",
+              "utteranceFallback": "That sounds patched together secondhand. Which block are we actually talking about?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "CLARIFY",
+                "speechAct": "CLARIFY",
+                "subject": "RUMOR",
+                "stateValue": "uncertain"
+              }
+            }
           ],
           "onMatch": "weigh_rumor",
+          "onClarify": "cross_check_witness",
           "onRefuse": "refused_rumor",
-          "onUnrelated": "suspend"
+          "onUnrelated": "suspend",
+          "accepts": [
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "NEWS",
+              "stateValue": "environmental"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "NEWS",
+              "stateValue": "witnessed"
+            },
+            {
+              "intent": "CLARIFY",
+              "speechAct": "CLARIFY",
+              "subject": "RUMOR",
+              "stateValue": "uncertain"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ]
         },
         "weigh_rumor": {
           "responsePool": "semantic.knowledge.gossip.exchange.weigh",
           "slots": {
-            "location": {
-              "type": "string",
-              "owner": "world",
-              "source": "slots.location"
-            },
-            "event": {
-              "type": "string",
-              "owner": "world",
-              "source": "slots.event"
-            },
             "item": {
               "type": "string",
               "owner": "inventory",
@@ -394,25 +699,25 @@
           "branchOffers": [
             {
               "id": "knowledge.gossip.mark_known",
-              "labelKey": "UI_PNC_Conversation_Suggestion_GossipConfirm_Label",
-              "labelFallback": "Confirm the details",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipConfirm_Utterance",
-              "utteranceFallback": "Lines up with what I saw near the strip mall\u2014worth keeping in mind.",
+              "labelKey": "UI_PNC_Gossip_Confirm_Label",
+              "labelFallback": "Corroborate the account",
+              "utteranceKey": "UI_PNC_Gossip_Confirm_Utterance",
+              "utteranceFallback": "Lines up with everything we've seen near that bend—worth treating as fact.",
               "consumers": [
                 "participant"
               ],
               "frame": {
                 "intent": "AGREE",
                 "speechAct": "AGREE",
-                "stateValue": "known"
+                "stateValue": "corroborated"
               }
             },
             {
               "id": "knowledge.gossip.mark_uncertain",
-              "labelKey": "UI_PNC_Conversation_Suggestion_GossipDoubt_Label",
-              "labelFallback": "Stay skeptical",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipDoubt_Utterance",
-              "utteranceFallback": "Could be true, could be folks talking out of fear. I wouldn't bet my neck on it.",
+              "labelKey": "UI_PNC_Gossip_Doubt_Label",
+              "labelFallback": "Flag as unverified",
+              "utteranceKey": "UI_PNC_Gossip_Doubt_Utterance",
+              "utteranceFallback": "Could be real, could be nerves playing tricks. Let's mark it unconfirmed.",
               "consumers": [
                 "participant"
               ],
@@ -422,36 +727,167 @@
                 "subject": "RUMOR",
                 "stateValue": "uncertain"
               }
+            },
+            {
+              "id": "knowledge.gossip.contradict_claim",
+              "labelKey": "UI_PNC_Gossip_Contradict_Label",
+              "labelFallback": "Contradict bad intel",
+              "utteranceKey": "UI_PNC_Gossip_Contradict_Utterance",
+              "utteranceFallback": "I walked past that street this morning—none of that wreck story holds up.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "DISAGREE",
+                "speechAct": "DISAGREE",
+                "subject": "RUMOR",
+                "stateValue": "contradicted"
+              }
+            },
+            {
+              "id": "knowledge.gossip.vouch_trusted",
+              "labelKey": "UI_PNC_Gossip_VouchTrusted_Label",
+              "labelFallback": "Share source privately",
+              "utteranceKey": "UI_PNC_Gossip_VouchTrusted_Utterance",
+              "utteranceFallback": "Between us, it came from our own scout before dawn—so keep your guard up.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "NEWS",
+                "stateValue": "reveal_source"
+              },
+              "constraints": {
+                "path": "relationship.trust",
+                "op": "gte",
+                "value": 25
+              }
             }
           ],
+          "onMatch": "cross_check_witness",
+          "onClarify": "close_exchange",
+          "onRefuse": "refused_rumor",
+          "onUnrelated": "suspend",
           "accepts": [
             {
               "intent": "AGREE",
-              "speechAct": "AGREE"
+              "speechAct": "AGREE",
+              "stateValue": "corroborated"
             },
             {
               "intent": "INFORM",
               "speechAct": "INFORM",
-              "subject": "RUMOR"
+              "subject": "RUMOR",
+              "stateValue": "uncertain"
+            },
+            {
+              "intent": "DISAGREE",
+              "speechAct": "DISAGREE",
+              "subject": "RUMOR",
+              "stateValue": "contradicted"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "NEWS",
+              "stateValue": "reveal_source"
             },
             {
               "intent": "REFUSE",
               "speechAct": "REFUSE"
             }
+          ]
+        },
+        "cross_check_witness": {
+          "responsePool": "semantic.knowledge.gossip.exchange.weigh",
+          "branchOffers": [
+            {
+              "id": "knowledge.gossip.witness_corroborates",
+              "labelKey": "UI_PNC_Gossip_WitnessCorroborate_Label",
+              "labelFallback": "Confirm alongside bystander",
+              "utteranceKey": "UI_PNC_Gossip_WitnessCorroborate_Utterance",
+              "utteranceFallback": "Right—three separate folks pointing at the same stretch means we reroute.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "AGREE",
+                "speechAct": "AGREE",
+                "stateValue": "corroborated"
+              },
+              "constraints": {
+                "path": "scene.hasThirdPartyWitness",
+                "op": "eq",
+                "value": true
+              }
+            },
+            {
+              "id": "knowledge.gossip.note_for_patrol",
+              "labelKey": "UI_PNC_Gossip_NotePatrol_Label",
+              "labelFallback": "Flag for next patrol",
+              "utteranceKey": "UI_PNC_Gossip_NotePatrol_Utterance",
+              "utteranceFallback": "Log the location and move on; next team heading east will double-check it.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "ACKNOWLEDGE",
+                "speechAct": "ACKNOWLEDGE",
+                "subject": "NEWS"
+              }
+            },
+            {
+              "id": "knowledge.gossip.drop_topic",
+              "labelKey": "UI_PNC_Gossip_DropTopic_Label",
+              "labelFallback": "End rumor check",
+              "utteranceKey": "UI_PNC_Gossip_DropTopic_Utterance",
+              "utteranceFallback": "We've spent enough breath on rumors. Leave it at that.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "REFUSE",
+                "speechAct": "REFUSE",
+                "stateValue": "withdraw"
+              }
+            }
           ],
           "onMatch": "close_exchange",
           "onRefuse": "refused_rumor",
-          "onUnrelated": "suspend"
+          "onUnrelated": "suspend",
+          "accepts": [
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE",
+              "stateValue": "corroborated"
+            },
+            {
+              "intent": "ACKNOWLEDGE",
+              "speechAct": "ACKNOWLEDGE",
+              "subject": "NEWS"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE",
+              "stateValue": "withdraw"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ]
         },
         "close_exchange": {
           "responsePool": "semantic.knowledge.gossip.exchange.close",
           "branchOffers": [
             {
               "id": "knowledge.gossip.thank_word",
-              "labelKey": "UI_PNC_Conversation_Suggestion_GossipThanks_Label",
+              "labelKey": "UI_PNC_Gossip_Thanks_Label",
               "labelFallback": "Thank for the heads-up",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_GossipThanks_Utterance",
-              "utteranceFallback": "Good to know. If you hear anything else on the radio or the road, pass it along.",
+              "utteranceKey": "UI_PNC_Gossip_Thanks_Utterance",
+              "utteranceFallback": "Good to know. Anything else over the air or down the road, pass it along.",
               "consumers": [
                 "participant"
               ],
@@ -459,8 +895,39 @@
                 "intent": "THANK",
                 "speechAct": "THANK"
               }
+            },
+            {
+              "id": "knowledge.gossip.agree_share",
+              "labelKey": "UI_PNC_Gossip_AgreeShare_Label",
+              "labelFallback": "Promise to share updates",
+              "utteranceKey": "UI_PNC_Gossip_AgreeShare_Utterance",
+              "utteranceFallback": "Deal—I'll swing back with word if anything shifts around that block.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "ACCEPT",
+                "speechAct": "ACCEPT"
+              }
+            },
+            {
+              "id": "knowledge.gossip.stay_silent",
+              "labelKey": "UI_PNC_Gossip_Withdraw_Label",
+              "labelFallback": "Keep own counsel",
+              "utteranceKey": "UI_PNC_Gossip_Withdraw_Utterance",
+              "utteranceFallback": "Not trading any more talk today. Stay sharp out there.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "REFUSE",
+                "speechAct": "REFUSE"
+              }
             }
           ],
+          "onMatch": "complete",
+          "onRefuse": "refused_rumor",
+          "onUnrelated": "suspend",
           "accepts": [
             {
               "intent": "THANK",
@@ -474,10 +941,7 @@
               "intent": "REFUSE",
               "speechAct": "REFUSE"
             }
-          ],
-          "onMatch": "complete",
-          "onRefuse": "refused_rumor",
-          "onUnrelated": "suspend"
+          ]
         },
         "refused_rumor": {
           "terminal": true,
@@ -487,6 +951,48 @@
           "terminal": true,
           "responsePool": "semantic.knowledge.gossip.exchange.complete"
         }
+      }
+    },
+    "replySemantics": {
+      "blocked": {
+        "stance": "negative",
+        "outcome": "blocked"
+      },
+      "known": {
+        "stance": "positive",
+        "outcome": "known"
+      },
+      "unknown": {
+        "stance": "neutral",
+        "outcome": "unknown"
+      },
+      "uncertain": {
+        "stance": "contextual",
+        "outcome": "uncertain"
+      },
+      "refused": {
+        "stance": "negative",
+        "outcome": "refused"
+      },
+      "corroborated": {
+        "stance": "positive",
+        "outcome": "corroborated"
+      },
+      "contradicted": {
+        "stance": "negative",
+        "outcome": "contradicted"
+      },
+      "reveal_source": {
+        "stance": "positive",
+        "outcome": "reveal_source"
+      },
+      "protect_source": {
+        "stance": "contextual",
+        "outcome": "protect_source"
+      },
+      "withdraw": {
+        "stance": "negative",
+        "outcome": "withdraw"
       }
     }
   },

@@ -7,6 +7,11 @@
     "reply.reconciled.say.variants.default": "Sige, {addressee.name}. Lahat tayo pagod at kulang sa tulog. Hatiin natin nang pantay ang bantay at kalimutan na ito.",
     "reply.deferred.say.variants.default": "Sige. Palamig muna tayo at pag-usapan kapag nakainom ng tubig at nakapahinga.",
     "reply.acknowledged.say.variants.default": "Naiintindihan kita, {addressee.name}. Walang may gustong manlamang dito—kailangan lang ng malinaw na usapan.",
-    "reply.strained.say.variants.default": "Hayaan na. Walang kuwenta makipag-usap kung walang nakikinig."
+    "reply.strained.say.variants.default": "Hayaan na. Walang kuwenta makipag-usap kung walang nakikinig.",
+    "reply.apologize.say.variants.default": "Tama ka—nasobrahan ako sa sigaw tungkol sa rasyon. Kasalanan ko iyon, {addressee.name}.",
+    "reply.defend.say.variants.default": "Teka—wala akong tinago. May ibang naglipat ng mga kahon bago ang pagpapalit ng bantay.",
+    "reply.challenge.say.variants.default": "Ulitin mo iyan sa harap ko kung iniisip mong ako ang nandadaya rito.",
+    "reply.mediate.say.variants.default": "Pareho kayong may punto—ilatag natin ang listahan sa mesa at ayusin nang patas ang bantay.",
+    "reply.withdraw.say.variants.default": "Lalayo muna ako bago pa mauwi sa sigawan na makakahatak ng mga patay sa bakod."
   }
 }

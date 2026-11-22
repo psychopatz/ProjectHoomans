@@ -7,6 +7,10 @@
     "reply.agreed.say.variants.default": "Sige, {addressee.name}. Kumuha ka ng martilyo at pako—tapusin natin ito bago dumilim.",
     "reply.deferred.say.variants.default": "Sige, tama lang. Bukas na natin pukpukin iyan para hindi tayo makatawag ng pansin.",
     "reply.checked_in.say.variants.default": "Kaya pa naman sa ngayon {scene.location}, {addressee.name}, kailangan lang ng dagdag na kamay kapag tahimik na.",
-    "reply.refused.say.variants.default": "Hindi ito ang oras para sa gawaing-kampo. Bantayan mo muna ang bakuran."
+    "reply.refused.say.variants.default": "Hindi ito ang oras para sa gawaing-kampo. Bantayan mo muna ang bakuran.",
+    "reply.volunteer.say.variants.default": "Akin na ang bareta—ako na ang tatapos niyan ngayon para hindi doble-doble ang pagod natin.",
+    "reply.negotiate.say.variants.default": "Magbubuhat ako ng kahoy, {addressee.name}, basta may kahati ako sa bantay pagkagat ng dilim.",
+    "reply.refuse_unsafe_work.say.variants.default": "Hindi ako lalabas sa bukas na bubong habang may pumipito at nagpuputukan sa kabilang kanto.",
+    "reply.reluctant.say.variants.default": "Sige na nga, kahit masakit ang likod ko—bilisan lang natin at tahimik."
   }
 }

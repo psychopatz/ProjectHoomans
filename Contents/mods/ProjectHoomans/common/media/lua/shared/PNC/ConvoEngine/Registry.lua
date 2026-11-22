@@ -9,7 +9,7 @@ Registry.REGISTRY_MODULE = "PNC/ConvoEngine/Registry"
 Registry.SCHEMA = "pnc.conversation.model.v1"
 Registry.VERSION = 1
 Registry.CONTENT_FINGERPRINT = "0c0dd14df241eb4b742a95ede0729f2131a3ac66d66cb1497ea50aff9d9e9e39"
-Registry.WHOLE_MODEL_FINGERPRINT = "f1374a1cb1d9ec20cfaeba40b81fb2f42eddc957eef6c7cb6314adf19e4fe8f6"
+Registry.WHOLE_MODEL_FINGERPRINT = "61a1db0a97629a3a2f1e3b821a4c32050ace38f8a670edb81cb460cd731cbbf5"
 Registry.PHRASE_FAMILIES = {}
 Registry.PLAYER_CHOICES = {}
 Registry.PATTERNS = {}
@@ -212,9 +212,10 @@ appendConvoPlans(require "PNC/ConvoEngine/Dialogue/SocialToolRepliesBoundaryIden
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/StaticSuggestionText")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskLifecycle")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/TaskToolReplies")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/ThematicInteractive/ColonyWorkStatusExchangeToSocialConflictMediateExchange")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/ThematicInteractive/SocialGreetingFirstContactToTravelExcursionPlanExchange")
-appendConvoPlans(require "PNC/ConvoEngine/Dialogue/ThematicInteractive/WellbeingNeedsCheckin")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/ThematicInteractive/ColonyWorkStatusExchangeToCombatAftermathDebriefExchange")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/ThematicInteractive/KnowledgeGossipExchangeToSocialConflictMediateExchange")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/ThematicInteractive/GreetingFirstContactToIdentityPersonalHistory")
+appendConvoPlans(require "PNC/ConvoEngine/Dialogue/ThematicInteractive/TravelExcursionPlanExchangeToWellbeingNeedsCheckin")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/WellbeingContent")
 appendConvoPlans(require "PNC/ConvoEngine/Dialogue/WorldEventBeats")
 appendConvoPlans(require "PsychopatzCore/ConvoEngine/Beat/Social/Conflict")

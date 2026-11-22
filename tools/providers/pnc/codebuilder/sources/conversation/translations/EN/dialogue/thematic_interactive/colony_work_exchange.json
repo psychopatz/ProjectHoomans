@@ -7,6 +7,10 @@
     "reply.agreed.say.variants.default": "Good, {addressee.name}. Grab a hammer and some nails—we'll get it buttoned up before dark.",
     "reply.deferred.say.variants.default": "Fair enough. Let's leave the heavy hammering until morning so we don't draw anything.",
     "reply.checked_in.say.variants.default": "It's holding for now {scene.location}, {addressee.name}, just needs another pair of hands when we get a quiet hour.",
-    "reply.refused.say.variants.default": "Not the time for chores. Keep your eyes on the yard."
+    "reply.refused.say.variants.default": "Not the time for chores. Keep your eyes on the yard.",
+    "reply.volunteer.say.variants.default": "Hand me the crowbar—I'll knock that job out right now so nobody pulls double duty.",
+    "reply.negotiate.say.variants.default": "I'll haul timber for you, {addressee.name}, as long as somebody splits dusk watch with me.",
+    "reply.refuse_unsafe_work.say.variants.default": "Not walking out on an open roof while alarms and shots are echoing two blocks away.",
+    "reply.reluctant.say.variants.default": "Alright, though my back's tight—we're keeping it brief and quiet."
   }
 }

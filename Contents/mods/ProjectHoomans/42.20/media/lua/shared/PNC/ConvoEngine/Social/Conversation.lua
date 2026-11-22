@@ -19,7 +19,7 @@ PNC.ConvoEngine.SocialConversation = Conversation
 
 Conversation.VERSION = 1
 Conversation.MAX_HISTORY = 8
-Conversation.MAX_STEPS = 6
+Conversation.MAX_STEPS = 8
 Conversation.INTERJECTION_SCORE = 0.72
 Conversation.INTERJECTION_MOTIVES = {
     WARN = true,
@@ -27,6 +27,26 @@ Conversation.INTERJECTION_MOTIVES = {
     SOCIALIZE = true,
     DISPUTE = true,
     COORDINATE = true,
+    INFORM = true,
+    CHECK = true,
+    REPAIR = true,
+    MEDIATE = true,
+    EPISTEMIC = true,
+}
+
+local INTERJECTION_OUTCOME_BY_STRATEGY = {
+    CORROBORATE = "witness_corroborates",
+    CONFIRM_FACT = "witness_corroborates",
+    AGREE = "witness_corroborates",
+    CONTRADICT = "witness_contradicts",
+    DISAGREE = "witness_contradicts",
+    MEDIATE = "mediator_deescalates",
+    DEESCALATE = "mediator_deescalates",
+    REFUSE_INTERVENTION = "refuse_intervention",
+    REFUSE = "refuse_intervention",
+    ADD_FACT = "third_party_adds_fact",
+    INFORM = "third_party_adds_fact",
+    REVEAL_SOURCE = "third_party_adds_fact",
 }
 
 local function copy(value, depth)
@@ -260,6 +280,11 @@ function Conversation.New(options)
             semanticContextState = scene.semanticState,
             affordanceRecentTurns = copy(self:History(scene.id)),
             affordanceRecipientRef = targetID,
+            worldKnowledge = copy(social.worldKnowledge or participant.worldKnowledge),
+            epistemic = copy(social.epistemic or participant.epistemic),
+            environment = copy(social.environment or participant.environment),
+            condition = copy(social.condition or projected.condition),
+            inventory = copy(social.inventory or participant.inventory),
         }
         local frontier = Affordances.collectForResponder(
             affordanceContext, responder
@@ -271,6 +296,9 @@ function Conversation.New(options)
             silenceThreshold = social.silenceThreshold,
             allowedStrategies = social.allowedStrategies,
             forbiddenStrategies = social.forbiddenStrategies,
+            epistemic = affordanceContext.epistemic,
+            worldKnowledge = affordanceContext.worldKnowledge,
+            condition = affordanceContext.condition,
         })
         choice.targetID = targetID
         choice.frontierCount = #frontier
@@ -324,6 +352,11 @@ function Conversation.New(options)
                             >= Conversation.INTERJECTION_SCORE
                     then
                         local actor = choices[actorID]
+                        local selectedStrategy = string.upper(tostring(actor.selected and actor.selected.strategy or ""))
+                        local interOutcome = INTERJECTION_OUTCOME_BY_STRATEGY[selectedStrategy]
+                            or (participant.role == "mediator" and "mediator_deescalates")
+                            or (participant.role == "witness" and "witness_corroborates")
+                            or nil
                         interjections[actorID] = {
                             allowed = true,
                             priority = math.max(
@@ -331,6 +364,8 @@ function Conversation.New(options)
                                 (tonumber(actor.selectedScore) or 0) - 0.6
                             ),
                             motive = social.motive,
+                            role = participant.role,
+                            outcome = interOutcome,
                         }
                     end
                 end
@@ -472,6 +507,8 @@ function Conversation.New(options)
                 recipientID = turn.targetID,
                 strategy = candidate.strategy,
                 stance = candidate.stance,
+                outcome = turn.interjectionOutcome or candidate.outcome,
+                interjectionRole = turn.interjectionRole,
                 text = candidate.display
                     and (candidate.display.utterance
                         or candidate.display.label),

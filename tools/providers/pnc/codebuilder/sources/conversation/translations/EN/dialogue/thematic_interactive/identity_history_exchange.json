@@ -33,6 +33,9 @@
     "reply.evasive.say.variants.default": "Doesn't matter much what I did before. Only matters what keeps us alive today.",
     "reply.evasive.say.variants.neutral": "Long story, and none of it puts food in a pack.",
     "reply.refused.say.variants.default": "I'd rather not dig into all that.",
-    "reply.refused.say.variants.negative": "Drop it. My past is my own business."
+    "reply.refused.say.variants.negative": "Drop it. My past is my own business.",
+    "reply.reveal_source.say.variants.default": "Alright, {addressee.name}—our old crew split near the rail yard, and that's where I got my rig.",
+    "reply.protect_source.say.variants.default": "Not giving names for folks who didn't ask to be dragged back into Knox County's mess.",
+    "reply.withdraw.say.variants.default": "Enough looking back. Past won't bar tonight's windows."
   }
 }

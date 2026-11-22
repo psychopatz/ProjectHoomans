@@ -95,6 +95,8 @@ function TurnPolicy.Select(spec)
                 row.reason = "explicit_interjection"
                 row.choice = choice
                 row.motive = interjection.motive
+                row.interjectionRole = interjection.role
+                row.interjectionOutcome = interjection.outcome
             else
                 row.reason = "interjection_not_eligible"
             end
@@ -162,6 +164,8 @@ function TurnPolicy.Select(spec)
         targetID = winner.targetID,
         choice = winner.choice,
         motive = winner.motive,
+        interjectionRole = winner.interjectionRole,
+        interjectionOutcome = winner.interjectionOutcome,
         reason = winner.reason,
         rows = rows,
     }

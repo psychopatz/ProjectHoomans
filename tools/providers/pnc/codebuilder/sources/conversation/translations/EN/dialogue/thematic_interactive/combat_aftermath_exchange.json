@@ -7,6 +7,9 @@
     "reply.debriefed.say.variants.default": "Nothing through the jacket, thank God, {addressee.name}. Door's wedged shut—let's catch our breath and check our gear.",
     "reply.cleared.say.variants.default": "Looks like the rest of them wandered off down the alley. Keep it quiet for a minute.",
     "reply.shaken.say.variants.default": "I'm not bit, just rattled. Give me a second to get my hands steady.",
-    "reply.refused.say.variants.default": "Don't crowd me right now. Watch the window."
+    "reply.refused.say.variants.default": "Don't crowd me right now. Watch the window.",
+    "reply.corroborated.say.variants.default": "Yeah, counted the same shots from the back window—there's still stragglers down that lane.",
+    "reply.contradicted.say.variants.default": "Those weren't raiders, {addressee.name}—some panicked kid set off a burglar alarm down the block.",
+    "reply.withdraw.say.variants.default": "Talk later. Reloading first and bolting the back door."
   }
 }

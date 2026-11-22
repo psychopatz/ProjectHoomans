@@ -77,6 +77,11 @@
             "id": "default"
           }
         ]
+      },
+      "after": {
+        "recommend": [
+          "wellbeing.needs.checkin"
+        ]
       }
     },
     "cleared": {
@@ -85,6 +90,11 @@
           {
             "id": "default"
           }
+        ]
+      },
+      "after": {
+        "recommend": [
+          "colony.work.status_exchange"
         ]
       }
     },
@@ -95,9 +105,47 @@
             "id": "default"
           }
         ]
+      },
+      "after": {
+        "recommend": [
+          "wellbeing.needs.checkin"
+        ]
       }
     },
     "refused": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "corroborated": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
+      "after": {
+        "recommend": [
+          "wellbeing.needs.checkin",
+          "travel.excursion.plan_exchange"
+        ]
+      }
+    },
+    "contradicted": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "withdraw": {
       "say": {
         "variants": [
           {
@@ -178,63 +226,154 @@
             {
               "id": "combat.aftermath.check_wounds",
               "labelKey": "UI_PNC_CombatAftermath_CheckWounds_Label",
-              "labelFallback": "Check for bites or tears",
+              "labelFallback": "Check injuries and bites",
               "utteranceKey": "UI_PNC_CombatAftermath_CheckWounds_Utterance",
-              "utteranceFallback": "You alright? Any scratches or rips in your jacket?",
+              "utteranceFallback": "Anybody get scratched or bitten in that scramble?",
               "consumers": [
                 "participant"
               ],
               "frame": {
                 "intent": "QUESTION",
                 "speechAct": "QUESTION",
-                "subject": "WELLBEING"
+                "subject": "COMBAT_AFTERMATH"
               }
             },
             {
               "id": "combat.aftermath.secure_area",
               "labelKey": "UI_PNC_CombatAftermath_SecureArea_Label",
-              "labelFallback": "Bar the back door",
+              "labelFallback": "Confirm doors and sightlines clear",
               "utteranceKey": "UI_PNC_CombatAftermath_SecureArea_Utterance",
-              "utteranceFallback": "I'll wedge a chair under the back door while you catch your breath.",
+              "utteranceFallback": "Back door's barred, porch is clear—catch a breath and reload.",
               "consumers": [
                 "participant"
               ],
               "frame": {
-                "intent": "OFFER",
-                "speechAct": "OFFER",
+                "intent": "INFORM",
+                "speechAct": "INFORM",
                 "subject": "COMBAT_AFTERMATH"
+              }
+            },
+            {
+              "id": "combat.aftermath.report_gunfire_source",
+              "labelKey": "UI_PNC_CombatAftermath_Gunfire_Label",
+              "labelFallback": "Report nearby gunfire or alarm",
+              "utteranceKey": "UI_PNC_CombatAftermath_Gunfire_Utterance",
+              "utteranceFallback": "Those shots and that siren a block east are going to pull every shambler this way.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "WARN",
+                "speechAct": "WARN",
+                "subject": "COMBAT_AFTERMATH",
+                "stateValue": "gunfire"
+              },
+              "constraints": {
+                "path": "worldKnowledge.recentGunfireOrAlarm",
+                "op": "eq",
+                "value": true
+              }
+            },
+            {
+              "id": "combat.aftermath.triage_cut",
+              "labelKey": "UI_PNC_CombatAftermath_TriageCut_Label",
+              "labelFallback": "Ask partner to look at wound",
+              "utteranceKey": "UI_PNC_CombatAftermath_TriageCut_Utterance",
+              "utteranceFallback": "Think glass tore my sleeve back there—keep watch while I check.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "REQUEST",
+                "speechAct": "REQUEST",
+                "subject": "COMBAT_AFTERMATH",
+                "stateValue": "injured"
+              },
+              "constraints": {
+                "path": "npcState.injured",
+                "op": "eq",
+                "value": true
               }
             }
           ],
+          "onMatch": "assess_aftermath",
+          "onClarify": "verify_perimeter",
+          "onRefuse": "shaken_withdrawal",
+          "onUnrelated": "suspend",
           "accepts": [
             {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
-              "subject": "WELLBEING"
-            },
-            {
-              "intent": "OFFER",
-              "speechAct": "OFFER",
               "subject": "COMBAT_AFTERMATH"
             },
             {
               "intent": "INFORM",
               "speechAct": "INFORM",
-              "subject": "WELLBEING"
+              "subject": "COMBAT_AFTERMATH"
+            },
+            {
+              "intent": "WARN",
+              "speechAct": "WARN",
+              "subject": "COMBAT_AFTERMATH",
+              "stateValue": "gunfire"
+            },
+            {
+              "intent": "REQUEST",
+              "speechAct": "REQUEST",
+              "subject": "COMBAT_AFTERMATH",
+              "stateValue": "injured"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
             }
-          ],
-          "onMatch": "assess_aftermath",
-          "onRefuse": "shaken_withdrawal",
-          "onUnrelated": "suspend"
+          ]
         },
-        "assess_aftermath": {
+        "verify_perimeter": {
           "branchOffers": [
             {
-              "id": "combat.aftermath.steady_down",
-              "labelKey": "UI_PNC_CombatAftermath_SteadyDown_Label",
-              "labelFallback": "Confirm the alley is clear",
-              "utteranceKey": "UI_PNC_CombatAftermath_SteadyDown_Utterance",
-              "utteranceFallback": "Looks like we lost the rest of them down the side street.",
+              "id": "combat.aftermath.witness_direction",
+              "labelKey": "UI_PNC_CombatAftermath_WitnessDir_Label",
+              "labelFallback": "Cross-check direction with witness",
+              "utteranceKey": "UI_PNC_CombatAftermath_WitnessDir_Utterance",
+              "utteranceFallback": "Ask them too—pretty sure the noise peeled off down the alley, not toward us.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "CLARIFY",
+                "speechAct": "CLARIFY",
+                "subject": "COMBAT_AFTERMATH",
+                "stateValue": "corroborated"
+              },
+              "constraints": {
+                "path": "scene.hasThirdPartyWitness",
+                "op": "eq",
+                "value": true
+              }
+            },
+            {
+              "id": "combat.aftermath.contradict_raid",
+              "labelKey": "UI_PNC_CombatAftermath_Contradict_Label",
+              "labelFallback": "Clarify it was only a false alarm",
+              "utteranceKey": "UI_PNC_CombatAftermath_Contradict_Utterance",
+              "utteranceFallback": "Hold steady—it wasn't an ambush, just an old burglar siren triggering down the street.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "DISAGREE",
+                "speechAct": "DISAGREE",
+                "subject": "COMBAT_AFTERMATH",
+                "stateValue": "contradicted"
+              }
+            },
+            {
+              "id": "combat.aftermath.bolt_entry",
+              "labelKey": "UI_PNC_CombatAftermath_BoltEntry_Label",
+              "labelFallback": "Report perimeter secured",
+              "utteranceKey": "UI_PNC_CombatAftermath_BoltEntry_Utterance",
+              "utteranceFallback": "Shutters latched and deadbolts turned. Nothing's stepping over the threshold.",
               "consumers": [
                 "participant"
               ],
@@ -242,48 +381,284 @@
                 "intent": "INFORM",
                 "speechAct": "INFORM",
                 "subject": "COMBAT_AFTERMATH",
-                "stateValue": "clear"
+                "stateValue": "cleared"
+              }
+            }
+          ],
+          "onMatch": "assess_aftermath",
+          "onClarify": "debrief_gear",
+          "onRefuse": "shaken_withdrawal",
+          "onUnrelated": "suspend",
+          "accepts": [
+            {
+              "intent": "CLARIFY",
+              "speechAct": "CLARIFY",
+              "subject": "COMBAT_AFTERMATH",
+              "stateValue": "corroborated"
+            },
+            {
+              "intent": "DISAGREE",
+              "speechAct": "DISAGREE",
+              "subject": "COMBAT_AFTERMATH",
+              "stateValue": "contradicted"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "COMBAT_AFTERMATH",
+              "stateValue": "cleared"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ]
+        },
+        "assess_aftermath": {
+          "branchOffers": [
+            {
+              "id": "combat.aftermath.steady_down",
+              "labelKey": "UI_PNC_CombatAftermath_SteadyDown_Label",
+              "labelFallback": "Debrief and keep guard",
+              "utteranceKey": "UI_PNC_CombatAftermath_SteadyDown_Utterance",
+              "utteranceFallback": "Clean work keeping everyone upright. Let's rotate watch.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "AGREE",
+                "speechAct": "AGREE",
+                "subject": "COMBAT_AFTERMATH"
               }
             },
             {
               "id": "combat.aftermath.admit_shaken",
               "labelKey": "UI_PNC_CombatAftermath_AdmitShaken_Label",
-              "labelFallback": "Take a minute to steady",
+              "labelFallback": "Admit still shaken",
               "utteranceKey": "UI_PNC_CombatAftermath_AdmitShaken_Utterance",
-              "utteranceFallback": "My hands are still shaking. Just give me a minute.",
+              "utteranceFallback": "My hands won't stop trembling—give me two minutes off the window.",
               "consumers": [
                 "participant"
               ],
               "frame": {
                 "intent": "INFORM",
                 "speechAct": "INFORM",
-                "subject": "WELLBEING",
+                "subject": "COMBAT_AFTERMATH",
                 "stateValue": "shaken"
+              },
+              "constraints": {
+                "path": "npcState.panic",
+                "op": "gte",
+                "value": 30
+              }
+            },
+            {
+              "id": "combat.aftermath.count_shells",
+              "labelKey": "UI_PNC_CombatAftermath_LowAmmo_Label",
+              "labelFallback": "Flag ammunition running low",
+              "utteranceKey": "UI_PNC_CombatAftermath_LowAmmo_Utterance",
+              "utteranceFallback": "Down to three shells in the belt—we cannot pick another fight right now.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "WARN",
+                "speechAct": "WARN",
+                "subject": "COMBAT_AFTERMATH",
+                "stateValue": "low_ammo"
+              },
+              "constraints": {
+                "path": "inventory.lowAmmo",
+                "op": "eq",
+                "value": true
               }
             }
           ],
+          "onMatch": "debrief_gear",
+          "onClarify": "corroborate_account",
+          "onRefuse": "shaken_withdrawal",
+          "onUnrelated": "suspend",
           "accepts": [
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE",
+              "subject": "COMBAT_AFTERMATH"
+            },
             {
               "intent": "INFORM",
               "speechAct": "INFORM",
               "subject": "COMBAT_AFTERMATH",
-              "stateValue": "clear"
-            },
-            {
-              "intent": "INFORM",
-              "speechAct": "INFORM",
-              "subject": "WELLBEING",
               "stateValue": "shaken"
             },
             {
-              "intent": "AGREE"
+              "intent": "WARN",
+              "speechAct": "WARN",
+              "subject": "COMBAT_AFTERMATH",
+              "stateValue": "low_ammo"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ]
+        },
+        "debrief_gear": {
+          "branchOffers": [
+            {
+              "id": "combat.aftermath.inspect_blades",
+              "labelKey": "UI_PNC_CombatAftermath_InspectGear_Label",
+              "labelFallback": "Check weapons and bandages",
+              "utteranceKey": "UI_PNC_CombatAftermath_InspectGear_Utterance",
+              "utteranceFallback": "Wipe blades clean and count spare strips while it's quiet.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "ACKNOWLEDGE",
+                "speechAct": "ACKNOWLEDGE",
+                "subject": "COMBAT_AFTERMATH"
+              }
+            },
+            {
+              "id": "combat.aftermath.request_rest",
+              "labelKey": "UI_PNC_CombatAftermath_ReqRest_Label",
+              "labelFallback": "Step back from watch briefly",
+              "utteranceKey": "UI_PNC_CombatAftermath_ReqRest_Utterance",
+              "utteranceFallback": "Cover this hallway a minute while I tighten my boots and catch wind.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "DEFER",
+                "speechAct": "DEFER",
+                "subject": "COMBAT_AFTERMATH",
+                "stateValue": "withdraw"
+              }
+            },
+            {
+              "id": "combat.aftermath.move_on",
+              "labelKey": "UI_PNC_CombatAftermath_MoveOn_Label",
+              "labelFallback": "Mark corridor safe enough",
+              "utteranceKey": "UI_PNC_CombatAftermath_MoveOn_Utterance",
+              "utteranceFallback": "No fresh movement outside—calling the yard clear for now.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "AGREE",
+                "speechAct": "AGREE",
+                "subject": "COMBAT_AFTERMATH",
+                "stateValue": "cleared"
+              }
+            }
+          ],
+          "onMatch": "corroborate_account",
+          "onRefuse": "shaken_withdrawal",
+          "onUnrelated": "suspend",
+          "accepts": [
+            {
+              "intent": "ACKNOWLEDGE",
+              "speechAct": "ACKNOWLEDGE",
+              "subject": "COMBAT_AFTERMATH"
+            },
+            {
+              "intent": "DEFER",
+              "speechAct": "DEFER",
+              "subject": "COMBAT_AFTERMATH",
+              "stateValue": "withdraw"
+            },
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE",
+              "subject": "COMBAT_AFTERMATH",
+              "stateValue": "cleared"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ]
+        },
+        "corroborate_account": {
+          "branchOffers": [
+            {
+              "id": "combat.aftermath.agree_report",
+              "labelKey": "UI_PNC_CombatAftermath_Corroborate_Label",
+              "labelFallback": "Corroborate threat count",
+              "utteranceKey": "UI_PNC_CombatAftermath_Corroborate_Utterance",
+              "utteranceFallback": "Same tally from here—half dozen split east, rest gone.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "AGREE",
+                "speechAct": "AGREE",
+                "subject": "COMBAT_AFTERMATH",
+                "stateValue": "corroborated"
+              }
+            },
+            {
+              "id": "combat.aftermath.disagree_report",
+              "labelKey": "UI_PNC_CombatAftermath_ContradictAccount_Label",
+              "labelFallback": "Correct the headcount",
+              "utteranceKey": "UI_PNC_CombatAftermath_ContradictAccount_Utterance",
+              "utteranceFallback": "More than half a dozen—saw another cluster behind the garage before dark.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "DISAGREE",
+                "speechAct": "DISAGREE",
+                "subject": "COMBAT_AFTERMATH",
+                "stateValue": "contradicted"
+              }
+            },
+            {
+              "id": "combat.aftermath.end_debrief",
+              "labelKey": "UI_PNC_CombatAftermath_EndDebrief_Label",
+              "labelFallback": "End debrief cleanly",
+              "utteranceKey": "UI_PNC_CombatAftermath_EndDebrief_Utterance",
+              "utteranceFallback": "Good enough. Eyes sharp on next shift.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "ACCEPT",
+                "speechAct": "ACCEPT"
+              }
             }
           ],
           "onMatch": "debriefed",
+          "onClarify": "cleared_report",
           "onRefuse": "shaken_withdrawal",
-          "onUnrelated": "suspend"
+          "onUnrelated": "suspend",
+          "accepts": [
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE",
+              "subject": "COMBAT_AFTERMATH",
+              "stateValue": "corroborated"
+            },
+            {
+              "intent": "DISAGREE",
+              "speechAct": "DISAGREE",
+              "subject": "COMBAT_AFTERMATH",
+              "stateValue": "contradicted"
+            },
+            {
+              "intent": "ACCEPT",
+              "speechAct": "ACCEPT"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ]
         },
         "debriefed": {
+          "terminal": true
+        },
+        "cleared_report": {
           "terminal": true
         },
         "shaken_withdrawal": {
@@ -307,6 +682,18 @@
       "refused": {
         "stance": "negative",
         "outcome": "refused"
+      },
+      "corroborated": {
+        "stance": "positive",
+        "outcome": "corroborated"
+      },
+      "contradicted": {
+        "stance": "negative",
+        "outcome": "contradicted"
+      },
+      "withdraw": {
+        "stance": "contextual",
+        "outcome": "withdraw"
       }
     }
   },

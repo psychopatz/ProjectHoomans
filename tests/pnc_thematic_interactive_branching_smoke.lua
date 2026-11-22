@@ -101,7 +101,32 @@ for _, theme in ipairs(ALL_EIGHT_THEMES) do
     local ok, res = FlowRegistry.Validate(f)
     T.truthy(ok, theme.id .. " flow passes FlowRegistry.Validate: " .. tostring(res))
     local nc = countMap(f.nodes)
-    T.truthy(nc >= 4 and nc <= 6, theme.id .. " has bounded node count (" .. tostring(nc) .. ")")
+    T.truthy(nc >= 7 and nc <= 9, theme.id .. " has expanded bounded node count (" .. tostring(nc) .. ")")
+    local constrainedOffers = 0
+    local totalOffers = 0
+    for _, node in pairs(f.nodes or {}) do
+        local offers = type(node) == "table" and node.branchOffers or {}
+        T.truthy(#offers <= 8, theme.id .. " stays within MAX_OFFERS=8")
+        for _, bo in ipairs(offers) do
+            totalOffers = totalOffers + 1
+            if type(bo.constraints) == "table" then
+                constrainedOffers = constrainedOffers + 1
+            end
+        end
+    end
+    T.truthy(totalOffers >= 12, theme.id .. " exposes deep branch offer surface (" .. tostring(totalOffers) .. ")")
+    T.truthy(constrainedOffers >= 2, theme.id .. " enforces hard contextual constraints (" .. tostring(constrainedOffers) .. ")")
+    local meta = p.metadata or (p.payload and p.payload.metadata) or {}
+    local replySem = meta.replySemantics or {}
+    T.truthy(countMap(replySem) >= 5, theme.id .. " separates rich outcome vs stance metadata")
+    local replies = p.reply or (p.payload and p.payload.reply) or {}
+    local recCount = 0
+    for _, rep in pairs(replies) do
+        if type(rep) == "table" and type(rep.after) == "table" and type(rep.after.recommend) == "table" then
+            recCount = recCount + #rep.after.recommend
+        end
+    end
+    T.truthy(recCount >= 1, theme.id .. " declares after.recommend follow-ups")
 end
 
 for _, spec in ipairs(FAMILIES) do
@@ -118,8 +143,8 @@ for _, spec in ipairs(FAMILIES) do
     T.truthy(valid, spec.id .. " flow passes FlowRegistry.Validate: " .. tostring(normalizedOrReason))
 
     local nodeCount = countMap(flow.nodes)
-    T.truthy(nodeCount >= 4 and nodeCount <= 6,
-        spec.id .. " has bounded flow node count (" .. tostring(nodeCount) .. ")")
+    T.truthy(nodeCount >= 7 and nodeCount <= 9,
+        spec.id .. " has expanded bounded flow node count (" .. tostring(nodeCount) .. ")")
 
     local initialNode = flow.nodes[flow.initial]
     T.truthy(initialNode, spec.id .. " has initial node")

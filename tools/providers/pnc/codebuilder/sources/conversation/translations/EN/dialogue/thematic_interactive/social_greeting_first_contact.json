@@ -33,6 +33,10 @@
     "reply.declined.say.variants.default": "Suit yourself. Just keep walking.",
     "reply.declined.say.variants.negative": "Then we're done talking. Move along before you draw the dead.",
     "reply.evasive.say.variants.default": "Keep your secrets if you want. Just don't bring trouble my way.",
-    "reply.evasive.say.variants.neutral": "Fine, no names needed. Stay safe out there."
+    "reply.evasive.say.variants.neutral": "Fine, no names needed. Stay safe out there.",
+    "reply.accepted.say.variants.default": "Fair enough—lower the crowbar and come under the awning out of sight.",
+    "reply.rejected.say.variants.default": "Keep walking down the shoulder. We aren't taking strangers inside tonight.",
+    "reply.reluctant.say.variants.default": "You get two minutes by the curb to state your piece, nothing closer.",
+    "reply.end_conversation.say.variants.default": "No trouble here—passing along and letting you keep your corner."
   }
 }

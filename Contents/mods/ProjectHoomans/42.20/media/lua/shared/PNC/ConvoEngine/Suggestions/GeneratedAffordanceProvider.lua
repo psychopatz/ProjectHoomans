@@ -191,6 +191,52 @@ local function hostilityContext(context)
         or (tonumber(features.hostility) or 0) >= 0.55
 end
 
+local REALIZATION_BASE_STRATEGY = {
+    CORROBORATE = "AGREE",
+    CONFIRM_FACT = "AGREE",
+    CONTRADICT = "DISAGREE",
+    EXPRESS_UNCERTAINTY = "ASK_FOLLOWUP",
+    REVEAL_SOURCE = "ACKNOWLEDGE",
+    PROTECT_SOURCE = "REFUSE",
+    ADD_FACT = "ACKNOWLEDGE",
+    QUESTION_SOURCE = "ASK_WHY",
+    MEDIATE = "DEESCALATE",
+    DEFEND = "DISAGREE",
+    ACCEPT_TREATMENT = "ACCEPT",
+    REFUSE_TREATMENT = "REFUSE",
+    VOLUNTEER = "AGREE",
+    NEGOTIATE = "ASK_FOLLOWUP",
+    REFUSE_UNSAFE_WORK = "REFUSE",
+    POSTPONE = "DISMISS",
+    REROUTE = "ASK_FOLLOWUP",
+    REQUEST_ESCORT = "ASK_WHY",
+    WITHDRAW = "END_CONVERSATION",
+    REFUSE_INTERVENTION = "REFUSE",
+}
+
+local EPISTEMIC_DEFAULT_TEXT = {
+    CORROBORATE = "That matches what I observed first-hand.",
+    CONFIRM_FACT = "I can confirm that directly.",
+    CONTRADICT = "That doesn't line up with what I actually saw there.",
+    EXPRESS_UNCERTAINTY = "Hard to swear to the exact spot without stepping outside to check.",
+    REVEAL_SOURCE = "Heard it straight from our scout before dusk.",
+    PROTECT_SOURCE = "Never mind who passed word along—take the warning and stay clear.",
+    ADD_FACT = "One more thing worth noting about that area.",
+    QUESTION_SOURCE = "Did you see that yourself or hear it over the air?",
+    MEDIATE = "Both sides have a point—let's reset the watch evenly and cool down.",
+    DEFEND = "I wasn't shirking; let's look at what actually happened.",
+    ACCEPT_TREATMENT = "Alright, wrap it up while it's clean.",
+    REFUSE_TREATMENT = "Save the clean gauze—just a scrape.",
+    VOLUNTEER = "I've got tools on me; I'll handle it.",
+    NEGOTIATE = "I can cover that chore if we split the next watch.",
+    REFUSE_UNSAFE_WORK = "Not pounding boards outside while threats are still loose.",
+    POSTPONE = "Better hold until daylight clears the corner.",
+    REROUTE = "Better detour through the back alleys around that hazard.",
+    REQUEST_ESCORT = "Only running that route with another rifle backing me up.",
+    WITHDRAW = "Stepping back before this gets louder.",
+    REFUSE_INTERVENTION = "Keep out of this between us.",
+}
+
 local function semanticFor(strategy, frame, context)
     local topic = frame.topic or frame.subject or "conversation"
     local details = {}
@@ -199,6 +245,28 @@ local function semanticFor(strategy, frame, context)
             directed = true,
             repair = true,
         }, details
+    elseif strategy == "CORROBORATE" or strategy == "CONFIRM_FACT" then
+        return "AGREE", "AGREE", frame.subject or topic, { epistemic = true, corroborate = true }, details
+    elseif strategy == "CONTRADICT" then
+        return "DISAGREE", "DISAGREE", frame.subject or topic, { epistemic = true, contradict = true }, details
+    elseif strategy == "EXPRESS_UNCERTAINTY" then
+        return "INFORM", "INFORM", frame.subject or "RUMOR", { epistemic = true, uncertain = true }, details
+    elseif strategy == "REVEAL_SOURCE" or strategy == "ADD_FACT" then
+        return "INFORM", "INFORM", frame.subject or "NEWS", { epistemic = true }, details
+    elseif strategy == "PROTECT_SOURCE" or strategy == "REFUSE_INTERVENTION" or strategy == "REFUSE_TREATMENT" or strategy == "REFUSE_UNSAFE_WORK" then
+        return "REFUSE", "REFUSE", frame.subject or topic, { epistemic = strategy == "PROTECT_SOURCE" }, details
+    elseif strategy == "QUESTION_SOURCE" or strategy == "REQUEST_ESCORT" then
+        return "QUESTION", "QUESTION", frame.subject or topic, { followUp = true }, details
+    elseif strategy == "MEDIATE" then
+        return "APOLOGIZE", "APOLOGIZE", "RECIPIENT", { directed = true, repair = true, deescalate = true, mediate = true }, details
+    elseif strategy == "DEFEND" or strategy == "POSTPONE" then
+        return "DISAGREE", "DISAGREE", frame.subject or topic, { boundary = true }, details
+    elseif strategy == "WITHDRAW" then
+        return "REFUSE", "REFUSE", "RECIPIENT", { withdraw = true }, details
+    elseif strategy == "ACCEPT_TREATMENT" then
+        return "ACCEPT", "ACCEPT", frame.subject or "WELLBEING", {}, details
+    elseif strategy == "VOLUNTEER" or strategy == "NEGOTIATE" or strategy == "REROUTE" then
+        return "OFFER", "OFFER", frame.subject or topic, { coordinate = true }, details
     elseif strategy == "CLAIM_JOKE" then
         return "APOLOGIZE", "APOLOGIZE", "RECIPIENT", {
             directed = true,
@@ -302,11 +370,12 @@ local function strategyPlan(strategy, stance, context, frame, ir)
     local _, speechAct, _, _, details =
         semanticFor(strategy, frame, context)
     details = type(details) == "table" and details or {}
+    local templateStrategy = REALIZATION_BASE_STRATEGY[strategy] or strategy
     local plan = UtterancePlan.New({
         speaker = Responder.Speaker(context),
         target = details.selfDirected and "self" or "recipient",
         dialogueAct = speechAct,
-        strategy = strategy,
+        strategy = templateStrategy,
         stance = stance,
         topic = frame.topic,
         subject = frame.subject,
@@ -326,10 +395,25 @@ local function strategyPlan(strategy, stance, context, frame, ir)
         provenance = {
             providerID = Provider.id,
             discourseReplyTo = copy(frame.replyTo),
+            semanticStrategy = strategy,
         },
     })
     local realized = UtterancePlan.Realize(plan)
     if not realized then return nil end
+    plan.strategy = strategy
+    if EPISTEMIC_DEFAULT_TEXT[strategy] then
+        local epistemic = type(context) == "table" and type(context.epistemic) == "table"
+            and context.epistemic or nil
+        if epistemic and type(epistemic.renderedByStrategy) == "table"
+            and type(epistemic.renderedByStrategy[strategy]) == "string"
+            and epistemic.renderedByStrategy[strategy] ~= ""
+        then
+            realized.text = epistemic.renderedByStrategy[strategy]
+        else
+            realized.text = EPISTEMIC_DEFAULT_TEXT[strategy]
+        end
+        realized.strategy = strategy
+    end
     return plan, realized
 end
 
@@ -552,6 +636,30 @@ function Provider.collect(context)
             ))
             return output
         end
+    end
+
+    if type(context.epistemic) == "table" or type(context.worldKnowledge) == "table" then
+        local epistemic = type(context.epistemic) == "table" and context.epistemic or {}
+        if epistemic.provenance == "witnessed" or epistemic.corroborated == true then
+            add(output, seen, candidate("CORROBORATE", "POSITIVE", context, "epistemic_witnessed"))
+            add(output, seen, candidate("ADD_FACT", "NEUTRAL", context, "epistemic_addition"))
+        end
+        if epistemic.contradicted == true then
+            add(output, seen, candidate("CONTRADICT", "NEGATIVE", context, "epistemic_contradicted"))
+        end
+        if epistemic.provenance == "environmental" or epistemic.provenance == "told"
+            or epistemic.status == "uncertain"
+        then
+            add(output, seen, candidate("EXPRESS_UNCERTAINTY", "NEUTRAL", context, "epistemic_uncertain"))
+        end
+        add(output, seen, candidate("REVEAL_SOURCE", "POSITIVE", context, "epistemic_source"))
+        add(output, seen, candidate("PROTECT_SOURCE", "NEUTRAL", context, "epistemic_privacy"))
+    end
+    if upper(ir.subject or frame.subject) == "CONFLICT" or tostring(frame.topic or "") == "conflict" then
+        add(output, seen, candidate("MEDIATE", "POSITIVE", context, "conflict_mediation"))
+        add(output, seen, candidate("DEFEND", "NEUTRAL", context, "conflict_defense"))
+        add(output, seen, candidate("WITHDRAW", "NEUTRAL", context, "conflict_withdraw"))
+        add(output, seen, candidate("REFUSE_INTERVENTION", "NEGATIVE", context, "conflict_boundary"))
     end
 
     for _, act in ipairs(Relations.ContextualActs()) do

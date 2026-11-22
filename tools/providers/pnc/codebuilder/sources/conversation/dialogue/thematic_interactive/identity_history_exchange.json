@@ -102,6 +102,12 @@
             "id": "positive"
           }
         ]
+      },
+      "after": {
+        "recommend": [
+          "knowledge.gossip.exchange",
+          "colony.work.status_exchange"
+        ]
       }
     },
     "guarded": {
@@ -116,6 +122,11 @@
           {
             "id": "contextual"
           }
+        ]
+      },
+      "after": {
+        "recommend": [
+          "wellbeing.needs.checkin"
         ]
       }
     },
@@ -142,6 +153,38 @@
           }
         ]
       }
+    },
+    "reveal_source": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
+      "after": {
+        "recommend": [
+          "knowledge.gossip.exchange"
+        ]
+      }
+    },
+    "protect_source": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
+    },
+    "withdraw": {
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
     }
   },
   "metadata": {
@@ -158,7 +201,10 @@
       "guarded",
       "evasive",
       "refused",
-      "blocked"
+      "blocked",
+      "reveal_source",
+      "protect_source",
+      "withdraw"
     ],
     "triggers": [
       {
@@ -230,40 +276,41 @@
           "branchOffers": [
             {
               "id": "identity.history.share_roots",
-              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryShareRoots_Label",
-              "labelFallback": "Share where you're from",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryShareRoots_Utterance",
-              "utteranceFallback": "I was working over in Muldraugh when the phones went dead. What about you?",
+              "labelKey": "UI_PNC_IdentityHistory_ShareRoots_Label",
+              "labelFallback": "Mention where you lived before",
+              "utteranceKey": "UI_PNC_IdentityHistory_ShareRoots_Utterance",
+              "utteranceFallback": "Worked garages south of Muldraugh before the highway roadblocks locked down.",
               "consumers": [
                 "participant"
               ],
               "frame": {
                 "intent": "INFORM",
                 "speechAct": "INFORM",
-                "subject": "BACKSTORY"
+                "subject": "BACKSTORY",
+                "stateValue": "positive"
               }
             },
             {
               "id": "identity.history.ask_trade",
-              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryAskTrade_Label",
-              "labelFallback": "Ask what they did before",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryAskTrade_Utterance",
-              "utteranceFallback": "What did you do before Knox County went to hell?",
+              "labelKey": "UI_PNC_IdentityHistory_AskTrade_Label",
+              "labelFallback": "Ask what work they knew",
+              "utteranceKey": "UI_PNC_IdentityHistory_AskTrade_Utterance",
+              "utteranceFallback": "What did you used to do before everyone ended up scavenging alleys?",
               "consumers": [
                 "participant"
               ],
               "frame": {
                 "intent": "QUESTION",
                 "speechAct": "QUESTION",
-                "subject": "BACKSTORY"
+                "subject": "IDENTITY"
               }
             },
             {
               "id": "identity.history.clarify_origin",
-              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryClarify_Label",
-              "labelFallback": "Ask which town they came from",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryClarify_Utterance",
-              "utteranceFallback": "Did you come up from Rosewood, or further east?",
+              "labelKey": "UI_PNC_IdentityHistory_ClarifyOrigin_Label",
+              "labelFallback": "Ask which town they survived",
+              "utteranceKey": "UI_PNC_IdentityHistory_ClarifyOrigin_Utterance",
+              "utteranceFallback": "Muldraugh, Rosewood, or caught on the Louisville river crossing?",
               "consumers": [
                 "participant"
               ],
@@ -272,18 +319,44 @@
                 "speechAct": "CLARIFY",
                 "subject": "BACKSTORY"
               }
+            },
+            {
+              "id": "identity.history.ask_shared_town",
+              "labelKey": "UI_PNC_IdentityHistory_SharedTown_Label",
+              "labelFallback": "Mention shared neighborhood landmarks",
+              "utteranceKey": "UI_PNC_IdentityHistory_SharedTown_Utterance",
+              "utteranceFallback": "Sounded like you knew the old clinic by the rail spur—used to live that side?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "BACKSTORY",
+                "stateValue": "shared"
+              },
+              "constraints": {
+                "path": "worldKnowledge.sharedSettlementHistory",
+                "op": "eq",
+                "value": true
+              }
             }
           ],
+          "onMatch": "share_history",
+          "onClarify": "clarify_origin",
+          "onRefuse": "kept_private",
+          "onUnrelated": "suspend",
           "accepts": [
             {
               "intent": "INFORM",
               "speechAct": "INFORM",
-              "subject": "BACKSTORY"
+              "subject": "BACKSTORY",
+              "stateValue": "positive"
             },
             {
               "intent": "QUESTION",
               "speechAct": "QUESTION",
-              "subject": "BACKSTORY"
+              "subject": "IDENTITY"
             },
             {
               "intent": "CLARIFY",
@@ -291,14 +364,16 @@
               "subject": "BACKSTORY"
             },
             {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "BACKSTORY",
+              "stateValue": "shared"
+            },
+            {
               "intent": "REFUSE",
               "speechAct": "REFUSE"
             }
-          ],
-          "onMatch": "share_history",
-          "onClarify": "clarify_origin",
-          "onRefuse": "kept_private",
-          "onUnrelated": "suspend"
+          ]
         },
         "clarify_origin": {
           "responsePool": "semantic.social.identity.personal_history.clarify",
@@ -317,10 +392,10 @@
           "branchOffers": [
             {
               "id": "identity.history.confirm_town",
-              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryConfirmTown_Label",
-              "labelFallback": "Mention the highway",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryConfirmTown_Utterance",
-              "utteranceFallback": "Got out right before they blocked the main highway.",
+              "labelKey": "UI_PNC_IdentityHistory_ConfirmTown_Label",
+              "labelFallback": "Confirm crossing the checkpoint early",
+              "utteranceKey": "UI_PNC_IdentityHistory_ConfirmTown_Utterance",
+              "utteranceFallback": "Slipped past the cordon back in early July before the power gave out.",
               "consumers": [
                 "participant"
               ],
@@ -329,8 +404,48 @@
                 "speechAct": "INFORM",
                 "subject": "BACKSTORY"
               }
+            },
+            {
+              "id": "identity.history.protect_crew_names",
+              "labelKey": "UI_PNC_IdentityHistory_ProtectCrew_Label",
+              "labelFallback": "Leave old companions unnamed",
+              "utteranceKey": "UI_PNC_IdentityHistory_ProtectCrew_Utterance",
+              "utteranceFallback": "Keep old camp names out of it—some folks still prefer staying ghosts.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "BACKSTORY",
+                "stateValue": "protect_source"
+              }
+            },
+            {
+              "id": "identity.history.note_witness_listen",
+              "labelKey": "UI_PNC_IdentityHistory_WitnessListen_Label",
+              "labelFallback": "Keep talk guarded with bystanders",
+              "utteranceKey": "UI_PNC_IdentityHistory_WitnessListen_Utterance",
+              "utteranceFallback": "Maybe save names for later when fewer ears are standing in the doorway.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "DEFER",
+                "speechAct": "DEFER",
+                "subject": "IDENTITY"
+              },
+              "constraints": {
+                "path": "scene.hasThirdPartyWitness",
+                "op": "eq",
+                "value": true
+              }
             }
           ],
+          "onMatch": "weigh_disclosure",
+          "onClarify": "share_history",
+          "onRefuse": "kept_private",
+          "onUnrelated": "suspend",
           "accepts": [
             {
               "intent": "INFORM",
@@ -338,27 +453,108 @@
               "subject": "BACKSTORY"
             },
             {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "BACKSTORY",
+              "stateValue": "protect_source"
+            },
+            {
+              "intent": "DEFER",
+              "speechAct": "DEFER",
+              "subject": "IDENTITY"
+            },
+            {
               "intent": "REFUSE",
               "speechAct": "REFUSE"
+            }
+          ]
+        },
+        "weigh_disclosure": {
+          "responsePool": "semantic.social.identity.personal_history.clarify",
+          "branchOffers": [
+            {
+              "id": "identity.history.trust_with_crew",
+              "labelKey": "UI_PNC_IdentityHistory_TrustCrew_Label",
+              "labelFallback": "Name who taught you fieldcraft",
+              "utteranceKey": "UI_PNC_IdentityHistory_TrustCrew_Utterance",
+              "utteranceFallback": "My uncle ran mechanics out of Riverside—that's where I learned wiring.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "IDENTITY",
+                "stateValue": "reveal_source"
+              },
+              "constraints": {
+                "path": "relationship.trust",
+                "op": "gte",
+                "value": 25
+              }
+            },
+            {
+              "id": "identity.history.stay_vague",
+              "labelKey": "UI_PNC_IdentityHistory_StayVague_Label",
+              "labelFallback": "Keep details light",
+              "utteranceKey": "UI_PNC_IdentityHistory_StayVague_Utterance",
+              "utteranceFallback": "Passed through two camps and kept moving—nothing fancy.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "BACKSTORY",
+                "stateValue": "guarded"
+              }
+            },
+            {
+              "id": "identity.history.withdraw_past",
+              "labelKey": "UI_PNC_IdentityHistory_WithdrawPast_Label",
+              "labelFallback": "Pass on sharing personal past",
+              "utteranceKey": "UI_PNC_IdentityHistory_WithdrawPast_Utterance",
+              "utteranceFallback": "Rather keep the past buried and focus on surviving this week.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "REFUSE",
+                "speechAct": "REFUSE",
+                "stateValue": "withdraw"
+              }
             }
           ],
           "onMatch": "share_history",
           "onRefuse": "kept_private",
-          "onUnrelated": "suspend"
+          "onUnrelated": "suspend",
+          "accepts": [
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "IDENTITY",
+              "stateValue": "reveal_source"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "BACKSTORY",
+              "stateValue": "guarded"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE",
+              "stateValue": "withdraw"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ]
         },
         "share_history": {
           "responsePool": "semantic.social.identity.personal_history.exchange",
           "slots": {
-            "person": {
-              "type": "string",
-              "owner": "social",
-              "source": "slots.person"
-            },
-            "event": {
-              "type": "string",
-              "owner": "world",
-              "source": "slots.event"
-            },
             "faction": {
               "type": "string",
               "owner": "social",
@@ -368,25 +564,93 @@
           "branchOffers": [
             {
               "id": "identity.history.connect_family",
-              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryFamily_Label",
-              "labelFallback": "Ask if anyone made it out",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryFamily_Utterance",
-              "utteranceFallback": "You still looking for anyone from back then?",
+              "labelKey": "UI_PNC_IdentityHistory_ConnectFamily_Label",
+              "labelFallback": "Share family or crew connection",
+              "utteranceKey": "UI_PNC_IdentityHistory_ConnectFamily_Utterance",
+              "utteranceFallback": "Sounds like we crossed some of the same checkpoints before they closed.",
               "consumers": [
                 "participant"
               ],
               "frame": {
-                "intent": "QUESTION",
-                "speechAct": "QUESTION",
-                "subject": "IDENTITY"
+                "intent": "AGREE",
+                "speechAct": "AGREE",
+                "subject": "BACKSTORY",
+                "stateValue": "shared"
+              },
+              "constraints": {
+                "path": "relationship.approval",
+                "op": "gte",
+                "value": 0
               }
             },
             {
               "id": "identity.history.acknowledge_past",
-              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryAck_Label",
-              "labelFallback": "Acknowledge the memory",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryAck_Utterance",
-              "utteranceFallback": "Feels like a lifetime ago already. Glad you made it this far.",
+              "labelKey": "UI_PNC_IdentityHistory_AckPast_Label",
+              "labelFallback": "Acknowledge shared survival",
+              "utteranceKey": "UI_PNC_IdentityHistory_AckPast_Utterance",
+              "utteranceFallback": "Long road to still be standing here. Glad it wasn't for nothing.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "ACKNOWLEDGE",
+                "speechAct": "ACKNOWLEDGE",
+                "subject": "IDENTITY"
+              }
+            },
+            {
+              "id": "identity.history.guard_origin",
+              "labelKey": "UI_PNC_IdentityHistory_GuardOrigin_Label",
+              "labelFallback": "Protect where old allies went",
+              "utteranceKey": "UI_PNC_IdentityHistory_GuardOrigin_Utterance",
+              "utteranceFallback": "Left them heading west—won't point anyone else after them.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "IDENTITY",
+                "stateValue": "protect_source"
+              }
+            }
+          ],
+          "onMatch": "reflect_bond",
+          "onRefuse": "kept_private",
+          "onUnrelated": "suspend",
+          "accepts": [
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE",
+              "subject": "BACKSTORY",
+              "stateValue": "shared"
+            },
+            {
+              "intent": "ACKNOWLEDGE",
+              "speechAct": "ACKNOWLEDGE",
+              "subject": "IDENTITY"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "IDENTITY",
+              "stateValue": "protect_source"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
+          ]
+        },
+        "reflect_bond": {
+          "responsePool": "semantic.social.identity.personal_history.reflect",
+          "branchOffers": [
+            {
+              "id": "identity.history.close_warm",
+              "labelKey": "UI_PNC_IdentityHistory_CloseWarm_Label",
+              "labelFallback": "Close on warmer trust",
+              "utteranceKey": "UI_PNC_IdentityHistory_CloseWarm_Utterance",
+              "utteranceFallback": "Good knowing who's actually standing beside me in this mess.",
               "consumers": [
                 "participant"
               ],
@@ -394,36 +658,13 @@
                 "intent": "THANK",
                 "speechAct": "THANK"
               }
-            }
-          ],
-          "accepts": [
-            {
-              "intent": "QUESTION",
-              "speechAct": "QUESTION",
-              "subject": "IDENTITY"
             },
             {
-              "intent": "THANK",
-              "speechAct": "THANK"
-            },
-            {
-              "intent": "REFUSE",
-              "speechAct": "REFUSE"
-            }
-          ],
-          "onMatch": "reflect_bond",
-          "onRefuse": "kept_private",
-          "onUnrelated": "suspend"
-        },
-        "reflect_bond": {
-          "responsePool": "semantic.social.identity.personal_history.reflect",
-          "branchOffers": [
-            {
-              "id": "identity.history.close_warm",
-              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryCloseWarm_Label",
-              "labelFallback": "Respect their story",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryCloseWarm_Utterance",
-              "utteranceFallback": "Good to know who I'm standing beside out here.",
+              "id": "identity.history.close_quiet",
+              "labelKey": "UI_PNC_IdentityHistory_CloseQuiet_Label",
+              "labelFallback": "Part respectfully",
+              "utteranceKey": "UI_PNC_IdentityHistory_CloseQuiet_Utterance",
+              "utteranceFallback": "Understood. We stick together when the sirens start up.",
               "consumers": [
                 "participant"
               ],
@@ -433,46 +674,86 @@
               }
             },
             {
-              "id": "identity.history.close_quiet",
-              "labelKey": "UI_PNC_Conversation_Suggestion_HistoryCloseQuiet_Label",
-              "labelFallback": "Leave it there",
-              "utteranceKey": "UI_PNC_Conversation_Suggestion_HistoryCloseQuiet_Utterance",
-              "utteranceFallback": "Fair enough. Past is past—we've got today to worry about.",
+              "id": "identity.history.close_guarded",
+              "labelKey": "UI_PNC_IdentityHistory_CloseGuarded_Label",
+              "labelFallback": "End past talk cleanly",
+              "utteranceKey": "UI_PNC_IdentityHistory_CloseGuarded_Utterance",
+              "utteranceFallback": "Enough stories for today. Keep eyes on the block.",
               "consumers": [
                 "participant"
               ],
               "frame": {
-                "intent": "AGREE",
-                "speechAct": "AGREE"
+                "intent": "REFUSE",
+                "speechAct": "REFUSE",
+                "stateValue": "withdraw"
               }
             }
           ],
+          "onMatch": "complete",
+          "onRefuse": "kept_private",
+          "onUnrelated": "suspend",
           "accepts": [
+            {
+              "intent": "THANK",
+              "speechAct": "THANK"
+            },
             {
               "intent": "ACCEPT",
               "speechAct": "ACCEPT"
             },
             {
-              "intent": "AGREE",
-              "speechAct": "AGREE"
+              "intent": "REFUSE",
+              "speechAct": "REFUSE",
+              "stateValue": "withdraw"
             },
             {
               "intent": "REFUSE",
               "speechAct": "REFUSE"
             }
-          ],
-          "onMatch": "complete",
-          "onRefuse": "kept_private",
-          "onUnrelated": "suspend"
+          ]
         },
         "kept_private": {
           "terminal": true,
-          "responsePool": "semantic.social.identity.personal_history.kept_private"
+          "responsePool": "semantic.social.identity.personal_history.refused"
         },
         "complete": {
           "terminal": true,
           "responsePool": "semantic.social.identity.personal_history.complete"
         }
+      }
+    },
+    "replySemantics": {
+      "blocked": {
+        "stance": "negative",
+        "outcome": "blocked"
+      },
+      "shared": {
+        "stance": "positive",
+        "outcome": "shared"
+      },
+      "guarded": {
+        "stance": "contextual",
+        "outcome": "guarded"
+      },
+      "evasive": {
+        "stance": "neutral",
+        "outcome": "evasive"
+      },
+      "refused": {
+        "stance": "negative",
+        "outcome": "refused"
+      },
+      "reveal_source": {
+        "stance": "positive",
+        "outcome": "reveal_source"
+      },
+      "protect_source": {
+        "stance": "contextual",
+        "outcome": "protect_source"
+      },
+      "withdraw": {
+        "stance": "neutral",
+        "outcome": "withdraw"
       }
     }
   },

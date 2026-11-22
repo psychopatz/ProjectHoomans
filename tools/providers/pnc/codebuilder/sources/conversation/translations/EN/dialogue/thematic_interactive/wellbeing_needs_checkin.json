@@ -33,6 +33,12 @@
     "reply.declined.say.variants.default": "I'm fine. Worry about your own pack.",
     "reply.declined.say.variants.negative": "Don't fuss over me. I'll handle my own business.",
     "reply.evasive.say.variants.default": "Getting by well enough. No sense complaining about it.",
-    "reply.evasive.say.variants.neutral": "Same as everybody else—tired, hungry, still kicking."
+    "reply.evasive.say.variants.neutral": "Same as everybody else—tired, hungry, still kicking.",
+    "reply.accept_treatment.say.variants.default": "Alright—wrap it tight before it dirties. Appreciate you carrying clean dressing.",
+    "reply.refuse_treatment.say.variants.default": "Keep your roll for someone bleeding out—I'll stitch myself later.",
+    "reply.reluctant.say.variants.default": "Fine, take one look, then get back on watch before anything hears us.",
+    "reply.holding_up.say.variants.default": "Tired to the bone, sure, but still standing and ready to move.",
+    "reply.strained.say.variants.default": "Running dry without tap water's wearing everyone thin, not just me.",
+    "reply.dismissed.say.variants.default": "Quit fussing over me. Keep your hands on your weapon."
   }
 }

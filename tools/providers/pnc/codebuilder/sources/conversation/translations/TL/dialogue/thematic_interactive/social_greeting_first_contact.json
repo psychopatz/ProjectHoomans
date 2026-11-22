@@ -33,6 +33,10 @@
     "reply.declined.say.variants.default": "Bahala ka. Tuloy ka na lang sa lakad mo.",
     "reply.declined.say.variants.negative": "Kung gano'n, tapos na ang usapan. Umalis ka bago tayo marinig ng mga patay.",
     "reply.evasive.say.variants.default": "Itago mo na kung gusto mo. Huwag ka lang magdala ng gulo rito.",
-    "reply.evasive.say.variants.neutral": "Sige, kahit walang pangalan. Mag-ingat ka na lang sa daan."
+    "reply.evasive.say.variants.neutral": "Sige, kahit walang pangalan. Mag-ingat ka na lang sa daan.",
+    "reply.accepted.say.variants.default": "Sige—ibaba mo na ang bareta at sumilong muna sa lilim para hindi tayo kita sa kalsada.",
+    "reply.rejected.say.variants.default": "Tuloy na sa paglalakad. Hindi kami nagpapapasok ng hindi kilala ngayong gabi.",
+    "reply.reluctant.say.variants.default": "Dalawang minuto ka lang diyan sa bangketa para magsalita, huwag lalapit.",
+    "reply.end_conversation.say.variants.default": "Walang gulo rito—daraan lang at hahayaan ko na kayo sa puwesto n'yo."
   }
 }

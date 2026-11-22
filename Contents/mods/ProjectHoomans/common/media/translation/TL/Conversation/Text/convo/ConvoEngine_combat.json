@@ -1,8 +1,11 @@
 {
   "convo.combat.aftermath.debrief_exchange.reply.cleared.say.1.default": "Mukhang lumayo na ang iba sa eskinita. Tahimik muna tayo sandali.",
+  "convo.combat.aftermath.debrief_exchange.reply.contradicted.say.1.default": "Hindi tulisan iyon, {addressee.name}—may nakatama lang ng alarm ng bahay sa kabilang kanto.",
+  "convo.combat.aftermath.debrief_exchange.reply.corroborated.say.1.default": "Oo, pareho ang narinig kong putok mula sa likod ng bintana—may mga pagala-gala pa sa kalyeng iyon.",
   "convo.combat.aftermath.debrief_exchange.reply.debriefed.say.1.default": "Walang tumagos sa dyaket, salamat naman, {addressee.name}. Nakakalso na ang pinto—hinga muna tayo at tingnan ang gamit.",
   "convo.combat.aftermath.debrief_exchange.reply.refused.say.1.default": "Huwag mo muna akong dikitan. Bantayan mo ang bintana.",
   "convo.combat.aftermath.debrief_exchange.reply.shaken.say.1.default": "Hindi ako nakagat, nanginginig lang talaga. Bigyan mo ako ng sandali para kumalma.",
+  "convo.combat.aftermath.debrief_exchange.reply.withdraw.say.1.default": "Mamaya na ang usapan. Magkakarga muna ako at isasara ang pinto.",
   "convo.combat.aftermath.debrief_exchange.say.1.default": "Biglang gumulo kanina, {addressee.name}. May nakagat o nakalmot ba sa'yo roon?",
   "convo.combat.assault.betrayal.say.1.aggressive": "Akala mo madali akong isahan ha?! Lagot ka sa akin!",
   "convo.combat.assault.betrayal.say.1.aggressive.1": "Akala mo madali akong isahan ha?! Lagot ka sa akin!",
