@@ -4,8 +4,8 @@
   "locale": "TL",
   "entries": {
     "say.variants.power_shutoff_open": [
-      "Bigla bang namatay ang ilaw? Mukhang tuluyan nang bumigay ang kuryente ngayong araw, {addressee.name}.",
-      "Hindi na babalik ang ilaw. Nawalan na ng kuryente ang buong lugar ngayon, {addressee.name}.",
+      "Nawalan ba ng ilaw {scene.location}? Mukhang tuluyan nang namatay ang kuryente ngayon, {addressee.name}.",
+      "{scene.clock}—at hindi na bumabalik ang ilaw. Bumigay na ang kuryente ngayon, {addressee.name}.",
       "Wala na talagang kuryente ngayon, {addressee.name}. Importante na ang generator at pagkaing di nasisira."
     ],
     "say.variants.power_shutoff_reply": [
@@ -14,7 +14,7 @@
       "Mahirap 'yan, {addressee.name}, pero inaasahan na natin 'to. Mag-adjust na lang tayo."
     ],
     "say.variants.water_shutoff_open": [
-      "Natuyo na ang mga gripo ngayong araw, {addressee.name}. Huminto na ang linya ng tubig.",
+      "Natuyo na ang mga gripo {scene.location} ngayon, {addressee.name}. Tuluyan nang nawalan ng tubig.",
       "Wala nang tulo sa gripo mula ngayon, {addressee.name}. Kunin na lahat ng bote at drum na makita.",
       "Tuluyan nang nawala ang tubig ngayon, {addressee.name}. Kailangan na nating magtipid sa inumin."
     ],

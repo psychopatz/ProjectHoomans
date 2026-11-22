@@ -4,7 +4,7 @@
   "locale": "EN",
   "entries": {
     "say.variants.first": [
-      "Whoa, easy there! I'm on your side!",
+      "Whoa, easy there, {addressee.name}! I'm on your side!",
       "Hey, watch where you're swinging!",
       "Careful, {addressee.name}, you almost knocked me over!",
       "Hold on, check your aim! Friendlies right here!"

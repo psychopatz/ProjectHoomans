@@ -200,13 +200,13 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "All right, you seem decent enough. Watch the side alleys out here.",
+                                        ["fallback"] = "All right, you seem decent enough. Name's {speaker.name}—watch the side alleys out here.",
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.greeting.first_contact.reply.welcomed.say.1.default",
                                         ["textRole"] = "response",
                                     },
                                     {
-                                        ["fallback"] = "Glad we didn't jump the gun, {addressee.name}. Good to know there's still decent folks left.",
+                                        ["fallback"] = "Glad we didn't jump the gun—I'm {speaker.name}. Good to know there's still decent folks left.",
                                         ["id"] = "positive",
                                         ["templateID"] = "convo.social.greeting.first_contact.reply.welcomed.say.1.positive",
                                         ["textRole"] = "response",
@@ -328,7 +328,7 @@ return {
                     ["variantID"] = "neutral",
                 },
                 {
-                    ["fallback"] = "All right, you seem decent enough. Watch the side alleys out here.",
+                    ["fallback"] = "All right, you seem decent enough. Name's {speaker.name}—watch the side alleys out here.",
                     ["outcome"] = "welcomed",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -336,7 +336,7 @@ return {
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "Glad we didn't jump the gun, {addressee.name}. Good to know there's still decent folks left.",
+                    ["fallback"] = "Glad we didn't jump the gun—I'm {speaker.name}. Good to know there's still decent folks left.",
                     ["outcome"] = "welcomed",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -830,11 +830,11 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "All right, you seem decent enough. Watch the side alleys out here.",
+                                        ["fallback"] = "All right, you seem decent enough. Name's {speaker.name}—watch the side alleys out here.",
                                         ["id"] = "default",
                                     },
                                     {
-                                        ["fallback"] = "Glad we didn't jump the gun, {addressee.name}. Good to know there's still decent folks left.",
+                                        ["fallback"] = "Glad we didn't jump the gun—I'm {speaker.name}. Good to know there's still decent folks left.",
                                         ["id"] = "positive",
                                     },
                                 },
@@ -1101,7 +1101,7 @@ return {
                 ["variantID"] = "neutral",
             },
             {
-                ["fallback"] = "All right, you seem decent enough. Watch the side alleys out here.",
+                ["fallback"] = "All right, you seem decent enough. Name's {speaker.name}—watch the side alleys out here.",
                 ["outcome"] = "welcomed",
                 ["realizationKey"] = "1",
                 ["role"] = "response",
@@ -1109,7 +1109,7 @@ return {
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "Glad we didn't jump the gun, {addressee.name}. Good to know there's still decent folks left.",
+                ["fallback"] = "Glad we didn't jump the gun—I'm {speaker.name}. Good to know there's still decent folks left.",
                 ["outcome"] = "welcomed",
                 ["realizationKey"] = "1",
                 ["role"] = "response",
@@ -1142,7 +1142,7 @@ return {
                                 ["variantCount"] = 2,
                             },
                             {
-                                ["fallback"] = "Feels good talking to someone who remembers normal life. What did you used to do around here?",
+                                ["fallback"] = "Feels good talking to someone who remembers normal life, {addressee.name}. What did you used to do around here?",
                                 ["id"] = "positive",
                                 ["templateID"] = "convo.social.identity.personal_history.say.1.positive",
                                 ["textRole"] = "spoken_action",
@@ -1319,7 +1319,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Funny how fast a regular job turns into useless trivia, huh? Good knowing a bit about you.",
+                                        ["fallback"] = "Funny how fast a regular job turns into useless trivia, huh, {addressee.name}? Good knowing a bit about you.",
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.identity.personal_history.reply.shared.say.1.default",
                                         ["textRole"] = "response",
@@ -1347,7 +1347,7 @@ return {
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "Feels good talking to someone who remembers normal life. What did you used to do around here?",
+                    ["fallback"] = "Feels good talking to someone who remembers normal life, {addressee.name}. What did you used to do around here?",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.identity.personal_history.say.1.positive",
@@ -1447,7 +1447,7 @@ return {
                     ["variantID"] = "negative",
                 },
                 {
-                    ["fallback"] = "Funny how fast a regular job turns into useless trivia, huh? Good knowing a bit about you.",
+                    ["fallback"] = "Funny how fast a regular job turns into useless trivia, huh, {addressee.name}? Good knowing a bit about you.",
                     ["outcome"] = "shared",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -1955,7 +1955,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Funny how fast a regular job turns into useless trivia, huh? Good knowing a bit about you.",
+                                        ["fallback"] = "Funny how fast a regular job turns into useless trivia, huh, {addressee.name}? Good knowing a bit about you.",
                                         ["id"] = "default",
                                     },
                                     {
@@ -1985,7 +1985,7 @@ return {
                                 ["id"] = "default",
                             },
                             {
-                                ["fallback"] = "Feels good talking to someone who remembers normal life. What did you used to do around here?",
+                                ["fallback"] = "Feels good talking to someone who remembers normal life, {addressee.name}. What did you used to do around here?",
                                 ["id"] = "positive",
                             },
                             {
@@ -2126,7 +2126,7 @@ return {
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "Feels good talking to someone who remembers normal life. What did you used to do around here?",
+                ["fallback"] = "Feels good talking to someone who remembers normal life, {addressee.name}. What did you used to do around here?",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.identity.personal_history.say.1.positive",
@@ -2226,7 +2226,7 @@ return {
                 ["variantID"] = "negative",
             },
             {
-                ["fallback"] = "Funny how fast a regular job turns into useless trivia, huh? Good knowing a bit about you.",
+                ["fallback"] = "Funny how fast a regular job turns into useless trivia, huh, {addressee.name}? Good knowing a bit about you.",
                 ["outcome"] = "shared",
                 ["realizationKey"] = "1",
                 ["role"] = "response",
@@ -2260,7 +2260,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "We're running low on canned goods and spare batteries. Think we can make a quick run up the road?",
+                                ["fallback"] = "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?",
                                 ["id"] = "default",
                                 ["templateID"] = "convo.travel.excursion.plan_exchange.say.1.default",
                                 ["textRole"] = "spoken_action",
@@ -2285,7 +2285,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Alright. Pack light, keep the crowbar handy, and we stick to the side streets.",
+                                        ["fallback"] = "Alright, {addressee.name}. Pack light, keep the crowbar handy, and we stick to the side streets.",
                                         ["id"] = "default",
                                         ["templateID"] = "convo.travel.excursion.plan_exchange.reply.agreed.say.1.default",
                                         ["textRole"] = "response",
@@ -2310,7 +2310,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Main road looked quiet earlier, but there's always a few stragglers near the gas station.",
+                                        ["fallback"] = "Roads looked quiet earlier {scene.location}, {addressee.name}, though there's always a few stragglers near the gas station.",
                                         ["id"] = "default",
                                         ["templateID"] = "convo.travel.excursion.plan_exchange.reply.assessed.say.1.default",
                                         ["textRole"] = "response",
@@ -2375,14 +2375,14 @@ return {
             },
             ["textRoles"] = {
                 {
-                    ["fallback"] = "We're running low on canned goods and spare batteries. Think we can make a quick run up the road?",
+                    ["fallback"] = "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.travel.excursion.plan_exchange.say.1.default",
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "Alright. Pack light, keep the crowbar handy, and we stick to the side streets.",
+                    ["fallback"] = "Alright, {addressee.name}. Pack light, keep the crowbar handy, and we stick to the side streets.",
                     ["outcome"] = "agreed",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -2390,7 +2390,7 @@ return {
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "Main road looked quiet earlier, but there's always a few stragglers near the gas station.",
+                    ["fallback"] = "Roads looked quiet earlier {scene.location}, {addressee.name}, though there's always a few stragglers near the gas station.",
                     ["outcome"] = "assessed",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -2685,7 +2685,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Alright. Pack light, keep the crowbar handy, and we stick to the side streets.",
+                                        ["fallback"] = "Alright, {addressee.name}. Pack light, keep the crowbar handy, and we stick to the side streets.",
                                         ["id"] = "default",
                                     },
                                 },
@@ -2708,7 +2708,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Main road looked quiet earlier, but there's always a few stragglers near the gas station.",
+                                        ["fallback"] = "Roads looked quiet earlier {scene.location}, {addressee.name}, though there's always a few stragglers near the gas station.",
                                         ["id"] = "default",
                                     },
                                 },
@@ -2776,7 +2776,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "We're running low on canned goods and spare batteries. Think we can make a quick run up the road?",
+                                ["fallback"] = "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?",
                                 ["id"] = "default",
                             },
                         },
@@ -2860,7 +2860,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "We're running low on canned goods and spare batteries. Think we can make a quick run up the road?",
+                            ["fallback"] = "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.travel.excursion.plan_exchange.say_1",
                         },
@@ -2894,14 +2894,14 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "We're running low on canned goods and spare batteries. Think we can make a quick run up the road?",
+                ["fallback"] = "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.travel.excursion.plan_exchange.say.1.default",
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "Alright. Pack light, keep the crowbar handy, and we stick to the side streets.",
+                ["fallback"] = "Alright, {addressee.name}. Pack light, keep the crowbar handy, and we stick to the side streets.",
                 ["outcome"] = "agreed",
                 ["realizationKey"] = "1",
                 ["role"] = "response",
@@ -2909,7 +2909,7 @@ return {
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "Main road looked quiet earlier, but there's always a few stragglers near the gas station.",
+                ["fallback"] = "Roads looked quiet earlier {scene.location}, {addressee.name}, though there's always a few stragglers near the gas station.",
                 ["outcome"] = "assessed",
                 ["realizationKey"] = "1",
                 ["role"] = "response",

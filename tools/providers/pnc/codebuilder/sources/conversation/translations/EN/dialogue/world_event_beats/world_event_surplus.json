@@ -4,9 +4,9 @@
   "locale": "EN",
   "entries": {
     "say.variants.experienced": [
-      "Garden plots are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
+      "Garden plots {scene.location} are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
       "Root cellar's looking fuller than it has in a month, {addressee.name}. Plenty of fresh cabbage and potatoes.",
-      "Supply crates are stocked up nicely, {addressee.name}. Takes some weight off everybody's shoulders."
+      "Supply crates {scene.location} are stocked up nicely, {addressee.name}. Takes some weight off everybody's shoulders."
     ],
     "say.variants.rumor": [
       "Word is the farms outside town brought in a strong harvest, {addressee.name}. Might ease things up for everybody.",

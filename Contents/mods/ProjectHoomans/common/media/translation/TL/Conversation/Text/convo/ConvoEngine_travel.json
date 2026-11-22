@@ -1,7 +1,7 @@
 {
-  "convo.travel.excursion.plan_exchange.reply.agreed.say.1.default": "Sige. Magdala lang ng magaan, ihanda ang bareta, at sa maliliit na kalye tayo dumaan.",
-  "convo.travel.excursion.plan_exchange.reply.assessed.say.1.default": "Tahimik kanina sa malaking kalsada, pero laging may pagala-gala malapit sa gasolinahan.",
+  "convo.travel.excursion.plan_exchange.reply.agreed.say.1.default": "Sige, {addressee.name}. Magdala lang ng magaan, ihanda ang bareta, at sa maliliit na kalye tayo dumaan.",
+  "convo.travel.excursion.plan_exchange.reply.assessed.say.1.default": "Tahimik kanina ang daan {scene.location}, {addressee.name}, pero laging may pagala-gala malapit sa gasolinahan.",
   "convo.travel.excursion.plan_exchange.reply.deferred.say.1.default": "Mas mabuting hintayin natin ang liwanag sa umaga. Masyadong makapal ang hamog sa highway ngayon.",
   "convo.travel.excursion.plan_exchange.reply.refused.say.1.default": "Walang saysay lumabas ngayon. Dito muna tayo hanggang ligtas.",
-  "convo.travel.excursion.plan_exchange.say.1.default": "Paubos na ang de-lata at reserbang baterya natin. Kaya ba nating sumaglit sa kalsada para maghanap?"
+  "convo.travel.excursion.plan_exchange.say.1.default": "Paubos na ang de-lata at reserbang baterya natin, {addressee.name}. Kaya ba nating sumaglit para maghanap {scene.location}?"
 }

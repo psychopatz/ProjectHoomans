@@ -4,9 +4,9 @@
   "locale": "TL",
   "entries": {
     "say.variants.experienced": [
-      "Bumabawi na ang mga taniman natin, {addressee.name}. Unang maayos na ani natin sa loob ng ilang linggo.",
+      "Namumunga na ang taniman {scene.location}, {addressee.name}. Unang maayos na ani natin sa ilang linggo.",
       "Mas puno ang imbakan ngayon kumpara nitong nakaraang buwan, {addressee.name}. Maraming sariwang gulay.",
-      "Maayos ang laman ng mga kahon ng suplay, {addressee.name}. Nakakagaan ng loob kahit papaano."
+      "Puno na ang mga kahon ng pagkain {scene.location}, {addressee.name}. Malaking ginhawa para sa lahat."
     ],
     "say.variants.rumor": [
       "Balita sa labas ng bayan, maganda raw ang ani sa mga bukid, {addressee.name}. Makakaluwag-luwag daw sa lahat.",

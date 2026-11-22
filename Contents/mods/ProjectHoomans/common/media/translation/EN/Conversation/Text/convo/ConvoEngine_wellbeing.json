@@ -8,7 +8,7 @@
   "convo.wellbeing.needs.checkin.reply.deferred.say.1.neutral": "Holding steady for now. Ask me again once we're off the open road.",
   "convo.wellbeing.needs.checkin.reply.evasive.say.1.default": "Getting by well enough. No sense complaining about it.",
   "convo.wellbeing.needs.checkin.reply.evasive.say.1.neutral": "Same as everybody else—tired, hungry, still kicking.",
-  "convo.wellbeing.needs.checkin.reply.supported.say.1.default": "Appreciate that. Knowing someone's got an eye out helps more than you'd think.",
+  "convo.wellbeing.needs.checkin.reply.supported.say.1.default": "Appreciate that, {addressee.name}. Knowing someone's got an eye out helps more than you'd think.",
   "convo.wellbeing.needs.checkin.reply.supported.say.1.positive": "Thanks, {addressee.name}. A little help goes a long way out here.",
   "convo.wellbeing.needs.checkin.say.1.contextual": "With the water pressure gone and the nights getting colder, how are you keeping up?",
   "convo.wellbeing.needs.checkin.say.1.contextual.1": "With the water pressure gone and the nights getting colder, how are you keeping up?",
@@ -22,7 +22,7 @@
   "convo.wellbeing.needs.checkin.say.1.neutral": "Just checking in. Running low on clean water, food, or anything to patch up with?",
   "convo.wellbeing.needs.checkin.say.1.neutral.1": "Just checking in. Running low on clean water, food, or anything to patch up with?",
   "convo.wellbeing.needs.checkin.say.1.neutral.2": "How's your shape today—hungry, beat, or managing okay?",
-  "convo.wellbeing.needs.checkin.say.1.positive": "Glad to see you still on your feet. Need anything while we've got a quiet moment?",
-  "convo.wellbeing.needs.checkin.say.1.positive.1": "Glad to see you still on your feet. Need anything while we've got a quiet moment?",
+  "convo.wellbeing.needs.checkin.say.1.positive": "Glad to see you still on your feet, {addressee.name}. Need anything while we've got a quiet moment?",
+  "convo.wellbeing.needs.checkin.say.1.positive.1": "Glad to see you still on your feet, {addressee.name}. Need anything while we've got a quiet moment?",
   "convo.wellbeing.needs.checkin.say.1.positive.2": "You're looking steadier than most folks out here. Everything holding together?"
 }

@@ -1,7 +1,7 @@
 {
   "convo.knowledge.gossip.exchange.reply.blocked.say.1.default": "Not the time for rumors—keep your head down.",
   "convo.knowledge.gossip.exchange.reply.blocked.say.1.negative": "Save the chatter. Watch the street.",
-  "convo.knowledge.gossip.exchange.reply.known.say.1.contextual": "Can vouch for part of it: saw fresh tracks and open shutters near the strip mall yesterday.",
+  "convo.knowledge.gossip.exchange.reply.known.say.1.contextual": "Can vouch for part of it, {addressee.name}: saw fresh tracks and open shutters near {slot.location} yesterday.",
   "convo.knowledge.gossip.exchange.reply.known.say.1.default": "Yeah, I saw that myself—{slot.location} is choked up, so steer clear if you're smart.",
   "convo.knowledge.gossip.exchange.reply.known.say.1.positive": "Actually, yes—{addressee.name}, word is solid on that. Worth keeping in your pocket.",
   "convo.knowledge.gossip.exchange.reply.refused.say.1.default": "I don't trade in gossip. Ask somebody else.",
@@ -22,7 +22,7 @@
   "convo.knowledge.gossip.exchange.say.1.neutral": "What's the word around here lately—anything moving on the highway or near town?",
   "convo.knowledge.gossip.exchange.say.1.neutral.1": "What's the word around here lately—anything moving on the highway or near town?",
   "convo.knowledge.gossip.exchange.say.1.neutral.2": "Any news worth knowing before heading past the next intersection?",
-  "convo.knowledge.gossip.exchange.say.1.positive": "Good catching you here—heard anything useful about clear roads or decent supplies nearby?",
-  "convo.knowledge.gossip.exchange.say.1.positive.1": "Good catching you here—heard anything useful about clear roads or decent supplies nearby?",
+  "convo.knowledge.gossip.exchange.say.1.positive": "Good catching you here, {addressee.name}—heard anything useful about clear roads or decent supplies nearby?",
+  "convo.knowledge.gossip.exchange.say.1.positive.1": "Good catching you here, {addressee.name}—heard anything useful about clear roads or decent supplies nearby?",
   "convo.knowledge.gossip.exchange.say.1.positive.2": "Got a minute to trade notes? Word travels fast when folks actually share it."
 }

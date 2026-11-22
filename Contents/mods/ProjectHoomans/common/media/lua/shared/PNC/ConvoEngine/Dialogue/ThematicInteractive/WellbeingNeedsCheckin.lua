@@ -23,7 +23,7 @@ return {
                                 ["variantCount"] = 2,
                             },
                             {
-                                ["fallback"] = "Glad to see you still on your feet. Need anything while we've got a quiet moment?",
+                                ["fallback"] = "Glad to see you still on your feet, {addressee.name}. Need anything while we've got a quiet moment?",
                                 ["id"] = "positive",
                                 ["templateID"] = "convo.wellbeing.needs.checkin.say.1.positive",
                                 ["textRole"] = "spoken_action",
@@ -200,7 +200,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Appreciate that. Knowing someone's got an eye out helps more than you'd think.",
+                                        ["fallback"] = "Appreciate that, {addressee.name}. Knowing someone's got an eye out helps more than you'd think.",
                                         ["id"] = "default",
                                         ["templateID"] = "convo.wellbeing.needs.checkin.reply.supported.say.1.default",
                                         ["textRole"] = "response",
@@ -228,7 +228,7 @@ return {
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "Glad to see you still on your feet. Need anything while we've got a quiet moment?",
+                    ["fallback"] = "Glad to see you still on your feet, {addressee.name}. Need anything while we've got a quiet moment?",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.wellbeing.needs.checkin.say.1.positive",
@@ -328,7 +328,7 @@ return {
                     ["variantID"] = "neutral",
                 },
                 {
-                    ["fallback"] = "Appreciate that. Knowing someone's got an eye out helps more than you'd think.",
+                    ["fallback"] = "Appreciate that, {addressee.name}. Knowing someone's got an eye out helps more than you'd think.",
                     ["outcome"] = "supported",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -830,7 +830,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Appreciate that. Knowing someone's got an eye out helps more than you'd think.",
+                                        ["fallback"] = "Appreciate that, {addressee.name}. Knowing someone's got an eye out helps more than you'd think.",
                                         ["id"] = "default",
                                     },
                                     {
@@ -860,7 +860,7 @@ return {
                                 ["id"] = "default",
                             },
                             {
-                                ["fallback"] = "Glad to see you still on your feet. Need anything while we've got a quiet moment?",
+                                ["fallback"] = "Glad to see you still on your feet, {addressee.name}. Need anything while we've got a quiet moment?",
                                 ["id"] = "positive",
                             },
                             {
@@ -1001,7 +1001,7 @@ return {
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "Glad to see you still on your feet. Need anything while we've got a quiet moment?",
+                ["fallback"] = "Glad to see you still on your feet, {addressee.name}. Need anything while we've got a quiet moment?",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.wellbeing.needs.checkin.say.1.positive",
@@ -1101,7 +1101,7 @@ return {
                 ["variantID"] = "neutral",
             },
             {
-                ["fallback"] = "Appreciate that. Knowing someone's got an eye out helps more than you'd think.",
+                ["fallback"] = "Appreciate that, {addressee.name}. Knowing someone's got an eye out helps more than you'd think.",
                 ["outcome"] = "supported",
                 ["realizationKey"] = "1",
                 ["role"] = "response",

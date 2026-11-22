@@ -13,6 +13,9 @@ PNC.Semantics.SpeechTransport = Transport
 
 Transport.VERSION = 1
 
+local TokenFormatter = PNC.ConvoEngine.TokenFormatter
+    or require "PNC/ConvoEngine/TokenFormatter"
+
 local MAX_COOLDOWN_KEYS = 256
 local sr = nil
 local streamCooldowns = {}
@@ -36,16 +39,11 @@ local function cleanText(v)
 end
 
 function Transport.FirstTokenName(raw)
-    local s = type(raw) == "string" and cleanText(raw) or nil
-    return s and (string.match(s, "^(%S+)") or s) or nil
+    return TokenFormatter.FirstTokenName(raw)
 end
 
 function Transport.FormatTokens(text, tokens)
-    local out = tostring(text or "")
-    if type(tokens) ~= "table" then return out end
-    return (string.gsub(out, "{([%w_%.]+)}", function(k)
-        if tokens[k] ~= nil then return tostring(tokens[k]) end
-    end))
+    return TokenFormatter.Format(text, tokens)
 end
 
 function Transport.DefaultCooldowns(familyMs, speakerMs, ambientMs)
@@ -164,7 +162,50 @@ function Transport.ResolveLine(rec, opts)
         end
     end
     if type(raw) ~= "string" or raw == "" then return nil, nil end
-    return Transport.FormatTokens(raw, opts.tokens), res
+    local mergedTokens = copyShallow(opts.tokens)
+    if mergedTokens["speaker.name"] == nil or cleanText(mergedTokens["speaker.name"]) == nil then
+        mergedTokens["speaker.name"] = TokenFormatter.FirstTokenName(
+            rec.name or rec.fullName or rec.displayName
+        )
+    end
+    if mergedTokens["addressee.name"] == nil or cleanText(mergedTokens["addressee.name"]) == nil then
+        local addr = type(opts.addressee) == "table" and opts.addressee or nil
+        local addrAllowed = addr == nil or (addr.identityKnown ~= false and addr.isUnknown ~= true)
+        local rawAddressee = (addrAllowed and addr and (addr.name or addr.fullName or addr.displayName))
+            or opts.addresseeName
+            or context.addresseeName
+            or context.playerAddressName
+            or (context.playerNameKnown ~= false and context.playerName)
+            or (context.npcIdentityKnown ~= false and context.npcName)
+            or context.targetName
+        mergedTokens["addressee.name"] = TokenFormatter.FirstTokenName(rawAddressee)
+    else
+        mergedTokens["addressee.name"] = TokenFormatter.CleanName(mergedTokens["addressee.name"])
+    end
+    if mergedTokens["scene.location"] == nil then
+        mergedTokens["scene.location"] = TokenFormatter.CleanLocation(
+            opts.sceneLocation
+            or opts.locationLabel
+            or context.sceneLocation
+            or context.locationLabel
+            or context.locationName
+            or context.zoneName
+            or context.settlementName
+            or context.roomName
+            or rec.zoneName
+            or rec.locationName
+            or rec.settlementName
+            or rec.roomName
+        )
+    elseif cleanText(mergedTokens["scene.location"]) == nil then
+        mergedTokens["scene.location"] = nil
+    end
+    if mergedTokens["scene.clock"] == nil or cleanText(mergedTokens["scene.clock"]) == nil then
+        mergedTokens["scene.clock"] = TokenFormatter.CleanName(
+            opts.sceneClock or context.sceneClock or context.timeOfDay
+        )
+    end
+    return Transport.FormatTokens(raw, mergedTokens), res
 end
 
 function Transport.Deliver(rec, now, opts)

@@ -3,8 +3,8 @@
   "family": "debrief_exchange",
   "locale": "TL",
   "entries": {
-    "say.variants.default": "Biglang gumulo kanina. May nakagat o nakalmot ba sa'yo roon?",
-    "reply.debriefed.say.variants.default": "Walang tumagos sa dyaket, salamat naman. Nakakalso na ang pinto—hinga muna tayo at tingnan ang gamit.",
+    "say.variants.default": "Biglang gumulo kanina, {addressee.name}. May nakagat o nakalmot ba sa'yo roon?",
+    "reply.debriefed.say.variants.default": "Walang tumagos sa dyaket, salamat naman, {addressee.name}. Nakakalso na ang pinto—hinga muna tayo at tingnan ang gamit.",
     "reply.cleared.say.variants.default": "Mukhang lumayo na ang iba sa eskinita. Tahimik muna tayo sandali.",
     "reply.shaken.say.variants.default": "Hindi ako nakagat, nanginginig lang talaga. Bigyan mo ako ng sandali para kumalma.",
     "reply.refused.say.variants.default": "Huwag mo muna akong dikitan. Bantayan mo ang bintana."

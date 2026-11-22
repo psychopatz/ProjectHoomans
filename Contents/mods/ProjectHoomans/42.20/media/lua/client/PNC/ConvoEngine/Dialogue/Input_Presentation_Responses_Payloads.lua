@@ -14,42 +14,16 @@ local ResponsePlan = require
     "PNC/ConvoEngine/Dialogue/ResponsePlan"
 local SpeechRealization = require
     "PNC/ConvoEngine/SpeechRealization"
+local TokenFormatter = PNC.ConvoEngine.TokenFormatter
+    or require "PNC/ConvoEngine/TokenFormatter"
 local ResponseAdapter = Internal.ResponseAdapter or {}
 Internal.ResponseAdapter = ResponseAdapter
-
-local function resolveTemplateArg(args, token)
-    if type(args) ~= "table" or type(token) ~= "string" or token == "" then
-        return nil
-    end
-    local direct = args[token]
-    if direct ~= nil and type(direct) ~= "table" then
-        return direct
-    end
-    local cursor = args
-    for part in string.gmatch(token, "[^%.]+") do
-        if type(cursor) ~= "table" then
-            cursor = nil
-            break
-        end
-        cursor = cursor[part]
-    end
-    if cursor ~= nil and type(cursor) ~= "table" then
-        return cursor
-    end
-    return nil
-end
 
 local function formatTemplateText(text, args)
     text = tostring(text or "")
     args = type(args) == "table" and args or {}
     if text ~= "" and string.find(text, "{", 1, true) then
-        text = string.gsub(text, "{([%w_.]+)}", function(token)
-            local resolved = resolveTemplateArg(args, token)
-            if resolved ~= nil and tostring(resolved) ~= "" then
-                return tostring(resolved)
-            end
-            return "{" .. token .. "}"
-        end)
+        text = TokenFormatter.Format(text, args)
     end
     local firstArg = args.familyAddress or args.familyTerm or args.npcName
         or args.target or args.object or args.location or args.topic
@@ -252,11 +226,58 @@ local function payloadsForResponse(response)
     }
 end
 
+local function enrichPresentationArgs(args, context)
+    if type(context) ~= "table" then return args end
+    args = type(args) == "table" and args or {}
+    if args["addressee.name"] == nil then
+        local known = context.playerNameKnown ~= false
+        local raw = context.addresseeName
+            or (known and (context.playerFirstName or context.playerAddressName or context.playerName))
+            or nil
+        args["addressee.name"] = TokenFormatter.FirstTokenName(raw)
+    end
+    if args["speaker.name"] == nil then
+        args["speaker.name"] = TokenFormatter.FirstTokenName(
+            context.speakerName or context.npcFirstName or context.npcFullName or context.npcName
+        )
+    end
+    if args["scene.location"] == nil then
+        args["scene.location"] = TokenFormatter.CleanLocation(
+            context.sceneLocation or context.locationLabel or context.locationName
+            or context.zoneName or context.settlementName or context.roomName
+        )
+    end
+    if args["slot.location"] == nil and args["scene.location"] ~= nil then
+        args["slot.location"] = args["scene.location"]
+    end
+    if args["scene.clock"] == nil then
+        local world = type(context.worldContext) == "table" and context.worldContext or nil
+        local time = world and type(world.time) == "table" and world.time or nil
+        args["scene.clock"] = TokenFormatter.CleanName(
+            context.sceneClock or (time and time.band) or context.timeOfDay
+        )
+    end
+    return args
+end
+
 function ResponseAdapter.Payloads(decision, context)
     local response = decision and decision.response or {}
     -- Realize only a presentation copy. The decision response and its plan
     -- remain the semantic/action authority for later policy and dispatch.
     response = SpeechRealization.Apply(response, context)
+    if type(response) == "table" then
+        response.args = enrichPresentationArgs(response.args, context)
+        local renderPlan = response.renderPlan or response.plan
+        if type(renderPlan) == "table" and type(renderPlan.turns) == "table" then
+            for _, turn in ipairs(renderPlan.turns) do
+                for _, seg in ipairs(turn.segments or {}) do
+                    if type(seg) == "table" then
+                        seg.args = enrichPresentationArgs(seg.args, context)
+                    end
+                end
+            end
+        end
+    end
     return payloadsForResponse(response)
 end
 

@@ -5,8 +5,8 @@
   "entries": {
     "say.variants.rain_open": [
       "Great, it's starting to pour, {addressee.name}. We might want some cover soon.",
-      "Rain's coming down hard, {addressee.name}. Gonna be soaked if we stay out here.",
-      "Feels like a real storm rolling in, {addressee.name}. Stay dry if you can."
+      "Rain's coming down hard {scene.location}, {addressee.name}. Gonna be soaked if we stay out here.",
+      "Feels like a real storm rolling in ({scene.clock}), {addressee.name}. Stay dry if you can."
     ]
   }
 }

@@ -34,7 +34,10 @@ families = [
     ]),
 ]
 
-allowed_placeholders = {"addressee.name", "speaker.name", "slot.show.name", "show.name"}
+allowed_placeholders = {
+    "addressee.name", "speaker.name", "scene.location", "scene.clock",
+    "slot.show.name", "show.name",
+}
 placeholder_re = re.compile(r"\{([^}]+)\}")
 jargon_re = re.compile(
     r"\b(?:NPCs?|UI|ModData|payload|cooldown|slot|debug|fallback|system error|invalid target|TODO|FIXME|placeholder)\b",
@@ -301,5 +304,59 @@ T.equal(deliveredOpts.poolID, "semantic.world.chronology.milestone")
 T.equal(deliveredOpts.text, nil, "no hardcoded text passed from ChronologyMilestones")
 T.equal(deliveredOpts.context.milestoneStage, "first_week")
 T.equal(deliveredOpts.context.socialStyle, "warm")
+
+-- 6. Verify graceful dynamic-token rendering across TokenFormatter & SpeechTransport
+PNC.Semantics.SpeechTransport = nil
+local SpeechTransport = T.load("ProjectHoomans", "server", "PNC/Semantics/PNC_SemanticSpeechTransport.lua")
+local TokenFormatter = require "PNC/ConvoEngine/TokenFormatter"
+
+-- Known name + location resolve cleanly
+T.equal(
+    SpeechTransport.FormatTokens("Hey, {addressee.name}, watch out {scene.location}!", {
+        ["addressee.name"] = "Marcus",
+        ["scene.location"] = "by the fence",
+    }),
+    "Hey, Marcus, watch out by the fence!"
+)
+
+-- Missing / nil / empty tokens cleanly collapse vocative punctuation with zero raw {token} leaks
+T.equal(SpeechTransport.FormatTokens("Hey, {addressee.name}, watch out!", {}), "Hey, watch out!")
+T.equal(SpeechTransport.FormatTokens("{addressee.name}, watch out!", nil), "Watch out!")
+T.equal(SpeechTransport.FormatTokens("Take care, {addressee.name}.", { ["addressee.name"] = "" }), "Take care.")
+T.equal(
+    SpeechTransport.FormatTokens("{scene.clock}—and the lights died, {addressee.name}.", {}),
+    "And the lights died."
+)
+T.equal(TokenFormatter.FirstTokenName("Unknown Survivor"), nil)
+T.equal(TokenFormatter.FirstTokenName("Ellie Vance"), "Ellie")
+
+-- ResolveLine populates speaker.name, addressee.name (when known), and scene.location cleanly
+local formatted, resolvedLine = SpeechTransport.ResolveLine(
+    { id = "npc:tok", name = "Caleb Mercer", zoneName = "in Muldraugh" },
+    {
+        eventType = "chronology_milestone_beat",
+        eventRef = "tok:1",
+        poolID = "semantic.world.chronology.milestone",
+        context = { milestoneStage = "first_week", socialStyle = "warm", playerName = "Ellie Vance", playerNameKnown = true },
+    }
+)
+T.truthy(resolvedLine ~= nil and type(formatted) == "string", "ResolveLine produces formatted text")
+T.falsy(string.find(formatted, "{", 1, true), "ResolveLine leaves no raw {token} placeholders")
+T.contains(formatted, "Ellie", "ResolveLine populates known addressee.name")
+
+-- Missing/unknown addressee name collapses cleanly in ResolveLine without leaking {addressee.name}
+local unknownFormatted = SpeechTransport.ResolveLine(
+    { id = "npc:tok2", name = "Caleb Mercer" },
+    {
+        eventType = "chronology_milestone_beat",
+        eventRef = "tok:2",
+        poolID = "semantic.world.chronology.milestone",
+        context = { milestoneStage = "first_week", socialStyle = "warm", playerName = "Unknown Survivor", playerNameKnown = false },
+    }
+)
+T.truthy(type(unknownFormatted) == "string" and unknownFormatted ~= "", "ResolveLine with unknown addressee returns text")
+T.falsy(string.find(unknownFormatted, "{", 1, true), "ResolveLine with unknown addressee leaves no raw braces")
+T.falsy(string.find(unknownFormatted, ", ,", 1, true), "ResolveLine with unknown addressee leaves no double comma")
+T.falsy(string.find(unknownFormatted, ", .", 1, true), "ResolveLine with unknown addressee leaves no broken comma-period")
 
 print("pnc_declarative_beats_and_voice_smoke: PASS")

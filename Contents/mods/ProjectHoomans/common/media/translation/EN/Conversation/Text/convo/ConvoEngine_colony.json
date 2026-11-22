@@ -1,7 +1,7 @@
 {
-  "convo.colony.work.status_exchange.reply.agreed.say.1.default": "Good. Grab a hammer and some nails—we'll get it buttoned up before dark.",
-  "convo.colony.work.status_exchange.reply.checked_in.say.1.default": "It's holding for now, just needs another pair of hands when we get a quiet hour.",
+  "convo.colony.work.status_exchange.reply.agreed.say.1.default": "Good, {addressee.name}. Grab a hammer and some nails—we'll get it buttoned up before dark.",
+  "convo.colony.work.status_exchange.reply.checked_in.say.1.default": "It's holding for now {scene.location}, {addressee.name}, just needs another pair of hands when we get a quiet hour.",
   "convo.colony.work.status_exchange.reply.deferred.say.1.default": "Fair enough. Let's leave the heavy hammering until morning so we don't draw anything.",
   "convo.colony.work.status_exchange.reply.refused.say.1.default": "Not the time for chores. Keep your eyes on the yard.",
-  "convo.colony.work.status_exchange.say.1.default": "Back fence still has a loose plank, and the rain barrels need checking. How are we looking on chores?"
+  "convo.colony.work.status_exchange.say.1.default": "Back fence still has a loose plank {scene.location}, {addressee.name}, and the rain barrels need checking. How are we looking on chores?"
 }

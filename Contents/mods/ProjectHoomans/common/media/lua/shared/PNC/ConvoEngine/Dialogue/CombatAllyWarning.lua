@@ -1250,7 +1250,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Heads up, {target.name} moving {scene.location}!",
+                                ["fallback"] = "Heads up, {addressee.name}, {target.name} moving {scene.location}!",
                                 ["id"] = "zombie_neutral",
                                 ["templateID"] = "convo.combat.callout.threat.say.1.zombie_neutral",
                                 ["textRole"] = "spoken_action",
@@ -1320,7 +1320,7 @@ return {
             ["namespace"] = "combat.callout",
             ["textRoles"] = {
                 {
-                    ["fallback"] = "Heads up, {target.name} moving {scene.location}!",
+                    ["fallback"] = "Heads up, {addressee.name}, {target.name} moving {scene.location}!",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.combat.callout.threat.say.1.zombie_neutral",
@@ -1434,7 +1434,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Heads up, {target.name} moving {scene.location}!",
+                                ["fallback"] = "Heads up, {addressee.name}, {target.name} moving {scene.location}!",
                                 ["id"] = "zombie_neutral",
                             },
                             {
@@ -1498,7 +1498,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "Heads up, {target.name} moving {scene.location}!",
+                            ["fallback"] = "Heads up, {addressee.name}, {target.name} moving {scene.location}!",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.combat.callout.threat.say_1",
                         },
@@ -1540,7 +1540,7 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "Heads up, {target.name} moving {scene.location}!",
+                ["fallback"] = "Heads up, {addressee.name}, {target.name} moving {scene.location}!",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.combat.callout.threat.say.1.zombie_neutral",
@@ -2493,7 +2493,7 @@ return {
                                 ["variantCount"] = 4,
                             },
                             {
-                                ["fallback"] = "Cover us, {addressee.name}, I'm bandaging {target.name}!",
+                                ["fallback"] = "Cover us {scene.location}, {addressee.name}, I'm bandaging {target.name}!",
                                 ["id"] = "ally",
                                 ["templateID"] = "convo.medical.bandage.cover_warn.say.1.ally",
                                 ["textRole"] = "spoken_action",
@@ -2514,7 +2514,7 @@ return {
                     ["variantID"] = "self",
                 },
                 {
-                    ["fallback"] = "Cover us, {addressee.name}, I'm bandaging {target.name}!",
+                    ["fallback"] = "Cover us {scene.location}, {addressee.name}, I'm bandaging {target.name}!",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.medical.bandage.cover_warn.say.1.ally",
@@ -2576,7 +2576,7 @@ return {
                                 ["id"] = "self",
                             },
                             {
-                                ["fallback"] = "Cover us, {addressee.name}, I'm bandaging {target.name}!",
+                                ["fallback"] = "Cover us {scene.location}, {addressee.name}, I'm bandaging {target.name}!",
                                 ["id"] = "ally",
                             },
                         },
@@ -2657,7 +2657,7 @@ return {
                 ["variantID"] = "self",
             },
             {
-                ["fallback"] = "Cover us, {addressee.name}, I'm bandaging {target.name}!",
+                ["fallback"] = "Cover us {scene.location}, {addressee.name}, I'm bandaging {target.name}!",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.medical.bandage.cover_warn.say.1.ally",

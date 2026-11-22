@@ -262,7 +262,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Whoa, easy there! I'm on your side!",
+                                ["fallback"] = "Whoa, easy there, {addressee.name}! I'm on your side!",
                                 ["id"] = "first",
                                 ["templateID"] = "convo.combat.assault.friendly_fire.say.1.first",
                                 ["textRole"] = "spoken_action",
@@ -290,7 +290,7 @@ return {
             ["namespace"] = "combat.assault",
             ["textRoles"] = {
                 {
-                    ["fallback"] = "Whoa, easy there! I'm on your side!",
+                    ["fallback"] = "Whoa, easy there, {addressee.name}! I'm on your side!",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.combat.assault.friendly_fire.say.1.first",
@@ -362,7 +362,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Whoa, easy there! I'm on your side!",
+                                ["fallback"] = "Whoa, easy there, {addressee.name}! I'm on your side!",
                                 ["id"] = "first",
                             },
                             {
@@ -402,7 +402,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "Whoa, easy there! I'm on your side!",
+                            ["fallback"] = "Whoa, easy there, {addressee.name}! I'm on your side!",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.combat.assault.friendly_fire.say_1",
                         },
@@ -444,7 +444,7 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "Whoa, easy there! I'm on your side!",
+                ["fallback"] = "Whoa, easy there, {addressee.name}! I'm on your side!",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.combat.assault.friendly_fire.say.1.first",

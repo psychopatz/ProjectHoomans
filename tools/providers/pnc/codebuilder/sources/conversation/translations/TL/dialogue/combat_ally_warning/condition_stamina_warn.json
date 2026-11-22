@@ -13,7 +13,7 @@
       "Ubos na ubos na ako, {addressee.name}! Bantayan mo ako habang naghahabol ng hininga!",
       "{addressee.name}, hindi ko na maiangat braso ko! Kailangan kong bumawi!",
       "Wala na akong lakas, {addressee.name}, hindi na ako makapalo!",
-      "Aatras muna ako nang kaunti, {addressee.name}, sagad na lakas ko!"
+      "Aatras muna ako nang kaunti {scene.location}, {addressee.name}, sagad na lakas ko!"
     ]
   }
 }

@@ -4,9 +4,9 @@
   "locale": "TL",
   "entries": {
     "say.variants.experienced": [
-      "Simot na ang nasa paminggalan natin dito, {addressee.name}. Kailangan nating pagkasyahin ang bawat lata.",
+      "Simot na ang nasa paminggalan {scene.location}, {addressee.name}. Kailangan nating pagkasyahin ang bawat lata.",
       "Sinilip ko ang mga kahon kaninang umaga at manipis na ang laman, {addressee.name}. Paubos na ang pagkain.",
-      "Simot na ang lahat ng aparador sa blokeng ito, {addressee.name}. Kailangan na nating maghanap ng suplay."
+      "Simot na ang lahat ng aparador {scene.location}, {addressee.name}. Kailangan na nating maghanap ng suplay."
     ],
     "say.variants.rumor": [
       "Balita sa daan, nagkakaubusan na raw ng pagkain, {addressee.name}. Nag-aagawan na raw sa mga de-lata.",

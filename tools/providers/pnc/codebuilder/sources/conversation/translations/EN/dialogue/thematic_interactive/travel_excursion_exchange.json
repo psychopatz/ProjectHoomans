@@ -3,10 +3,10 @@
   "family": "plan_exchange",
   "locale": "EN",
   "entries": {
-    "say.variants.default": "We're running low on canned goods and spare batteries. Think we can make a quick run up the road?",
-    "reply.agreed.say.variants.default": "Alright. Pack light, keep the crowbar handy, and we stick to the side streets.",
+    "say.variants.default": "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?",
+    "reply.agreed.say.variants.default": "Alright, {addressee.name}. Pack light, keep the crowbar handy, and we stick to the side streets.",
     "reply.deferred.say.variants.default": "Better to wait for first light. Fog's too thick out by the highway right now.",
-    "reply.assessed.say.variants.default": "Main road looked quiet earlier, but there's always a few stragglers near the gas station.",
+    "reply.assessed.say.variants.default": "Roads looked quiet earlier {scene.location}, {addressee.name}, though there's always a few stragglers near the gas station.",
     "reply.refused.say.variants.default": "No sense going out there right now. Stay put until it's safe."
   }
 }

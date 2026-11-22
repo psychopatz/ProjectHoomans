@@ -23,7 +23,7 @@ return {
                                 ["variantCount"] = 10,
                             },
                             {
-                                ["fallback"] = "Take care. I will see you soon.",
+                                ["fallback"] = "Take care, {addressee.name}. I will see you soon.",
                                 ["id"] = "friendly",
                                 ["templateID"] = "convo.social.farewell.depart.say.1.friendly",
                                 ["textRole"] = "spoken_action",
@@ -44,14 +44,14 @@ return {
                                 ["variantCount"] = 9,
                             },
                             {
-                                ["fallback"] = "Watch your perimeter out there.",
+                                ["fallback"] = "Watch your perimeter out there, {addressee.name}.",
                                 ["id"] = "colonist",
                                 ["templateID"] = "convo.social.farewell.depart.say.1.colonist",
                                 ["textRole"] = "spoken_action",
                                 ["variantCount"] = 9,
                             },
                             {
-                                ["fallback"] = "Stay safe out there, friend. Come back in one piece.",
+                                ["fallback"] = "Stay safe out there, {addressee.name}. Come back in one piece.",
                                 ["id"] = "friend",
                                 ["templateID"] = "convo.social.farewell.depart.say.1.friend",
                                 ["textRole"] = "spoken_action",
@@ -65,7 +65,7 @@ return {
                                 ["variantCount"] = 9,
                             },
                             {
-                                ["fallback"] = "Come back to me safely. Please don't stay gone long.",
+                                ["fallback"] = "Come back to me safely, {addressee.name}. Please don't stay gone long.",
                                 ["id"] = "lover",
                                 ["templateID"] = "convo.social.farewell.depart.say.1.lover",
                                 ["textRole"] = "spoken_action",
@@ -93,21 +93,21 @@ return {
                                 ["variantCount"] = 8,
                             },
                             {
-                                ["fallback"] = "Keep holding the line. I'll check back soon.",
+                                ["fallback"] = "Keep holding the line, {addressee.name}. I'll check back soon.",
                                 ["id"] = "player_colonist",
                                 ["templateID"] = "convo.social.farewell.depart.say.1.player_colonist",
                                 ["textRole"] = "spoken_action",
                                 ["variantCount"] = 8,
                             },
                             {
-                                ["fallback"] = "Take care of yourself, friend. Talk soon.",
+                                ["fallback"] = "Take care of yourself, {addressee.name}. Talk soon.",
                                 ["id"] = "player_friend",
                                 ["templateID"] = "convo.social.farewell.depart.say.1.player_friend",
                                 ["textRole"] = "spoken_action",
                                 ["variantCount"] = 8,
                             },
                             {
-                                ["fallback"] = "Be safe while I'm out. I'll be right back.",
+                                ["fallback"] = "Be safe while I'm out, {addressee.name}. I'll be right back.",
                                 ["id"] = "player_family",
                                 ["templateID"] = "convo.social.farewell.depart.say.1.player_family",
                                 ["textRole"] = "spoken_action",
@@ -135,7 +135,7 @@ return {
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "Take care. I will see you soon.",
+                    ["fallback"] = "Take care, {addressee.name}. I will see you soon.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.farewell.depart.say.1.friendly",
@@ -156,14 +156,14 @@ return {
                     ["variantID"] = "wary",
                 },
                 {
-                    ["fallback"] = "Watch your perimeter out there.",
+                    ["fallback"] = "Watch your perimeter out there, {addressee.name}.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.farewell.depart.say.1.colonist",
                     ["variantID"] = "colonist",
                 },
                 {
-                    ["fallback"] = "Stay safe out there, friend. Come back in one piece.",
+                    ["fallback"] = "Stay safe out there, {addressee.name}. Come back in one piece.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.farewell.depart.say.1.friend",
@@ -177,7 +177,7 @@ return {
                     ["variantID"] = "family",
                 },
                 {
-                    ["fallback"] = "Come back to me safely. Please don't stay gone long.",
+                    ["fallback"] = "Come back to me safely, {addressee.name}. Please don't stay gone long.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.farewell.depart.say.1.lover",
@@ -205,21 +205,21 @@ return {
                     ["variantID"] = "player_wary",
                 },
                 {
-                    ["fallback"] = "Keep holding the line. I'll check back soon.",
+                    ["fallback"] = "Keep holding the line, {addressee.name}. I'll check back soon.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.farewell.depart.say.1.player_colonist",
                     ["variantID"] = "player_colonist",
                 },
                 {
-                    ["fallback"] = "Take care of yourself, friend. Talk soon.",
+                    ["fallback"] = "Take care of yourself, {addressee.name}. Talk soon.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.farewell.depart.say.1.player_friend",
                     ["variantID"] = "player_friend",
                 },
                 {
-                    ["fallback"] = "Be safe while I'm out. I'll be right back.",
+                    ["fallback"] = "Be safe while I'm out, {addressee.name}. I'll be right back.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.farewell.depart.say.1.player_family",
@@ -282,7 +282,7 @@ return {
                                 ["id"] = "default",
                             },
                             {
-                                ["fallback"] = "Take care. I will see you soon.",
+                                ["fallback"] = "Take care, {addressee.name}. I will see you soon.",
                                 ["id"] = "friendly",
                             },
                             {
@@ -294,11 +294,11 @@ return {
                                 ["id"] = "wary",
                             },
                             {
-                                ["fallback"] = "Watch your perimeter out there.",
+                                ["fallback"] = "Watch your perimeter out there, {addressee.name}.",
                                 ["id"] = "colonist",
                             },
                             {
-                                ["fallback"] = "Stay safe out there, friend. Come back in one piece.",
+                                ["fallback"] = "Stay safe out there, {addressee.name}. Come back in one piece.",
                                 ["id"] = "friend",
                             },
                             {
@@ -306,7 +306,7 @@ return {
                                 ["id"] = "family",
                             },
                             {
-                                ["fallback"] = "Come back to me safely. Please don't stay gone long.",
+                                ["fallback"] = "Come back to me safely, {addressee.name}. Please don't stay gone long.",
                                 ["id"] = "lover",
                             },
                             {
@@ -322,15 +322,15 @@ return {
                                 ["id"] = "player_wary",
                             },
                             {
-                                ["fallback"] = "Keep holding the line. I'll check back soon.",
+                                ["fallback"] = "Keep holding the line, {addressee.name}. I'll check back soon.",
                                 ["id"] = "player_colonist",
                             },
                             {
-                                ["fallback"] = "Take care of yourself, friend. Talk soon.",
+                                ["fallback"] = "Take care of yourself, {addressee.name}. Talk soon.",
                                 ["id"] = "player_friend",
                             },
                             {
-                                ["fallback"] = "Be safe while I'm out. I'll be right back.",
+                                ["fallback"] = "Be safe while I'm out, {addressee.name}. I'll be right back.",
                                 ["id"] = "player_family",
                             },
                             {
@@ -407,7 +407,7 @@ return {
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "Take care. I will see you soon.",
+                ["fallback"] = "Take care, {addressee.name}. I will see you soon.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.farewell.depart.say.1.friendly",
@@ -428,14 +428,14 @@ return {
                 ["variantID"] = "wary",
             },
             {
-                ["fallback"] = "Watch your perimeter out there.",
+                ["fallback"] = "Watch your perimeter out there, {addressee.name}.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.farewell.depart.say.1.colonist",
                 ["variantID"] = "colonist",
             },
             {
-                ["fallback"] = "Stay safe out there, friend. Come back in one piece.",
+                ["fallback"] = "Stay safe out there, {addressee.name}. Come back in one piece.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.farewell.depart.say.1.friend",
@@ -449,7 +449,7 @@ return {
                 ["variantID"] = "family",
             },
             {
-                ["fallback"] = "Come back to me safely. Please don't stay gone long.",
+                ["fallback"] = "Come back to me safely, {addressee.name}. Please don't stay gone long.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.farewell.depart.say.1.lover",
@@ -477,21 +477,21 @@ return {
                 ["variantID"] = "player_wary",
             },
             {
-                ["fallback"] = "Keep holding the line. I'll check back soon.",
+                ["fallback"] = "Keep holding the line, {addressee.name}. I'll check back soon.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.farewell.depart.say.1.player_colonist",
                 ["variantID"] = "player_colonist",
             },
             {
-                ["fallback"] = "Take care of yourself, friend. Talk soon.",
+                ["fallback"] = "Take care of yourself, {addressee.name}. Talk soon.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.farewell.depart.say.1.player_friend",
                 ["variantID"] = "player_friend",
             },
             {
-                ["fallback"] = "Be safe while I'm out. I'll be right back.",
+                ["fallback"] = "Be safe while I'm out, {addressee.name}. I'll be right back.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.farewell.depart.say.1.player_family",

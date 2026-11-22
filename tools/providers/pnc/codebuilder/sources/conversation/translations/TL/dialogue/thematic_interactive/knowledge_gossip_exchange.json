@@ -8,7 +8,7 @@
       "May nasagap ka ba sa radyo o sa ibang napadaan dito?"
     ],
     "say.variants.positive": [
-      "Buti nagkita tayo rito—may magandang balita ka ba tungkol sa malinis na daan o gamit sa malapit?",
+      "Buti nagkita tayo rito, {addressee.name}—may magandang balita ka ba tungkol sa malinis na daan o gamit sa malapit?",
       "May sandali ka ba para magpalitan ng balita? Malaking bagay kapag nagtutulungan sa impormasyon."
     ],
     "say.variants.neutral": [
@@ -27,7 +27,7 @@
     "reply.blocked.say.variants.negative": "Itigil muna ang kuwentuhan. Bantayan mo ang kalye.",
     "reply.known.say.variants.default": "Oo, nakita ko mismo—barado sa {slot.location}, kaya umiwas ka roon kung marunong kang mag-ingat.",
     "reply.known.say.variants.positive": "Oo naman—{addressee.name}, sigurado ang balitang 'yan. Tandaan mo para sa lakad mo.",
-    "reply.known.say.variants.contextual": "Mapapatunayan ko ang parte niyan: may nakita akong bagong bakas at bukas na pinto malapit sa strip mall kahapon.",
+    "reply.known.say.variants.contextual": "Mapapatunayan ko ang parte niyan, {addressee.name}: may nakita akong bagong bakas at bukas na pinto malapit sa {slot.location} kahapon.",
     "reply.unknown.say.variants.default": "Hindi ko masasabi. Wala akong narinig kahit ano tungkol diyan.",
     "reply.unknown.say.variants.neutral": "Walang ideya—dito lang ako sa bloke na 'to nagbabantay, wala akong nasagap na balita.",
     "reply.uncertain.say.variants.default": "Narinig kong pinag-uusapan ng iba, oo, pero hindi ko ipupusta ang buhay ko roon.",

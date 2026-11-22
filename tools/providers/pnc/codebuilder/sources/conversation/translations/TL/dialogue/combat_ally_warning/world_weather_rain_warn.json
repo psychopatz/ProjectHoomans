@@ -5,8 +5,8 @@
   "entries": {
     "say.variants.rain_open": [
       "Naku, bumubuhos na ang ulan, {addressee.name}. Kailangan natin ng silong mamaya.",
-      "Ang lakas ng ulan, {addressee.name}. Mababasa tayo rito sa labas.",
-      "Parang may paparating na bagyo, {addressee.name}. Maghanap tayo ng masisilungan."
+      "Ang lakas ng ulan {scene.location}, {addressee.name}. Mababasa tayo rito sa labas.",
+      "Parang may paparating na bagyo ({scene.clock}), {addressee.name}. Maghanap tayo ng masisilungan."
     ]
   }
 }

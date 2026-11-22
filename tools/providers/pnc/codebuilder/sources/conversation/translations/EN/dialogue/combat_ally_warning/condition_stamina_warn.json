@@ -13,7 +13,7 @@
       "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!",
       "{addressee.name}, my arms feel like lead! Need a moment to recover!",
       "Zero stamina left, {addressee.name}, I can barely swing!",
-      "Falling back a step, {addressee.name}, I'm totally spent!"
+      "Falling back a step {scene.location}, {addressee.name}, I'm totally spent!"
     ]
   }
 }

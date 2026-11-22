@@ -8,7 +8,7 @@
   "convo.condition.stamina.warn.say.1.exhausted.1": "Ubos na ubos na ako, {addressee.name}! Bantayan mo ako habang naghahabol ng hininga!",
   "convo.condition.stamina.warn.say.1.exhausted.2": "{addressee.name}, hindi ko na maiangat braso ko! Kailangan kong bumawi!",
   "convo.condition.stamina.warn.say.1.exhausted.3": "Wala na akong lakas, {addressee.name}, hindi na ako makapalo!",
-  "convo.condition.stamina.warn.say.1.exhausted.4": "Aatras muna ako nang kaunti, {addressee.name}, sagad na lakas ko!",
+  "convo.condition.stamina.warn.say.1.exhausted.4": "Aatras muna ako nang kaunti {scene.location}, {addressee.name}, sagad na lakas ko!",
   "convo.condition.stamina.warn.say.1.winded": "Teka lang, {addressee.name}, hinihingal na ako rito.",
   "convo.condition.stamina.warn.say.1.winded.1": "Teka lang, {addressee.name}, hinihingal na ako rito.",
   "convo.condition.stamina.warn.say.1.winded.2": "{addressee.name}, bumibigat na hininga ko. Pahinga muna saglit.",

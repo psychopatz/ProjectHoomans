@@ -29,6 +29,8 @@ local Arbiter = PNC.ConvoEngine.CombatBanterArbiter
     or require "PNC/ConvoEngine/CombatBanterArbiter"
 local WeaponContext = PNC.Semantics.CombatWeaponContext
     or require "PNC/Semantics/PNC_SemanticCombatWeaponContext"
+local TokenFormatter = PNC.ConvoEngine.TokenFormatter
+    or require "PNC/ConvoEngine/TokenFormatter"
 
 Service.VERSION = 1
 Service.REACTION_RADIUS = tonumber(Const and Const.ZOMBIE_TARGET_RADIUS) or 12
@@ -205,40 +207,18 @@ local function ambientPayload(
     local presentationClass = realization.presentationClass
         or context.presentationClass or "BARK"
     context.presentationClass = presentationClass
-    if context.combatWeaponDisplayName then
-        -- ProjectHoomans projects the Core-owned typed weapon slot into the
-        -- existing combat moment authority at the final realization seam.
-        local weaponPlaceholders = {
-            "{slot.weapon.name}",
-            "{combatWeaponDisplayName}",
-        }
-        for _, placeholder in ipairs(weaponPlaceholders) do
-            realization.fallback = string.gsub(
-                realization.fallback,
-                placeholder,
-                function() return context.combatWeaponDisplayName end
-            )
-        end
-    end
     local lootName = context.lootItemName or "gear"
-    local lootPlaceholders = {
-        "{loot.item}",
-        "{slot.loot.name}",
+    local reactionTokens = {
+        ["slot.weapon.name"] = context.combatWeaponDisplayName,
+        ["combatWeaponDisplayName"] = context.combatWeaponDisplayName,
+        ["loot.item"] = lootName,
+        ["slot.loot.name"] = lootName,
+        ["addressee.name"] = TokenFormatter.FirstTokenName(context.addresseeName),
+        ["speaker.name"] = TokenFormatter.FirstTokenName(
+            record.name or record.fullName or record.displayName
+        ),
     }
-    for _, placeholder in ipairs(lootPlaceholders) do
-        realization.fallback = string.gsub(
-            realization.fallback,
-            placeholder,
-            function() return lootName end
-        )
-    end
-    if context.addresseeName and context.addresseeName ~= "" then
-        realization.fallback = string.gsub(
-            realization.fallback,
-            "{addressee.name}",
-            function() return context.addresseeName end
-        )
-    end
+    realization.fallback = TokenFormatter.Format(realization.fallback, reactionTokens)
     context.responsePlanID = realization.responsePlanID
     context.realizationFamily = realization.realizationFamily
     context.realizationID = realization.realizationID

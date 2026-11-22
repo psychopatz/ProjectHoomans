@@ -8,7 +8,7 @@
   "convo.wellbeing.needs.checkin.reply.deferred.say.1.neutral": "Kaya pa naman sa ngayon. Tanungin mo ulit ako kapag wala na tayo sa gitna ng kalsada.",
   "convo.wellbeing.needs.checkin.reply.evasive.say.1.default": "Nakakaraos naman. Wala nang saysay magreklamo pa.",
   "convo.wellbeing.needs.checkin.reply.evasive.say.1.neutral": "Gaya rin ng iba—pagod, gutom, pero buhay pa.",
-  "convo.wellbeing.needs.checkin.reply.supported.say.1.default": "Salamat. Malaking bagay nang may nagbabantay at nagtatanong.",
+  "convo.wellbeing.needs.checkin.reply.supported.say.1.default": "Salamat, {addressee.name}. Malaking bagay nang may nagbabantay at nagtatanong.",
   "convo.wellbeing.needs.checkin.reply.supported.say.1.positive": "Salamat, {addressee.name}. Malaking tulong na 'yan sa panahong 'to.",
   "convo.wellbeing.needs.checkin.say.1.contextual": "Ngayong wala nang tulo ang gripo at lumalamig na ang gabi, nakakaya mo pa ba?",
   "convo.wellbeing.needs.checkin.say.1.contextual.1": "Ngayong wala nang tulo ang gripo at lumalamig na ang gabi, nakakaya mo pa ba?",
@@ -22,7 +22,7 @@
   "convo.wellbeing.needs.checkin.say.1.neutral": "Kinukumusta lang kita. Kinakapos ka ba sa malinis na tubig, pagkain, o panlinis ng sugat?",
   "convo.wellbeing.needs.checkin.say.1.neutral.1": "Kinukumusta lang kita. Kinakapos ka ba sa malinis na tubig, pagkain, o panlinis ng sugat?",
   "convo.wellbeing.needs.checkin.say.1.neutral.2": "Kamusta ang katawan mo ngayon—gutom, pagod, o kaya pa naman?",
-  "convo.wellbeing.needs.checkin.say.1.positive": "Buti naman at nakatayo ka pa nang maayos. May kailangan ka ba habang tahimik pa?",
-  "convo.wellbeing.needs.checkin.say.1.positive.1": "Buti naman at nakatayo ka pa nang maayos. May kailangan ka ba habang tahimik pa?",
+  "convo.wellbeing.needs.checkin.say.1.positive": "Buti naman at nakatayo ka pa nang maayos, {addressee.name}. May kailangan ka ba habang tahimik pa?",
+  "convo.wellbeing.needs.checkin.say.1.positive.1": "Buti naman at nakatayo ka pa nang maayos, {addressee.name}. May kailangan ka ba habang tahimik pa?",
   "convo.wellbeing.needs.checkin.say.1.positive.2": "Mas matatag ka pa tingnan kaysa sa karamihan dito. Maayos pa ba ang lagay mo?"
 }

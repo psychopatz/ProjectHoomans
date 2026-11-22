@@ -35,6 +35,8 @@ if not SpeechRealization then
     local ok, loaded = pcall(require, "PNC/ConvoEngine/SpeechRealization")
     SpeechRealization = ok and loaded or nil
 end
+local TokenFormatter = PNC.ConvoEngine and PNC.ConvoEngine.TokenFormatter
+    or require "PNC/ConvoEngine/TokenFormatter"
 
 Farewell.CHANCE_PERCENT = Farewell.CHANCE_PERCENT or 55
 Farewell.NPC_DELAY_MS = Farewell.NPC_DELAY_MS or 1900
@@ -107,7 +109,7 @@ local function eligibleReason(reason)
         and reason ~= "inline_group_silent_close"
 end
 
-local function realizeLine(realization, npcID, role, salt)
+local function realizeLine(realization, npcID, role, salt, tokens)
     if not realization then return nil end
     local text = realization.fallback
     local sr = SpeechRealization or (PNC.ConvoEngine and PNC.ConvoEngine.SpeechRealization)
@@ -125,6 +127,7 @@ local function realizeLine(realization, npcID, role, salt)
             text = ap.fallback
         end
     end
+    text = TokenFormatter.Format(text, tokens)
     return clean(text, nil)
 end
 
@@ -268,8 +271,38 @@ function Farewell.Schedule(spec, state, reason)
             }
         )
     end
-    playerText = realizeLine(playerRealization, "player:" .. tostring(playerID or "local"), role, seed .. ":player")
-    npcText = realizeLine(npcRealization, npcID, role, seed .. ":npc")
+    local npcTokens = {
+        ["addressee.name"] = npcFarewellCtx.playerNameKnown == true
+            and TokenFormatter.FirstTokenName(
+                npcFarewellCtx.playerFirstName
+                or npcFarewellCtx.playerAddressName
+                or npcFarewellCtx.playerName
+            ) or nil,
+        ["speaker.name"] = npcFarewellCtx.npcIdentityKnown == true
+            and TokenFormatter.FirstTokenName(
+                npcFarewellCtx.npcFirstName
+                or npcFarewellCtx.npcName
+            ) or nil,
+    }
+    local playerTokens = {
+        ["addressee.name"] = npcFarewellCtx.npcIdentityKnown == true
+            and TokenFormatter.FirstTokenName(
+                npcFarewellCtx.npcFirstName
+                or npcFarewellCtx.npcAddress
+                or npcFarewellCtx.npcName
+            ) or nil,
+        ["speaker.name"] = TokenFormatter.FirstTokenName(
+            npcFarewellCtx.playerFirstName or npcFarewellCtx.playerName
+        ),
+    }
+    playerText = realizeLine(
+        playerRealization,
+        "player:" .. tostring(playerID or "local"),
+        role,
+        seed .. ":player",
+        playerTokens
+    )
+    npcText = realizeLine(npcRealization, npcID, role, seed .. ":npc", npcTokens)
     if playerText and player and current >= lastPlayerFarewellAt + Farewell.PLAYER_COOLDOWN_MS then
         lastPlayerFarewellAt = current
         PNC.PlayerSpeech.Speak(player, playerText, {

@@ -8,7 +8,7 @@
       "Got a minute to check in—how are your food, water, and bandages looking?"
     ],
     "say.variants.positive": [
-      "Glad to see you still on your feet. Need anything while we've got a quiet moment?",
+      "Glad to see you still on your feet, {addressee.name}. Need anything while we've got a quiet moment?",
       "You're looking steadier than most folks out here. Everything holding together?"
     ],
     "say.variants.neutral": [
@@ -25,7 +25,7 @@
     ],
     "reply.blocked.say.variants.default": "Can't do this right now—keep your eyes up.",
     "reply.blocked.say.variants.negative": "Leave it. I've got bigger problems in front of me.",
-    "reply.supported.say.variants.default": "Appreciate that. Knowing someone's got an eye out helps more than you'd think.",
+    "reply.supported.say.variants.default": "Appreciate that, {addressee.name}. Knowing someone's got an eye out helps more than you'd think.",
     "reply.supported.say.variants.positive": "Thanks, {addressee.name}. A little help goes a long way out here.",
     "reply.deferred.say.variants.default": "Let's get somewhere with four walls first, then we'll sort out what's short.",
     "reply.deferred.say.variants.neutral": "Holding steady for now. Ask me again once we're off the open road.",

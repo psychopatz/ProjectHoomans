@@ -4,9 +4,9 @@
   "locale": "EN",
   "entries": {
     "say.variants.experienced": [
-      "We're scraping the bottom of the pantry here, {addressee.name}. Gotta stretch every can we've got.",
+      "We're scraping the bottom of the pantry {scene.location}, {addressee.name}. Gotta stretch every can we've got.",
       "Opened the crates this morning and they're looking mighty thin, {addressee.name}. Food's getting tight.",
-      "Every cupboard on this block is picked clean, {addressee.name}. We need a real supply run soon."
+      "Every cupboard {scene.location} is picked clean, {addressee.name}. We need a real supply run soon."
     ],
     "say.variants.rumor": [
       "Word is food's getting scarce down the road, {addressee.name}. Folks are already fighting over canned goods.",

@@ -4,7 +4,7 @@
   "locale": "EN",
   "entries": {
     "say.variants.zombie_neutral": [
-      "Heads up, {target.name} moving {scene.location}!",
+      "Heads up, {addressee.name}, {target.name} moving {scene.location}!",
       "Watch it! Got {target.name} {scene.location}!",
       "Stay sharp, {target.name} spotted {scene.location}!",
       "Incoming! We've got {target.name} {scene.location}!"
@@ -13,7 +13,7 @@
       "Contact, {scene.location}! {target.name}, weapons up!",
       "Visual on {target.name} advancing {scene.location}, engage!",
       "{target.name}, {scene.location}! Converge and clear!",
-      "Hold formation, got {target.name} {scene.location}!"
+      "Hold formation, {addressee.name}, got {target.name} {scene.location}!"
     ],
     "say.variants.zombie_hostile": [
       "Drop them! {target.name} prowling {scene.location}!",

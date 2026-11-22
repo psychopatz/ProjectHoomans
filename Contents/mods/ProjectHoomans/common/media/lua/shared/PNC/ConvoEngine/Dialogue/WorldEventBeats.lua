@@ -23,7 +23,7 @@ return {
                                 ["variantCount"] = 3,
                             },
                             {
-                                ["fallback"] = "A whole week still standing, {addressee.name}. Glad I'm not walking these streets alone.",
+                                ["fallback"] = "A whole week still standing {scene.location}, {addressee.name}. Glad I'm not walking these streets alone.",
                                 ["id"] = "first_week_warm",
                                 ["templateID"] = "convo.chronology.milestone.react.say.1.first_week_warm",
                                 ["textRole"] = "spoken_action",
@@ -44,7 +44,7 @@ return {
                                 ["variantCount"] = 3,
                             },
                             {
-                                ["fallback"] = "We made it a whole month, {addressee.name}. Whatever comes next, I'm glad we're still here together.",
+                                ["fallback"] = "We made it a whole month {scene.location}, {addressee.name}. Whatever comes next, I'm glad we're still here together.",
                                 ["id"] = "first_month_warm",
                                 ["templateID"] = "convo.chronology.milestone.react.say.1.first_month_warm",
                                 ["textRole"] = "spoken_action",
@@ -65,7 +65,7 @@ return {
                                 ["variantCount"] = 3,
                             },
                             {
-                                ["fallback"] = "An entire season together out here, {addressee.name}. Never thought I'd be grateful for a quiet evening like this.",
+                                ["fallback"] = "An entire season together {scene.location}, {addressee.name}. Never thought I'd be grateful for a quiet night like this.",
                                 ["id"] = "first_season_warm",
                                 ["templateID"] = "convo.chronology.milestone.react.say.1.first_season_warm",
                                 ["textRole"] = "spoken_action",
@@ -86,7 +86,7 @@ return {
                                 ["variantCount"] = 3,
                             },
                             {
-                                ["fallback"] = "A full year, {addressee.name}. Against every odd in the book, we're still here.",
+                                ["fallback"] = "A full year {scene.location}, {addressee.name}. Against every odd, we're still standing.",
                                 ["id"] = "first_year_warm",
                                 ["templateID"] = "convo.chronology.milestone.react.say.1.first_year_warm",
                                 ["textRole"] = "spoken_action",
@@ -107,7 +107,7 @@ return {
                                 ["variantCount"] = 3,
                             },
                             {
-                                ["fallback"] = "Days like today hit a little harder, {addressee.name}. Just glad we're still here to remember them.",
+                                ["fallback"] = "Days like today hit a little harder {scene.location}, {addressee.name}. Glad we're still here to remember.",
                                 ["id"] = "anniversary_warm",
                                 ["templateID"] = "convo.chronology.milestone.react.say.1.anniversary_warm",
                                 ["textRole"] = "spoken_action",
@@ -135,7 +135,7 @@ return {
                     ["variantID"] = "first_week_steady",
                 },
                 {
-                    ["fallback"] = "A whole week still standing, {addressee.name}. Glad I'm not walking these streets alone.",
+                    ["fallback"] = "A whole week still standing {scene.location}, {addressee.name}. Glad I'm not walking these streets alone.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.chronology.milestone.react.say.1.first_week_warm",
@@ -156,7 +156,7 @@ return {
                     ["variantID"] = "first_month_steady",
                 },
                 {
-                    ["fallback"] = "We made it a whole month, {addressee.name}. Whatever comes next, I'm glad we're still here together.",
+                    ["fallback"] = "We made it a whole month {scene.location}, {addressee.name}. Whatever comes next, I'm glad we're still here together.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.chronology.milestone.react.say.1.first_month_warm",
@@ -177,7 +177,7 @@ return {
                     ["variantID"] = "first_season_steady",
                 },
                 {
-                    ["fallback"] = "An entire season together out here, {addressee.name}. Never thought I'd be grateful for a quiet evening like this.",
+                    ["fallback"] = "An entire season together {scene.location}, {addressee.name}. Never thought I'd be grateful for a quiet night like this.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.chronology.milestone.react.say.1.first_season_warm",
@@ -198,7 +198,7 @@ return {
                     ["variantID"] = "first_year_steady",
                 },
                 {
-                    ["fallback"] = "A full year, {addressee.name}. Against every odd in the book, we're still here.",
+                    ["fallback"] = "A full year {scene.location}, {addressee.name}. Against every odd, we're still standing.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.chronology.milestone.react.say.1.first_year_warm",
@@ -219,7 +219,7 @@ return {
                     ["variantID"] = "anniversary_steady",
                 },
                 {
-                    ["fallback"] = "Days like today hit a little harder, {addressee.name}. Just glad we're still here to remember them.",
+                    ["fallback"] = "Days like today hit a little harder {scene.location}, {addressee.name}. Glad we're still here to remember.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.chronology.milestone.react.say.1.anniversary_warm",
@@ -282,7 +282,7 @@ return {
                                 ["id"] = "first_week_steady",
                             },
                             {
-                                ["fallback"] = "A whole week still standing, {addressee.name}. Glad I'm not walking these streets alone.",
+                                ["fallback"] = "A whole week still standing {scene.location}, {addressee.name}. Glad I'm not walking these streets alone.",
                                 ["id"] = "first_week_warm",
                             },
                             {
@@ -294,7 +294,7 @@ return {
                                 ["id"] = "first_month_steady",
                             },
                             {
-                                ["fallback"] = "We made it a whole month, {addressee.name}. Whatever comes next, I'm glad we're still here together.",
+                                ["fallback"] = "We made it a whole month {scene.location}, {addressee.name}. Whatever comes next, I'm glad we're still here together.",
                                 ["id"] = "first_month_warm",
                             },
                             {
@@ -306,7 +306,7 @@ return {
                                 ["id"] = "first_season_steady",
                             },
                             {
-                                ["fallback"] = "An entire season together out here, {addressee.name}. Never thought I'd be grateful for a quiet evening like this.",
+                                ["fallback"] = "An entire season together {scene.location}, {addressee.name}. Never thought I'd be grateful for a quiet night like this.",
                                 ["id"] = "first_season_warm",
                             },
                             {
@@ -318,7 +318,7 @@ return {
                                 ["id"] = "first_year_steady",
                             },
                             {
-                                ["fallback"] = "A full year, {addressee.name}. Against every odd in the book, we're still here.",
+                                ["fallback"] = "A full year {scene.location}, {addressee.name}. Against every odd, we're still standing.",
                                 ["id"] = "first_year_warm",
                             },
                             {
@@ -330,7 +330,7 @@ return {
                                 ["id"] = "anniversary_steady",
                             },
                             {
-                                ["fallback"] = "Days like today hit a little harder, {addressee.name}. Just glad we're still here to remember them.",
+                                ["fallback"] = "Days like today hit a little harder {scene.location}, {addressee.name}. Glad we're still here to remember.",
                                 ["id"] = "anniversary_warm",
                             },
                             {
@@ -407,7 +407,7 @@ return {
                 ["variantID"] = "first_week_steady",
             },
             {
-                ["fallback"] = "A whole week still standing, {addressee.name}. Glad I'm not walking these streets alone.",
+                ["fallback"] = "A whole week still standing {scene.location}, {addressee.name}. Glad I'm not walking these streets alone.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.chronology.milestone.react.say.1.first_week_warm",
@@ -428,7 +428,7 @@ return {
                 ["variantID"] = "first_month_steady",
             },
             {
-                ["fallback"] = "We made it a whole month, {addressee.name}. Whatever comes next, I'm glad we're still here together.",
+                ["fallback"] = "We made it a whole month {scene.location}, {addressee.name}. Whatever comes next, I'm glad we're still here together.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.chronology.milestone.react.say.1.first_month_warm",
@@ -449,7 +449,7 @@ return {
                 ["variantID"] = "first_season_steady",
             },
             {
-                ["fallback"] = "An entire season together out here, {addressee.name}. Never thought I'd be grateful for a quiet evening like this.",
+                ["fallback"] = "An entire season together {scene.location}, {addressee.name}. Never thought I'd be grateful for a quiet night like this.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.chronology.milestone.react.say.1.first_season_warm",
@@ -470,7 +470,7 @@ return {
                 ["variantID"] = "first_year_steady",
             },
             {
-                ["fallback"] = "A full year, {addressee.name}. Against every odd in the book, we're still here.",
+                ["fallback"] = "A full year {scene.location}, {addressee.name}. Against every odd, we're still standing.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.chronology.milestone.react.say.1.first_year_warm",
@@ -491,7 +491,7 @@ return {
                 ["variantID"] = "anniversary_steady",
             },
             {
-                ["fallback"] = "Days like today hit a little harder, {addressee.name}. Just glad we're still here to remember them.",
+                ["fallback"] = "Days like today hit a little harder {scene.location}, {addressee.name}. Glad we're still here to remember.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.chronology.milestone.react.say.1.anniversary_warm",
@@ -523,7 +523,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Shit, an alarm! {addressee.name}, every deadhead in blocks is gonna hear that!",
+                                ["fallback"] = "Shit, an alarm {scene.location}! {addressee.name}, every deadhead in blocks is gonna hear that!",
                                 ["id"] = "house_alarm_open",
                                 ["templateID"] = "convo.world.alarm.react.say.1.house_alarm_open",
                                 ["textRole"] = "spoken_action",
@@ -544,7 +544,7 @@ return {
             ["namespace"] = "world.alarm",
             ["textRoles"] = {
                 {
-                    ["fallback"] = "Shit, an alarm! {addressee.name}, every deadhead in blocks is gonna hear that!",
+                    ["fallback"] = "Shit, an alarm {scene.location}! {addressee.name}, every deadhead in blocks is gonna hear that!",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.world.alarm.react.say.1.house_alarm_open",
@@ -603,7 +603,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Shit, an alarm! {addressee.name}, every deadhead in blocks is gonna hear that!",
+                                ["fallback"] = "Shit, an alarm {scene.location}! {addressee.name}, every deadhead in blocks is gonna hear that!",
                                 ["id"] = "house_alarm_open",
                             },
                             {
@@ -639,7 +639,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "Shit, an alarm! {addressee.name}, every deadhead in blocks is gonna hear that!",
+                            ["fallback"] = "Shit, an alarm {scene.location}! {addressee.name}, every deadhead in blocks is gonna hear that!",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.world.alarm.react.say_1",
                         },
@@ -673,7 +673,7 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "Shit, an alarm! {addressee.name}, every deadhead in blocks is gonna hear that!",
+                ["fallback"] = "Shit, an alarm {scene.location}! {addressee.name}, every deadhead in blocks is gonna hear that!",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.world.alarm.react.say.1.house_alarm_open",
@@ -705,7 +705,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "We're scraping the bottom of the pantry here, {addressee.name}. Gotta stretch every can we've got.",
+                                ["fallback"] = "We're scraping the bottom of the pantry {scene.location}, {addressee.name}. Gotta stretch every can we've got.",
                                 ["id"] = "experienced",
                                 ["templateID"] = "convo.world.event.food_crisis.say.1.experienced",
                                 ["textRole"] = "spoken_action",
@@ -740,7 +740,7 @@ return {
             ["namespace"] = "world.event",
             ["textRoles"] = {
                 {
-                    ["fallback"] = "We're scraping the bottom of the pantry here, {addressee.name}. Gotta stretch every can we've got.",
+                    ["fallback"] = "We're scraping the bottom of the pantry {scene.location}, {addressee.name}. Gotta stretch every can we've got.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.world.event.food_crisis.say.1.experienced",
@@ -813,7 +813,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "We're scraping the bottom of the pantry here, {addressee.name}. Gotta stretch every can we've got.",
+                                ["fallback"] = "We're scraping the bottom of the pantry {scene.location}, {addressee.name}. Gotta stretch every can we've got.",
                                 ["id"] = "experienced",
                             },
                             {
@@ -857,7 +857,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "We're scraping the bottom of the pantry here, {addressee.name}. Gotta stretch every can we've got.",
+                            ["fallback"] = "We're scraping the bottom of the pantry {scene.location}, {addressee.name}. Gotta stretch every can we've got.",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.world.event.food_crisis.say_1",
                         },
@@ -891,7 +891,7 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "We're scraping the bottom of the pantry here, {addressee.name}. Gotta stretch every can we've got.",
+                ["fallback"] = "We're scraping the bottom of the pantry {scene.location}, {addressee.name}. Gotta stretch every can we've got.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.world.event.food_crisis.say.1.experienced",
@@ -937,14 +937,14 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Ran into armed crews along the road myself, {addressee.name}. They aren't asking polite questions.",
+                                ["fallback"] = "Ran into armed crews {scene.location} myself, {addressee.name}. They aren't asking polite questions.",
                                 ["id"] = "experienced",
                                 ["templateID"] = "convo.world.event.raider_surge.say.1.experienced",
                                 ["textRole"] = "spoken_action",
                                 ["variantCount"] = 3,
                             },
                             {
-                                ["fallback"] = "Saw armed crews working the highway from the treeline, {addressee.name}. Keep your head down.",
+                                ["fallback"] = "Saw armed crews working {scene.location} from the treeline, {addressee.name}. Keep your head down.",
                                 ["id"] = "witnessed",
                                 ["templateID"] = "convo.world.event.raider_surge.say.1.witnessed",
                                 ["textRole"] = "spoken_action",
@@ -979,14 +979,14 @@ return {
             ["namespace"] = "world.event",
             ["textRoles"] = {
                 {
-                    ["fallback"] = "Ran into armed crews along the road myself, {addressee.name}. They aren't asking polite questions.",
+                    ["fallback"] = "Ran into armed crews {scene.location} myself, {addressee.name}. They aren't asking polite questions.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.world.event.raider_surge.say.1.experienced",
                     ["variantID"] = "experienced",
                 },
                 {
-                    ["fallback"] = "Saw armed crews working the highway from the treeline, {addressee.name}. Keep your head down.",
+                    ["fallback"] = "Saw armed crews working {scene.location} from the treeline, {addressee.name}. Keep your head down.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.world.event.raider_surge.say.1.witnessed",
@@ -1059,11 +1059,11 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Ran into armed crews along the road myself, {addressee.name}. They aren't asking polite questions.",
+                                ["fallback"] = "Ran into armed crews {scene.location} myself, {addressee.name}. They aren't asking polite questions.",
                                 ["id"] = "experienced",
                             },
                             {
-                                ["fallback"] = "Saw armed crews working the highway from the treeline, {addressee.name}. Keep your head down.",
+                                ["fallback"] = "Saw armed crews working {scene.location} from the treeline, {addressee.name}. Keep your head down.",
                                 ["id"] = "witnessed",
                             },
                             {
@@ -1107,7 +1107,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "Ran into armed crews along the road myself, {addressee.name}. They aren't asking polite questions.",
+                            ["fallback"] = "Ran into armed crews {scene.location} myself, {addressee.name}. They aren't asking polite questions.",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.world.event.raider_surge.say_1",
                         },
@@ -1141,14 +1141,14 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "Ran into armed crews along the road myself, {addressee.name}. They aren't asking polite questions.",
+                ["fallback"] = "Ran into armed crews {scene.location} myself, {addressee.name}. They aren't asking polite questions.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.world.event.raider_surge.say.1.experienced",
                 ["variantID"] = "experienced",
             },
             {
-                ["fallback"] = "Saw armed crews working the highway from the treeline, {addressee.name}. Keep your head down.",
+                ["fallback"] = "Saw armed crews working {scene.location} from the treeline, {addressee.name}. Keep your head down.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.world.event.raider_surge.say.1.witnessed",
@@ -1194,7 +1194,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Garden plots are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
+                                ["fallback"] = "Garden plots {scene.location} are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
                                 ["id"] = "experienced",
                                 ["templateID"] = "convo.world.event.surplus.say.1.experienced",
                                 ["textRole"] = "spoken_action",
@@ -1229,7 +1229,7 @@ return {
             ["namespace"] = "world.event",
             ["textRoles"] = {
                 {
-                    ["fallback"] = "Garden plots are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
+                    ["fallback"] = "Garden plots {scene.location} are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.world.event.surplus.say.1.experienced",
@@ -1302,7 +1302,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Garden plots are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
+                                ["fallback"] = "Garden plots {scene.location} are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
                                 ["id"] = "experienced",
                             },
                             {
@@ -1346,7 +1346,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "Garden plots are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
+                            ["fallback"] = "Garden plots {scene.location} are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.world.event.surplus.say_1",
                         },
@@ -1380,7 +1380,7 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "Garden plots are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
+                ["fallback"] = "Garden plots {scene.location} are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.world.event.surplus.say.1.experienced",
@@ -1904,7 +1904,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Did everything just go dark? Looks like the power grid finally died today, {addressee.name}.",
+                                ["fallback"] = "Did everything just go dark {scene.location}? Looks like the power grid finally died today, {addressee.name}.",
                                 ["id"] = "power_shutoff_open",
                                 ["templateID"] = "convo.world.utility.outage.say.1.power_shutoff_open",
                                 ["textRole"] = "spoken_action",
@@ -1918,7 +1918,7 @@ return {
                                 ["variantCount"] = 3,
                             },
                             {
-                                ["fallback"] = "Pipes just ran dry today, {addressee.name}. Water system finally quit on us.",
+                                ["fallback"] = "Pipes just ran dry {scene.location} today, {addressee.name}. Water system finally quit on us.",
                                 ["id"] = "water_shutoff_open",
                                 ["templateID"] = "convo.world.utility.outage.say.1.water_shutoff_open",
                                 ["textRole"] = "spoken_action",
@@ -1939,7 +1939,7 @@ return {
             ["namespace"] = "world.utility",
             ["textRoles"] = {
                 {
-                    ["fallback"] = "Did everything just go dark? Looks like the power grid finally died today, {addressee.name}.",
+                    ["fallback"] = "Did everything just go dark {scene.location}? Looks like the power grid finally died today, {addressee.name}.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.world.utility.outage.say.1.power_shutoff_open",
@@ -1953,7 +1953,7 @@ return {
                     ["variantID"] = "power_shutoff_reply",
                 },
                 {
-                    ["fallback"] = "Pipes just ran dry today, {addressee.name}. Water system finally quit on us.",
+                    ["fallback"] = "Pipes just ran dry {scene.location} today, {addressee.name}. Water system finally quit on us.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.world.utility.outage.say.1.water_shutoff_open",
@@ -2012,7 +2012,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Did everything just go dark? Looks like the power grid finally died today, {addressee.name}.",
+                                ["fallback"] = "Did everything just go dark {scene.location}? Looks like the power grid finally died today, {addressee.name}.",
                                 ["id"] = "power_shutoff_open",
                             },
                             {
@@ -2020,7 +2020,7 @@ return {
                                 ["id"] = "power_shutoff_reply",
                             },
                             {
-                                ["fallback"] = "Pipes just ran dry today, {addressee.name}. Water system finally quit on us.",
+                                ["fallback"] = "Pipes just ran dry {scene.location} today, {addressee.name}. Water system finally quit on us.",
                                 ["id"] = "water_shutoff_open",
                             },
                             {
@@ -2056,7 +2056,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "Did everything just go dark? Looks like the power grid finally died today, {addressee.name}.",
+                            ["fallback"] = "Did everything just go dark {scene.location}? Looks like the power grid finally died today, {addressee.name}.",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.world.utility.outage.say_1",
                         },
@@ -2090,7 +2090,7 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "Did everything just go dark? Looks like the power grid finally died today, {addressee.name}.",
+                ["fallback"] = "Did everything just go dark {scene.location}? Looks like the power grid finally died today, {addressee.name}.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.world.utility.outage.say.1.power_shutoff_open",
@@ -2104,7 +2104,7 @@ return {
                 ["variantID"] = "power_shutoff_reply",
             },
             {
-                ["fallback"] = "Pipes just ran dry today, {addressee.name}. Water system finally quit on us.",
+                ["fallback"] = "Pipes just ran dry {scene.location} today, {addressee.name}. Water system finally quit on us.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.world.utility.outage.say.1.water_shutoff_open",

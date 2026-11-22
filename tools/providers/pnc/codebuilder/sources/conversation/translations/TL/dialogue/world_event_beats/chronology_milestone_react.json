@@ -9,7 +9,7 @@
       "Isang linggo na ang nakalipas. Hindi ko akalaing magiging ganito ang mga kalsada, {addressee.name}."
     ],
     "say.variants.first_week_warm": [
-      "Isang buong linggo pa tayong nakatayo, {addressee.name}. Buti na lang hindi ako nag-iisa sa mga daang ito.",
+      "Isang buong linggo pa tayong nakatayo {scene.location}, {addressee.name}. Buti na lang hindi ako nag-iisa sa mga daang ito.",
       "Pitong araw na, at magkakasama pa rin tayong nagbabantayan. Malaking bagay 'yon, {addressee.name}.",
       "Tapos na ang unang linggo. Huminga muna kapag kaya, {addressee.name}—pinaghirapan natin 'to."
     ],
@@ -24,7 +24,7 @@
       "Isang buwan na, {addressee.name}. Alam na natin ang nagpapanatiling buhay sa atin—ituloy lang."
     ],
     "say.variants.first_month_warm": [
-      "Umabot tayo ng isang buong buwan, {addressee.name}. Anuman ang dumating, masaya akong magkasama pa rin tayo.",
+      "Umabot tayo ng isang buong buwan {scene.location}, {addressee.name}. Anuman ang dumating, masaya akong magkasama pa rin tayo.",
       "Tatlumpung araw, {addressee.name}. Hindi maniniwala ang mga tao noon sa kalahati ng pinagdaanan natin.",
       "Isang buwan nang nakatayo. Salamat sa pagbabantay sa likod ko rito, {addressee.name}."
     ],
@@ -39,7 +39,7 @@
       "Nakaligtas sa isang buong panahon, {addressee.name}. Panatilihing tuyo ang panggatong at malinis ang sandata."
     ],
     "say.variants.first_season_warm": [
-      "Isang buong panahong magkasama rito, {addressee.name}. Hindi ko akalaing magpapasalamat ako sa tahimik na gabing ganito.",
+      "Isang buong panahong magkasama {scene.location}, {addressee.name}. Hindi ko akalaing magpapasalamat ako sa tahimik na gabing ganito.",
       "Tatlong buwan, {addressee.name}. Pinaghirapan natin ang bawat sulok ng masisilungan natin.",
       "Nagbago na ang panahon pero nakatayo pa rin tayo nang magkatabi. Lakasan ang loob, {addressee.name}."
     ],
@@ -54,7 +54,7 @@
       "Labindalawang buwan mula nang magsimula, {addressee.name}. Nakatayo pa rin, tuloy pa rin."
     ],
     "say.variants.first_year_warm": [
-      "Isang buong taon, {addressee.name}. Sa kabila ng lahat ng panganib, nandito pa rin tayo.",
+      "Isang buong taon {scene.location}, {addressee.name}. Sa kabila ng lahat ng panganib, nandito pa rin tayo.",
       "Isang taong magkasama sa hirap at panganib, {addressee.name}. Sulit tandaan ang araw na 'to.",
       "Labindalawang buwan na. Anuman ang natira sa lugar na 'to, buti magkasama tayong humaharap, {addressee.name}."
     ],
@@ -69,7 +69,7 @@
       "Bumabalik na naman ang parehong petsa, {addressee.name}. Nakakapagtaka kung ano ang tumatatak sa isip."
     ],
     "say.variants.anniversary_warm": [
-      "Mas mabigat sa dibdib ang mga ganitong araw, {addressee.name}. Mabuti na lang nandito pa tayo para makaalala.",
+      "Mas mabigat sa dibdib ang mga ganitong araw {scene.location}, {addressee.name}. Mabuti na lang nandito pa tayo para makaalala.",
       "Naiisip ko ang mga nawala sa atin sa daan, {addressee.name}. Hindi natin sila malilimutan.",
       "Mabigat ang araw na 'to, {addressee.name}. Dito ka lang malapit—hindi kailangang mag-isa sa pag-alala."
     ],

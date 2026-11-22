@@ -16,7 +16,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Back fence still has a loose plank, and the rain barrels need checking. How are we looking on chores?",
+                                ["fallback"] = "Back fence still has a loose plank {scene.location}, {addressee.name}, and the rain barrels need checking. How are we looking on chores?",
                                 ["id"] = "default",
                                 ["templateID"] = "convo.colony.work.status_exchange.say.1.default",
                                 ["textRole"] = "spoken_action",
@@ -41,7 +41,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Good. Grab a hammer and some nails—we'll get it buttoned up before dark.",
+                                        ["fallback"] = "Good, {addressee.name}. Grab a hammer and some nails—we'll get it buttoned up before dark.",
                                         ["id"] = "default",
                                         ["templateID"] = "convo.colony.work.status_exchange.reply.agreed.say.1.default",
                                         ["textRole"] = "response",
@@ -66,7 +66,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "It's holding for now, just needs another pair of hands when we get a quiet hour.",
+                                        ["fallback"] = "It's holding for now {scene.location}, {addressee.name}, just needs another pair of hands when we get a quiet hour.",
                                         ["id"] = "default",
                                         ["templateID"] = "convo.colony.work.status_exchange.reply.checked_in.say.1.default",
                                         ["textRole"] = "response",
@@ -131,14 +131,14 @@ return {
             },
             ["textRoles"] = {
                 {
-                    ["fallback"] = "Back fence still has a loose plank, and the rain barrels need checking. How are we looking on chores?",
+                    ["fallback"] = "Back fence still has a loose plank {scene.location}, {addressee.name}, and the rain barrels need checking. How are we looking on chores?",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.colony.work.status_exchange.say.1.default",
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "Good. Grab a hammer and some nails—we'll get it buttoned up before dark.",
+                    ["fallback"] = "Good, {addressee.name}. Grab a hammer and some nails—we'll get it buttoned up before dark.",
                     ["outcome"] = "agreed",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -146,7 +146,7 @@ return {
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "It's holding for now, just needs another pair of hands when we get a quiet hour.",
+                    ["fallback"] = "It's holding for now {scene.location}, {addressee.name}, just needs another pair of hands when we get a quiet hour.",
                     ["outcome"] = "checked_in",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -465,7 +465,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Good. Grab a hammer and some nails—we'll get it buttoned up before dark.",
+                                        ["fallback"] = "Good, {addressee.name}. Grab a hammer and some nails—we'll get it buttoned up before dark.",
                                         ["id"] = "default",
                                     },
                                 },
@@ -488,7 +488,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "It's holding for now, just needs another pair of hands when we get a quiet hour.",
+                                        ["fallback"] = "It's holding for now {scene.location}, {addressee.name}, just needs another pair of hands when we get a quiet hour.",
                                         ["id"] = "default",
                                     },
                                 },
@@ -556,7 +556,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Back fence still has a loose plank, and the rain barrels need checking. How are we looking on chores?",
+                                ["fallback"] = "Back fence still has a loose plank {scene.location}, {addressee.name}, and the rain barrels need checking. How are we looking on chores?",
                                 ["id"] = "default",
                             },
                         },
@@ -640,7 +640,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "Back fence still has a loose plank, and the rain barrels need checking. How are we looking on chores?",
+                            ["fallback"] = "Back fence still has a loose plank {scene.location}, {addressee.name}, and the rain barrels need checking. How are we looking on chores?",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.colony.work.status_exchange.say_1",
                         },
@@ -674,14 +674,14 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "Back fence still has a loose plank, and the rain barrels need checking. How are we looking on chores?",
+                ["fallback"] = "Back fence still has a loose plank {scene.location}, {addressee.name}, and the rain barrels need checking. How are we looking on chores?",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.colony.work.status_exchange.say.1.default",
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "Good. Grab a hammer and some nails—we'll get it buttoned up before dark.",
+                ["fallback"] = "Good, {addressee.name}. Grab a hammer and some nails—we'll get it buttoned up before dark.",
                 ["outcome"] = "agreed",
                 ["realizationKey"] = "1",
                 ["role"] = "response",
@@ -689,7 +689,7 @@ return {
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "It's holding for now, just needs another pair of hands when we get a quiet hour.",
+                ["fallback"] = "It's holding for now {scene.location}, {addressee.name}, just needs another pair of hands when we get a quiet hour.",
                 ["outcome"] = "checked_in",
                 ["realizationKey"] = "1",
                 ["role"] = "response",
@@ -731,7 +731,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "That got ugly fast. You catch any scratches or bites back there?",
+                                ["fallback"] = "That got ugly fast, {addressee.name}. You catch any scratches or bites back there?",
                                 ["id"] = "default",
                                 ["templateID"] = "convo.combat.aftermath.debrief_exchange.say.1.default",
                                 ["textRole"] = "spoken_action",
@@ -781,7 +781,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Nothing through the jacket, thank God. Door's wedged shut—let's catch our breath and check our gear.",
+                                        ["fallback"] = "Nothing through the jacket, thank God, {addressee.name}. Door's wedged shut—let's catch our breath and check our gear.",
                                         ["id"] = "default",
                                         ["templateID"] = "convo.combat.aftermath.debrief_exchange.reply.debriefed.say.1.default",
                                         ["textRole"] = "response",
@@ -846,7 +846,7 @@ return {
             },
             ["textRoles"] = {
                 {
-                    ["fallback"] = "That got ugly fast. You catch any scratches or bites back there?",
+                    ["fallback"] = "That got ugly fast, {addressee.name}. You catch any scratches or bites back there?",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.combat.aftermath.debrief_exchange.say.1.default",
@@ -861,7 +861,7 @@ return {
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "Nothing through the jacket, thank God. Door's wedged shut—let's catch our breath and check our gear.",
+                    ["fallback"] = "Nothing through the jacket, thank God, {addressee.name}. Door's wedged shut—let's catch our breath and check our gear.",
                     ["outcome"] = "debriefed",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -1160,7 +1160,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Nothing through the jacket, thank God. Door's wedged shut—let's catch our breath and check our gear.",
+                                        ["fallback"] = "Nothing through the jacket, thank God, {addressee.name}. Door's wedged shut—let's catch our breath and check our gear.",
                                         ["id"] = "default",
                                     },
                                 },
@@ -1228,7 +1228,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "That got ugly fast. You catch any scratches or bites back there?",
+                                ["fallback"] = "That got ugly fast, {addressee.name}. You catch any scratches or bites back there?",
                                 ["id"] = "default",
                             },
                         },
@@ -1312,7 +1312,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "That got ugly fast. You catch any scratches or bites back there?",
+                            ["fallback"] = "That got ugly fast, {addressee.name}. You catch any scratches or bites back there?",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.combat.aftermath.debrief_exchange.say_1",
                         },
@@ -1346,7 +1346,7 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "That got ugly fast. You catch any scratches or bites back there?",
+                ["fallback"] = "That got ugly fast, {addressee.name}. You catch any scratches or bites back there?",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.combat.aftermath.debrief_exchange.say.1.default",
@@ -1361,7 +1361,7 @@ return {
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "Nothing through the jacket, thank God. Door's wedged shut—let's catch our breath and check our gear.",
+                ["fallback"] = "Nothing through the jacket, thank God, {addressee.name}. Door's wedged shut—let's catch our breath and check our gear.",
                 ["outcome"] = "debriefed",
                 ["realizationKey"] = "1",
                 ["role"] = "response",
@@ -1410,7 +1410,7 @@ return {
                                 ["variantCount"] = 2,
                             },
                             {
-                                ["fallback"] = "Good catching you here—heard anything useful about clear roads or decent supplies nearby?",
+                                ["fallback"] = "Good catching you here, {addressee.name}—heard anything useful about clear roads or decent supplies nearby?",
                                 ["id"] = "positive",
                                 ["templateID"] = "convo.knowledge.gossip.exchange.say.1.positive",
                                 ["textRole"] = "spoken_action",
@@ -1500,7 +1500,7 @@ return {
                                         ["textRole"] = "response",
                                     },
                                     {
-                                        ["fallback"] = "Can vouch for part of it: saw fresh tracks and open shutters near the strip mall yesterday.",
+                                        ["fallback"] = "Can vouch for part of it, {addressee.name}: saw fresh tracks and open shutters near {slot.location} yesterday.",
                                         ["id"] = "contextual",
                                         ["templateID"] = "convo.knowledge.gossip.exchange.reply.known.say.1.contextual",
                                         ["textRole"] = "response",
@@ -1623,7 +1623,7 @@ return {
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "Good catching you here—heard anything useful about clear roads or decent supplies nearby?",
+                    ["fallback"] = "Good catching you here, {addressee.name}—heard anything useful about clear roads or decent supplies nearby?",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.knowledge.gossip.exchange.say.1.positive",
@@ -1683,7 +1683,7 @@ return {
                     ["variantID"] = "positive",
                 },
                 {
-                    ["fallback"] = "Can vouch for part of it: saw fresh tracks and open shutters near the strip mall yesterday.",
+                    ["fallback"] = "Can vouch for part of it, {addressee.name}: saw fresh tracks and open shutters near {slot.location} yesterday.",
                     ["outcome"] = "known",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -2156,7 +2156,7 @@ return {
                                         ["id"] = "positive",
                                     },
                                     {
-                                        ["fallback"] = "Can vouch for part of it: saw fresh tracks and open shutters near the strip mall yesterday.",
+                                        ["fallback"] = "Can vouch for part of it, {addressee.name}: saw fresh tracks and open shutters near {slot.location} yesterday.",
                                         ["id"] = "contextual",
                                     },
                                 },
@@ -2263,7 +2263,7 @@ return {
                                 ["id"] = "default",
                             },
                             {
-                                ["fallback"] = "Good catching you here—heard anything useful about clear roads or decent supplies nearby?",
+                                ["fallback"] = "Good catching you here, {addressee.name}—heard anything useful about clear roads or decent supplies nearby?",
                                 ["id"] = "positive",
                             },
                             {
@@ -2422,7 +2422,7 @@ return {
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "Good catching you here—heard anything useful about clear roads or decent supplies nearby?",
+                ["fallback"] = "Good catching you here, {addressee.name}—heard anything useful about clear roads or decent supplies nearby?",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.knowledge.gossip.exchange.say.1.positive",
@@ -2482,7 +2482,7 @@ return {
                 ["variantID"] = "positive",
             },
             {
-                ["fallback"] = "Can vouch for part of it: saw fresh tracks and open shutters near the strip mall yesterday.",
+                ["fallback"] = "Can vouch for part of it, {addressee.name}: saw fresh tracks and open shutters near {slot.location} yesterday.",
                 ["outcome"] = "known",
                 ["realizationKey"] = "1",
                 ["role"] = "response",
@@ -2556,7 +2556,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Everyone's snapping at each other over the watch schedule and the pantry. We need to sort this out before someone walks out.",
+                                ["fallback"] = "Everyone's snapping at each other over the watch schedule and the pantry, {addressee.name}. We need to sort this out before someone walks out.",
                                 ["id"] = "default",
                                 ["templateID"] = "convo.social.conflict.mediate_exchange.say.1.default",
                                 ["textRole"] = "spoken_action",
@@ -2581,7 +2581,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "I hear you. Nobody's trying to shortchange anyone here—we just need clearer rules.",
+                                        ["fallback"] = "I hear you, {addressee.name}. Nobody's trying to shortchange anyone here—we just need clearer rules.",
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.conflict.mediate_exchange.reply.acknowledged.say.1.default",
                                         ["textRole"] = "response",
@@ -2631,7 +2631,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Alright. We're all tired and short on sleep. Let's split the watch evenly and drop it.",
+                                        ["fallback"] = "Alright, {addressee.name}. We're all tired and short on sleep. Let's split the watch evenly and drop it.",
                                         ["id"] = "default",
                                         ["templateID"] = "convo.social.conflict.mediate_exchange.reply.reconciled.say.1.default",
                                         ["textRole"] = "response",
@@ -2671,14 +2671,14 @@ return {
             },
             ["textRoles"] = {
                 {
-                    ["fallback"] = "Everyone's snapping at each other over the watch schedule and the pantry. We need to sort this out before someone walks out.",
+                    ["fallback"] = "Everyone's snapping at each other over the watch schedule and the pantry, {addressee.name}. We need to sort this out before someone walks out.",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.social.conflict.mediate_exchange.say.1.default",
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "I hear you. Nobody's trying to shortchange anyone here—we just need clearer rules.",
+                    ["fallback"] = "I hear you, {addressee.name}. Nobody's trying to shortchange anyone here—we just need clearer rules.",
                     ["outcome"] = "acknowledged",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -2694,7 +2694,7 @@ return {
                     ["variantID"] = "default",
                 },
                 {
-                    ["fallback"] = "Alright. We're all tired and short on sleep. Let's split the watch evenly and drop it.",
+                    ["fallback"] = "Alright, {addressee.name}. We're all tired and short on sleep. Let's split the watch evenly and drop it.",
                     ["outcome"] = "reconciled",
                     ["realizationKey"] = "1",
                     ["role"] = "response",
@@ -2959,7 +2959,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "I hear you. Nobody's trying to shortchange anyone here—we just need clearer rules.",
+                                        ["fallback"] = "I hear you, {addressee.name}. Nobody's trying to shortchange anyone here—we just need clearer rules.",
                                         ["id"] = "default",
                                     },
                                 },
@@ -3005,7 +3005,7 @@ return {
                                 ["shorthand"] = true,
                                 ["variants"] = {
                                     {
-                                        ["fallback"] = "Alright. We're all tired and short on sleep. Let's split the watch evenly and drop it.",
+                                        ["fallback"] = "Alright, {addressee.name}. We're all tired and short on sleep. Let's split the watch evenly and drop it.",
                                         ["id"] = "default",
                                     },
                                 },
@@ -3050,7 +3050,7 @@ return {
                         ["shorthand"] = true,
                         ["variants"] = {
                             {
-                                ["fallback"] = "Everyone's snapping at each other over the watch schedule and the pantry. We need to sort this out before someone walks out.",
+                                ["fallback"] = "Everyone's snapping at each other over the watch schedule and the pantry, {addressee.name}. We need to sort this out before someone walks out.",
                                 ["id"] = "default",
                             },
                         },
@@ -3134,7 +3134,7 @@ return {
                         {
                             ["args"] = {
                             },
-                            ["fallback"] = "Everyone's snapping at each other over the watch schedule and the pantry. We need to sort this out before someone walks out.",
+                            ["fallback"] = "Everyone's snapping at each other over the watch schedule and the pantry, {addressee.name}. We need to sort this out before someone walks out.",
                             ["kind"] = "translation",
                             ["templateID"] = "convo.social.conflict.mediate_exchange.say_1",
                         },
@@ -3168,14 +3168,14 @@ return {
         },
         ["textRoles"] = {
             {
-                ["fallback"] = "Everyone's snapping at each other over the watch schedule and the pantry. We need to sort this out before someone walks out.",
+                ["fallback"] = "Everyone's snapping at each other over the watch schedule and the pantry, {addressee.name}. We need to sort this out before someone walks out.",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.social.conflict.mediate_exchange.say.1.default",
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "I hear you. Nobody's trying to shortchange anyone here—we just need clearer rules.",
+                ["fallback"] = "I hear you, {addressee.name}. Nobody's trying to shortchange anyone here—we just need clearer rules.",
                 ["outcome"] = "acknowledged",
                 ["realizationKey"] = "1",
                 ["role"] = "response",
@@ -3191,7 +3191,7 @@ return {
                 ["variantID"] = "default",
             },
             {
-                ["fallback"] = "Alright. We're all tired and short on sleep. Let's split the watch evenly and drop it.",
+                ["fallback"] = "Alright, {addressee.name}. We're all tired and short on sleep. Let's split the watch evenly and drop it.",
                 ["outcome"] = "reconciled",
                 ["realizationKey"] = "1",
                 ["role"] = "response",

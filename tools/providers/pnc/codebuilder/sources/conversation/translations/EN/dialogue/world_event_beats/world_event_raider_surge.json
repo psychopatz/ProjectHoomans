@@ -4,14 +4,14 @@
   "locale": "EN",
   "entries": {
     "say.variants.experienced": [
-      "Ran into armed crews along the road myself, {addressee.name}. They aren't asking polite questions.",
-      "Took shots near the overpass earlier, {addressee.name}. Raiders are hitting anybody moving gear.",
+      "Ran into armed crews {scene.location} myself, {addressee.name}. They aren't asking polite questions.",
+      "Took shots {scene.location} earlier, {addressee.name}. Raiders are hitting anybody moving gear.",
       "Those highwaymen aren't rumors, {addressee.name}—we barely slipped past a roadblock this morning."
     ],
     "say.variants.witnessed": [
-      "Saw armed crews working the highway from the treeline, {addressee.name}. Keep your head down.",
+      "Saw armed crews working {scene.location} from the treeline, {addressee.name}. Keep your head down.",
       "Watched three trucks full of gunmen roll past the crossroads, {addressee.name}. Stay off the blacktop.",
-      "Spotted lookout scouts perched on the gas station roof, {addressee.name}. Raiders are out in force."
+      "Spotted lookout scouts perched {scene.location}, {addressee.name}. Raiders are out in force."
     ],
     "say.variants.rumor": [
       "Heard armed crews are working the highway, {addressee.name}. Best we stick to the back roads.",

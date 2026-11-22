@@ -16,14 +16,14 @@
       "Magkita na lang tayo."
     ],
     "say.variants.friendly": [
-      "Mag-ingat ka. Magkikita tayo sa lalong madaling panahon.",
+      "Mag-ingat ka, {addressee.name}. Magkikita tayo sa lalong madaling panahon.",
       "Mag-ingat ka, kaibigan. Bumalik kang buo.",
-      "Alagaan mo sarili mo. Huwag kang mawawala.",
+      "Alagaan mo sarili mo, {addressee.name}. Huwag kang mawawala.",
       "Magandang kapalaran sa labas. Hanggang sa muli.",
       "Yumuko sa panganib at mag-ingat. Usap tayo ulit.",
       "Mabuti at nagkita tayo. Ligtas na paglalakbay.",
       "Alagaan mo sarili mo. Hihintayin kita.",
-      "Bantayan ang likod mo sa labas, kaibigan.",
+      "Bantayan ang likod mo sa labas, {addressee.name}.",
       "Manatiling buhay. Mag-inuman tayo sa susunod.",
       "Mag-ingat ka sa labas. Magkikita tayo sa lalong madaling panahon."
     ],
@@ -50,45 +50,45 @@
       "Tingnan natin kung gaano ito tatagal."
     ],
     "say.variants.colonist": [
-      "Bantayan mo ang paligid sa labas.",
+      "Bantayan mo ang paligid sa labas, {addressee.name}.",
       "Magmatyag ka. Sabihan mo kami kung may problema.",
       "Huwag ilayo ang radyo at mag-ingat.",
-      "Sige. Bantayan ang bawat kanto sa labas.",
+      "Sige, {addressee.name}. Bantayan ang bawat kanto sa labas.",
       "Mag-ulat ka sa kampo pagbalik mo.",
       "Ingatan ang gamit at bumalik kang ligtas.",
-      "Maging alerto sa labas. Kailangan ka pa namin.",
+      "Maging alerto sa labas, {addressee.name}. Kailangan ka pa namin.",
       "Bantayan ang likod mo. Huwag magpaipit nang mag-isa.",
       "Sa malinis na daan ka dumaan at bumalik ka."
     ],
     "say.variants.friend": [
-      "Mag-ingat ka sa labas, kaibigan. Bumalik kang buo.",
+      "Mag-ingat ka sa labas, {addressee.name}. Bumalik kang buo.",
       "Bantayan ang likod mo. Huwag mo akong paghanapin sa iyo.",
       "Mabuti at nakapag-usap tayo. Mabuhay ka riyan.",
-      "Alagaan mo sarili mo. Kita tayo agad.",
+      "Alagaan mo sarili mo, {addressee.name}. Kita tayo agad.",
       "Masarap palaging kausap ka. Bantayan ang mga sulok.",
-      "Magmatyag ka, pare. Kita tayo mamaya.",
+      "Magmatyag ka, {addressee.name}. Kita tayo mamaya.",
       "Ingatan mo sarili mo. Nandito lang ako kung magkagulo.",
-      "Huwag kang bibitaw, kaibigan. Marami pa tayong gagawin.",
+      "Huwag kang bibitaw, {addressee.name}. Marami pa tayong gagawin.",
       "Huwag kang gagawa ng delikado nang wala ako, ha?"
     ],
     "say.variants.family": [
       "Mag-ingat ka sa labas. Alam mo kung gaano ka kahalaga sa akin.",
-      "Umuwi kang ligtas, ha? Ayoko nang mawala ka rin.",
+      "Umuwi kang ligtas, {addressee.name}, ha? Ayoko nang mawala ka rin.",
       "Yumuko sa panganib at umuwing buo.",
       "Ipangako mong hindi ka magpapakabayani sa labas.",
-      "Alagaan mo sarili mo. Maghihintay ako rito para sa iyo.",
+      "Alagaan mo sarili mo, {addressee.name}. Maghihintay ako rito para sa iyo.",
       "Lagi kang magtago sa kubli at bumalik agad pagkatapos.",
-      "Pakiusap, mag-ingat ka. Walang iwanan sa pamilya.",
+      "Pakiusap, mag-ingat ka, {addressee.name}. Walang iwanan sa pamilya.",
       "Bantayan ang bawat kanto. Gusto kitang makitang bumalik.",
       "Huwag kang magtatagal sa labas. Mag-ingat ka."
     ],
     "say.variants.lover": [
-      "Bumalik ka sa akin nang ligtas. Huwag kang magtatagal.",
-      "Mag-ingat ka sa labas, mahal. Hihintayin kita.",
+      "Bumalik ka sa akin nang ligtas, {addressee.name}. Huwag kang magtatagal.",
+      "Mag-ingat ka sa labas, {addressee.name}. Hihintayin kita.",
       "Ipangako mong babalik kang buo.",
       "Ingatan mo sarili mo. Ikaw na lang ang natitira sa akin.",
       "Huwag mo akong pag-alalahin nang matagal. Bilisan mong bumalik.",
-      "Maging ligtas ka diyan, mahal ko. Nakabantay ako sa iyo.",
+      "Maging ligtas ka diyan, {addressee.name}. Nakabantay ako sa iyo.",
       "Kumapit ka diyan sa labas. Umuwi ka agad sa akin.",
       "Bibilangin ko ang mga minuto hanggang makabalik ka.",
       "Mabuhay ka para sa akin. Marami pa tayong bukas."
@@ -124,31 +124,31 @@
       "Dumistansya ka muna."
     ],
     "say.variants.player_colonist": [
-      "Bantayan ang linya. Babalik ako agad.",
+      "Bantayan ang linya, {addressee.name}. Babalik ako agad.",
       "Maging alerto rito. Aalis muna ako.",
       "Bantayan ang likod natin. Usap tayo mamaya.",
       "Maghanda lang. Nandito lang ako sa paligid.",
       "Ayusin ang gamit. Kita tayo mamaya.",
-      "Lalabas muna ako saglit. Bantayan ang kampo.",
+      "Lalabas muna ako saglit, {addressee.name}. Bantayan ang kampo.",
       "Bantayan ang pwesto mo. Kita tayo agad.",
       "Babalik ako agad mamaya."
     ],
     "say.variants.player_friend": [
-      "Mag-ingat ka, kaibigan. Usap tayo ulit.",
+      "Mag-ingat ka, {addressee.name}. Usap tayo ulit.",
       "Bantayan ang likod mo. Kita tayo agad.",
-      "Mamaya ulit, pare. Mag-ingat ka.",
+      "Mamaya ulit, {addressee.name}. Mag-ingat ka.",
       "Huwag kang magpapakagat habang wala ako.",
       "Masarap kausap palagi. Kapit lang.",
-      "Sige, lakad na ako. Magmatyag ka, kaibigan.",
+      "Sige, lakad na ako. Magmatyag ka, {addressee.name}.",
       "Huwag kang bibitaw hanggang makabalik ako.",
       "Kita tayo agad, kaibigan."
     ],
     "say.variants.player_family": [
-      "Mag-ingat ka habang nasa labas ako. Babalik ako agad.",
+      "Mag-ingat ka habang nasa labas ako, {addressee.name}. Babalik ako agad.",
       "Alagaan mo sarili mo para sa akin. Usap tayo ulit.",
       "Huwag kang susugal sa panganib, ha? Babalik ako.",
       "Diyan ka lang at yumuko sa gulo.",
-      "Bantayan mo sarili mo. Hindi tayo maghihiwalay.",
+      "Bantayan mo sarili mo, {addressee.name}. Hindi tayo maghihiwalay.",
       "Babalik ako agad, pangako iyan.",
       "Mag-ingat ka. Hindi ako magtatagal.",
       "Ingatan mo sarili mo hanggang pagbalik ko."
@@ -156,9 +156,9 @@
     "say.variants.player_lover": [
       "Mag-ingat ka para sa akin. Babalik ako agad sa iyo.",
       "Huwag mo akong masyadong hanapin. Sandali lang ako.",
-      "Ingatan mo sarili mo, mahal. Kita tayo agad.",
+      "Ingatan mo sarili mo, {addressee.name}. Kita tayo agad.",
       "Mabuhay ka para sa ating dalawa. Babalik ako.",
-      "Hintayin mo ako, ha? Mag-ingat ka.",
+      "Hintayin mo ako, {addressee.name}, ha? Mag-ingat ka.",
       "Hindi ako magtatagal sa labas. Alagaan mo sarili mo.",
       "Lumayo sa panganib hanggang makabalik ako sa tabi mo.",
       "Babalik ako bago mo pa namalayan."

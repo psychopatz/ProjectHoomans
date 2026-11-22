@@ -10,7 +10,7 @@
       "Buy me a second, {addressee.name}, patching myself up!"
     ],
     "say.variants.ally": [
-      "Cover us, {addressee.name}, I'm bandaging {target.name}!",
+      "Cover us {scene.location}, {addressee.name}, I'm bandaging {target.name}!",
       "Keep them off us, {addressee.name}, treating {target.name} now!",
       "Hold the line, {addressee.name}! I'm patching {target.name} up!",
       "Watch our backs, {addressee.name}, wrapping {target.name} now!"

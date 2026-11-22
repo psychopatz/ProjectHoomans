@@ -1,7 +1,7 @@
 {
-  "convo.travel.excursion.plan_exchange.reply.agreed.say.1.default": "Alright. Pack light, keep the crowbar handy, and we stick to the side streets.",
-  "convo.travel.excursion.plan_exchange.reply.assessed.say.1.default": "Main road looked quiet earlier, but there's always a few stragglers near the gas station.",
+  "convo.travel.excursion.plan_exchange.reply.agreed.say.1.default": "Alright, {addressee.name}. Pack light, keep the crowbar handy, and we stick to the side streets.",
+  "convo.travel.excursion.plan_exchange.reply.assessed.say.1.default": "Roads looked quiet earlier {scene.location}, {addressee.name}, though there's always a few stragglers near the gas station.",
   "convo.travel.excursion.plan_exchange.reply.deferred.say.1.default": "Better to wait for first light. Fog's too thick out by the highway right now.",
   "convo.travel.excursion.plan_exchange.reply.refused.say.1.default": "No sense going out there right now. Stay put until it's safe.",
-  "convo.travel.excursion.plan_exchange.say.1.default": "We're running low on canned goods and spare batteries. Think we can make a quick run up the road?"
+  "convo.travel.excursion.plan_exchange.say.1.default": "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?"
 }

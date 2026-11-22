@@ -4,8 +4,8 @@
   "locale": "EN",
   "entries": {
     "say.variants.power_shutoff_open": [
-      "Did everything just go dark? Looks like the power grid finally died today, {addressee.name}.",
-      "The lights aren't coming back on. The grid gave out today, {addressee.name}.",
+      "Did everything just go dark {scene.location}? Looks like the power grid finally died today, {addressee.name}.",
+      "{scene.clock}—and the lights aren't coming back on. The grid gave out today, {addressee.name}.",
       "Power's finally gone for good today, {addressee.name}. Freezers and generators matter even more now."
     ],
     "say.variants.power_shutoff_reply": [
@@ -14,7 +14,7 @@
       "Rough milestone, {addressee.name}, but we knew it was coming. Let's adapt."
     ],
     "say.variants.water_shutoff_open": [
-      "Pipes just ran dry today, {addressee.name}. Water system finally quit on us.",
+      "Pipes just ran dry {scene.location} today, {addressee.name}. Water system finally quit on us.",
       "Tap water's dead as of today, {addressee.name}. Better grab every bottle and barrel we see.",
       "Looks like the water main finally shut off today, {addressee.name}. No more easy sinks."
     ],

@@ -10,7 +10,7 @@
       "Bigyan mo ako ng sandali, {addressee.name}, ginagamot ko sarili ko!"
     ],
     "say.variants.ally": [
-      "Bantayan mo kami, {addressee.name}, binibendahe ko si {target.name}!",
+      "Bantayan mo kami {scene.location}, {addressee.name}, binibendahe ko si {target.name}!",
       "Ilayo mo sila, {addressee.name}, ginagamot ko na si {target.name}!",
       "Hawakan ang linya, {addressee.name}! Tinatalian ko sugat ni {target.name}!",
       "Bantay sa likod namin, {addressee.name}, ginagamot si {target.name}!"

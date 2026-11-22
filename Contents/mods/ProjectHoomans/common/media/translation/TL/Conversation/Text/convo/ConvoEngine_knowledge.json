@@ -1,7 +1,7 @@
 {
   "convo.knowledge.gossip.exchange.reply.blocked.say.1.default": "Hindi ito ang oras para sa tsismis—yumuko ka lang.",
   "convo.knowledge.gossip.exchange.reply.blocked.say.1.negative": "Itigil muna ang kuwentuhan. Bantayan mo ang kalye.",
-  "convo.knowledge.gossip.exchange.reply.known.say.1.contextual": "Mapapatunayan ko ang parte niyan: may nakita akong bagong bakas at bukas na pinto malapit sa strip mall kahapon.",
+  "convo.knowledge.gossip.exchange.reply.known.say.1.contextual": "Mapapatunayan ko ang parte niyan, {addressee.name}: may nakita akong bagong bakas at bukas na pinto malapit sa {slot.location} kahapon.",
   "convo.knowledge.gossip.exchange.reply.known.say.1.default": "Oo, nakita ko mismo—barado sa {slot.location}, kaya umiwas ka roon kung marunong kang mag-ingat.",
   "convo.knowledge.gossip.exchange.reply.known.say.1.positive": "Oo naman—{addressee.name}, sigurado ang balitang 'yan. Tandaan mo para sa lakad mo.",
   "convo.knowledge.gossip.exchange.reply.refused.say.1.default": "Hindi ako nakikisali sa mga sabi-sabi. Sa iba ka na lang magtanong.",
@@ -22,7 +22,7 @@
   "convo.knowledge.gossip.exchange.say.1.neutral": "Ano'ng balita rito nitong mga nakaraang araw—may galaw ba sa highway o malapit sa bayan?",
   "convo.knowledge.gossip.exchange.say.1.neutral.1": "Ano'ng balita rito nitong mga nakaraang araw—may galaw ba sa highway o malapit sa bayan?",
   "convo.knowledge.gossip.exchange.say.1.neutral.2": "May kailangan ba akong malaman bago tumawid sa susunod na kanto?",
-  "convo.knowledge.gossip.exchange.say.1.positive": "Buti nagkita tayo rito—may magandang balita ka ba tungkol sa malinis na daan o gamit sa malapit?",
-  "convo.knowledge.gossip.exchange.say.1.positive.1": "Buti nagkita tayo rito—may magandang balita ka ba tungkol sa malinis na daan o gamit sa malapit?",
+  "convo.knowledge.gossip.exchange.say.1.positive": "Buti nagkita tayo rito, {addressee.name}—may magandang balita ka ba tungkol sa malinis na daan o gamit sa malapit?",
+  "convo.knowledge.gossip.exchange.say.1.positive.1": "Buti nagkita tayo rito, {addressee.name}—may magandang balita ka ba tungkol sa malinis na daan o gamit sa malapit?",
   "convo.knowledge.gossip.exchange.say.1.positive.2": "May sandali ka ba para magpalitan ng balita? Malaking bagay kapag nagtutulungan sa impormasyon."
 }

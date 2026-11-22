@@ -16,6 +16,8 @@ local Style = PNC.ConvoEngine.SpeechStyleContext
     or require "PNC/ConvoEngine/SpeechStyleContext"
 local UtterancePlan = PNC.ConvoEngine.UtterancePlan
     or require "PNC/ConvoEngine/UtterancePlan"
+local TokenFormatter = PNC.ConvoEngine.TokenFormatter
+    or require "PNC/ConvoEngine/TokenFormatter"
 local cachedRegistry
 do
     local ok, value = pcall(require,
@@ -646,6 +648,10 @@ function Realization.Apply(response, context)
         output.plan = copy(response.plan, 0)
     end
     return output
+end
+
+function Realization.FormatTokens(text, tokens)
+    return TokenFormatter.Format(text, tokens)
 end
 
 return Realization

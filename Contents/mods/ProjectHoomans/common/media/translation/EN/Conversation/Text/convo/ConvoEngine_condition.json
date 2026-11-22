@@ -8,7 +8,7 @@
   "convo.condition.stamina.warn.say.1.exhausted.1": "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!",
   "convo.condition.stamina.warn.say.1.exhausted.2": "{addressee.name}, my arms feel like lead! Need a moment to recover!",
   "convo.condition.stamina.warn.say.1.exhausted.3": "Zero stamina left, {addressee.name}, I can barely swing!",
-  "convo.condition.stamina.warn.say.1.exhausted.4": "Falling back a step, {addressee.name}, I'm totally spent!",
+  "convo.condition.stamina.warn.say.1.exhausted.4": "Falling back a step {scene.location}, {addressee.name}, I'm totally spent!",
   "convo.condition.stamina.warn.say.1.winded": "Whoa, {addressee.name}, give me a second to catch my breath.",
   "convo.condition.stamina.warn.say.1.winded.1": "Whoa, {addressee.name}, give me a second to catch my breath.",
   "convo.condition.stamina.warn.say.1.winded.2": "{addressee.name}, my legs are burning. Slowing down for a beat.",

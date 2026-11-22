@@ -8,7 +8,7 @@
       "Pick up anything on the radio or from other folks passing through?"
     ],
     "say.variants.positive": [
-      "Good catching you here—heard anything useful about clear roads or decent supplies nearby?",
+      "Good catching you here, {addressee.name}—heard anything useful about clear roads or decent supplies nearby?",
       "Got a minute to trade notes? Word travels fast when folks actually share it."
     ],
     "say.variants.neutral": [
@@ -27,7 +27,7 @@
     "reply.blocked.say.variants.negative": "Save the chatter. Watch the street.",
     "reply.known.say.variants.default": "Yeah, I saw that myself—{slot.location} is choked up, so steer clear if you're smart.",
     "reply.known.say.variants.positive": "Actually, yes—{addressee.name}, word is solid on that. Worth keeping in your pocket.",
-    "reply.known.say.variants.contextual": "Can vouch for part of it: saw fresh tracks and open shutters near the strip mall yesterday.",
+    "reply.known.say.variants.contextual": "Can vouch for part of it, {addressee.name}: saw fresh tracks and open shutters near {slot.location} yesterday.",
     "reply.unknown.say.variants.default": "Couldn't tell you. Haven't heard a peep about that.",
     "reply.unknown.say.variants.neutral": "No idea—I've been keeping my head down on this block, haven't caught any news.",
     "reply.uncertain.say.variants.default": "Heard folks talking about it, sure, but nobody I'd bet my boots on.",

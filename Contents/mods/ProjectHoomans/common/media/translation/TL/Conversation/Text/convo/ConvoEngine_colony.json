@@ -1,7 +1,7 @@
 {
-  "convo.colony.work.status_exchange.reply.agreed.say.1.default": "Sige. Kumuha ka ng martilyo at pako—tapusin natin ito bago dumilim.",
-  "convo.colony.work.status_exchange.reply.checked_in.say.1.default": "Kaya pa naman sa ngayon, kailangan lang ng dagdag na kamay kapag tahimik na.",
+  "convo.colony.work.status_exchange.reply.agreed.say.1.default": "Sige, {addressee.name}. Kumuha ka ng martilyo at pako—tapusin natin ito bago dumilim.",
+  "convo.colony.work.status_exchange.reply.checked_in.say.1.default": "Kaya pa naman sa ngayon {scene.location}, {addressee.name}, kailangan lang ng dagdag na kamay kapag tahimik na.",
   "convo.colony.work.status_exchange.reply.deferred.say.1.default": "Sige, tama lang. Bukas na natin pukpukin iyan para hindi tayo makatawag ng pansin.",
   "convo.colony.work.status_exchange.reply.refused.say.1.default": "Hindi ito ang oras para sa gawaing-kampo. Bantayan mo muna ang bakuran.",
-  "convo.colony.work.status_exchange.say.1.default": "May maluwag pang tabla sa bakod sa likod, tapos kailangan ding silipin ang mga drum ng tubig-ulan. Kumusta ang trabaho rito?"
+  "convo.colony.work.status_exchange.say.1.default": "May maluwag pang tabla sa bakod {scene.location}, {addressee.name}, tapos kailangan ding silipin ang mga drum ng tubig-ulan. Kumusta ang trabaho rito?"
 }

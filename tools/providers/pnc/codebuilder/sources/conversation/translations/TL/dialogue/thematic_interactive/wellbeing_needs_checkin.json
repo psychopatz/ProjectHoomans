@@ -8,7 +8,7 @@
       "May sandali ka ba—kamusta ang pagkain, tubig, at benda mo?"
     ],
     "say.variants.positive": [
-      "Buti naman at nakatayo ka pa nang maayos. May kailangan ka ba habang tahimik pa?",
+      "Buti naman at nakatayo ka pa nang maayos, {addressee.name}. May kailangan ka ba habang tahimik pa?",
       "Mas matatag ka pa tingnan kaysa sa karamihan dito. Maayos pa ba ang lagay mo?"
     ],
     "say.variants.neutral": [
@@ -25,7 +25,7 @@
     ],
     "reply.blocked.say.variants.default": "Hindi puwede ngayon—tumingin ka sa paligid.",
     "reply.blocked.say.variants.negative": "Tama na muna. May mas malaking problema sa harap natin.",
-    "reply.supported.say.variants.default": "Salamat. Malaking bagay nang may nagbabantay at nagtatanong.",
+    "reply.supported.say.variants.default": "Salamat, {addressee.name}. Malaking bagay nang may nagbabantay at nagtatanong.",
     "reply.supported.say.variants.positive": "Salamat, {addressee.name}. Malaking tulong na 'yan sa panahong 'to.",
     "reply.deferred.say.variants.default": "Humanap muna tayo ng masisilungan bago natin ayusin ang kulang sa gamit.",
     "reply.deferred.say.variants.neutral": "Kaya pa naman sa ngayon. Tanungin mo ulit ako kapag wala na tayo sa gitna ng kalsada.",

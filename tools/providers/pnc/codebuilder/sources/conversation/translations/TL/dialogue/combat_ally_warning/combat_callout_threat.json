@@ -4,7 +4,7 @@
   "locale": "TL",
   "entries": {
     "say.variants.zombie_neutral": [
-      "Bantay, may {target.name} na gumagalaw {scene.location}!",
+      "Ingat, {addressee.name}, may {target.name} na gumagalaw {scene.location}!",
       "Ingat! May {target.name} {scene.location}!",
       "Maging alerto, nakita ang {target.name} {scene.location}!",
       "Parating na! May {target.name} {scene.location}!"
@@ -13,7 +13,7 @@
       "Kontak {scene.location}! {target.name}, itaas ang sandata!",
       "Kumpirmado ang {target.name} na sumusulong {scene.location}, laban!",
       "{target.name} {scene.location}! Magtipon at linisin!",
-      "Hawakan ang linya, may {target.name} {scene.location}!"
+      "Panatilihin ang pwesto, {addressee.name}, may {target.name} {scene.location}!"
     ],
     "say.variants.zombie_hostile": [
       "Patumbahin! {target.name} ang gumagala {scene.location}!",
@@ -22,13 +22,13 @@
       "Hayan na! {target.name} ang nahuli {scene.location}, tirahin!"
     ],
     "say.variants.hostile_neutral": [
-      "Ingat, nakita ang {target.name} {scene.location}!",
+      "Mag-ingat, namataan ang {target.name} {scene.location}!",
       "May gulo! {target.name} ang kumikilos {scene.location}!",
       "Alerto! May {target.name} {scene.location}!",
       "Bantay lang! Namataan ang {target.name} {scene.location}!"
     ],
     "say.variants.hostile_tactical": [
-      "Kalabang kontak! {target.name} {scene.location}, ihanda ang sandata!",
+      "May kalaban! {target.name} {scene.location}, ihanda ang armas!",
       "Armadong banta, {target.name} {scene.location}, sumugod!",
       "Nakita ko ang {target.name} na lumalapit {scene.location}!",
       "Kumpirmado ang banta, {target.name} {scene.location}, kumubli!"

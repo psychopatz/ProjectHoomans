@@ -3,10 +3,10 @@
   "family": "mediate_exchange",
   "locale": "EN",
   "entries": {
-    "say.variants.default": "Everyone's snapping at each other over the watch schedule and the pantry. We need to sort this out before someone walks out.",
-    "reply.reconciled.say.variants.default": "Alright. We're all tired and short on sleep. Let's split the watch evenly and drop it.",
+    "say.variants.default": "Everyone's snapping at each other over the watch schedule and the pantry, {addressee.name}. We need to sort this out before someone walks out.",
+    "reply.reconciled.say.variants.default": "Alright, {addressee.name}. We're all tired and short on sleep. Let's split the watch evenly and drop it.",
     "reply.deferred.say.variants.default": "Fine. Let's cool off and talk about it after we've both had some water and rest.",
-    "reply.acknowledged.say.variants.default": "I hear you. Nobody's trying to shortchange anyone here—we just need clearer rules.",
+    "reply.acknowledged.say.variants.default": "I hear you, {addressee.name}. Nobody's trying to shortchange anyone here—we just need clearer rules.",
     "reply.strained.say.variants.default": "Forget it. Not much point talking when nobody's listening."
   }
 }

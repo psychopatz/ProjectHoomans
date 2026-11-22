@@ -14,6 +14,8 @@ local Authority = PNC.ConvoEngine.RealizationAuthority
     or require "PNC/ConvoEngine/Dialogue/RealizationAuthority"
 local SpeechRealization = PNC.ConvoEngine.SpeechRealization
     or require "PNC/ConvoEngine/SpeechRealization"
+local TokenFormatter = PNC.ConvoEngine.TokenFormatter
+    or require "PNC/ConvoEngine/TokenFormatter"
 local CombatReactionProfile = PNC.Semantics.CombatReactionProfile
     or require "PNC/Semantics/PNC_SemanticCombatReactionProfile"
 
@@ -57,30 +59,62 @@ end
 
 local function formatTokens(text, context)
     local output = tostring(text or "")
-    local values = type(context) == "table"
-        and (context.contentArgs or context.renderTokens or context)
-        or {}
-    local key
-    local value
-    for key, value in pairs(values) do
-        if type(key) == "string"
-            and (type(value) == "string" or type(value) == "number")
-        then
-            output = string.gsub(output, "{" .. tostring(key) .. "}",
-                function() return tostring(value) end)
+    if not string.find(output, "{", 1, true) then return output end
+    local ctx = type(context) == "table" and context or {}
+    local tokens = {}
+    local function mergeScalar(tbl)
+        if type(tbl) ~= "table" then return end
+        for key, value in pairs(tbl) do
+            if type(key) == "string"
+                and (type(value) == "string" or type(value) == "number")
+            then
+                tokens[key] = value
+            end
         end
     end
-    -- Command wording is authored with the actor-neutral ConvoEngine binding. The
-    -- established command callers still provide the bounded group display
-    -- value as `name`/`names`; project it into addressee.name at this one
-    -- adopter boundary without creating a new semantic variable.
-    local addresseeName = values["addressee.name"]
-        or values.names or values.name
-    if type(addresseeName) == "string" or type(addresseeName) == "number" then
-        output = string.gsub(output, "{addressee.name}",
-            function() return tostring(addresseeName) end)
-    end
-    return output
+    mergeScalar(ctx)
+    mergeScalar(ctx.renderTokens)
+    mergeScalar(ctx.contentArgs)
+
+    -- Command wording is authored with the actor-neutral ConvoEngine binding.
+    -- Populate addressee.name (when known/named), speaker.name, scene.location,
+    -- and scene.clock, rejecting empty or "Unknown" placeholders so
+    -- TokenFormatter collapses optional vocatives cleanly.
+    local addresseeKnown = ctx.playerNameKnown ~= false
+    local rawAddressee = tokens["addressee.name"]
+        or tokens.names
+        or tokens.name
+        or ctx.addresseeName
+        or (addresseeKnown and (ctx.playerFirstName or ctx.playerAddressName or ctx.playerName))
+        or (ctx.npcIdentityKnown ~= false and (ctx.npcFirstName or ctx.npcName))
+    tokens["addressee.name"] = TokenFormatter.CleanName(rawAddressee)
+
+    local rec = type(ctx.npcRecord) == "table" and ctx.npcRecord
+        or (type(ctx.target) == "table" and ctx.target or nil)
+    local rawSpeaker = tokens["speaker.name"]
+        or ctx.speakerName
+        or ctx.npcFirstName
+        or ctx.npcFullName
+        or ctx.npcName
+        or (rec and (rec.name or rec.fullName or rec.displayName))
+    tokens["speaker.name"] = TokenFormatter.FirstTokenName(rawSpeaker)
+
+    local rawLocation = tokens["scene.location"]
+        or ctx.sceneLocation
+        or ctx.locationLabel
+        or ctx.locationName
+        or ctx.zoneName
+        or ctx.settlementName
+        or ctx.roomName
+        or (rec and (rec.zoneName or rec.locationName or rec.settlementName or rec.roomName))
+    tokens["scene.location"] = TokenFormatter.CleanLocation(rawLocation)
+
+    local rawClock = tokens["scene.clock"]
+        or ctx.sceneClock
+        or ctx.timeOfDay
+    tokens["scene.clock"] = TokenFormatter.CleanName(rawClock)
+
+    return TokenFormatter.Format(output, tokens)
 end
 
 local function rendered(realization, context)

@@ -4,7 +4,7 @@
   "locale": "TL",
   "entries": {
     "say.variants.first": [
-      "Teka, hinay-hinay lang! Kakampi mo ako!",
+      "Teka, hinay-hinay lang, {addressee.name}! Kakampi mo ako!",
       "Hoy, tingnan mo tinatamaan mo!",
       "Ingat naman, {addressee.name}, muntik mo na akong matumba!",
       "Teka lang, kakampi ako! Huwag mo akong itulak!"
