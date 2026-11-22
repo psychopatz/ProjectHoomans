@@ -4,13 +4,13 @@
   "locale": "TL",
   "entries": {
     "say.variants.engaging_neutral": [
-      "Kita ko na—{target.name} {scene.location}, {addressee.name}! Papunta na!",
-      "Hawak sa tingin ko ang {target.name} {scene.location}—kasunod mo na ako, {addressee.name}!",
+      "Nakita ko na ang {target.name} {scene.location}, {addressee.name}! Papunta na!",
+      "Hawak sa tingin ko ang {target.name} {scene.location}, kasunod mo na ako, {addressee.name}!",
       "Papunta na, {addressee.name}! Pigilan ang {target.name} {scene.location}!",
       "Sige, {addressee.name}, lulusob ako sa {target.name} {scene.location}!"
     ],
     "say.variants.engaging_tactical": [
-      "Kumpirmado ang {target.name} {scene.location}, {addressee.name}—lumalaban na!",
+      "Kumpirmado ang {target.name} {scene.location}, {addressee.name}, lumalaban na!",
       "Kopyado, {addressee.name}! Umiikot sa {target.name} {scene.location}!",
       "Nakatutok na ako sa {target.name} {scene.location}, kasabay mo {addressee.name}!",
       "Sige, {addressee.name}, lumalapit sa {target.name} {scene.location}!"
@@ -18,38 +18,86 @@
     "say.variants.engaging_hostile": [
       "Kita ko na ang {target.name} {scene.location}, {addressee.name}! Tatapusin ko 'to!",
       "Oo, {addressee.name}, nakita ko ang {target.name} {scene.location}! Sugod!",
-      "Magtira ka sa {target.name} para sa akin, {addressee.name}! Papasok {scene.location}!",
-      "Naka-lock na ang {target.name} {scene.location}, {addressee.name}! Oras na tumba!"
+      "Magtira ka ng {target.name} para sa akin, {addressee.name}, papasok {scene.location}!",
+      "Tutok na sa {target.name} {scene.location}, {addressee.name}! Oras na tumba!"
     ],
     "say.variants.alerted_neutral": [
       "Narinig kita, {addressee.name}! Hinahanap ko na ang {target.name} {scene.location}!",
-      "Haharap ako sa {scene.location}, {addressee.name}—mag-ingat sa {target.name}!",
+      "Lilingon ako para bantayan ka, {addressee.name}, ingat sa {target.name} {scene.location}!",
       "Sige, {addressee.name}, susuporta ako laban sa {target.name} {scene.location}!",
-      "Teka, {addressee.name}! Tinitingnan ko {scene.location} para sa {target.name}!"
+      "Papunta ako, {addressee.name}! Handa na laban sa {target.name} {scene.location}!"
     ],
     "say.variants.alerted_tactical": [
-      "Kopyado ang kontak, {addressee.name}! Sinusuri {scene.location} para sa {target.name}!",
-      "Lilingon sa likod mo, {addressee.name}—wala pang linaw ang {target.name} {scene.location}!",
+      "Kopyado ang kontak, {addressee.name}! Nagmamasid {scene.location} para sa {target.name}!",
+      "Bantay ko ang likod mo, {addressee.name}, wala pang linaw ang {target.name} {scene.location}!",
       "Alerto, {addressee.name}, humahanap ng tanaw sa {target.name} {scene.location}!",
-      "Sige, {addressee.name}, binabantayan {scene.location} laban sa {target.name}!"
+      "Sige, {addressee.name}, hahanapin ko ang {target.name} {scene.location}!"
     ],
     "say.variants.alerted_hostile": [
-      "Libangin ang {target.name}, {addressee.name}! Papunta na ako {scene.location}!",
-      "Huwag pakawalan ang {target.name} {scene.location}, {addressee.name}—papasok ako!",
-      "Saan banda {scene.location}, {addressee.name}?! Pupuntahan ko ang {target.name}!",
+      "Libangin ang {target.name} {scene.location}, {addressee.name}! Papunta na ako!",
+      "Huwag pakawalan ang {target.name} {scene.location}, {addressee.name}, papasok ako!",
+      "Pigilan mo ang {target.name} {scene.location}, {addressee.name}, pupuntahan ko na!",
       "Ipitin ang {target.name} {scene.location}, {addressee.name}, umiikot na ako!"
     ],
     "say.variants.defensive_neutral": [
       "Teka, {addressee.name}, lalayo muna ako sa {target.name} {scene.location}!",
-      "Narinig kita, {addressee.name}—aatras palayo sa {target.name} {scene.location}!",
-      "Umiiwas sa {target.name} {scene.location}—mag-ingat ka, {addressee.name}!",
+      "Narinig kita, {addressee.name}, aatras palayo sa {target.name} {scene.location}!",
+      "Umiiwas sa {target.name} {scene.location}, ingat ka, {addressee.name}!",
       "Ingat sa {target.name} {scene.location}, {addressee.name}, dito muna ako sa likod!"
     ],
     "say.variants.defensive_shaken": [
-      "Mag-ingat sa {target.name} {scene.location}, {addressee.name}—lalayo ako!",
+      "Ingat sa {target.name} {scene.location}, {addressee.name}, lalayo ako!",
       "Masyadong malapit! Umiiwas na sa {target.name} {scene.location}, {addressee.name}!",
-      "Naririnig ko ang {target.name} {scene.location}, {addressee.name}—yuyuko muna ako!",
-      "Huwag palapitin ang {target.name} mula {scene.location}, {addressee.name}!"
+      "Naririnig ko ang {target.name} {scene.location}, {addressee.name}, yuyuko muna ako!",
+      "Bantay sa {target.name} {scene.location}, {addressee.name}, hindi ko kaya 'yan!"
+    ],
+    "say.variants.wingman_engaging_neutral": [
+      "Kasunod mo na ako, {addressee.name}! Uusad ako sa gilid ng {target.name}!",
+      "Bantay ko likod mo, {addressee.name}, sasabay sa {target.name}!",
+      "Kasama mo ako, {addressee.name}! Pigilan natin ang {target.name}!",
+      "Lalapit sa tabi mo, {addressee.name}, bantayan ang {target.name}!"
+    ],
+    "say.variants.wingman_engaging_tactical": [
+      "Umiikot sa gilid, {addressee.name}, ipitin ang {target.name}!",
+      "Nasa likod mo na ako, {addressee.name}! Lulusob sa {target.name}!",
+      "Bantay sa tagiliran mo, {addressee.name}! Aabante sa {target.name}!",
+      "Sasara sa tabi mo, {addressee.name}, ikulong ang {target.name}!"
+    ],
+    "say.variants.wingman_engaging_hostile": [
+      "Magtira ng {target.name} para sa akin, {addressee.name}! Iikot ako!",
+      "Nasa likod mo na ako, {addressee.name}, patumbahin ang {target.name}!",
+      "Haharangin ko sa gilid ang {target.name}, {addressee.name}!",
+      "Sasabay sa sugod mo, {addressee.name}! Tapusin ang {target.name}!"
+    ],
+    "say.variants.wingman_alerted_neutral": [
+      "Aabante sa likod mo, {addressee.name}! Abang sa {target.name}!",
+      "Kasabay mo na ako, {addressee.name}, nagmamatyag sa {target.name}!",
+      "Hawakan ko gilid mo, {addressee.name}! Sabihin mo kung sumugod ang {target.name}!",
+      "Lalapit sa likod mo, {addressee.name}, handa sa {target.name}!"
+    ],
+    "say.variants.wingman_alerted_tactical": [
+      "Bantay sa likod mo, {addressee.name}, nagmamasid sa {target.name}!",
+      "Susuporta sa iyo, {addressee.name}, sinusundan ang {target.name}!",
+      "Nasa balikat mo na ako, {addressee.name}! Handang bumaril sa {target.name}!",
+      "Hawakan ko ang gilid, {addressee.name}, bantay sa {target.name}!"
+    ],
+    "say.variants.wingman_defensive": [
+      "Ikaw na bahala sa {target.name}, {addressee.name}! Lalayo muna ako!",
+      "Ilayo mo ang {target.name} sa akin, {addressee.name}, kukubli ako!",
+      "Ingat sa {target.name}, {addressee.name}, mananatili ako sa likod!",
+      "Aatras palayo sa {target.name}, {addressee.name}, magbantay ka!"
+    ],
+    "say.variants.anchor_combat": [
+      "Bantay ko ang likuran natin, {addressee.name}!",
+      "Walang makakasingit sa likod! Tuloy lang, {addressee.name}!",
+      "Hawak ko ang huling linya, {addressee.name}, sugod lang!",
+      "Binabantayan ko ang paligid, {addressee.name}, ituloy ang laban!"
+    ],
+    "say.variants.anchor_tactical": [
+      "Nakaayos ang bantay sa likod, {addressee.name}, abante na!",
+      "Segurado ang paligid natin, {addressee.name}, malaya kang sumugod!",
+      "Hawak ko ang tanaw sa likuran, {addressee.name}!",
+      "Sarado ang mga gilid natin, {addressee.name}, sulong!"
     ]
   }
 }

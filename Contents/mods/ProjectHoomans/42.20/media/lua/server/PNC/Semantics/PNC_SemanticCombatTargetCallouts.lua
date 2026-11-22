@@ -99,11 +99,6 @@ function Service.OnTargetChanged(event, record)
             kind = semanticClass, id = targetId, x = x, y = y, z = z,
             observedAt = now, positionSource = source,
         }, { now = now, sameAreaThreshold = 0.5, maxThreatAgeMs = 2000 })
-        if spatial then
-            mode, modeReason = Language.SelectMode(record, profile, spatial)
-            spatial.presentationMode, spatial.presentationReason = mode, modeReason
-            text, textReason, presentation = Language.Decorate("", semanticClass, spatial, mode)
-        end
     end
 
     local ref = eventID(event, record, target)
@@ -113,7 +108,7 @@ function Service.OnTargetChanged(event, record)
     if warningResult and warningResult.emitted == true then
         local tone = Service.ResolveAllyWarnTone(record, profile)
         local toks = Service.BuildRichSpeechTokens and Service.BuildRichSpeechTokens(
-            record, record, warningResult.descriptor, now, tone
+            record, record, warningResult.descriptor, now, tone, { spatial = spatial }
         ) or nil
         local rich, rRes = Service.ResolveSemanticLine(
             record, "combat_ally_warn_callout", "WARN", semanticClass, ref, profile, toks
@@ -124,6 +119,11 @@ function Service.OnTargetChanged(event, record)
             speechID = rRes and rRes.realizationID or "semantic.combat.ally_warn.callout"
             presClass = rRes and rRes.presentationClass or "BARK"
         end
+    end
+    if not text and spatial then
+        mode, modeReason = Language.SelectMode(record, profile, spatial)
+        spatial.presentationMode, spatial.presentationReason = mode, modeReason
+        text, textReason, presentation = Language.Decorate("", semanticClass, spatial, mode)
     end
     if presentation or (warningResult and warningResult.emitted == true and text) then
         ctx = {

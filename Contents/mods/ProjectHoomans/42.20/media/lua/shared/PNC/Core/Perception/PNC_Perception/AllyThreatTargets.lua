@@ -69,15 +69,15 @@ function Perception.NormalizeThreatDescriptor(target, at)
         x = x, y = y, z = z, semanticClass = info.semanticClass, observedAt = now,
         displayName = m.displayName, enemyType = m.enemyType, factionName = m.factionName,
         roomName = m.roomName, isIndoors = m.isIndoors, enemyCount = m.enemyCount or 1,
-    }
+    }, info
 end
 
-function Perception.CanAllyEngageThreat(ally, descriptor)
+function Perception.CanAllyEngageThreat(ally, descriptor, preResolvedInfo)
     if type(ally) ~= "table" or ally.alive == false or type(descriptor) ~= "table" then
         return false, nil, "invalid_context"
     end
     local kind = tostring(descriptor.kind or "")
-    local info = resolveTargetWorld(kind, descriptor)
+    local info = preResolvedInfo or resolveTargetWorld(kind, descriptor)
     if not info or not info.object then return false, nil, "target_unavailable" end
     if kind == "zombie" and Perception.IsActualZombieBody and not Perception.IsActualZombieBody(info.object) then
         return false, nil, "not_actual_zombie"

@@ -5,12 +5,12 @@
   "entries": {
     "say.variants.engaging_neutral": [
       "I see {target.name} {scene.location}, {addressee.name}! Moving in!",
-      "Got eyes on {target.name} {scene.location}—right behind you, {addressee.name}!",
+      "Got eyes on {target.name} {scene.location}, right behind you, {addressee.name}!",
       "On my way, {addressee.name}! Holding {target.name} {scene.location}!",
       "Copy that, {addressee.name}, jumping on {target.name} {scene.location}!"
     ],
     "say.variants.engaging_tactical": [
-      "Visual confirmed on {target.name} {scene.location}, {addressee.name}—engaging!",
+      "Visual confirmed on {target.name} {scene.location}, {addressee.name}, engaging!",
       "Copy, {addressee.name}! Moving to flank {target.name} {scene.location}!",
       "I've got a bead on {target.name} {scene.location}, advancing with you, {addressee.name}!",
       "Roger, {addressee.name}, converging on {target.name} {scene.location}!"
@@ -18,38 +18,86 @@
     "say.variants.engaging_hostile": [
       "Got {target.name} in my sights {scene.location}, {addressee.name}! Finishing this!",
       "Yeah, {addressee.name}, I see {target.name} {scene.location}! Going in!",
-      "Leave some of {target.name} for me, {addressee.name}! Pushing {scene.location}!",
+      "Leave some of {target.name} for me, {addressee.name}, pushing {scene.location}!",
       "Locked on {target.name} {scene.location}, {addressee.name}! Time to drop them!"
     ],
     "say.variants.alerted_neutral": [
       "Heard you, {addressee.name}! Looking for {target.name} {scene.location} now!",
-      "Turning toward {scene.location}, {addressee.name}—watch out for {target.name}!",
+      "Turning to cover you, {addressee.name}, watch out for {target.name} {scene.location}!",
       "Copy, {addressee.name}, backing you up against {target.name} {scene.location}!",
-      "On it, {addressee.name}! Checking {scene.location} for {target.name}!"
+      "Moving over, {addressee.name}, ready for {target.name} {scene.location}!"
     ],
     "say.variants.alerted_tactical": [
-      "Copy contact, {addressee.name}! Scanning {scene.location} for {target.name}!",
-      "Turning to cover {addressee.name}—no visual on {target.name} {scene.location} yet!",
+      "Copy contact, {addressee.name}! Scanning for {target.name} {scene.location}!",
+      "Covering you, {addressee.name}, no visual on {target.name} {scene.location} yet!",
       "On alert, {addressee.name}, moving for eyes on {target.name} {scene.location}!",
-      "Roger, {addressee.name}, sweeping {scene.location} for {target.name}!"
+      "Roger, {addressee.name}, moving to spot {target.name} {scene.location}!"
     ],
     "say.variants.alerted_hostile": [
-      "Keep {target.name} busy, {addressee.name}! Coming {scene.location} now!",
-      "Don't let {target.name} slip {scene.location}, {addressee.name}—I'm moving in!",
-      "Where {scene.location}, {addressee.name}?! Coming to drop {target.name}!",
+      "Keep {target.name} busy {scene.location}, {addressee.name}! Coming over now!",
+      "Don't let {target.name} slip {scene.location}, {addressee.name}, I'm coming in!",
+      "Hold {target.name} there {scene.location}, {addressee.name}, coming to drop them!",
       "Pin {target.name} down {scene.location}, {addressee.name}, I'm coming around!"
     ],
     "say.variants.defensive_neutral": [
       "Whoa, {addressee.name}, keeping clear of {target.name} {scene.location}!",
-      "Heard you, {addressee.name}—falling back away from {target.name} {scene.location}!",
-      "Staying out of reach of {target.name} {scene.location}—be careful, {addressee.name}!",
+      "Heard you, {addressee.name}, backing away from {target.name} {scene.location}!",
+      "Staying clear of {target.name} {scene.location}, be careful, {addressee.name}!",
       "Watch yourself around {target.name} {scene.location}, {addressee.name}, I'm hanging back!"
     ],
     "say.variants.defensive_shaken": [
-      "Be careful with {target.name} {scene.location}, {addressee.name}—I'm staying back!",
+      "Be careful with {target.name} {scene.location}, {addressee.name}, I'm staying back!",
       "Too close! Getting clear of {target.name} {scene.location}, {addressee.name}!",
-      "I hear {target.name} {scene.location}, {addressee.name}—keeping my head down!",
-      "Don't let {target.name} reach us from {scene.location}, {addressee.name}!"
+      "I hear {target.name} {scene.location}, {addressee.name}, keeping my head down!",
+      "Stay sharp around {target.name} {scene.location}, {addressee.name}, I can't hold them!"
+    ],
+    "say.variants.wingman_engaging_neutral": [
+      "Right behind you, {addressee.name}! I'll flank {target.name}!",
+      "Got your back, {addressee.name}, pushing up on {target.name}!",
+      "With you, {addressee.name}! Let's stop {target.name} together!",
+      "Moving up beside you, {addressee.name}, watch {target.name}!"
+    ],
+    "say.variants.wingman_engaging_tactical": [
+      "Flanking wide, {addressee.name}, keep {target.name} pinned!",
+      "Stacking up behind you, {addressee.name}! Engaging {target.name}!",
+      "Covering your flank, {addressee.name}! Moving on {target.name}!",
+      "Closing the gap with you, {addressee.name}, locking down {target.name}!"
+    ],
+    "say.variants.wingman_engaging_hostile": [
+      "Save some of {target.name} for me, {addressee.name}! Going around!",
+      "Right behind you, {addressee.name}, let's drop {target.name}!",
+      "Cutting off {target.name} from the side, {addressee.name}!",
+      "Pushing in with you, {addressee.name}! Finish {target.name}!"
+    ],
+    "say.variants.wingman_alerted_neutral": [
+      "Moving up behind you, {addressee.name}! Watching for {target.name}!",
+      "Right with you, {addressee.name}, keeping an eye out for {target.name}!",
+      "Got your sides, {addressee.name}! Tell me if {target.name} breaks through!",
+      "Closing in behind you, {addressee.name}, ready for {target.name}!"
+    ],
+    "say.variants.wingman_alerted_tactical": [
+      "Covering your six, {addressee.name}, scanning for {target.name}!",
+      "Moving to support you, {addressee.name}, tracking {target.name}!",
+      "On your shoulder, {addressee.name}! Ready to engage {target.name}!",
+      "Holding the side angle, {addressee.name}, watching for {target.name}!"
+    ],
+    "say.variants.wingman_defensive": [
+      "You handle {target.name}, {addressee.name}! I'm staying clear!",
+      "Keep {target.name} off me, {addressee.name}, getting to cover!",
+      "Watch yourself around {target.name}, {addressee.name}, I'm hanging back!",
+      "Pulling back from {target.name}, {addressee.name}, be careful!"
+    ],
+    "say.variants.anchor_combat": [
+      "I've got the rear covered, {addressee.name}!",
+      "Watching our backs! Keep pushing, {addressee.name}!",
+      "Nobody gets behind us, {addressee.name}, stay on them!",
+      "Holding the perimeter, {addressee.name}, keep pressing!"
+    ],
+    "say.variants.anchor_tactical": [
+      "Rear guard set, {addressee.name}, push forward!",
+      "Securing our perimeter, {addressee.name}, you're clear to engage!",
+      "Holding overwatch on our six, {addressee.name}!",
+      "Flanks locked down, {addressee.name}, advance!"
     ]
   }
 }

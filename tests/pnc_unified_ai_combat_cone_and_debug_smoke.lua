@@ -543,8 +543,8 @@ do
     lineCalls, shadowLineCalls, textSpyCalls, drawnText = 0, 0, {}, {}
     renderer.RenderCombatDebug(manager, entryA, settings, renderState)
     renderer.RenderCombatDebug(manager, entryB, settings, renderState)
-    T.truthy(shadowLineCalls > 0 and lineCalls > 40,
-        "combat overlay should draw thick dark-backed strokes for cones, rings, and warning link")
+    T.truthy(shadowLineCalls > 0 and lineCalls > 40 and lineCalls < 200,
+        "combat overlay should draw thick dark-backed strokes for cones, rings, and warning link efficiently")
     T.equal(#textSpyCalls, 1, "cones mode must render detailed text only for focused NPC")
     T.truthy(rectCalls > 0, "combat text backdrop drawRect must be rendered")
 

@@ -33,12 +33,11 @@ local function turnAllyToward(ally, tx, ty, at)
     end
 end
 
-function Internal.ApplyAllyThreatAlert(callerKey, item, desc, now, staggerIdx)
+function Internal.ApplyAllyThreatAlert(callerKey, item, desc, now, staggerIdx, resolvedInfo)
     local ally = item.record
     ally.runtime = type(ally.runtime) == "table" and ally.runtime or {}
-    local canEngage, worldObj, engageReason = Perception.CanAllyEngageThreat(ally, desc)
-    local objForLos = (desc.kind == "foreign_npc" and type(worldObj) == "table") and worldObj.worldObject or worldObj
-    local hasLOS = objForLos ~= nil and Perception.CanSeeWorldObject ~= nil and Perception.CanSeeWorldObject(ally, objForLos) == true or false
+    local canEngage, _, engageReason = Perception.CanAllyEngageThreat(ally, desc, resolvedInfo)
+    local hasLOS = false
 
     ally.runtime.allyThreatAlert = {
         kind = desc.kind, key = desc.key, id = desc.id, zombieId = desc.zombieId, onlineID = desc.onlineID,
@@ -49,7 +48,7 @@ function Internal.ApplyAllyThreatAlert(callerKey, item, desc, now, staggerIdx)
         relationKind = item.relationKind, observedAt = now, expiresAt = now + 6000, viaAllyWarning = true,
         canEngage = canEngage, engageReason = engageReason, alertRadius = item.effRadius,
     }
-    ally.runtime.allyThreatAlertCheckAt, ally.runtime.allyThreatAlertVisible = 0, hasLOS
+    ally.runtime.allyThreatAlertCheckAt, ally.runtime.allyThreatAlertVisible = 0, false
     ally.runtime.allyWarnedCooldownUntil = now + 3500
     ally.runtime.lastWarningLink = {
         kind = item.relationKind, role = "recipient", actorId = callerKey, threatKind = desc.kind,

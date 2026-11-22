@@ -63,7 +63,7 @@ local function isSpeakerIndoors(speaker)
     return sq ~= nil and type(sq.getRoom) == "function" and sq:getRoom() ~= nil
 end
 
-local function resolveLocationLabel(speaker, desc, now, tone)
+local function resolveLocationLabel(speaker, desc, now, tone, preSpatial)
     local sx = tonumber(speaker and speaker.x) or tonumber(desc.x) or 0
     local sy = tonumber(speaker and speaker.y) or tonumber(desc.y) or 0
     local sz = tonumber(speaker and speaker.z) or 0
@@ -86,8 +86,9 @@ local function resolveLocationLabel(speaker, desc, now, tone)
     local proj = PNC.TacticalSpatialProjection
     local relMod = PsychopatzCore and PsychopatzCore.SpatialRelation or nil
     local bearing = nil
-    if proj and type(proj.Project) == "function" and relMod then
-        local spatial = proj.Project(speaker, {
+    local spatial = preSpatial
+    if not spatial and proj and type(proj.Project) == "function" and relMod then
+        spatial = proj.Project(speaker, {
             kind = desc.semanticClass or "human_hostile",
             id = desc.id or desc.zombieId or desc.actorId or "threat",
             x = tx, y = ty, z = tz, observedAt = now,
@@ -95,13 +96,13 @@ local function resolveLocationLabel(speaker, desc, now, tone)
             now = now, sameAreaThreshold = 0.5, maxThreatAgeMs = 4000,
             allowCachedFacing = true, maxCachedFacingAgeMs = 5000,
         })
-        if spatial then
-            if tone == "tactical" and spatial.clockToken and type(relMod.GetClockLabel) == "function" then
-                bearing = fmtKey("UI_PNC_AllyWarn_Loc_AtClock", "at %s",
-                    relMod.GetClockLabel(spatial.clockToken))
-            elseif spatial.relativeSector8 and type(relMod.GetRelativeSectorLabel) == "function" then
-                bearing = relMod.GetRelativeSectorLabel(spatial.relativeSector8)
-            end
+    end
+    if spatial and relMod then
+        if tone == "tactical" and spatial.clockToken and type(relMod.GetClockLabel) == "function" then
+            bearing = fmtKey("UI_PNC_AllyWarn_Loc_AtClock", "at %s",
+                relMod.GetClockLabel(spatial.clockToken))
+        elseif spatial.relativeSector8 and type(relMod.GetRelativeSectorLabel) == "function" then
+            bearing = relMod.GetRelativeSectorLabel(spatial.relativeSector8)
         end
     end
     if not bearing and relMod and type(relMod.Between) == "function" then
@@ -139,8 +140,9 @@ function Service.ResolveAllyWarnTone(record, profile)
     return "neutral"
 end
 
-function Service.BuildRichSpeechTokens(speakerRecord, callerRecord, desc, now, tone)
+function Service.BuildRichSpeechTokens(speakerRecord, callerRecord, desc, now, tone, opts)
     desc = type(desc) == "table" and desc or {}
+    opts = type(opts) == "table" and opts or nil
     local count = math.max(1, math.floor(tonumber(desc.enemyCount) or 1))
     local kSg = kindLabel(desc.enemyType, false)
     local kPl = kindLabel(desc.enemyType, true)
@@ -168,12 +170,16 @@ function Service.BuildRichSpeechTokens(speakerRecord, callerRecord, desc, now, t
     else
         targetLabel = fmtKey("UI_PNC_AllyWarn_SinglePrefix", "a %s", kSg)
     end
+    local locLabel = ""
+    if not (opts and opts.skipLocation == true) then
+        locLabel = resolveLocationLabel(speakerRecord, desc, now, tone, opts and opts.spatial or nil)
+    end
     return {
         ["addressee.name"] = callerName,
         ["target.name"] = targetLabel,
         ["target.count"] = tostring(count),
         ["target.kind"] = count > 1 and kPl or kSg,
-        ["scene.location"] = resolveLocationLabel(speakerRecord, desc, now, tone),
+        ["scene.location"] = locLabel,
     }
 end
 

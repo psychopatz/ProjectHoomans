@@ -40,6 +40,14 @@ local EVENT_REACTION_TEMPLATES = {
     "combat.ally_warn.reply.alerted_hostile",
     "combat.ally_warn.reply.defensive_neutral",
     "combat.ally_warn.reply.defensive_shaken",
+    "combat.ally_warn.reply.wingman_engaging_neutral",
+    "combat.ally_warn.reply.wingman_engaging_tactical",
+    "combat.ally_warn.reply.wingman_engaging_hostile",
+    "combat.ally_warn.reply.wingman_alerted_neutral",
+    "combat.ally_warn.reply.wingman_alerted_tactical",
+    "combat.ally_warn.reply.wingman_defensive",
+    "combat.ally_warn.reply.anchor_combat",
+    "combat.ally_warn.reply.anchor_tactical",
 }
 
 for _, templateID in ipairs(EVENT_REACTION_TEMPLATES) do

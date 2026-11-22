@@ -4,40 +4,40 @@
   "locale": "TL",
   "entries": {
     "say.variants.zombie_neutral": [
-      "Mag-ingat—{target.name} papalapit {scene.location}!",
-      "Bantay! May {target.name} na gumagalaw {scene.location}!",
-      "Maging alerto, {target.name} ang nakita {scene.location}!",
+      "Bantay, may {target.name} na gumagalaw {scene.location}!",
+      "Ingat! May {target.name} {scene.location}!",
+      "Maging alerto, nakita ang {target.name} {scene.location}!",
       "Parating na! May {target.name} {scene.location}!"
     ],
     "say.variants.zombie_tactical": [
-      "Kontak ng patay—{target.name} {scene.location}! Itaas ang sandata!",
+      "Kontak {scene.location}! {target.name}, itaas ang sandata!",
       "Kumpirmado ang {target.name} na sumusulong {scene.location}, laban!",
       "{target.name} {scene.location}! Magtipon at linisin!",
-      "Hawakan ang linya—{target.name} ang lumalapit {scene.location}!"
+      "Hawakan ang linya, may {target.name} {scene.location}!"
     ],
     "say.variants.zombie_hostile": [
       "Patumbahin! {target.name} ang gumagala {scene.location}!",
       "Tapusin agad ang {target.name} {scene.location} bago dumami!",
-      "Bantayan ang gilid—{target.name} ang sumusulpot {scene.location}!",
-      "Bulok! {target.name} nasa {scene.location}, tirahin na!"
+      "Bantayan ang gilid, may {target.name} {scene.location}!",
+      "Hayan na! {target.name} ang nahuli {scene.location}, tirahin!"
     ],
     "say.variants.hostile_neutral": [
-      "Mag-ingat—{target.name} ang nakita {scene.location}!",
+      "Ingat, nakita ang {target.name} {scene.location}!",
       "May gulo! {target.name} ang kumikilos {scene.location}!",
-      "Alerto! {target.name} ang papalapit {scene.location}!",
-      "Bantay lang! May {target.name} {scene.location}!"
+      "Alerto! May {target.name} {scene.location}!",
+      "Bantay lang! Namataan ang {target.name} {scene.location}!"
     ],
     "say.variants.hostile_tactical": [
       "Kalabang kontak! {target.name} {scene.location}, ihanda ang sandata!",
-      "Armadong banta—{target.name} {scene.location}, sumugod!",
+      "Armadong banta, {target.name} {scene.location}, sumugod!",
       "Nakita ko ang {target.name} na lumalapit {scene.location}!",
-      "Kumpirmado ang banta—{target.name} {scene.location}, mag-cover!"
+      "Kumpirmado ang banta, {target.name} {scene.location}, kumubli!"
     ],
     "say.variants.hostile_hostile": [
-      "Palabasin 'yan! Nasa {scene.location} ang {target.name}!",
-      "Durugin sila—{target.name} ang nahuli {scene.location}!",
+      "Palabasin 'yan! May {target.name} {scene.location}!",
+      "Durugin sila, {target.name} ang nahuli {scene.location}!",
       "Hayan na! Patumbahin ang {target.name} {scene.location}!",
-      "Huwag pakawalan—{target.name} {scene.location}!"
+      "Huwag pakawalan, bantayan ang {target.name} {scene.location}!"
     ]
   }
 }

@@ -14,10 +14,13 @@ local function cleanText(v)
 end
 
 local function roomInfoAt(obj, x, y, z, hintRoom)
-    local sq = (obj and obj.getCurrentSquare and obj:getCurrentSquare())
-        or (type(getCell) == "function" and getCell()
-            and getCell():getGridSquare(math.floor(x), math.floor(y), math.floor(z)))
-        or nil
+    local sq = obj and obj.getCurrentSquare and obj:getCurrentSquare() or nil
+    if not sq and type(getCell) == "function" then
+        local cell = getCell()
+        if cell and cell.getGridSquare then
+            sq = cell:getGridSquare(math.floor(x), math.floor(y), math.floor(z))
+        end
+    end
     local room = sq and sq.getRoom and sq:getRoom() or nil
     local def = room and room.getRoomDef and room:getRoomDef() or nil
     local raw = cleanText(hintRoom)
@@ -98,7 +101,10 @@ function Internal.EstimateThreatCount(caller, desc, raw)
             for i = 1, #entries do
                 local zb = entries[i].zombie
                 if zb and (not zb.isDead or not zb:isDead()) and zb.getX and zb.getY then
-                    if distSq(dx, dy, zb:getX(), zb:getY()) <= 64 then c = c + 1 end
+                    if distSq(dx, dy, zb:getX(), zb:getY()) <= 64 then
+                        c = c + 1
+                        if c >= 10 then break end
+                    end
                 end
             end
         end
@@ -106,18 +112,36 @@ function Internal.EstimateThreatCount(caller, desc, raw)
     end
     local rels = PNC.Relationships
     if rels and rels.AreNPCsEnemies and type(raw) == "table" then
+        local callerId = caller and caller.id ~= nil and tostring(caller.id) or ""
+        local callerFac = caller and caller.factionID or nil
         for i = 1, #raw do
             local r = raw[i]
-            if type(r) == "table" and r.alive ~= false
+            if type(r) == "table" and r ~= caller and r.alive ~= false
+                and (callerId == "" or tostring(r.id or "") ~= callerId)
+                and (callerFac == nil or r.factionID ~= callerFac)
                 and math.abs((tonumber(r.z) or 0) - dz) < 1
                 and distSq(dx, dy, r.x or 0, r.y or 0) <= 64
                 and rels.AreNPCsEnemies(caller, r, { ignoreAttackNPCPolicy = true })
             then
                 c = c + 1
+                if c >= 10 then break end
             end
         end
     end
     return math.max(1, c)
+end
+
+function Internal.FastTargetKey(t)
+    local k = type(t) == "table" and tostring(t.kind or "") or ""
+    if k == "zombie" and t.zombieId ~= nil then return "zombie:" .. tostring(t.zombieId)
+    elseif k == "npc" and t.id ~= nil then return "npc:" .. tostring(t.id)
+    elseif k == "player" then
+        if t.onlineID ~= nil then return "player:" .. tostring(t.onlineID) end
+        if t.username ~= nil and t.username ~= "" then return "player:" .. tostring(t.username) end
+    elseif k == "foreign_npc" and t.provider ~= nil and (t.actorId or t.id) ~= nil then
+        return "foreign_npc:" .. tostring(t.provider) .. ":" .. tostring(t.actorId or t.id)
+    end
+    return nil
 end
 
 return Perception

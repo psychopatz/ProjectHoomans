@@ -214,6 +214,7 @@ function H.FinishTick(now)
     end
     local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil
     if callouts and (tonumber(callouts.PendingReplyCount) or 0) > 0
+        and (callouts.NextReplyDueAt == nil or now >= (tonumber(callouts.NextReplyDueAt) or 0))
         and type(callouts.PumpPendingReplies) == "function"
     then
         safeOptional("server_finish.ally_warn_replies", callouts,

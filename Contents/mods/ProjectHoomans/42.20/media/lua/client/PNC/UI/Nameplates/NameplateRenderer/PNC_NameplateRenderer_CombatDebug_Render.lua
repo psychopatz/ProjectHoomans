@@ -25,22 +25,29 @@ local function resolveDetailMode(settings)
     return mode
 end
 
-local function isEntrySelectedOrHovered(manager, entry, worldX, worldY, worldZ)
+local function isEntrySelectedOrHovered(manager, entry, worldX, worldY, worldZ, renderState)
     local npcId = tostring(
         entry.uuid or (entry.snapshot and entry.snapshot.id) or ""
     )
-    local clientState = PNC.Network and PNC.Network.ClientState or nil
-    local selectedId = clientState and clientState.unifiedAIDebug
-        and tostring(clientState.unifiedAIDebug.selectedId or "") or ""
+    local selectedId = type(renderState) == "table" and renderState.selectedId or nil
+    if selectedId == nil then
+        local clientState = PNC.Network and PNC.Network.ClientState or nil
+        selectedId = clientState and clientState.unifiedAIDebug
+            and tostring(clientState.unifiedAIDebug.selectedId or "") or ""
+    end
     if npcId ~= "" and selectedId ~= "" and npcId == selectedId then
         return true
     end
-    if type(getMouseX) == "function" and type(getMouseY) == "function"
-        and type(screenPoint) == "function"
-    then
+    local mx = type(renderState) == "table" and renderState.mouseX or nil
+    local my = type(renderState) == "table" and renderState.mouseY or nil
+    if mx == nil and type(getMouseX) == "function" then
+        mx = (tonumber(getMouseX()) or -9999) - (tonumber(manager.x) or 0)
+    end
+    if my == nil and type(getMouseY) == "function" then
+        my = (tonumber(getMouseY()) or -9999) - (tonumber(manager.y) or 0)
+    end
+    if mx and my and mx > -9000 and my > -9000 and type(screenPoint) == "function" then
         local sx, sy = screenPoint(manager, worldX, worldY, worldZ)
-        local mx = (tonumber(getMouseX()) or -9999) - (tonumber(manager.x) or 0)
-        local my = (tonumber(getMouseY()) or -9999) - (tonumber(manager.y) or 0)
         local dx = mx - sx
         local dy = my - sy
         if (dx * dx) + (dy * dy) <= (36 * 36) then
@@ -72,7 +79,7 @@ local function drawCombatDebug(manager, entry, settings, renderState)
         or entry.snapshot.inCombat == true
     local detailMode = resolveDetailMode(settings)
     local isSelected = isEntrySelectedOrHovered(
-        manager, entry, worldX, worldY, worldZ
+        manager, entry, worldX, worldY, worldZ, renderState
     )
     local usedRects = type(renderState) == "table"
         and renderState.usedLabelRects or nil

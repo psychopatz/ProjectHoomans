@@ -4,40 +4,40 @@
   "locale": "EN",
   "entries": {
     "say.variants.zombie_neutral": [
-      "Heads up—{target.name} closing in {scene.location}!",
-      "Watch it! Got {target.name} moving {scene.location}!",
+      "Heads up, {target.name} moving {scene.location}!",
+      "Watch it! Got {target.name} {scene.location}!",
       "Stay sharp, {target.name} spotted {scene.location}!",
       "Incoming! We've got {target.name} {scene.location}!"
     ],
     "say.variants.zombie_tactical": [
-      "Contact dead—{target.name} {scene.location}! Weapons up!",
+      "Contact, {scene.location}! {target.name}, weapons up!",
       "Visual on {target.name} advancing {scene.location}, engage!",
-      "{target.name} {scene.location}! Converge and clear!",
-      "Hold formation—{target.name} pushing in {scene.location}!"
+      "{target.name}, {scene.location}! Converge and clear!",
+      "Hold formation, got {target.name} {scene.location}!"
     ],
     "say.variants.zombie_hostile": [
-      "Drop them! {target.name} wandering {scene.location}!",
+      "Drop them! {target.name} prowling {scene.location}!",
       "Cut down {target.name} {scene.location} before they swarm!",
-      "Watch your flank—{target.name} creeping in {scene.location}!",
-      "Fresh meat! {target.name} right {scene.location}!"
+      "Watch your flank! Got {target.name} {scene.location}!",
+      "Fresh meat! {target.name} caught {scene.location}!"
     ],
     "say.variants.hostile_neutral": [
-      "Watch out—{target.name} spotted {scene.location}!",
+      "Watch out, {target.name} spotted {scene.location}!",
       "Got trouble! {target.name} moving {scene.location}!",
-      "Heads up, {target.name} coming in {scene.location}!",
-      "Stay on guard! {target.name} {scene.location}!"
+      "Heads up, we've got {target.name} {scene.location}!",
+      "Stay on guard! Spotted {target.name} {scene.location}!"
     ],
     "say.variants.hostile_tactical": [
       "Hostile contact! {target.name} {scene.location}, weapons ready!",
-      "Armed threat—{target.name} {scene.location}, engage!",
+      "Armed threat, {target.name} {scene.location}, engage!",
       "Eyes on {target.name} closing {scene.location}!",
-      "Threat confirmed—{target.name} in range {scene.location}, take cover!"
+      "Threat confirmed, {target.name} spotted {scene.location}, take cover!"
     ],
     "say.variants.hostile_hostile": [
       "Flush them out! Got {target.name} {scene.location}!",
-      "Tear them apart—{target.name} caught {scene.location}!",
-      "Right there! Drop {target.name} {scene.location}!",
-      "Don't let them slip—{target.name} {scene.location}!"
+      "Tear them apart, {target.name} caught {scene.location}!",
+      "Right over there! Drop {target.name} {scene.location}!",
+      "Don't let them slip, keep eyes on {target.name} {scene.location}!"
     ]
   }
 }

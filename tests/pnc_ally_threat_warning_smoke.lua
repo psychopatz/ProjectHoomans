@@ -460,12 +460,20 @@ do
     T.equal(sAlly.runtime.allyThreatAlert.kind, "zombie", "WarnGroup must forward normalized zombie target")
 end
 
--- 5. Verify rich contextual callouts and replies (target names, counts/types, locations, defensive, rotation).
+-- 5. Verify rich contextual callouts and replies (target names, counts/types, locations, defensive, rotation, 3-beat squad).
 do
     local function assertNoRawTokens(text, label)
         T.truthy(type(text) == "string" and text ~= "", label .. ": empty text")
         if string.find(text, "{", 1, true) or string.find(text, "}", 1, true) then
             error(label .. ": unresolved token in: " .. tostring(text))
+        end
+    end
+    local function assertNoLLMHyphens(text, label)
+        if string.find(text, "\226\128\148", 1, true)
+            or string.find(text, "\226\128\147", 1, true)
+            or string.find(text, " - ", 1, true)
+        then
+            error(label .. ": LLM dash/hyphen found in: " .. tostring(text))
         end
     end
 
@@ -494,6 +502,7 @@ do
     T.equal(#deliveredBarks, 1, "caller bark must deliver immediately")
     local calloutText = deliveredBarks[1].text
     assertNoRawTokens(calloutText, "5a callout")
+    assertNoLLMHyphens(calloutText, "5a callout")
     T.contains(calloutText, "Marcus", "callout must name target Marcus")
     T.contains(calloutText, "in the kitchen", "callout must name kitchen location")
 
@@ -502,7 +511,9 @@ do
     T.equal(fired, 2, "both Adrienne (engaging) and Pete (defensive) must reply")
     T.equal(#deliveredBarks, 3, "two reply barks must deliver")
     assertNoRawTokens(deliveredBarks[2].text, "5a engaging reply")
+    assertNoLLMHyphens(deliveredBarks[2].text, "5a engaging reply")
     assertNoRawTokens(deliveredBarks[3].text, "5a defensive reply")
+    assertNoLLMHyphens(deliveredBarks[3].text, "5a defensive reply")
     T.contains(deliveredBarks[2].text, "Sammie", "engaging reply must address caller Sammie")
     T.contains(deliveredBarks[2].text, "Marcus", "engaging reply must name Marcus")
     T.contains(deliveredBarks[2].text, "in the kitchen", "engaging reply must name kitchen")
@@ -548,6 +559,7 @@ do
     }, tacticalSpotter)
     T.truthy(okZ, "multi-zombie warning must emit")
     assertNoRawTokens(deliveredBarks[1].text, "5b zombie callout")
+    assertNoLLMHyphens(deliveredBarks[1].text, "5b zombie callout")
     T.contains(deliveredBarks[1].text, "4 walkers", "callout must state exact nearby zombie count + type")
     T.contains(deliveredBarks[1].text, "o'clock", "tactical callout must include clock bearing")
 
@@ -555,6 +567,7 @@ do
     Callouts.PumpPendingReplies(nowMs)
     T.truthy(#deliveredBarks >= 2, "tactical ally reply must deliver")
     assertNoRawTokens(deliveredBarks[2].text, "5b zombie reply")
+    assertNoLLMHyphens(deliveredBarks[2].text, "5b zombie reply")
     T.contains(deliveredBarks[2].text, "Clay", "reply must address caller Clay")
     T.contains(deliveredBarks[2].text, "4 walkers", "reply must repeat enemy count + type")
 
@@ -586,6 +599,7 @@ do
     }, tacticalSpotter)
     local bText1 = deliveredBarks[#deliveredBarks].text
     assertNoRawTokens(bText1, "5c foreign_npc callout 1")
+    assertNoLLMHyphens(bText1, "5c foreign_npc callout 1")
     T.contains(bText1, "Viper and their crew", "named multi-hostile foreign target must mention leader and crew")
 
     nowMs = 110000
@@ -598,8 +612,85 @@ do
     }, tacticalSpotter)
     local bText2 = deliveredBarks[#deliveredBarks].text
     assertNoRawTokens(bText2, "5c foreign_npc callout 2")
+    assertNoLLMHyphens(bText2, "5c foreign_npc callout 2")
     T.contains(bText2, "2 bandits", "unnamed bandit pair must mention count and provider enemy type")
     T.truthy(bText1 ~= bText2, "variant rotation must vary callout wording across events")
+
+    -- 5d. 5-person squad coherent 3-beat reply chain (Spotter -> Lead -> Wingman -> Anchor), zero shock spam.
+    npcStore, liveBodies, deliveredBarks = {}, {}, {}
+    PNC.Registry.Data = npcStore
+    PNC.Perception.ResetAllyThreatWarnings()
+    Callouts.ResetRuntime()
+    nowMs = 130000
+
+    local sqSammie = makeNPC("sq-sammie", {
+        x = 10, y = 10, factionID = "survivors", tactical = true,
+        runtime = {
+            facingDirX = 1, facingDirY = 0,
+            perceptionFrame = {
+                entries = {
+                    { zombie = zombieWorld },
+                    { zombie = zNear(18.5, 10) },
+                    { zombie = zNear(19.0, 10.5) },
+                },
+            },
+        },
+    })
+    sqSammie.name = "Sammie"
+    local sqAdrienne = makeNPC("sq-adrienne", { x = 11, y = 10, factionID = "survivors", tactical = true })
+    sqAdrienne.name = "Adrienne"
+    local sqClay = makeNPC("sq-clay", { x = 12, y = 10, factionID = "survivors", tactical = true })
+    sqClay.name = "Clay"
+    local sqVonda = makeNPC("sq-vonda", { x = 13, y = 10, factionID = "survivors", tactical = true })
+    sqVonda.name = "Vonda"
+    local sqDante = makeNPC("sq-dante", { x = 14, y = 10, factionID = "survivors", tactical = true })
+    sqDante.name = "Dante"
+
+    local okSq, resSq = Callouts.OnTargetChanged({
+        target = { kind = "zombie", zombieId = "z-101", x = 18, y = 10, z = 0 },
+        at = nowMs, ignoreWarningCooldown = true,
+    }, sqSammie)
+    T.truthy(okSq and resSq and resSq.warning and #resSq.warning.notified == 4, "all 4 nearby squadmates must be alerted")
+    T.truthy(sqDante.runtime.allyThreatAlert ~= nil, "4th ally Dante still receives tactical threat alert")
+    T.equal(Callouts.PendingReplyCount, 3, "only 3 allies may queue speech replies")
+    T.truthy(Callouts.NextReplyDueAt ~= nil, "NextReplyDueAt must be armed after enqueue")
+    T.equal(Callouts.PumpPendingReplies(nowMs + 100), 0, "PumpPendingReplies must fast-exit before NextReplyDueAt")
+
+    assertNoRawTokens(deliveredBarks[1].text, "5d callout")
+    assertNoLLMHyphens(deliveredBarks[1].text, "5d callout")
+
+    nowMs = nowMs + 800
+    T.equal(Callouts.PumpPendingReplies(nowMs), 1, "Beat 1 Lead reply must fire at +800ms")
+    T.equal(deliveredBarks[2].npcId, "sq-adrienne", "Beat 1 must come from closest Lead ally Adrienne")
+    assertNoRawTokens(deliveredBarks[2].text, "5d beat1 lead")
+    assertNoLLMHyphens(deliveredBarks[2].text, "5d beat1 lead")
+    T.contains(deliveredBarks[2].text, "Sammie", "Beat 1 Lead must address spotter Sammie")
+    T.contains(deliveredBarks[2].text, "3 walkers", "Beat 1 Lead must name 3 walkers")
+    T.contains(deliveredBarks[2].text, "o'clock", "Beat 1 Lead must include location")
+
+    nowMs = nowMs + 700
+    T.equal(Callouts.PumpPendingReplies(nowMs), 1, "Beat 2 Wingman reply must fire at +1500ms")
+    T.equal(deliveredBarks[3].npcId, "sq-clay", "Beat 2 must come from second ally Clay")
+    assertNoRawTokens(deliveredBarks[3].text, "5d beat2 wingman")
+    assertNoLLMHyphens(deliveredBarks[3].text, "5d beat2 wingman")
+    T.contains(deliveredBarks[3].text, "Adrienne", "Beat 2 Wingman must chain directly off Lead Adrienne")
+    T.contains(deliveredBarks[3].text, "3 walkers", "Beat 2 Wingman must reference 3 walkers")
+
+    nowMs = nowMs + 800
+    T.equal(Callouts.PumpPendingReplies(nowMs), 1, "Beat 3 Anchor reply must fire at +2300ms")
+    T.equal(deliveredBarks[4].npcId, "sq-vonda", "Beat 3 must come from third ally Vonda")
+    assertNoRawTokens(deliveredBarks[4].text, "5d beat3 anchor")
+    assertNoLLMHyphens(deliveredBarks[4].text, "5d beat3 anchor")
+    T.contains(deliveredBarks[4].text, "Clay", "Beat 3 Anchor must close the beat addressing Clay")
+    T.equal(#deliveredBarks, 4, "5-person squad must stay capped at 1 callout + 3 coherent replies")
+    T.equal(Callouts.PendingReplyCount, 0, "PendingReplyCount must drain to 0")
+    T.equal(Callouts.NextReplyDueAt, nil, "NextReplyDueAt must clear when queue drains")
+
+    if PNC.ShockingReactionTaskProvider and PNC.ShockingReactionTaskProvider.HandleShockingEvent then
+        T.equal(PNC.ShockingReactionTaskProvider.HandleShockingEvent({
+            eventType = "shock.ally_threat_warning", x = 10, y = 10, z = 0, radius = 16,
+        }), 0, "ShockingReactionTaskProvider must skip duplicate shock.ally_threat_warning fanout")
+    end
 end
 
 T.finish("pnc_ally_threat_warning_smoke")

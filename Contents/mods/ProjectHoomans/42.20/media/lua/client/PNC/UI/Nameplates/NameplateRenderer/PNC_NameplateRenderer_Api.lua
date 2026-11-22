@@ -42,7 +42,16 @@ function Renderer.Render(manager, settings)
         end
     end
     if settings.showCombatDebug then
-        local combatRenderState = { usedLabelRects = {} }
+        local clientState = PNC.Network and PNC.Network.ClientState or nil
+        local combatRenderState = {
+            usedLabelRects = {},
+            selectedId = clientState and clientState.unifiedAIDebug
+                and tostring(clientState.unifiedAIDebug.selectedId or "") or "",
+            mouseX = (type(getMouseX) == "function" and tonumber(getMouseX()) or -9999)
+                - (tonumber(manager.x) or 0),
+            mouseY = (type(getMouseY) == "function" and tonumber(getMouseY()) or -9999)
+                - (tonumber(manager.y) or 0),
+        }
         for _, entry in pairs(manager.entries) do
             if not entry.debugOnly
                 and scopeVisible(entry, Scopes.DEBUG, true)

@@ -5,32 +5,22 @@ PNC.Perception = PNC.Perception or {}
 PNC.Perception.Internal = PNC.Perception.Internal or {}
 
 local Perception, Internal = PNC.Perception, PNC.Perception.Internal
-local Core, Const = PNC.Core, PNC.Const or {}
-local Spatial, Registry = PNC.SpatialIndex, PNC.Registry
-
-local DEFAULT_WARNING_RADIUS = 16.0
-local MAX_WARN_ALLIES = 8
-local CALLER_COOLDOWN_MS = 6000
-local TEAM_THREAT_DEDUP_MS = 9000
-local WARNING_LINK_TTL_MS = 2500
-local MAX_DEDUP_KEYS = 128
+local Core, Const, Spatial, Registry = PNC.Core, PNC.Const or {}, PNC.SpatialIndex, PNC.Registry
+local DEFAULT_WARNING_RADIUS, MAX_WARN_ALLIES, CALLER_COOLDOWN_MS = 16.0, 8, 6000
+local TEAM_THREAT_DEDUP_MS, WARNING_LINK_TTL_MS, MAX_DEDUP_KEYS = 9000, 2500, 128
 
 Perception.AllyWarningCallerAt = Perception.AllyWarningCallerAt or {}
 Perception.AllyWarningTeamThreatAt = Perception.AllyWarningTeamThreatAt or {}
 Perception.AllyWarningCallerKeys = Perception.AllyWarningCallerKeys or {}
 Perception.AllyWarningTeamKeys = Perception.AllyWarningTeamKeys or {}
-Perception.AllyWarningStats = Perception.AllyWarningStats or {
-    published = 0, notified = 0, throttled = 0, hopBlocked = 0,
-}
+Perception.AllyWarningStats = Perception.AllyWarningStats or { published = 0, notified = 0, throttled = 0, hopBlocked = 0 }
 
 local function nowMs(at)
     if at ~= nil then return tonumber(at) or 0 end
     return Core and type(Core.Now) == "function" and (tonumber(Core.Now()) or 0) or 0
 end
 
-local function isAuthority()
-    return not Core or type(Core.IsAuthority) ~= "function" or Core.IsAuthority() == true
-end
+local function isAuth() return not Core or type(Core.IsAuthority) ~= "function" or Core.IsAuthority() == true end
 
 local function distSq(x1, y1, x2, y2)
     if Core and type(Core.DistanceSq) == "function" then return Core.DistanceSq(x1, y1, x2, y2) end
@@ -41,8 +31,8 @@ end
 local function rememberKey(map, order, key, at)
     if map[key] == nil then
         while #order >= MAX_DEDUP_KEYS do
-            local oldest = table.remove(order, 1)
-            if oldest ~= nil then map[oldest] = nil end
+            local old = table.remove(order, 1)
+            if old ~= nil then map[old] = nil end
         end
         order[#order + 1] = key
     end
@@ -60,29 +50,42 @@ local function teamKeyOf(caller)
     return "actor:" .. tostring(caller and caller.id or "")
 end
 
+local function failRes(reason, teamKey, desc)
+    return { emitted = false, reason = reason, descriptor = desc, teamKey = teamKey, notified = {} }
+end
+
 function Perception.PublishAllyThreatWarning(caller, target, opts)
     opts = type(opts) == "table" and opts or {}
-    if not isAuthority() or type(caller) ~= "table" or caller.alive == false or caller.id == nil then
-        return { emitted = false, reason = "invalid_caller", notified = {} }
+    if not isAuth() or type(caller) ~= "table" or caller.alive == false or caller.id == nil then
+        return failRes("invalid_caller")
     end
     if (type(target) == "table" and target.viaAllyWarning == true)
         or (tonumber(opts.hopDepth) or 0) > 0 or tostring(opts.source or "") == "ally_threat_warning"
     then
         Perception.AllyWarningStats.hopBlocked = Perception.AllyWarningStats.hopBlocked + 1
-        return { emitted = false, reason = "hop_limit", notified = {} }
+        return failRes("hop_limit")
     end
-    local now = nowMs(opts.at)
-    local descriptor = Perception.NormalizeThreatDescriptor and Perception.NormalizeThreatDescriptor(target, now) or nil
-    if not descriptor then return { emitted = false, reason = "invalid_threat_target", notified = {} } end
-    descriptor.callerId = tostring(caller.id)
-
-    local callerKey, teamKey = tostring(caller.id), teamKeyOf(caller)
-    local dedupKey = teamKey .. "|" .. descriptor.key
+    local now, callerKey, teamKey = nowMs(opts.at), tostring(caller.id), teamKeyOf(caller)
+    local fastKey = Internal.FastTargetKey and Internal.FastTargetKey(target) or nil
     if opts.ignoreCooldown ~= true and (now < (tonumber(Perception.AllyWarningCallerAt[callerKey]) or 0)
-        or now < (tonumber(Perception.AllyWarningTeamThreatAt[dedupKey]) or 0))
+        or (fastKey and now < (tonumber(Perception.AllyWarningTeamThreatAt[teamKey .. "|" .. fastKey]) or 0)))
     then
         Perception.AllyWarningStats.throttled = Perception.AllyWarningStats.throttled + 1
-        return { emitted = false, reason = "warning_throttled", descriptor = descriptor, teamKey = teamKey, notified = {} }
+        return failRes("warning_throttled", teamKey)
+    end
+    local descriptor, resolvedInfo = nil, nil
+    if Perception.NormalizeThreatDescriptor then
+        descriptor, resolvedInfo = Perception.NormalizeThreatDescriptor(target, now)
+    end
+    if not descriptor then return failRes("invalid_threat_target") end
+    descriptor.callerId = callerKey
+
+    local dedupKey = teamKey .. "|" .. descriptor.key
+    if opts.ignoreCooldown ~= true and not fastKey
+        and now < (tonumber(Perception.AllyWarningTeamThreatAt[dedupKey]) or 0)
+    then
+        Perception.AllyWarningStats.throttled = Perception.AllyWarningStats.throttled + 1
+        return failRes("warning_throttled", teamKey, descriptor)
     end
 
     local cx, cy, cz = tonumber(caller.x) or descriptor.x, tonumber(caller.y) or descriptor.y, tonumber(caller.z) or descriptor.z
@@ -117,7 +120,7 @@ function Perception.PublishAllyThreatWarning(caller, target, opts)
         local ally = sorted[i].record
         local nextAt = tonumber(ally.runtime and ally.runtime.allyWarnedCooldownUntil) or 0
         if (opts.ignoreCooldown == true or now >= nextAt) and Internal.ApplyAllyThreatAlert then
-            notified[#notified + 1] = Internal.ApplyAllyThreatAlert(callerKey, sorted[i], descriptor, now, #notified)
+            notified[#notified + 1] = Internal.ApplyAllyThreatAlert(callerKey, sorted[i], descriptor, now, #notified, resolvedInfo)
         end
     end
 

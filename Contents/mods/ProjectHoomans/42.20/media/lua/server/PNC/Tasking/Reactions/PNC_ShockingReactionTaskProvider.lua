@@ -49,6 +49,7 @@ end
 ---Handles a spatial shocking event, updates ClueMemory, builds reaction offers, and emits SHOCKING_EVENT.
 function Provider.HandleShockingEvent(event)
     if type(event) ~= "table" or event.x == nil or event.y == nil then return 0 end
+    if event.eventType == "shock.ally_threat_warning" then return 0 end
     local at = tonumber(event.at or event.emittedAt) or nowMs()
     local radius = math.max(1, tonumber(event.radius) or 18)
     local ez = tonumber(event.z) or 0

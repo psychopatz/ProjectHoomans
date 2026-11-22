@@ -6,6 +6,10 @@ local rounded = Internal.Rounded
 local screenPoint = Internal.ScreenPoint
 local drawWorldLine = Internal.DrawWorldLine
 local drawWorldThickLine = Internal.DrawWorldThickLine or drawWorldLine
+local drawScreenThickLine = Internal.DrawScreenThickLine
+    or function(manager, sx1, sy1, sx2, sy2, color)
+        manager:drawLine2(sx1, sy1, sx2, sy2, color.a, color.r, color.g, color.b)
+    end
 local drawWorldMarker = Internal.DrawWorldMarker
 local drawWorldCircle = Internal.DrawWorldCircle
 
@@ -29,9 +33,27 @@ local PERIPHERAL_CONE_COLOR = { r = 0.25, g = 0.9, b = 1.0, a = 0.78 }
 local CLUE_MARKER_COLOR = { r = 1.0, g = 0.72, b = 0.16, a = 0.92 }
 local WARNING_LINK_COLOR = { r = 1.0, g = 0.78, b = 0.14, a = 0.95 }
 local SELECTED_CHEVRON_COLOR = { r = 1.0, g = 1.0, b = 1.0, a = 0.98 }
+local CONE_INNER_COLORS = {
+    [COMBAT_CONE_COLOR] = { r = COMBAT_CONE_COLOR.r, g = COMBAT_CONE_COLOR.g, b = COMBAT_CONE_COLOR.b, a = 0.34 },
+    [COMBAT_CONE_ALERT_COLOR] = { r = COMBAT_CONE_ALERT_COLOR.r, g = COMBAT_CONE_ALERT_COLOR.g, b = COMBAT_CONE_ALERT_COLOR.b, a = 0.34 },
+    [COMBAT_CONE_ENGAGED_COLOR] = { r = COMBAT_CONE_ENGAGED_COLOR.r, g = COMBAT_CONE_ENGAGED_COLOR.g, b = COMBAT_CONE_ENGAGED_COLOR.b, a = 0.34 },
+}
+local CONE_RIB_COLORS = {
+    [COMBAT_CONE_COLOR] = { r = COMBAT_CONE_COLOR.r, g = COMBAT_CONE_COLOR.g, b = COMBAT_CONE_COLOR.b, a = 0.28 },
+    [COMBAT_CONE_ALERT_COLOR] = { r = COMBAT_CONE_ALERT_COLOR.r, g = COMBAT_CONE_ALERT_COLOR.g, b = COMBAT_CONE_ALERT_COLOR.b, a = 0.28 },
+    [COMBAT_CONE_ENGAGED_COLOR] = { r = COMBAT_CONE_ENGAGED_COLOR.r, g = COMBAT_CONE_ENGAGED_COLOR.g, b = COMBAT_CONE_ENGAGED_COLOR.b, a = 0.28 },
+}
+local CLUE_LINE_COLOR = {
+    r = CLUE_MARKER_COLOR.r, g = CLUE_MARKER_COLOR.g, b = CLUE_MARKER_COLOR.b, a = 0.62,
+}
+local FIRE_LANE_SIDE_COLORS = {
+    [COMBAT_UNSAFE_COLOR] = { r = COMBAT_UNSAFE_COLOR.r, g = COMBAT_UNSAFE_COLOR.g, b = COMBAT_UNSAFE_COLOR.b, a = COMBAT_UNSAFE_COLOR.a * 0.42 },
+    [COMBAT_AIM_COLOR] = { r = COMBAT_AIM_COLOR.r, g = COMBAT_AIM_COLOR.g, b = COMBAT_AIM_COLOR.b, a = COMBAT_AIM_COLOR.a * 0.42 },
+    [COMBAT_SAFE_COLOR] = { r = COMBAT_SAFE_COLOR.r, g = COMBAT_SAFE_COLOR.g, b = COMBAT_SAFE_COLOR.b, a = COMBAT_SAFE_COLOR.a * 0.42 },
+    [COMBAT_TARGET_COLOR] = { r = COMBAT_TARGET_COLOR.r, g = COMBAT_TARGET_COLOR.g, b = COMBAT_TARGET_COLOR.b, a = COMBAT_TARGET_COLOR.a * 0.42 },
+}
 local COMBAT_MARKER_HALF_SIZE = 9
-local COMBAT_DEBUG_CONE_SEGMENTS = 14
-local COMBAT_DEBUG_CIRCLE_SEGMENTS = 24
+local COMBAT_DEBUG_CIRCLE_SEGMENTS = 18
 
 local function normalizeDirection(x, y)
     local length = math.sqrt((x * x) + (y * y))
@@ -90,26 +112,6 @@ local function resolveConePalette(debugState)
     return COMBAT_CONE_COLOR
 end
 
-local function drawConeBand(manager, originX, originY, z, baseAngle, halfAngle, radius, segments, color, thickness, shadow)
-    local previousX
-    local previousY
-    local i
-    for i = 0, segments do
-        local angle = baseAngle - halfAngle
-            + ((halfAngle * 2) * (i / segments))
-        local x = originX + math.cos(angle) * radius
-        local y = originY + math.sin(angle) * radius
-        if previousX ~= nil then
-            drawWorldThickLine(
-                manager, previousX, previousY, z,
-                x, y, z, color, thickness, shadow
-            )
-        end
-        previousX = x
-        previousY = y
-    end
-end
-
 local function drawCombatCone(manager, zombie, debugState, isSelected)
     local target = debugState.target
     local originX = zombie:getX()
@@ -121,51 +123,76 @@ local function drawCombatCone(manager, zombie, debugState, isSelected)
         tonumber(debugState.coneHalfAngleDegrees) or 55
     )
     local radius = tonumber(debugState.coneRadius) or 8.5
-    local segments = COMBAT_DEBUG_CONE_SEGMENTS
+    local segments = isSelected == true and 10 or 8
     local palette = resolveConePalette(debugState)
-    local outerThickness = isSelected == true and 4 or 3
-    local sideThickness = isSelected == true and 3 or 2
-    local innerBandColor = {
-        r = palette.r, g = palette.g, b = palette.b, a = 0.34,
-    }
-    local ribColor = {
-        r = palette.r, g = palette.g, b = palette.b, a = 0.28,
-    }
+    local outerThickness = isSelected == true and 3 or 2
+    local sideThickness = 2
+    local innerBandColor = CONE_INNER_COLORS[palette] or palette
+    local ribColor = CONE_RIB_COLORS[palette] or palette
+    local ox, oy = screenPoint(manager, originX, originY, z)
+    local startAngle = baseAngle - halfAngle
+    local span = halfAngle * 2
     local i
 
-    drawConeBand(manager, originX, originY, z, baseAngle, halfAngle,
-        radius * 0.38, 8, innerBandColor, 1, 0)
-    drawConeBand(manager, originX, originY, z, baseAngle, halfAngle,
-        radius * 0.72, 10, innerBandColor, 1, 0)
-    drawConeBand(manager, originX, originY, z, baseAngle, halfAngle,
-        radius, segments, palette, outerThickness, 0.72)
+    -- Single subtle mid-range band projecting each vertex once.
+    local innerRadius = radius * 0.58
+    local prevIx, prevIy
+    for i = 0, 5 do
+        local angle = startAngle + (span * (i / 5))
+        local sx, sy = screenPoint(
+            manager,
+            originX + math.cos(angle) * innerRadius,
+            originY + math.sin(angle) * innerRadius,
+            z
+        )
+        if prevIx ~= nil then
+            manager:drawLine2(
+                prevIx, prevIy, sx, sy,
+                innerBandColor.a, innerBandColor.r, innerBandColor.g, innerBandColor.b
+            )
+        end
+        prevIx, prevIy = sx, sy
+    end
 
     local midIdx = math.floor(segments / 2)
+    local prevSx, prevSy
     for i = 0, segments do
-        local angle = baseAngle - halfAngle
-            + ((halfAngle * 2) * (i / segments))
-        local x = originX + math.cos(angle) * radius
-        local y = originY + math.sin(angle) * radius
+        local angle = startAngle + (span * (i / segments))
+        local wx = originX + math.cos(angle) * radius
+        local wy = originY + math.sin(angle) * radius
+        local sx, sy = screenPoint(manager, wx, wy, z)
+        if prevSx ~= nil then
+            drawScreenThickLine(
+                manager, prevSx, prevSy, sx, sy, palette, outerThickness, 0.72
+            )
+        end
+        prevSx, prevSy = sx, sy
         if i == 0 or i == segments then
-            drawWorldThickLine(
-                manager, originX, originY, z, x, y, z,
-                palette, sideThickness, 0.65
+            drawScreenThickLine(
+                manager, ox, oy, sx, sy, palette, sideThickness, 0.6
             )
         elseif i == midIdx then
             local tipColor = isSelected == true and SELECTED_CHEVRON_COLOR or palette
-            drawWorldThickLine(
-                manager, originX, originY, z, x, y, z,
-                tipColor, 2, 0.55
-            )
+            drawScreenThickLine(manager, ox, oy, sx, sy, tipColor, 2, 0.5)
             local tipSize = math.min(0.65, radius * 0.12)
-            local lx = x - math.cos(angle - 0.5) * tipSize
-            local ly = y - math.sin(angle - 0.5) * tipSize
-            local rx = x - math.cos(angle + 0.5) * tipSize
-            local ry = y - math.sin(angle + 0.5) * tipSize
-            drawWorldThickLine(manager, x, y, z, lx, ly, z, tipColor, 2, 0.45)
-            drawWorldThickLine(manager, x, y, z, rx, ry, z, tipColor, 2, 0.45)
-        elseif i % 3 == 0 then
-            drawWorldLine(manager, originX, originY, z, x, y, z, ribColor)
+            local lx, ly = screenPoint(
+                manager,
+                wx - math.cos(angle - 0.5) * tipSize,
+                wy - math.sin(angle - 0.5) * tipSize,
+                z
+            )
+            local rx, ry = screenPoint(
+                manager,
+                wx - math.cos(angle + 0.5) * tipSize,
+                wy - math.sin(angle + 0.5) * tipSize,
+                z
+            )
+            drawScreenThickLine(manager, sx, sy, lx, ly, tipColor, 2, 0.5)
+            drawScreenThickLine(manager, sx, sy, rx, ry, tipColor, 2, 0.5)
+        elseif isSelected == true and i % 3 == 0 then
+            manager:drawLine2(
+                ox, oy, sx, sy, ribColor.a, ribColor.r, ribColor.g, ribColor.b
+            )
         end
     end
 end
@@ -220,6 +247,7 @@ local function drawFireLane(manager, zombie, debugState, target)
     if length <= 0.001 then return end
     perpendicularX = (-dy / length) * corridor
     perpendicularY = (dx / length) * corridor
+    local sideColor = FIRE_LANE_SIDE_COLORS[color] or color
     drawWorldLine(
         manager,
         originX + perpendicularX,
@@ -228,12 +256,7 @@ local function drawFireLane(manager, zombie, debugState, target)
         targetX + perpendicularX,
         targetY + perpendicularY,
         targetZ,
-        {
-            r = color.r,
-            g = color.g,
-            b = color.b,
-            a = color.a * 0.42,
-        }
+        sideColor
     )
     drawWorldLine(
         manager,
@@ -243,12 +266,7 @@ local function drawFireLane(manager, zombie, debugState, target)
         targetX - perpendicularX,
         targetY - perpendicularY,
         targetZ,
-        {
-            r = color.r,
-            g = color.g,
-            b = color.b,
-            a = color.a * 0.42,
-        }
+        sideColor
     )
 end
 
@@ -415,7 +433,6 @@ local function drawWarningLink(manager, worldX, worldY, worldZ, debugState)
 end
 
 local function drawVisionConeOnly(manager, zombie, debugState, worldX, worldY, worldZ, isSelected)
-    local palette = resolveConePalette(debugState)
     drawCombatCone(manager, zombie, debugState, isSelected)
     local peripheralRadius = tonumber(debugState.peripheralRadius) or 2.5
     if peripheralRadius > 0 then
@@ -427,8 +444,8 @@ local function drawVisionConeOnly(manager, zombie, debugState, worldX, worldY, w
             peripheralRadius,
             PERIPHERAL_CONE_COLOR,
             false,
-            COMBAT_DEBUG_CIRCLE_SEGMENTS,
-            2
+            isSelected == true and 16 or 12,
+            1
         )
     end
     drawWarningLink(manager, worldX, worldY, worldZ, debugState)
@@ -440,12 +457,13 @@ local function drawVisionConeOnly(manager, zombie, debugState, worldX, worldY, w
             local cy = c and tonumber(c.y)
             local cz = (c and tonumber(c.z)) or worldZ
             if cx and cy then
-                drawWorldThickLine(manager, worldX, worldY, worldZ, cx, cy, cz, {
-                    r = CLUE_MARKER_COLOR.r,
-                    g = CLUE_MARKER_COLOR.g,
-                    b = CLUE_MARKER_COLOR.b,
-                    a = 0.62,
-                }, 2, 0.45)
+                if isSelected == true then
+                    drawWorldThickLine(
+                        manager, worldX, worldY, worldZ, cx, cy, cz, CLUE_LINE_COLOR, 2, 0.45
+                    )
+                else
+                    drawWorldLine(manager, worldX, worldY, worldZ, cx, cy, cz, CLUE_LINE_COLOR)
+                end
                 drawWorldMarker(manager, cx, cy, cz, CLUE_MARKER_COLOR, 7)
             end
         end
