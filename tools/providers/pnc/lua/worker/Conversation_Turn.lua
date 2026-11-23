@@ -17,6 +17,15 @@ function Turn.run(context, text, Conversation)
     local translationBefore = #Runtime.translationLookups
     local relationshipBefore = Conversation.relationshipSnapshot(context)
     local contextBefore = Conversation.contextSnapshot(context, view)
+    local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts
+    local previousListener, injuryEvidence
+    if callouts then
+        previousListener = callouts.InjuryEvidenceListener
+        callouts.InjuryEvidenceListener = function(evidence)
+            injuryEvidence = evidence
+            if previousListener then previousListener(evidence) end
+        end
+    end
     local semanticClickFrame = Runtime.semanticClickFrame
     Runtime.semanticClickFrame = nil
     local accepted
@@ -82,6 +91,7 @@ function Turn.run(context, text, Conversation)
     local toolCalls = context.OutputProjection.normalizedToolCalls(
         context, newTrace, newTransport, result, actionResult
     )
+    if callouts then callouts.InjuryEvidenceListener = previousListener end
     local response = {
         ok = true,
         type = "turn",
@@ -110,6 +120,7 @@ function Turn.run(context, text, Conversation)
         },
         relationshipBefore = relationshipBefore,
         relationshipAfter = Conversation.relationshipSnapshot(context),
+        context = Values.copy(injuryEvidence),
         contextBefore = contextBefore,
         contextAfter = Conversation.contextSnapshot(context, view),
         routedSituation = Values.copy(routedSituation),

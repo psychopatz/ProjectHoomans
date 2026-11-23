@@ -26,6 +26,29 @@ local function combatArbiter()
     return banter
 end
 
+function S.ValidateInjuryLine(text, profile, evidence, knowledge)
+    local wounds = PNC.NPCWounds
+    if not text or not profile or not profile.selectedWound or not wounds then return text end
+    local valid, reason, detail
+    if evidence and wounds.ValidateInjuryClaims then
+        valid, reason, detail = wounds.ValidateInjuryClaims(evidence, profile)
+    elseif wounds.ValidateRealizationAgainstSelectedWound then
+        valid, reason = wounds.ValidateRealizationAgainstSelectedWound(text, profile)
+    end
+    if S.InjuryEvidenceListener then
+        S.InjuryEvidenceListener({
+            utteranceEvidence = evidence,
+            authoritativeTruth = {
+                source = "selected_wound_projection", selectedWound = profile.selectedWound,
+                physiology = profile.physiology, knowledgeStatus = knowledge,
+            },
+            realizationDiagnostics = reason, diagnosticDetail = detail, text = text,
+        })
+    end
+    if valid == false then return nil end
+    return text
+end
+
 function S.ResolveSemanticLine(rec, evType, act, tClass, ref, profile, tokens, extra)
     if type(rec) ~= "table" or rec.id == nil then return nil, nil end
     local ex = type(extra) == "table" and extra or nil
@@ -40,7 +63,7 @@ function S.ResolveSemanticLine(rec, evType, act, tClass, ref, profile, tokens, e
             context[k] = v
         end
     end
-    return Transport.ResolveLine(rec, {
+    local text, resolved = Transport.ResolveLine(rec, {
         eventType = evType,
         eventID = ref,
         act = act,
@@ -50,6 +73,9 @@ function S.ResolveSemanticLine(rec, evType, act, tClass, ref, profile, tokens, e
         context = context,
         inCombat = context.inCombat,
     })
+    return S.ValidateInjuryLine(text, context.injuryProfile, ex and ex.utteranceEvidence,
+        context.observerCanInferOnly == nil and "experienced"
+            or (context.observerCanInferOnly and "inferred" or "known")), resolved
 end
 
 function S.DeliverBark(rec, now, opts)

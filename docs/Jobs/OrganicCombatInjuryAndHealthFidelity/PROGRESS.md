@@ -3,7 +3,7 @@
 **Primary Repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` (`main`)
 **Baseline Commit:** `4522d6e952708bf3ccb013ce620ad9d698a60cb1`
 **Reopened From:** H11 user live acceptance after contradictory runtime evidence on 2026-11-23
-**Active Phase:** `H10R7` — Semantic-Truth Quality Sweep + Negative-Claim Guards
+**Active Phase:** `H10R8` — EN/TL Variety, MP/Save/Scale/Performance Regression + Closure
 **Parent Status:** `REOPENED_DEVELOPER_WORK_REQUIRED`; H11 deferred until H10R1–H10R8 pass.
 
 ## Phase Status
@@ -17,9 +17,15 @@
 | `H10R4` | Core Semantic Microplanning: Modifiers, Clause Relations, Discourse Focus | `DONE` | H10R4 phase commit |
 | `H10R5` | Interactive Injury Observation/Triage Scenes + Item-Aware Aid | `DONE` | H10R5 phase commit |
 | `H10R6` | Relationship/Disposition/Inventory Outcome Policy + Action Contracts | `DONE` | H10R6 phase commit |
-| `H10R7` | Semantic-Truth Quality Sweep + Negative-Claim Guards | `ACTIVE` | pending |
-| `H10R8` | EN/TL Variety, MP/Save/Scale/Performance Regression + Closure | `PENDING` | pending |
+| `H10R7` | Semantic-Truth Quality Sweep + Negative-Claim Guards | `DONE` | H10R7 phase commit |
+| `H10R8` | EN/TL Variety, MP/Save/Scale/Performance Regression + Closure | `ACTIVE` | pending |
 | `H11` | User Live SP/MP Acceptance | `DEFERRED` | resumes after H10R1–H10R8 |
+
+## Completed in H10R7
+
+H10R7 validates structured wound claims against selected-wound facts before presentation, with a narrow text guard for older realizations. Optional harness evidence carries claims, modifiers, realized relations, referents, and authoritative wound, physiology, and inventory snapshots. Quality Sweep distinguishes same-variant reuse across context matrices from authoring duplication, semantic collisions, low variety, and variant collapse.
+
+Nine focused Lua smokes, ten focused Core quality tests, and nine legacy quality and anti-duplication tests passed. The legacy sweep acceptance assertions still expect a smaller catalog, which H10R8 will reconcile against baseline. Continue H10R8 with broad semantic, runtime, static, authority, localization, and workload checks before H11.
 
 ## Completed in H10R6
 

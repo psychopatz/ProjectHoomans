@@ -374,12 +374,14 @@ function UtterancePlan.Realize(plan)
         }, locale, nil, true)
     end
     local function renderRelation(relation, left, right)
-        return realizeSimple({
+        local result, reason = realizeSimple({
             strategy = "RELATION_" .. relation, dialogueAct = "COMPOSE", styleVariant = plan.styleVariant,
             selectionSalt = plan.selectionSalt,
             slots = { clause_left = left, clause_right = right },
             safeSlots = { clause_left = true, clause_right = true },
         }, locale, UtterancePlan.MAX_TEXT, true)
+        if result then result.realizedRelation = relation end
+        return result, reason
     end
     local result, reason = ClausePlan.Realize(plan.composition, renderClause, renderRelation)
     if not result then return nil, reason end

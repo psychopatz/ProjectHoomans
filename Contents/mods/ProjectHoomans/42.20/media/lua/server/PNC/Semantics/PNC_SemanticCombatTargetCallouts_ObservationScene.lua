@@ -20,12 +20,30 @@ local function hasOffer(beat, offerID)
     return false
 end
 
-local function sendOutcome(helper, player, binding, role, node, now)
+local INVENTORY_EVIDENCE = {
+    aid_supply_offer = "inventory.bandage_available",
+    aid_disappointed = "inventory.bandage_available",
+    aid_no_supply = "inventory.bandage_unavailable",
+    aid_scarce = "inventory.bandage_available",
+}
+
+local function sendOutcome(helper, player, binding, role, node, now, inspection)
     local S = PNC.Semantics.CombatTargetCallouts
     local ref = binding.ref .. ":reply"
     local text, res = S.ResolveSemanticLine(helper, "combat_injury_visible_observation", "WARN", "human_hostile",
         ref, nil, {}, { replyRole = role, topic = "combat_injury", inCombat = false, poolID = "semantic.combat.injury.visible_observation" })
     if not text then return false end
+    local proof = INVENTORY_EVIDENCE[role]
+    if proof and S.InjuryEvidenceListener and inspection and inspection.inventory then
+        S.InjuryEvidenceListener({
+            utteranceEvidence = { clauses = { { claims = { proof } } } },
+            authoritativeTruth = {
+                source = "authoritative_injury_aid_inspection", knowledgeStatus = "known",
+                inventory = { bandageAvailable = inspection.inventory.hasBandage },
+            },
+            text = text,
+        })
+    end
     local offerIDs = node and Offers.IDs(node) or nil
     local offerPlan = offerIDs and #offerIDs > 0
     local sent = S.DeliverBark(helper, now, {
@@ -104,7 +122,7 @@ function Observation.Respond(player, playerID, helper, beat, offerID, now)
     local runtime = require "PNC/ConvoEngine/Interaction/SceneRuntime"
     local S = PNC.Semantics.CombatTargetCallouts
     local Aid = require "PNC/Semantics/PNC_SemanticInjuryAid"
-    local role, nextNode
+    local role, nextNode, inspection
     if binding.sceneID then
         local scene = runtime.Get(binding.sceneID)
         if not scene then return false, "injury_observation_scene_expired" end
@@ -139,7 +157,8 @@ function Observation.Respond(player, playerID, helper, beat, offerID, now)
             role = "aid_dismissed"
         elseif branch == "observation_no_dressing" or branch == "observation_help" then
             local action = branch == "observation_no_dressing" and "transfer_bandage" or "treat"
-            local admitted, _, inspection = Aid.Offer(helper, injured, { action = action })
+            local admitted, _
+            admitted, _, inspection = Aid.Offer(helper, injured, { action = action })
             if admitted and tostring(admitted.partID) == tostring(binding.partID) then
                 binding.aid = admitted
                 nextNode = Offers.SUPPLY_NODE
@@ -163,7 +182,7 @@ function Observation.Respond(player, playerID, helper, beat, offerID, now)
         end
     end
 
-    local sent = sendOutcome(helper, player, binding, role, nextNode, now)
+    local sent = sendOutcome(helper, player, binding, role, nextNode, now, inspection)
     if not sent or not nextNode then closeBinding(helper, binding, runtime, role) end
     return true, role
 end

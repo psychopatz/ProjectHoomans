@@ -66,8 +66,8 @@ function I.EmitWoundDialogue(record, evType, roleVariant, profile, hitDesc, now,
     if evType == "combat_fighting_injured_callout" then
         local composed = WoundComposition.Realize(profile, { styleVariant = S.ResolveAllyWarnTone(record, nil) })
         if composed then
-            text = composed.text
-            ctx.utteranceEvidence = { clauses = composed.clauses, relations = composed.relations }
+            local evidence = { clauses = composed.clauses, relations = composed.relations }
+            text = S.ValidateInjuryLine(composed.text, profile, evidence, "experienced") or text
         end
     end
     if not text then return false, "semantic_realization_unavailable" end

@@ -57,6 +57,14 @@ function S.ResolveVisibleObservationVariant(_obs, _inj, prof, delta, ep)
     if sel.bandaged or sel.splinted then return "default" end
 end
 
+local VISIBLE_CLAIMS = {
+    heavy_bleeding = { clauses = { { claims = { "bleeding" } } } },
+    dirty_bandage = { clauses = { { claims = { "bandaged", "bandageDirty" } } } },
+    limp_mobility = { clauses = { { claims = { "locomotionImpaired" } } } },
+    feverish_weak = { clauses = { { claims = { "fever" } } } },
+    medic_infection_assessment = { clauses = { { claims = { "ordinaryInfection" } } } },
+}
+
 local OPEN_OBSERVATION_ROLES = {
     supportive = "observer_supportive", clinical = "observer_clinical", protective = "observer_protective",
     dismissive = "observer_dismissive", hostile = "observer_hostile",
@@ -96,7 +104,8 @@ function S.OnVisibleConditionObserved(obs, inj, now, opts)
     }
     local text, res = S.ResolveSemanticLine(
         obs, "combat_injury_visible_observation", "WARN",
-        "human_hostile", ref, nil, toks, { replyRole = variant, topic = "combat_injury", inCombat = false, poolID = "semantic.combat.injury.visible_observation", context = ctx }
+        "human_hostile", ref, nil, toks, { replyRole = variant, topic = "combat_injury", inCombat = false, poolID = "semantic.combat.injury.visible_observation", context = ctx,
+            utteranceEvidence = VISIBLE_CLAIMS[variant] }
     )
     if not text then return false, "observation_realization_unavailable" end
 
