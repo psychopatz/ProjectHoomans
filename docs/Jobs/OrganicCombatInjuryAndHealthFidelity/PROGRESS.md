@@ -2,24 +2,40 @@
 
 **Primary Repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` (`main`)
 **Baseline Commit:** `4522d6e952708bf3ccb013ce620ad9d698a60cb1`
-**Active Phase:** `H11` — User Live Project Zomboid SP/MP Acceptance (`H0`–`H10` Developer Phases Complete)
+**Reopened From:** H11 user live acceptance after contradictory runtime evidence on 2026-11-23
+**Current HEAD at reopen:** `76b7a83b4958494c511cacc5d7c21977e9967e0c`
+**Active Phase:** `H10R1` — Selected-Wound Truth Projection + Debug/Production Event Parity
+**Parent Status:** `REOPENED_DEVELOPER_WORK_REQUIRED`; H11 deferred until H10R1–H10R8 pass.
 
 ## Phase Status
 
 | Phase | Title | Status | Commit |
 | --- | --- | --- | --- |
-| `H0` | Baseline Audit & Durable Job Docs | `DONE` | `2b096f92e09e2cac6b292e4ba3575dc3213d900a` |
-| `H1` | Multi-Dimensional Health Model & Cached Projection | `DONE` | `3b659bd5c970cc139304c326a8445599ac0af36d` |
-| `H2` | Build 42 Knox Transmission, Mortality & Ordinary Wound Infection | `DONE` | `52f25c9cd0fe558120c8bcc45485b55058ccf568` |
-| `H3` | Lightweight Cold, Sickness, Fever & Thermoregulation Parity | `DONE` | `0d35403bc5060ec3ec7a7d4aa1f7c46da8ca31ea` |
-| `H4` | Combat, Escalation, Treatment, Physiology & Post-Combat Beats | `DONE` | `e83e772070ce1f7bbf288e9c68b392b6bb92b653` |
-| `H5` | Director-Style Ally Reaction Arbitration | `DONE` | `907a626ab0813d8db3f7532ff9dcdac3d020b068` |
-| `H6` | Beat -> Player Response -> Multi-Actor Scene Handoff | `DONE` | `7458c3badcb5b4b710b40303c87cadb973d55154` |
-| `H7` | Bite Conflict Facts/Behavior Policy & Bounded Memory | `DONE` | `85a9de85577ffb9e51013977bb732adc9a655c3d` |
-| `H8` | EN/TL Realizations & CodeBuilder Reconciliation | `DONE` | `4f55f861e2571837a7670c08f18574a1962e2993` (`psychopatzCore`: `1a67819822909751090f1a68ef02faa50d667beb`) |
-| `H9` | Deterministic Tests, MP Authority & 200-NPC Scale Suite | `DONE` | `15b4316eccccbdd664546ec2b941ccda093b3f34` |
-| `H10` | Final Audit & Developer-Side Closure | `DONE` | Pending `H10` phase commit |
-| `H11` | User Live SP/MP Acceptance | `USER_OWNED` | Ready for user runtime test |
+| `H0`–`H10` | Original Build 42 wound/physiology/dialogue implementation | `BASELINE_ACCEPTED_THEN_REOPENED_BY_LIVE_EVIDENCE` | through `76b7a83b4` |
+| `H10R1` | Selected-Wound Truth Projection + Debug/Production Event Parity | `ACTIVE` | pending |
+| `H10R2` | Immediate Pain-Reaction Beat + Escalation/Cooldown Policy | `PENDING` | pending |
+| `H10R3` | Witness Observation Gating + Non-Colonist Injury Awareness | `PENDING` | pending |
+| `H10R4` | Core Semantic Microplanning: Modifiers, Clause Relations, Discourse Focus | `PENDING` | pending |
+| `H10R5` | Interactive Injury Observation/Triage Scenes + Item-Aware Aid | `PENDING` | pending |
+| `H10R6` | Relationship/Disposition/Inventory Outcome Policy + Action Contracts | `PENDING` | pending |
+| `H10R7` | Semantic-Truth Quality Sweep + Negative-Claim Guards | `PENDING` | pending |
+| `H10R8` | EN/TL Variety, MP/Save/Scale/Performance Regression + Closure | `PENDING` | pending |
+| `H11` | User Live SP/MP Acceptance | `DEFERRED` | resumes after H10R1–H10R8 |
+
+
+## Reopen Evidence — 2026-11-23 Live Acceptance
+
+User runtime testing invalidated the previous H10 closure claim without invalidating the underlying H0–H10 foundation. Mandatory repair evidence:
+
+- `ApplyDebugWound()` mutates wound/health state but does **not** call `Internal.NotifyWoundCallout()`, so the Character Health debug `Random Body Part` action bypasses the production semantic wound event and produces no immediate pain/interactive reaction.
+- fighting-injured realization currently collapses treatment into `patchState = patched_up`; canonical wording can mention a **splint** even when the selected wound is merely bandaged.
+- whole-body `treatmentState` may describe treatment on a different wound than the selected wound/body part being spoken about.
+- `patched_up_lower_limb_severe` can claim `can't run fast` from coarse region+severity even when the selected wound's authoritative `functionalImpairment` does not support locomotion loss.
+- current ally witness gating is a short recent-reaction penalty, not a per-observer/per-injured first-of-day + injury-revision gate.
+- current responder discovery is squad/ally oriented; it does not yet support bounded non-colonist/stranger observations such as visible blood, open wounds, dirty/soaked dressings, or obvious sickness.
+- immediate pain vocalization is not a dedicated semantic Beat; `SecondaryChannel` alert bark is insufficient to represent wound type/severity/body part.
+
+These are developer-side correctness/robustness defects. H11 resumes only after the repair phases close.
 
 ## Developer-Side Closure Summary (`H0`–`H10`)
 

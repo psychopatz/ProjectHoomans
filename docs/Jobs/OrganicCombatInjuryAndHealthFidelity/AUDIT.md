@@ -30,3 +30,17 @@ Pre-existing uncommitted worktree files from prior combat-wound prototype (`27 m
 - `PNC_NPCWounds.lua` top-level 13-module require list must remain exact (`tests/pnc_npc_wounds_presence_boundary_smoke.lua`).
 - `PNC_Compatibility_DamageContext.lua` legacy `burn -> scratch` test contract remains untouched (`tests/pnc_compatibility_damage_context_smoke.lua`).
 - `psychopatzCore` and `DynamicTrading` remain untouched unless CodeBuilder whole-model fingerprint (`FoundationRegistry.lua`) requires alignment in `H8`.
+## 4. H11 Live-Acceptance Reopen Audit — 2026-11-23
+
+User runtime evidence exposed developer-side gaps after the original H10 closure:
+
+1. **Debug wound parity failure:** `PNC_NPCWounds_Debug.ApplyDebugWound()` calls `Internal.AddWound()` + `PNC.Health.ApplyDamage()` but does not call `Internal.NotifyWoundCallout()`. The Character Health `damage_part` / `Random Body Part` debug action can therefore wound and auto-bandage an NPC without exercising immediate semantic wound reaction/interaction. Production `ApplyCombatDamage` and zombie attack paths do notify.
+2. **Treatment semantic overreach:** `PNC_SemanticCombatTargetCallouts_WoundProfile.lua` collapses any bandaged selected wound into `patchState = patched_up`, while canonical `patched_up_lower_limb_severe` realizations include explicit `splint` wording. Splint must require selected-wound `splinted == true`.
+3. **Cross-wound leakage risk:** cached projection `treatmentState` summarizes all wounds while `WoundProfile` chooses one selected wound for speech. Whole-body stabilization state must not authorize a treatment claim about another body part.
+4. **Function claim overreach:** `ResolveFightingInjuredVariant` selects `*_lower_limb_severe` from region/severity, while wording can claim inability to run. The projection already computes `functionalImpairment`; realization must gate capability claims on that exact selected-wound/actor function state.
+5. **Missing visceral pain layer:** wound delivery requests a generic secondary alert bark before the semantic wound dialogue; there is no dedicated wound-type/severity/body-part pain semantic family that reliably produces immediate `ow/fuck/I'm hit/it bit me` reactions.
+6. **Witness gating gap:** responder arbitration uses a short `lastWoundReactionAt` penalty (~6s), not first meaningful observer->injured observation per world day plus injury revision/escalation.
+7. **Non-colonist gap:** current `FindSquadmates()` filters via `Perception.AreWarningAllies`; stranger/non-colonist visible injury comments are not covered by the wound observer path.
+8. **Interaction opportunity:** existing Beat->responsePlan->Scene infrastructure is suitable for no-bandage/offer-bandage/refuse/help branches, but must use real inventory/capability constraints and authoritative transfer/treatment actions.
+
+The repair should preserve the successful H0–H10 health/physiology foundation and reopen only the owning layers above.

@@ -4,45 +4,39 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "H10"
-phase_commit_message: "phase(H10): H10: finalize OrganicCombatInjuryAndHealthFidelity docs, guards, and developer-side closure"
-state: "USER_ACCEPTANCE"
-parent_status: "USER_ACCEPTANCE_PENDING"
-phase: "H11"
-chunk: "User-owned live Project Zomboid Build 42 SP/MP acceptance testing"
-retrieval_tier: "verify"
-phase_commit_vector: "psychopatz-core=1a67819822909751090f1a68ef02faa50d667beb;project-hoomans=self;dynamic-trading=62757d0b7fc1c114873735387827ccad9d828077"
-phase_residual_vector: "psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=f8a3016d89344add854593d73e4170362efc8de00531cffdb129f3b976936188"
-residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
-codebase_memory_indexed_commit: "0e35ae37deb6e385a806136bfa1edbca9acfe8e6"
-updated_at: "2026-11-22T23:26:35.832535Z"
+phase_commit_phase: "H10R planning checkpoint"
+phase_commit_message: "docs: reopen organic injury acceptance repairs"
+state: "CLEAN_CHECKPOINT"
+parent_status: "IN_PROGRESS"
+phase: "H10R1"
+chunk: "Selected-wound truth projection and debug/production wound-event parity"
+retrieval_tier: "auditor"
 ---
-
-
 
 # Session Handoff
 
 ## What became true
 
-- All mandatory developer-side phases (`H0` through `H10`) of `OrganicCombatInjuryAndHealthFidelity` are complete, verified, and locally committed on `main` across `ProjectHoomans` and `psychopatzCore`.
-- Build 42 17-part (`Groin -> pelvis_groin`) wound/treatment/codec fidelity, `ZombieLore.Transmission` (`1`–`4`) & `Mortality == 7` parity, ordinary wound infection (`0..10`), Live+Abstract physiology parity, O(1) dirty-cached health projections, Director-style 1-vs-2 ally reaction arbitration (`<= 4` participants), Beat -> hard-constrained player suggestions -> `DialogueFlowKernel` -> `LocalResponse` -> multi-actor `Scene` handoff, `Wounds.EvaluateBiteConflictPolicy`, EN/TL realizations (`reconcile.py --check` clean), and 200-NPC scale tests are all verified.
+- H0–H10 remain a useful accepted foundation, but H11 live runtime evidence reopened developer work.
+- Debug `Random Body Part` wounds currently bypass `NotifyWoundCallout`; this is the concrete reason live debug injuries can silently bandage without immediate semantic reaction.
+- Fighting-injured wording can overclaim selected-wound treatment (`splint`) and function (`can't run`) because realization uses coarse `patched_up + bodyRegion + severity` buckets rather than exact selected-wound treatment/function facts.
+- Current witness policy is ally/squad-focused and cooldown-based, not first-of-day/new-injury observation with non-colonist coverage.
+- Existing ConvoEngine responsePlan/branch/Scene and authoritative inventory/treatment systems should be extended rather than replaced.
+- Robustness/performance are primary acceptance gates: no new per-NPC tick/poller, no full scans, bounded caches/queries/participants, O(1) clean projection reads.
 
 ## Remaining
 
-- `H11` — User-owned live Project Zomboid Build 42 SP/MP acceptance testing.
+Execute H10R1 through H10R8, then return the baton to H11 user live acceptance.
 
 ## Resume
 
-1. Launch Project Zomboid Build 42 SP/MP with `PsychopatzCore` and `ProjectHoomans` enabled to perform live `H11` acceptance (verify combat wound received beats, fighting-while-injured open vs patched callouts, pelvic/groin variants, bite possible/confirmed/non-transmissible variants under different Sandbox transmission settings, ally reaction arbitration, interactive triage exchange choices, and cold/fever/wetness progression).
+Start H10R1 from exact current source. Separate selected-wound truth from whole-body summaries, make debug wound injection emit the same normalized production semantic wound event, add negative truth assertions for treatment/function/infection claims, and commit the accepted phase before continuing automatically.
 
-## Evidence
+## Blockers / concurrent work
 
-- `TEST_VERIFIED`: `reconcile.py --check` (`clean = true, drifted = 0, stale = 0`), `file_token_bloat_scan.py --threshold 2000` (`0` production modules over 2000 tokens), `pz_verify.py --kahlua` (`0` issues), `tests/run_tests.py` (`7/7` targeted Lua smoke suites PASS), Python `unittest` (`38/38` authority/eligibility/domain tests PASS), `repo_guard.py check` PASS, and `checkpoint.py verify` PASS.
-
-## Blockers / open decisions
-
-- None.
+- DynamicTrading currently has unrelated dirty generated ConvoEngine files. Do not touch, stage, reset or incorporate them into this goal.
+- psychopatzCore changes are allowed only for genuinely reusable H10R4/H10R7 semantic-composition or Quality Sweep mechanisms; preserve its existing world-event work.
 
 ## Acceptance
 
-Ready for user-owned `H11` live SP/MP runtime acceptance.
+Parent completion requires H10R1–H10R8 developer gates. H11 remains user-owned and cannot resume until the live false-positive/no-reaction defects are covered by deterministic tests and robustness/performance regression.

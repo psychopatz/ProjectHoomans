@@ -47,3 +47,91 @@ Rather than collapsing trauma and infection into a single `woundType -> priority
 ## 4. Separation of Dialogue Semantics vs Gameplay Authority
 
 Dialogue modules (`PNC_SemanticCombatTargetCallouts_*`, `ConvoEngine`) consume normalized projections and emit `biteConflictFacts` and `semanticEventFacts` only. They must never write authoritative combat/execution commands (`recommendedAction` is prohibited in dialogue). Gameplay/behavior authority (`Wounds.EvaluateBiteConflictPolicy`) independently evaluates observer disposition, relationship, Knox exposure state, and player triage orders (`activeInjuryTriageState`) to return behavior stances (`none | protect | monitor | quarantine | abandon | threaten | execute_candidate`).
+## 5. Live-Acceptance Repair: Injury Reaction Ladder
+
+A wound is both a health mutation and a semantic event. The repaired runtime uses one authoritative mutation/event path:
+
+```text
+authoritative wound mutation
+  -> selected-wound truth projection + injuryRevision
+  -> atomic pain Beat (injured actor)
+  -> bounded witness observation arbitration
+  -> optional visible-condition Beat later
+  -> optional interactive injury Scene
+  -> authoritative inventory/treatment/behavior action
+  -> bounded high-salience memory only when warranted
+```
+
+Debug damage must inject the same normalized event as production combat/zombie damage. `debug` is provenance, not a separate silent execution path.
+
+### Pain Beat
+
+Immediate pain is atomic and can occur even without an audience/Scene. Semantic selection uses wound type, selected body part, physical severity, bleeding, functional impairment, panic/disposition and speech style. Realization may range from a restrained grunt to profanity or explicit wound recognition. Cooldowns are escalation-aware: repeated equal/minor hits may suppress; materially worse trauma, gunshot, bite or critical injury may preempt.
+
+### Witness Beat
+
+Witnessing the hit and later noticing the condition are distinct. Per observer->injured state is a compact bounded signature, not transcript history. Strong first observation resets by world-day bucket; later same-day Beats require meaningful injury/treatment/Knox/bleeding/physiology change. Candidate discovery uses existing spatial/perception indexes and Director arbitration; ordinarily one observer speaks, with rare semantically strong interjection.
+
+### Non-colonist observation
+
+Any eligible nearby survivor may notice observable facts (blood, open wound, limp, dirty/soaked dressing, obvious bite mark, feverish/weak state) if perception/knowledge supports it. Hidden diagnoses remain inferred/unknown unless witnessed, inspected, told or medically qualified. Faction/colonist membership changes relevance/relationship policy, not truth.
+
+## 6. Selected-Wound Truth Firewall
+
+Whole-body summaries and selected-wound facts are separate. Dialogue about `{slot.wound.part}` must derive treatment/function claims from that selected wound.
+
+Forbidden unsupported examples:
+- `splinted=false` -> no `splint/splinted`;
+- `bandaged=false` -> no `wrapped/bandaged/dressing`;
+- `stitched=false` -> no stitch claim;
+- `haveGlass=false` / `haveBullet=false` -> no foreign-body claim;
+- selected functional impairment not locomotor -> no `can't run/limp` claim;
+- fever absent -> no fever claim;
+- Knox unconfirmed/impossible -> no `turning` certainty;
+- no observer knowledge -> no hidden diagnostic claim.
+
+Quality tooling must validate these semantic claims independently from generic prose heuristics.
+
+## 7. Semantic Microplanning, Not String Glue
+
+Reusable composition belongs in ConvoEngine/Core when generalizable. Canonical semantics author modifiers and logical clause relations rather than locale-specific adjectives/conjunctions:
+
+```text
+CLAUSE: selected wound is bandaged
+RELATION: CONTRAST
+CLAUSE: speaker has limb_mobility impairment
+RELATION: CONSEQUENCE
+CLAUSE: request allies keep threats in front
+```
+
+EN may realize `CONTRAST` as `but/though/still`; TL owns its own valid construction. Bounded discourse focus may refer to the last unambiguous fact/referent, but ambiguity forces explicit wording. This state is transient Beat/Scene realization context only and is never durable ModData/transcript history.
+
+## 8. Interactive Aid Contract
+
+An observation Beat such as `You're bleeding; patch that up` may expose a Scene. Branch hard constraints query authoritative state:
+
+- injured has/does not have bandage;
+- observer has/does not have transferable bandage;
+- transfer/treatment is currently valid/reachable;
+- medical capability/knowledge;
+- danger/combat state.
+
+Soft utility combines directional relationship, compassion, loyalty, aggression, materialism/scarcity anxiety, medical skill and current danger. Dialogue never fabricates supplies and never performs inventory mutation itself; it invokes the existing authoritative action/transfer/treatment contract.
+
+## 9. Robustness and Performance Are Acceptance Gates
+
+This repair may not introduce:
+- independent per-NPC/OnTick wound observers;
+- full NPC/registry scans per wound;
+- repeated whole-body recomputation on clean reads;
+- unbounded observer history, Beat queues, Scenes or transcripts;
+- runtime LLM/grammar dependency;
+- client-authoritative health/item state.
+
+Required execution shape:
+- mutation increments/invalidates a compact injury revision/projection;
+- self reaction is O(1) plus bounded realization;
+- observer lookup is an existing bounded spatial query only when a relevant event/state transition occurs;
+- observer cache is bounded and current-day/recent-state only;
+- Director candidate and Scene participant caps remain bounded (`<=4` Scene actors; existing visible-offer/turn caps preserved);
+- debug-off behavior has zero-ish observability overhead.
