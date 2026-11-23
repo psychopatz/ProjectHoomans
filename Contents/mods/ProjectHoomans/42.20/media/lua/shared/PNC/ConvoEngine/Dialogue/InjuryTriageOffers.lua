@@ -3,6 +3,7 @@ local Offers = {
     FLOW_ID = "combat.injury.triage_exchange",
     INITIAL_NODE = "observation_reply",
     SUPPLY_NODE = "observation_supply",
+    FOLLOWUP_NODE = "observation_followup",
 }
 local PLAN_PREFIX = "semantic.flow.combat.injury.triage."
 local nodes
@@ -24,6 +25,7 @@ end
 function Offers.ForPlan(plan)
     if plan == Offers.PlanID(Offers.INITIAL_NODE) then return offersForNode(Offers.INITIAL_NODE) end
     if plan == Offers.PlanID(Offers.SUPPLY_NODE) then return offersForNode(Offers.SUPPLY_NODE) end
+    if plan == Offers.PlanID(Offers.FOLLOWUP_NODE) then return offersForNode(Offers.FOLLOWUP_NODE) end
     return {}
 end
 

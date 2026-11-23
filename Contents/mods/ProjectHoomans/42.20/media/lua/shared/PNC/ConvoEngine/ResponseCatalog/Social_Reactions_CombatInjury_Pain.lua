@@ -42,6 +42,8 @@ local OBS_ROLES = {
     "visible_bite", "feverish_weak",
     "aid_supply_offer", "aid_treatment_offer", "aid_no_supply", "aid_refused",
     "aid_acknowledged", "aid_dismissed", "aid_taken", "aid_treated", "aid_changed",
+    "observer_supportive", "observer_clinical", "observer_protective", "observer_dismissive", "observer_hostile",
+    "aid_scarce", "aid_disappointed", "aid_hostile", "aid_gratitude", "aid_debt", "aid_reassured",
     "default",
 }
 

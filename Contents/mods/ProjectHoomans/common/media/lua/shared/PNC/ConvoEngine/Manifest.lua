@@ -245,7 +245,7 @@ return {
             ["sourceShard"] = "dialogue/core_knowledge_identity/question_identity.json",
         },
         {
-            ["bytes"] = 37086,
+            ["bytes"] = 41881,
             ["domain"] = "semantic",
             ["kind"] = "Flows",
             ["module"] = "PNC/ConvoEngine/Flows/Dialogue/CombatWoundCallouts",
@@ -986,7 +986,7 @@ return {
             ["sourceShard"] = "dialogue/combat_tactical_spatial/combat_tactical_spatial_hostile.json",
         },
         {
-            ["bytes"] = 171659,
+            ["bytes"] = 177618,
             ["domain"] = "combat_wound_callouts",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryTriageExchange",
@@ -1002,7 +1002,7 @@ return {
             ["sourceShard"] = "dialogue/combat_wound_callouts/combat_fighting_injured_callout.json",
         },
         {
-            ["bytes"] = 100867,
+            ["bytes"] = 115631,
             ["domain"] = "combat_wound_callouts",
             ["kind"] = "ConvoEngine",
             ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/InjuryVisibleObservationToWoundReceivedBeat",
@@ -5094,5 +5094,5 @@ return {
             ["sourceShard"] = "@index/director/core",
         },
     },
-    ["wholeModelFingerprint"] = "44a0d89d27f332cc4215565d13b726dfc98c4bf70b36edb05ac2784de2486c89",
+    ["wholeModelFingerprint"] = "0608862f6e2082708e85689f7a47121d71a6e5e6a41c4f0991a21e249059cf0c",
 }

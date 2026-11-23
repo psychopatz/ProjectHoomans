@@ -81,6 +81,45 @@
     ],
     "say.variants.aid_changed": [
       "Sandali. Hindi muna kita matutulungan diyan."
+    ],
+    "say.variants.observer_supportive": [
+      "Umupo ka muna. Tutulungan kita diyan.",
+      "Sandali. Takpan muna natin ang sugat mo."
+    ],
+    "say.variants.observer_clinical": [
+      "Huwag ka munang gumalaw. Patingin ng sugat.",
+      "Titingnan ko muna ang sugat bago bendahan."
+    ],
+    "say.variants.observer_protective": [
+      "Takpan mo muna ang sugat bago tayo umalis.",
+      "Takpan mo ang sugat. Ako muna ang magbabantay."
+    ],
+    "say.variants.observer_dismissive": [
+      "Asikasuhin mo iyan. Hindi tayo puwedeng laging huminto.",
+      "Asikasuhin mo ang sugat para hindi bumagal ang lahat."
+    ],
+    "say.variants.observer_hostile": [
+      "Problema mo iyan. Lumayo ka sa akin.",
+      "Asikasuhin mo iyan o magpaiwan ka."
+    ],
+    "say.variants.aid_scarce": [
+      "Huling benda ko na ito. Kailangan kong itabi."
+    ],
+    "say.variants.aid_disappointed": [
+      "Lumabas ka nang walang benda? May maibibigay ako sa iyo."
+    ],
+    "say.variants.aid_hostile": [
+      "Mukhang problema mo iyan."
+    ],
+    "say.variants.aid_gratitude": [
+      "Walang anuman. Magpahinga ka muna.",
+      "Walang anuman. Alagaan mo ang sugat."
+    ],
+    "say.variants.aid_debt": [
+      "Wala kang utang sa akin. Magpagaling ka lang."
+    ],
+    "say.variants.aid_reassured": [
+      "Sigurado ako. Ikaw ang nangangailangan niyan."
     ]
   }
 }

@@ -101,6 +101,8 @@
   "UI_PNC_InjuryObservation_observation_accept_aid_Utterance": "Oo, kailangan ko iyan.",
   "UI_PNC_InjuryObservation_observation_decline_aid_Label": "Sa iyo na. Kakayanin ko.",
   "UI_PNC_InjuryObservation_observation_decline_aid_Utterance": "Sa iyo na. Kakayanin ko.",
+  "UI_PNC_InjuryObservation_observation_decline_costly_Label": "Huwag mo nang sayangin sa akin.",
+  "UI_PNC_InjuryObservation_observation_decline_costly_Utterance": "Huwag mo nang sayangin sa akin.",
   "UI_PNC_InjuryObservation_observation_dismiss_Label": "Huwag kang makialam.",
   "UI_PNC_InjuryObservation_observation_dismiss_Utterance": "Huwag kang makialam.",
   "UI_PNC_InjuryObservation_observation_help_Label": "Matutulungan mo ba ako?",
@@ -110,5 +112,11 @@
   "UI_PNC_InjuryObservation_observation_minimize_Label": "Hindi naman malala.",
   "UI_PNC_InjuryObservation_observation_minimize_Utterance": "Hindi naman malala.",
   "UI_PNC_InjuryObservation_observation_no_dressing_Label": "Wala akong benda.",
-  "UI_PNC_InjuryObservation_observation_no_dressing_Utterance": "Wala akong benda."
+  "UI_PNC_InjuryObservation_observation_no_dressing_Utterance": "Wala akong benda.",
+  "UI_PNC_InjuryObservation_observation_owe_Label": "May utang na loob ako sa iyo.",
+  "UI_PNC_InjuryObservation_observation_owe_Utterance": "May utang na loob ako sa iyo.",
+  "UI_PNC_InjuryObservation_observation_sure_Label": "Sigurado ka?",
+  "UI_PNC_InjuryObservation_observation_sure_Utterance": "Sigurado ka?",
+  "UI_PNC_InjuryObservation_observation_thanks_Label": "Salamat.",
+  "UI_PNC_InjuryObservation_observation_thanks_Utterance": "Salamat."
 }

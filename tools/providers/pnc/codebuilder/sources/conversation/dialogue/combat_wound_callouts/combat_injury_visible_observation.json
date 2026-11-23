@@ -71,6 +71,39 @@
       },
       {
         "id": "aid_changed"
+      },
+      {
+        "id": "observer_supportive"
+      },
+      {
+        "id": "observer_clinical"
+      },
+      {
+        "id": "observer_protective"
+      },
+      {
+        "id": "observer_dismissive"
+      },
+      {
+        "id": "observer_hostile"
+      },
+      {
+        "id": "aid_scarce"
+      },
+      {
+        "id": "aid_disappointed"
+      },
+      {
+        "id": "aid_hostile"
+      },
+      {
+        "id": "aid_gratitude"
+      },
+      {
+        "id": "aid_debt"
+      },
+      {
+        "id": "aid_reassured"
       }
     ]
   },

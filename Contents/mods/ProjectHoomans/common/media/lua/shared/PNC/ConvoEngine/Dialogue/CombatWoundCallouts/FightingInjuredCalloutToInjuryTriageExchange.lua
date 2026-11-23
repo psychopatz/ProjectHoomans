@@ -2323,6 +2323,81 @@ return {
                                 },
                             },
                         },
+                        ["observation_followup"] = {
+                            ["accepts"] = {
+                                {
+                                    ["intent"] = "ACKNOWLEDGE",
+                                    ["speechAct"] = "ACKNOWLEDGE",
+                                    ["stateValue"] = "observation_thanks",
+                                    ["subject"] = "COMBAT_INJURY",
+                                },
+                                {
+                                    ["intent"] = "INFORM",
+                                    ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "observation_owe",
+                                    ["subject"] = "COMBAT_INJURY",
+                                },
+                                {
+                                    ["intent"] = "QUESTION",
+                                    ["speechAct"] = "QUESTION",
+                                    ["stateValue"] = "observation_sure",
+                                    ["subject"] = "COMBAT_INJURY",
+                                },
+                            },
+                            ["branchOffers"] = {
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "ACKNOWLEDGE",
+                                        ["speechAct"] = "ACKNOWLEDGE",
+                                        ["stateValue"] = "observation_thanks",
+                                        ["subject"] = "COMBAT_INJURY",
+                                    },
+                                    ["id"] = "combat.injury.observation_thanks",
+                                    ["labelFallback"] = "Thanks.",
+                                    ["labelKey"] = "UI_PNC_InjuryObservation_observation_thanks_Label",
+                                    ["utteranceFallback"] = "Thanks.",
+                                    ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_thanks_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "INFORM",
+                                        ["speechAct"] = "INFORM",
+                                        ["stateValue"] = "observation_owe",
+                                        ["subject"] = "COMBAT_INJURY",
+                                    },
+                                    ["id"] = "combat.injury.observation_owe",
+                                    ["labelFallback"] = "I owe you.",
+                                    ["labelKey"] = "UI_PNC_InjuryObservation_observation_owe_Label",
+                                    ["utteranceFallback"] = "I owe you.",
+                                    ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_owe_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "QUESTION",
+                                        ["speechAct"] = "QUESTION",
+                                        ["stateValue"] = "observation_sure",
+                                        ["subject"] = "COMBAT_INJURY",
+                                    },
+                                    ["id"] = "combat.injury.observation_sure",
+                                    ["labelFallback"] = "You're sure?",
+                                    ["labelKey"] = "UI_PNC_InjuryObservation_observation_sure_Label",
+                                    ["utteranceFallback"] = "You're sure?",
+                                    ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_sure_Utterance",
+                                },
+                            },
+                            ["onMatch"] = "triage_resolution",
+                            ["onUnrelated"] = "suspend",
+                            ["responsePool"] = "semantic.flow.combat.injury.triage.observation_followup",
+                        },
                         ["observation_reply"] = {
                             ["accepts"] = {
                                 {
@@ -2457,6 +2532,12 @@ return {
                                     ["stateValue"] = "observation_decline_aid",
                                     ["subject"] = "COMBAT_INJURY",
                                 },
+                                {
+                                    ["intent"] = "REFUSE",
+                                    ["speechAct"] = "REFUSE",
+                                    ["stateValue"] = "observation_decline_costly",
+                                    ["subject"] = "COMBAT_INJURY",
+                                },
                             },
                             ["branchOffers"] = {
                                 {
@@ -2491,8 +2572,24 @@ return {
                                     ["utteranceFallback"] = "Keep it. I'll manage.",
                                     ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_decline_aid_Utterance",
                                 },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "REFUSE",
+                                        ["speechAct"] = "REFUSE",
+                                        ["stateValue"] = "observation_decline_costly",
+                                        ["subject"] = "COMBAT_INJURY",
+                                    },
+                                    ["id"] = "combat.injury.observation_decline_costly",
+                                    ["labelFallback"] = "Don't waste it on me.",
+                                    ["labelKey"] = "UI_PNC_InjuryObservation_observation_decline_costly_Label",
+                                    ["utteranceFallback"] = "Don't waste it on me.",
+                                    ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_decline_costly_Utterance",
+                                },
                             },
-                            ["onMatch"] = "triage_resolution",
+                            ["onMatch"] = "observation_followup",
                             ["onRefuse"] = "triage_resolution",
                             ["onUnrelated"] = "suspend",
                             ["responsePool"] = "semantic.flow.combat.injury.triage.observation_supply",

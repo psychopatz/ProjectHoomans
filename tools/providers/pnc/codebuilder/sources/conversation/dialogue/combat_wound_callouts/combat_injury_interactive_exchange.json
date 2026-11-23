@@ -911,6 +911,22 @@
                 "subject": "COMBAT_INJURY",
                 "stateValue": "observation_decline_aid"
               }
+            },
+            {
+              "id": "combat.injury.observation_decline_costly",
+              "labelKey": "UI_PNC_InjuryObservation_observation_decline_costly_Label",
+              "labelFallback": "Don't waste it on me.",
+              "utteranceKey": "UI_PNC_InjuryObservation_observation_decline_costly_Utterance",
+              "utteranceFallback": "Don't waste it on me.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "REFUSE",
+                "speechAct": "REFUSE",
+                "subject": "COMBAT_INJURY",
+                "stateValue": "observation_decline_costly"
+              }
             }
           ],
           "accepts": [
@@ -925,9 +941,15 @@
               "speechAct": "REFUSE",
               "subject": "COMBAT_INJURY",
               "stateValue": "observation_decline_aid"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "observation_decline_costly"
             }
           ],
-          "onMatch": "triage_resolution",
+          "onMatch": "observation_followup",
           "onRefuse": "triage_resolution",
           "onUnrelated": "suspend"
         },
@@ -938,6 +960,81 @@
           "onPass": "observation_reply",
           "onFail": "injury_report_open",
           "onUnknown": "injury_report_open"
+        },
+        "observation_followup": {
+          "responsePool": "semantic.flow.combat.injury.triage.observation_followup",
+          "branchOffers": [
+            {
+              "id": "combat.injury.observation_thanks",
+              "labelKey": "UI_PNC_InjuryObservation_observation_thanks_Label",
+              "labelFallback": "Thanks.",
+              "utteranceKey": "UI_PNC_InjuryObservation_observation_thanks_Utterance",
+              "utteranceFallback": "Thanks.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "ACKNOWLEDGE",
+                "speechAct": "ACKNOWLEDGE",
+                "subject": "COMBAT_INJURY",
+                "stateValue": "observation_thanks"
+              }
+            },
+            {
+              "id": "combat.injury.observation_owe",
+              "labelKey": "UI_PNC_InjuryObservation_observation_owe_Label",
+              "labelFallback": "I owe you.",
+              "utteranceKey": "UI_PNC_InjuryObservation_observation_owe_Utterance",
+              "utteranceFallback": "I owe you.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "COMBAT_INJURY",
+                "stateValue": "observation_owe"
+              }
+            },
+            {
+              "id": "combat.injury.observation_sure",
+              "labelKey": "UI_PNC_InjuryObservation_observation_sure_Label",
+              "labelFallback": "You're sure?",
+              "utteranceKey": "UI_PNC_InjuryObservation_observation_sure_Utterance",
+              "utteranceFallback": "You're sure?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "COMBAT_INJURY",
+                "stateValue": "observation_sure"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "ACKNOWLEDGE",
+              "speechAct": "ACKNOWLEDGE",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "observation_thanks"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "observation_owe"
+            },
+            {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "observation_sure"
+            }
+          ],
+          "onMatch": "triage_resolution",
+          "onUnrelated": "suspend"
         }
       }
     },

@@ -101,6 +101,8 @@
   "UI_PNC_InjuryObservation_observation_accept_aid_Utterance": "Yes, I could use it.",
   "UI_PNC_InjuryObservation_observation_decline_aid_Label": "Keep it. I'll manage.",
   "UI_PNC_InjuryObservation_observation_decline_aid_Utterance": "Keep it. I'll manage.",
+  "UI_PNC_InjuryObservation_observation_decline_costly_Label": "Don't waste it on me.",
+  "UI_PNC_InjuryObservation_observation_decline_costly_Utterance": "Don't waste it on me.",
   "UI_PNC_InjuryObservation_observation_dismiss_Label": "Mind your own business.",
   "UI_PNC_InjuryObservation_observation_dismiss_Utterance": "Mind your own business.",
   "UI_PNC_InjuryObservation_observation_help_Label": "Can you help me?",
@@ -110,5 +112,11 @@
   "UI_PNC_InjuryObservation_observation_minimize_Label": "It's not that bad.",
   "UI_PNC_InjuryObservation_observation_minimize_Utterance": "It's not that bad.",
   "UI_PNC_InjuryObservation_observation_no_dressing_Label": "I don't have a bandage.",
-  "UI_PNC_InjuryObservation_observation_no_dressing_Utterance": "I don't have a bandage."
+  "UI_PNC_InjuryObservation_observation_no_dressing_Utterance": "I don't have a bandage.",
+  "UI_PNC_InjuryObservation_observation_owe_Label": "I owe you.",
+  "UI_PNC_InjuryObservation_observation_owe_Utterance": "I owe you.",
+  "UI_PNC_InjuryObservation_observation_sure_Label": "You're sure?",
+  "UI_PNC_InjuryObservation_observation_sure_Utterance": "You're sure?",
+  "UI_PNC_InjuryObservation_observation_thanks_Label": "Thanks.",
+  "UI_PNC_InjuryObservation_observation_thanks_Utterance": "Thanks."
 }

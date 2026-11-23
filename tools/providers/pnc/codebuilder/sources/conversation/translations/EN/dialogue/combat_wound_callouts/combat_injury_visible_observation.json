@@ -81,6 +81,45 @@
     ],
     "say.variants.aid_changed": [
       "Hang on. I can't help with it right now."
+    ],
+    "say.variants.observer_supportive": [
+      "Sit down a second. Let me help you with that.",
+      "Hey, stop a minute. Let's get that covered."
+    ],
+    "say.variants.observer_clinical": [
+      "Hold still. Let me take a look at that wound.",
+      "I need to look at the wound before we dress it."
+    ],
+    "say.variants.observer_protective": [
+      "Get that wound covered before we move.",
+      "Cover that wound. I'll keep watch in the meantime."
+    ],
+    "say.variants.observer_dismissive": [
+      "Get that dealt with. We can't keep stopping.",
+      "Deal with that wound or you'll slow everyone down."
+    ],
+    "say.variants.observer_hostile": [
+      "That's your problem. Keep it away from me.",
+      "Deal with it or stay behind."
+    ],
+    "say.variants.aid_scarce": [
+      "It's the last dressing I've got. I need to keep it."
+    ],
+    "say.variants.aid_disappointed": [
+      "You went out without a dressing? I can spare this one."
+    ],
+    "say.variants.aid_hostile": [
+      "Sounds like your problem."
+    ],
+    "say.variants.aid_gratitude": [
+      "Anytime. Take it easy for a minute.",
+      "You're welcome. Look after that wound."
+    ],
+    "say.variants.aid_debt": [
+      "You don't owe me anything. Just get better."
+    ],
+    "say.variants.aid_reassured": [
+      "I'm sure. You're the one who needs it."
     ]
   }
 }

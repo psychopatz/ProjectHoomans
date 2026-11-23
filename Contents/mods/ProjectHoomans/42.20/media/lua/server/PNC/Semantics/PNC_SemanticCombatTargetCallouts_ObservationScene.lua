@@ -65,6 +65,28 @@ local function closeBinding(helper, binding, runtime, reason)
     if binding.sceneID then runtime.Close(binding.sceneID, reason) end
 end
 
+local FOLLOWUP = {
+    observation_thanks = "aid_gratitude", observation_owe = "aid_debt", observation_sure = "aid_reassured",
+}
+
+local function rememberAid(helper, injured, binding, outcome, now)
+    local S = PNC.Semantics.CombatTargetCallouts
+    if S.RecordHighSalienceInjuryMemory then
+        S.RecordHighSalienceInjuryMemory(injured, {
+            kind = "triage_resolution", triageOutcome = outcome, eventRef = binding.ref,
+            partId = binding.partID, actorId = helper.id, provenance = "experienced", now = now,
+        })
+    end
+    local relationships = PNC.Relationships
+    if not relationships or not relationships.ApplyConversationEffect then return end
+    local gameTime = getGameTime and getGameTime()
+    local worldAge = gameTime and gameTime.getWorldAgeHours and gameTime:getWorldAgeHours() or 0
+    relationships.ApplyConversationEffect(tostring(injured.id), "npc:" .. tostring(helper.id), {
+        interactionType = "injury_aid_received", memoryType = "injury_aid_received",
+        approval = 3, familiarity = 1, decayPerDay = 0.15, tags = { injury = true, aid = true },
+    }, { eventID = "injury-aid:" .. binding.ref, worldAgeHours = worldAge })
+end
+
 function Observation.Respond(player, playerID, helper, beat, offerID, now)
     local binding = helper.runtime and helper.runtime.activeInjuryObservation
     if not binding or not beat or beat.flowID ~= Offers.FLOW_ID
@@ -87,10 +109,19 @@ function Observation.Respond(player, playerID, helper, beat, offerID, now)
         local scene = runtime.Get(binding.sceneID)
         if not scene then return false, "injury_observation_scene_expired" end
         recordChoice(scene, injured, helper, offer)
-        if branch == "observation_accept_aid" and binding.aid then
+        if binding.completedAid then
+            role = FOLLOWUP[branch]
+            if not role then return false, "injury_observation_reply_wrong_stage" end
+        elseif branch == "observation_accept_aid" and binding.aid then
             local worked = Aid.Execute(helper, injured, binding.aid)
-            role = worked and (binding.aid.action == "bandage_transfer" and "aid_taken" or "aid_treated") or "aid_changed"
-        elseif branch == "observation_decline_aid" then
+            role = "aid_changed"
+            if worked then
+                role = binding.aid.action == "bandage_transfer" and "aid_taken" or "aid_treated"
+                binding.completedAid, binding.aid = true, nil
+                nextNode = Offers.FOLLOWUP_NODE
+                rememberAid(helper, injured, binding, role, now)
+            end
+        elseif branch == "observation_decline_aid" or branch == "observation_decline_costly" then
             role = "aid_acknowledged"
         else
             return false, "injury_observation_reply_wrong_stage"
@@ -113,6 +144,13 @@ function Observation.Respond(player, playerID, helper, beat, offerID, now)
                 binding.aid = admitted
                 nextNode = Offers.SUPPLY_NODE
                 role = action == "transfer_bandage" and "aid_supply_offer" or "aid_treatment_offer"
+                if action == "transfer_bandage" and inspection and inspection.social
+                    and inspection.social.policy == "disappointed" then role = "aid_disappointed" end
+            elseif inspection and inspection.social and inspection.social.policy == "hostile" then
+                role = "aid_hostile"
+            elseif inspection and inspection.outcome == "refuse" and inspection.social
+                and inspection.social.policy == "scarce" and inspection.inventory.bandageCount == 1 then
+                role = "aid_scarce"
             elseif inspection and inspection.reason == "missing_bandage" then
                 role = "aid_no_supply"
             elseif inspection and inspection.outcome == "refuse" then

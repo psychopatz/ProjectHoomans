@@ -126,25 +126,28 @@ local function resolveSocial(helper, injured, danger, bandageCount)
     local approval = tonumber(relationship.approval) or 0
     local trust = tonumber(relationship.trust) or 0
     local relationState = string.lower(tostring(relationship.state or "unknown"))
+    local isLeader = helper.role == "leader" or helper.tacticalRole == "leader"
     local policy
 
     if relationState == "enemy" or relationState == "hostile"
         or (approval <= -40 and aggression >= 60)
     then
         policy = "hostile"
-    elseif danger and (loyalty >= 55 or compassion >= 65
-        or relationState == "friend" or relationState == "friendly")
-    then
+    elseif isLeader or (danger and (loyalty >= 55 or compassion >= 65
+        or relationState == "friend" or relationState == "friendly")) then
         policy = "protective"
-    elseif scarcityAnxiety >= 65 and materialism >= 60 and compassion < 45 then
-        policy = "dismissive"
     elseif compassion >= 65 or trust >= 55 or approval >= 50 then
         policy = "supportive"
     elseif isMedic or firstAidLevel >= 3 then
         policy = "clinical"
-    elseif scarcityAnxiety >= 55 and bandageCount <= 1
-        and materialism >= 50 and compassion < 55
-    then
+    elseif scarcityAnxiety >= 65 and bandageCount == 1 and materialism >= 60
+        and compassion < 35 and loyalty < 45 then
+        policy = "scarce"
+    elseif (aggression >= 70 and compassion < 40)
+        or (scarcityAnxiety >= 65 and materialism >= 60 and compassion < 45) then
+        policy = "dismissive"
+    elseif scarcityAnxiety >= 55 and bandageCount and bandageCount <= 1
+        and materialism >= 50 and compassion < 55 then
         policy = "disappointed"
     else
         policy = "practical"
@@ -160,6 +163,11 @@ local function resolveSocial(helper, injured, danger, bandageCount)
         remainingBandages = tonumber(bandageCount) or 0,
         dangerActive = danger == true,
     }
+end
+
+function Aid.ObserverPolicy(helper, injured)
+    if not validRecord(helper) or not validRecord(injured) then return "practical" end
+    return resolveSocial(helper, injured, combatActive(helper), nil).policy
 end
 
 local function taskTransfer(taskID, helper, injured)
@@ -313,7 +321,7 @@ local function inspect(helper, injured, options)
         result.outcome = "ask_for_supplies"
         result.social = resolveSocial(helper, injured, danger, bandageCount)
         if result.social.policy == "hostile"
-            or result.social.policy == "dismissive"
+            or result.social.policy == "dismissive" or result.social.policy == "scarce"
             or result.social.policy == "disappointed"
         then
             result.outcome = "refuse"
@@ -338,7 +346,7 @@ local function inspect(helper, injured, options)
     result.eligible = true
     result.reason = "ready"
     if result.social.policy == "hostile"
-        or result.social.policy == "dismissive"
+        or result.social.policy == "dismissive" or result.social.policy == "scarce"
         or result.social.policy == "disappointed"
     then
         result.outcome = "refuse"

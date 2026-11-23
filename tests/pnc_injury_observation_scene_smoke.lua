@@ -8,7 +8,7 @@ local helper = { id = "medic", alive = true, runtime = {} }
 local injured = { id = "injured", alive = true }
 local player = {}
 local clock = 1000
-local closed, opened, mutations = 0, 0, 0
+local closed, opened, mutations, memories = 0, 0, 0, 0
 local scene, activeBeat, handler
 local available = true
 local lastRole
@@ -18,6 +18,12 @@ PNC = {
     Const = { CMD_SEMANTIC_INTERACTION_LIFECYCLE = "semantic_interaction_lifecycle" },
     ServerCommandRouter = { Register = function(_, value) handler = value end },
     Registry = { Get = function(id) if id == injured.id then return injured end if id == helper.id then return helper end end },
+    Relationships = { ApplyConversationEffect = function(observer, target, effect)
+        T.equal(observer, injured.id)
+        T.equal(target, "npc:" .. helper.id)
+        T.equal(effect.memoryType, "injury_aid_received")
+        memories = memories + 1
+    end },
     PlayerCharacters = { GetEntityKey = function(value) if value == player then return "player:local" end end },
     Conversation = {
         Authority = { Internal = { ValidateLease = function(_, _, token) return token == "approved" end } },
@@ -90,13 +96,19 @@ T.equal(choose("observation_no_dressing").accepted, true)
 T.equal(lastRole, "aid_supply_offer")
 T.equal(opened, 1)
 T.equal(mutations, 0, "offer has no gameplay effect")
-T.equal(#activeBeat.offerIDs, 2, "confirmation comes from the second authored node")
+T.equal(#activeBeat.offerIDs, 3, "confirmation and two declines come from the second authored node")
 clock = 1200
 T.equal(choose("observation_accept_aid").accepted, true)
 T.equal(lastRole, "aid_taken")
 T.equal(mutations, 1)
-T.equal(closed, 1)
+T.equal(closed, 0, "completed aid opens bounded follow-up replies")
+T.equal(memories, 1, "committed aid records one directed relationship consequence")
+T.equal(#activeBeat.offerIDs, 3)
 T.equal(choose("observation_accept_aid").accepted, false, "consumed offer cannot replay")
+T.equal(choose("observation_thanks").accepted, true)
+T.equal(lastRole, "aid_gratitude")
+T.equal(closed, 1)
+T.equal(memories, 1, "gratitude does not create a second gameplay memory")
 
 clock, available = 1500, false
 start()
@@ -104,3 +116,4 @@ T.equal(choose("observation_no_dressing").accepted, true)
 T.equal(lastRole, "aid_no_supply")
 T.equal(mutations, 1, "missing inventory never dispatches a transfer")
 T.equal(closed, 2)
+T.equal(memories, 1, "ordinary no-supply response has no durable memory")

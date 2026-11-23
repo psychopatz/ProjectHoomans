@@ -57,6 +57,11 @@ function S.ResolveVisibleObservationVariant(_obs, _inj, prof, delta, ep)
     if sel.bandaged or sel.splinted then return "default" end
 end
 
+local OPEN_OBSERVATION_ROLES = {
+    supportive = "observer_supportive", clinical = "observer_clinical", protective = "observer_protective",
+    dismissive = "observer_dismissive", hostile = "observer_hostile",
+}
+
 function S.OnVisibleConditionObserved(obs, inj, now, opts)
     if type(obs) ~= "table" or obs.alive == false or obs.id == nil then return false, "invalid_observer" end
     if type(inj) ~= "table" or inj.alive == false or inj.id == nil then return false, "invalid_injured" end
@@ -71,6 +76,11 @@ function S.OnVisibleConditionObserved(obs, inj, now, opts)
     local variant = S.ResolveVisibleObservationVariant(obs, inj, prof, delta, ep)
     if not variant then return false, "condition_not_visible" end
     if not I.CanSeeInjury(obs, inj) then return false, "no_line_of_sight" end
+    local openWound = variant == "open_wound" or variant == "medic_triage_offer"
+    if openWound then
+        local aid = require "PNC/Semantics/PNC_SemanticInjuryAid"
+        variant = OPEN_OBSERVATION_ROLES[aid.ObserverPolicy(obs, inj)] or variant
+    end
     local addrName = (S.FirstTokenName and S.FirstTokenName(inj.name or inj.fullName)) or tostring(inj.name or "survivor")
     local toks = { ["addressee.name"] = addrName, ["slot.wound.part"] = prof.partToken, ["slot.wound.label"] = prof.woundLabel }
     local ref = "vis-obs:" .. tostring(obs.id) .. ":" .. tostring(inj.id) .. ":" .. tostring(math.floor(now))
@@ -98,8 +108,8 @@ function S.OnVisibleConditionObserved(obs, inj, now, opts)
         eventType = "combat_injury_visible_observation", eventRef = ref, threadID = ref, transient = true,
     }
 
-    local interactive = variant == "heavy_bleeding" or variant == "open_wound"
-        or variant == "dirty_bandage" or variant == "medic_triage_offer" or variant == "suspected_infection"
+    local interactive = variant == "heavy_bleeding" or (openWound and variant ~= "observer_hostile")
+        or variant == "dirty_bandage" or variant == "suspected_infection"
     local active = obs.runtime and obs.runtime.activeInjuryObservation
     if active and now < active.untilAt then interactive = false end
     local offerIDs = interactive and TriageOffers.IDs(TriageOffers.INITIAL_NODE) or nil

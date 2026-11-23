@@ -3,7 +3,7 @@
 **Primary Repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` (`main`)
 **Baseline Commit:** `4522d6e952708bf3ccb013ce620ad9d698a60cb1`
 **Reopened From:** H11 user live acceptance after contradictory runtime evidence on 2026-11-23
-**Active Phase:** `H10R6` — Relationship/Disposition/Inventory Outcome Policy + Action Contracts
+**Active Phase:** `H10R7` — Semantic-Truth Quality Sweep + Negative-Claim Guards
 **Parent Status:** `REOPENED_DEVELOPER_WORK_REQUIRED`; H11 deferred until H10R1–H10R8 pass.
 
 ## Phase Status
@@ -16,10 +16,16 @@
 | `H10R3` | Witness Observation Gating + Non-Colonist Injury Awareness | `DONE` | H10R3 phase commit |
 | `H10R4` | Core Semantic Microplanning: Modifiers, Clause Relations, Discourse Focus | `DONE` | H10R4 phase commit |
 | `H10R5` | Interactive Injury Observation/Triage Scenes + Item-Aware Aid | `DONE` | H10R5 phase commit |
-| `H10R6` | Relationship/Disposition/Inventory Outcome Policy + Action Contracts | `ACTIVE` | pending |
-| `H10R7` | Semantic-Truth Quality Sweep + Negative-Claim Guards | `PENDING` | pending |
+| `H10R6` | Relationship/Disposition/Inventory Outcome Policy + Action Contracts | `DONE` | H10R6 phase commit |
+| `H10R7` | Semantic-Truth Quality Sweep + Negative-Claim Guards | `ACTIVE` | pending |
 | `H10R8` | EN/TL Variety, MP/Save/Scale/Performance Regression + Closure | `PENDING` | pending |
 | `H11` | User Live SP/MP Acceptance | `DEFERRED` | resumes after H10R1–H10R8 |
+
+## Completed in H10R6
+
+H10R6 projects directional relationship, resolved disposition, scarcity, medical skill, role, and danger into observation and aid outcomes. The same open wound can elicit a supportive, clinical, protective, dismissive, or hostile reaction. Real aid opens a bounded gratitude follow-up and records one directed consequence through the relationship authority. Acknowledgment, decline, and no-supply chatter are transient.
+
+Nine focused Lua smokes and a clean CodeBuilder check passed. Resume H10R7 by connecting selected-wound, clause, and action evidence to the Quality Sweep. Keep the existing R8 workload outside this phase.
 
 ## Completed in H10R5
 
