@@ -1,0 +1,79 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.injury.pain_reaction",
+  "locale": "TL",
+  "entries": {
+    "say.variants.scratch_minor": [
+      "Aray, nakalmot ang {slot.wound.part} ko!",
+      "Tch, nagagalusan ang {slot.wound.part} ko."
+    ],
+    "say.variants.scratch_stoic": [
+      "Hmph. Gasgas lang sa {slot.wound.part} ko.",
+      "Mababaw na kalmot lang sa {slot.wound.part} ko, wala ito."
+    ],
+    "say.variants.scratch_aggressive": [
+      "Lintik, nakalmot ng hayop ang {slot.wound.part} ko!",
+      "Bwisit, nadaplisan ang {slot.wound.part} ko!"
+    ],
+    "say.variants.laceration_moderate": [
+      "Aray! Nahiwa ang {slot.wound.part} ko!",
+      "Ugh, may mahabang hiwa sa {slot.wound.part} ko!"
+    ],
+    "say.variants.laceration_severe": [
+      "Aray! Malalim ang laslas sa {slot.wound.part} ko, malakas ang dugo!",
+      "Lintik, napunit nang malalim ang {slot.wound.part} ko!"
+    ],
+    "say.variants.laceration_aggressive": [
+      "Hayop na iyon, nilaslas ang {slot.wound.part} ko!",
+      "Binuksan ang {slot.wound.part} ko, magbabayad ka!"
+    ],
+    "say.variants.laceration_stoic": [
+      "Ngh, malalim ang hiwa sa {slot.wound.part} ko. Nakatayo pa.",
+      "Tinamaan ng hiwa ang {slot.wound.part} ko, kaya pa."
+    ],
+    "say.variants.fracture": [
+      "Krak, aray! May nabali sa {slot.wound.part} ko!",
+      "Diyos ko, nabasag ata ang buto sa {slot.wound.part} ko!"
+    ],
+    "say.variants.deep_wound": [
+      "Aray! Bumuka nang malalim ang {slot.wound.part} ko!",
+      "Ugh, malalim ang sugat sa {slot.wound.part} ko, bumubulwak ang dugo!"
+    ],
+    "say.variants.deep_wound_glass": [
+      "Aray! Bumaon ang bubog sa {slot.wound.part} ko!",
+      "Ugh, may nakabaong bubog sa {slot.wound.part} ko!"
+    ],
+    "say.variants.burn": [
+      "Aray! Napaso nang matindi ang {slot.wound.part} ko!",
+      "Ugh, grabe ang paso sa {slot.wound.part} ko!"
+    ],
+    "say.variants.bullet": [
+      "Aray, nabaril ako! Tinamaan ng bala ang {slot.wound.part} ko!",
+      "Ugh! May tama ng bala sa {slot.wound.part} ko!"
+    ],
+    "say.variants.bullet_stoic": [
+      "Ngh, tinamaan ng bala ang {slot.wound.part} ko!",
+      "May tama ng baril sa {slot.wound.part} ko, nakakakilos pa!"
+    ],
+    "say.variants.bite": [
+      "Hindi, aray! Bumaon ang ngipin sa {slot.wound.part} ko!",
+      "Lintik! Nakagat ang {slot.wound.part} ko!"
+    ],
+    "say.variants.bite_panicked": [
+      "Hindi, hindi! Nakagat ang {slot.wound.part} ko, ilayo ninyo sa akin!",
+      "Diyos ko, bumaon ang kagat sa {slot.wound.part} ko! Nakagat ako!"
+    ],
+    "say.variants.bite_non_transmissible": [
+      "Aray! Nakagat ang {slot.wound.part} ko, hindi nakakahawa sa laway pero malakas ang dugo!",
+      "Ugh, bumaon ang ngipin sa {slot.wound.part} ko! Ligtas sa laway pero sobrang sakit!"
+    ],
+    "say.variants.multiple_hits_severe": [
+      "Aray, isa pang matinding tama sa {slot.wound.part} ko! Dumadami na ang sugat ko!",
+      "Ugh! Tinamaan na naman ang {slot.wound.part} ko, nauubusan na ako ng dugo!"
+    ],
+    "say.variants.default": [
+      "Aray, tinamaan ang {slot.wound.part} ko!",
+      "Ugh, nadaplisan ang {slot.wound.part} ko!"
+    ]
+  }
+}

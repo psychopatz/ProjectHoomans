@@ -24,6 +24,7 @@ SandboxVars = {
 
 local nowMs = 10000
 local deliveredBarks = {}
+local painBarks = {}
 local dirtyMarks = {}
 local emittedEvents = {}
 local npcStore = {}
@@ -95,6 +96,10 @@ PNC = {
     },
     Network = {
         SendConversationRelationshipForNPC = function(_player, npcId, eventType, payload)
+            if tostring(eventType) == "combat_injury_pain_reaction" then
+                painBarks[#painBarks + 1] = { npcId = tostring(npcId), text = payload and payload.ambientFlavor and payload.ambientFlavor.text, ambientFlavor = payload and payload.ambientFlavor }
+                return true
+            end
             deliveredBarks[#deliveredBarks + 1] = {
                 npcId = tostring(npcId),
                 eventType = tostring(eventType),
@@ -223,6 +228,9 @@ do
     nowMs = 20000
     local okScr = Wounds.ApplyCombatDamage(adrienne, liveBodies.adri, { amount = 4, partId = "ForeArm_L", woundType = "scratch", attackerKind = "zombie" })
     T.truthy(okScr, "scratch damage applies")
+    T.equal(#painBarks, 1, "scratch emits immediate pain reaction Beat first")
+    T.equal(painBarks[1].ambientFlavor.context.combatReactionRole, "scratch_minor", "scratch pain variant")
+    assertCleanText(painBarks[1].text, "scratch pain beat")
     T.equal(deliveredBarks[1].eventType, "combat_wound_received_beat", "scratch emits wound_received_beat")
     assertCleanText(deliveredBarks[1].text, "scratch beat")
     T.contains(string.lower(deliveredBarks[1].text), "left forearm", "scratch names damaged body part")

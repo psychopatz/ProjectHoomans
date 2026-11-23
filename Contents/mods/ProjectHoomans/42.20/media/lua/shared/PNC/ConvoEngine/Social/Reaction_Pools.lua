@@ -46,6 +46,8 @@ local DIRECT_EVENT_POOLS = {
     combat_fighting_injured_callout = "semantic.combat.fighting.injured_callout",
     combat_wound_received_beat = "semantic.combat.wound.received_beat",
     combat_wound_ally_reaction = "semantic.combat.wound.ally_reaction",
+    combat_injury_pain_reaction = "semantic.combat.injury.pain_reaction",
+    combat_injury_visible_observation = "semantic.combat.injury.visible_observation",
 }
 
 local KILL_STYLES = {

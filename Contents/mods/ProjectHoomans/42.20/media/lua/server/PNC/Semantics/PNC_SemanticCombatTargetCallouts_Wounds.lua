@@ -8,6 +8,7 @@ PNC.Semantics.CombatTargetCalloutsInternal = PNC.Semantics.CombatTargetCalloutsI
 PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_WoundDelivery"
+require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_PainReaction"
 
 local S = PNC.Semantics.CombatTargetCallouts or {}
 local I = PNC.Semantics.CombatTargetCalloutsInternal
@@ -15,19 +16,31 @@ PNC.Semantics.CombatTargetCallouts = S
 
 local teamInjuryCalloutAt = {}
 
+local function invalidActor(r)
+    if type(r) ~= "table" or r.alive == false or r.id == nil then return "invalid_target" end
+    local h = r.health
+    if type(h) == "table" and (h.state == "dead" or h.state == "incapacitated") then return "target_incapacitated" end
+end
+
 function S.OnNPCWoundReceived(record, hitSpec, now, opts)
-    if type(record) ~= "table" or record.alive == false or record.id == nil then return false, "invalid_target" end
-    if type(record.health) == "table" and (record.health.state == "dead" or record.health.state == "incapacitated") then
-        return false, "target_incapacitated"
-    end
+    local bad = invalidActor(record)
+    if bad then return false, bad end
     local profile = S.ClassifyActorWoundProfile(record, hitSpec)
     if not profile then return false, "no_wound_profile" end
     now = I.SituationNow(now)
     record.runtime = type(record.runtime) == "table" and record.runtime or {}
-    local elapsed = now - (tonumber(record.runtime.lastWoundBeatAt) or -99999)
-    local prevPri = tonumber(record.runtime.lastWoundBeatPriority) or 0
-    local isPreempt = prevPri > 0 and profile.woundTierPriority > prevPri and elapsed < 4500
-    if not (opts and opts.ignoreCooldown == true) and elapsed < 4500 and not isPreempt then
+
+    local okPain, painReason = false, "pain_skipped"
+    if not (opts and opts.skipPainBeat == true) and type(S.EmitImmediatePainReaction) == "function" then
+        okPain, painReason = S.EmitImmediatePainReaction(record, hitSpec, profile, now, opts)
+        if not okPain and not (opts and opts.ignoreCooldown == true) then
+            return false, painReason
+        end
+    end
+
+    local allowed, isPreempt = S.ShouldPreemptWoundBeat(record, profile, now, 4500)
+    if not (opts and opts.ignoreCooldown == true) and not allowed then
+        if okPain then return true, painReason end
         return false, "wound_beat_cooldown"
     end
     local hitDesc = {
@@ -35,7 +48,7 @@ function S.OnNPCWoundReceived(record, hitSpec, now, opts)
         enemyType = (hitSpec and hitSpec.attackerKind == "zombie") and "zombie" or "hostile",
         x = record.x, y = record.y, z = record.z,
     }
-    local ref = "wound:" .. tostring(record.id) .. ":" .. tostring(math.floor(now))
+    local ref = "wound:" .. tostring(record.id) .. ":" .. tostring(math.floor(now)) .. ":" .. tostring(profile.injuryRevision or 1)
     local pri = profile.isBite and 78 or (profile.woundTierPriority >= 4 and 74 or 66)
     local callOpts = isPreempt and { isPreempt = true, skipReplies = opts and opts.skipReplies } or opts
     local ok, reason = I.EmitWoundDialogue(
@@ -45,15 +58,19 @@ function S.OnNPCWoundReceived(record, hitSpec, now, opts)
     if ok then
         record.runtime.lastWoundBeatAt = now
         record.runtime.lastWoundBeatPriority = profile.woundTierPriority
+        record.runtime.lastWoundBeatSeverityRank = S.SeverityRank(profile.physicalSeverityBand or profile.severityBand)
+        record.runtime.lastWoundBeatRegion = tostring(profile.bodyRegion or "torso")
+        return ok, reason
+    end
+    if okPain then
+        return true, painReason
     end
     return ok, reason
 end
 
 function S.OnFightingWhileInjured(record, desc, now, opts)
-    if type(record) ~= "table" or record.alive == false or record.id == nil then return false, "invalid_target" end
-    if type(record.health) == "table" and (record.health.state == "dead" or record.health.state == "incapacitated") then
-        return false, "target_incapacitated"
-    end
+    local bad = invalidActor(record)
+    if bad then return false, bad end
     local profile = S.ClassifyActorWoundProfile(record, opts and opts.hitSpec)
     if not profile then return false, "not_injured" end
     now = I.SituationNow(now)
@@ -93,10 +110,8 @@ function S.OnFightingWhileInjured(record, desc, now, opts)
 end
 
 function S.OnInjuryStateTransition(record, transitionSpec, now, opts)
-    if type(record) ~= "table" or record.alive == false or record.id == nil then return false, "invalid_target" end
-    if type(record.health) == "table" and (record.health.state == "dead" or record.health.state == "incapacitated") then
-        return false, "target_incapacitated"
-    end
+    local bad = invalidActor(record)
+    if bad then return false, bad end
     transitionSpec = type(transitionSpec) == "table" and transitionSpec or { kind = tostring(transitionSpec or "severity_escalation") }
     local kind = tostring(transitionSpec.kind or "severity_escalation")
     now = I.SituationNow(now)

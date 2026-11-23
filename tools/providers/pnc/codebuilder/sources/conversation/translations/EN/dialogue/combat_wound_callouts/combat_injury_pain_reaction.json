@@ -1,0 +1,79 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.injury.pain_reaction",
+  "locale": "EN",
+  "entries": {
+    "say.variants.scratch_minor": [
+      "Ah, scratched my {slot.wound.part}!",
+      "Tch, caught a scratch on my {slot.wound.part}."
+    ],
+    "say.variants.scratch_stoic": [
+      "Hmph. Barely grazed my {slot.wound.part}.",
+      "Just a scrape on my {slot.wound.part}, nothing."
+    ],
+    "say.variants.scratch_aggressive": [
+      "Bastard nicked my {slot.wound.part}!",
+      "Damn thing clawed my {slot.wound.part}!"
+    ],
+    "say.variants.laceration_moderate": [
+      "Gah! Cut open my {slot.wound.part}!",
+      "Agh, that slashed my {slot.wound.part}!"
+    ],
+    "say.variants.laceration_severe": [
+      "Agh! Torn deep across my {slot.wound.part}, bleeding fast!",
+      "Damn it, deep gash on my {slot.wound.part}!"
+    ],
+    "say.variants.laceration_aggressive": [
+      "Son of a bitch sliced my {slot.wound.part}!",
+      "Ripped my {slot.wound.part} open, you'll pay for that!"
+    ],
+    "say.variants.laceration_stoic": [
+      "Ngh, bad cut on my {slot.wound.part}. Still standing.",
+      "Took a deep slash to my {slot.wound.part}, holding steady."
+    ],
+    "say.variants.fracture": [
+      "Crack, agh! Something broke in my {slot.wound.part}!",
+      "God, my {slot.wound.part} just snapped!"
+    ],
+    "say.variants.deep_wound": [
+      "Gah! Ripped wide open on my {slot.wound.part}!",
+      "Agh, deep wound on my {slot.wound.part}, blood's pouring!"
+    ],
+    "say.variants.deep_wound_glass": [
+      "Agh! Shards drove straight into my {slot.wound.part}!",
+      "Gah, glass embedded deep in my {slot.wound.part}!"
+    ],
+    "say.variants.burn": [
+      "Agh! Searing burn across my {slot.wound.part}!",
+      "Gah, my {slot.wound.part} is burned bad!"
+    ],
+    "say.variants.bullet": [
+      "Agh, I'm shot! Round hit my {slot.wound.part}!",
+      "Gah! Took a bullet to my {slot.wound.part}!"
+    ],
+    "say.variants.bullet_stoic": [
+      "Ngh, took a round in my {slot.wound.part}!",
+      "Hit by gunfire in my {slot.wound.part}, still moving!"
+    ],
+    "say.variants.bite": [
+      "No, agh! Teeth sank into my {slot.wound.part}!",
+      "Dammit! It bit my {slot.wound.part}!"
+    ],
+    "say.variants.bite_panicked": [
+      "No, no, no! It bit my {slot.wound.part}, get it off me!",
+      "Oh god, teeth tore into my {slot.wound.part}! I'm bitten!"
+    ],
+    "say.variants.bite_non_transmissible": [
+      "Agh! Filthy teeth tore my {slot.wound.part}, won't turn me, but it's bleeding hard!",
+      "Gah, bit my {slot.wound.part}! Saliva's no death sentence, just hurts like hell!"
+    ],
+    "say.variants.multiple_hits_severe": [
+      "Agh, another hard hit on my {slot.wound.part}! I'm taking too many wounds!",
+      "Gah! Torn up again on my {slot.wound.part}, losing too much blood!"
+    ],
+    "say.variants.default": [
+      "Gah, took a hit to my {slot.wound.part}!",
+      "Agh, clipped on my {slot.wound.part}!"
+    ]
+  }
+}

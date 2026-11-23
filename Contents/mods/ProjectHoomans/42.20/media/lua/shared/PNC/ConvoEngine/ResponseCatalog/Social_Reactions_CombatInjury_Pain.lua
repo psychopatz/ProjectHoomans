@@ -1,0 +1,35 @@
+-- Immediate pain-reaction Beat pool (combat.injury.pain_reaction).
+PNC = PNC or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
+
+local Catalog = PNC.ConvoEngine.ResponseCatalog
+local Shared = type(Catalog) == "table" and Catalog.CombatInjuryShared or nil
+if type(Shared) ~= "table" or type(Catalog.Register) ~= "function" then
+    return false
+end
+
+local PREFIX = "combat.injury.pain_reaction"
+local POOL = "semantic.combat.injury.pain_reaction"
+local FALLBACK = "Gah, got hit on my {slot.wound.part}!"
+local ROLES = {
+    "scratch_minor", "scratch_stoic", "scratch_aggressive",
+    "laceration_moderate", "laceration_severe", "laceration_aggressive", "laceration_stoic",
+    "fracture", "deep_wound", "deep_wound_glass", "burn",
+    "bullet", "bullet_stoic",
+    "bite", "bite_panicked", "bite_non_transmissible",
+    "multiple_hits_severe", "default",
+}
+
+Shared.install(PREFIX, ROLES)
+local out = {}
+for _, vid in ipairs(ROLES) do
+    local isDefault = vid == "default"
+    out[#out + 1] = Shared.makeVariant(
+        POOL, PREFIX, vid,
+        (not isDefault) and { combatReactionRole = vid } or nil,
+        isDefault and 10 or 95, "REACT", FALLBACK
+    )
+end
+Catalog.Register(POOL, { variants = out })
+
+return true

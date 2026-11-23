@@ -283,8 +283,13 @@ do
     Wounds.ApplyCombatDamage(injured, liveBodies["triage-vic"], {
         amount = 14, partId = "UpperArm_L", woundType = "bite", attackerKind = "zombie",
     })
-    T.truthy(#deliveredBarks >= 1, "bite received beat delivered")
-    local beatFlavor = deliveredBarks[1].ambientFlavor
+    T.truthy(#deliveredBarks >= 2, "bite pain and received beats delivered")
+    T.equal(deliveredBarks[1].eventType, "combat_injury_pain_reaction", "immediate pain Beat precedes received Beat")
+    local beatFlavor = nil
+    for _, b in ipairs(deliveredBarks) do
+        if b.eventType == "combat_wound_received_beat" then beatFlavor = b.ambientFlavor break end
+    end
+    T.truthy(beatFlavor ~= nil, "bite received beat delivered")
     T.equal(beatFlavor.observerOnly, false, "injury Beat sets observerOnly=false for player interaction")
     T.equal(beatFlavor.recipientKind, "player", "injury Beat sets recipientKind=player")
     T.truthy(type(beatFlavor.responsePlanID) == "string" and beatFlavor.responsePlanID ~= "", "injury Beat carries responsePlanID")

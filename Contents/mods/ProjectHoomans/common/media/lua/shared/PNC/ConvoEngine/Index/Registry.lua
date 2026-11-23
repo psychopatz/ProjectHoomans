@@ -178,7 +178,7 @@ return {
         ["domain"] = "combat_wound_callouts",
         ["kind"] = "dialogue",
         ["module"] = "PNC/ConvoEngine/Index/Dialogue/CombatWoundCallouts",
-        ["recordCount"] = 4,
+        ["recordCount"] = 5,
     },
     {
         ["domain"] = "companion_check_in",

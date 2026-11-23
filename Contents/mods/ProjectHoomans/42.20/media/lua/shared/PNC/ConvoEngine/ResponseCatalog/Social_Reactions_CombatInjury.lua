@@ -110,12 +110,12 @@ local FALLBACK_BY_PREFIX = {
     ["combat.wound.ally_reaction"] = "Stay on my side—I've got your cover!",
 }
 
-local function makeInjuryVariant(poolID, prefix, vid, when, priority, act)
+local function makeInjuryVariant(poolID, prefix, vid, when, priority, act, fallback)
     local templateID = prefix .. "." .. vid
     return {
         id = poolID .. "." .. vid,
         templateID = templateID,
-        fallback = FALLBACK_BY_PREFIX[prefix],
+        fallback = fallback or FALLBACK_BY_PREFIX[prefix],
         contentOwner = CONTENT_OWNER,
         when = when,
         priority = priority or 0,
@@ -164,6 +164,9 @@ registerExactRolePool(
     ALLY_REACTION_ROLES, "REACT", "default", false
 )
 
+Catalog.CombatInjuryShared = { makeVariant = makeInjuryVariant, install = installInjuryTemplates }
+
+require "PNC/ConvoEngine/ResponseCatalog/Social_Reactions_CombatInjury_Pain"
 require "PNC/ConvoEngine/ResponseCatalog/Social_Reactions_CombatInjury_Triage"
 
 return true

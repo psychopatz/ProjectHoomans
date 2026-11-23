@@ -3,7 +3,7 @@
 **Primary Repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` (`main`)
 **Baseline Commit:** `4522d6e952708bf3ccb013ce620ad9d698a60cb1`
 **Reopened From:** H11 user live acceptance after contradictory runtime evidence on 2026-11-23
-**Active Phase:** `H10R2` — Immediate Pain-Reaction Beat + Escalation/Cooldown Policy
+**Active Phase:** `H10R3` — Witness Observation Gating + Non-Colonist Injury Awareness
 **Parent Status:** `REOPENED_DEVELOPER_WORK_REQUIRED`; H11 deferred until H10R1–H10R8 pass.
 
 ## Phase Status
@@ -11,15 +11,23 @@
 | Phase | Title | Status | Commit |
 | --- | --- | --- | --- |
 | `H0`–`H10` | Original Build 42 wound/physiology/dialogue implementation | `BASELINE_ACCEPTED_THEN_REOPENED_BY_LIVE_EVIDENCE` | through `76b7a83b4` |
-| `H10R1` | Selected-Wound Truth Projection + Debug/Production Event Parity | `DONE` | Pending `H10R1` phase commit |
-| `H10R2` | Immediate Pain-Reaction Beat + Escalation/Cooldown Policy | `ACTIVE` | pending |
-| `H10R3` | Witness Observation Gating + Non-Colonist Injury Awareness | `PENDING` | pending |
+| `H10R1` | Selected-Wound Truth Projection + Debug/Production Event Parity | `DONE` | `041d905217` |
+| `H10R2` | Immediate Pain-Reaction Beat + Escalation/Cooldown Policy | `DONE` | H10R2 phase commit |
+| `H10R3` | Witness Observation Gating + Non-Colonist Injury Awareness | `ACTIVE` | pending |
 | `H10R4` | Core Semantic Microplanning: Modifiers, Clause Relations, Discourse Focus | `PENDING` | pending |
 | `H10R5` | Interactive Injury Observation/Triage Scenes + Item-Aware Aid | `PENDING` | pending |
 | `H10R6` | Relationship/Disposition/Inventory Outcome Policy + Action Contracts | `PENDING` | pending |
 | `H10R7` | Semantic-Truth Quality Sweep + Negative-Claim Guards | `PENDING` | pending |
 | `H10R8` | EN/TL Variety, MP/Save/Scale/Performance Regression + Closure | `PENDING` | pending |
 | `H11` | User Live SP/MP Acceptance | `DEFERRED` | resumes after H10R1–H10R8 |
+
+## Completed in H10R2
+
+- New `combat.injury.pain_reaction` CodeBuilder family (18 variants, EN/TL) and `semantic.combat.injury.pain_reaction` pool (`Social_Reactions_CombatInjury_Pain.lua`); `combat_injury_pain_reaction` routed in `Reaction_Pools.lua`.
+- `PNC_SemanticCombatTargetCallouts_PainPolicy.lua`: disposition/panic-aware `S.ResolvePainReactionVariant`, `S.ShouldPreemptWoundCooldown` (2.5s pain window) and `S.ShouldPreemptWoundBeat` (4.5s received-Beat window; bite, gunshot, tier, severity >= moderate, severe new region).
+- `PNC_SemanticCombatTargetCallouts_PainReaction.lua`: `S.EmitImmediatePainReaction` delivers immediately even solo (self-addressee fallback), with player reply offers, fact refs and zero priority hold so the received-wound Beat still follows.
+- `S.OnNPCWoundReceived` emits the pain Beat first; returns success on solo/no-audience when the pain Beat landed. Debug wounds share the path (H10R1).
+- Tests: `pnc_injury_pain_reaction_smoke` (suppress/preempt/variant probes); branching smoke asserts pain Beat precedes received Beat. Pre-existing unrelated failures at `041d905217` (translation manager, dialogue flow identity, presentation class, population director, context/animation debug, lightweight sim timeout) are unchanged.
 
 ## Completed in H10R1
 
