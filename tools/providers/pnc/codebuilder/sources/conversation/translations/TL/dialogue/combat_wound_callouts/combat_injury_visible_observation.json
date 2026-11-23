@@ -50,6 +50,37 @@
     "say.variants.default": [
       "May sugat ka sa {slot.wound.part} mo, {addressee.name}. Asikasuhin mo iyan.",
       "Ingatan mo ang {slot.wound.part} mo, {addressee.name}, may tama ka pa."
+    ],
+    "say.variants.aid_supply_offer": [
+      "May sobra akong benda. Gusto mo?",
+      "May maibibigay akong benda kung kailangan mo."
+    ],
+    "say.variants.aid_treatment_offer": [
+      "Kung hindi ka gagalaw, mabebendahan ko iyan.",
+      "Huwag ka munang gumalaw. Tutulungan kitang bendahan iyan."
+    ],
+    "say.variants.aid_no_supply": [
+      "Wala rin akong benda.",
+      "Wala rin ako. Kailangan nating maghanap ng benda."
+    ],
+    "say.variants.aid_refused": [
+      "Wala akong maibibigay na benda ngayon.",
+      "Kailangan mong maghanap sa iba."
+    ],
+    "say.variants.aid_acknowledged": [
+      "Sige. Sabihin mo kung magbago ang lagay mo."
+    ],
+    "say.variants.aid_dismissed": [
+      "Sige. Lalayo muna ako."
+    ],
+    "say.variants.aid_taken": [
+      "Ayan. May benda ka na."
+    ],
+    "say.variants.aid_treated": [
+      "Ayan. Nakalagay na ang benda."
+    ],
+    "say.variants.aid_changed": [
+      "Sandali. Hindi muna kita matutulungan diyan."
     ]
   }
 }

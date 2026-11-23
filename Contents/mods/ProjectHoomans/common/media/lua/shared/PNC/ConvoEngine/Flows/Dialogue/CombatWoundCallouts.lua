@@ -28,7 +28,7 @@ return {
         },
         ["domain"] = "semantic",
         ["id"] = "combat.injury.triage_exchange",
-        ["initial"] = "injury_report_open",
+        ["initial"] = "injury_entry",
         ["nodes"] = {
             ["assess_wound_location"] = {
                 ["accepts"] = {
@@ -242,6 +242,14 @@ return {
                 ["onUnrelated"] = "suspend",
                 ["responsePool"] = "semantic.flow.combat.injury.triage.bite_check",
             },
+            ["injury_entry"] = {
+                ["gate"] = {
+                    ["type"] = "pnc:injury_observation",
+                },
+                ["onFail"] = "injury_report_open",
+                ["onPass"] = "observation_reply",
+                ["onUnknown"] = "injury_report_open",
+            },
             ["injury_report_open"] = {
                 ["accepts"] = {
                     {
@@ -385,6 +393,180 @@ return {
                         ["type"] = "string",
                     },
                 },
+            },
+            ["observation_reply"] = {
+                ["accepts"] = {
+                    {
+                        ["intent"] = "ACKNOWLEDGE",
+                        ["speechAct"] = "ACKNOWLEDGE",
+                        ["stateValue"] = "observation_known",
+                        ["subject"] = "COMBAT_INJURY",
+                    },
+                    {
+                        ["intent"] = "INFORM",
+                        ["speechAct"] = "INFORM",
+                        ["stateValue"] = "observation_no_dressing",
+                        ["subject"] = "COMBAT_INJURY",
+                    },
+                    {
+                        ["intent"] = "QUESTION",
+                        ["speechAct"] = "QUESTION",
+                        ["stateValue"] = "observation_help",
+                        ["subject"] = "COMBAT_INJURY",
+                    },
+                    {
+                        ["intent"] = "DISAGREE",
+                        ["speechAct"] = "DISAGREE",
+                        ["stateValue"] = "observation_minimize",
+                        ["subject"] = "COMBAT_INJURY",
+                    },
+                    {
+                        ["intent"] = "REFUSE",
+                        ["speechAct"] = "REFUSE",
+                        ["stateValue"] = "observation_dismiss",
+                        ["subject"] = "COMBAT_INJURY",
+                    },
+                },
+                ["branchOffers"] = {
+                    {
+                        ["consumers"] = {
+                            "participant",
+                        },
+                        ["frame"] = {
+                            ["intent"] = "ACKNOWLEDGE",
+                            ["speechAct"] = "ACKNOWLEDGE",
+                            ["stateValue"] = "observation_known",
+                            ["subject"] = "COMBAT_INJURY",
+                        },
+                        ["id"] = "combat.injury.observation_known",
+                        ["labelFallback"] = "I know.",
+                        ["labelKey"] = "UI_PNC_InjuryObservation_observation_known_Label",
+                        ["utteranceFallback"] = "I know.",
+                        ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_known_Utterance",
+                    },
+                    {
+                        ["consumers"] = {
+                            "participant",
+                        },
+                        ["frame"] = {
+                            ["intent"] = "INFORM",
+                            ["speechAct"] = "INFORM",
+                            ["stateValue"] = "observation_no_dressing",
+                            ["subject"] = "COMBAT_INJURY",
+                        },
+                        ["id"] = "combat.injury.observation_no_dressing",
+                        ["labelFallback"] = "I don't have a bandage.",
+                        ["labelKey"] = "UI_PNC_InjuryObservation_observation_no_dressing_Label",
+                        ["utteranceFallback"] = "I don't have a bandage.",
+                        ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_no_dressing_Utterance",
+                    },
+                    {
+                        ["consumers"] = {
+                            "participant",
+                        },
+                        ["frame"] = {
+                            ["intent"] = "QUESTION",
+                            ["speechAct"] = "QUESTION",
+                            ["stateValue"] = "observation_help",
+                            ["subject"] = "COMBAT_INJURY",
+                        },
+                        ["id"] = "combat.injury.observation_help",
+                        ["labelFallback"] = "Can you help me?",
+                        ["labelKey"] = "UI_PNC_InjuryObservation_observation_help_Label",
+                        ["utteranceFallback"] = "Can you help me?",
+                        ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_help_Utterance",
+                    },
+                    {
+                        ["consumers"] = {
+                            "participant",
+                        },
+                        ["frame"] = {
+                            ["intent"] = "DISAGREE",
+                            ["speechAct"] = "DISAGREE",
+                            ["stateValue"] = "observation_minimize",
+                            ["subject"] = "COMBAT_INJURY",
+                        },
+                        ["id"] = "combat.injury.observation_minimize",
+                        ["labelFallback"] = "It's not that bad.",
+                        ["labelKey"] = "UI_PNC_InjuryObservation_observation_minimize_Label",
+                        ["utteranceFallback"] = "It's not that bad.",
+                        ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_minimize_Utterance",
+                    },
+                    {
+                        ["consumers"] = {
+                            "participant",
+                        },
+                        ["frame"] = {
+                            ["intent"] = "REFUSE",
+                            ["speechAct"] = "REFUSE",
+                            ["stateValue"] = "observation_dismiss",
+                            ["subject"] = "COMBAT_INJURY",
+                        },
+                        ["id"] = "combat.injury.observation_dismiss",
+                        ["labelFallback"] = "Mind your own business.",
+                        ["labelKey"] = "UI_PNC_InjuryObservation_observation_dismiss_Label",
+                        ["utteranceFallback"] = "Mind your own business.",
+                        ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_dismiss_Utterance",
+                    },
+                },
+                ["onMatch"] = "observation_supply",
+                ["onRefuse"] = "triage_resolution",
+                ["onUnrelated"] = "suspend",
+                ["responsePool"] = "semantic.flow.combat.injury.triage.observation_reply",
+            },
+            ["observation_supply"] = {
+                ["accepts"] = {
+                    {
+                        ["intent"] = "ACCEPT",
+                        ["speechAct"] = "ACCEPT",
+                        ["stateValue"] = "observation_accept_aid",
+                        ["subject"] = "COMBAT_INJURY",
+                    },
+                    {
+                        ["intent"] = "REFUSE",
+                        ["speechAct"] = "REFUSE",
+                        ["stateValue"] = "observation_decline_aid",
+                        ["subject"] = "COMBAT_INJURY",
+                    },
+                },
+                ["branchOffers"] = {
+                    {
+                        ["consumers"] = {
+                            "participant",
+                        },
+                        ["frame"] = {
+                            ["intent"] = "ACCEPT",
+                            ["speechAct"] = "ACCEPT",
+                            ["stateValue"] = "observation_accept_aid",
+                            ["subject"] = "COMBAT_INJURY",
+                        },
+                        ["id"] = "combat.injury.observation_accept_aid",
+                        ["labelFallback"] = "Yes, I could use it.",
+                        ["labelKey"] = "UI_PNC_InjuryObservation_observation_accept_aid_Label",
+                        ["utteranceFallback"] = "Yes, I could use it.",
+                        ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_accept_aid_Utterance",
+                    },
+                    {
+                        ["consumers"] = {
+                            "participant",
+                        },
+                        ["frame"] = {
+                            ["intent"] = "REFUSE",
+                            ["speechAct"] = "REFUSE",
+                            ["stateValue"] = "observation_decline_aid",
+                            ["subject"] = "COMBAT_INJURY",
+                        },
+                        ["id"] = "combat.injury.observation_decline_aid",
+                        ["labelFallback"] = "Keep it. I'll manage.",
+                        ["labelKey"] = "UI_PNC_InjuryObservation_observation_decline_aid_Label",
+                        ["utteranceFallback"] = "Keep it. I'll manage.",
+                        ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_decline_aid_Utterance",
+                    },
+                },
+                ["onMatch"] = "triage_resolution",
+                ["onRefuse"] = "triage_resolution",
+                ["onUnrelated"] = "suspend",
+                ["responsePool"] = "semantic.flow.combat.injury.triage.observation_supply",
             },
             ["quarantine_or_mercy_standoff"] = {
                 ["accepts"] = {

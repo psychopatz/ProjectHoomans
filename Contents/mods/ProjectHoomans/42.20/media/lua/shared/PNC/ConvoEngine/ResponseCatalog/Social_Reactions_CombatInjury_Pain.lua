@@ -40,6 +40,8 @@ local OBS_ROLES = {
     "suspected_infection", "medic_infection_assessment", "medic_triage_offer",
     "limp_mobility", "multiple_wounds_escalation", "new_wound_noticed",
     "visible_bite", "feverish_weak",
+    "aid_supply_offer", "aid_treatment_offer", "aid_no_supply", "aid_refused",
+    "aid_acknowledged", "aid_dismissed", "aid_taken", "aid_treated", "aid_changed",
     "default",
 }
 

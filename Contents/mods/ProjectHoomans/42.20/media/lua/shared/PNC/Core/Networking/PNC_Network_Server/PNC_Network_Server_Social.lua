@@ -97,7 +97,9 @@ local function ensureNPCSpeechInteraction(
     then
         return nil
     end
-    if not isServer or not isServer() then return nil end
+    local injurySP = context.flowID == "combat.injury.triage_exchange"
+        and Core.IsAuthority and Core.IsAuthority()
+    if not (isServer and isServer()) and not injurySP then return nil end
     if not PNC.Conversation
         or not PNC.Conversation.InteractionLifecyclePersistence
     then

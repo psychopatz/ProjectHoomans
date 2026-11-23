@@ -490,7 +490,7 @@ return {
             ["sourcePath"] = "dialogue/combat_wound_callouts/combat_fighting_injured_callout.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryVisibleObservation",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryTriageExchange",
         ["namespace"] = "combat.fighting",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1255,7 +1255,7 @@ return {
             ["sourcePath"] = "dialogue/combat_wound_callouts/combat_injury_pain_reaction.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryVisibleObservation",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryTriageExchange",
         ["namespace"] = "combat.injury",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1906,7 +1906,7 @@ return {
             ["sourcePath"] = "dialogue/combat_wound_callouts/combat_injury_interactive_exchange.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryVisibleObservation",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryTriageExchange",
         ["namespace"] = "combat.injury",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1957,7 +1957,7 @@ return {
                         },
                     },
                     ["id"] = "combat.injury.triage_exchange",
-                    ["initial"] = "injury_report_open",
+                    ["initial"] = "injury_entry",
                     ["nodes"] = {
                         ["assess_wound_location"] = {
                             ["accepts"] = {
@@ -2171,6 +2171,14 @@ return {
                             ["onUnrelated"] = "suspend",
                             ["responsePool"] = "semantic.flow.combat.injury.triage.bite_check",
                         },
+                        ["injury_entry"] = {
+                            ["gate"] = {
+                                ["type"] = "pnc:injury_observation",
+                            },
+                            ["onFail"] = "injury_report_open",
+                            ["onPass"] = "observation_reply",
+                            ["onUnknown"] = "injury_report_open",
+                        },
                         ["injury_report_open"] = {
                             ["accepts"] = {
                                 {
@@ -2314,6 +2322,180 @@ return {
                                     ["type"] = "string",
                                 },
                             },
+                        },
+                        ["observation_reply"] = {
+                            ["accepts"] = {
+                                {
+                                    ["intent"] = "ACKNOWLEDGE",
+                                    ["speechAct"] = "ACKNOWLEDGE",
+                                    ["stateValue"] = "observation_known",
+                                    ["subject"] = "COMBAT_INJURY",
+                                },
+                                {
+                                    ["intent"] = "INFORM",
+                                    ["speechAct"] = "INFORM",
+                                    ["stateValue"] = "observation_no_dressing",
+                                    ["subject"] = "COMBAT_INJURY",
+                                },
+                                {
+                                    ["intent"] = "QUESTION",
+                                    ["speechAct"] = "QUESTION",
+                                    ["stateValue"] = "observation_help",
+                                    ["subject"] = "COMBAT_INJURY",
+                                },
+                                {
+                                    ["intent"] = "DISAGREE",
+                                    ["speechAct"] = "DISAGREE",
+                                    ["stateValue"] = "observation_minimize",
+                                    ["subject"] = "COMBAT_INJURY",
+                                },
+                                {
+                                    ["intent"] = "REFUSE",
+                                    ["speechAct"] = "REFUSE",
+                                    ["stateValue"] = "observation_dismiss",
+                                    ["subject"] = "COMBAT_INJURY",
+                                },
+                            },
+                            ["branchOffers"] = {
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "ACKNOWLEDGE",
+                                        ["speechAct"] = "ACKNOWLEDGE",
+                                        ["stateValue"] = "observation_known",
+                                        ["subject"] = "COMBAT_INJURY",
+                                    },
+                                    ["id"] = "combat.injury.observation_known",
+                                    ["labelFallback"] = "I know.",
+                                    ["labelKey"] = "UI_PNC_InjuryObservation_observation_known_Label",
+                                    ["utteranceFallback"] = "I know.",
+                                    ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_known_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "INFORM",
+                                        ["speechAct"] = "INFORM",
+                                        ["stateValue"] = "observation_no_dressing",
+                                        ["subject"] = "COMBAT_INJURY",
+                                    },
+                                    ["id"] = "combat.injury.observation_no_dressing",
+                                    ["labelFallback"] = "I don't have a bandage.",
+                                    ["labelKey"] = "UI_PNC_InjuryObservation_observation_no_dressing_Label",
+                                    ["utteranceFallback"] = "I don't have a bandage.",
+                                    ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_no_dressing_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "QUESTION",
+                                        ["speechAct"] = "QUESTION",
+                                        ["stateValue"] = "observation_help",
+                                        ["subject"] = "COMBAT_INJURY",
+                                    },
+                                    ["id"] = "combat.injury.observation_help",
+                                    ["labelFallback"] = "Can you help me?",
+                                    ["labelKey"] = "UI_PNC_InjuryObservation_observation_help_Label",
+                                    ["utteranceFallback"] = "Can you help me?",
+                                    ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_help_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "DISAGREE",
+                                        ["speechAct"] = "DISAGREE",
+                                        ["stateValue"] = "observation_minimize",
+                                        ["subject"] = "COMBAT_INJURY",
+                                    },
+                                    ["id"] = "combat.injury.observation_minimize",
+                                    ["labelFallback"] = "It's not that bad.",
+                                    ["labelKey"] = "UI_PNC_InjuryObservation_observation_minimize_Label",
+                                    ["utteranceFallback"] = "It's not that bad.",
+                                    ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_minimize_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "REFUSE",
+                                        ["speechAct"] = "REFUSE",
+                                        ["stateValue"] = "observation_dismiss",
+                                        ["subject"] = "COMBAT_INJURY",
+                                    },
+                                    ["id"] = "combat.injury.observation_dismiss",
+                                    ["labelFallback"] = "Mind your own business.",
+                                    ["labelKey"] = "UI_PNC_InjuryObservation_observation_dismiss_Label",
+                                    ["utteranceFallback"] = "Mind your own business.",
+                                    ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_dismiss_Utterance",
+                                },
+                            },
+                            ["onMatch"] = "observation_supply",
+                            ["onRefuse"] = "triage_resolution",
+                            ["onUnrelated"] = "suspend",
+                            ["responsePool"] = "semantic.flow.combat.injury.triage.observation_reply",
+                        },
+                        ["observation_supply"] = {
+                            ["accepts"] = {
+                                {
+                                    ["intent"] = "ACCEPT",
+                                    ["speechAct"] = "ACCEPT",
+                                    ["stateValue"] = "observation_accept_aid",
+                                    ["subject"] = "COMBAT_INJURY",
+                                },
+                                {
+                                    ["intent"] = "REFUSE",
+                                    ["speechAct"] = "REFUSE",
+                                    ["stateValue"] = "observation_decline_aid",
+                                    ["subject"] = "COMBAT_INJURY",
+                                },
+                            },
+                            ["branchOffers"] = {
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "ACCEPT",
+                                        ["speechAct"] = "ACCEPT",
+                                        ["stateValue"] = "observation_accept_aid",
+                                        ["subject"] = "COMBAT_INJURY",
+                                    },
+                                    ["id"] = "combat.injury.observation_accept_aid",
+                                    ["labelFallback"] = "Yes, I could use it.",
+                                    ["labelKey"] = "UI_PNC_InjuryObservation_observation_accept_aid_Label",
+                                    ["utteranceFallback"] = "Yes, I could use it.",
+                                    ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_accept_aid_Utterance",
+                                },
+                                {
+                                    ["consumers"] = {
+                                        "participant",
+                                    },
+                                    ["frame"] = {
+                                        ["intent"] = "REFUSE",
+                                        ["speechAct"] = "REFUSE",
+                                        ["stateValue"] = "observation_decline_aid",
+                                        ["subject"] = "COMBAT_INJURY",
+                                    },
+                                    ["id"] = "combat.injury.observation_decline_aid",
+                                    ["labelFallback"] = "Keep it. I'll manage.",
+                                    ["labelKey"] = "UI_PNC_InjuryObservation_observation_decline_aid_Label",
+                                    ["utteranceFallback"] = "Keep it. I'll manage.",
+                                    ["utteranceKey"] = "UI_PNC_InjuryObservation_observation_decline_aid_Utterance",
+                                },
+                            },
+                            ["onMatch"] = "triage_resolution",
+                            ["onRefuse"] = "triage_resolution",
+                            ["onUnrelated"] = "suspend",
+                            ["responsePool"] = "semantic.flow.combat.injury.triage.observation_supply",
                         },
                         ["quarantine_or_mercy_standoff"] = {
                             ["accepts"] = {
@@ -2973,458 +3155,6 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "response",
                 ["templateID"] = "convo.combat.injury.triage_exchange.reply.refused.say.1.default",
-                ["variantID"] = "default",
-            },
-        },
-        ["when"] = nil,
-    },
-    {
-        ["domain"] = "combat_wound_callouts",
-        ["domainPath"] = "combat_wound_callouts",
-        ["exchangeFamily"] = {
-            ["familyID"] = "combat.injury.visible_observation",
-            ["initiatingSay"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "You've got an open wound on your {slot.wound.part}, {addressee.name}. You should get that covered.",
-                                ["id"] = "open_wound",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.open_wound",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                            {
-                                ["fallback"] = "You're bleeding hard from your {slot.wound.part}, {addressee.name}! Patch it up right now!",
-                                ["id"] = "heavy_bleeding",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.heavy_bleeding",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                            {
-                                ["fallback"] = "That bandage on your {slot.wound.part} looks filthy, {addressee.name}. Change it when you can.",
-                                ["id"] = "dirty_bandage",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.dirty_bandage",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                            {
-                                ["fallback"] = "That wound on your {slot.wound.part} might be infected, {addressee.name}.",
-                                ["id"] = "suspected_infection",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.suspected_infection",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                            {
-                                ["fallback"] = "Hold still, {addressee.name}. That wound on your {slot.wound.part} is inflamed, we need to disinfect and dress it.",
-                                ["id"] = "medic_infection_assessment",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.medic_infection_assessment",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                            {
-                                ["fallback"] = "Hold still, {addressee.name}. Let me see that {slot.wound.part}.",
-                                ["id"] = "medic_triage_offer",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.medic_triage_offer",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                            {
-                                ["fallback"] = "You're favoring your {slot.wound.part} and limping, {addressee.name}. Don't push your stride too hard.",
-                                ["id"] = "limp_mobility",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.limp_mobility",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                            {
-                                ["fallback"] = "You got hit again on your {slot.wound.part}, {addressee.name}! You're taking too many wounds!",
-                                ["id"] = "multiple_wounds_escalation",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.multiple_wounds_escalation",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                            {
-                                ["fallback"] = "Wait, {addressee.name}, you took a new hit on your {slot.wound.part} too?",
-                                ["id"] = "new_wound_noticed",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.new_wound_noticed",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                            {
-                                ["fallback"] = "Wait... is that a bite mark on your {slot.wound.part}, {addressee.name}?",
-                                ["id"] = "visible_bite",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.visible_bite",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                            {
-                                ["fallback"] = "You look feverish, {addressee.name}. Can you sit for a minute?",
-                                ["id"] = "feverish_weak",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.feverish_weak",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                            {
-                                ["fallback"] = "You're hurt on your {slot.wound.part}, {addressee.name}. Take care of that wound.",
-                                ["id"] = "default",
-                                ["templateID"] = "convo.combat.injury.visible_observation.say.1.default",
-                                ["textRole"] = "spoken_action",
-                                ["variantCount"] = 2,
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["namespace"] = "combat.injury",
-            ["slots"] = {
-                ["wound"] = {
-                    ["multiple"] = false,
-                    ["public"] = true,
-                    ["required"] = false,
-                    ["type"] = "entity.item",
-                },
-            },
-            ["textRoles"] = {
-                {
-                    ["fallback"] = "You've got an open wound on your {slot.wound.part}, {addressee.name}. You should get that covered.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.open_wound",
-                    ["variantID"] = "open_wound",
-                },
-                {
-                    ["fallback"] = "You're bleeding hard from your {slot.wound.part}, {addressee.name}! Patch it up right now!",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.heavy_bleeding",
-                    ["variantID"] = "heavy_bleeding",
-                },
-                {
-                    ["fallback"] = "That bandage on your {slot.wound.part} looks filthy, {addressee.name}. Change it when you can.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.dirty_bandage",
-                    ["variantID"] = "dirty_bandage",
-                },
-                {
-                    ["fallback"] = "That wound on your {slot.wound.part} might be infected, {addressee.name}.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.suspected_infection",
-                    ["variantID"] = "suspected_infection",
-                },
-                {
-                    ["fallback"] = "Hold still, {addressee.name}. That wound on your {slot.wound.part} is inflamed, we need to disinfect and dress it.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.medic_infection_assessment",
-                    ["variantID"] = "medic_infection_assessment",
-                },
-                {
-                    ["fallback"] = "Hold still, {addressee.name}. Let me see that {slot.wound.part}.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.medic_triage_offer",
-                    ["variantID"] = "medic_triage_offer",
-                },
-                {
-                    ["fallback"] = "You're favoring your {slot.wound.part} and limping, {addressee.name}. Don't push your stride too hard.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.limp_mobility",
-                    ["variantID"] = "limp_mobility",
-                },
-                {
-                    ["fallback"] = "You got hit again on your {slot.wound.part}, {addressee.name}! You're taking too many wounds!",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.multiple_wounds_escalation",
-                    ["variantID"] = "multiple_wounds_escalation",
-                },
-                {
-                    ["fallback"] = "Wait, {addressee.name}, you took a new hit on your {slot.wound.part} too?",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.new_wound_noticed",
-                    ["variantID"] = "new_wound_noticed",
-                },
-                {
-                    ["fallback"] = "Wait... is that a bite mark on your {slot.wound.part}, {addressee.name}?",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.visible_bite",
-                    ["variantID"] = "visible_bite",
-                },
-                {
-                    ["fallback"] = "You look feverish, {addressee.name}. Can you sit for a minute?",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.feverish_weak",
-                    ["variantID"] = "feverish_weak",
-                },
-                {
-                    ["fallback"] = "You're hurt on your {slot.wound.part}, {addressee.name}. Take care of that wound.",
-                    ["realizationKey"] = "1",
-                    ["role"] = "spoken_action",
-                    ["templateID"] = "convo.combat.injury.visible_observation.say.1.default",
-                    ["variantID"] = "default",
-                },
-            },
-        },
-        ["id"] = "combat.injury.visible_observation",
-        ["kind"] = "dialogue",
-        ["lineage"] = {
-            ["authoringSchema"] = "psychopatz.convo-engine.v1",
-            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
-            ["localId"] = "visible_observation",
-            ["sourceId"] = "combat.injury.visible_observation",
-            ["sourcePath"] = "dialogue/combat_wound_callouts/combat_injury_visible_observation.json",
-            ["sourceSchema"] = "psychopatz.convo-engine.v1",
-        },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryVisibleObservation",
-        ["namespace"] = "combat.injury",
-        ["owner"] = "ProjectHoomans",
-        ["participants"] = {
-            ["addressee"] = {
-                "participant",
-            },
-            ["speaker"] = {
-                "participant",
-            },
-        },
-        ["payload"] = {
-            ["domains"] = {
-                {
-                    ["domain"] = "combat",
-                    ["owner"] = "ProjectHoomans",
-                },
-            },
-            ["events"] = {
-                {
-                    ["id"] = "combat_injury_visible_observation",
-                    ["kind"] = "combat_event",
-                },
-            },
-            ["metadata"] = {
-                ["category"] = "projecthoomans:event_reactions",
-                ["contentOwner"] = "projecthoomans.dialogue_content.events",
-                ["responseAct"] = "WARN",
-            },
-            ["say"] = {
-                ["keyOrder"] = {
-                    "1",
-                },
-                ["mode"] = "single",
-                ["realizations"] = {
-                    ["1"] = {
-                        ["key"] = "1",
-                        ["shorthand"] = true,
-                        ["variants"] = {
-                            {
-                                ["fallback"] = "You've got an open wound on your {slot.wound.part}, {addressee.name}. You should get that covered.",
-                                ["id"] = "open_wound",
-                            },
-                            {
-                                ["fallback"] = "You're bleeding hard from your {slot.wound.part}, {addressee.name}! Patch it up right now!",
-                                ["id"] = "heavy_bleeding",
-                            },
-                            {
-                                ["fallback"] = "That bandage on your {slot.wound.part} looks filthy, {addressee.name}. Change it when you can.",
-                                ["id"] = "dirty_bandage",
-                            },
-                            {
-                                ["fallback"] = "That wound on your {slot.wound.part} might be infected, {addressee.name}.",
-                                ["id"] = "suspected_infection",
-                            },
-                            {
-                                ["fallback"] = "Hold still, {addressee.name}. That wound on your {slot.wound.part} is inflamed, we need to disinfect and dress it.",
-                                ["id"] = "medic_infection_assessment",
-                            },
-                            {
-                                ["fallback"] = "Hold still, {addressee.name}. Let me see that {slot.wound.part}.",
-                                ["id"] = "medic_triage_offer",
-                            },
-                            {
-                                ["fallback"] = "You're favoring your {slot.wound.part} and limping, {addressee.name}. Don't push your stride too hard.",
-                                ["id"] = "limp_mobility",
-                            },
-                            {
-                                ["fallback"] = "You got hit again on your {slot.wound.part}, {addressee.name}! You're taking too many wounds!",
-                                ["id"] = "multiple_wounds_escalation",
-                            },
-                            {
-                                ["fallback"] = "Wait, {addressee.name}, you took a new hit on your {slot.wound.part} too?",
-                                ["id"] = "new_wound_noticed",
-                            },
-                            {
-                                ["fallback"] = "Wait... is that a bite mark on your {slot.wound.part}, {addressee.name}?",
-                                ["id"] = "visible_bite",
-                            },
-                            {
-                                ["fallback"] = "You look feverish, {addressee.name}. Can you sit for a minute?",
-                                ["id"] = "feverish_weak",
-                            },
-                            {
-                                ["fallback"] = "You're hurt on your {slot.wound.part}, {addressee.name}. Take care of that wound.",
-                                ["id"] = "default",
-                            },
-                        },
-                    },
-                },
-                ["textRole"] = "spoken_action",
-            },
-            ["topics"] = {
-                {
-                    ["domain"] = "combat",
-                    ["id"] = "combat_injury",
-                },
-            },
-        },
-        ["references"] = {
-        },
-        ["responsePlan"] = {
-            ["dialogueAct"] = "WARN",
-            ["kind"] = "dialogue_act_plan",
-            ["responsePlanID"] = "combat.injury.visible_observation",
-            ["schemaVersion"] = 1,
-            ["turns"] = {
-                {
-                    ["continuation"] = "end",
-                    ["id"] = "say_1",
-                    ["offers"] = {
-                    },
-                    ["segments"] = {
-                        {
-                            ["args"] = {
-                            },
-                            ["fallback"] = "You've got an open wound on your {slot.wound.part}, {addressee.name}. You should get that covered.",
-                            ["kind"] = "translation",
-                            ["templateID"] = "convo.combat.injury.visible_observation.say_1",
-                        },
-                    },
-                },
-            },
-        },
-        ["roles"] = {
-            ["addressee"] = {
-                ["cardinality"] = "ONE",
-                ["kinds"] = {
-                    "actor",
-                },
-                ["role"] = "addressee",
-            },
-            ["speaker"] = {
-                ["cardinality"] = "ONE",
-                ["kinds"] = {
-                    "actor",
-                },
-                ["role"] = "speaker",
-            },
-        },
-        ["slots"] = {
-            ["wound"] = {
-                ["multiple"] = false,
-                ["public"] = true,
-                ["required"] = false,
-                ["type"] = "entity.item",
-            },
-        },
-        ["sourceShard"] = "dialogue/combat_wound_callouts/combat_injury_visible_observation.json",
-        ["target"] = {
-            ["multiple"] = false,
-            ["required"] = false,
-            ["type"] = "entity.any",
-        },
-        ["textRoles"] = {
-            {
-                ["fallback"] = "You've got an open wound on your {slot.wound.part}, {addressee.name}. You should get that covered.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.open_wound",
-                ["variantID"] = "open_wound",
-            },
-            {
-                ["fallback"] = "You're bleeding hard from your {slot.wound.part}, {addressee.name}! Patch it up right now!",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.heavy_bleeding",
-                ["variantID"] = "heavy_bleeding",
-            },
-            {
-                ["fallback"] = "That bandage on your {slot.wound.part} looks filthy, {addressee.name}. Change it when you can.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.dirty_bandage",
-                ["variantID"] = "dirty_bandage",
-            },
-            {
-                ["fallback"] = "That wound on your {slot.wound.part} might be infected, {addressee.name}.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.suspected_infection",
-                ["variantID"] = "suspected_infection",
-            },
-            {
-                ["fallback"] = "Hold still, {addressee.name}. That wound on your {slot.wound.part} is inflamed, we need to disinfect and dress it.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.medic_infection_assessment",
-                ["variantID"] = "medic_infection_assessment",
-            },
-            {
-                ["fallback"] = "Hold still, {addressee.name}. Let me see that {slot.wound.part}.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.medic_triage_offer",
-                ["variantID"] = "medic_triage_offer",
-            },
-            {
-                ["fallback"] = "You're favoring your {slot.wound.part} and limping, {addressee.name}. Don't push your stride too hard.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.limp_mobility",
-                ["variantID"] = "limp_mobility",
-            },
-            {
-                ["fallback"] = "You got hit again on your {slot.wound.part}, {addressee.name}! You're taking too many wounds!",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.multiple_wounds_escalation",
-                ["variantID"] = "multiple_wounds_escalation",
-            },
-            {
-                ["fallback"] = "Wait, {addressee.name}, you took a new hit on your {slot.wound.part} too?",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.new_wound_noticed",
-                ["variantID"] = "new_wound_noticed",
-            },
-            {
-                ["fallback"] = "Wait... is that a bite mark on your {slot.wound.part}, {addressee.name}?",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.visible_bite",
-                ["variantID"] = "visible_bite",
-            },
-            {
-                ["fallback"] = "You look feverish, {addressee.name}. Can you sit for a minute?",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.feverish_weak",
-                ["variantID"] = "feverish_weak",
-            },
-            {
-                ["fallback"] = "You're hurt on your {slot.wound.part}, {addressee.name}. Take care of that wound.",
-                ["realizationKey"] = "1",
-                ["role"] = "spoken_action",
-                ["templateID"] = "convo.combat.injury.visible_observation.say.1.default",
                 ["variantID"] = "default",
             },
         },

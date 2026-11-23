@@ -9,28 +9,83 @@
   },
   "say": {
     "variants": [
-      { "id": "open_wound" },
-      { "id": "heavy_bleeding" },
-      { "id": "dirty_bandage" },
-      { "id": "suspected_infection" },
-      { "id": "medic_infection_assessment" },
-      { "id": "medic_triage_offer" },
-      { "id": "limp_mobility" },
-      { "id": "multiple_wounds_escalation" },
-      { "id": "new_wound_noticed" },
-      { "id": "visible_bite" },
-      { "id": "feverish_weak" },
-      { "id": "default" }
+      {
+        "id": "open_wound"
+      },
+      {
+        "id": "heavy_bleeding"
+      },
+      {
+        "id": "dirty_bandage"
+      },
+      {
+        "id": "suspected_infection"
+      },
+      {
+        "id": "medic_infection_assessment"
+      },
+      {
+        "id": "medic_triage_offer"
+      },
+      {
+        "id": "limp_mobility"
+      },
+      {
+        "id": "multiple_wounds_escalation"
+      },
+      {
+        "id": "new_wound_noticed"
+      },
+      {
+        "id": "visible_bite"
+      },
+      {
+        "id": "feverish_weak"
+      },
+      {
+        "id": "default"
+      },
+      {
+        "id": "aid_supply_offer"
+      },
+      {
+        "id": "aid_treatment_offer"
+      },
+      {
+        "id": "aid_no_supply"
+      },
+      {
+        "id": "aid_refused"
+      },
+      {
+        "id": "aid_acknowledged"
+      },
+      {
+        "id": "aid_dismissed"
+      },
+      {
+        "id": "aid_taken"
+      },
+      {
+        "id": "aid_treated"
+      },
+      {
+        "id": "aid_changed"
+      }
     ]
   },
   "roles": {
     "speaker": {
       "cardinality": "ONE",
-      "kinds": [ "actor" ]
+      "kinds": [
+        "actor"
+      ]
     },
     "addressee": {
       "cardinality": "ONE",
-      "kinds": [ "actor" ]
+      "kinds": [
+        "actor"
+      ]
     }
   },
   "slots": {

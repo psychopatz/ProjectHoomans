@@ -18,12 +18,18 @@
           {
             "path": "npcState.activeBehavior",
             "op": "in",
-            "values": [ "hostile", "dead" ]
+            "values": [
+              "hostile",
+              "dead"
+            ]
           },
           {
             "path": "npcState.healthState",
             "op": "in",
-            "values": [ "dead", "incapacitated" ]
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
           },
           {
             "path": "roles.hostile",
@@ -46,51 +52,113 @@
   ],
   "say": {
     "variants": [
-      { "id": "default" }
+      {
+        "id": "default"
+      }
     ]
   },
   "reply": {
     "patched_push_on": {
-      "say": { "variants": [ { "id": "default" } ] },
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
       "after": {
-        "recommend": [ "combat.aftermath.debrief_exchange" ]
+        "recommend": [
+          "combat.aftermath.debrief_exchange"
+        ]
       }
     },
     "ordered_fallback": {
-      "say": { "variants": [ { "id": "default" } ] },
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
       "after": {
-        "recommend": [ "wellbeing.needs.checkin" ]
+        "recommend": [
+          "wellbeing.needs.checkin"
+        ]
       }
     },
     "covered_for_treatment": {
-      "say": { "variants": [ { "id": "default" } ] },
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
       "after": {
-        "recommend": [ "wellbeing.needs.checkin" ]
+        "recommend": [
+          "wellbeing.needs.checkin"
+        ]
       }
     },
     "reassured_bond": {
-      "say": { "variants": [ { "id": "default" } ] },
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
       "after": {
-        "recommend": [ "combat.aftermath.debrief_exchange" ]
+        "recommend": [
+          "combat.aftermath.debrief_exchange"
+        ]
       }
     },
     "bite_non_lethal_stabilized": {
-      "say": { "variants": [ { "id": "default" } ] },
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
       "after": {
-        "recommend": [ "wellbeing.needs.checkin" ]
+        "recommend": [
+          "wellbeing.needs.checkin"
+        ]
       }
     },
     "bite_quarantined": {
-      "say": { "variants": [ { "id": "default" } ] }
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
     },
     "bite_psychopath_threatened": {
-      "say": { "variants": [ { "id": "default" } ] },
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      },
       "after": {
-        "recommend": [ "social.conflict.mediate_exchange" ]
+        "recommend": [
+          "social.conflict.mediate_exchange"
+        ]
       }
     },
     "refused": {
-      "say": { "variants": [ { "id": "default" } ] }
+      "say": {
+        "variants": [
+          {
+            "id": "default"
+          }
+        ]
+      }
     }
   },
   "metadata": {
@@ -133,12 +201,18 @@
           {
             "path": "npcState.activeBehavior",
             "op": "not_in",
-            "values": [ "hostile", "dead" ]
+            "values": [
+              "hostile",
+              "dead"
+            ]
           },
           {
             "path": "npcState.healthState",
             "op": "not_in",
-            "values": [ "dead", "incapacitated" ]
+            "values": [
+              "dead",
+              "incapacitated"
+            ]
           },
           {
             "path": "roles.hostile",
@@ -147,7 +221,7 @@
           }
         ]
       },
-      "initial": "injury_report_open",
+      "initial": "injury_entry",
       "nodes": {
         "injury_report_open": {
           "responsePool": "semantic.flow.combat.injury.triage.open",
@@ -170,7 +244,9 @@
               "labelFallback": "Ask where you're hit and how bad it is",
               "utteranceKey": "UI_PNC_CombatInjury_CheckWhere_Utterance",
               "utteranceFallback": "Where did they get you? Is that wrap still holding?",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "QUESTION",
                 "speechAct": "QUESTION",
@@ -183,7 +259,9 @@
               "labelFallback": "Cover them while they patch up",
               "utteranceKey": "UI_PNC_CombatInjury_OfferCover_Utterance",
               "utteranceFallback": "I have eyes on the dead. Tie that wound off right now!",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "ACCEPT",
                 "speechAct": "ACCEPT",
@@ -202,7 +280,9 @@
               "labelFallback": "Order them behind the line",
               "utteranceKey": "UI_PNC_CombatInjury_OrderFallback_Utterance",
               "utteranceFallback": "You're bleeding too hard to trade swings! Pull back behind me!",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "CLARIFY",
                 "speechAct": "CLARIFY",
@@ -216,7 +296,9 @@
               "labelFallback": "Keep them focused and fighting",
               "utteranceKey": "UI_PNC_CombatInjury_Reassure_Utterance",
               "utteranceFallback": "Stay on my shoulder and watch your wrap. We are not losing you today.",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "INFORM",
                 "speechAct": "INFORM",
@@ -230,7 +312,9 @@
               "labelFallback": "Check the bite mark immediately",
               "utteranceKey": "UI_PNC_CombatInjury_CheckBite_Utterance",
               "utteranceFallback": "Wait, was that teeth? Let me see that bite right now!",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "WARN",
                 "speechAct": "WARN",
@@ -249,12 +333,38 @@
           "onRefuse": "bite_transmission_check",
           "onUnrelated": "suspend",
           "accepts": [
-            { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "COMBAT_INJURY" },
-            { "intent": "INFORM", "speechAct": "INFORM", "subject": "COMBAT_INJURY" },
-            { "intent": "ACCEPT", "speechAct": "ACCEPT", "subject": "COMBAT_INJURY", "stateValue": "covered_for_treatment" },
-            { "intent": "CLARIFY", "speechAct": "CLARIFY", "subject": "COMBAT_INJURY", "stateValue": "ordered_fallback" },
-            { "intent": "WARN", "speechAct": "WARN", "subject": "COMBAT_INJURY", "stateValue": "bitten" },
-            { "intent": "REFUSE", "speechAct": "REFUSE" }
+            {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "COMBAT_INJURY"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "COMBAT_INJURY"
+            },
+            {
+              "intent": "ACCEPT",
+              "speechAct": "ACCEPT",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "covered_for_treatment"
+            },
+            {
+              "intent": "CLARIFY",
+              "speechAct": "CLARIFY",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "ordered_fallback"
+            },
+            {
+              "intent": "WARN",
+              "speechAct": "WARN",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "bitten"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
           ]
         },
         "assess_wound_location": {
@@ -266,7 +376,9 @@
               "labelFallback": "Press them to bandage open wounds",
               "utteranceKey": "UI_PNC_CombatInjury_PatchOpen_Utterance",
               "utteranceFallback": "It's still soaked with fresh blood. Step back two paces and wrap it!",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "INFORM",
                 "speechAct": "INFORM",
@@ -285,7 +397,9 @@
               "labelFallback": "Check if the bandage is holding",
               "utteranceKey": "UI_PNC_CombatInjury_HoldPatched_Utterance",
               "utteranceFallback": "If that dressing holds, swing steady and let me take the point.",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "AGREE",
                 "speechAct": "AGREE",
@@ -299,7 +413,9 @@
               "labelFallback": "Look to nearby squadmates",
               "utteranceKey": "UI_PNC_CombatInjury_SquadCheck_Utterance",
               "utteranceFallback": "Hey, keep eyes on their flank while we sort this injury out!",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "CLARIFY",
                 "speechAct": "CLARIFY",
@@ -318,7 +434,9 @@
               "labelFallback": "Verify bite transmission risk",
               "utteranceKey": "UI_PNC_CombatInjury_InspectBite_Utterance",
               "utteranceFallback": "Hold still so I can see whether that bite broke deep.",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "QUESTION",
                 "speechAct": "QUESTION",
@@ -337,11 +455,32 @@
           "onRefuse": "bite_transmission_check",
           "onUnrelated": "suspend",
           "accepts": [
-            { "intent": "INFORM", "speechAct": "INFORM", "subject": "COMBAT_INJURY" },
-            { "intent": "AGREE", "speechAct": "AGREE", "subject": "COMBAT_INJURY" },
-            { "intent": "CLARIFY", "speechAct": "CLARIFY", "subject": "COMBAT_INJURY", "stateValue": "squad_check" },
-            { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "COMBAT_INJURY", "stateValue": "bite_check" },
-            { "intent": "REFUSE", "speechAct": "REFUSE" }
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "COMBAT_INJURY"
+            },
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE",
+              "subject": "COMBAT_INJURY"
+            },
+            {
+              "intent": "CLARIFY",
+              "speechAct": "CLARIFY",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "squad_check"
+            },
+            {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "bite_check"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
           ]
         },
         "bite_transmission_check": {
@@ -353,7 +492,9 @@
               "labelFallback": "Remind them bites do not turn people here",
               "utteranceKey": "UI_PNC_CombatInjury_BiteNoSaliva_Utterance",
               "utteranceFallback": "Breathe! The sickness does not spread by saliva here, just stop the bleeding!",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "INFORM",
                 "speechAct": "INFORM",
@@ -372,7 +513,9 @@
               "labelFallback": "Acknowledge lethal bite risk",
               "utteranceKey": "UI_PNC_CombatInjury_BiteLethal_Utterance",
               "utteranceFallback": "Stay calm. Wrap that bite tight and watch the squad while we clear a way out.",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "WARN",
                 "speechAct": "WARN",
@@ -391,7 +534,9 @@
               "labelFallback": "Confront hostile squadmate over bitten ally",
               "utteranceKey": "UI_PNC_CombatInjury_PsychoThreat_Utterance",
               "utteranceFallback": "Nobody is pulling a trigger on them in the middle of my fight!",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "CHALLENGE",
                 "speechAct": "CHALLENGE",
@@ -410,10 +555,28 @@
           "onRefuse": "triage_resolution",
           "onUnrelated": "suspend",
           "accepts": [
-            { "intent": "INFORM", "speechAct": "INFORM", "subject": "COMBAT_INJURY", "stateValue": "bite_non_lethal_stabilized" },
-            { "intent": "WARN", "speechAct": "WARN", "subject": "COMBAT_INJURY", "stateValue": "bite_lethal" },
-            { "intent": "CHALLENGE", "speechAct": "CHALLENGE", "subject": "COMBAT_INJURY", "stateValue": "bite_psychopath_threatened" },
-            { "intent": "REFUSE", "speechAct": "REFUSE" }
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "bite_non_lethal_stabilized"
+            },
+            {
+              "intent": "WARN",
+              "speechAct": "WARN",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "bite_lethal"
+            },
+            {
+              "intent": "CHALLENGE",
+              "speechAct": "CHALLENGE",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "bite_psychopath_threatened"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
           ]
         },
         "squad_reaction_interjection": {
@@ -425,7 +588,9 @@
               "labelFallback": "Keep the squad together and protect them",
               "utteranceKey": "UI_PNC_CombatInjury_DefendAlly_Utterance",
               "utteranceFallback": "Lower that barrel right now! We patch our own first and fight together.",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "MEDIATE",
                 "speechAct": "MEDIATE",
@@ -439,7 +604,9 @@
               "labelFallback": "Set quarantine perimeter after contact",
               "utteranceKey": "UI_PNC_CombatInjury_Quarantine_Utterance",
               "utteranceFallback": "Keep twenty paces back once these walkers drop, we will watch the fever safely.",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "DISAGREE",
                 "speechAct": "DISAGREE",
@@ -458,9 +625,20 @@
           "onRefuse": "triage_resolution",
           "onUnrelated": "suspend",
           "accepts": [
-            { "intent": "MEDIATE", "speechAct": "MEDIATE", "subject": "COMBAT_INJURY" },
-            { "intent": "DISAGREE", "speechAct": "DISAGREE", "subject": "COMBAT_INJURY" },
-            { "intent": "REFUSE", "speechAct": "REFUSE" }
+            {
+              "intent": "MEDIATE",
+              "speechAct": "MEDIATE",
+              "subject": "COMBAT_INJURY"
+            },
+            {
+              "intent": "DISAGREE",
+              "speechAct": "DISAGREE",
+              "subject": "COMBAT_INJURY"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
           ]
         },
         "tactical_fallback_or_push": {
@@ -472,7 +650,9 @@
               "labelFallback": "Rotate them to rear guard",
               "utteranceKey": "UI_PNC_CombatInjury_RotateRear_Utterance",
               "utteranceFallback": "Switch spots with me now! Watch the rear while I clear the front.",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "AGREE",
                 "speechAct": "AGREE",
@@ -486,7 +666,9 @@
               "labelFallback": "Hold formation patched up",
               "utteranceKey": "UI_PNC_CombatInjury_ConfirmHold_Utterance",
               "utteranceFallback": "Good wrap. Stick close so nothing hits that limb again.",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "ACCEPT",
                 "speechAct": "ACCEPT",
@@ -499,9 +681,20 @@
           "onRefuse": "triage_resolution",
           "onUnrelated": "suspend",
           "accepts": [
-            { "intent": "AGREE", "speechAct": "AGREE", "subject": "COMBAT_INJURY" },
-            { "intent": "ACCEPT", "speechAct": "ACCEPT", "subject": "COMBAT_INJURY" },
-            { "intent": "REFUSE", "speechAct": "REFUSE" }
+            {
+              "intent": "AGREE",
+              "speechAct": "AGREE",
+              "subject": "COMBAT_INJURY"
+            },
+            {
+              "intent": "ACCEPT",
+              "speechAct": "ACCEPT",
+              "subject": "COMBAT_INJURY"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
           ]
         },
         "quarantine_or_mercy_standoff": {
@@ -513,7 +706,9 @@
               "labelFallback": "Order immediate bandage and watch",
               "utteranceKey": "UI_PNC_CombatInjury_StandoffStabilize_Utterance",
               "utteranceFallback": "Stay on your feet, wrap the bite, and we sort out the rest back at camp.",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "ACCEPT",
                 "speechAct": "ACCEPT",
@@ -527,7 +722,9 @@
               "labelFallback": "Warn aggressive squadmate to stand down",
               "utteranceKey": "UI_PNC_CombatInjury_StandoffHostile_Utterance",
               "utteranceFallback": "Try shooting my teammate and you answer to me next.",
-              "consumers": [ "participant" ],
+              "consumers": [
+                "participant"
+              ],
               "frame": {
                 "intent": "CHALLENGE",
                 "speechAct": "CHALLENGE",
@@ -540,42 +737,265 @@
           "onRefuse": "triage_resolution",
           "onUnrelated": "suspend",
           "accepts": [
-            { "intent": "ACCEPT", "speechAct": "ACCEPT", "subject": "COMBAT_INJURY" },
-            { "intent": "CHALLENGE", "speechAct": "CHALLENGE", "subject": "COMBAT_INJURY" },
-            { "intent": "REFUSE", "speechAct": "REFUSE" }
+            {
+              "intent": "ACCEPT",
+              "speechAct": "ACCEPT",
+              "subject": "COMBAT_INJURY"
+            },
+            {
+              "intent": "CHALLENGE",
+              "speechAct": "CHALLENGE",
+              "subject": "COMBAT_INJURY"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE"
+            }
           ]
         },
         "triage_resolution": {
           "responsePool": "semantic.flow.combat.injury.triage.resolved",
           "terminal": true
+        },
+        "observation_reply": {
+          "responsePool": "semantic.flow.combat.injury.triage.observation_reply",
+          "branchOffers": [
+            {
+              "id": "combat.injury.observation_known",
+              "labelKey": "UI_PNC_InjuryObservation_observation_known_Label",
+              "labelFallback": "I know.",
+              "utteranceKey": "UI_PNC_InjuryObservation_observation_known_Utterance",
+              "utteranceFallback": "I know.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "ACKNOWLEDGE",
+                "speechAct": "ACKNOWLEDGE",
+                "subject": "COMBAT_INJURY",
+                "stateValue": "observation_known"
+              }
+            },
+            {
+              "id": "combat.injury.observation_no_dressing",
+              "labelKey": "UI_PNC_InjuryObservation_observation_no_dressing_Label",
+              "labelFallback": "I don't have a bandage.",
+              "utteranceKey": "UI_PNC_InjuryObservation_observation_no_dressing_Utterance",
+              "utteranceFallback": "I don't have a bandage.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "INFORM",
+                "speechAct": "INFORM",
+                "subject": "COMBAT_INJURY",
+                "stateValue": "observation_no_dressing"
+              }
+            },
+            {
+              "id": "combat.injury.observation_help",
+              "labelKey": "UI_PNC_InjuryObservation_observation_help_Label",
+              "labelFallback": "Can you help me?",
+              "utteranceKey": "UI_PNC_InjuryObservation_observation_help_Utterance",
+              "utteranceFallback": "Can you help me?",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "COMBAT_INJURY",
+                "stateValue": "observation_help"
+              }
+            },
+            {
+              "id": "combat.injury.observation_minimize",
+              "labelKey": "UI_PNC_InjuryObservation_observation_minimize_Label",
+              "labelFallback": "It's not that bad.",
+              "utteranceKey": "UI_PNC_InjuryObservation_observation_minimize_Utterance",
+              "utteranceFallback": "It's not that bad.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "DISAGREE",
+                "speechAct": "DISAGREE",
+                "subject": "COMBAT_INJURY",
+                "stateValue": "observation_minimize"
+              }
+            },
+            {
+              "id": "combat.injury.observation_dismiss",
+              "labelKey": "UI_PNC_InjuryObservation_observation_dismiss_Label",
+              "labelFallback": "Mind your own business.",
+              "utteranceKey": "UI_PNC_InjuryObservation_observation_dismiss_Utterance",
+              "utteranceFallback": "Mind your own business.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "REFUSE",
+                "speechAct": "REFUSE",
+                "subject": "COMBAT_INJURY",
+                "stateValue": "observation_dismiss"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "ACKNOWLEDGE",
+              "speechAct": "ACKNOWLEDGE",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "observation_known"
+            },
+            {
+              "intent": "INFORM",
+              "speechAct": "INFORM",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "observation_no_dressing"
+            },
+            {
+              "intent": "QUESTION",
+              "speechAct": "QUESTION",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "observation_help"
+            },
+            {
+              "intent": "DISAGREE",
+              "speechAct": "DISAGREE",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "observation_minimize"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "observation_dismiss"
+            }
+          ],
+          "onMatch": "observation_supply",
+          "onRefuse": "triage_resolution",
+          "onUnrelated": "suspend"
+        },
+        "observation_supply": {
+          "responsePool": "semantic.flow.combat.injury.triage.observation_supply",
+          "branchOffers": [
+            {
+              "id": "combat.injury.observation_accept_aid",
+              "labelKey": "UI_PNC_InjuryObservation_observation_accept_aid_Label",
+              "labelFallback": "Yes, I could use it.",
+              "utteranceKey": "UI_PNC_InjuryObservation_observation_accept_aid_Utterance",
+              "utteranceFallback": "Yes, I could use it.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "ACCEPT",
+                "speechAct": "ACCEPT",
+                "subject": "COMBAT_INJURY",
+                "stateValue": "observation_accept_aid"
+              }
+            },
+            {
+              "id": "combat.injury.observation_decline_aid",
+              "labelKey": "UI_PNC_InjuryObservation_observation_decline_aid_Label",
+              "labelFallback": "Keep it. I'll manage.",
+              "utteranceKey": "UI_PNC_InjuryObservation_observation_decline_aid_Utterance",
+              "utteranceFallback": "Keep it. I'll manage.",
+              "consumers": [
+                "participant"
+              ],
+              "frame": {
+                "intent": "REFUSE",
+                "speechAct": "REFUSE",
+                "subject": "COMBAT_INJURY",
+                "stateValue": "observation_decline_aid"
+              }
+            }
+          ],
+          "accepts": [
+            {
+              "intent": "ACCEPT",
+              "speechAct": "ACCEPT",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "observation_accept_aid"
+            },
+            {
+              "intent": "REFUSE",
+              "speechAct": "REFUSE",
+              "subject": "COMBAT_INJURY",
+              "stateValue": "observation_decline_aid"
+            }
+          ],
+          "onMatch": "triage_resolution",
+          "onRefuse": "triage_resolution",
+          "onUnrelated": "suspend"
+        },
+        "injury_entry": {
+          "gate": {
+            "type": "pnc:injury_observation"
+          },
+          "onPass": "observation_reply",
+          "onFail": "injury_report_open",
+          "onUnknown": "injury_report_open"
         }
       }
     },
     "replySemantics": {
-      "patched_push_on": { "stance": "positive", "outcome": "patched_push_on" },
-      "ordered_fallback": { "stance": "neutral", "outcome": "ordered_fallback" },
-      "covered_for_treatment": { "stance": "positive", "outcome": "covered_for_treatment" },
-      "reassured_bond": { "stance": "positive", "outcome": "reassured_bond" },
-      "bite_non_lethal_stabilized": { "stance": "positive", "outcome": "bite_non_lethal_stabilized" },
-      "bite_quarantined": { "stance": "contextual", "outcome": "bite_quarantined" },
-      "bite_psychopath_threatened": { "stance": "negative", "outcome": "bite_psychopath_threatened" },
-      "refused": { "stance": "negative", "outcome": "refused" }
+      "patched_push_on": {
+        "stance": "positive",
+        "outcome": "patched_push_on"
+      },
+      "ordered_fallback": {
+        "stance": "neutral",
+        "outcome": "ordered_fallback"
+      },
+      "covered_for_treatment": {
+        "stance": "positive",
+        "outcome": "covered_for_treatment"
+      },
+      "reassured_bond": {
+        "stance": "positive",
+        "outcome": "reassured_bond"
+      },
+      "bite_non_lethal_stabilized": {
+        "stance": "positive",
+        "outcome": "bite_non_lethal_stabilized"
+      },
+      "bite_quarantined": {
+        "stance": "contextual",
+        "outcome": "bite_quarantined"
+      },
+      "bite_psychopath_threatened": {
+        "stance": "negative",
+        "outcome": "bite_psychopath_threatened"
+      },
+      "refused": {
+        "stance": "negative",
+        "outcome": "refused"
+      }
     }
   },
   "roles": {
     "speaker": {
       "cardinality": "ONE",
-      "kinds": [ "actor" ]
+      "kinds": [
+        "actor"
+      ]
     },
     "addressee": {
       "cardinality": "ONE",
-      "kinds": [ "actor" ]
+      "kinds": [
+        "actor"
+      ]
     },
     "witness": {
       "cardinality": "BOUNDED_MANY",
       "min": 0,
       "max": 3,
-      "kinds": [ "actor" ]
+      "kinds": [
+        "actor"
+      ]
     }
   },
   "domains": [

@@ -11,6 +11,9 @@ PNC.ConvoEngine = PNC.ConvoEngine or {}
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_WitnessGating"
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_SituationQuery"
 
+local TriageOffers = require "PNC/ConvoEngine/Dialogue/InjuryTriageOffers"
+local ObservationScene = require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_ObservationScene"
+
 local S = PNC.Semantics.CombatTargetCallouts or {}
 local I = PNC.Semantics.CombatTargetCalloutsInternal
 PNC.Semantics.CombatTargetCallouts = S
@@ -83,7 +86,7 @@ function S.OnVisibleConditionObserved(obs, inj, now, opts)
     }
     local text, res = S.ResolveSemanticLine(
         obs, "combat_injury_visible_observation", "WARN",
-        "human_hostile", ref, nil, toks, { replyRole = variant, topic = "combat_injury", inCombat = false, context = ctx }
+        "human_hostile", ref, nil, toks, { replyRole = variant, topic = "combat_injury", inCombat = false, poolID = "semantic.combat.injury.visible_observation", context = ctx }
     )
     if not text then return false, "observation_realization_unavailable" end
 
@@ -95,22 +98,30 @@ function S.OnVisibleConditionObserved(obs, inj, now, opts)
         eventType = "combat_injury_visible_observation", eventRef = ref, threadID = ref, transient = true,
     }
 
+    local interactive = variant == "heavy_bleeding" or variant == "open_wound"
+        or variant == "dirty_bandage" or variant == "medic_triage_offer" or variant == "suspected_infection"
+    local active = obs.runtime and obs.runtime.activeInjuryObservation
+    if active and now < active.untilAt then interactive = false end
+    local offerIDs = interactive and TriageOffers.IDs(TriageOffers.INITIAL_NODE) or nil
+    interactive = offerIDs and #offerIDs > 0
     local sent = S.DeliverBark(obs, now, {
         eventType = "combat_injury_visible_observation",
         speechEventID = res and res.realizationID or ("semantic.combat.injury.visible_observation." .. variant),
         act = "WARN", topic = "combat_injury", family = OBS_OPTS.family,
         cooldownMs = OBS_OPTS.cooldownMs, familyCooldownMs = OBS_OPTS.familyCooldownMs,
         priority = OBS_OPTS.priority, priorityHoldMs = OBS_OPTS.priorityHoldMs, ttlMs = OBS_OPTS.ttlMs,
-        responsePlanID = res and res.responsePlanID, realizationID = res and res.realizationID,
+        responsePlanID = interactive and TriageOffers.PlanID(TriageOffers.INITIAL_NODE) or (res and res.responsePlanID),
+        realizationID = res and res.realizationID or ("semantic.combat.injury.visible_observation." .. variant),
         poolID = res and res.poolID, realizationFamily = res and res.realizationFamily,
-        flowID = "combat.injury.triage_exchange", observerOnly = false, recipientKind = "player",
-        offerIDs = res and res.offerIDs, factRefs = { ref }, semanticEventFacts = facts,
-        lightweightBark = true, clientCooldowns = OBS_OPTS.clientCooldowns,
+        flowID = TriageOffers.FLOW_ID, observerOnly = not interactive, recipientKind = "player",
+        offerIDs = offerIDs, factRefs = { ref }, semanticEventFacts = facts,
+        lightweightBark = not interactive, clientCooldowns = OBS_OPTS.clientCooldowns,
         threadID = ref, streamKey = "vis-obs:" .. tostring(obs.id) .. ":" .. tostring(inj.id),
         eventRef = ref, text = text, presentationClass = res and res.presentationClass or "BARK", context = presentation,
     })
     if (tonumber(sent) or 0) <= 0 then return false, "observation_not_delivered" end
     S.RecordWitnessObservation(obs, inj, prof, now, opts)
+    if interactive then ObservationScene.Bind(obs, inj, ref, prof.partId, now) end
     return true, variant, { text = text, variant = variant, changeReason = gateR, deltaFacts = delta, epistemic = ep }
 end
 

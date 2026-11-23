@@ -27,6 +27,16 @@ function Input.SubmitSemanticFrame(view, frame, options)
         return false, "semantic_dialogue_disabled"
     end
 
+    local offerID = type(frame) == "table" and frame.candidateID or nil
+    if type(offerID) == "string" and string.find(offerID, "^combat%.injury%.observation_") then
+        local ir, why = Suggestions.FrameToIR(frame, view)
+        if not ir then return false, why end
+        local envelope = Internal.RecordSemanticChoiceEnvelope(view, frame)
+        if not envelope then return false, "injury_observation_envelope_unavailable" end
+        envelope.offerID = offerID
+        return Internal.submitLifecycleEnvelope(view, { interaction = envelope })
+    end
+
     local handled
     local accepted
     local reason

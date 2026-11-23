@@ -176,11 +176,13 @@ local function offersFromLifecycle(context)
         wanted[tostring(offerIDs[index] or "")] = true
     end
     local catalog = responseCatalog()
-    if not catalog then return {} end
+    local offers = catalog and catalog.OffersForSelection(planID, realizationID) or {}
+    if beat.flowID == "combat.injury.triage_exchange" then
+        local projected = require("PNC/ConvoEngine/Dialogue/InjuryTriageOffers").ForPlan(planID)
+        if #projected > 0 then offers = projected end
+    end
     local output = {}
-    for index, offer in ipairs(
-        catalog.OffersForSelection(planID, realizationID) or {}
-    ) do
+    for index, offer in ipairs(offers) do
         if wanted[tostring(offer.id or "")] then
             output[#output + 1] = {
                 offer = offer,

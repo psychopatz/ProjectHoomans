@@ -3,7 +3,7 @@
 **Primary Repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` (`main`)
 **Baseline Commit:** `4522d6e952708bf3ccb013ce620ad9d698a60cb1`
 **Reopened From:** H11 user live acceptance after contradictory runtime evidence on 2026-11-23
-**Active Phase:** `H10R5` — Interactive Injury Observation/Triage Scenes + Item-Aware Aid
+**Active Phase:** `H10R6` — Relationship/Disposition/Inventory Outcome Policy + Action Contracts
 **Parent Status:** `REOPENED_DEVELOPER_WORK_REQUIRED`; H11 deferred until H10R1–H10R8 pass.
 
 ## Phase Status
@@ -15,11 +15,17 @@
 | `H10R2` | Immediate Pain-Reaction Beat + Escalation/Cooldown Policy | `DONE` | H10R2 phase commit |
 | `H10R3` | Witness Observation Gating + Non-Colonist Injury Awareness | `DONE` | H10R3 phase commit |
 | `H10R4` | Core Semantic Microplanning: Modifiers, Clause Relations, Discourse Focus | `DONE` | H10R4 phase commit |
-| `H10R5` | Interactive Injury Observation/Triage Scenes + Item-Aware Aid | `ACTIVE` | pending |
-| `H10R6` | Relationship/Disposition/Inventory Outcome Policy + Action Contracts | `PENDING` | pending |
+| `H10R5` | Interactive Injury Observation/Triage Scenes + Item-Aware Aid | `DONE` | H10R5 phase commit |
+| `H10R6` | Relationship/Disposition/Inventory Outcome Policy + Action Contracts | `ACTIVE` | pending |
 | `H10R7` | Semantic-Truth Quality Sweep + Negative-Claim Guards | `PENDING` | pending |
 | `H10R8` | EN/TL Variety, MP/Save/Scale/Performance Regression + Closure | `PENDING` | pending |
 | `H11` | User Live SP/MP Acceptance | `DEFERRED` | resumes after H10R1–H10R8 |
+
+## Completed in H10R5
+
+H10R5 gives visible injury observation Beats five canonical triage replies. Existing server lease and active Beat provenance admit replies, while the existing Scene runtime binds the observer, injured NPC, and player to one bounded exchange. Aid consent revalidates selected wound, donor item, patient inventory, range, and current policy. Successful supply offers transfer an actual bandage through ServerInventory and direct care uses Treatment.
+
+Nine focused Lua smokes passed, including generated flow validation, leased offer admission, denial, replay protection, no-supply truth, real transfer/rollback, MP loader guard, and the existing bite Scene regression. CodeBuilder reconciled cleanly against the isolated DynamicTrading snapshot. Resume H10R6 to extend relationship-sensitive wording, post-aid replies, and bounded outcome memory.
 
 ## Completed in H10R4
 

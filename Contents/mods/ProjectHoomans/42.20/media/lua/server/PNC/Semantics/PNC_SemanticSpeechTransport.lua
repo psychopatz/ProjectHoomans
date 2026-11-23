@@ -95,7 +95,7 @@ function Transport.Deliver(rec, now, opts)
         end
         local recipientKind = opts.recipientKind or (observerOnly and "npc" or "player")
         local ok = net.SendConversationRelationshipForNPC(p, npcId, ev, {
-            lightweightBark = opts.lightweightBark ~= nil and (opts.lightweightBark == true) or (lane ~= "scene"),
+            lightweightBark = opts.lightweightBark == true or (opts.lightweightBark == nil and lane ~= "scene"),
             source = ev,
             eventID = ref,
             eventRef = ref,

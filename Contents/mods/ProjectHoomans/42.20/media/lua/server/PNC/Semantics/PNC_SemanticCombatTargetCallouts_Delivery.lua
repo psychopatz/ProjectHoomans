@@ -85,6 +85,8 @@ function S.DeliverBark(rec, now, opts)
         flowID = opts.flowID or (opts.context and opts.context.flowID),
         observerOnly = opts.observerOnly,
         recipientKind = opts.recipientKind,
+        lightweightBark = opts.lightweightBark,
+        audienceFilter = opts.audienceFilter,
         factRefs = opts.factRefs,
         offerIDs = opts.offerIDs,
         semanticEventFacts = opts.semanticEventFacts,

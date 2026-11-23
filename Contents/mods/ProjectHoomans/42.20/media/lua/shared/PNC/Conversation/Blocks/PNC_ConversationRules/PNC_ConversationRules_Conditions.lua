@@ -350,6 +350,11 @@ local BUILTINS = {
     ["pnc:history"] = historyMatches,
     ["pnc:weather"] = weatherMatches,
     ["pnc:fact"] = engineFactMatches,
+    ["pnc:injury_observation"] = function(context)
+        local lifecycle = context and (context.interactionLifecycle or context.conversationLifecycleState)
+        local beat = lifecycle and (lifecycle.activeBeat or (lifecycle.thread and lifecycle.thread.activeBeat))
+        return beat ~= nil and beat.responsePlanID == "semantic.flow.combat.injury.triage.observation_reply"
+    end,
     ["pnc:base_not_established"] = function(context)
         return context.baseEstablished ~= true
     end,

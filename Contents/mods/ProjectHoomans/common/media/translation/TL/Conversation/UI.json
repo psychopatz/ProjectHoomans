@@ -96,5 +96,19 @@
   "UI_PNC_Conversation_Suggestion_Unavailable_Tooltip": "Hindi magagamit sa kasalukuyang sitwasyon.",
   "UI_PNC_Conversation_Suggestion_WaitAt_Label": "Sabihing maghintay siya roon",
   "UI_PNC_Conversation_Suggestion_WaitAt_Utterance": "Maghintay ka roon.",
-  "UI_PNC_Conversation_Suggestion_WhatsUp_Label": "Ano ang balita?"
+  "UI_PNC_Conversation_Suggestion_WhatsUp_Label": "Ano ang balita?",
+  "UI_PNC_InjuryObservation_observation_accept_aid_Label": "Oo, kailangan ko iyan.",
+  "UI_PNC_InjuryObservation_observation_accept_aid_Utterance": "Oo, kailangan ko iyan.",
+  "UI_PNC_InjuryObservation_observation_decline_aid_Label": "Sa iyo na. Kakayanin ko.",
+  "UI_PNC_InjuryObservation_observation_decline_aid_Utterance": "Sa iyo na. Kakayanin ko.",
+  "UI_PNC_InjuryObservation_observation_dismiss_Label": "Huwag kang makialam.",
+  "UI_PNC_InjuryObservation_observation_dismiss_Utterance": "Huwag kang makialam.",
+  "UI_PNC_InjuryObservation_observation_help_Label": "Matutulungan mo ba ako?",
+  "UI_PNC_InjuryObservation_observation_help_Utterance": "Matutulungan mo ba ako?",
+  "UI_PNC_InjuryObservation_observation_known_Label": "Alam ko.",
+  "UI_PNC_InjuryObservation_observation_known_Utterance": "Alam ko.",
+  "UI_PNC_InjuryObservation_observation_minimize_Label": "Hindi naman malala.",
+  "UI_PNC_InjuryObservation_observation_minimize_Utterance": "Hindi naman malala.",
+  "UI_PNC_InjuryObservation_observation_no_dressing_Label": "Wala akong benda.",
+  "UI_PNC_InjuryObservation_observation_no_dressing_Utterance": "Wala akong benda."
 }

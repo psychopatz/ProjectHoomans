@@ -140,6 +140,14 @@ local function handle(player, args)
     if not envelope then
         return rejected(requestID, npcID, "interaction_envelope_invalid")
     end
+    local offerID = text(interaction.offerID, 96)
+    if string.find(offerID, "^combat%.injury%.observation_") then
+        local scene = require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_ObservationScene"
+        local ok, outcome = scene.Respond(player, playerKey, record, beat, offerID, Core.Now())
+        if not ok then return rejected(requestID, npcID, outcome) end
+        return { accepted = true, authority = "server", requestID = requestID, npcID = npcID, result = outcome }
+    end
+
     local at = worldAgeHours()
     local options = {
         meaningful = durableAct(envelope.act),

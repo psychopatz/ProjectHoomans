@@ -157,7 +157,6 @@ local function submitLifecycleEnvelope(view, result, actionResult)
         and result.interaction or nil
     if type(interaction) ~= "table"
         or (interaction.source ~= "typed_text" and interaction.source ~= "semantic_choice")
-        or not sendClientCommand
     then
         return false, "lifecycle_transport_unavailable"
     end
@@ -191,17 +190,26 @@ local function submitLifecycleEnvelope(view, result, actionResult)
         tostring(result.sequence or 0),
         tostring(Internal.Now()),
     }, ":")
-    sendClientCommand(
-        PNC.Const.MODULE,
-        PNC.Const.CMD_SEMANTIC_INTERACTION_LIFECYCLE,
-        {
+    local payload = {
             requestID = requestID,
             npcID = view and view.spec and view.spec.npcID,
             token = lifecycle and lifecycle.token
                 or session and session.token,
             interaction = interaction,
         }
-    )
+    local localRouter = PNC.ServerCommandRouter
+    if interaction.offerID and string.find(interaction.offerID, "^combat%.injury%.observation_")
+        and localRouter and PNC.Core and PNC.Core.IsAuthority and PNC.Core.IsAuthority()
+        and (not isServer or not isServer()) then
+        local player = getSpecificPlayer and getSpecificPlayer(0)
+        if not player or not localRouter.Handle(PNC.Const.CMD_SEMANTIC_INTERACTION_LIFECYCLE, player, payload) then
+            return false, "lifecycle_local_route_unavailable"
+        end
+    elseif sendClientCommand then
+        sendClientCommand(PNC.Const.MODULE, PNC.Const.CMD_SEMANTIC_INTERACTION_LIFECYCLE, payload)
+    else
+        return false, "lifecycle_transport_unavailable"
+    end
     return true, "submitted"
 end
 

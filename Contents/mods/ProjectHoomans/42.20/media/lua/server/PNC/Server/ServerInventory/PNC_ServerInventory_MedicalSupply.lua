@@ -30,10 +30,62 @@ local function combatActive(record)
         or now < (tonumber(runtime.inCombatUntil) or 0)
 end
 
+local function aidTransferInRange(donor, patient)
+    local medical = PNC.MedicalCareExecutor
+    local medicalInternal = medical and medical.Internal or nil
+    local donorBody = Registry and Registry.GetLiveZombie
+        and Registry.GetLiveZombie(donor.id) or nil
+    local patientBody = Registry and Registry.GetLiveZombie
+        and Registry.GetLiveZombie(patient.id) or nil
+    if medicalInternal and type(medicalInternal.Position) == "function"
+        and type(medicalInternal.InTreatmentRange) == "function"
+    then
+        local dx, dy = medicalInternal.Position(donor, donorBody)
+        local px, py = medicalInternal.Position(patient, patientBody)
+        if tonumber(dx) == nil or tonumber(dy) == nil
+            or tonumber(px) == nil or tonumber(py) == nil
+        then
+            return false
+        end
+        return medicalInternal.InTreatmentRange(
+            donor, donorBody, patient, patientBody
+        ) == true
+    end
+    local donorX = donorBody and donorBody.getX
+        and tonumber(donorBody:getX()) or tonumber(donor.x)
+    local donorY = donorBody and donorBody.getY
+        and tonumber(donorBody:getY()) or tonumber(donor.y)
+    local donorZ = donorBody and donorBody.getZ
+        and tonumber(donorBody:getZ()) or tonumber(donor.z) or 0
+    local patientX = patientBody and patientBody.getX
+        and tonumber(patientBody:getX()) or tonumber(patient.x)
+    local patientY = patientBody and patientBody.getY
+        and tonumber(patientBody:getY()) or tonumber(patient.y)
+    local patientZ = patientBody and patientBody.getZ
+        and tonumber(patientBody:getZ()) or tonumber(patient.z) or 0
+    local range = tonumber(PNC.Const and PNC.Const.BANDAGE_RANGE) or 3
+    if donorX == nil or donorY == nil or patientX == nil or patientY == nil
+        or math.abs(donorZ - patientZ) >= 1
+    then
+        return false
+    end
+    local deltaX = donorX - patientX
+    local deltaY = donorY - patientY
+    return deltaX * deltaX + deltaY * deltaY <= range * range
+end
+
 local function medicalBandageItemType(fullType)
     local treatment = PNC.Treatment
     return treatment and type(treatment.IsBandageType) == "function"
         and treatment.IsBandageType(fullType) == true or false
+end
+
+local function rollbackCallback(callback)
+    -- Consume/materialization providers return rollback callbacks across a
+    -- service boundary; contain provider failure while preserving this action.
+    if type(callback) ~= "function" then return false end
+    local ok, result = pcall(callback)
+    return ok and result ~= false
 end
 
 local function inventoryItemSpec(item)
@@ -236,6 +288,165 @@ function Service.TransferMedicalBandageForTask(taskID, donorID, itemID)
         taskID = task.id,
         requesterID = requester.id,
         donorID = donor.id,
+        itemType = item.type,
+        itemID = compactIDs[1],
+    }
+end
+
+-- Direct NPC-to-NPC bandage gift used by an explicitly accepted injury-aid
+-- action. The caller owns proximity and social policy; this authority boundary
+-- rechecks patient need and both compact inventories before committing.
+function Service.TransferMedicalBandageForAid(donorID, patientID, itemID)
+    local donor = Registry and Registry.Get and Registry.Get(donorID) or nil
+    local patient = Registry and Registry.Get and Registry.Get(patientID) or nil
+    local treatment = PNC.Treatment
+    local wounds = PNC.NPCWounds
+    local donorPlan
+    local patientPlan
+    local donorInventory
+    local item
+    local spec
+    local canAccept
+    local acceptReason
+    local consumed
+    local consumeReason
+    local effect
+    local added
+    local addReason
+    local compactIDs
+    local body
+    local projected
+    local projectionReason
+    local projectionUndo
+    local removed
+    local nativeRollbackOk
+    local donorRollbackOk
+    if not (PNC.Core and type(PNC.Core.IsAuthority) == "function"
+        and PNC.Core.IsAuthority() == true)
+    then
+        return false, "not_authority"
+    end
+    if not donor or donor.alive == false
+        or not patient or patient.alive == false
+        or tostring(donor.id) == tostring(patient.id)
+    then
+        return false, "invalid_aid_participant"
+    end
+    if combatActive(donor) or combatActive(patient) then
+        return false, "combat_active"
+    end
+    if not aidTransferInRange(donor, patient) then
+        return false, "out_of_range"
+    end
+    if not treatment or type(treatment.GetNPCBandagePlan) ~= "function"
+        or type(treatment.IsBandageType) ~= "function"
+        or not wounds or type(wounds.GetTreatableWounds) ~= "function"
+        or not Inventory or type(Inventory.CanAccept) ~= "function"
+        or type(Inventory.AddItems) ~= "function"
+        or type(Inventory.RemoveItems) ~= "function"
+    then
+        return false, "medical_transfer_unavailable"
+    end
+    if #wounds.GetTreatableWounds(patient) == 0 then
+        return false, "patient_has_no_treatable_wound"
+    end
+    patientPlan = treatment.GetNPCBandagePlan(patient, { consumeItem = true })
+    if patientPlan and patientPlan.itemID then
+        return false, "medical_supply_already_available"
+    end
+    donorPlan = treatment.GetNPCBandagePlan(donor, { consumeItem = true })
+    if not donorPlan
+        or tostring(donorPlan.itemID or "") ~= tostring(itemID or "")
+        or treatment.IsBandageType(donorPlan.fullType) ~= true
+    then
+        return false, "donor_bandage_unavailable"
+    end
+    donorInventory = Inventory and Inventory.EnsureRecordInventory
+        and Inventory.EnsureRecordInventory(donor, {
+            reconcileWaterContainer = false,
+        }) or donor.inventory
+    item = donorInventory and donorInventory.items
+        and donorInventory.items[tostring(itemID or "")] or nil
+    if not item or not treatment.IsBandageType(item.type) then
+        return false, "donor_bandage_unavailable"
+    end
+    spec = inventoryItemSpec(item)
+    if not spec or not spec.type then return false, "bandage_item_invalid" end
+    canAccept, acceptReason = Inventory.CanAccept(patient, { spec }, "root")
+    if not canAccept then return false, acceptReason or "inventory_full" end
+    if not PNC.SupplyInventory
+        or type(PNC.SupplyInventory.Consume) ~= "function"
+    then
+        return false, "supply_consumption_unavailable"
+    end
+    consumed, consumeReason, effect = PNC.SupplyInventory.Consume(
+        donor,
+        itemID,
+        {
+            resourceKind = "MEDICAL",
+            treatment = "BANDAGE",
+            required = {},
+            source = "injury_aid_bandage_gift",
+        }
+    )
+    if not consumed then
+        return false, consumeReason or "donor_bandage_unavailable"
+    end
+    added, addReason, compactIDs = Inventory.AddItems(
+        patient, { spec }, "root", "injury_aid_bandage_gift")
+    if not added then
+        donorRollbackOk = effect and rollbackCallback(effect.undo) or false
+        if not donorRollbackOk then
+            return false, "donor_inventory_rollback_failed"
+        end
+        return false, addReason or "recipient_inventory_rejected"
+    end
+    if not compactIDs or not compactIDs[1] then
+        -- The recipient may already own a compact copy; retain the donor
+        -- consumption rather than risking a duplicated physical bandage.
+        return false, "recipient_inventory_item_missing"
+    end
+    body = Registry.GetLiveZombie and Registry.GetLiveZombie(patient.id) or nil
+    if body then
+        if type(Inventory.MaterializeItem) ~= "function" then
+            removed = Inventory.RemoveItems(patient, compactIDs,
+                "injury_aid_bandage_gift_projection_rollback")
+            if removed ~= true then
+                return false, "recipient_inventory_rollback_failed"
+            end
+            donorRollbackOk = effect and rollbackCallback(effect.undo) or false
+            if not donorRollbackOk then
+                return false, "donor_inventory_rollback_failed"
+            end
+            return false, "live_inventory_projection_unavailable"
+        end
+        projected, projectionReason, projectionUndo = Inventory.MaterializeItem(
+            patient, body, compactIDs[1])
+        if not projected then
+            nativeRollbackOk = projectionUndo == nil
+                or rollbackCallback(projectionUndo)
+            if not nativeRollbackOk then
+                return false, "native_projection_rollback_failed"
+            end
+            removed = Inventory.RemoveItems(patient, compactIDs,
+                "injury_aid_bandage_gift_projection_rollback")
+            if removed ~= true then
+                return false, "recipient_inventory_rollback_failed"
+            end
+            donorRollbackOk = effect and rollbackCallback(effect.undo) or false
+            if not donorRollbackOk then
+                return false, "donor_inventory_rollback_failed"
+            end
+            return false, projectionReason or "live_inventory_projection_failed"
+        end
+    end
+    if Network and Network.BroadcastRecord then
+        Network.BroadcastRecord(donor, "medical_bandage_shared")
+        Network.BroadcastRecord(patient, "medical_bandage_received")
+    end
+    return true, "bandage_gifted", {
+        donorID = donor.id,
+        patientID = patient.id,
         itemType = item.type,
         itemID = compactIDs[1],
     }

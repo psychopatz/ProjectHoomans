@@ -50,6 +50,37 @@
     "say.variants.default": [
       "You're hurt on your {slot.wound.part}, {addressee.name}. Take care of that wound.",
       "Watch that {slot.wound.part}, {addressee.name}, you're still injured."
+    ],
+    "say.variants.aid_supply_offer": [
+      "I've got a bandage I can spare. Want it?",
+      "Here, I can spare a dressing if you need it."
+    ],
+    "say.variants.aid_treatment_offer": [
+      "If you can hold still, I can put a dressing on that.",
+      "Hold still and I'll help you dress it."
+    ],
+    "say.variants.aid_no_supply": [
+      "I don't have any bandages either.",
+      "Neither do I. We'll need to find a dressing."
+    ],
+    "say.variants.aid_refused": [
+      "I can't spare a dressing right now.",
+      "You'll have to find one somewhere else."
+    ],
+    "say.variants.aid_acknowledged": [
+      "All right. Let me know if that changes."
+    ],
+    "say.variants.aid_dismissed": [
+      "Fine. I'll give you some room."
+    ],
+    "say.variants.aid_taken": [
+      "There. You've got a bandage now."
+    ],
+    "say.variants.aid_treated": [
+      "There. The dressing's on."
+    ],
+    "say.variants.aid_changed": [
+      "Hang on. I can't help with it right now."
     ]
   }
 }
