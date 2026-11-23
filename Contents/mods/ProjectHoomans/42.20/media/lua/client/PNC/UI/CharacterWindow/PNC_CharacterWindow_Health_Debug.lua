@@ -167,20 +167,29 @@ function Debug.ShowHealthMenu(view, partId, x, y)
     local wound = body and body.wounds and body.wounds[partId] or nil
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local canDebug = PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() == true
-    local isWholeBody = partId == "WholeBody"
-    local context
-    local option
-    if (isWholeBody and not canDebug) or (not wound
-        or (wound.bandaged == true and wound.bandageDirty ~= true)
-        or not player) and not canDebug
-    then
-        return false
+    local canApply = wound and not wound.dressingHealed
+        and (not wound.bandaged or wound.bandageDirty)
+    local canRemove = wound and (wound.bandaged or wound.splinted)
+    if not canDebug and (not player or not (canApply or canRemove)) then return false end
+
+    local context = ISContextMenu.get(0, x + view:getAbsoluteX(), y + view:getAbsoluteY())
+    if player and canRemove and PNC.Client and PNC.Client.RemoveBandage then
+        local inRange = PNC.Treatment and PNC.Treatment.IsPlayerInBandageRange
+            and PNC.Treatment.IsPlayerInBandageRange(player, view.npcId)
+        local clientOnly = PNC.Core and PNC.Core.IsClientOnly and PNC.Core.IsClientOnly()
+        if wound.bandaged then
+            local remove = context:addOption(Shared.Text("ContextMenu_Remove_Bandage", "Remove Bandage"),
+                nil, function() PNC.Client.RemoveBandage(view.npcId, partId) end)
+            remove.notAvailable = not (inRange or clientOnly)
+        end
+        if wound.splinted then
+            local remove = context:addOption(Shared.Text("ContextMenu_Remove_Splint", "Remove Splint"),
+                nil, function() PNC.Client.RemoveBandage(view.npcId, partId, true) end)
+            remove.notAvailable = not (inRange or clientOnly)
+        end
     end
-    context = ISContextMenu.get(0, x + view:getAbsoluteX(), y + view:getAbsoluteY())
-    -- Whole Body ailments have no wound object and can never enter the normal
-    -- bandage flow. Debug menus may still inspect the region explicitly.
-    if not isWholeBody and wound
-        and (wound.bandaged ~= true or wound.bandageDirty == true) and player then
+    if player and canApply then
+        local option
         option = context:addOption(Shared.Text("ContextMenu_Bandage", "Bandage"), nil)
         if PNC.BandageMenu and PNC.BandageMenu.AddMaterialOptions then
             PNC.BandageMenu.AddMaterialOptions(

@@ -6,8 +6,8 @@ local Helper = {}
 local num = Codec.normalizeNumber
 local str = Codec.normalizeString
 
-local WOUND_BOOLS = { "bandaged", "stitched", "splinted", "cauterized", "haveGlass", "haveBullet", "infectedWound", "bandageDirty", "zombieWound" }
-local WOUND_POS_NUMS = { "alcoholLevel", "splintFactor", "createdAt", "bandagedAt", "dirtyAtWorldHour", "lastHealWorldHour", "healAtWorldHour" }
+local WOUND_BOOLS = { "bandaged", "stitched", "splinted", "cauterized", "haveGlass", "haveBullet", "infectedWound", "bandageDirty", "sterileDressing", "dressingLifeTracked", "dressingHealed", "virtualDressing", "zombieWound" }
+local WOUND_POS_NUMS = { "alcoholLevel", "bandageLife", "splintFactor", "createdAt", "bandagedAt", "dirtyAtWorldHour", "lastHealWorldHour", "healAtWorldHour" }
 local INF_BOOLS = { "active", "fatal", "pendingFatal", "nonLethalFever", "fakePeakReached" }
 local INF_NUMS = { "infectedAtWorldHour", "fatalAtWorldHour", "reanimateAtWorldHour", "progress", "fever", "lastUpdatedWorldHour", "lastDamageWorldHour" }
 local PHYS_BANDS = { thermalBand = "normal", wetnessBand = "dry", coldBand = "none", feverBand = "none", sicknessBand = "none" }
@@ -22,9 +22,14 @@ function Helper.sanitizeWound(partId, wound)
         bleedingRate = math.max(0, num(wound.bleedingRate, 0)),
         woundInfectionLevel = Core.Clamp(num(wound.woundInfectionLevel, 0), 0, 10),
         bandageType = str(wound.bandageType),
+        spentBandageType = str(wound.spentBandageType),
+        splintItem = str(wound.splintItem),
+        splintType = str(wound.splintType),
     }
     for i = 1, #WOUND_BOOLS do local k = WOUND_BOOLS[i]; out[k] = wound[k] == true end
     for i = 1, #WOUND_POS_NUMS do local k = WOUND_POS_NUMS[i]; out[k] = math.max(0, num(wound[k], 0)) end
+    if wound.dressingLifeTracked and not wound.dirtyAtWorldHour then out.dirtyAtWorldHour = nil end
+    if wound.lastFractureHealHour ~= nil then out.lastFractureHealHour = num(wound.lastFractureHealHour, 0) end
     return out
 end
 
@@ -68,7 +73,11 @@ function Helper.compactWound(w)
         bleedingRate = w.bleedingRate > 0 and w.bleedingRate or nil,
         woundInfectionLevel = w.woundInfectionLevel > 0 and w.woundInfectionLevel or nil,
         bandageType = w.bandageType,
+        spentBandageType = w.spentBandageType,
+        splintItem = w.splintItem,
+        splintType = w.splintType,
     }
+    out.lastFractureHealHour = w.lastFractureHealHour
     for i = 1, #WOUND_BOOLS do local k = WOUND_BOOLS[i]; out[k] = w[k] == true or nil end
     for i = 1, #WOUND_POS_NUMS do local k = WOUND_POS_NUMS[i]; out[k] = (w[k] or 0) > 0 and w[k] or nil end
     return out

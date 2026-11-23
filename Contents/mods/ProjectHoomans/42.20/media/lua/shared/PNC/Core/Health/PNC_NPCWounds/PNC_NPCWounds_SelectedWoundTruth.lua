@@ -75,6 +75,11 @@ function SelectedTruth.Build(Dims, body, partId, wound, resolvedType, rStats, pa
     return {
         woundType = resolvedType, bodyPart = partId, partLabel = partDef and partDef.label or partId,
         bodyRegion = region, bandaged = bandaged, bandageDirty = bandageDirty,
+        bandageType = bandaged and w.bandageType or nil,
+        spentBandageType = bandageDirty and w.spentBandageType or nil,
+        sterileDressing = bandaged and not bandageDirty and w.sterileDressing == true,
+        splintItem = splinted and w.splintItem or nil,
+        splintType = splinted and w.splintType or nil,
         splinted = splinted, stitched = stitched, cauterized = cauterized,
         haveGlass = haveGlass, haveBullet = haveBullet, bleeding = bleeding,
         bleedingRate = bRate, bleedingBand = Dims.ResolveBleedingBand(bRate),

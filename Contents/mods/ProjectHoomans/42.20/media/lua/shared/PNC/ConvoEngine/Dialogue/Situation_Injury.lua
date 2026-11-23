@@ -60,14 +60,14 @@ function Internal.ResolveInjuryState(context)
         local hasRawBite = false
         if type(bodyHealth) == "table" and type(bodyHealth.wounds) == "table" then
             for _, wEntry in pairs(bodyHealth.wounds) do
-                if type(wEntry) == "table" then
+                if type(wEntry) == "table" and not wEntry.dressingHealed then
                     if tostring(wEntry.type or "") == "bite" then
                         hasRawBite = true
                         break
                     end
                     for i = 1, #wEntry do
                         local w = wEntry[i]
-                        if type(w) == "table" and tostring(w.type or "") == "bite" then
+                        if type(w) == "table" and not w.dressingHealed and tostring(w.type or "") == "bite" then
                             hasRawBite = true
                             break
                         end

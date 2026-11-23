@@ -96,8 +96,7 @@ end
 
 function Dims.ScanWounds(body, preferredPartId, statsTable)
     local wounds = type(body.wounds) == "table" and body.wounds or {}
-    local bestPartId = preferredPartId and tostring(preferredPartId) or nil
-    local bestWound = bestPartId and wounds[bestPartId] or nil
+    local bestPartId, bestWound
     local bestPri, worstRank, maxOrdInf, hasOrdInf = -1, 0, 0, false
     local f = {
         bite = false, bullet = false, glass = false, fracture = false,
@@ -105,23 +104,25 @@ function Dims.ScanWounds(body, preferredPartId, statsTable)
         dirty = false, transmissible = false,
     }
     for partId, wound in pairs(wounds) do
-        local wType = Wounds.NormalizeWoundType and Wounds.NormalizeWoundType(wound.type) or tostring(wound.type or "scratch")
-        local st = statsTable[wType]
-        local pRank = (st and tonumber(st.physicalSeverityRank)) or 1
-        if pRank > worstRank then worstRank = pRank end
-        f[wType] = true
-        if wound.haveBullet == true then f.bullet = true end
-        if wound.haveGlass == true then f.glass = true end
-        if wound.bandageDirty == true then f.dirty = true end
-        local ordLvl = tonumber(wound.woundInfectionLevel) or 0
-        if ordLvl > maxOrdInf then maxOrdInf = ordLvl end
-        if wound.infectedWound == true then hasOrdInf = true end
-        if (wound.zombieWound == true or wType == "bite") and Dims.CanWoundTransmitKnox(wType) then
-            f.transmissible = true
+        if not wound.dressingHealed then
+            local wType = Wounds.NormalizeWoundType and Wounds.NormalizeWoundType(wound.type) or tostring(wound.type or "scratch")
+            local st = statsTable[wType]
+            local pRank = (st and tonumber(st.physicalSeverityRank)) or 1
+            if pRank > worstRank then worstRank = pRank end
+            f[wType] = true
+            if wound.haveBullet == true then f.bullet = true end
+            if wound.haveGlass == true then f.glass = true end
+            if wound.bandageDirty == true then f.dirty = true end
+            local ordLvl = tonumber(wound.woundInfectionLevel) or 0
+            if ordLvl > maxOrdInf then maxOrdInf = ordLvl end
+            if wound.infectedWound == true then hasOrdInf = true end
+            if (wound.zombieWound == true or wType == "bite") and Dims.CanWoundTransmitKnox(wType) then
+                f.transmissible = true
+            end
+            local pri = (st and tonumber(st.priority) or 1) + (wound.bandaged ~= true and 10 or 0)
+                + (preferredPartId ~= nil and partId == tostring(preferredPartId) and 100 or 0)
+            if pri > bestPri then bestPri = pri; bestPartId = partId; bestWound = wound end
         end
-        local pri = (st and tonumber(st.priority) or 1) + (wound.bandaged ~= true and 10 or 0)
-            + (preferredPartId ~= nil and partId == tostring(preferredPartId) and 100 or 0)
-        if pri > bestPri then bestPri = pri; bestPartId = partId; bestWound = wound end
     end
     return bestPartId, bestWound, worstRank, maxOrdInf, hasOrdInf, f
 end

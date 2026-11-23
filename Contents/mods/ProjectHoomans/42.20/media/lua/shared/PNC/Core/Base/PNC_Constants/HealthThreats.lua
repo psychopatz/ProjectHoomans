@@ -17,7 +17,8 @@ Const.REVIVE_RANGE = 3.0
 Const.BANDAGE_TYPE = "Base.Bandage"
 Const.BANDAGE_TYPES = {
     "Base.AlcoholBandage", "Base.Bandage", "Base.Bandaid",
-    "Base.AlcoholRippedSheets", "Base.RippedSheets",
+    "Base.AlcoholRippedSheets", "Base.RippedSheets", "Base.DenimStrips", "Base.LeatherStrips",
+    "Base.BandageDirty", "Base.RippedSheetsDirty", "Base.DenimStripsDirty", "Base.LeatherStripsDirty",
 }
 -- Abstract factions may perform medical care without a physical bandage.
 -- This descriptor is not an inventory item; it records treatment provenance

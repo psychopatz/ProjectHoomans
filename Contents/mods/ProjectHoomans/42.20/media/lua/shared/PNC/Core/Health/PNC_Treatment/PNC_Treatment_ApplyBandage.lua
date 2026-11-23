@@ -49,10 +49,13 @@ function Treatment.ApplyBandage(record, partId, options)
             partId, itemType, firstAidLevel)
         return false, "wounds_unavailable"
     end
-    applied, reason = PNC.NPCWounds.Bandage(record, partId, Core.Now(), {
+    local returnedItem
+    applied, reason, returnedItem = PNC.NPCWounds.Bandage(record, partId, Core.Now(), {
         bandageType = itemType,
         bandageName = options.bandageName,
         firstAidLevel = firstAidLevel,
+        nativeItem = options.nativeItem,
+        virtualDressing = options.virtualDressing,
     })
     if not applied then
         audit(record, route, "rejected", reason, actorId, partId,
@@ -81,7 +84,7 @@ function Treatment.ApplyBandage(record, partId, options)
     end
     audit(record, route, "applied", "bandaged", actorId,
         partId, itemType, firstAidLevel)
-    return true, "bandaged"
+    return true, "bandaged", returnedItem
 end
 
 return Treatment

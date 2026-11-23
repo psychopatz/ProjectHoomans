@@ -5,14 +5,11 @@ local Wounds = PNC.NPCWounds
 local Internal = Wounds.Internal
 local Core = PNC.Core
 local Const = PNC.Const
-
-function Internal.GetBandageQuality(fullType)
-    return Internal.BandageQuality[tostring(fullType or "")]
-        or Internal.BandageQuality["Base.RippedSheets"]
-end
+local Dressing = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Dressing"
+Wounds.GetBandageReturnType = Dressing.ReturnType
 
 local function isTreatable(wound)
-    return wound and not (wound.type == "fracture" and wound.splinted == true and wound.bandaged == true)
+    return wound and not wound.dressingHealed and not (wound.type == "fracture" and wound.splinted == true and wound.bandaged == true)
         and ((wound.bandaged ~= true and not (wound.type == "fracture" and wound.splinted == true))
             or wound.bandageDirty == true)
 end
@@ -47,39 +44,66 @@ function Wounds.Bandage(record, partId, now, options)
     local wound = body.wounds[tostring(partId or "")]
     if type(now) == "table" and options == nil then options = now; now = nil end
     options = type(options) == "table" and options or {}
-    if not wound then return false, "wound_missing" end
+    if not wound or wound.dressingHealed then return false, "wound_missing" end
     if wound.bandaged == true and wound.bandageDirty ~= true then return false, "already_bandaged" end
     now = tonumber(now) or Core.Now()
     local currentHour = Internal.WorldHour()
+    local dressingType = tostring(options.bandageType or "Base.RippedSheets")
+    local profile = Dressing.Profile(dressingType, options.nativeItem)
+    if not profile then return false, "invalid_bandage_type" end
+    local oldDressing = Dressing.ReturnType(wound)
     wound.bandaged = true
-    wound.bandagedAt = now
-    wound.bandageType = tostring(options.bandageType or "Base.RippedSheets")
-    wound.bandageName = tostring(options.bandageName or wound.bandageType)
-    wound.bandageDirty = false
+    wound.bandagedAt = tonumber(now) or Core.Now()
+    wound.bandageType = dressingType
+    wound.bandageName = options.bandageName
+    wound.spentBandageType = profile.spentType
+    wound.virtualDressing = options.virtualDressing == true or dressingType == "PNC.AbstractMedical"
+    wound.sterileDressing = profile.sterile
+    wound.bandageDirty = profile.dirty
+    if options.nativeItem and options.nativeItem.isInfected and options.nativeItem:isInfected() then
+        wound.infectedWound = true
+        wound.woundInfectionLevel = math.max(0.5, tonumber(wound.woundInfectionLevel) or 0)
+    end
     wound.bandageAppliedWorldHour = currentHour
     wound.lastHealWorldHour = currentHour
-    wound.dirtyAtWorldHour = currentHour + math.max(0.25,
-        tonumber(options.dirtyAfterWorldHours) or tonumber(Const.BANDAGE_DIRTY_AFTER_WORLD_HOURS) or 8)
     wound.firstAidLevel = Core.Clamp(math.floor(tonumber(options.firstAidLevel) or 0), 0, 10)
-    wound.healRatePerWorldHour = ((tonumber(Const.BANDAGE_HEAL_PER_WORLD_HOUR) or 1.5)
-        + wound.firstAidLevel * (tonumber(Const.BANDAGE_FIRST_AID_HEAL_BONUS) or 0.25))
-        * Internal.GetBandageQuality(wound.bandageType)
-    if wound.bandageType == "Base.AlcoholBandage" or wound.bandageType == "Base.AlcoholRippedSheets" then
-        wound.alcoholLevel = math.min(5, (tonumber(wound.alcoholLevel) or 0) + 1.5)
-    end
+    wound.bandageLife = Dressing.Life(profile, wound.firstAidLevel)
+    -- NPC world-hour integration uses the installed item's native life budget.
+    local hours = tonumber(options.dirtyAfterWorldHours) or Dressing.WorldHours(wound.bandageLife, wound,
+        tonumber(Const.BANDAGE_DIRTY_AFTER_WORLD_HOURS) or 8)
+    wound.dirtyAtWorldHour = hours and currentHour + hours or nil
+    wound.dressingLifeTracked = true
+    wound.healRatePerWorldHour = tonumber(Const.BANDAGE_HEAL_PER_WORLD_HOUR) or 1.5
     wound.bandageInitialDamage = math.max(0, tonumber(wound.damage) or tonumber(wound.severity) or 0)
     wound.bandageHealedPoints = 0
     wound.healAtWorldHour = 0
     Wounds.Recalculate(record)
     if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "bandaged", true) end
     if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
-    return true, "bandaged"
+    return true, "bandaged", oldDressing
+end
+
+function Wounds.RemoveBandage(record, partId)
+    if not record or record.alive == false then return false, "invalid_target" end
+    local body = Wounds.Ensure(record)
+    local wound = body.wounds[tostring(partId or "")]
+    if not wound or wound.bandaged ~= true then return false, "not_bandaged" end
+    local recovered = Dressing.ReturnType(wound)
+    wound.bandaged, wound.bandageDirty = false, false
+    wound.bandageType, wound.bandageName, wound.spentBandageType = nil, nil, nil
+    wound.virtualDressing, wound.sterileDressing, wound.dressingLifeTracked = nil, nil, nil
+    wound.bandageLife, wound.dirtyAtWorldHour = nil, nil
+    if wound.dressingHealed and not wound.splinted then body.wounds[tostring(partId)] = nil end
+    Wounds.Recalculate(record)
+    if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "bandage_removed", true) end
+    if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
+    return true, "bandage_removed", recovered
 end
 
 function Wounds.Stitch(record, partId, now, options)
     local body = Wounds.Ensure(record)
     local wound = body.wounds[tostring(partId or "")]
-    if not wound then return false, "wound_missing" end
+    if not wound or wound.dressingHealed then return false, "wound_missing" end
     if wound.stitched == true then return false, "already_stitched" end
     options = type(options) == "table" and options or {}
     wound.stitched = true
@@ -98,16 +122,40 @@ end
 function Wounds.Splint(record, partId, now, options)
     local body = Wounds.Ensure(record)
     local wound = body.wounds[tostring(partId or "")]
-    if not wound then return false, "wound_missing" end
+    if not wound or wound.dressingHealed or (wound.type ~= "fracture" and wound.fractured ~= true) then
+        return false, "fracture_missing"
+    end
+    if partId == "Head" or partId == "Torso_Upper" or partId == "Torso_Lower" then
+        return false, "splint_part_invalid"
+    end
     if wound.splinted == true then return false, "already_splinted" end
     options = type(options) == "table" and options or {}
     wound.splinted = true
     wound.splintedAt = tonumber(now) or Core.Now()
-    wound.splintFactor = math.max(1, tonumber(options.splintFactor) or 2)
+    wound.splintFactor = math.max(0.5, tonumber(options.splintFactor)
+        or (Core.Clamp(tonumber(options.firstAidLevel) or 0, 0, 10) + 1) / 2)
+    wound.lastFractureHealHour = Internal.WorldHour()
+    wound.splintItem = options.splintItem
+    wound.splintType = options.splintType
     Wounds.Recalculate(record)
     if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "splinted", true) end
     if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
     return true, "splinted"
+end
+
+function Wounds.RemoveSplint(record, partId)
+    if not record or record.alive == false then return false, "invalid_target" end
+    local body = Wounds.Ensure(record)
+    local wound = body.wounds[tostring(partId or "")]
+    if not wound or wound.splinted ~= true then return false, "not_splinted" end
+    local support = wound.splintItem
+    local fabric = Dressing.IsSplintSupport(support) and "Base.RippedSheets" or nil
+    wound.splinted, wound.splintFactor, wound.splintItem, wound.splintType = false, nil, nil, nil
+    if wound.dressingHealed and not wound.bandaged then body.wounds[tostring(partId)] = nil end
+    Wounds.Recalculate(record)
+    if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "splint_removed", true) end
+    if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
+    return true, "splint_removed", support, fabric
 end
 
 function Wounds.DebugAlmostDirty(record, partId)

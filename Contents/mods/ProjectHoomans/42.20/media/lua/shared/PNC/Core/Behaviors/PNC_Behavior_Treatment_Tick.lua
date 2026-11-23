@@ -52,6 +52,7 @@ function Behavior.Tick(record, zombie, now)
     end
     if requiresMedicalItem(Treatment, record)
         and not Treatment.HasNPCBandage(record)
+        and not (Treatment.GetNPCSplintPlan and Treatment.GetNPCSplintPlan(record, partId))
     then
         if PNC.NeedSupplyBridge and PNC.NeedSupplyBridge.EnsureMedical then
             PNC.NeedSupplyBridge.EnsureMedical(record, "BANDAGE", partId, false)
@@ -119,21 +120,27 @@ function Behavior.Tick(record, zombie, now)
             )
         end
         if now < (tonumber(state.finishAt) or 0) then return true end
-        applied, label = Treatment.TryNPCBandage(record, state.partId)
+        local usingSplint = state.useSplint
+        if usingSplint then
+            applied, label = Treatment.TryNPCSplint(record, state.partId)
+        else
+            applied, label = Treatment.TryNPCBandage(record, state.partId, { bandageType = state.bandageType })
+        end
         if zombie and Animation and Animation.FinishBump then
             Animation.FinishBump(zombie, true)
         end
         state.phase = "idle"
         state.partId = nil
         state.bandageType = nil
+        state.useSplint = nil
         state.bandageName = nil
         state.finishAt = 0
         state.retryAt = now + (applied and 750
             or (tonumber(Const.SELF_BANDAGE_RETRY_MS) or 5000))
-        state.lastResult = applied and "bandaged" or tostring(label or "failed")
+        state.lastResult = applied and (usingSplint and "splinted" or "bandaged") or tostring(label or "failed")
         record.runtime.tacticalState = nil
         if applied then
-            record.runtime.forceSyncEvent = "self_bandaged"
+            record.runtime.forceSyncEvent = usingSplint and "splinted" or "self_bandaged"
         end
         return true
     end

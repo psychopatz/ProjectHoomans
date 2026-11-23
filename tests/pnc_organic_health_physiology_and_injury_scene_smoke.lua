@@ -372,4 +372,80 @@ do
     T.truthy(elapsedMs < 250, "200-NPC projection + physiology tick completes well under 250ms budget (actual=" .. string.format("%.2fms", elapsedMs) .. ")")
 end
 
+do
+    local Dressing = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Dressing"
+    local Codec = require "PNC/Core/Health/Repository/PNC_HealthWoundCodec"
+    T.equal(Dressing.Profile("Base.RippedSheets").power, Dressing.Profile("Base.AlcoholRippedSheets").power)
+    T.equal(Dressing.Profile("Base.Bandage").power, Dressing.Profile("Base.AlcoholBandage").power)
+    T.truthy(Dressing.Profile("Base.Bandage").power > Dressing.Profile("Base.RippedSheets").power)
+    T.equal(Dressing.Profile("Base.Bandaid").power, 1.5)
+    T.equal(Dressing.Profile("Base.AlcoholBandage").spentType, "Base.BandageDirty")
+    T.equal(Dressing.Profile("Base.DenimStrips").spentType, "Base.DenimStripsDirty")
+    T.equal(Dressing.Profile("Base.LeatherStrips").spentType, "Base.LeatherStripsDirty")
+    T.equal(Dressing.Life(Dressing.Profile("Base.RippedSheetsDirty"), 10), 0)
+    local treated = makeNPC("dressing-item-regression")
+    Wounds.Ensure(treated).wounds.Hand_L = { type = "laceration", damage = 20, severity = 20, bleedingRate = 0.02 }
+    T.truthy(Wounds.Bandage(treated, "Hand_L", nowMs, {
+        bandageType = "Base.AlcoholRippedSheets", dirtyAfterWorldHours = 0.1,
+    }))
+    local wound = treated.health.body.wounds.Hand_L
+    T.equal(wound.bandageType, "Base.AlcoholRippedSheets")
+    T.truthy(wound.sterileDressing)
+    T.equal(Wounds.GetBandageReturnType(wound), "Base.AlcoholRippedSheets")
+    worldHours = worldHours + 0.2
+    Wounds.Update(treated, nil, nowMs)
+    T.truthy(wound.bandageDirty)
+    local restored = Codec.sanitizeWound("Hand_L", Codec.compactWound(Codec.sanitizeWound("Hand_L", wound)))
+    T.equal(Wounds.GetBandageReturnType(restored), "Base.RippedSheetsDirty")
+    local changed, _, previous = Wounds.Bandage(treated, "Hand_L", nowMs, { bandageType = "Base.Bandage" })
+    T.truthy(changed)
+    T.equal(previous, "Base.RippedSheetsDirty")
+    local removed, _, recovered = Wounds.RemoveBandage(treated, "Hand_L")
+    T.truthy(removed)
+    T.equal(recovered, "Base.Bandage")
+    T.falsy(Wounds.RemoveBandage(treated, "Hand_L"), "a removed dressing cannot be collected twice")
+    Wounds.Ensure(treated).wounds.ForeArm_L = { type = "fracture", damage = 25, severity = 25 }
+    T.truthy(Wounds.Splint(treated, "ForeArm_L", nowMs, { firstAidLevel = 3, splintItem = "Base.WoodenStick2" }))
+    local splint = treated.health.body.wounds.ForeArm_L
+    T.equal(splint.splintFactor, 2)
+    T.equal(Codec.sanitizeWound("ForeArm_L", splint).splintItem, "Base.WoodenStick2")
+    worldHours = worldHours + 1
+    Wounds.Update(treated, nil, nowMs)
+    T.truthy(splint.damage < 25, "splint advances fracture recovery without a bandage")
+    local unsplinted = makeNPC("unsplinted-fracture")
+    local untreatedFracture = { type = "fracture", damage = 25, severity = 25, lastFractureHealHour = worldHours - 1 }
+    Wounds.Ensure(unsplinted).wounds.ForeArm_L = untreatedFracture
+    Wounds.Update(unsplinted, nil, nowMs)
+    T.truthy(splint.damage < untreatedFracture.damage, "splint recovers a fracture faster")
+    local splintRemoved, _, support, fabric = Wounds.RemoveSplint(treated, "ForeArm_L")
+    T.truthy(splintRemoved)
+    T.equal(support, "Base.WoodenStick2")
+    T.equal(fabric, "Base.RippedSheets")
+    T.falsy(Wounds.RemoveSplint(treated, "ForeArm_L"), "splint materials cannot be collected twice")
+    T.truthy(Wounds.Splint(unsplinted, "ForeArm_L", nowMs, { splintItem = "Base.Splint" }))
+    local _, _, crafted, extraFabric = Wounds.RemoveSplint(unsplinted, "ForeArm_L")
+    T.equal(crafted, "Base.Splint")
+    T.equal(extraFabric, nil)
+
+    local recoveredNPC = makeNPC("healed-but-wearing-dressing")
+    Wounds.Ensure(recoveredNPC).wounds.Hand_R = { type = "scratch", damage = 0.1, severity = 0.1 }
+    T.truthy(Wounds.Bandage(recoveredNPC, "Hand_R", nowMs, {
+        bandageType = "Base.RippedSheets", dirtyAfterWorldHours = 5,
+    }))
+    worldHours = worldHours + 1
+    Wounds.Update(recoveredNPC, nil, nowMs)
+    local healed = recoveredNPC.health.body.wounds.Hand_R
+    T.truthy(healed.dressingHealed, "a healed wound still carries its physical dressing")
+    T.equal(Wounds.GetFunctionalImpairment(recoveredNPC).kind, "none")
+    local projection = Wounds.GetOrBuildProjection(recoveredNPC, { preferredPartId = "Hand_R" })
+    T.equal(projection.totalWoundCount, 0, "the retained dressing is outside injury projection")
+    local persisted = Codec.sanitizeWound("Hand_R", Codec.compactWound(Codec.sanitizeWound("Hand_R", healed)))
+    T.truthy(persisted.dressingHealed)
+    T.equal(Wounds.GetBandageReturnType(persisted), "Base.RippedSheets")
+    local _, _, cleanRag = Wounds.RemoveBandage(recoveredNPC, "Hand_R")
+    T.equal(cleanRag, "Base.RippedSheets")
+    T.equal(recoveredNPC.health.body.wounds.Hand_R, nil)
+
+end
+
 T.finish("pnc_organic_health_physiology_and_injury_scene_smoke")

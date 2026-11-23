@@ -100,6 +100,7 @@ local function clearAction(record, zombie, reason)
     state.phase = "idle"
     state.partId = nil
     state.bandageType = nil
+    state.useSplint = nil
     state.bandageName = nil
     state.startedAt = 0
     state.finishAt = 0
@@ -130,8 +131,9 @@ end
 
 local function startBandage(record, zombie, partId, now)
     local Treatment = PNC.Treatment
-    local supply = Treatment and Treatment.GetNPCBandagePlan
-        and Treatment.GetNPCBandagePlan(record) or nil
+    local splint = Treatment and Treatment.GetNPCSplintPlan and Treatment.GetNPCSplintPlan(record, partId)
+    local supply = splint or (Treatment and Treatment.GetNPCBandagePlan
+        and Treatment.GetNPCBandagePlan(record))
     if not supply and Treatment and Treatment.FindNPCBandage then
         supply = Treatment.FindNPCBandage(record)
     end
@@ -143,6 +145,7 @@ local function startBandage(record, zombie, partId, now)
     if not supply then return false end
     state.phase = "bandaging"
     state.partId = partId
+    state.useSplint = splint ~= nil
     state.bandageType = supply.fullType
     state.bandageName = supply.displayName
     state.startedAt = now
@@ -249,6 +252,7 @@ function Behavior.BuildSnapshot(record)
         phase = state.phase,
         partId = state.partId,
         bandageType = state.bandageType,
+        useSplint = state.useSplint == true,
         bandageName = state.bandageName,
         startedAt = state.startedAt,
         finishAt = state.finishAt,

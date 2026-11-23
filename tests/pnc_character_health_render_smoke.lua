@@ -95,6 +95,13 @@ local view = {
     end,
     drawTextureScaled = function() end,
 }
+local itemIcons = {}
+PNC.Treatment = { GetBandageDisplayName = function(fullType) return fullType end }
+instanceItem = function(fullType)
+    return { getTex = function() return fullType end }
+end
+view.drawTextureScaled = function(_, texture) itemIcons[texture] = true end
+
 local snapshot = {
     hpCurrent = 42,
     hpMax = 100,
@@ -129,6 +136,17 @@ local snapshot = {
 }
 
 PNC.CharacterWindowTabs.RenderHealth(view, snapshot, {}, 0)
+local wound = snapshot.bodyHealth.wounds.Head
+wound.bandageType = "Base.AlcoholRippedSheets"
+wound.splinted = true
+wound.splintItem = "Base.WoodenStick2"
+PNC.CharacterWindowTabs.RenderHealth(view, snapshot, {}, 0)
+T.truthy(itemIcons["Base.AlcoholRippedSheets"], "health window displays the applied item's icon")
+T.truthy(itemIcons["Base.WoodenStick2"], "health window displays the splint support icon")
+wound.bandageDirty = true
+wound.spentBandageType = "Base.RippedSheetsDirty"
+PNC.CharacterWindowTabs.RenderHealth(view, snapshot, {}, 0)
+T.truthy(itemIcons["Base.RippedSheetsDirty"], "health window switches to spent dressing icon")
 local text = table.concat(drawn, "\n")
 T.contains(text, "Whole Body", "health details identify the whole body")
 T.contains(text, "Starvation: 75% | Hunger: 90% (CRITICAL) - RECOVERING",

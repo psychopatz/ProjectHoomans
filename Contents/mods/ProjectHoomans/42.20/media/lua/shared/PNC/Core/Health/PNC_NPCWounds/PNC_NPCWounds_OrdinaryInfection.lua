@@ -2,6 +2,7 @@ PNC = PNC or {}
 local Wounds = PNC.NPCWounds
 local Internal = Wounds.Internal
 local Core = PNC.Core
+local Dressing = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Dressing"
 
 function Internal.EmitWoundStateChange(record, partId, changeKind, wound)
     if Internal.Events and Internal.EventTypes and Internal.EventTypes.NPC_WOUND_STATE_CHANGED then
@@ -27,6 +28,11 @@ function Internal.UpdateOrdinaryWoundInfection(record, partId, wound, currentHou
         delta = delta + 0.15 * dt
     elseif wound.bandaged == true or wound.stitched == true then
         delta = delta - 0.25 * dt
+    end
+    if lvl > 0 and wound.sterileDressing and wound.bandaged and not wound.bandageDirty then
+        local cleanHours = math.max(0, math.min(currentHour, tonumber(wound.dirtyAtWorldHour) or currentHour) - lastHour)
+        local multiplier = Dressing.NativeMultiplierPerWorldHour()
+        delta = delta - (multiplier and 0.0006 * multiplier or 0.80) * cleanHours
     end
     if alc > 0 then
         delta = delta - 0.80 * dt

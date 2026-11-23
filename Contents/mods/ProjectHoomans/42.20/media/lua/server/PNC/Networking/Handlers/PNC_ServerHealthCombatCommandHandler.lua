@@ -23,6 +23,8 @@ Router.Register(Const.CMD_BANDAGE, function(player, args)
         treatment.TryBandage(player, args.id, args.partId, {
             consumeItem = not debugFree,
             bandageType = args.bandageType,
+            remove = args.remove == true,
+            removeSplint = args.removeSplint == true,
         })
     end
 end)

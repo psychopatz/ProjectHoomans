@@ -23,7 +23,10 @@ local function applyWoundFlags(wound, normalizedType, stats, severityDamage, exi
     if stats.haveGlass == true then wound.haveGlass = true end
     if stats.haveBullet == true then wound.haveBullet = true end
     if stats.deepWounded == true then wound.deepWounded = true end
-    if stats.fractured == true then wound.fractured = true; wound.splinted = false end
+    if stats.fractured == true then
+        wound.fractured, wound.splinted = true, false
+        wound.splintItem, wound.splintType, wound.splintFactor, wound.lastFractureHealHour = nil, nil, nil, nil
+    end
     if stats.burned == true then wound.burned = true end
     if normalizedType == "bite" then
         -- BodyPart.java:692 SetBitten sets infectedWound = true alongside Knox check
@@ -33,6 +36,8 @@ local function applyWoundFlags(wound, normalizedType, stats, severityDamage, exi
     wound.bandaged, wound.stitched, wound.cauterized = false, false, false
     wound.bandagedAt, wound.healAtWorldHour = 0, 0
     wound.bandageType, wound.bandageName, wound.bandageDirty = nil, nil, false
+    wound.spentBandageType, wound.sterileDressing, wound.virtualDressing = nil, nil, nil
+    wound.dressingLifeTracked, wound.dressingHealed, wound.bandageLife = nil, nil, nil
     wound.bandageAppliedWorldHour, wound.lastHealWorldHour, wound.dirtyAtWorldHour, wound.firstAidLevel = 0, 0, 0, 0
     wound.alcoholLevel = tonumber(wound.alcoholLevel) or 0
 end

@@ -11,6 +11,7 @@ local Skills = PNC.Skills
 local Types = PNC.Types
 
 local BANDAGE_NAMES = {
+    ["PNC.AbstractMedical"] = Const.ABSTRACT_MEDICAL_TREATMENT_NAME or "Abstract medical treatment",
     ["Base.AlcoholBandage"] = "Sterilized Bandage",
     ["Base.Bandage"] = "Bandage",
     ["Base.Bandaid"] = "Adhesive Bandage",
@@ -40,6 +41,9 @@ local function bandageDisplayName(fullType, item)
     if item and item.getName then
         return tostring(item:getName())
     end
+    local manager = getScriptManager and getScriptManager()
+    local script = fullType and manager and manager:getItem(fullType)
+    if script and script.getDisplayName then return tostring(script:getDisplayName()) end
     return BANDAGE_NAMES[tostring(fullType or "")]
         or tostring(fullType or "Ripped Sheets")
 end

@@ -36,7 +36,7 @@ local function openWounds(entry)
     local wound
     local parts = PNC.NPCWounds and PNC.NPCWounds.Parts or {}
     for partId, wound in pairs(woundsFor(entry)) do
-        if wound and (wound.bandaged ~= true or wound.bandageDirty == true) then
+        if wound and not wound.dressingHealed and (wound.bandaged ~= true or wound.bandageDirty == true) then
             output[#output + 1] = {
                 partId = tostring(partId),
                 wound = wound,
@@ -49,7 +49,10 @@ local function openWounds(entry)
 end
 
 function Provider.isEnabled(entry)
-    return #openWounds(entry) > 0
+    for _, wound in pairs(woundsFor(entry)) do
+        if wound then return true end
+    end
+    return false
 end
 
 function Provider.addOptions(menu, entry, player)
@@ -61,6 +64,22 @@ function Provider.addOptions(menu, entry, player)
     local sameLevel = math.abs((tonumber(entry and entry.z) or 0) - (tonumber(player and player:getZ()) or 0)) < 1
     local range = tonumber(PNC.Const.BANDAGE_RANGE) or 3
     local inRange = sameLevel and ((dx * dx) + (dy * dy)) <= (range * range)
+    for partId, wound in pairs(woundsFor(entry)) do
+        if wound and (wound.bandaged == true or wound.splinted == true) then
+            local parts = PNC.NPCWounds and PNC.NPCWounds.Parts
+            local part = parts and parts[partId]
+            local selectedPart = partId
+            local partLabel = part and part.label or tostring(partId)
+            local function addRemoval(translationKey, splint)
+                local option = menu:addOption(getText(translationKey) .. " - " .. partLabel, nil, function()
+                    PNC.Client.RemoveBandage(entry.id, selectedPart, splint)
+                end)
+                option.notAvailable = not inRange
+            end
+            if wound.bandaged then addRemoval("ContextMenu_Remove_Bandage", false) end
+            if wound.splinted then addRemoval("ContextMenu_Remove_Splint", true) end
+        end
+    end
     local i
     for i = 1, #wounds do
         local row = wounds[i]

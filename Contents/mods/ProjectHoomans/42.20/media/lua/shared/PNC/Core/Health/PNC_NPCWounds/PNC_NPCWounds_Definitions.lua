@@ -45,13 +45,6 @@ function Wounds.GetWoundStats(woundType)
     return normalized and Internal.WoundStats[normalized] or nil
 end
 
-Internal.BandageQuality = {
-    ["Base.AlcoholBandage"] = 1.35,
-    ["Base.Bandage"] = 1.20,
-    ["Base.Bandaid"] = 0.65,
-    ["Base.AlcoholRippedSheets"] = 1.10,
-    ["Base.RippedSheets"] = 0.90,
-}
 Internal.DebugWoundTypes = { "scratch", "laceration", "bite" }
 Internal.CoveragePartAliases = {
     UpperBody = "Torso_Upper",

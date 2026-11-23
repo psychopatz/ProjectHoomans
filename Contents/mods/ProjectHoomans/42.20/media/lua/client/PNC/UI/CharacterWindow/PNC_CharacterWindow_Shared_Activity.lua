@@ -68,7 +68,9 @@ function Shared.GetMedicalActivity(snapshot, payload)
     return {
         source = source,
         phase = phase,
-        label = activityLabel(source, phase),
+        label = state.useSplint == true and Shared.Text("ContextMenu_Splint", "Splint")
+            or activityLabel(source, phase),
+        useSplint = state.useSplint == true,
         taskId = state.taskId,
         patientId = state.patientId,
         partId = state.partId,

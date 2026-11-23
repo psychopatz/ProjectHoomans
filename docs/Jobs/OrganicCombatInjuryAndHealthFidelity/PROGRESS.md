@@ -21,6 +21,12 @@
 | `H10R8` | EN/TL Variety, MP/Save/Scale/Performance Regression + Closure | `DONE` | H10R8 phase commit |
 | `H11` | User Live SP/MP Acceptance | `ACTIVE` | user-owned native verification |
 
+## Build 42 treatment follow-up
+
+The authority records the applied clothing strip, bandage, or splint and carries the material through save/load and the Health panel. Native item definitions provide bandage power, sterility, and spent-item identity. Physically applied dressings and splints can be removed from the Health panel. A dressing that becomes dirty stays on the patient until removal or replacement. An improvised splint returns the support and ripped sheet. A crafted splint returns the splint.
+
+NPCs use their existing wound model to integrate healing and dressing wear over world hours. The installed game supplies the sterilization recipes. NPCs can consume an already sterilized item from inventory. The six focused health, treatment, UI, scale, and server guard tests passed. Native treatment timing and multiplayer inventory presentation remain part of H11.
+
 ## Completed in H10R8
 
 H10R1–H10R8 developer repairs are locally committed on `main`. Injury prompts work through both active conversation leases and server-admitted ambient Beats. The server revalidates the exact selected wound, line of sight, reachability, and item before executing aid. Projection rebuilds reuse authoritative summaries after mutations that already recalculated them. EN/TL composed calls use the selected body part.

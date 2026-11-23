@@ -92,10 +92,12 @@ function Wounds.GetFunctionalImpairment(record)
     local mobility = Wounds.GetMobilityState(record)
     local regions = {}
     for partId, wound in pairs(body.wounds or {}) do
-        local region = Wounds.ClassifyBodyRegion and Wounds.ClassifyBodyRegion(partId) or "torso"
-        local unstabilized = wound.bandaged ~= true or (wound.type == "fracture" and wound.splinted ~= true)
-            or wound.haveBullet == true or wound.haveGlass == true
-        if unstabilized or (tonumber(wound.damage) or 0) >= 6 then regions[region] = true end
+        if not wound.dressingHealed then
+            local region = Wounds.ClassifyBodyRegion and Wounds.ClassifyBodyRegion(partId) or "torso"
+            local unstabilized = wound.bandaged ~= true or (wound.type == "fracture" and wound.splinted ~= true)
+                or wound.haveBullet == true or wound.haveGlass == true
+            if unstabilized or (tonumber(wound.damage) or 0) >= 6 then regions[region] = true end
+        end
     end
     for i = 1, #Wounds.PartOrder do
         local id = Wounds.PartOrder[i]

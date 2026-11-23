@@ -42,6 +42,18 @@ function Client.CompleteBandage(npcId, partId, debugFree, bandageType)
         }) or false
 end
 
+function Client.RemoveBandage(npcId, partId, splint)
+    local player = getSpecificPlayer and getSpecificPlayer(0)
+    if not player or not npcId or not partId then return false end
+    local request = { id = npcId, partId = partId, remove = splint ~= true, removeSplint = splint == true }
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not sendClientCommand then return false end
+        sendClientCommand(player, Const.MODULE, Const.CMD_BANDAGE, request)
+        return true
+    end
+    return PNC.Treatment.TryBandage(player, npcId, partId, request)
+end
+
 function Client.SendBandage(npcId, partId, debugFree, bandageType)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     if not player or not npcId or not partId then return false end

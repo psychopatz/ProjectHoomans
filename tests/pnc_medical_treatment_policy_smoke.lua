@@ -222,4 +222,73 @@ T.truthy(not string.find(boundedMessage, "\n", 1, true),
 T.truthy(#boundedMessage < 700,
     "treatment diagnostic fields are length bounded")
 
+do
+    PNC.Core.IsAuthority = function() return true end
+    local consumedKinds = {}
+    local original = PNC.SupplyInventory.Consume
+    PNC.SupplyInventory.Consume = function(actor, itemID, request)
+        consumedKinds[#consumedKinds + 1] = request.treatment
+        return original(actor, itemID, request)
+    end
+    local actor = {
+        id = "fracture-patient", alive = true,
+        health = { body = { wounds = { ForeArm_L = { type = "fracture" } } } },
+        inventory = { items = {
+            stick = { id = "stick", type = "Base.WoodenStick2", stack = 1 },
+            rag = { id = "rag", type = "Base.RippedSheets", stack = 1 },
+        } },
+    }
+    PNC.NPCWounds.Splint = function(_, part, _, options)
+        T.equal(part, "ForeArm_L")
+        T.equal(options.splintItem, "Base.WoodenStick2")
+        T.equal(options.firstAidLevel, 4)
+        return true, "splinted"
+    end
+    T.truthy(PNC.Treatment.TryNPCSplint(actor, "ForeArm_L"))
+    T.equal(actor.inventory.items.stick.stack, 0)
+    T.equal(actor.inventory.items.rag.stack, 0)
+    T.equal(consumedKinds[1], "SPLINT")
+    T.equal(consumedKinds[2], "SPLINT")
+    PNC.SupplyInventory.Consume = original
+end
+
+do
+    local received, broadcasts = {}, {}
+    local position = 20
+    patient.x, patient.y, patient.z = 0, 0, 0
+    PNC.Registry.Get = function(id) return id == patient.id and patient or nil end
+    PNC.Registry.GetLiveZombie = function() return nil end
+    PNC.Core.DistanceSq = function(x1, y1, x2, y2)
+        return (x1 - x2) ^ 2 + (y1 - y2) ^ 2
+    end
+    PNC.Network = { BroadcastRecord = function(_, event) broadcasts[#broadcasts + 1] = event end }
+    local hasSplint = true
+    PNC.NPCWounds.RemoveSplint = function(target, part)
+        T.equal(target, patient)
+        T.equal(part, "ForeArm_L")
+        if not hasSplint then return false, "not_splinted" end
+        hasSplint = false
+        return true, "splint_removed", "Base.WoodenStick2", "Base.RippedSheets"
+    end
+    local inventory = { AddItem = function(_, fullType) received[#received + 1] = fullType end }
+    local player = {
+        getX = function() return position end,
+        getY = function() return 0 end,
+        getZ = function() return 0 end,
+        getInventory = function() return inventory end,
+    }
+    local permitted, reason = PNC.Treatment.TryBandage(player, patient.id, "ForeArm_L", { removeSplint = true })
+    T.falsy(permitted)
+    T.equal(reason, "too_far")
+    T.equal(#received, 0)
+    position = 1
+    T.truthy(PNC.Treatment.TryBandage(player, patient.id, "ForeArm_L", { removeSplint = true }))
+    T.equal(received[1], "Base.WoodenStick2")
+    T.equal(received[2], "Base.RippedSheets")
+    T.equal(broadcasts[1], "splint_removed")
+    T.falsy(PNC.Treatment.TryBandage(player, patient.id, "ForeArm_L", { removeSplint = true }))
+    T.equal(#received, 2)
+    T.equal(#broadcasts, 1)
+end
+
 T.finish("pnc_medical_treatment_policy_smoke")

@@ -28,23 +28,24 @@ local function findNPCBandage(record, requestedType)
         searchTypes = types
     end
     for i = 1, #searchTypes do
-        for _, item in pairs(inv and inv.items or {}) do
-            stack = item and tonumber(item.stack) or 1
-            if item and tostring(item.type or "") == tostring(searchTypes[i])
-                and stack > 0
-            then
-                return {
-                    itemID = item.id,
-                    fullType = item.type,
-                    displayName = Internal.BandageDisplayName(item.type),
-                }
+        local fullType = searchTypes[i]
+        if requestedType or not string.find(fullType, "Dirty", 1, true) then
+            for _, item in pairs(inv and inv.items or {}) do
+                stack = item and tonumber(item.stack) or 1
+                if item and item.type == fullType and stack > 0 then
+                    return {
+                        itemID = item.id,
+                        fullType = item.type,
+                        displayName = Internal.BandageDisplayName(item.type),
+                    }
+                end
             end
         end
     end
     return nil
 end
 
-local function consumeNPCBandage(record, supply, reason)
+local function consumeNPCBandage(record, supply, reason, treatment)
     if not record or not supply then return false, nil end
     if PNC.SupplyInventory and PNC.SupplyInventory.Consume then
         local ok, _, effect = PNC.SupplyInventory.Consume(
@@ -52,7 +53,7 @@ local function consumeNPCBandage(record, supply, reason)
             supply.itemID,
             {
                 resourceKind = "MEDICAL",
-                treatment = "BANDAGE",
+                treatment = treatment or "BANDAGE",
                 required = {},
                 source = reason or "npc_bandage",
             }

@@ -16,9 +16,11 @@ local NEED_WEIGHTS = Internal.NeedWeights
 local CONDITION_TYPES = Internal.ConditionTypes
 local CONDITION_WEIGHTS = Internal.ConditionWeights
 
-local function hasEntries(value)
+local function hasActiveWounds(value)
     if type(value) ~= "table" then return false end
-    for _ in pairs(value) do return true end
+    for _, wound in pairs(value) do
+        if type(wound) ~= "table" or not wound.dressingHealed then return true end
+    end
     return false
 end
 
@@ -162,7 +164,7 @@ local function healthState(context)
             or (tonumber(bodyHealth.openWoundCount) or 0) > 0
             or (tonumber(bodyHealth.bandagedWoundCount) or 0) > 0
             or (tonumber(bodyHealth.overallPercent) or 100) < 99
-            or hasEntries(bodyHealth.wounds)
+            or hasActiveWounds(bodyHealth.wounds)
         then
             return "injured"
         end

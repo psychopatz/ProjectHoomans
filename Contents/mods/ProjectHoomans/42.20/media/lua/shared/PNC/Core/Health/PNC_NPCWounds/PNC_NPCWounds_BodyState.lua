@@ -104,16 +104,18 @@ function Wounds.Recalculate(record)
     local body = Wounds.Ensure(record)
     local bleedingRate, openCount, bandagedCount, patchedCount = 0, 0, 0, 0
     for _, wound in pairs(body.wounds) do
-        local isBandaged = wound.bandaged == true
-        local isSplinted = wound.splinted == true and wound.type == "fracture"
-        local isStitched = wound.stitched == true and (tonumber(wound.bleedingRate) or 0) <= 0
-        local isCauterized = wound.cauterized == true and (tonumber(wound.bleedingRate) or 0) <= 0
-        if isBandaged then bandagedCount = bandagedCount + 1 end
-        if isBandaged or isSplinted or isStitched or isCauterized then
-            patchedCount = patchedCount + 1
-        else
-            openCount = openCount + 1
-            bleedingRate = bleedingRate + math.max(0, tonumber(wound.bleedingRate) or 0)
+        if not wound.dressingHealed then
+            local isBandaged = wound.bandaged == true
+            local isSplinted = wound.splinted == true and wound.type == "fracture"
+            local isStitched = wound.stitched == true and (tonumber(wound.bleedingRate) or 0) <= 0
+            local isCauterized = wound.cauterized == true and (tonumber(wound.bleedingRate) or 0) <= 0
+            if isBandaged then bandagedCount = bandagedCount + 1 end
+            if isBandaged or isSplinted or isStitched or isCauterized then
+                patchedCount = patchedCount + 1
+            else
+                openCount = openCount + 1
+                bleedingRate = bleedingRate + math.max(0, tonumber(wound.bleedingRate) or 0)
+            end
         end
     end
     body.bleedingRate = bleedingRate

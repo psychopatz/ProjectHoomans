@@ -38,12 +38,22 @@ function Treatment.IsPlayerInBandageRange(player, npcId)
     return isPlayerInRange(player, record)
 end
 
+local function giveDressing(player, fullType)
+    if not fullType then return end
+    local inventory = player.getInventory and player:getInventory()
+    if not inventory or not inventory.AddItem then return end
+    local recovered = inventory:AddItem(fullType)
+    if recovered and isServer and isServer() and sendAddItemToContainer then
+        sendAddItemToContainer(inventory, recovered)
+    end
+end
+
 function Treatment.TryBandage(player, npcId, partId, options)
     options = type(options) == "table" and options or {}
     local record = npcId and Registry.Get(npcId) or nil
     local item
     local container
-    local applied
+    local applied, returnedItem
     local reason
     local wound
     local socialContext
@@ -68,6 +78,17 @@ function Treatment.TryBandage(player, npcId, partId, options)
         audit(record, "complete", "rejected", "too_far", partId)
         return false, "too_far"
     end
+    if options.remove == true or options.removeSplint == true then
+        local remove = PNC.NPCWounds.RemoveBandage
+        if options.removeSplint == true then remove = PNC.NPCWounds.RemoveSplint end
+        if not remove then return false, "wounds_unavailable" end
+        local removed, why, recovered, fabric = remove(record, partId)
+        if not removed then return false, why end
+        giveDressing(player, recovered)
+        giveDressing(player, fabric)
+        if PNC.Network and PNC.Network.BroadcastRecord then PNC.Network.BroadcastRecord(record, why) end
+        return true, why
+    end
     if options.consumeItem ~= false then
         item, container = Internal.FindBandage(player, options.bandageType)
         if not item then
@@ -89,8 +110,10 @@ function Treatment.TryBandage(player, npcId, partId, options)
             tonumber(wound.damage) or tonumber(wound.severity)
         ) or nil,
     }
-    applied, reason = Treatment.ApplyBandage(record, partId, {
+    applied, reason, returnedItem = Treatment.ApplyBandage(record, partId, {
         bandageType = resolvedType,
+        nativeItem = item,
+        virtualDressing = options.consumeItem == false,
         bandageName = Treatment.GetBandageDisplayName(resolvedType, item),
         firstAidLevel = Treatment.GetPlayerFirstAidLevel(player),
         diagnosticRoute = "player",
@@ -103,6 +126,7 @@ function Treatment.TryBandage(player, npcId, partId, options)
         if sendRemoveItemFromContainer then
             sendRemoveItemFromContainer(container, item)
         end
+        giveDressing(player, returnedItem)
     end
     if PNC.Network and PNC.Network.BroadcastRecord then
         PNC.Network.BroadcastRecord(record, "bandaged")

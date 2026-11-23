@@ -14,6 +14,16 @@ local function audit(record, eventName, route, status, reason, actorId,
     end
 end
 
+local function returnDressing(actor, fullType)
+    local inventory = PNC.Inventory
+    if not fullType or not inventory or not inventory.AddItems then return end
+    local ok, _, ids = inventory.AddItems(actor, { { type = fullType, stack = 1 } }, "root", "removed_dressing")
+    if not ok or not ids or not ids[1] then return end
+    local registry = PNC.Registry
+    local body = registry and registry.GetLiveZombie and registry.GetLiveZombie(actor.id)
+    if body and inventory.MaterializeItem then inventory.MaterializeItem(actor, body, ids[1]) end
+end
+
 function Treatment.TryNPCMedicalTreatment(actorRecord, targetRecord,
     partId, options)
     local policy
@@ -64,8 +74,10 @@ function Treatment.TryNPCMedicalTreatment(actorRecord, targetRecord,
         end
     end
     firstAid = Treatment.GetNPCFirstAidLevel(actorRecord)
-    applied, reason = Treatment.ApplyBandage(targetRecord, partId, {
+    local returnedItem
+    applied, reason, returnedItem = Treatment.ApplyBandage(targetRecord, partId, {
         bandageType = supply and supply.fullType or policy.bandageType,
+        virtualDressing = not policy.requiresItem,
         bandageName = supply and supply.displayName or policy.bandageName,
         firstAidLevel = firstAid,
         diagnosticRoute = route,
@@ -83,6 +95,7 @@ function Treatment.TryNPCMedicalTreatment(actorRecord, targetRecord,
             policy.mode, firstAid)
         return false, reason
     end
+    if policy.requiresItem then returnDressing(actorRecord, returnedItem) end
     if Skills and Skills.AddXP then
         Skills.AddXP(actorRecord, "FirstAid", 1)
     end
@@ -97,6 +110,60 @@ function Treatment.TryNPCMedicalTreatment(actorRecord, targetRecord,
         supply and supply.fullType or policy.bandageType,
         policy.mode, firstAid)
     return true, resultLabel
+end
+
+local Dressing = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Dressing"
+
+function Treatment.GetNPCSplintPlan(record, partId)
+    local body = record and record.health and record.health.body
+    local wound = body and body.wounds and body.wounds[partId]
+    if not wound or wound.type ~= "fracture" or wound.splinted or wound.stitched
+        or partId == "Head" or partId == "Torso_Upper" or partId == "Torso_Lower" then return nil end
+    local support, fabric
+    for _, item in pairs(record.inventory and record.inventory.items or {}) do
+        if item.id and (tonumber(item.stack) or 1) > 0 then
+            if item.type == "Base.Splint" then
+                return { itemID = item.id, fullType = item.type, displayName = Internal.BandageDisplayName(item.type) }
+            elseif item.type == "Base.RippedSheets" then
+                fabric = item.id
+            elseif Dressing.IsSplintSupport(item.type) then
+                support = item
+            end
+        end
+    end
+    if support and fabric then
+        return {
+            itemID = support.id, fullType = support.type, fabricID = fabric,
+            displayName = Internal.BandageDisplayName(support.type),
+        }
+    end
+end
+
+function Treatment.TryNPCSplint(record, partId)
+    if not Internal.IsAuthority() or not record or record.alive == false then return false, "invalid_actor" end
+    local plan = Treatment.GetNPCSplintPlan(record, partId)
+    if not plan then return false, "missing_splint" end
+    local ok, undoSupport = Internal.ConsumeNPCBandage(record, plan, "npc_splint_support", "SPLINT")
+    if not ok then return false, "splint_consumption_failed" end
+    local undoFabric
+    if plan.fabricID then
+        ok, undoFabric = Internal.ConsumeNPCBandage(record, { itemID = plan.fabricID }, "npc_splint_fabric", "SPLINT")
+        if not ok then
+            if undoSupport then undoSupport() end
+            return false, "splint_consumption_failed"
+        end
+    end
+    local applied, reason = PNC.NPCWounds.Splint(record, partId, PNC.Core.Now(), {
+        firstAidLevel = Treatment.GetNPCFirstAidLevel(record), splintItem = plan.fullType,
+        splintType = not plan.fabricID and plan.fullType or nil,
+    })
+    if not applied then
+        if undoFabric then undoFabric() end
+        if undoSupport then undoSupport() end
+        return false, reason
+    end
+    if PNC.Network and PNC.Network.BroadcastRecord then PNC.Network.BroadcastRecord(record, "splinted") end
+    return true, reason
 end
 
 function Treatment.TryNPCBandage(record, partId, options)

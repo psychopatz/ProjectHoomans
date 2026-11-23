@@ -6,6 +6,39 @@ local Wounds = PNC.NPCWounds
 local Internal = Wounds.Internal
 local Core = PNC.Core
 local Const = PNC.Const
+local Dressing = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Dressing"
+
+local function healWound(record, body, partId, wound, amount)
+    local damage = math.max(0, tonumber(wound.damage) or tonumber(wound.severity) or 0)
+    local healed = math.min(damage, amount)
+    if healed > 0 then
+        Wounds.ApplyBodyHealing(record, healed, partId)
+        wound.damage = damage - healed
+        wound.severity = math.max(0, (tonumber(wound.severity) or damage) - healed)
+    end
+    if damage - healed > 0.001 then return healed end
+    if (wound.dressingLifeTracked and not wound.virtualDressing) or wound.splintItem then
+        wound.dressingHealed = true
+        wound.bleedingRate = 0
+        wound.woundInfectionLevel, wound.infectedWound = 0, false
+    else
+        body.wounds[partId] = nil
+    end
+    Internal.EmitWoundStateChange(record, partId, "wound_healed", wound)
+    return healed
+end
+
+local function updateFracture(record, body, partId, wound, currentHour)
+    if wound.type ~= "fracture" or wound.dressingHealed then return false end
+    local elapsed = math.max(0, currentHour - (tonumber(wound.lastFractureHealHour) or currentHour))
+    wound.lastFractureHealHour = currentHour
+    if elapsed == 0 then return false end
+    local multiplier = Dressing.NativeMultiplierPerWorldHour() or 3600
+    local factor = wound.splinted and (tonumber(wound.splintFactor) or 0) or 0
+    local rate = (factor > 0 and 0.00005 * factor or 0.000005) * multiplier
+    healWound(record, body, partId, wound, elapsed * rate)
+    return true
+end
 
 local function updateBandagedWound(record, body, partId, wound, currentHour)
     local changed = false
@@ -14,41 +47,31 @@ local function updateBandagedWound(record, body, partId, wound, currentHour)
         wound.bandageInitialDamage = math.max(0, (tonumber(wound.damage) or tonumber(wound.severity) or 0) + (tonumber(wound.bandageHealedPoints) or 0))
         changed = true
     end
-    if (tonumber(wound.lastHealWorldHour) or 0) <= 0 then
+    if not wound.dressingLifeTracked and (tonumber(wound.lastHealWorldHour) or 0) <= 0 then
         wound.lastHealWorldHour = currentHour
         wound.bandageAppliedWorldHour = currentHour
         wound.dirtyAtWorldHour = currentHour + (tonumber(Const.BANDAGE_DIRTY_AFTER_WORLD_HOURS) or 8)
         wound.healAtWorldHour = 0
         changed = true
     end
-    if wound.bandageDirty == true then return changed end
+    if wound.dressingHealed == true then return changed end
+    if wound.bandageDirty == true and not wound.dressingLifeTracked then return changed end
     local lastHealHour = tonumber(wound.lastHealWorldHour) or currentHour
     local dirtyAtHour = tonumber(wound.dirtyAtWorldHour) or math.huge
-    local healUntilHour = math.min(currentHour, dirtyAtHour)
+    local healUntilHour = wound.dressingLifeTracked and currentHour or math.min(currentHour, dirtyAtHour)
     local healElapsed = math.max(0, healUntilHour - lastHealHour)
-    if healElapsed > 0 then
-        local baseRate = ((tonumber(Const.BANDAGE_HEAL_PER_WORLD_HOUR) or 1.5)
-            + (tonumber(wound.firstAidLevel) or 0) * (tonumber(Const.BANDAGE_FIRST_AID_HEAL_BONUS) or 0.25))
-            * Internal.GetBandageQuality(wound.bandageType)
+    if healElapsed > 0 and wound.type ~= "fracture" then
+        local baseRate = tonumber(Const.BANDAGE_HEAL_PER_WORLD_HOUR) or 1.5
         local infPenalty = math.max(0.35, 1 - (tonumber(wound.woundInfectionLevel) or 0) * 0.06)
         local healRate = math.max(0.01, (tonumber(wound.healRatePerWorldHour) or baseRate) * infPenalty)
-        local remainingDamage = math.max(0, tonumber(wound.damage) or tonumber(wound.severity) or 0)
-        local healAmount = math.min(remainingDamage, healElapsed * healRate)
         wound.lastHealWorldHour = healUntilHour
-        if healAmount > 0 then
-            Wounds.ApplyBodyHealing(record, healAmount, partId)
-            wound.damage = math.max(0, remainingDamage - healAmount)
-            wound.severity = math.max(0, (tonumber(wound.severity) or remainingDamage) - healAmount)
-            wound.bandageHealedPoints = math.max(0, tonumber(wound.bandageHealedPoints) or 0) + healAmount
-            changed = true
-        end
-        if (tonumber(wound.damage) or 0) <= 0.001 then
-            body.wounds[partId] = nil
-            Internal.EmitWoundStateChange(record, partId, "wound_healed", wound)
-        end
+        local healed = healWound(record, body, partId, wound, healElapsed * healRate)
+        wound.bandageHealedPoints = math.max(0, tonumber(wound.bandageHealedPoints) or 0) + healed
+        changed = true
     end
-    if body.wounds[partId] and currentHour >= dirtyAtHour then
+    if body.wounds[partId] and not wound.bandageDirty and currentHour >= dirtyAtHour then
         wound.bandageDirty = true
+        wound.bandageLife = 0
         wound.lastHealWorldHour = currentHour
         changed = true
         Internal.EmitWoundStateChange(record, partId, "bandage_dirty", wound)
@@ -97,9 +120,10 @@ function Wounds.Update(record, zombie, now)
     end
     local totalOrdInf = 0
     for partId, wound in pairs(body.wounds) do
-        if Internal.UpdateOrdinaryWoundInfection(record, partId, wound, currentHour) then changed = true end
+        if not wound.dressingHealed and Internal.UpdateOrdinaryWoundInfection(record, partId, wound, currentHour) then changed = true end
         if wound.bandaged == true and updateBandagedWound(record, body, partId, wound, currentHour) then changed = true end
-        if body.wounds[partId] then totalOrdInf = totalOrdInf + (tonumber(wound.woundInfectionLevel) or 0) end
+        if body.wounds[partId] and updateFracture(record, body, partId, wound, currentHour) then changed = true end
+        if body.wounds[partId] and not wound.dressingHealed then totalOrdInf = totalOrdInf + (tonumber(wound.woundInfectionLevel) or 0) end
     end
     if Wounds.WholeBody and Wounds.WholeBody.SetSeverity then
         local sev = totalOrdInf >= 2.0 and Core.Clamp(totalOrdInf / 20.0, 0, 1) or 0

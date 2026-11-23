@@ -49,7 +49,10 @@ local function computeProjection(record, prefPart, prefType, recalculate)
         and (sw.knoxExposure == "impossible" and "bite_non_transmissible" or (sw.knoxExposure == "confirmed" and "bite_confirmed_symptomatic" or "bite_possible_exposure"))
         or rType
     local pDef = Wounds.Parts and Wounds.Parts[bestPart] or nil
-    local total = 0; for _ in pairs(body.wounds or {}) do total = total + 1 end
+    local total = 0
+    for _, wound in pairs(body.wounds or {}) do
+        if not wound.dressingHealed then total = total + 1 end
+    end
     local wbPatch = not injured and "uninjured" or ((openCount > 0 or bleeding or f.dirty) and "with_wounds" or "patched_up")
     local wbTreat = Dims.ResolveTreatmentState(body.wounds)
     local effSev = sw.physicalSeverity ~= "none" and sw.physicalSeverity or physSev

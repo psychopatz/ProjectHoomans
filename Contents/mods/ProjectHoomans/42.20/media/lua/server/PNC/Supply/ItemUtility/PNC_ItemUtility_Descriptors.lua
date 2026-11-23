@@ -256,6 +256,11 @@ function Utility.Supports(descriptor, request)
             and descriptor.fluidSafe ~= false
     end
     if request.resourceKind == "MEDICAL" then
+        if request.treatment == "SPLINT" then
+            local dressing = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Dressing"
+            return descriptor.fullType == "Base.Splint" or descriptor.fullType == "Base.RippedSheets"
+                or dressing.IsSplintSupport(descriptor.fullType)
+        end
         return request.treatment == "BANDAGE" and descriptor.bandage == true
     end
     return false

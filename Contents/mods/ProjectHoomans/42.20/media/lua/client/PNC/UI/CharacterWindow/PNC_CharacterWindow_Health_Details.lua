@@ -35,6 +35,23 @@ local function overallStatus(current, maximum, incapacitated)
     return Shared.Text("IGUI_health_Crital_damage", "Critical damage")
 end
 
+local Dressing = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Dressing"
+local dressingIcons = {}
+
+local function drawDressing(view, label, itemType, x, y, r, g)
+    local texture = itemType and dressingIcons[itemType]
+    if texture == nil and itemType and itemType ~= "PNC.AbstractMedical" and instanceItem then
+        local item = instanceItem(itemType)
+        texture = item and item.getTex and item:getTex() or false
+        dressingIcons[itemType] = texture
+    end
+    if texture and view.drawTextureScaled then
+        view:drawTextureScaled(texture, x, y, 14, 14, 1, 1, 1, 1)
+        x = x + 17
+    end
+    view:drawText("- " .. label, x, y, r, g, 0.28, 1, UIFont.Small)
+end
+
 local function activityPartLabel(partId)
     partId = tostring(partId or "")
     if partId == "" then return nil end
@@ -50,7 +67,8 @@ local function renderMedicalActivity(view, x, y, width, fontHeight, snapshot, pa
     if activity.source == "medical" and activity.patientId then
         detail = detail .. " | Patient: " .. tostring(activity.patientId)
     elseif activity.bandageName then
-        detail = detail .. " | Bandage: " .. tostring(activity.bandageName)
+        local supplyLabel = activity.useSplint and "" or "Bandage: "
+        detail = detail .. " | " .. supplyLabel .. tostring(activity.bandageName)
     end
     if activity.progress ~= nil then detail = detail .. string.format(" | Progress: %.0f%%", activity.progress * 100) end
     if activity.blockedReason then
@@ -170,10 +188,26 @@ local function renderWoundRows(view, x, y, width, fontHeight, rows, body, debugA
         local localizedPart = Shared.Text(BODY_PART_TEXT[row.partId], row.label)
         view:drawText(PsychopatzCore.UI.Layout.Ellipsize(localizedPart, UIFont.Small, width), x, y, 1, 1, 1, 1, UIFont.Small)
         y = y + fontHeight
+        if wound.splinted == true then
+            local itemType = wound.splintType or wound.splintItem
+            local itemName = itemType and PNC.Treatment and PNC.Treatment.GetBandageDisplayName
+                and PNC.Treatment.GetBandageDisplayName(itemType)
+            local label = Shared.Text("IGUI_health_Splinted", "Splinted")
+            drawDressing(view, itemName and (label .. " - " .. itemName) or label,
+                itemType, x + 15, y, 0.28, 0.89)
+            y = y + fontHeight
+        end
         if wound.bandaged == true then
-            local bandageLabel = tostring(wound.bandageName or wound.bandageType or Shared.Text("IGUI_health_Bandaged", "Bandaged"))
-            local prefix = wound.bandageDirty == true and Shared.Text("IGUI_health_DirtyBandage", "Dirty Bandage") or Shared.Text("IGUI_health_Bandaged", "Bandaged")
-            view:drawText("- " .. prefix .. " (" .. bandageLabel .. ")", x + 15, y, wound.bandageDirty == true and 0.95 or 0.28, wound.bandageDirty == true and 0.55 or 0.89, 0.28, 1, UIFont.Small)
+            local itemType = (wound.bandageDirty and Dressing.ReturnType(wound)) or wound.bandageType
+            local bandageLabel = itemType and PNC.Treatment and PNC.Treatment.GetBandageDisplayName
+                and PNC.Treatment.GetBandageDisplayName(itemType)
+            local prefix = wound.bandageDirty == true and Shared.Text("IGUI_health_DirtyBandage", "Dirty Bandage")
+                or Shared.Text("IGUI_health_Bandaged", "Bandaged")
+            bandageLabel = bandageLabel or wound.bandageName
+            local label = bandageLabel and (prefix .. " - " .. bandageLabel) or prefix
+            drawDressing(view, label, itemType, x + 15, y, wound.bandageDirty and 0.95 or 0.28,
+                wound.bandageDirty and 0.55 or 0.89)
+            y = y + fontHeight
             if debugAllowed then
                 local nowHour = Health.CurrentWorldHour()
                 local dirtyAt = tonumber(wound.dirtyAtWorldHour) or nowHour
@@ -189,8 +223,10 @@ local function renderWoundRows(view, x, y, width, fontHeight, rows, body, debugA
             end
         else
             view:drawText("- " .. woundLabel(wound), x + 15, y, 0.89, 0.28, 0.28, 1, UIFont.Small)
-            y = y + fontHeight
-            view:drawText("- " .. Shared.Text("IGUI_health_Bleeding", "Bleeding"), x + 15, y, 0.89, 0.28, 0.28, 1, UIFont.Small)
+            if (tonumber(wound.bleedingRate) or 0) > 0 then
+                y = y + fontHeight
+                view:drawText("- " .. Shared.Text("IGUI_health_Bleeding", "Bleeding"), x + 15, y, 0.89, 0.28, 0.28, 1, UIFont.Small)
+            end
             if body.infection and body.infection.sourcePart == row.partId and (body.infection.active == true or body.infection.fatal == true) then
                 y = y + fontHeight
                 view:drawText("- " .. Shared.Text("IGUI_health_Infected", "Infected"), x + 15, y, 1, 0.28, 0, 1, UIFont.Small)
