@@ -1,8 +1,8 @@
 {
   "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "lexeme.combat_injury.leg",
+  "family": "lexeme.combat_injury.thigh",
   "locale": "EN",
   "entries": {
-    "realization.forms": "leg"
+    "realization.forms": "thigh"
   }
 }

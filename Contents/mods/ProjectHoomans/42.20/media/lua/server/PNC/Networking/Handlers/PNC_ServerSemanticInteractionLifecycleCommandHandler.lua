@@ -85,6 +85,9 @@ local function handle(player, args)
     end
     local record = PNC.Registry and PNC.Registry.Get
         and PNC.Registry.Get(npcID) or nil
+    local offerID = text(interaction.offerID, 96)
+    local injuryOffer = string.find(offerID, "^combat%.injury%.observation_") ~= nil
+    local token = text(args.token, 128)
     local authority = PNC.Conversation
         and PNC.Conversation.Authority or nil
     local validateLease = authority and authority.Internal
@@ -95,13 +98,14 @@ local function handle(player, args)
         valid, reason = validateLease(
             player,
             record,
-            text(args.token, 128)
+            token
         )
     else
         valid = false
         reason = "conversation_authority_unavailable"
     end
-    if valid ~= true then
+    local ambientInjuryOffer = injuryOffer and token == "" and record ~= nil
+    if valid ~= true and not ambientInjuryOffer then
         return rejected(requestID, npcID, reason or "invalid_conversation")
     end
     local playerKey = PNC.PlayerCharacters
@@ -140,9 +144,12 @@ local function handle(player, args)
     if not envelope then
         return rejected(requestID, npcID, "interaction_envelope_invalid")
     end
-    local offerID = text(interaction.offerID, 96)
-    if string.find(offerID, "^combat%.injury%.observation_") then
+    if injuryOffer then
         local scene = require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_ObservationScene"
+        if not record or not beat or (ambientInjuryOffer and
+            (text(interaction.offerEventRef, 160) ~= beat.eventRef or not scene.PlayerCanRespond(player, record))) then
+            return rejected(requestID, npcID, "injury_observation_outside_authority")
+        end
         local ok, outcome = scene.Respond(player, playerKey, record, beat, offerID, Core.Now())
         if not ok then return rejected(requestID, npcID, outcome) end
         return { accepted = true, authority = "server", requestID = requestID, npcID = npcID, result = outcome }

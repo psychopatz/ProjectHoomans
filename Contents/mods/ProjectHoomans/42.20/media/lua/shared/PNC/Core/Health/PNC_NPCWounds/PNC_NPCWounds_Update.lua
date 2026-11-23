@@ -114,7 +114,7 @@ function Wounds.Update(record, zombie, now)
     end
     if changed then
         Wounds.Recalculate(record)
-        if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "wound_tick") end
+        if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "wound_tick", true) end
         record.runtime = record.runtime or {}
         record.runtime.forceSyncEvent = record.runtime.forceSyncEvent or "wound_healed"
         if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end

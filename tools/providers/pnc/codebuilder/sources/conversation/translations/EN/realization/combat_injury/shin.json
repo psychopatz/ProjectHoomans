@@ -1,8 +1,8 @@
 {
   "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "lexeme.combat_injury.hip",
+  "family": "lexeme.combat_injury.shin",
   "locale": "EN",
   "entries": {
-    "realization.forms": "hip"
+    "realization.forms": "shin"
   }
 }

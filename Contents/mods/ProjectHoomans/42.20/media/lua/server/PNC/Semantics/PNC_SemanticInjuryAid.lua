@@ -54,6 +54,9 @@ end
 local function inTreatmentRange(helper, injured)
     local helperBody = actorBody(helper)
     local injuredBody = actorBody(injured)
+    local perception = PNC.Perception
+    if helperBody and injuredBody and perception and perception.CanSeeWorldObject
+        and perception.CanSeeWorldObject(helper, injuredBody) ~= true then return false, "no_line_of_sight" end
     local executor = PNC.MedicalCareExecutor
     local executorInternal = executor and executor.Internal or nil
     if executorInternal and type(executorInternal.InTreatmentRange) == "function" then
@@ -264,7 +267,7 @@ local function inspect(helper, injured, options)
         return result
     end
 
-    partID, wound = wounds.FindTreatableWound(injured)
+    partID, wound = wounds.FindTreatableWound(injured, options.partID)
     if not partID or type(wound) ~= "table" then
         result.reason = "no_treatable_wound"
         return result
@@ -404,6 +407,7 @@ function Aid.Execute(helper, injured, offer, options)
     elseif offer.action == "npc_bandage" then
         opts.action = "treat"
     end
+    opts.partID = offer.partID
     if offer.medicalTaskID ~= nil then
         opts.medicalTaskID = offer.medicalTaskID
     end

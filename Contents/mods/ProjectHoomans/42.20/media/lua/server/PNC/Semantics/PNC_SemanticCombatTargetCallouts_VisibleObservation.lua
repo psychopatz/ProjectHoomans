@@ -136,7 +136,8 @@ function S.OnVisibleConditionObserved(obs, inj, now, opts)
         offerIDs = offerIDs, factRefs = { ref }, semanticEventFacts = facts,
         lightweightBark = not interactive, clientCooldowns = OBS_OPTS.clientCooldowns,
         threadID = ref, streamKey = "vis-obs:" .. tostring(obs.id) .. ":" .. tostring(inj.id),
-        eventRef = ref, text = text, presentationClass = res and res.presentationClass or "BARK", context = presentation,
+        eventRef = ref, text = text, presentationClass = interactive and "TACTICAL_PROMPT" or (res and res.presentationClass or "BARK"),
+        context = presentation,
     })
     if (tonumber(sent) or 0) <= 0 then return false, "observation_not_delivered" end
     S.RecordWitnessObservation(obs, inj, prof, now, opts)

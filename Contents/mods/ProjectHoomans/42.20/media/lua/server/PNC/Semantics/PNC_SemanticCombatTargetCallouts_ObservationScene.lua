@@ -13,6 +13,15 @@ function Observation.Bind(observer, injured, ref, partID, now)
     }
 end
 
+function Observation.PlayerCanRespond(player, helper)
+    local registry = PNC.Registry
+    local body = registry and registry.GetLiveZombie and registry.GetLiveZombie(helper.id)
+    if not body or not player or not player.getX or not player.getY or not player.getZ
+        or (player.isDead and player:isDead()) or (body.isDead and body:isDead()) then return false end
+    local dx, dy = player:getX() - body:getX(), player:getY() - body:getY()
+    return math.abs(player:getZ() - body:getZ()) < 1 and dx * dx + dy * dy <= 144
+end
+
 local function hasOffer(beat, offerID)
     for i = 1, math.min(8, #(beat.offerIDs or {})) do
         if beat.offerIDs[i] == offerID then return true end
@@ -55,6 +64,7 @@ local function sendOutcome(helper, player, binding, role, node, now, inspection)
         realizationID = res and res.realizationID or "semantic.combat.injury.visible_observation." .. role,
         offerIDs = offerIDs, factRefs = { ref }, recipientKind = "player",
         lightweightBark = not offerPlan, observerOnly = not offerPlan,
+        presentationClass = offerPlan and "TACTICAL_PROMPT" or "BARK",
         audienceFilter = function(candidate) return candidate == player end,
         context = {
             eventType = "combat_injury_visible_observation", eventRef = ref,
@@ -158,7 +168,7 @@ function Observation.Respond(player, playerID, helper, beat, offerID, now)
         elseif branch == "observation_no_dressing" or branch == "observation_help" then
             local action = branch == "observation_no_dressing" and "transfer_bandage" or "treat"
             local admitted, _
-            admitted, _, inspection = Aid.Offer(helper, injured, { action = action })
+            admitted, _, inspection = Aid.Offer(helper, injured, { action = action, partID = binding.partID })
             if admitted and tostring(admitted.partID) == tostring(binding.partID) then
                 binding.aid = admitted
                 nextNode = Offers.SUPPLY_NODE

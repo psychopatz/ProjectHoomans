@@ -1,7 +1,7 @@
 {
   "schema": "psychopatz.convo-engine.v1",
-  "id": "lexeme.combat_injury.hip",
+  "id": "lexeme.combat_injury.groin",
   "owner": "ProjectHoomans",
   "type": "lexeme",
-  "concept": "COMBAT_INJURY_HIP"
+  "concept": "COMBAT_INJURY_GROIN"
 }

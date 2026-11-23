@@ -5,9 +5,11 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 local UtterancePlan = require "PNC/ConvoEngine/UtterancePlan"
 local Composition = {}
 
-local REGION_LEXEMES = {
-    lower_limb = "COMBAT_INJURY_LEG",
-    pelvis_groin = "COMBAT_INJURY_HIP",
+local BODY_PART_LEXEMES = {
+    UpperLeg_L = "COMBAT_INJURY_THIGH", UpperLeg_R = "COMBAT_INJURY_THIGH",
+    LowerLeg_L = "COMBAT_INJURY_SHIN", LowerLeg_R = "COMBAT_INJURY_SHIN",
+    Foot_L = "COMBAT_INJURY_FOOT", Foot_R = "COMBAT_INJURY_FOOT",
+    Groin = "COMBAT_INJURY_GROIN",
 }
 
 function Composition.Realize(profile, opts)
@@ -16,7 +18,7 @@ function Composition.Realize(profile, opts)
         or (wound.functionalImpairment ~= "limb_mobility" and wound.functionalImpairment ~= "pelvic_mobility") then
         return nil
     end
-    local lexeme = REGION_LEXEMES[wound.bodyRegion]
+    local lexeme = BODY_PART_LEXEMES[wound.bodyPart]
     if not lexeme or not wound.bodyPart then return nil end
 
     local referent = { id = wound.bodyPart, kind = "WOUND" }

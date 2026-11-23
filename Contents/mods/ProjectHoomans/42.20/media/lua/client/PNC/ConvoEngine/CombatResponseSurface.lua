@@ -163,15 +163,15 @@ local function buildTransientView(receive, lifecycle)
     context.playerUUID = context.playerUUID or uuid
     context.characterUUID = context.characterUUID or uuid
     context.interactionLifecycle = lifecycle
-    context.currentTopic = "combat"
-    context.actorAuthority = context.actorAuthority or {
-        owned = true,
-        companion = true,
-    }
+    local injuryPrompt = lifecycle.activeBeat.flowID == "combat.injury.triage_exchange"
+    context.currentTopic = injuryPrompt and "combat_injury" or "combat"
+    if not injuryPrompt then
+        context.actorAuthority = context.actorAuthority or { owned = true, companion = true }
+    end
     context.npcState = context.npcState
         or type(snapshot) == "table" and snapshot
         or { activeBehavior = "FollowOwner" }
-    context.combatTacticalPrompt = true
+    context.combatTacticalPrompt = not injuryPrompt
     context.presentationClass = "TACTICAL_PROMPT"
 
     local session = {

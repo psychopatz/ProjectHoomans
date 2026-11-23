@@ -11,26 +11,35 @@ function Internal.GetBandageQuality(fullType)
         or Internal.BandageQuality["Base.RippedSheets"]
 end
 
+local function isTreatable(wound)
+    return wound and not (wound.type == "fracture" and wound.splinted == true and wound.bandaged == true)
+        and ((wound.bandaged ~= true and not (wound.type == "fracture" and wound.splinted == true))
+            or wound.bandageDirty == true)
+end
+
 function Wounds.GetTreatableWounds(record)
     local body = Wounds.Ensure(record)
     local output = {}
     for i = 1, #Wounds.PartOrder do
         local partId = Wounds.PartOrder[i]
         local wound = body.wounds[partId]
-        if wound
-            and not (wound.type == "fracture" and wound.splinted == true and wound.bandaged == true)
-            and ((wound.bandaged ~= true and not (wound.type == "fracture" and wound.splinted == true))
-                or wound.bandageDirty == true)
-        then
-            output[#output + 1] = { partId = partId, wound = wound }
-        end
+        if isTreatable(wound) then output[#output + 1] = { partId = partId, wound = wound } end
     end
     return output
 end
 
-function Wounds.FindTreatableWound(record)
-    local wounds = Wounds.GetTreatableWounds(record)
-    return wounds[1] and wounds[1].partId or nil, wounds[1] and wounds[1].wound or nil
+function Wounds.FindTreatableWound(record, preferredPart)
+    local body = Wounds.Ensure(record)
+    if preferredPart then
+        local wound = body.wounds[preferredPart]
+        if isTreatable(wound) then return preferredPart, wound end
+        return nil
+    end
+    for i = 1, #Wounds.PartOrder do
+        local part = Wounds.PartOrder[i]
+        local wound = body.wounds[part]
+        if isTreatable(wound) then return part, wound end
+    end
 end
 
 function Wounds.Bandage(record, partId, now, options)
@@ -62,7 +71,7 @@ function Wounds.Bandage(record, partId, now, options)
     wound.bandageHealedPoints = 0
     wound.healAtWorldHour = 0
     Wounds.Recalculate(record)
-    if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "bandaged") end
+    if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "bandaged", true) end
     if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
     return true, "bandaged"
 end
@@ -81,7 +90,7 @@ function Wounds.Stitch(record, partId, now, options)
         if wound.type == "deep_wound_glass" then wound.type = "deep_wound" end
     end
     Wounds.Recalculate(record)
-    if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "stitched") end
+    if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "stitched", true) end
     if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
     return true, "stitched"
 end
@@ -96,7 +105,7 @@ function Wounds.Splint(record, partId, now, options)
     wound.splintedAt = tonumber(now) or Core.Now()
     wound.splintFactor = math.max(1, tonumber(options.splintFactor) or 2)
     Wounds.Recalculate(record)
-    if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "splinted") end
+    if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "splinted", true) end
     if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
     return true, "splinted"
 end

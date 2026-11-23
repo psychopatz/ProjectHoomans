@@ -6,7 +6,9 @@ isClient = function() return false end
 
 local helper = { id = "medic", alive = true, runtime = {} }
 local injured = { id = "injured", alive = true }
-local player = {}
+local px = 1
+local player = { getX = function() return px end, getY = function() return 0 end, getZ = function() return 0 end }
+local observerBody = { getX = function() return 0 end, getY = function() return 0 end, getZ = function() return 0 end }
 local clock = 1000
 local closed, opened, mutations, memories = 0, 0, 0, 0
 local scene, activeBeat, handler
@@ -17,7 +19,7 @@ PNC = {
     Core = { IsAuthority = function() return true end, Now = function() return clock end },
     Const = { CMD_SEMANTIC_INTERACTION_LIFECYCLE = "semantic_interaction_lifecycle" },
     ServerCommandRouter = { Register = function(_, value) handler = value end },
-    Registry = { Get = function(id) if id == injured.id then return injured end if id == helper.id then return helper end end },
+    Registry = { GetLiveZombie = function() return observerBody end, Get = function(id) if id == injured.id then return injured end if id == helper.id then return helper end end },
     Relationships = { ApplyConversationEffect = function(observer, target, effect)
         T.equal(observer, injured.id)
         T.equal(target, "npc:" .. helper.id)
@@ -81,10 +83,11 @@ local function start()
     }
 end
 
-local function choose(action, token)
+local function choose(action, token, eventRef)
     return handler(player, {
         requestID = "a-turn-" .. tostring(clock), npcID = helper.id, token = token or "approved",
-        interaction = { act = "INFORM", topic = "combat_injury", offerID = "combat.injury." .. action },
+        interaction = { act = "INFORM", topic = "combat_injury", offerID = "combat.injury." .. action,
+            offerEventRef = eventRef or (activeBeat and activeBeat.eventRef) },
     })
 end
 
@@ -117,3 +120,10 @@ T.equal(lastRole, "aid_no_supply")
 T.equal(mutations, 1, "missing inventory never dispatches a transfer")
 T.equal(closed, 2)
 T.equal(memories, 1, "ordinary no-supply response has no durable memory")
+
+clock, px = 1600, 13
+start()
+T.equal(choose("observation_known", "").accepted, false, "ambient replies validate current player distance")
+px = 1
+T.equal(choose("observation_known", "", "other-beat").accepted, false, "ambient reply must name its own current Beat")
+T.equal(choose("observation_known", "").accepted, true, "a nearby player can answer the server-admitted ambient Beat")

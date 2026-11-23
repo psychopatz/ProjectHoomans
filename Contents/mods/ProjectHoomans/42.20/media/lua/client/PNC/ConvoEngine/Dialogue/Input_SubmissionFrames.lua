@@ -34,6 +34,7 @@ function Input.SubmitSemanticFrame(view, frame, options)
         local envelope = Internal.RecordSemanticChoiceEnvelope(view, frame)
         if not envelope then return false, "injury_observation_envelope_unavailable" end
         envelope.offerID = offerID
+        envelope.offerEventRef = frame.eventRef or (frame.origin and frame.origin.eventRef)
         return Internal.submitLifecycleEnvelope(view, { interaction = envelope })
     end
 

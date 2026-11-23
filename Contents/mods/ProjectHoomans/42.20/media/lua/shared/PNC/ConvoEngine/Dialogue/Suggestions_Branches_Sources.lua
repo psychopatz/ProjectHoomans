@@ -178,7 +178,8 @@ local function offersFromLifecycle(context)
     local catalog = responseCatalog()
     local offers = catalog and catalog.OffersForSelection(planID, realizationID) or {}
     if beat.flowID == "combat.injury.triage_exchange" then
-        local projected = require("PNC/ConvoEngine/Dialogue/InjuryTriageOffers").ForPlan(planID)
+        local triage = require "PNC/ConvoEngine/Dialogue/InjuryTriageOffers"
+        local projected = triage.ForPlan(planID)
         if #projected > 0 then offers = projected end
     end
     local output = {}

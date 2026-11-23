@@ -3,19 +3,25 @@ local Dims = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_ProjectionDime
 local SelectedTruth = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_SelectedWoundTruth"
 local Wounds = PNC.NPCWounds
 
-function Wounds.InvalidateProjection(record, reason)
+function Wounds.InvalidateProjection(record, reason, summariesCurrent)
     if type(record) ~= "table" then return end
     local rt = type(record.runtime) == "table" and record.runtime or {}
     record.runtime = rt
     rt.healthProjectionDirty = true
+    rt.woundSummariesCurrent = summariesCurrent == true
     rt.healthProjectionDirtyReason = tostring(reason or "mutated")
     rt.healthProjectionRev = (tonumber(rt.healthProjectionRev) or 0) + 1
     rt.injuryRevision = rt.healthProjectionRev
 end
 
-local function computeProjection(record, prefPart, prefType)
-    local body = type(Wounds.Recalculate) == "function" and Wounds.Recalculate(record) or (record.health and record.health.body) or {}
+local function computeProjection(record, prefPart, prefType, recalculate)
     local health = type(record.health) == "table" and record.health or {}
+    local body = health.body
+    if (recalculate or not body) and type(Wounds.Recalculate) == "function" then
+        body = Wounds.Recalculate(record)
+        health = record.health or health
+    end
+    body = body or {}
     local openCount, bandagedCount = tonumber(body.openWoundCount) or 0, tonumber(body.bandagedWoundCount) or 0
     local patchedCount, bleedingRate = tonumber(body.patchedWoundCount) or bandagedCount, tonumber(body.bleedingRate) or 0
     local bleeding = bleedingRate > 0 or openCount > 0 or health.bleeding == true
@@ -76,14 +82,19 @@ end
 
 function Wounds.GetOrBuildProjection(record, opts)
     if type(record) ~= "table" or record.alive == false then return nil end
-    opts = type(opts) == "table" and opts or {}
-    local rt = type(record.runtime) == "table" and record.runtime or {}
-    record.runtime = rt
-    if opts.force ~= true and not opts.preferredPartId and not opts.preferredWoundType and rt.healthProjection and rt.healthProjectionDirty ~= true then
+    if type(opts) ~= "table" then opts = nil end
+    local rt = record.runtime
+    if type(rt) ~= "table" then rt = {}; record.runtime = rt end
+    local preferredPart = opts and opts.preferredPartId
+    local preferredType = opts and opts.preferredWoundType
+    local force = opts and opts.force == true
+    local useDefault = not preferredPart and not preferredType
+    if not force and useDefault and rt.healthProjection and rt.healthProjectionDirty ~= true then
         return rt.healthProjection
     end
-    local proj = computeProjection(record, opts.preferredPartId, opts.preferredWoundType)
-    if not opts.preferredPartId and not opts.preferredWoundType then rt.healthProjection = proj; rt.healthProjectionDirty = false end
+    local proj = computeProjection(record, preferredPart, preferredType, force or not rt.woundSummariesCurrent)
+    rt.woundSummariesCurrent = true
+    if useDefault then rt.healthProjection = proj; rt.healthProjectionDirty = false end
     return proj
 end
 

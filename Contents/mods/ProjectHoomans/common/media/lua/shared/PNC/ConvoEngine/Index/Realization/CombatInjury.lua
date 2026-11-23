@@ -72,22 +72,40 @@ return {
         ["kind"] = "realization",
         ["source"] = "realization/combat_injury/mobility_reference.json",
     },
-    ["lexeme.combat_injury.hip"] = {
+    ["lexeme.combat_injury.foot"] = {
         ["domain"] = "combat_injury",
         ["generated"] = {
             "PNC/ConvoEngine/Realization/CombatInjury",
         },
-        ["id"] = "lexeme.combat_injury.hip",
+        ["id"] = "lexeme.combat_injury.foot",
         ["kind"] = "realization",
-        ["source"] = "realization/combat_injury/hip.json",
+        ["source"] = "realization/combat_injury/foot.json",
     },
-    ["lexeme.combat_injury.leg"] = {
+    ["lexeme.combat_injury.groin"] = {
         ["domain"] = "combat_injury",
         ["generated"] = {
             "PNC/ConvoEngine/Realization/CombatInjury",
         },
-        ["id"] = "lexeme.combat_injury.leg",
+        ["id"] = "lexeme.combat_injury.groin",
         ["kind"] = "realization",
-        ["source"] = "realization/combat_injury/leg.json",
+        ["source"] = "realization/combat_injury/groin.json",
+    },
+    ["lexeme.combat_injury.shin"] = {
+        ["domain"] = "combat_injury",
+        ["generated"] = {
+            "PNC/ConvoEngine/Realization/CombatInjury",
+        },
+        ["id"] = "lexeme.combat_injury.shin",
+        ["kind"] = "realization",
+        ["source"] = "realization/combat_injury/shin.json",
+    },
+    ["lexeme.combat_injury.thigh"] = {
+        ["domain"] = "combat_injury",
+        ["generated"] = {
+            "PNC/ConvoEngine/Realization/CombatInjury",
+        },
+        ["id"] = "lexeme.combat_injury.thigh",
+        ["kind"] = "realization",
+        ["source"] = "realization/combat_injury/thigh.json",
     },
 }

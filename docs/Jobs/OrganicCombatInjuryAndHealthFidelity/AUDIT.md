@@ -44,3 +44,11 @@ User runtime evidence exposed developer-side gaps after the original H10 closure
 8. **Interaction opportunity:** existing Beat->responsePlan->Scene infrastructure is suitable for no-bandage/offer-bandage/refuse/help branches, but must use real inventory/capability constraints and authoritative transfer/treatment actions.
 
 The repair should preserve the successful H0–H10 health/physiology foundation and reopen only the owning layers above.
+
+## H10R8 regression and scale evidence
+
+- The final 1,109-test Lua run had 1,103 passes. The six failing tests also failed on the pre-repair H10R2 checkpoint under the same harness. They cover animation/debug routing, context debug, population director, combat presentation classes, general dialogue-flow identity, and the custom translation manager.
+- The semantic Beat, combat-awareness, and social/wellbeing suites passed 10 cases. The general wellbeing-wording suite passed six and returned the same two EN/TL default-vs-injured wording failures on both the pre-repair checkpoint and the repaired tree. The selected-wound EN/TL microplanning suite passed.
+- Twelve provider sweep acceptance/anti-duplication tests and ten Core truth/quality tests passed. The 64-case EN/TL pairwise Quality Sweep completed with 64 clean evidence rows. CodeBuilder checked clean against an isolated snapshot of committed DynamicTrading sources.
+- Production Lua files changed since the reopen checkpoint passed scoped Kahlua checks. The repository-wide scan still identifies two existing findings in `Catalog_Register.lua` and `PNC_StutterTrace.lua`.
+- Three interleaved runs against H9 `15b4316e` measured current versus H9 medians of 23.04 versus 26.09 ms for the 200-NPC clean projection workload, 210.19 versus 236.32 ms for 1,600 wound mutations and projections, and 11.43 versus 11.23 ms for post-burst cached reads and physiology. The current event-heavy workload also exercised 200 random debug injuries, wound and treatment transitions, eight bounded observer candidates, exceptional two-observer arbitration, and 200 production Scene openings and closures. The witnessed-debug segment took 73.31 ms median. The Scene segment took 87.32 ms median.

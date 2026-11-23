@@ -63,7 +63,7 @@ function Internal.AddWound(record, part, woundType, now, woundDamage, options)
         end
     end
     Wounds.Recalculate(record)
-    if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "wound_added") end
+    if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "wound_added", true) end
     if Internal.Events and Internal.EventTypes then
         Internal.Events.emit(Internal.EventTypes.NPC_WOUNDED, record, part.id, wound.type, severityDamage)
     end

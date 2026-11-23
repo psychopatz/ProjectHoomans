@@ -37,6 +37,9 @@ local function aidTransferInRange(donor, patient)
         and Registry.GetLiveZombie(donor.id) or nil
     local patientBody = Registry and Registry.GetLiveZombie
         and Registry.GetLiveZombie(patient.id) or nil
+    local perception = PNC.Perception
+    if donorBody and patientBody and perception and perception.CanSeeWorldObject
+        and perception.CanSeeWorldObject(donor, patientBody) ~= true then return false end
     if medicalInternal and type(medicalInternal.Position) == "function"
         and type(medicalInternal.InTreatmentRange) == "function"
     then
