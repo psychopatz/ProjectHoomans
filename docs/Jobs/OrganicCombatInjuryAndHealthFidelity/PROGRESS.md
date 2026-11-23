@@ -3,7 +3,7 @@
 **Primary Repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` (`main`)
 **Baseline Commit:** `4522d6e952708bf3ccb013ce620ad9d698a60cb1`
 **Reopened From:** H11 user live acceptance after contradictory runtime evidence on 2026-11-23
-**Active Phase:** `H10R3` — Witness Observation Gating + Non-Colonist Injury Awareness
+**Active Phase:** `H10R4` — Core Semantic Microplanning
 **Parent Status:** `REOPENED_DEVELOPER_WORK_REQUIRED`; H11 deferred until H10R1–H10R8 pass.
 
 ## Phase Status
@@ -13,13 +13,21 @@
 | `H0`–`H10` | Original Build 42 wound/physiology/dialogue implementation | `BASELINE_ACCEPTED_THEN_REOPENED_BY_LIVE_EVIDENCE` | through `76b7a83b4` |
 | `H10R1` | Selected-Wound Truth Projection + Debug/Production Event Parity | `DONE` | `041d905217` |
 | `H10R2` | Immediate Pain-Reaction Beat + Escalation/Cooldown Policy | `DONE` | H10R2 phase commit |
-| `H10R3` | Witness Observation Gating + Non-Colonist Injury Awareness | `ACTIVE` | pending |
-| `H10R4` | Core Semantic Microplanning: Modifiers, Clause Relations, Discourse Focus | `PENDING` | pending |
+| `H10R3` | Witness Observation Gating + Non-Colonist Injury Awareness | `DONE` | H10R3 phase commit |
+| `H10R4` | Core Semantic Microplanning: Modifiers, Clause Relations, Discourse Focus | `ACTIVE` | pending |
 | `H10R5` | Interactive Injury Observation/Triage Scenes + Item-Aware Aid | `PENDING` | pending |
 | `H10R6` | Relationship/Disposition/Inventory Outcome Policy + Action Contracts | `PENDING` | pending |
 | `H10R7` | Semantic-Truth Quality Sweep + Negative-Claim Guards | `PENDING` | pending |
 | `H10R8` | EN/TL Variety, MP/Save/Scale/Performance Regression + Closure | `PENDING` | pending |
 | `H11` | User Live SP/MP Acceptance | `DEFERRED` | resumes after H10R1–H10R8 |
+
+## Completed in H10R3
+
+- Immediate hit witnesses use a bounded nearby roster, same-floor geometry, and LOS to the live NPC body. The solo pain Beat no longer performs a squad query.
+- A live actor crossing a spatial cell can notice an existing visible injury in a nearby survivor from any faction. Discovery uses at most four nearby candidates per crossing and emits at most one observation per crossing.
+- A transient per-observer cache keeps up to 12 target signatures for the current world day. Delivery commits the observation. Unchanged repeats stay quiet, and new wounds, worsening symptoms, and changes in visible treatment reopen eligibility.
+- Visible-condition EN/TL wording distinguishes heavy bleeding, dirty bandages, mobility loss, visible bite marks, and tentative infection. Medical skill can influence triage wording. Inspection or disclosure is required for stronger diagnosis.
+- Six focused Lua smokes passed, including the production scale and MP server-file guards. Owner-scoped generation reconciled cleanly using an isolated committed DynamicTrading snapshot. The broad Lua run still reported the six known debug, presentation, dialogue, population, and translation smoke failures. The wound-heavy performance comparison remains an H10R8 gate.
 
 ## Completed in H10R2
 

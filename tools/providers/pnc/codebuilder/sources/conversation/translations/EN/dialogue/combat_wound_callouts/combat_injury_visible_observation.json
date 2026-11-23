@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.injury.visible_observation",
+  "locale": "EN",
+  "entries": {
+    "say.variants.open_wound": [
+      "You've got an open wound on your {slot.wound.part}, {addressee.name}. You should get that covered.",
+      "Hey {addressee.name}, your {slot.wound.part} is cut open. Wrap it before it gets worse."
+    ],
+    "say.variants.heavy_bleeding": [
+      "You're bleeding hard from your {slot.wound.part}, {addressee.name}! Patch it up right now!",
+      "{addressee.name}, blood's pouring from your {slot.wound.part}! Get a bandage on that!"
+    ],
+    "say.variants.dirty_bandage": [
+      "That bandage on your {slot.wound.part} looks filthy, {addressee.name}. Change it when you can.",
+      "The wrap on your {slot.wound.part} looks dirty, {addressee.name}."
+    ],
+    "say.variants.suspected_infection": [
+      "That wound on your {slot.wound.part} might be infected, {addressee.name}.",
+      "Something doesn't look right with that wound, {addressee.name}. You should have it checked."
+    ],
+    "say.variants.medic_infection_assessment": [
+      "Hold still, {addressee.name}. That wound on your {slot.wound.part} is inflamed, we need to disinfect and dress it.",
+      "Let me look at your {slot.wound.part}, {addressee.name}. The edges look infected, it needs proper cleaning."
+    ],
+    "say.variants.medic_triage_offer": [
+      "Hold still, {addressee.name}. Let me see that {slot.wound.part}.",
+      "Sit down a second, {addressee.name}, so I can check that wound."
+    ],
+    "say.variants.limp_mobility": [
+      "You're favoring your {slot.wound.part} and limping, {addressee.name}. Don't push your stride too hard.",
+      "{addressee.name}, that injury on your {slot.wound.part} is slowing your step. Watch your footing."
+    ],
+    "say.variants.multiple_wounds_escalation": [
+      "You got hit again on your {slot.wound.part}, {addressee.name}! You're taking too many wounds!",
+      "{addressee.name}, another wound on your {slot.wound.part}! You're banged up all over, get patched up!"
+    ],
+    "say.variants.new_wound_noticed": [
+      "Wait, {addressee.name}, you took a new hit on your {slot.wound.part} too?",
+      "You're hurt on your {slot.wound.part} now as well, {addressee.name}. Let's get that treated."
+    ],
+    "say.variants.visible_bite": [
+      "Wait... is that a bite mark on your {slot.wound.part}, {addressee.name}?",
+      "{addressee.name}, those look like teeth marks on your {slot.wound.part}. Keep back a second!"
+    ],
+    "say.variants.feverish_weak": [
+      "You look feverish, {addressee.name}. Can you sit for a minute?",
+      "{addressee.name}, you look like you're running a fever. Sit down a second."
+    ],
+    "say.variants.default": [
+      "You're hurt on your {slot.wound.part}, {addressee.name}. Take care of that wound.",
+      "Watch that {slot.wound.part}, {addressee.name}, you're still injured."
+    ]
+  }
+}

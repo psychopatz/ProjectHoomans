@@ -36,8 +36,8 @@ local function buildWoundTokens(addr, profile)
 end
 
 function I.EmitWoundDialogue(record, evType, roleVariant, profile, hitDesc, now, pri, ref, opts)
-    local mates = I.FindSquadmates(record, 14)
-    local responders = I.SelectWoundResponders(mates, record, profile, now)
+    local mates = I.FindNearbyInjuryObservers(record, 14)
+    local responders = I.SelectWoundResponders(mates, record, profile, now, { witnessedHit = evType == "combat_wound_received_beat" })
     local playerAddr = I.FindNearbyPlayerAddressee(record, 14)
     local addressee = (responders[1] and responders[1].ally) or mates[1] or playerAddr
     if not addressee then return false, "no_audience" end
@@ -154,6 +154,12 @@ function I.EmitWoundDialogue(record, evType, roleVariant, profile, hitDesc, now,
         for idx, entry in ipairs(responders) do
             S.EnqueueCustomReply({
                 speaker = entry.ally,
+                skipLOSCheck = true,
+                onDelivered = function(observer, at)
+                    observer.runtime = observer.runtime or {}
+                    observer.runtime.lastWoundReactionAt = at
+                    S.RecordWitnessObservation(observer, record, profile, at)
+                end,
                 addressee = record,
                 desc = hitDesc,
                 role = entry.role,

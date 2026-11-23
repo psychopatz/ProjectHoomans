@@ -79,4 +79,46 @@ function I.FindSquadmates(rec, radius)
     return list
 end
 
+local function injuryNeighbors(rec, radius)
+    local sp = PNC.SpatialIndex
+    if not sp or not sp.QueryNPCs or not rec.x or not rec.y then return {} end
+    local raw = sp.QueryNPCs(rec.x, rec.y, radius)
+    local limit, regionZ, radiusSq = 24, tonumber(rec.z) or 0, radius * radius
+    local out = {}
+    for i = 1, math.min(limit, #raw) do
+        local candidate = raw[i]
+        if candidate.id ~= rec.id and candidate.alive ~= false and candidate.x and candidate.y
+            and math.abs((tonumber(candidate.z) or 0) - regionZ) < 1 then
+            local distance = distSq(rec.x, rec.y, candidate.x, candidate.y)
+            if distance <= radiusSq then out[#out + 1] = { record = candidate, distance = distance } end
+        end
+    end
+    table.sort(out, function(a, b)
+        if a.distance ~= b.distance then return a.distance < b.distance end
+        return tostring(a.record.id) < tostring(b.record.id)
+    end)
+    return out
+end
+
+function I.CanSeeInjury(observer, injured, body)
+    local reg, perc = PNC.Registry, PNC.Perception
+    body = body or (reg and reg.GetLiveZombie and reg.GetLiveZombie(injured.id))
+    return body ~= nil and perc and perc.CanSeeWorldObject
+        and perc.CanSeeWorldObject(observer, body) == true
+end
+
+function I.FindNearbyInjuryObservers(rec, radius)
+    local reg = PNC.Registry
+    local body = reg and reg.GetLiveZombie and reg.GetLiveZombie(rec.id)
+    if not body then return {} end
+    local nearby, list = injuryNeighbors(rec, radius), {}
+    for i = 1, math.min(8, #nearby) do
+        local observer = nearby[i].record
+        if I.CanSeeInjury(observer, rec, body) then list[#list + 1] = observer end
+    end
+    return list
+end
+
+I.FindInjuryEncounterNeighbors = injuryNeighbors
+
 return S

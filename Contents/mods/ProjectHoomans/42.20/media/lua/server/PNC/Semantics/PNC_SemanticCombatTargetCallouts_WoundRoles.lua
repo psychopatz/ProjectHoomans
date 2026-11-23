@@ -10,6 +10,8 @@ PNC.ConvoEngine = PNC.ConvoEngine or {}
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_WoundProfile"
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_WoundArbitration"
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_InjuryMemory"
+require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_WitnessGating"
+require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_VisibleObservation"
 
 local S = PNC.Semantics.CombatTargetCallouts or {}
 local I = PNC.Semantics.CombatTargetCalloutsInternal
@@ -89,12 +91,18 @@ local function shouldAddSecondResponder(first, second, profile)
         and ((first.isBond and second.isMedic) or (second.isBond and first.isMedic))
 end
 
-function I.SelectWoundResponders(mates, record, profile, now)
+function I.SelectWoundResponders(mates, record, profile, now, opts)
     now = tonumber(now) or 0
     if type(mates) ~= "table" or #mates == 0 then return {} end
     local candidates = {}
     for i = 1, #mates do
-        candidates[#candidates + 1] = I.ScoreWoundResponderCandidate(mates[i], record, profile, now)
+        local ally = mates[i]
+        local gateOk, gateReason, delta = S.EvaluateWitnessObservationGate(ally, record, profile, now, opts)
+        if gateOk then
+            local scored = I.ScoreWoundResponderCandidate(ally, record, profile, now)
+            scored.gateReason, scored.deltaFacts = gateReason, delta
+            candidates[#candidates + 1] = scored
+        end
     end
     table.sort(candidates, function(a, b)
         if a.score ~= b.score then return a.score > b.score end
@@ -106,9 +114,7 @@ function I.SelectWoundResponders(mates, record, profile, now)
     if first.isThreat then
         recordBiteConflictFacts(record, first, profile, now)
     end
-    first.ally.runtime = type(first.ally.runtime) == "table" and first.ally.runtime or {}
-    first.ally.runtime.lastWoundReactionAt = now
-    selected[1] = { ally = first.ally, role = first.role, score = first.score }
+    selected[1] = { ally = first.ally, role = first.role, score = first.score, gateReason = first.gateReason, deltaFacts = first.deltaFacts }
     for i = 2, #candidates do
         local cand = candidates[i]
         if cand.score >= 10 and shouldAddSecondResponder(first, cand, profile) then
@@ -116,9 +122,7 @@ function I.SelectWoundResponders(mates, record, profile, now)
                 recordBiteConflictFacts(record, cand, profile, now)
             end
             local role = (not cand.isThreat and not cand.isMedic and not cand.isBond) and "squad_crossfire_wingman" or cand.role
-            cand.ally.runtime = type(cand.ally.runtime) == "table" and cand.ally.runtime or {}
-            cand.ally.runtime.lastWoundReactionAt = now
-            selected[2] = { ally = cand.ally, role = role, score = cand.score }
+            selected[2] = { ally = cand.ally, role = role, score = cand.score, gateReason = cand.gateReason, deltaFacts = cand.deltaFacts }
             break
         end
     end

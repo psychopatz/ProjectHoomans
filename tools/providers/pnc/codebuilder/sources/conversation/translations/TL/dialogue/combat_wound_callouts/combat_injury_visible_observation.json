@@ -1,0 +1,55 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "combat.injury.visible_observation",
+  "locale": "TL",
+  "entries": {
+    "say.variants.open_wound": [
+      "May bukas na sugat sa {slot.wound.part} mo, {addressee.name}. Dapat mong balutin iyan.",
+      "Hoy {addressee.name}, hiwa ang {slot.wound.part} mo. Lagyan mo ng bendahe bago lumala."
+    ],
+    "say.variants.heavy_bleeding": [
+      "Malakas ang dugo sa {slot.wound.part} mo, {addressee.name}! Balutin mo na agad iyan!",
+      "{addressee.name}, bumubulwak ang dugo sa {slot.wound.part} mo! Lagyan mo na ng bendahe!"
+    ],
+    "say.variants.dirty_bandage": [
+      "Mukhang marumi na ang benda sa {slot.wound.part} mo, {addressee.name}. Palitan mo kapag puwede na.",
+      "Ang dumi na ng benda sa {slot.wound.part} mo, {addressee.name}."
+    ],
+    "say.variants.suspected_infection": [
+      "Baka may impeksiyon na ang sugat sa {slot.wound.part} mo, {addressee.name}.",
+      "Mukhang may problema sa sugat mo, {addressee.name}. Ipasuri mo muna."
+    ],
+    "say.variants.medic_infection_assessment": [
+      "Huwag kang gagalaw, {addressee.name}. Namamaga na ang sugat sa {slot.wound.part} mo, kailangan nating linisin at balutin.",
+      "Patingin ng {slot.wound.part} mo, {addressee.name}. May senyales ng impeksyon kaya dapat disimpektahin."
+    ],
+    "say.variants.medic_triage_offer": [
+      "Sandali, {addressee.name}. Patingin nga ng {slot.wound.part} mo.",
+      "Umupo ka muna, {addressee.name}. Titingnan ko ang sugat."
+    ],
+    "say.variants.limp_mobility": [
+      "Paika-ika ka dahil sa {slot.wound.part} mo, {addressee.name}. Huwag mong pilitin ang lakad mo.",
+      "{addressee.name}, bumabagal ang hakbang mo dahil sa tama sa {slot.wound.part} mo. Mag-ingat ka."
+    ],
+    "say.variants.multiple_wounds_escalation": [
+      "Tinamaan ka na naman sa {slot.wound.part} mo, {addressee.name}! Dumadami na ang sugat mo!",
+      "{addressee.name}, may bagong sugat ka pa sa {slot.wound.part}! Bugbog ka na, magpagamot ka na!"
+    ],
+    "say.variants.new_wound_noticed": [
+      "Teka, {addressee.name}, may bagong tama ka rin sa {slot.wound.part} mo?",
+      "May sugat ka na rin pala sa {slot.wound.part} mo, {addressee.name}. Gamutin natin iyan."
+    ],
+    "say.variants.visible_bite": [
+      "Teka... bakas ba ng kagat iyang nasa {slot.wound.part} mo, {addressee.name}?",
+      "{addressee.name}, parang kagat ang sugat sa {slot.wound.part} mo. Dumistansya ka muna!"
+    ],
+    "say.variants.feverish_weak": [
+      "Parang nilalagnat ka, {addressee.name}. Umupo ka muna.",
+      "{addressee.name}, mukhang may lagnat ka. Magpahinga ka muna."
+    ],
+    "say.variants.default": [
+      "May sugat ka sa {slot.wound.part} mo, {addressee.name}. Asikasuhin mo iyan.",
+      "Ingatan mo ang {slot.wound.part} mo, {addressee.name}, may tama ka pa."
+    ]
+  }
+}

@@ -4,6 +4,490 @@ return {
         ["domain"] = "combat_wound_callouts",
         ["domainPath"] = "combat_wound_callouts",
         ["exchangeFamily"] = {
+            ["familyID"] = "combat.wound.ally_reaction",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "No! Don't talk like that, {addressee.name}! Stay beside me, I'm not leaving you out here!",
+                                ["id"] = "close_bond_bite_lethal",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.close_bond_bite_lethal",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Stay with me, {addressee.name}! Don't you dare go down on my watch, I've got you!",
+                                ["id"] = "close_bond_critical",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.close_bond_critical",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Easy, {addressee.name}, watch that patched {slot.wound.part}! Stick right by my shoulder, I'm not losing you!",
+                                ["id"] = "close_bond_patched",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.close_bond_patched",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Fall back behind me, {addressee.name}, your {slot.wound.part} needs wrapping before you bleed out!",
+                                ["id"] = "supportive_cover_wounded",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.supportive_cover_wounded",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Watch your dressing on that {slot.wound.part}, {addressee.name}, shout if it starts soaking through!",
+                                ["id"] = "supportive_cover_patched",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.supportive_cover_patched",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Copy that, {addressee.name}, pull behind the line and tie off your {slot.wound.part}!",
+                                ["id"] = "tactical_cover_wounded",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.tactical_cover_wounded",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Keep your {slot.wound.part} protected, {addressee.name}, we hold spacing until clear!",
+                                ["id"] = "tactical_cover_patched",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.tactical_cover_patched",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "I'm closing the gap on your flank, {addressee.name}! Squad, tighten up and cover that {slot.wound.part}!",
+                                ["id"] = "squad_crossfire_wingman",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.squad_crossfire_wingman",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "You're not turning, {addressee.name}, saliva doesn't spread it! Keep pressure on your {slot.wound.part} and keep moving!",
+                                ["id"] = "bite_non_transmissible_relief",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.bite_non_transmissible_relief",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Quit groaning about your {slot.wound.part}, {addressee.name}, either hold your corner or get out of my way.",
+                                ["id"] = "low_rel_dismissive",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.low_rel_dismissive",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "You got bit, {addressee.name}. Stay five steps back, and the second you look feverish I'm ending you.",
+                                ["id"] = "low_rel_bite_execution_threat",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.low_rel_bite_execution_threat",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "You're bitten, {addressee.name}. Forget bandages. I'm putting you down myself before you turn on us.",
+                                ["id"] = "psychopath_bite_execution_threat",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.psychopath_bite_execution_threat",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Stay sharp on your feet, {addressee.name}, keep watching your {slot.wound.part}!",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "combat.wound",
+            ["slots"] = {
+                ["wound"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "No! Don't talk like that, {addressee.name}! Stay beside me, I'm not leaving you out here!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.close_bond_bite_lethal",
+                    ["variantID"] = "close_bond_bite_lethal",
+                },
+                {
+                    ["fallback"] = "Stay with me, {addressee.name}! Don't you dare go down on my watch, I've got you!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.close_bond_critical",
+                    ["variantID"] = "close_bond_critical",
+                },
+                {
+                    ["fallback"] = "Easy, {addressee.name}, watch that patched {slot.wound.part}! Stick right by my shoulder, I'm not losing you!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.close_bond_patched",
+                    ["variantID"] = "close_bond_patched",
+                },
+                {
+                    ["fallback"] = "Fall back behind me, {addressee.name}, your {slot.wound.part} needs wrapping before you bleed out!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.supportive_cover_wounded",
+                    ["variantID"] = "supportive_cover_wounded",
+                },
+                {
+                    ["fallback"] = "Watch your dressing on that {slot.wound.part}, {addressee.name}, shout if it starts soaking through!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.supportive_cover_patched",
+                    ["variantID"] = "supportive_cover_patched",
+                },
+                {
+                    ["fallback"] = "Copy that, {addressee.name}, pull behind the line and tie off your {slot.wound.part}!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.tactical_cover_wounded",
+                    ["variantID"] = "tactical_cover_wounded",
+                },
+                {
+                    ["fallback"] = "Keep your {slot.wound.part} protected, {addressee.name}, we hold spacing until clear!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.tactical_cover_patched",
+                    ["variantID"] = "tactical_cover_patched",
+                },
+                {
+                    ["fallback"] = "I'm closing the gap on your flank, {addressee.name}! Squad, tighten up and cover that {slot.wound.part}!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.squad_crossfire_wingman",
+                    ["variantID"] = "squad_crossfire_wingman",
+                },
+                {
+                    ["fallback"] = "You're not turning, {addressee.name}, saliva doesn't spread it! Keep pressure on your {slot.wound.part} and keep moving!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.bite_non_transmissible_relief",
+                    ["variantID"] = "bite_non_transmissible_relief",
+                },
+                {
+                    ["fallback"] = "Quit groaning about your {slot.wound.part}, {addressee.name}, either hold your corner or get out of my way.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.low_rel_dismissive",
+                    ["variantID"] = "low_rel_dismissive",
+                },
+                {
+                    ["fallback"] = "You got bit, {addressee.name}. Stay five steps back, and the second you look feverish I'm ending you.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.low_rel_bite_execution_threat",
+                    ["variantID"] = "low_rel_bite_execution_threat",
+                },
+                {
+                    ["fallback"] = "You're bitten, {addressee.name}. Forget bandages. I'm putting you down myself before you turn on us.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.psychopath_bite_execution_threat",
+                    ["variantID"] = "psychopath_bite_execution_threat",
+                },
+                {
+                    ["fallback"] = "Stay sharp on your feet, {addressee.name}, keep watching your {slot.wound.part}!",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.combat.wound.ally_reaction.say.1.default",
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "combat.wound.ally_reaction",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "ally_reaction",
+            ["sourceId"] = "combat.wound.ally_reaction",
+            ["sourcePath"] = "dialogue/combat_wound_callouts/combat_wound_ally_reaction.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/AllyReactionToReceivedBeat",
+        ["namespace"] = "combat.wound",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "combat_wound_ally_reaction",
+                    ["kind"] = "combat_event",
+                },
+            },
+            ["metadata"] = {
+                ["category"] = "projecthoomans:event_reactions",
+                ["contentOwner"] = "projecthoomans.dialogue_content.events",
+                ["responseAct"] = "REACT",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "No! Don't talk like that, {addressee.name}! Stay beside me, I'm not leaving you out here!",
+                                ["id"] = "close_bond_bite_lethal",
+                            },
+                            {
+                                ["fallback"] = "Stay with me, {addressee.name}! Don't you dare go down on my watch, I've got you!",
+                                ["id"] = "close_bond_critical",
+                            },
+                            {
+                                ["fallback"] = "Easy, {addressee.name}, watch that patched {slot.wound.part}! Stick right by my shoulder, I'm not losing you!",
+                                ["id"] = "close_bond_patched",
+                            },
+                            {
+                                ["fallback"] = "Fall back behind me, {addressee.name}, your {slot.wound.part} needs wrapping before you bleed out!",
+                                ["id"] = "supportive_cover_wounded",
+                            },
+                            {
+                                ["fallback"] = "Watch your dressing on that {slot.wound.part}, {addressee.name}, shout if it starts soaking through!",
+                                ["id"] = "supportive_cover_patched",
+                            },
+                            {
+                                ["fallback"] = "Copy that, {addressee.name}, pull behind the line and tie off your {slot.wound.part}!",
+                                ["id"] = "tactical_cover_wounded",
+                            },
+                            {
+                                ["fallback"] = "Keep your {slot.wound.part} protected, {addressee.name}, we hold spacing until clear!",
+                                ["id"] = "tactical_cover_patched",
+                            },
+                            {
+                                ["fallback"] = "I'm closing the gap on your flank, {addressee.name}! Squad, tighten up and cover that {slot.wound.part}!",
+                                ["id"] = "squad_crossfire_wingman",
+                            },
+                            {
+                                ["fallback"] = "You're not turning, {addressee.name}, saliva doesn't spread it! Keep pressure on your {slot.wound.part} and keep moving!",
+                                ["id"] = "bite_non_transmissible_relief",
+                            },
+                            {
+                                ["fallback"] = "Quit groaning about your {slot.wound.part}, {addressee.name}, either hold your corner or get out of my way.",
+                                ["id"] = "low_rel_dismissive",
+                            },
+                            {
+                                ["fallback"] = "You got bit, {addressee.name}. Stay five steps back, and the second you look feverish I'm ending you.",
+                                ["id"] = "low_rel_bite_execution_threat",
+                            },
+                            {
+                                ["fallback"] = "You're bitten, {addressee.name}. Forget bandages. I'm putting you down myself before you turn on us.",
+                                ["id"] = "psychopath_bite_execution_threat",
+                            },
+                            {
+                                ["fallback"] = "Stay sharp on your feet, {addressee.name}, keep watching your {slot.wound.part}!",
+                                ["id"] = "default",
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "combat_injury",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "combat.wound.ally_reaction",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "No! Don't talk like that, {addressee.name}! Stay beside me, I'm not leaving you out here!",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.combat.wound.ally_reaction.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+            ["target"] = {
+                ["cardinality"] = "OPTIONAL_ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "target",
+            },
+        },
+        ["slots"] = {
+            ["wound"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
+        },
+        ["sourceShard"] = "dialogue/combat_wound_callouts/combat_wound_ally_reaction.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "No! Don't talk like that, {addressee.name}! Stay beside me, I'm not leaving you out here!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.close_bond_bite_lethal",
+                ["variantID"] = "close_bond_bite_lethal",
+            },
+            {
+                ["fallback"] = "Stay with me, {addressee.name}! Don't you dare go down on my watch, I've got you!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.close_bond_critical",
+                ["variantID"] = "close_bond_critical",
+            },
+            {
+                ["fallback"] = "Easy, {addressee.name}, watch that patched {slot.wound.part}! Stick right by my shoulder, I'm not losing you!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.close_bond_patched",
+                ["variantID"] = "close_bond_patched",
+            },
+            {
+                ["fallback"] = "Fall back behind me, {addressee.name}, your {slot.wound.part} needs wrapping before you bleed out!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.supportive_cover_wounded",
+                ["variantID"] = "supportive_cover_wounded",
+            },
+            {
+                ["fallback"] = "Watch your dressing on that {slot.wound.part}, {addressee.name}, shout if it starts soaking through!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.supportive_cover_patched",
+                ["variantID"] = "supportive_cover_patched",
+            },
+            {
+                ["fallback"] = "Copy that, {addressee.name}, pull behind the line and tie off your {slot.wound.part}!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.tactical_cover_wounded",
+                ["variantID"] = "tactical_cover_wounded",
+            },
+            {
+                ["fallback"] = "Keep your {slot.wound.part} protected, {addressee.name}, we hold spacing until clear!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.tactical_cover_patched",
+                ["variantID"] = "tactical_cover_patched",
+            },
+            {
+                ["fallback"] = "I'm closing the gap on your flank, {addressee.name}! Squad, tighten up and cover that {slot.wound.part}!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.squad_crossfire_wingman",
+                ["variantID"] = "squad_crossfire_wingman",
+            },
+            {
+                ["fallback"] = "You're not turning, {addressee.name}, saliva doesn't spread it! Keep pressure on your {slot.wound.part} and keep moving!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.bite_non_transmissible_relief",
+                ["variantID"] = "bite_non_transmissible_relief",
+            },
+            {
+                ["fallback"] = "Quit groaning about your {slot.wound.part}, {addressee.name}, either hold your corner or get out of my way.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.low_rel_dismissive",
+                ["variantID"] = "low_rel_dismissive",
+            },
+            {
+                ["fallback"] = "You got bit, {addressee.name}. Stay five steps back, and the second you look feverish I'm ending you.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.low_rel_bite_execution_threat",
+                ["variantID"] = "low_rel_bite_execution_threat",
+            },
+            {
+                ["fallback"] = "You're bitten, {addressee.name}. Forget bandages. I'm putting you down myself before you turn on us.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.psychopath_bite_execution_threat",
+                ["variantID"] = "psychopath_bite_execution_threat",
+            },
+            {
+                ["fallback"] = "Stay sharp on your feet, {addressee.name}, keep watching your {slot.wound.part}!",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.combat.wound.ally_reaction.say.1.default",
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "combat_wound_callouts",
+        ["domainPath"] = "combat_wound_callouts",
+        ["exchangeFamily"] = {
             ["familyID"] = "combat.wound.received_beat",
             ["initiatingSay"] = {
                 ["keyOrder"] = {
@@ -350,7 +834,7 @@ return {
             ["sourcePath"] = "dialogue/combat_wound_callouts/combat_wound_received_beat.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/CombatWoundReceivedBeat",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/AllyReactionToReceivedBeat",
         ["namespace"] = "combat.wound",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {

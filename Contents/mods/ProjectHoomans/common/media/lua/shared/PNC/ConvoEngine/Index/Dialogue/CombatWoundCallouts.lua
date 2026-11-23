@@ -3,7 +3,7 @@ return {
     ["combat.fighting.injured_callout"] = {
         ["domain"] = "combat_wound_callouts",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToWoundAllyReaction",
+            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryVisibleObservation",
         },
         ["id"] = "combat.fighting.injured_callout",
         ["kind"] = "dialogue",
@@ -12,7 +12,7 @@ return {
     ["combat.injury.pain_reaction"] = {
         ["domain"] = "combat_wound_callouts",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToWoundAllyReaction",
+            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryVisibleObservation",
         },
         ["id"] = "combat.injury.pain_reaction",
         ["kind"] = "dialogue",
@@ -21,7 +21,7 @@ return {
     ["combat.injury.triage_exchange"] = {
         ["domain"] = "combat_wound_callouts",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToWoundAllyReaction",
+            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryVisibleObservation",
         },
         ["id"] = "combat.injury.triage_exchange",
         ["kind"] = "dialogue",
@@ -32,10 +32,19 @@ return {
         },
         ["source"] = "dialogue/combat_wound_callouts/combat_injury_interactive_exchange.json",
     },
+    ["combat.injury.visible_observation"] = {
+        ["domain"] = "combat_wound_callouts",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToInjuryVisibleObservation",
+        },
+        ["id"] = "combat.injury.visible_observation",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/combat_wound_callouts/combat_injury_visible_observation.json",
+    },
     ["combat.wound.ally_reaction"] = {
         ["domain"] = "combat_wound_callouts",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/FightingInjuredCalloutToWoundAllyReaction",
+            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/AllyReactionToReceivedBeat",
         },
         ["id"] = "combat.wound.ally_reaction",
         ["kind"] = "dialogue",
@@ -44,7 +53,7 @@ return {
     ["combat.wound.received_beat"] = {
         ["domain"] = "combat_wound_callouts",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/CombatWoundReceivedBeat",
+            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/AllyReactionToReceivedBeat",
         },
         ["id"] = "combat.wound.received_beat",
         ["kind"] = "dialogue",

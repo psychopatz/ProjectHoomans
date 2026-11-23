@@ -247,7 +247,13 @@ function H.ProcessRecord(record, now)
         Animation.SyncLocomotion(zombie, record)
     end
     if Spatial and Spatial.UpdateNPC then
-        Spatial.UpdateNPC(record)
+        local crossedCell = Spatial.UpdateNPC(record)
+        if crossedCell and zombie then
+            local combat = PNC.Semantics and PNC.Semantics.CombatTargetCallouts
+            if combat and combat.OnInjuryEncounterCellChanged then
+                combat.OnInjuryEncounterCellChanged(record, now)
+            end
+        end
     end
     if Network and Network.QueuePeriodicRoster then
         Network.QueuePeriodicRoster(record, now)

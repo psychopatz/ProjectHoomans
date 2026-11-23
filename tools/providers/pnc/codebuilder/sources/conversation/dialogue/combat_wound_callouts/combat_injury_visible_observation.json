@@ -1,0 +1,60 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "combat.injury.visible_observation",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "WARN"
+  },
+  "say": {
+    "variants": [
+      { "id": "open_wound" },
+      { "id": "heavy_bleeding" },
+      { "id": "dirty_bandage" },
+      { "id": "suspected_infection" },
+      { "id": "medic_infection_assessment" },
+      { "id": "medic_triage_offer" },
+      { "id": "limp_mobility" },
+      { "id": "multiple_wounds_escalation" },
+      { "id": "new_wound_noticed" },
+      { "id": "visible_bite" },
+      { "id": "feverish_weak" },
+      { "id": "default" }
+    ]
+  },
+  "roles": {
+    "speaker": {
+      "cardinality": "ONE",
+      "kinds": [ "actor" ]
+    },
+    "addressee": {
+      "cardinality": "ONE",
+      "kinds": [ "actor" ]
+    }
+  },
+  "slots": {
+    "wound": {
+      "type": "entity.item",
+      "required": false
+    }
+  },
+  "domains": [
+    {
+      "domain": "combat",
+      "owner": "ProjectHoomans"
+    }
+  ],
+  "topics": [
+    {
+      "id": "combat_injury",
+      "domain": "combat"
+    }
+  ],
+  "events": [
+    {
+      "id": "combat_injury_visible_observation",
+      "kind": "combat_event"
+    }
+  ]
+}

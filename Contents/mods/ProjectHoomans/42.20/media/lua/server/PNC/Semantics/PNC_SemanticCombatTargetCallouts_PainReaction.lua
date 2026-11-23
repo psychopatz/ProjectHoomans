@@ -42,11 +42,8 @@ function S.EmitImmediatePainReaction(record, hitSpec, profile, now, opts)
 
     local isPreempt = preemptReason ~= "cooldown_expired" and preemptReason ~= "first_wound"
     local variant = S.ResolvePainReactionVariant(record, profile)
-    local playerAddr = type(I.FindNearbyPlayerAddressee) == "function" and I.FindNearbyPlayerAddressee(record, 14) or nil
-    local mates = type(I.FindSquadmates) == "function" and I.FindSquadmates(record, 14) or {}
-    local addr = mates[1] or playerAddr or record
-    local addrName = (S.FirstTokenName and S.FirstTokenName(addr and (addr.name or addr.fullName)))
-        or tostring(addr and addr.name or "friend")
+    local addrName = (S.FirstTokenName and S.FirstTokenName(record.name or record.fullName))
+        or tostring(record.name or "survivor")
     local toks = {
         ["addressee.name"] = addrName,
         ["slot.wound.part"] = profile.partToken,

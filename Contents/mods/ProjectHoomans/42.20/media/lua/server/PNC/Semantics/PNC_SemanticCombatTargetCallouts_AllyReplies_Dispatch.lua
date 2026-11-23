@@ -59,8 +59,10 @@ function S.DispatchPendingReply(e, rec, now, reg, perc, sec)
     })
     if not text then return end
     local sent = S.SendReplyBark(rec, now, ev, act, e.eventRef, text, res, toks, e.barkOpts, e.threadID)
+    if (tonumber(sent) or 0) <= 0 then return end
+    if e.onDelivered then e.onDelivered(rec, now) end
     local w = e.wave
-    if w and (tonumber(sent) or 0) > 0 then
+    if w then
         local rName = tostring(rec.name or rec.fullName or "")
         if role == "lead" then w.leadSpoke, w.leadId, w.leadName = true, tostring(rec.id), rName
         elseif role == "wingman" then w.wingmanSpoke, w.wingmanId, w.wingmanName = true, tostring(rec.id), rName end

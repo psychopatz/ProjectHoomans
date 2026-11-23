@@ -120,6 +120,7 @@ function Spatial.UpdateNPC(record)
         cellY = cellY,
         record = record,
     }
+    return previous ~= nil and (previous.cellX ~= cellX or previous.cellY ~= cellY)
 end
 
 function Spatial.RemoveNPC(id)

@@ -32,4 +32,27 @@ for _, vid in ipairs(ROLES) do
 end
 Catalog.Register(POOL, { variants = out })
 
+local OBS_PREFIX = "combat.injury.visible_observation"
+local OBS_POOL = "semantic.combat.injury.visible_observation"
+local OBS_FALLBACK = "You look hurt, {addressee.name}."
+local OBS_ROLES = {
+    "open_wound", "heavy_bleeding", "dirty_bandage",
+    "suspected_infection", "medic_infection_assessment", "medic_triage_offer",
+    "limp_mobility", "multiple_wounds_escalation", "new_wound_noticed",
+    "visible_bite", "feverish_weak",
+    "default",
+}
+
+Shared.install(OBS_PREFIX, OBS_ROLES)
+local obsOut = {}
+for _, vid in ipairs(OBS_ROLES) do
+    local isDefault = vid == "default"
+    obsOut[#obsOut + 1] = Shared.makeVariant(
+        OBS_POOL, OBS_PREFIX, vid,
+        (not isDefault) and { combatReactionRole = vid } or nil,
+        isDefault and 10 or 95, "WARN", OBS_FALLBACK
+    )
+end
+Catalog.Register(OBS_POOL, { variants = obsOut })
+
 return true
