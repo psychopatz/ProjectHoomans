@@ -156,14 +156,14 @@ return {
                                 ["variantCount"] = 2,
                             },
                             {
-                                ["fallback"] = "Splints and wraps on my {slot.wound.part} are taking all I've got, {addressee.name}, stay on my shoulder!",
+                                ["fallback"] = "Dressing on my {slot.wound.part} is taking all I've got, {addressee.name}, stay on my shoulder!",
                                 ["id"] = "patched_up_lower_limb_severe",
                                 ["templateID"] = "convo.combat.fighting.injured_callout.say.1.patched_up_lower_limb_severe",
                                 ["textRole"] = "spoken_action",
                                 ["variantCount"] = 2,
                             },
                             {
-                                ["fallback"] = "Got my {slot.wound.part} patched up, {addressee.name}, limping a bit but still standing my ground!",
+                                ["fallback"] = "Got my {slot.wound.part} patched up, {addressee.name}, still standing my ground!",
                                 ["id"] = "patched_up_lower_limb",
                                 ["templateID"] = "convo.combat.fighting.injured_callout.say.1.patched_up_lower_limb",
                                 ["textRole"] = "spoken_action",
@@ -395,14 +395,14 @@ return {
                     ["variantID"] = "patched_up_upper_limb",
                 },
                 {
-                    ["fallback"] = "Splints and wraps on my {slot.wound.part} are taking all I've got, {addressee.name}, stay on my shoulder!",
+                    ["fallback"] = "Dressing on my {slot.wound.part} is taking all I've got, {addressee.name}, stay on my shoulder!",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.combat.fighting.injured_callout.say.1.patched_up_lower_limb_severe",
                     ["variantID"] = "patched_up_lower_limb_severe",
                 },
                 {
-                    ["fallback"] = "Got my {slot.wound.part} patched up, {addressee.name}, limping a bit but still standing my ground!",
+                    ["fallback"] = "Got my {slot.wound.part} patched up, {addressee.name}, still standing my ground!",
                     ["realizationKey"] = "1",
                     ["role"] = "spoken_action",
                     ["templateID"] = "convo.combat.fighting.injured_callout.say.1.patched_up_lower_limb",
@@ -610,11 +610,11 @@ return {
                                 ["id"] = "patched_up_upper_limb",
                             },
                             {
-                                ["fallback"] = "Splints and wraps on my {slot.wound.part} are taking all I've got, {addressee.name}, stay on my shoulder!",
+                                ["fallback"] = "Dressing on my {slot.wound.part} is taking all I've got, {addressee.name}, stay on my shoulder!",
                                 ["id"] = "patched_up_lower_limb_severe",
                             },
                             {
-                                ["fallback"] = "Got my {slot.wound.part} patched up, {addressee.name}, limping a bit but still standing my ground!",
+                                ["fallback"] = "Got my {slot.wound.part} patched up, {addressee.name}, still standing my ground!",
                                 ["id"] = "patched_up_lower_limb",
                             },
                             {
@@ -875,14 +875,14 @@ return {
                 ["variantID"] = "patched_up_upper_limb",
             },
             {
-                ["fallback"] = "Splints and wraps on my {slot.wound.part} are taking all I've got, {addressee.name}, stay on my shoulder!",
+                ["fallback"] = "Dressing on my {slot.wound.part} is taking all I've got, {addressee.name}, stay on my shoulder!",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.combat.fighting.injured_callout.say.1.patched_up_lower_limb_severe",
                 ["variantID"] = "patched_up_lower_limb_severe",
             },
             {
-                ["fallback"] = "Got my {slot.wound.part} patched up, {addressee.name}, limping a bit but still standing my ground!",
+                ["fallback"] = "Got my {slot.wound.part} patched up, {addressee.name}, still standing my ground!",
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.combat.fighting.injured_callout.say.1.patched_up_lower_limb",

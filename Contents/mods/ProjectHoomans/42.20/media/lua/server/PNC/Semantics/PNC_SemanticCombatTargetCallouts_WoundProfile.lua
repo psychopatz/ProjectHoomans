@@ -13,14 +13,9 @@ local S = PNC.Semantics.CombatTargetCallouts or {}
 PNC.Semantics.CombatTargetCallouts = S
 
 local WOUND_LABELS = {
-    bite = "bite",
-    bullet = "gunshot wound",
-    deep_wound_glass = "glass gash",
-    deep_wound = "deep wound",
-    fracture = "fracture",
-    burn = "burn",
-    laceration = "laceration",
-    scratch = "scratch",
+    bite = "bite", bullet = "gunshot wound", deep_wound_glass = "glass gash",
+    deep_wound = "deep wound", fracture = "fracture", burn = "burn",
+    laceration = "laceration", scratch = "scratch",
 }
 
 local WOUND_PRIORITIES = {
@@ -28,54 +23,9 @@ local WOUND_PRIORITIES = {
     deep_wound = 4, deep_wound_glass = 4, bullet = 5, bite = 6,
 }
 
-local FIGHTING_VARIANT_TABLE = {
-    with_wounds = {
-        minor_low_tier = "with_wounds_minor",
-        head_neck_severe = "with_wounds_head_neck_critical",
-        head_neck = "with_wounds_head_neck",
-        torso_severe = "with_wounds_torso_critical",
-        torso = "with_wounds_torso",
-        pelvis_groin_severe = "with_wounds_pelvis_groin_severe",
-        pelvis_groin = "with_wounds_pelvis_groin",
-        upper_limb_severe = "with_wounds_upper_limb_severe",
-        upper_limb = "with_wounds_upper_limb",
-        lower_limb_severe = "with_wounds_lower_limb_severe",
-        lower_limb = "with_wounds_lower_limb",
-    },
-    patched_up = {
-        minor_low_tier = "patched_up_minor",
-        head_neck_severe = "patched_up_head_neck_severe",
-        head_neck = "patched_up_head_neck",
-        torso_severe = "patched_up_torso_severe",
-        torso = "patched_up_torso",
-        pelvis_groin_severe = "patched_up_pelvis_groin_severe",
-        pelvis_groin = "patched_up_pelvis_groin",
-        upper_limb_severe = "patched_up_upper_limb_severe",
-        upper_limb = "patched_up_upper_limb",
-        lower_limb_severe = "patched_up_lower_limb_severe",
-        lower_limb = "patched_up_lower_limb",
-    },
-}
-
-local TRANSITION_VARIANTS = {
-    severity_escalation = "severity_escalation",
-    bandage_dirty = "bandage_dirty",
-    treatment_stabilized = "treatment_stabilized",
-    knox_symptom_onset = "knox_symptom_onset",
-    fever_onset = "fever_onset",
-    cold_illness_onset = "cold_illness_onset",
-    hypothermia_onset = "hypothermia_onset",
-    hyperthermia_onset = "hyperthermia_onset",
-    soaked_chill = "soaked_chill",
-    post_combat_injury_check = "post_combat_injury_check",
-}
-
 local function salivaTransmissible()
     local sb = PNC.Sandbox
-    if sb and type(sb.IsZombieSalivaTransmissible) == "function" then
-        return sb.IsZombieSalivaTransmissible() == true
-    end
-    return true
+    return not (sb and type(sb.IsZombieSalivaTransmissible) == "function") or sb.IsZombieSalivaTransmissible() == true
 end
 
 function S.ClassifyActorWoundProfile(record, hitSpec)
@@ -89,27 +39,24 @@ function S.ClassifyActorWoundProfile(record, hitSpec)
         local partId = tostring(hitSpec.partId or "Torso_Upper")
         local sal = salivaTransmissible()
         local knoxExp = (wType == "bite" and sal) and "possible" or "impossible"
-        local effTier = wType
-        if wType == "bite" then
-            effTier = sal and "bite_possible_exposure" or "bite_non_transmissible"
-        end
+        local effTier = wType == "bite" and (sal and "bite_possible_exposure" or "bite_non_transmissible") or wType
         local physSev = (wType == "bullet") and "critical" or ((wType == "bite" or wType == "deep_wound") and "severe" or "moderate")
+        local region = (wounds and wounds.ClassifyBodyRegion and wounds.ClassifyBodyRegion(partId)) or "torso"
         prof = {
-            injured = true,
-            patchState = hitSpec.bandaged == true and "patched_up" or "with_wounds",
+            injured = true, patchState = hitSpec.bandaged == true and "patched_up" or "with_wounds",
             treatmentState = hitSpec.bandaged == true and "bandaged" or "open_untreated",
-            partId = partId,
-            partLabel = string.gsub(partId, "_", " "),
-            bodyRegion = (wounds and wounds.ClassifyBodyRegion and wounds.ClassifyBodyRegion(partId)) or "torso",
-            woundType = wType,
-            effectiveWoundTier = effTier,
-            woundTierPriority = WOUND_PRIORITIES[wType] or 2,
-            isBite = wType == "bite",
-            salivaTransmissible = sal,
-            knoxExposure = knoxExp,
-            knoxStage = "none",
-            physicalSeverityBand = physSev,
-            severityBand = physSev,
+            partId = partId, partLabel = string.gsub(partId, "_", " "), bodyRegion = region,
+            woundType = wType, effectiveWoundTier = effTier, woundTierPriority = WOUND_PRIORITIES[wType] or 2,
+            isBite = wType == "bite", salivaTransmissible = sal, knoxExposure = knoxExp, knoxStage = "none",
+            physicalSeverityBand = physSev, severityBand = physSev,
+            selectedWound = {
+                woundType = wType, bodyPart = partId, bodyRegion = region,
+                bandaged = hitSpec.bandaged == true, splinted = hitSpec.splinted == true,
+                stitched = hitSpec.stitched == true, physicalSeverity = physSev,
+                functionalImpairment = wType == "fracture" and "limb_mobility" or "none",
+                locomotionImpaired = wType == "fracture" and (region == "lower_limb" or region == "pelvis_groin"),
+                knoxExposure = knoxExp,
+            },
         }
     end
     if not prof then return nil end
@@ -121,28 +68,38 @@ end
 
 function S.ResolveFightingInjuredVariant(profile)
     if type(profile) ~= "table" then return "default" end
-    local patch = profile.patchState == "patched_up" and "patched_up" or "with_wounds"
-    if profile.treatmentState == "dirty_dressing" or profile.hasDirtyBandage == true then
+    local sel = type(profile.selectedWound) == "table" and profile.selectedWound or profile
+    if sel.bandageDirty == true or sel.treatmentState == "dirty_dressing" then
         return "with_wounds_dirty_bandage"
     end
+    local isStabilized = sel.bandaged == true or sel.stitched == true or sel.splinted == true or sel.cauterized == true
+        or profile.patchState == "patched_up"
+    local patch = isStabilized and "patched_up" or "with_wounds"
     local tier = tostring(profile.effectiveWoundTier or "")
     if tier == "bite_possible_exposure" or tier == "bite_confirmed_symptomatic" or tier == "bite_non_transmissible" then
         return patch .. "_" .. tier
     end
-    local group = FIGHTING_VARIANT_TABLE[patch]
-    local sev = profile.physicalSeverityBand or profile.severityBand
+    local sev = sel.physicalSeverity or profile.physicalSeverityBand or profile.severityBand
     if sev == "minor" and (tonumber(profile.woundTierPriority) or 0) <= 2 then
-        return group.minor_low_tier
+        return patch .. "_minor"
     end
-    local region = tostring(profile.bodyRegion or "torso")
+    local region = tostring(sel.bodyRegion or profile.bodyRegion or "torso")
+    local funcImp = tostring(sel.functionalImpairment or profile.functionalImpairment or "none")
+    local locoImpaired = sel.locomotionImpaired == true
+        or funcImp == "limb_mobility" or funcImp == "pelvic_mobility" or funcImp == "multi_system"
+    if (region == "lower_limb" or region == "pelvis_groin") and not locoImpaired then
+        return patch .. "_" .. region
+    end
     if sev == "critical" or sev == "severe" then
-        return group[region .. "_severe"] or group[region] or "default"
+        local sevSuffix = (patch == "with_wounds" and (region == "head_neck" or region == "torso")) and "_critical" or "_severe"
+        return patch .. "_" .. region .. sevSuffix
     end
-    return group[region] or "default"
+    return patch .. "_" .. region
 end
 
 function S.ResolveTransitionBeatVariant(_, transitionKind)
-    return TRANSITION_VARIANTS[tostring(transitionKind or "")] or "default"
+    local k = tostring(transitionKind or "")
+    return k ~= "" and k or "default"
 end
 
 function S.BuildTransitionProfile(record, transitionSpec)

@@ -4,39 +4,44 @@ checkpoint_mode: "committed_handoff"
 target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
-phase_commit_phase: "H10R planning checkpoint"
-phase_commit_message: "docs: reopen organic injury acceptance repairs"
+phase_commit_phase: "H10R1"
+phase_commit_message: "phase(H10R1): H10R1: separate selected-wound truth from whole-body summaries and unify debug/production wound events"
 state: "CLEAN_CHECKPOINT"
 parent_status: "IN_PROGRESS"
-phase: "H10R1"
-chunk: "Selected-wound truth projection and debug/production wound-event parity"
-retrieval_tier: "auditor"
+phase: "H10R2"
+chunk: "Immediate atomic combat.injury.pain_reaction Beat and escalation-aware cooldown policy"
+retrieval_tier: "verify"
+phase_commit_vector: "psychopatz-core=1a67819822909751090f1a68ef02faa50d667beb;project-hoomans=self;dynamic-trading=62757d0b7fc1c114873735387827ccad9d828077"
+phase_residual_vector: "psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=f8a3016d89344add854593d73e4170362efc8de00531cffdb129f3b976936188"
+residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
+codebase_memory_indexed_commit: "0e35ae37deb6e385a806136bfa1edbca9acfe8e6"
+updated_at: "2026-11-23T00:40:43.353747Z"
 ---
+
 
 # Session Handoff
 
 ## What became true
 
-- H0–H10 remain a useful accepted foundation, but H11 live runtime evidence reopened developer work.
-- Debug `Random Body Part` wounds currently bypass `NotifyWoundCallout`; this is the concrete reason live debug injuries can silently bandage without immediate semantic reaction.
-- Fighting-injured wording can overclaim selected-wound treatment (`splint`) and function (`can't run`) because realization uses coarse `patched_up + bodyRegion + severity` buckets rather than exact selected-wound treatment/function facts.
-- Current witness policy is ally/squad-focused and cooldown-based, not first-of-day/new-injury observation with non-colonist coverage.
-- Existing ConvoEngine responsePlan/branch/Scene and authoritative inventory/treatment systems should be extended rather than replaced.
-- Robustness/performance are primary acceptance gates: no new per-NPC tick/poller, no full scans, bounded caches/queries/participants, O(1) clean projection reads.
+- H10R1 complete: `Wounds.ApplyDebugWound` invokes `Internal.NotifyWoundCallout(..., { provenance = "debug" })`; `Wounds.GetOrBuildProjection` exposes `selectedWound` truth separate from `wholeBodyTreatmentState`; `S.ResolveFightingInjuredVariant` gates locomotion-impaired variants on `selectedWound.locomotionImpaired`; `Wounds.ValidateRealizationAgainstSelectedWound` enforces negative treatment/function/infection truth assertions.
 
 ## Remaining
 
-Execute H10R1 through H10R8, then return the baton to H11 user live acceptance.
+- Execute H10R2 through H10R8 autonomously on `main`, then return the baton to H11.
 
 ## Resume
 
-Start H10R1 from exact current source. Separate selected-wound truth from whole-body summaries, make debug wound injection emit the same normalized production semantic wound event, add negative truth assertions for treatment/function/infection claims, and commit the accepted phase before continuing automatically.
+1. Implement H10R2 (`combat.injury.pain_reaction` semantic family, self-speaker delivery even without squadmates, disposition/panic/severity/region selection, and escalation-aware cooldown preemption).
+2. Verify token limits, Kahlua lint, and runtime probe, then commit H10R2.
 
-## Blockers / concurrent work
+## Evidence
 
-- DynamicTrading currently has unrelated dirty generated ConvoEngine files. Do not touch, stage, reset or incorporate them into this goal.
-- psychopatzCore changes are allowed only for genuinely reusable H10R4/H10R7 semantic-composition or Quality Sweep mechanisms; preserve its existing world-event work.
+- `TEST_VERIFIED`: `file_token_bloat_scan.py --threshold 2000` (`0 / 6` over 2000), `pz_verify.py --kahlua` (`0` issues), `tests/run_tests.py` (`2/2` PASS), and `H10R1_PROBE_OK`.
+
+## Blockers / open decisions
+
+- None.
 
 ## Acceptance
 
-Parent completion requires H10R1–H10R8 developer gates. H11 remains user-owned and cannot resume until the live false-positive/no-reaction defects are covered by deterministic tests and robustness/performance regression.
+H10R2 passes when `combat.injury.pain_reaction` fires immediately on real and debug wounds (even solo), varies by wound type, severity, body region, and numeric disposition/style, suppresses equal/lower minor repeat hits inside cooldown, and preempts on severity/tier/region escalation.

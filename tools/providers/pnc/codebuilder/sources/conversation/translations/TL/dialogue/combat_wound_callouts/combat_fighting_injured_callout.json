@@ -84,11 +84,11 @@
       "Matibay tali sa {slot.wound.part} ko, {addressee.name}, sulong lang!"
     ],
     "say.variants.patched_up_lower_limb_severe": [
-      "Pilit kong tinitiis ang splint sa {slot.wound.part} ko, {addressee.name}, dikit ka sa balikat ko!",
+      "Pilit kong tinitiis ang bendahe sa {slot.wound.part} ko, {addressee.name}, dikit ka sa balikat ko!",
       "Nakabalot na {slot.wound.part} ko, {addressee.name}, hindi ako makatakas agad kaya harapin natin!"
     ],
     "say.variants.patched_up_lower_limb": [
-      "Nakabendahe na {slot.wound.part} ko, {addressee.name}, iika-ika pero nakatindig pa!",
+      "Nakabendahe na {slot.wound.part} ko, {addressee.name}, matatag at nakatindig pa!",
       "May balot ang {slot.wound.part} ko, {addressee.name}, huwag lang palikod!"
     ],
     "say.variants.patched_up_minor": [

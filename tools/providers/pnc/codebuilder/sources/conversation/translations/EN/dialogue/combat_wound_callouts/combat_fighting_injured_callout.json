@@ -84,11 +84,11 @@
       "Wrap on my {slot.wound.part} is solid, {addressee.name}, keep pushing forward!"
     ],
     "say.variants.patched_up_lower_limb_severe": [
-      "Splints and wraps on my {slot.wound.part} are taking all I've got, {addressee.name}, stay on my shoulder!",
+      "Dressing on my {slot.wound.part} is taking all I've got, {addressee.name}, stay on my shoulder!",
       "Patched my {slot.wound.part} up, {addressee.name}, can't run fast so keep them in front of us!"
     ],
     "say.variants.patched_up_lower_limb": [
-      "Got my {slot.wound.part} patched up, {addressee.name}, limping a bit but still standing my ground!",
+      "Got my {slot.wound.part} patched up, {addressee.name}, still standing my ground!",
       "Leg's wrapped on my {slot.wound.part}, {addressee.name}, just don't let them get behind me!"
     ],
     "say.variants.patched_up_minor": [

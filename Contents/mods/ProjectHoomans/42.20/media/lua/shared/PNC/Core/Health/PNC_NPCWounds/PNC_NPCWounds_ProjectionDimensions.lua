@@ -120,7 +120,7 @@ function Dims.ScanWounds(body, preferredPartId, statsTable)
             f.transmissible = true
         end
         local pri = (st and tonumber(st.priority) or 1) + (wound.bandaged ~= true and 10 or 0)
-            + (preferredPartId ~= nil and partId == tostring(preferredPartId) and 0.5 or 0)
+            + (preferredPartId ~= nil and partId == tostring(preferredPartId) and 100 or 0)
         if pri > bestPri then bestPri = pri; bestPartId = partId; bestWound = wound end
     end
     return bestPartId, bestWound, worstRank, maxOrdInf, hasOrdInf, f

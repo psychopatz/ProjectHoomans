@@ -48,6 +48,7 @@ function Internal.NotifyWoundCallout(record, partId, wound, damage, now, extra)
         attackerKind = extra and extra.attackerKind or nil,
         attackerID = extra and extra.attackerID or nil,
         attackType = extra and extra.attackType or nil,
+        provenance = extra and extra.provenance or "combat",
     }, now or Core.Now())
 end
 

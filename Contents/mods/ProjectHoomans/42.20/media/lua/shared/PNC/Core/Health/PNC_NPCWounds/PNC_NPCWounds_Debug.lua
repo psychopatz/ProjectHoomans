@@ -33,11 +33,12 @@ function Wounds.ApplyDebugWound(
         selectedType =
             types[(tonumber(roll) or 0) + 1] or "scratch"
     end
+    local hitAt = Core.Now()
     local wound, defaultDamage = Internal.AddWound(
         record,
         part,
         selectedType,
-        Core.Now(),
+        hitAt,
         amount
     )
     local appliedDamage = math.max(
@@ -50,6 +51,13 @@ function Wounds.ApplyDebugWound(
         type = "debug_" .. selectedType,
         attackerKind = "debug",
     })
+    if record.alive ~= false and type(Internal.NotifyWoundCallout) == "function" then
+        Internal.NotifyWoundCallout(record, part.id, wound, appliedDamage, hitAt, {
+            woundType = wound and wound.type or selectedType,
+            attackerKind = selectedType == "bite" and "zombie" or "debug",
+            provenance = "debug",
+        })
+    end
     record.runtime = record.runtime or {}
     record.runtime.forceSyncEvent = "debug_wound"
     if PNC.Registry and PNC.Registry.MarkDirty then
