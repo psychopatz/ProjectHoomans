@@ -3,7 +3,7 @@
 **Primary Repository:** `/home/psychopatz/Zomboid/Workshop/ProjectHoomans` (`main`)
 **Baseline Commit:** `4522d6e952708bf3ccb013ce620ad9d698a60cb1`
 **Reopened From:** H11 user live acceptance after contradictory runtime evidence on 2026-11-23
-**Active Phase:** `H10R4` — Core Semantic Microplanning
+**Active Phase:** `H10R5` — Interactive Injury Observation/Triage Scenes + Item-Aware Aid
 **Parent Status:** `REOPENED_DEVELOPER_WORK_REQUIRED`; H11 deferred until H10R1–H10R8 pass.
 
 ## Phase Status
@@ -14,12 +14,18 @@
 | `H10R1` | Selected-Wound Truth Projection + Debug/Production Event Parity | `DONE` | `041d905217` |
 | `H10R2` | Immediate Pain-Reaction Beat + Escalation/Cooldown Policy | `DONE` | H10R2 phase commit |
 | `H10R3` | Witness Observation Gating + Non-Colonist Injury Awareness | `DONE` | H10R3 phase commit |
-| `H10R4` | Core Semantic Microplanning: Modifiers, Clause Relations, Discourse Focus | `ACTIVE` | pending |
-| `H10R5` | Interactive Injury Observation/Triage Scenes + Item-Aware Aid | `PENDING` | pending |
+| `H10R4` | Core Semantic Microplanning: Modifiers, Clause Relations, Discourse Focus | `DONE` | H10R4 phase commit |
+| `H10R5` | Interactive Injury Observation/Triage Scenes + Item-Aware Aid | `ACTIVE` | pending |
 | `H10R6` | Relationship/Disposition/Inventory Outcome Policy + Action Contracts | `PENDING` | pending |
 | `H10R7` | Semantic-Truth Quality Sweep + Negative-Claim Guards | `PENDING` | pending |
 | `H10R8` | EN/TL Variety, MP/Save/Scale/Performance Regression + Closure | `PENDING` | pending |
 | `H11` | User Live SP/MP Acceptance | `DEFERRED` | resumes after H10R1–H10R8 |
+
+## Completed in H10R4
+
+H10R4 extends the existing UtterancePlan with bounded semantic clauses, modifiers, logical relations, and transient referents. The fighting injury callout composes bandage and mobility language only when both facts belong to the selected wound. Ambiguity selects an explicit noun. Core owns the generic plan and locale-specific relation constructions. Hoomans owns injury constructions and wound eligibility.
+
+Seven focused Lua smokes passed, including generated EN/TL realization, reference fallback, negative treatment/function checks, and the MP loader guard. CodeBuilder reconciled cleanly against the isolated DynamicTrading snapshot. Resume H10R5 by adding authoritatively item-aware offer and reply branches to the observation Beat and existing triage Scene.
 
 ## Completed in H10R3
 

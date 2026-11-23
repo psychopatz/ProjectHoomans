@@ -1,5 +1,19 @@
 -- Generated Conversation realization discovery index; do not edit by hand.
 return {
+    ["PNC/ConvoEngine/Realization/Templates/CombatInjury"] = {
+        ["generated"] = {
+            "PNC/ConvoEngine/Realization/Templates/CombatInjury",
+        },
+        ["id"] = "PNC/ConvoEngine/Realization/Templates/CombatInjury",
+        ["kind"] = "realization",
+    },
+    ["PsychopatzCore/ConvoEngine/Realization/Templates/ClauseRelations"] = {
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Realization/Templates/ClauseRelations",
+        },
+        ["id"] = "PsychopatzCore/ConvoEngine/Realization/Templates/ClauseRelations",
+        ["kind"] = "realization",
+    },
     ["PsychopatzCore/ConvoEngine/Realization/Templates/SocialAffirmation"] = {
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Realization/Templates/SocialAffirmation",

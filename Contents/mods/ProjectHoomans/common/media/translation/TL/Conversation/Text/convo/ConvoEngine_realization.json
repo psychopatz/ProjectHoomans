@@ -1,0 +1,8 @@
+{
+  "convo.construction.combat_injury.dressing": "may benda ang {lexeme:wound_part} ko",
+  "convo.construction.combat_injury.dressing_dressing_dirty": "marumi na ang benda sa {lexeme:wound_part} ko",
+  "convo.construction.combat_injury.mobility_explicit": "bumabagal ang kilos ko dahil sa sugat sa {lexeme:wound_part} ko",
+  "convo.construction.combat_injury.mobility_reference": "bumabagal pa rin ang kilos ko dahil dito",
+  "convo.lexeme.combat_injury.hip": "balakang",
+  "convo.lexeme.combat_injury.leg": "binti"
+}

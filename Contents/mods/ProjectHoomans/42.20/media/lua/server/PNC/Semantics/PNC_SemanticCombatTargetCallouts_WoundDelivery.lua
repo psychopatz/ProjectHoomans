@@ -14,6 +14,8 @@ local S = PNC.Semantics.CombatTargetCallouts or {}
 local I = PNC.Semantics.CombatTargetCalloutsInternal
 PNC.Semantics.CombatTargetCallouts = S
 
+local WoundComposition = require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_WoundComposition"
+
 local WOUND_BARK_OPTS = {
     family = "combat_wound_beat",
     priority = 72,
@@ -61,6 +63,13 @@ function I.EmitWoundDialogue(record, evType, roleVariant, profile, hitDesc, now,
         record, evType, evType == "combat_wound_received_beat" and "REACT" or "WARN",
         "human_hostile", ref, nil, toks, { replyRole = roleVariant, topic = "combat_injury", context = ctx }
     )
+    if evType == "combat_fighting_injured_callout" then
+        local composed = WoundComposition.Realize(profile, { styleVariant = S.ResolveAllyWarnTone(record, nil) })
+        if composed then
+            text = composed.text
+            ctx.utteranceEvidence = { clauses = composed.clauses, relations = composed.relations }
+        end
+    end
     if not text then return false, "semantic_realization_unavailable" end
 
     local facts = {

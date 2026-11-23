@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "construction.combat_injury.dressing",
+  "owner": "ProjectHoomans",
+  "type": "construction",
+  "strategy": "INJURY_DRESSING",
+  "dialogueAct": "INFORM"
+}

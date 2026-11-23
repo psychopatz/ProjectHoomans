@@ -637,6 +637,18 @@ return {
         ["recordCount"] = 7,
     },
     {
+        ["domain"] = "clause_relations",
+        ["kind"] = "realization",
+        ["module"] = "PNC/ConvoEngine/Index/Realization/ClauseRelations",
+        ["recordCount"] = 14,
+    },
+    {
+        ["domain"] = "combat_injury",
+        ["kind"] = "realization",
+        ["module"] = "PNC/ConvoEngine/Index/Realization/CombatInjury",
+        ["recordCount"] = 10,
+    },
+    {
         ["domain"] = "social_affirmation",
         ["kind"] = "realization",
         ["module"] = "PNC/ConvoEngine/Index/Realization/SocialAffirmation",

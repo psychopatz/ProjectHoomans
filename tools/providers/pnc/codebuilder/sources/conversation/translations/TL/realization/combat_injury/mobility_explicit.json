@@ -1,0 +1,21 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "construction.combat_injury.mobility_explicit",
+  "locale": "TL",
+  "entries": {
+    "realization.translations": [
+      {
+        "kind": "literal",
+        "value": "bumabagal ang kilos ko dahil sa sugat sa "
+      },
+      {
+        "kind": "lexeme",
+        "slot": "wound_part"
+      },
+      {
+        "kind": "literal",
+        "value": " ko"
+      }
+    ]
+  }
+}

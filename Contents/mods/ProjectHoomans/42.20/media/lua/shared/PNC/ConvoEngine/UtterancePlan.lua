@@ -6,6 +6,8 @@ PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 PNC.ConvoEngine = PNC.ConvoEngine or {}
 
+local ClausePlan = require "PsychopatzCore/ConvoEngine/ClausePlan"
+
 local UtterancePlan = PNC.ConvoEngine.UtterancePlan or {}
 PNC.ConvoEngine.UtterancePlan = UtterancePlan
 
@@ -218,6 +220,9 @@ function UtterancePlan.New(spec)
             slotCount = slotCount + 1
         end
     end
+    if spec.composition ~= nil then
+        plan.composition, plan.compositionError = ClausePlan.Normalize(spec.composition)
+    end
     return plan
 end
 
@@ -254,11 +259,11 @@ local function constructionFor(plan, locale)
     return eligible[index]
 end
 
-local function externalConvoText(key, fallback)
+local function externalConvoText(key, fallback, owner)
     if type(key) ~= "string" or key == "" then return nil end
     local manager = CustomTranslationManager
     if type(manager) == "table" and type(manager.get) == "function" then
-        local ok, value = pcall(manager.get, "PsychopatzCore", "Conversation", key, fallback)
+        local ok, value = pcall(manager.get, owner or "PsychopatzCore", "Conversation", key, fallback)
         if ok and type(value) == "string" and value ~= "" and value ~= key then
             return value
         end
@@ -288,11 +293,7 @@ local function parseTemplateTokens(pattern)
     return tokens
 end
 
-function UtterancePlan.Realize(plan)
-    if type(plan) ~= "table" or plan.kind ~= "semantic_utterance_plan" then
-        return nil, "utterance_plan_invalid"
-    end
-    local locale = currentLocale(plan)
+local function realizeSimple(plan, locale, slotLimit, composed)
     local construction = constructionFor(plan, locale) or constructionFor(plan, "EN")
     if not construction then
         return nil, "construction_unavailable"
@@ -301,9 +302,11 @@ function UtterancePlan.Realize(plan)
     loadCatalog()
     local activeTokens = construction.tokens or {}
     if locale ~= "EN" and type(construction.translationKey) == "string" and construction.translationKey ~= "" then
-        local localizedPattern = externalConvoText(construction.translationKey, nil)
+        local localizedPattern = externalConvoText(construction.translationKey, nil, construction.owner)
         if localizedPattern then
             activeTokens = parseTemplateTokens(localizedPattern)
+        elseif composed then
+            return nil, "construction_locale_unavailable"
         end
     end
     local parts = {}
@@ -315,10 +318,15 @@ function UtterancePlan.Realize(plan)
         elseif kind == "lexeme" then
             local concept = plan.lexemes[tostring(token.slot or "")]
             local lexeme = concept and lexemesByConcept[concept] or nil
-            local form = lexeme and lexeme.forms
-                and (lexeme.forms[locale] or lexeme.forms.EN)
-                or (lexeme and (externalConvoText(lexeme.translationKey, lexeme.fallback) or lexeme.fallback))
-                or nil
+            local form = lexeme and lexeme.forms and lexeme.forms[locale]
+            if not form and lexeme then
+                if composed and locale == "EN" then
+                    form = lexeme.fallback or (lexeme.forms and lexeme.forms.EN)
+                else
+                    form = externalConvoText(lexeme.translationKey, lexeme.fallback, lexeme.owner)
+                        or lexeme.fallback or (lexeme.forms and lexeme.forms.EN)
+                end
+            end
             if not form or form == "" then
                 return nil, "lexeme_unavailable"
             end
@@ -329,7 +337,7 @@ function UtterancePlan.Realize(plan)
             if plan.safeSlots[slot] ~= true or plan.slots[slot] == nil then
                 return nil, "unsafe_or_missing_slot"
             end
-            parts[#parts + 1] = bounded(plan.slots[slot], 96)
+            parts[#parts + 1] = bounded(plan.slots[slot], slotLimit or 96)
         else
             return nil, "construction_token_unsupported"
         end
@@ -346,6 +354,41 @@ function UtterancePlan.Realize(plan)
         dialogueAct = plan.dialogueAct,
         lexemeIDs = usedLexemes,
     }, "realized"
+end
+
+function UtterancePlan.Realize(plan)
+    if type(plan) ~= "table" or plan.kind ~= "semantic_utterance_plan" then
+        return nil, "utterance_plan_invalid"
+    end
+    if plan.compositionError then return nil, plan.compositionError end
+    local locale = currentLocale(plan)
+    if not plan.composition then return realizeSimple(plan, locale) end
+
+    local function renderClause(clause, mode)
+        local strategy = clause.strategy
+        for i = 1, #clause.modifiers do strategy = strategy .. "_" .. clause.modifiers[i] end
+        if mode then strategy = strategy .. "_" .. string.upper(mode) end
+        return realizeSimple({
+            strategy = strategy, dialogueAct = plan.dialogueAct, styleVariant = plan.styleVariant,
+            selectionSalt = plan.selectionSalt, lexemes = plan.lexemes, slots = plan.slots, safeSlots = plan.safeSlots,
+        }, locale, nil, true)
+    end
+    local function renderRelation(relation, left, right)
+        return realizeSimple({
+            strategy = "RELATION_" .. relation, dialogueAct = "COMPOSE", styleVariant = plan.styleVariant,
+            selectionSalt = plan.selectionSalt,
+            slots = { clause_left = left, clause_right = right },
+            safeSlots = { clause_left = true, clause_right = true },
+        }, locale, UtterancePlan.MAX_TEXT, true)
+    end
+    local result, reason = ClausePlan.Realize(plan.composition, renderClause, renderRelation)
+    if not result then return nil, reason end
+    result.kind = "semantic_utterance_realization"
+    result.schemaVersion = UtterancePlan.VERSION
+    result.locale = locale
+    result.strategy = plan.strategy
+    result.dialogueAct = plan.dialogueAct
+    return result, "realized"
 end
 
 local function contains(values, wanted)

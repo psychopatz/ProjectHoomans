@@ -77,6 +77,14 @@
       "order": 3011,
       "owner": "ProjectHoomans",
       "domainFromSubdir": true
+    },
+    {
+      "path": "realization",
+      "kind": "convo_engine",
+      "domain": "general",
+      "order": 3012,
+      "owner": "ProjectHoomans",
+      "domainFromSubdir": true
     }
   ]
 }

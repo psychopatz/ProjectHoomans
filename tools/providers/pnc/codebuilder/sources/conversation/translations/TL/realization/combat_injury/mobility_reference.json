@@ -1,0 +1,13 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "construction.combat_injury.mobility_reference",
+  "locale": "TL",
+  "entries": {
+    "realization.translations": [
+      {
+        "kind": "literal",
+        "value": "bumabagal pa rin ang kilos ko dahil dito"
+      }
+    ]
+  }
+}

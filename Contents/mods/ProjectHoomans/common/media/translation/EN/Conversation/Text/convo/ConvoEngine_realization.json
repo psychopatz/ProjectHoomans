@@ -1,0 +1,8 @@
+{
+  "convo.construction.combat_injury.dressing": "my {lexeme:wound_part} is bandaged",
+  "convo.construction.combat_injury.dressing_dressing_dirty": "the bandage on my {lexeme:wound_part} is dirty",
+  "convo.construction.combat_injury.mobility_explicit": "the injury on my {lexeme:wound_part} is slowing me down",
+  "convo.construction.combat_injury.mobility_reference": "it's slowing me down",
+  "convo.lexeme.combat_injury.hip": "hip",
+  "convo.lexeme.combat_injury.leg": "leg"
+}
