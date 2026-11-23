@@ -5,13 +5,13 @@ target_repo: "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
 branch: "main"
 phase_commit: "self"
 phase_commit_phase: "H10R8"
-phase_commit_message: "Match NPC treatment materials to Build 42"
+phase_commit_message: "Use actual treatment materials in wound dialogue"
 state: "USER_ACCEPTANCE"
 parent_status: "IN_PROGRESS"
 phase: "H11"
 chunk: "Witness observation gating and non-colonist visible-condition awareness"
 retrieval_tier: "verify"
-phase_commit_vector: "psychopatz-core=21499cfb6412414a46bda8a4058429defe206797;project-hoomans=self;dynamic-trading=62757d0b7fc1c114873735387827ccad9d828077"
+phase_commit_vector: "psychopatz-core=2df8f2cceb9ab751cc7f813287bbf2ff7a58a7ec;project-hoomans=self;dynamic-trading=62757d0b7fc1c114873735387827ccad9d828077"
 phase_residual_vector: "psychopatz-core=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;project-hoomans=a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f;dynamic-trading=f8a3016d89344add854593d73e4170362efc8de00531cffdb129f3b976936188"
 residual_worktree_fingerprint: "a709d4c2b505952658c06044726110ba4ccebe001b7c233ca939f42d1c555d4f"
 updated_at: "2026-11-23T02:19:24Z"
@@ -27,3 +27,5 @@ H11 is user-owned native SP/MP acceptance. Recheck the Character Health random-w
 
 
 For the treatment follow-up, give an NPC ripped sheets, a bandage, and a sterilized variant in separate runs. Check consumption and the matching Health panel name and icon. Let the dressing become dirty, then remove it through the Health panel and check the returned item. Apply a crafted splint and an improvised splint in separate fracture tests, then check recovery and returned components. In MP, repeat from a remote client in and out of treatment range and save/reload a patient with treatment still applied.
+
+Recheck the wound-status and witness comments in EN and TL. A patient with a sterilized cloth dressing can name it. A casual observer sees cloth. A spent dressing can be described as dirty. A visibly different replacement is eligible for one fresh observation, and an improvised splint can be described by its wooden support.

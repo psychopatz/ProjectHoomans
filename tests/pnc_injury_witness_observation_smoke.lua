@@ -25,6 +25,7 @@ PNC = {
 
 local S = require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_SituationQuery"
 require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_VisibleObservation"
+S.ValidateInjuryLine = function(text) return text end
 S.ResolveSemanticLine = function(_, _, _, _, _, _, _, options) return options.replyRole end
 S.DeliverBark = function()
     sent = sent + delivery
@@ -49,6 +50,19 @@ T.truthy(ok, "dirty dressing transition is visible")
 T.equal(variant, "dirty_bandage", "a dressing does not reveal the bite or infection underneath")
 T.falsy(S.ResolveObserverEpistemicPolicy({ skills = { FirstAid = 5 } }, injured, {}).canStatePreciseDiagnosis,
     "medical skill alone does not establish a diagnosis")
+
+profile.selectedWound.bandageDirty = false
+profile.selectedWound.bandageType = "Base.Bandage"
+profile.selectedWound.treatmentState = "bandaged"
+local clean, _, cleanBeat = S.OnVisibleConditionObserved(observer, injured, 86400007)
+T.truthy(clean)
+T.contains(cleanBeat.text, "a bandage")
+profile.selectedWound.bandageType = "Base.DenimStrips"
+local changed, _, changedBeat = S.OnVisibleConditionObserved(observer, injured, 86400008)
+T.truthy(changed, "a visibly different dressing makes observation eligible")
+T.equal(changedBeat.changeReason, "treatment_changed")
+T.contains(changedBeat.text, "a strip of denim")
+T.falsy(S.OnVisibleConditionObserved(observer, injured, 86400009), "unchanged material stays silent")
 
 for i = 1, 12 do
     S.RecordWitnessObservation(observer, { id = "other-" .. i }, profile, 86400007)

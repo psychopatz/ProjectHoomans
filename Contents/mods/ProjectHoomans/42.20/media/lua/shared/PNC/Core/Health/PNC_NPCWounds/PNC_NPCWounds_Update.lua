@@ -74,6 +74,7 @@ local function updateBandagedWound(record, body, partId, wound, currentHour)
         wound.bandageLife = 0
         wound.lastHealWorldHour = currentHour
         changed = true
+        if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "bandage_dirty") end
         Internal.EmitWoundStateChange(record, partId, "bandage_dirty", wound)
     end
     return changed

@@ -46,6 +46,47 @@ profile.selectedWound.functionalImpairment = "limb_mobility"
 profile.selectedWound.bandaged = false
 T.falsy(Composition.Realize(profile, { locale = "EN" }), "other wound treatment cannot authorize a dressing claim")
 
+local treatmentWound = {
+    bodyPart = "ForeArm_L", bandaged = true, bandageType = "Base.AlcoholRippedSheets",
+    sterileDressing = true,
+}
+local treated = { totalWoundCount = 1, selectedWound = treatmentWound }
+local self = assert(Composition.Realize(treated, { locale = "EN" }))
+T.contains(self.text, "a sterilized strip of cloth")
+T.equal(self.clauses[1].claims[2], "COMBAT_TREATMENT_STERILE_RAG")
+local observed = assert(Composition.Realize(treated, { locale = "TL", observed = true }))
+T.contains(observed.text, "piraso ng tela")
+T.falsy(string.find(observed.text, "isterilisado", 1, true), "sterility is not visible")
+local disclosed = assert(Composition.Realize(treated, { locale = "TL", observed = true, treatmentKnown = true }))
+T.contains(disclosed.text, "isterilisadong piraso ng tela")
+T.contains(disclosed.text, "tinakpan mo", "observer perspective survives disclosure")
+
+PNC.NPCWounds = {}
+require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_TruthValidation"
+local check = PNC.NPCWounds.ValidateInjuryClaims
+T.truthy(check(self, treated, "experienced"))
+local accepted, mismatch = check(self, treated, "inferred")
+T.falsy(accepted)
+T.equal(mismatch, "TREATMENT_REALIZATION_MISMATCH")
+T.truthy(check(observed, treated, "inferred"))
+
+treatmentWound.bandageDirty = true
+treatmentWound.spentBandageType = "Base.RippedSheetsDirty"
+local dirty = assert(Composition.Realize(treated, { locale = "EN", observed = true }))
+T.contains(dirty.text, "looks dirty")
+T.equal(dirty.clauses[1].claims[2], "COMBAT_TREATMENT_RAG")
+T.falsy(check(self, treated, "experienced"), "a spent dressing cannot be described as sterile")
+T.truthy(check(dirty, treated, "inferred"))
+
+treatmentWound.bandaged, treatmentWound.splinted, treatmentWound.splintItem = false, true, "Base.Plank"
+local splint = assert(Composition.Realize(treated, { locale = "EN", observed = true }))
+T.contains(splint.text, "a plank for a splint")
+T.truthy(check(splint, treated, "inferred"))
+treatmentWound.splinted = false
+T.falsy(check(splint, treated, "inferred"), "a stored item does not imply an applied splint")
+treatmentWound.bandaged, treatmentWound.bandageDirty, treatmentWound.virtualDressing = true, false, true
+T.falsy(Composition.Realize(treated, { locale = "EN" }), "a virtual dressing contributes no material")
+
 local ClausePlan = require "PsychopatzCore/ConvoEngine/ClausePlan"
 local plan, reason = ClausePlan.Normalize({ clauses = {
     { strategy = "FIRST" }, { strategy = "SECOND", relation = "but" },

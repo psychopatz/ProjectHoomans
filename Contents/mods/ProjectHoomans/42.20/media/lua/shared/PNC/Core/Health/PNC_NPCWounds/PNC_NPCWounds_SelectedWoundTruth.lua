@@ -76,6 +76,7 @@ function SelectedTruth.Build(Dims, body, partId, wound, resolvedType, rStats, pa
         woundType = resolvedType, bodyPart = partId, partLabel = partDef and partDef.label or partId,
         bodyRegion = region, bandaged = bandaged, bandageDirty = bandageDirty,
         bandageType = bandaged and w.bandageType or nil,
+        virtualDressing = bandaged and w.virtualDressing == true or false,
         spentBandageType = bandageDirty and w.spentBandageType or nil,
         sterileDressing = bandaged and not bandageDirty and w.sterileDressing == true,
         splintItem = splinted and w.splintItem or nil,

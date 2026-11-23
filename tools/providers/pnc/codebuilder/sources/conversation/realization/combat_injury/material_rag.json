@@ -1,0 +1,7 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "lexeme.combat_injury.material_rag",
+  "owner": "ProjectHoomans",
+  "type": "lexeme",
+  "concept": "COMBAT_TREATMENT_RAG"
+}

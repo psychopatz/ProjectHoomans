@@ -1,0 +1,21 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "construction.combat_injury.self_splint_material",
+  "locale": "EN",
+  "entries": {
+    "realization.translations": [
+      {
+        "kind": "literal",
+        "value": "I used "
+      },
+      {
+        "kind": "lexeme",
+        "slot": "treatment_material"
+      },
+      {
+        "kind": "literal",
+        "value": " to hold the fracture still"
+      }
+    ]
+  }
+}

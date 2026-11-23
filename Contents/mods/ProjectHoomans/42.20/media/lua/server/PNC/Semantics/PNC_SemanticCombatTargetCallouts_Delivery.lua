@@ -31,7 +31,7 @@ function S.ValidateInjuryLine(text, profile, evidence, knowledge)
     if not text or not profile or not profile.selectedWound or not wounds then return text end
     local valid, reason, detail
     if evidence and wounds.ValidateInjuryClaims then
-        valid, reason, detail = wounds.ValidateInjuryClaims(evidence, profile)
+        valid, reason, detail = wounds.ValidateInjuryClaims(evidence, profile, knowledge)
     elseif wounds.ValidateRealizationAgainstSelectedWound then
         valid, reason = wounds.ValidateRealizationAgainstSelectedWound(text, profile)
     end

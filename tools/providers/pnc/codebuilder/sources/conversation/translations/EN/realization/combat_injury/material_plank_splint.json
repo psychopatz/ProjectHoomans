@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "lexeme.combat_injury.material_plank_splint",
+  "locale": "EN",
+  "entries": {
+    "realization.forms": "a plank for a splint"
+  }
+}

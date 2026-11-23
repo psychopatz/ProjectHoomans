@@ -18,6 +18,8 @@ local S = PNC.Semantics.CombatTargetCallouts or {}
 local I = PNC.Semantics.CombatTargetCalloutsInternal
 PNC.Semantics.CombatTargetCallouts = S
 
+local WoundComposition = require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_WoundComposition"
+
 local OBS_OPTS = {
     family = "combat_injury_visible_observation",
     priority = 68, priorityHoldMs = 600, cooldownMs = 1500, familyCooldownMs = 1500, ttlMs = 9000,
@@ -107,6 +109,13 @@ function S.OnVisibleConditionObserved(obs, inj, now, opts)
         "human_hostile", ref, nil, toks, { replyRole = variant, topic = "combat_injury", inCombat = false, poolID = "semantic.combat.injury.visible_observation", context = ctx,
             utteranceEvidence = VISIBLE_CLAIMS[variant] }
     )
+    if variant == "dirty_bandage" or variant == "default" then
+        local composed = WoundComposition.Realize(prof, { observed = true, treatmentKnown = ep.canStatePreciseDiagnosis })
+        if composed then
+            text = S.ValidateInjuryLine(composed.text, prof, composed,
+                ep.observerCanInferOnly and "inferred" or "known") or text
+        end
+    end
     if not text then return false, "observation_realization_unavailable" end
 
     local facts = { [ref] = {

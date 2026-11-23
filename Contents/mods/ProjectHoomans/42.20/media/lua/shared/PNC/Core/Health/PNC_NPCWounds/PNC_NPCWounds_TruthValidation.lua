@@ -1,6 +1,7 @@
 -- Negative semantic truth validator for realized injury/physiology text.
 PNC = PNC or {}
 local Wounds = PNC.NPCWounds
+local TreatmentSpeech = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_TreatmentSpeech"
 
 local LOCOMOTION_IMPAIRMENTS = {
     limb_mobility = true,
@@ -73,7 +74,7 @@ local CLAIMS = {
     ordinaryInfection = { "ordinaryInfection", "INFECTION_REALIZATION_MISMATCH" },
 }
 
-function Wounds.ValidateInjuryClaims(evidence, profile)
+function Wounds.ValidateInjuryClaims(evidence, profile, knowledge)
     local wound = profile.selectedWound
     if not wound then return false, "SELECTED_WOUND_UNAVAILABLE" end
     for _, clause in ipairs(evidence.clauses or {}) do
@@ -81,6 +82,11 @@ function Wounds.ValidateInjuryClaims(evidence, profile)
             return false, "REFERENCE_AMBIGUOUS"
         end
         for _, claim in ipairs(clause.claims or {}) do
+            if TreatmentSpeech.IsMaterialClaim(claim)
+                and not TreatmentSpeech.Matches(wound, claim, knowledge == "inferred")
+            then
+                return false, "TREATMENT_REALIZATION_MISMATCH", claim
+            end
             local spec = CLAIMS[claim]
             if spec and wound[spec[1]] ~= true then return false, spec[2], claim end
             if claim == "locomotionImpaired" and not LOCOMOTION_IMPAIRMENTS[wound.functionalImpairment] then

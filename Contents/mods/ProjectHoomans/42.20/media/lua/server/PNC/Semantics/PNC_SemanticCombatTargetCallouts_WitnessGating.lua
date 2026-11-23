@@ -32,6 +32,8 @@ local function dayBucket(now)
 end
 S.CurrentWorldDayBucket = dayBucket
 
+local TreatmentSpeech = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_TreatmentSpeech"
+
 local observations = setmetatable({}, { __mode = "k" })
 local FEVER = { feverish = 1, high_fever = 2 }
 local SICKNESS = { moderate = 1, severe = 2 }
@@ -48,6 +50,7 @@ local function signature(prof, opts)
         count = tonumber(prof.totalWoundCount) or CNT_R[prof.woundCountBand] or 0,
         knox = hasDiagnosis and (KNX_R[sel.knoxStage] or KNX_R[sel.knoxExposure]) or 0,
         treatment = sel.treatmentState or prof.treatmentState,
+        treatmentMaterial = TreatmentSpeech.Describe(sel, not hasDiagnosis),
         region = sel.bodyRegion or prof.bodyRegion,
         part = sel.bodyPart or prof.partId,
         bite = (exposed or hasDiagnosis or (opts and opts.witnessedHit)) and sel.woundType == "bite",
@@ -96,7 +99,7 @@ function S.EvaluateWitnessObservationGate(obs, inj, prof, now, opts)
     elseif cur.dirty and not prev.dirty then reason = "dressing_dirty"
     elseif cur.infected and not prev.infected then reason = "infection_visible"
     elseif cur.physiology > prev.physiology then reason = "physiology_worsened"
-    elseif cur.treatment ~= prev.treatment then reason = "treatment_changed" end
+    elseif cur.treatment ~= prev.treatment or cur.treatmentMaterial ~= prev.treatmentMaterial then reason = "treatment_changed" end
     if not reason then return false, "unchanged_today" end
     return true, reason, {
         firstOfDay = not prev, newSinceLastObservation = newWound,

@@ -646,7 +646,7 @@ return {
         ["domain"] = "combat_injury",
         ["kind"] = "realization",
         ["module"] = "PNC/ConvoEngine/Index/Realization/CombatInjury",
-        ["recordCount"] = 12,
+        ["recordCount"] = 35,
     },
     {
         ["domain"] = "social_affirmation",

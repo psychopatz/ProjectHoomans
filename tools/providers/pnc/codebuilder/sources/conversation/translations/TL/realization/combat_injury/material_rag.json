@@ -1,0 +1,8 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "lexeme.combat_injury.material_rag",
+  "locale": "TL",
+  "entries": {
+    "realization.forms": "piraso ng tela"
+  }
+}

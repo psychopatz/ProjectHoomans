@@ -25,6 +25,8 @@
 
 The authority records the applied clothing strip, bandage, or splint and carries the material through save/load and the Health panel. Native item definitions provide bandage power, sterility, and spent-item identity. Physically applied dressings and splints can be removed from the Health panel. A dressing that becomes dirty stays on the patient until removal or replacement. An improvised splint returns the support and ripped sheet. A crafted splint returns the splint.
 
+EN and TL wound-status, dirty-dressing, and visible-treatment comments use the selected wound’s real material. Firsthand knowledge or disclosure can name a sterile dressing. A casual witness can describe its visible material. A visible material change can reopen the existing observation gate.
+
 NPCs use their existing wound model to integrate healing and dressing wear over world hours. The installed game supplies the sterilization recipes. NPCs can consume an already sterilized item from inventory. The six focused health, treatment, UI, scale, and server guard tests passed. Native treatment timing and multiplayer inventory presentation remain part of H11.
 
 ## Completed in H10R8

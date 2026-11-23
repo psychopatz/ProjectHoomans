@@ -1,0 +1,21 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "construction.combat_injury.self_dressing_material_dressing_dirty",
+  "locale": "TL",
+  "entries": {
+    "realization.translations": [
+      {
+        "kind": "literal",
+        "value": "Tinakpan ko ang sugat gamit ang "
+      },
+      {
+        "kind": "lexeme",
+        "slot": "treatment_material"
+      },
+      {
+        "kind": "literal",
+        "value": ", at marumi na ang pantakip"
+      }
+    ]
+  }
+}
