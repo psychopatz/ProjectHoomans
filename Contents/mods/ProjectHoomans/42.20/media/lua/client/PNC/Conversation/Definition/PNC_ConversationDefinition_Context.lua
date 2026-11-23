@@ -95,6 +95,14 @@ local function visibleIdentityArguments(
         player = player,
         playerContext = playerContext,
         playerUUID = playerContext.characterUUID or playerContext.playerUUID,
+        relationshipKind = entry and (
+            entry.relationshipKind or entry.relationshipCategory
+                or entry.relationshipState or entry.socialRole
+                or entry.npcType or entry.tacticalClass
+        ) or nil,
+        tone = entry and (entry.tone or entry.beatTone) or nil,
+        persona = entry and (entry.persona or entry.personaStyle) or nil,
+        familiarity = entry and entry.familiarity or nil,
         state = clientState,
     })
     local npcFull, npcFirst, npcLast, npcDisplay = npcIdentity(

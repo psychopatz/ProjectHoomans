@@ -125,4 +125,51 @@ T.truthy(teammateDelivery.accepted,
 T.equal(teammateCallbackText, "Jordan, Alexandra.",
     "ambient LLM output uses first names at the presentation boundary")
 
+-- Unknown neutral NPCs must never receive the player's real name merely
+-- because an older ambient payload omitted the knowledge flag.
+PNC.Network.ClientState.playerNameKnowledge = {
+    ["npc-stranger"] = false,
+}
+local strangerItem = {
+    eventID = "ambient:event:stranger",
+    family = "combat_commentary",
+    speakerID = "npc-stranger",
+    speakerName = "Unknown Survivor",
+    playerUUID = "player-one",
+    context = {
+        name = "Unknown Survivor",
+        player = "Alexandra Maximilian Longsurname",
+        playerFirstName = "Alexandra",
+        playerFullName = "Alexandra Maximilian Longsurname",
+        playerIsFemale = true,
+        socialRole = "neutral",
+        relationshipState = "neutral",
+        relationshipTier = "reserved",
+        eventType = "zombie_kill_witnessed",
+    },
+}
+local strangerAccepted, strangerReason = Integration.SubmitAmbientFlavor(
+    strangerItem,
+    function() end
+)
+T.truthy(strangerAccepted,
+    "unknown neutral ambient request is accepted: " .. tostring(strangerReason))
+local strangerPacket = Integration.Poll()
+T.equal(strangerPacket.conversation_context.player_name_known, false,
+    "unknown ambient NPC is not granted player-name knowledge")
+T.equal(strangerPacket.conversation_context.player_name, "miss",
+    "unknown neutral NPC uses the formal female address")
+T.equal(strangerPacket.conversation_context.player_full_name, nil,
+    "unknown ambient payload does not expose the real full name")
+T.falsy(string.find(
+    strangerPacket.conversation_context.message,
+    "Alexandra",
+    1,
+    true
+), "unknown ambient prompt does not expose the real first name")
+Integration.Deliver({
+    request_id = strangerPacket.request_id,
+    response_text = "Stay sharp.",
+})
+
 T.finish("pnc_pbrainz_ambient_smoke")

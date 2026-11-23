@@ -18,7 +18,7 @@ function Executor.GetCandidates(npcId)
     local actor = Registry and Registry.Get and Registry.Get(npcId) or nil
     local candidates = {}
     local at = PNC.Core.Now()
-    if not actor or not Internal.IsDoctor(actor) then return candidates end
+    if not actor or not WorkPolicy.IsEnabled(actor, "MedicalCare") then return candidates end
     for _, task in ipairs(Service.List(false)) do
         local supplyTask = preflightMissingSupply(task, at)
         if supplyTask then

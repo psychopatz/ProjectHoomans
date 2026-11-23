@@ -1,0 +1,31 @@
+{
+  "schema": "psychopatz.convo-engine.v1",
+  "id": "medical.care.assisted",
+  "owner": "ProjectHoomans",
+  "metadata": {
+    "category": "projecthoomans:event_reactions",
+    "contentOwner": "projecthoomans.dialogue_content.events",
+    "responseAct": "REACT"
+  },
+  "say": {
+    "variants": [
+      { "id": "start_patch_npc" },
+      { "id": "start_patch_player" },
+      { "id": "start_change_dirty" },
+      { "id": "complete_patch" },
+      { "id": "complete_change_dirty" },
+      { "id": "patient_thanks" },
+      { "id": "default" }
+    ]
+  },
+  "roles": {
+    "speaker": { "cardinality": "ONE", "kinds": [ "actor" ] },
+    "addressee": { "cardinality": "ONE", "kinds": [ "actor" ] }
+  },
+  "slots": {
+    "wound": { "type": "entity.item", "required": false }
+  },
+  "domains": [ { "domain": "combat", "owner": "ProjectHoomans" } ],
+  "topics": [ { "id": "medical", "domain": "combat" } ],
+  "events": [ { "id": "medical_care_assisted", "kind": "social_event" } ]
+}

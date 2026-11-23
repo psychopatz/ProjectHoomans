@@ -97,4 +97,38 @@ T.equal(applied.semanticAddress, resolved.address,
 T.equal(applied.identityKnown, false,
     "applied address invented identity knowledge")
 
+local unknownMale = Resolver.ResolveForNPC({
+    npcID = "npc-neutral-male",
+    playerUUID = "player-1",
+    isMale = true,
+    relationshipState = "neutral",
+    state = { playerNameKnowledge = { ["npc-neutral-male"] = false } },
+})
+T.equal(unknownMale.known, false,
+    "neutral NPC unexpectedly learned the player's name")
+T.equal(unknownMale.addressName, "mister",
+    "neutral unknown male did not use the formal address")
+
+local unknownFemale = Resolver.ResolveForNPC({
+    npcID = "npc-neutral-female",
+    playerUUID = "player-1",
+    isFemale = true,
+    relationshipState = "stranger",
+    state = { playerNameKnowledge = { ["npc-neutral-female"] = false } },
+})
+T.equal(unknownFemale.addressName, "miss",
+    "neutral unknown female did not use the formal address")
+
+local missingKnowledgeFlag = Resolver.ResolveForNPC({
+    npcID = "npc-missing-knowledge",
+    playerUUID = "player-1",
+    isFemale = true,
+    playerFirstName = "ActualPlayerName",
+    relationshipState = "neutral",
+})
+T.equal(missingKnowledgeFlag.known, false,
+    "missing name-knowledge flag defaulted to known")
+T.falsy(missingKnowledgeFlag.addressName == "ActualPlayerName",
+    "real player name leaked without explicit knowledge")
+
 T.finish("pnc_semantic_address_resolver_smoke")

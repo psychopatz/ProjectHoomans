@@ -257,6 +257,22 @@ function Presentation.BuildSpeechContext(player, context)
             and context.playerNameKnown or nil,
         isFemale = type(context) == "table"
             and context.playerIsFemale or nil,
+        relationshipKind = targets[1] and (
+            targets[1].relationshipKind or targets[1].relationshipCategory
+                or targets[1].relationshipState or targets[1].socialRole
+                or targets[1].npcType or targets[1].tacticalClass
+        ) or type(context) == "table" and (
+            context.relationshipKind or context.relationshipState
+                or context.socialRole or context.npcType
+        ) or nil,
+        tone = targets[1] and (targets[1].tone or targets[1].beatTone)
+            or type(context) == "table" and (context.tone or context.beatTone)
+            or nil,
+        persona = targets[1] and (targets[1].persona or targets[1].personaStyle)
+            or type(context) == "table"
+                and (context.persona or context.personaStyle) or nil,
+        familiarity = targets[1] and targets[1].familiarity
+            or type(context) == "table" and context.familiarity or nil,
         state = state,
     })
     return {

@@ -9,9 +9,23 @@ local Dressing = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Dressing"
 Wounds.GetBandageReturnType = Dressing.ReturnType
 
 local function isTreatable(wound)
-    return wound and not wound.dressingHealed and not (wound.type == "fracture" and wound.splinted == true and wound.bandaged == true)
-        and ((wound.bandaged ~= true and not (wound.type == "fracture" and wound.splinted == true))
-            or wound.bandageDirty == true)
+    if not wound or wound.dressingHealed then return false end
+    if wound.bandageDirty == true then return true end
+    if wound.type == "fracture" and wound.splinted == true then return false end
+    return wound.bandaged ~= true
+end
+
+function Wounds.FindRemovableHealedDressing(record)
+    local body = Wounds.Ensure(record)
+    for i = 1, #Wounds.PartOrder do
+        local partId = Wounds.PartOrder[i]
+        local wound = body.wounds[partId]
+        if wound and wound.dressingHealed == true then
+            if wound.bandaged == true then return partId, wound, "bandage" end
+            if wound.splinted == true then return partId, wound, "splint" end
+        end
+    end
+    return nil
 end
 
 function Wounds.GetTreatableWounds(record)

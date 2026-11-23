@@ -480,7 +480,7 @@ return {
             ["sourcePath"] = "dialogue/combat_wound_callouts/combat_injury_visible_observation.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/InjuryVisibleObservationToWoundReceivedBeat",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/CombatInjuryVisibleObservationToMedicalCareAssisted",
         ["namespace"] = "combat.injury",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1166,7 +1166,7 @@ return {
             ["sourcePath"] = "dialogue/combat_wound_callouts/combat_wound_ally_reaction.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/InjuryVisibleObservationToWoundReceivedBeat",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/CombatInjuryVisibleObservationToMedicalCareAssisted",
         ["namespace"] = "combat.wound",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -1776,7 +1776,7 @@ return {
             ["sourcePath"] = "dialogue/combat_wound_callouts/combat_wound_received_beat.json",
             ["sourceSchema"] = "psychopatz.convo-engine.v1",
         },
-        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/InjuryVisibleObservationToWoundReceivedBeat",
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/CombatInjuryVisibleObservationToMedicalCareAssisted",
         ["namespace"] = "combat.wound",
         ["owner"] = "ProjectHoomans",
         ["participants"] = {
@@ -2132,6 +2132,333 @@ return {
                 ["realizationKey"] = "1",
                 ["role"] = "spoken_action",
                 ["templateID"] = "convo.combat.wound.received_beat.say.1.default",
+                ["variantID"] = "default",
+            },
+        },
+        ["when"] = nil,
+    },
+    {
+        ["domain"] = "combat_wound_callouts",
+        ["domainPath"] = "combat_wound_callouts",
+        ["exchangeFamily"] = {
+            ["familyID"] = "medical.care.assisted",
+            ["initiatingSay"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Hold still, {addressee.name}, let me wrap your {slot.wound.part}.",
+                                ["id"] = "start_patch_npc",
+                                ["templateID"] = "convo.medical.care.assisted.say.1.start_patch_npc",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Hold still, {addressee.name}, let me patch up your {slot.wound.part}.",
+                                ["id"] = "start_patch_player",
+                                ["templateID"] = "convo.medical.care.assisted.say.1.start_patch_player",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "That dressing on your {slot.wound.part} is filthy, {addressee.name}, let me change it.",
+                                ["id"] = "start_change_dirty",
+                                ["templateID"] = "convo.medical.care.assisted.say.1.start_change_dirty",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "All set, {addressee.name}, that {slot.wound.part} is wrapped tight.",
+                                ["id"] = "complete_patch",
+                                ["templateID"] = "convo.medical.care.assisted.say.1.complete_patch",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Fresh wrap on your {slot.wound.part}, {addressee.name}, keep it clean.",
+                                ["id"] = "complete_change_dirty",
+                                ["templateID"] = "convo.medical.care.assisted.say.1.complete_change_dirty",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Thanks, {addressee.name}, that feels a lot better already.",
+                                ["id"] = "patient_thanks",
+                                ["templateID"] = "convo.medical.care.assisted.say.1.patient_thanks",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                            {
+                                ["fallback"] = "Hold still, {addressee.name}, tending your {slot.wound.part}.",
+                                ["id"] = "default",
+                                ["templateID"] = "convo.medical.care.assisted.say.1.default",
+                                ["textRole"] = "spoken_action",
+                                ["variantCount"] = 2,
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["namespace"] = "medical.care",
+            ["slots"] = {
+                ["wound"] = {
+                    ["multiple"] = false,
+                    ["public"] = true,
+                    ["required"] = false,
+                    ["type"] = "entity.item",
+                },
+            },
+            ["textRoles"] = {
+                {
+                    ["fallback"] = "Hold still, {addressee.name}, let me wrap your {slot.wound.part}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.care.assisted.say.1.start_patch_npc",
+                    ["variantID"] = "start_patch_npc",
+                },
+                {
+                    ["fallback"] = "Hold still, {addressee.name}, let me patch up your {slot.wound.part}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.care.assisted.say.1.start_patch_player",
+                    ["variantID"] = "start_patch_player",
+                },
+                {
+                    ["fallback"] = "That dressing on your {slot.wound.part} is filthy, {addressee.name}, let me change it.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.care.assisted.say.1.start_change_dirty",
+                    ["variantID"] = "start_change_dirty",
+                },
+                {
+                    ["fallback"] = "All set, {addressee.name}, that {slot.wound.part} is wrapped tight.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.care.assisted.say.1.complete_patch",
+                    ["variantID"] = "complete_patch",
+                },
+                {
+                    ["fallback"] = "Fresh wrap on your {slot.wound.part}, {addressee.name}, keep it clean.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.care.assisted.say.1.complete_change_dirty",
+                    ["variantID"] = "complete_change_dirty",
+                },
+                {
+                    ["fallback"] = "Thanks, {addressee.name}, that feels a lot better already.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.care.assisted.say.1.patient_thanks",
+                    ["variantID"] = "patient_thanks",
+                },
+                {
+                    ["fallback"] = "Hold still, {addressee.name}, tending your {slot.wound.part}.",
+                    ["realizationKey"] = "1",
+                    ["role"] = "spoken_action",
+                    ["templateID"] = "convo.medical.care.assisted.say.1.default",
+                    ["variantID"] = "default",
+                },
+            },
+        },
+        ["id"] = "medical.care.assisted",
+        ["kind"] = "dialogue",
+        ["lineage"] = {
+            ["authoringSchema"] = "psychopatz.convo-engine.v1",
+            ["canonicalSchema"] = "psychopatz.convo-engine.v1",
+            ["localId"] = "assisted",
+            ["sourceId"] = "medical.care.assisted",
+            ["sourcePath"] = "dialogue/combat_wound_callouts/medical_care_assisted.json",
+            ["sourceSchema"] = "psychopatz.convo-engine.v1",
+        },
+        ["module"] = "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/CombatInjuryVisibleObservationToMedicalCareAssisted",
+        ["namespace"] = "medical.care",
+        ["owner"] = "ProjectHoomans",
+        ["participants"] = {
+            ["addressee"] = {
+                "participant",
+            },
+            ["speaker"] = {
+                "participant",
+            },
+        },
+        ["payload"] = {
+            ["domains"] = {
+                {
+                    ["domain"] = "combat",
+                    ["owner"] = "ProjectHoomans",
+                },
+            },
+            ["events"] = {
+                {
+                    ["id"] = "medical_care_assisted",
+                    ["kind"] = "social_event",
+                },
+            },
+            ["metadata"] = {
+                ["category"] = "projecthoomans:event_reactions",
+                ["contentOwner"] = "projecthoomans.dialogue_content.events",
+                ["responseAct"] = "REACT",
+            },
+            ["say"] = {
+                ["keyOrder"] = {
+                    "1",
+                },
+                ["mode"] = "single",
+                ["realizations"] = {
+                    ["1"] = {
+                        ["key"] = "1",
+                        ["shorthand"] = true,
+                        ["variants"] = {
+                            {
+                                ["fallback"] = "Hold still, {addressee.name}, let me wrap your {slot.wound.part}.",
+                                ["id"] = "start_patch_npc",
+                            },
+                            {
+                                ["fallback"] = "Hold still, {addressee.name}, let me patch up your {slot.wound.part}.",
+                                ["id"] = "start_patch_player",
+                            },
+                            {
+                                ["fallback"] = "That dressing on your {slot.wound.part} is filthy, {addressee.name}, let me change it.",
+                                ["id"] = "start_change_dirty",
+                            },
+                            {
+                                ["fallback"] = "All set, {addressee.name}, that {slot.wound.part} is wrapped tight.",
+                                ["id"] = "complete_patch",
+                            },
+                            {
+                                ["fallback"] = "Fresh wrap on your {slot.wound.part}, {addressee.name}, keep it clean.",
+                                ["id"] = "complete_change_dirty",
+                            },
+                            {
+                                ["fallback"] = "Thanks, {addressee.name}, that feels a lot better already.",
+                                ["id"] = "patient_thanks",
+                            },
+                            {
+                                ["fallback"] = "Hold still, {addressee.name}, tending your {slot.wound.part}.",
+                                ["id"] = "default",
+                            },
+                        },
+                    },
+                },
+                ["textRole"] = "spoken_action",
+            },
+            ["topics"] = {
+                {
+                    ["domain"] = "combat",
+                    ["id"] = "medical",
+                },
+            },
+        },
+        ["references"] = {
+        },
+        ["responsePlan"] = {
+            ["dialogueAct"] = "REACT",
+            ["kind"] = "dialogue_act_plan",
+            ["responsePlanID"] = "medical.care.assisted",
+            ["schemaVersion"] = 1,
+            ["turns"] = {
+                {
+                    ["continuation"] = "end",
+                    ["id"] = "say_1",
+                    ["offers"] = {
+                    },
+                    ["segments"] = {
+                        {
+                            ["args"] = {
+                            },
+                            ["fallback"] = "Hold still, {addressee.name}, let me wrap your {slot.wound.part}.",
+                            ["kind"] = "translation",
+                            ["templateID"] = "convo.medical.care.assisted.say_1",
+                        },
+                    },
+                },
+            },
+        },
+        ["roles"] = {
+            ["addressee"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "addressee",
+            },
+            ["speaker"] = {
+                ["cardinality"] = "ONE",
+                ["kinds"] = {
+                    "actor",
+                },
+                ["role"] = "speaker",
+            },
+        },
+        ["slots"] = {
+            ["wound"] = {
+                ["multiple"] = false,
+                ["public"] = true,
+                ["required"] = false,
+                ["type"] = "entity.item",
+            },
+        },
+        ["sourceShard"] = "dialogue/combat_wound_callouts/medical_care_assisted.json",
+        ["target"] = {
+            ["multiple"] = false,
+            ["required"] = false,
+            ["type"] = "entity.any",
+        },
+        ["textRoles"] = {
+            {
+                ["fallback"] = "Hold still, {addressee.name}, let me wrap your {slot.wound.part}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.care.assisted.say.1.start_patch_npc",
+                ["variantID"] = "start_patch_npc",
+            },
+            {
+                ["fallback"] = "Hold still, {addressee.name}, let me patch up your {slot.wound.part}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.care.assisted.say.1.start_patch_player",
+                ["variantID"] = "start_patch_player",
+            },
+            {
+                ["fallback"] = "That dressing on your {slot.wound.part} is filthy, {addressee.name}, let me change it.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.care.assisted.say.1.start_change_dirty",
+                ["variantID"] = "start_change_dirty",
+            },
+            {
+                ["fallback"] = "All set, {addressee.name}, that {slot.wound.part} is wrapped tight.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.care.assisted.say.1.complete_patch",
+                ["variantID"] = "complete_patch",
+            },
+            {
+                ["fallback"] = "Fresh wrap on your {slot.wound.part}, {addressee.name}, keep it clean.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.care.assisted.say.1.complete_change_dirty",
+                ["variantID"] = "complete_change_dirty",
+            },
+            {
+                ["fallback"] = "Thanks, {addressee.name}, that feels a lot better already.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.care.assisted.say.1.patient_thanks",
+                ["variantID"] = "patient_thanks",
+            },
+            {
+                ["fallback"] = "Hold still, {addressee.name}, tending your {slot.wound.part}.",
+                ["realizationKey"] = "1",
+                ["role"] = "spoken_action",
+                ["templateID"] = "convo.medical.care.assisted.say.1.default",
                 ["variantID"] = "default",
             },
         },

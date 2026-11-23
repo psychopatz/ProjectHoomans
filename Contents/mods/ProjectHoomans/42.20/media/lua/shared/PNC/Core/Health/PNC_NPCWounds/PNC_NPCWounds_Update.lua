@@ -16,7 +16,7 @@ local function healWound(record, body, partId, wound, amount)
         wound.damage = damage - healed
         wound.severity = math.max(0, (tonumber(wound.severity) or damage) - healed)
     end
-    if damage - healed > 0.001 then return healed end
+    if damage - healed > 0.001 then return healed, false end
     if (wound.dressingLifeTracked and not wound.virtualDressing) or wound.splintItem then
         wound.dressingHealed = true
         wound.bleedingRate = 0
@@ -25,37 +25,37 @@ local function healWound(record, body, partId, wound, amount)
         body.wounds[partId] = nil
     end
     Internal.EmitWoundStateChange(record, partId, "wound_healed", wound)
-    return healed
+    return healed, true
 end
 
 local function updateFracture(record, body, partId, wound, currentHour)
-    if wound.type ~= "fracture" or wound.dressingHealed then return false end
+    if wound.type ~= "fracture" or wound.dressingHealed then return false, false end
     local elapsed = math.max(0, currentHour - (tonumber(wound.lastFractureHealHour) or currentHour))
     wound.lastFractureHealHour = currentHour
-    if elapsed == 0 then return false end
+    if elapsed == 0 then return false, false end
     local multiplier = Dressing.NativeMultiplierPerWorldHour() or 3600
     local factor = wound.splinted and (tonumber(wound.splintFactor) or 0) or 0
     local rate = (factor > 0 and 0.00005 * factor or 0.000005) * multiplier
-    healWound(record, body, partId, wound, elapsed * rate)
-    return true
+    local healed, finished = healWound(record, body, partId, wound, elapsed * rate)
+    return finished == true, healed > 0
 end
 
 local function updateBandagedWound(record, body, partId, wound, currentHour)
-    local changed = false
-    if wound.bandageHealedPoints == nil then wound.bandageHealedPoints = 0; changed = true end
+    local discreteChanged, microChanged, dirtyFlipped = false, false, false
+    if wound.bandageHealedPoints == nil then wound.bandageHealedPoints = 0; discreteChanged = true end
     if wound.bandageInitialDamage == nil then
         wound.bandageInitialDamage = math.max(0, (tonumber(wound.damage) or tonumber(wound.severity) or 0) + (tonumber(wound.bandageHealedPoints) or 0))
-        changed = true
+        discreteChanged = true
     end
     if not wound.dressingLifeTracked and (tonumber(wound.lastHealWorldHour) or 0) <= 0 then
         wound.lastHealWorldHour = currentHour
         wound.bandageAppliedWorldHour = currentHour
         wound.dirtyAtWorldHour = currentHour + (tonumber(Const.BANDAGE_DIRTY_AFTER_WORLD_HOURS) or 8)
         wound.healAtWorldHour = 0
-        changed = true
+        discreteChanged = true
     end
-    if wound.dressingHealed == true then return changed end
-    if wound.bandageDirty == true and not wound.dressingLifeTracked then return changed end
+    if wound.dressingHealed == true then return discreteChanged, microChanged, false end
+    if wound.bandageDirty == true and not wound.dressingLifeTracked then return discreteChanged, microChanged, false end
     local lastHealHour = tonumber(wound.lastHealWorldHour) or currentHour
     local dirtyAtHour = tonumber(wound.dirtyAtWorldHour) or math.huge
     local healUntilHour = wound.dressingLifeTracked and currentHour or math.min(currentHour, dirtyAtHour)
@@ -65,19 +65,32 @@ local function updateBandagedWound(record, body, partId, wound, currentHour)
         local infPenalty = math.max(0.35, 1 - (tonumber(wound.woundInfectionLevel) or 0) * 0.06)
         local healRate = math.max(0.01, (tonumber(wound.healRatePerWorldHour) or baseRate) * infPenalty)
         wound.lastHealWorldHour = healUntilHour
-        local healed = healWound(record, body, partId, wound, healElapsed * healRate)
+        local healed, finished = healWound(record, body, partId, wound, healElapsed * healRate)
         wound.bandageHealedPoints = math.max(0, tonumber(wound.bandageHealedPoints) or 0) + healed
-        changed = true
+        if finished then
+            discreteChanged = true
+        elseif healed > 0 then
+            microChanged = true
+        end
     end
     if body.wounds[partId] and not wound.bandageDirty and currentHour >= dirtyAtHour then
         wound.bandageDirty = true
         wound.bandageLife = 0
         wound.lastHealWorldHour = currentHour
-        changed = true
+        discreteChanged = true
+        dirtyFlipped = true
         if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "bandage_dirty") end
         Internal.EmitWoundStateChange(record, partId, "bandage_dirty", wound)
+        if PNC.MedicalCareService and PNC.MedicalCareService.RequestNPC then
+            PNC.MedicalCareService.RequestNPC(record, {
+                source = "bandage_dirty",
+                sourceRef = tostring(record.id) .. ":" .. tostring(partId),
+                severity = tonumber(wound.damage) or 15,
+                incapacitated = record.health and record.health.state == "incapacitated",
+            })
+        end
     end
-    return changed
+    return discreteChanged, microChanged, dirtyFlipped
 end
 
 local function applyBleeding(record, zombie, body, health, now)
@@ -109,9 +122,14 @@ function Wounds.Update(record, zombie, now)
     local infection = body and body.infection or nil
     if not body or record.alive == false then return false end
     local currentHour = Internal.WorldHour()
-    local changed = false
+    local discreteChanged, microChanged, alreadyInvalidated = false, false, false
     if infection and infection.active == true then
-        if Internal.RefreshInfectionState(record, currentHour, false, zombie) then changed = true end
+        local prevStage, prevActive = infection.stage, infection.active == true
+        if Internal.RefreshInfectionState(record, currentHour, false, zombie) then microChanged = true end
+        if infection.stage ~= prevStage or (infection.active == true) ~= prevActive then
+            discreteChanged = true
+            alreadyInvalidated = true
+        end
         if infection.nonLethalFever ~= true and (infection.pendingFatal == true
             or currentHour >= (tonumber(infection.fatalAtWorldHour) or math.huge))
         then
@@ -121,32 +139,62 @@ function Wounds.Update(record, zombie, now)
     end
     local totalOrdInf = 0
     for partId, wound in pairs(body.wounds) do
-        if not wound.dressingHealed and Internal.UpdateOrdinaryWoundInfection(record, partId, wound, currentHour) then changed = true end
-        if wound.bandaged == true and updateBandagedWound(record, body, partId, wound, currentHour) then changed = true end
-        if body.wounds[partId] and updateFracture(record, body, partId, wound, currentHour) then changed = true end
+        if not wound.dressingHealed then
+            local infChanged, infFlipped = Internal.UpdateOrdinaryWoundInfection(record, partId, wound, currentHour)
+            if infFlipped then discreteChanged = true; alreadyInvalidated = true
+            elseif infChanged then microChanged = true end
+        end
+        if wound.bandaged == true then
+            local bDiscrete, bMicro, bDirty = updateBandagedWound(record, body, partId, wound, currentHour)
+            if bDiscrete then discreteChanged = true end
+            if bMicro then microChanged = true end
+            if bDirty then alreadyInvalidated = true end
+        end
+        if body.wounds[partId] then
+            local fDiscrete, fMicro = updateFracture(record, body, partId, wound, currentHour)
+            if fDiscrete then discreteChanged = true end
+            if fMicro then microChanged = true end
+        end
         if body.wounds[partId] and not wound.dressingHealed then totalOrdInf = totalOrdInf + (tonumber(wound.woundInfectionLevel) or 0) end
     end
     if Wounds.WholeBody and Wounds.WholeBody.SetSeverity then
         local sev = totalOrdInf >= 2.0 and Core.Clamp(totalOrdInf / 20.0, 0, 1) or 0
         local _, wbChanged = Wounds.WholeBody.SetSeverity(record, "wound_infection", sev)
-        if wbChanged then changed = true end
+        if wbChanged then microChanged = true end
     end
-    if body.infection and body.infection.active == true and Internal.RefreshInfectionState(record, currentHour, true, zombie) then
-        changed = true
+    if body.infection and body.infection.active == true then
+        local prevStage, prevActive = body.infection.stage, body.infection.active == true
+        if Internal.RefreshInfectionState(record, currentHour, true, zombie) then microChanged = true end
+        if body.infection.stage ~= prevStage or (body.infection.active == true) ~= prevActive then
+            discreteChanged = true
+            alreadyInvalidated = true
+        end
     end
     if type(Wounds.UpdatePhysiology) == "function" and Wounds.UpdatePhysiology(record, nil, nil) then
-        changed = true
-    end
-    if changed then
-        Wounds.Recalculate(record)
-        if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "wound_tick", true) end
-        record.runtime = record.runtime or {}
-        record.runtime.forceSyncEvent = record.runtime.forceSyncEvent or "wound_healed"
-        if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
+        discreteChanged = true
+        alreadyInvalidated = true
     end
     now = tonumber(now) or Core.Now()
-    if applyBleeding(record, zombie, body, health, now) then changed = true end
-    return changed
+    if discreteChanged then
+        Wounds.Recalculate(record)
+        if not alreadyInvalidated and Wounds.InvalidateProjection then
+            Wounds.InvalidateProjection(record, "wound_state_changed", true)
+        elseif record.runtime then
+            record.runtime.woundSummariesCurrent = true
+        end
+        record.runtime = record.runtime or {}
+        record.runtime.forceSyncEvent = record.runtime.forceSyncEvent or "wound_healed"
+        record.runtime.lastWoundDirtyAt = now
+        if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
+    elseif microChanged then
+        record.runtime = record.runtime or {}
+        if now - (tonumber(record.runtime.lastWoundDirtyAt) or 0) >= (tonumber(Const.WOUND_DIRTY_FLUSH_MS) or 5000) then
+            record.runtime.lastWoundDirtyAt = now
+            if PNC.Registry and PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "wounds") end
+        end
+    end
+    if applyBleeding(record, zombie, body, health, now) then microChanged = true end
+    return discreteChanged or microChanged
 end
 
 return Wounds

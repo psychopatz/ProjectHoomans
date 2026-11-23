@@ -163,12 +163,19 @@ local parseRecruit = CoreSemantics.Parse("join me", { capabilities = { ["hoomans
 T.truthy(parseRecruit, "Parses 'join me'")
 T.equal(parseRecruit.intent, "RECRUIT", "Join me intent is RECRUIT")
 
-local parseCamp = CoreSemantics.Parse("make camp", { capabilities = { ["hoomans.social"] = true } })
-T.truthy(parseCamp, "Parses 'make camp'")
-T.equal(parseCamp.intent, "CAMP", "Make camp intent is CAMP")
-
 local parseWellbeing = CoreSemantics.Parse("how are you", { capabilities = { ["hoomans.social"] = true } })
 T.truthy(parseWellbeing, "Parses 'how are you'")
 T.equal(parseWellbeing.intent, "ASK_WELLBEING", "How are you intent is ASK_WELLBEING")
+
+-- The world composition loads both the action catalog and the shared pack.
+require "PNC/Semantics/PNC_SemanticCatalog"
+T.truthy(HoomansPack.Register(PsychopatzCore), "Shared pack can reload after the catalog")
+local commandContext = { capabilities = { ["hoomans.social"] = true } }
+for _, text in ipairs({ "lets camp here", "Let's camp here.", "make camp", "rest here" }) do
+    local parsed = CoreSemantics.Parser.ParseCandidates(text, commandContext)
+    local ir = parsed.selected and parsed.selected.ir
+    T.equal(ir and ir.action, "CAMP", text .. " resolves to the camp command")
+    T.equal(ir and ir.target and ir.target.scope, "here", text .. " keeps local camp scope")
+end
 
 T.finish("pnc_core_semantic_adopter_smoke")

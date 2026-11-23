@@ -45,7 +45,7 @@ local function finishRequest(lease, task, record, body, reason)
     local patient = Internal.Patient(task)
     local remaining
     clearRuntime(record, body, reason)
-    if patient then remaining = Internal.Treatable(patient) end
+    if patient then remaining = Internal.Treatable(patient, task) end
     local current = Service.Get(task.id)
     if current and not Service.TERMINAL[current.status] then
         if remaining and #remaining > 0 then
@@ -116,7 +116,7 @@ local function treatAbstract(lease, task, record)
 end
 
 local function beginTreatment(lease, task, record, body, patient, patientBody, now)
-    local partId = Internal.CurrentPart(patient)
+    local partId, entry = Internal.CurrentPart(patient, task)
     local plan = Treatment and Treatment.GetNPCBandagePlan
         and Treatment.GetNPCBandagePlan(record, treatmentOptions(task))
         or nil
@@ -130,8 +130,12 @@ local function beginTreatment(lease, task, record, body, patient, patientBody, n
     state = record.runtime.medicalCare or {}
     state.phase = "treating"
     state.taskId = task.id
-    state.patientId = patient.id
+    state.patientId = task.patientId or patient.id
+    state.patientKind = task.patientKind
     state.partId = partId
+    state.dirtyChange = (task.patientKind == "player" and entry and entry.dirty == true)
+        or (entry and entry.wound and entry.wound.bandageDirty == true) or false
+    state.playerPartInfo = task.patientKind == "player" and entry or nil
     state.lootPosition = lootPosition
     state.bump = Internal.ResolveLootBump(lootPosition)
     state.bandageType = plan and plan.requiresItem == true
@@ -168,8 +172,11 @@ local function beginTreatment(lease, task, record, body, patient, patientBody, n
     record.runtime.forceSyncEvent = "medical_care_treating"
     Service.SetPhase(task.id, Status.TREATING, { actorId = lease.npcId })
     setLeasePhase(lease, "WORKING")
+    if Internal.SpeakTreatmentStart then
+        Internal.SpeakTreatmentStart(record, patient, task.patientKind, partId, state.dirtyChange == true, now)
+    end
     local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil
-    if callouts and type(callouts.OnAllyBandagingUnderThreat) == "function" then
+    if task.patientKind == "npc" and callouts and type(callouts.OnAllyBandagingUnderThreat) == "function" then
         callouts.OnAllyBandagingUnderThreat(record, patient, now)
     end
     return true
@@ -183,8 +190,18 @@ local function finishLiveTreatment(lease, task, record, body)
     if not state or state.phase ~= "treating" then
         return false, "medical_treatment_state_missing"
     end
-    applied, reason = Treatment.TryNPCMedicalTreatment(
-        record, patient, state.partId, treatmentOptions(task, state))
+    if task.patientKind == "player" then
+        local _, freshInfo = Internal.CurrentPart(patient, task)
+        local pInfo = state.playerPartInfo or freshInfo
+        if Internal.ApplyNPCTreatmentToPlayer then
+            applied, reason = Internal.ApplyNPCTreatmentToPlayer(record, patient, pInfo, treatmentOptions(task, state))
+        else
+            applied, reason = false, "player_treatment_unavailable"
+        end
+    else
+        applied, reason = Treatment.TryNPCMedicalTreatment(
+            record, patient, state.partId, treatmentOptions(task, state))
+    end
     if body and Animation and Animation.FinishBump then
         Animation.FinishBump(body, true)
     end
@@ -197,6 +214,10 @@ local function finishLiveTreatment(lease, task, record, body)
         PNC.Tasking.Commands.CancelForNPC(lease.npcId,
             reason or "MEDICAL_TREATMENT_FAILED")
         return false, reason
+    end
+    if Internal.SpeakTreatmentComplete then
+        Internal.SpeakTreatmentComplete(record, patient, task.patientKind, state.partId,
+            state.dirtyChange == true, PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0)
     end
     return finishRequest(lease, task, record, body, "treatment_completed")
 end
@@ -221,26 +242,35 @@ function Executor.Tick(lease)
         return false, "medical_actor_unavailable"
     end
     patient = Internal.Patient(task)
-    if not patient or patient.alive == false then
+    local pDead = patient and (task.patientKind == "player" and patient.isDead and patient:isDead() == true or task.patientKind ~= "player" and patient.alive == false)
+    if not patient or pDead then
         Service.Cancel(task.id, "medical_patient_unavailable")
         PNC.Tasking.Commands.CancelForNPC(lease.npcId,
             "MEDICAL_PATIENT_UNAVAILABLE")
         return false, "medical_patient_unavailable"
     end
-    if not Internal.CurrentPart(patient) then
+    if not Internal.CurrentPart(patient, task) then
         Service.Complete(task.id, "patient_wound_resolved")
         PNC.Tasking.Commands.Complete(lease.leaseId, "patient_wound_resolved")
         return true
     end
+    if Internal.combatActive and Internal.combatActive(record) then
+        Executor.Cancel(lease, "combat_active")
+        if PNC.Tasking and PNC.Tasking.Commands and PNC.Tasking.Commands.CancelForNPC then
+            PNC.Tasking.Commands.CancelForNPC(lease.npcId, "COMBAT_ACTIVE")
+        end
+        return false, "combat_active"
+    end
     body = Registry.GetLiveZombie and Registry.GetLiveZombie(record.id) or nil
-    patientBody = Registry.GetLiveZombie
-        and Registry.GetLiveZombie(patient.id) or nil
+    patientBody = task.patientKind == "player" and patient
+        or (Registry.GetLiveZombie and Registry.GetLiveZombie(patient.id) or nil)
     if not body or not patientBody then
+        if task.patientKind == "player" then return false, "player_body_unavailable" end
         return treatAbstract(lease, task, record)
     end
     record.runtime = record.runtime or {}
     record.runtime.medicalCare = record.runtime.medicalCare or {
-        phase = "traveling", taskId = task.id, patientId = patient.id,
+        phase = "traveling", taskId = task.id, patientId = task.patientId or patient.id, patientKind = task.patientKind,
     }
     record.activeBehavior = "MedicalCare"
     record.runtime.tacticalState = "medical_care"

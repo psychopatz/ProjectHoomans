@@ -36,6 +36,12 @@ function Identity.Resolve(item, source, npcID, playerID)
         playerFullName = source.playerFullName,
         playerFirstName = source.playerFirstName,
         playerSurname = source.playerSurname or source.playerLastName,
+        relationshipKind = source.relationshipKind
+            or source.relationshipCategory or source.relationshipState
+            or source.socialRole or source.npcType or source.tacticalClass,
+        tone = source.tone or source.beatTone or source.speechStyle,
+        persona = source.persona or source.personaStyle,
+        familiarity = source.familiarity,
         state = PNC.Network and PNC.Network.ClientState or nil,
     })
     local victim = Identity.Split(

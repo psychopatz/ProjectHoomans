@@ -47,14 +47,14 @@ local function emit(eventType, task, cause)
     if eventType == "MEDICAL_CARE_REQUESTED" or cause == "requeued" then
         local executor = PNC.MedicalCareExecutor
         local registry = PNC.Registry
-        local isDoctor = executor and executor.Internal
-            and executor.Internal.IsDoctor
-        if registry and registry.ForEach and isDoctor then
+        local canAssist = executor and executor.Internal and executor.Internal.CanAssistPatient
+        local isDoctor = executor and executor.Internal and executor.Internal.IsDoctor
+        local patient = executor and executor.Internal and executor.Internal.Patient and executor.Internal.Patient(task)
+        if registry and registry.ForEach and (canAssist or isDoctor) then
             registry.ForEach(function(record)
-                if record and record.alive ~= false
-                    and isDoctor(record)
-                    and tostring(record.id) ~= tostring(task.patientId)
-                then
+                local ok = canAssist and patient and canAssist(record, patient, task.patientKind) == true
+                    or (isDoctor and isDoctor(record) and tostring(record.id) ~= tostring(task.patientId))
+                if ok and record and record.alive ~= false then
                     tasking.Events.Emit(eventType, {
                         npcId = record.id,
                         source = "MedicalCareService",

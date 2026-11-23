@@ -43,6 +43,7 @@ local DIRECT_EVENT_POOLS = {
     ["social.incapacitated_repeat"] = "semantic.medical.distress.repeat",
     witnessed_teammate_hurt = "semantic.medical.distress.teammate",
     treated_wound = "semantic.medical.distress.treatment",
+    medical_care_assisted = "semantic.medical.care.assisted",
     combat_fighting_injured_callout = "semantic.combat.fighting.injured_callout",
     combat_wound_received_beat = "semantic.combat.wound.received_beat",
     combat_wound_ally_reaction = "semantic.combat.wound.ally_reaction",

@@ -230,10 +230,21 @@ local function enrichPresentationArgs(args, context)
     if type(context) ~= "table" then return args end
     args = type(args) == "table" and args or {}
     if args["addressee.name"] == nil then
-        local known = context.playerNameKnown ~= false
-        local raw = context.addresseeName
-            or (known and (context.playerFirstName or context.playerAddressName or context.playerName))
-            or nil
+        -- Name knowledge is an explicit capability.  A missing flag must not
+        -- be treated as permission to expose the player's real name: older
+        -- ambient/response payloads legitimately omit it.
+        local known = context.playerNameKnown == true
+        local raw
+        if known then
+            raw = context.addresseeName
+                or context.playerFirstName
+                or context.playerAddressName
+                or context.playerName
+        elseif context.playerNameKnown == false then
+            -- Keep an already-resolved formal term, but never trust a raw
+            -- addresseeName field when the NPC is explicitly name-blind.
+            raw = context.playerAddressName or context.player
+        end
         args["addressee.name"] = TokenFormatter.FirstTokenName(raw)
     end
     if args["speaker.name"] == nil then

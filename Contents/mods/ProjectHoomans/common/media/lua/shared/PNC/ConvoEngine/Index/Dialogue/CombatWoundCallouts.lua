@@ -35,7 +35,7 @@ return {
     ["combat.injury.visible_observation"] = {
         ["domain"] = "combat_wound_callouts",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/InjuryVisibleObservationToWoundReceivedBeat",
+            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/CombatInjuryVisibleObservationToMedicalCareAssisted",
         },
         ["id"] = "combat.injury.visible_observation",
         ["kind"] = "dialogue",
@@ -44,7 +44,7 @@ return {
     ["combat.wound.ally_reaction"] = {
         ["domain"] = "combat_wound_callouts",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/InjuryVisibleObservationToWoundReceivedBeat",
+            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/CombatInjuryVisibleObservationToMedicalCareAssisted",
         },
         ["id"] = "combat.wound.ally_reaction",
         ["kind"] = "dialogue",
@@ -53,10 +53,19 @@ return {
     ["combat.wound.received_beat"] = {
         ["domain"] = "combat_wound_callouts",
         ["generated"] = {
-            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/InjuryVisibleObservationToWoundReceivedBeat",
+            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/CombatInjuryVisibleObservationToMedicalCareAssisted",
         },
         ["id"] = "combat.wound.received_beat",
         ["kind"] = "dialogue",
         ["source"] = "dialogue/combat_wound_callouts/combat_wound_received_beat.json",
+    },
+    ["medical.care.assisted"] = {
+        ["domain"] = "combat_wound_callouts",
+        ["generated"] = {
+            "PNC/ConvoEngine/Dialogue/CombatWoundCallouts/CombatInjuryVisibleObservationToMedicalCareAssisted",
+        },
+        ["id"] = "medical.care.assisted",
+        ["kind"] = "dialogue",
+        ["source"] = "dialogue/combat_wound_callouts/medical_care_assisted.json",
     },
 }

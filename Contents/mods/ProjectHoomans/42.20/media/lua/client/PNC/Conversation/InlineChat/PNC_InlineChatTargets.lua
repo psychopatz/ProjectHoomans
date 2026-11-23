@@ -43,11 +43,17 @@ local function refreshPresenceBodies()
     if sync and sync.RefreshBodyMap then sync.RefreshBodyMap(nowMs()) end
 end
 
+local function clearOutline(playerIndex, zombie)
+    local hub = PNC.ContextHub
+    if zombie and zombie.setOutlineHighlight
+        and not (hub and hub.IsHighlighting and hub.IsHighlighting(playerIndex, zombie)) then
+        zombie:setOutlineHighlight(playerIndex, false)
+    end
+end
+
 function Targets.ClearHighlights(playerIndex)
     for _, zombie in pairs(State.highlightedZombies or {}) do
-        if zombie and zombie.setOutlineHighlight then
-            zombie:setOutlineHighlight(playerIndex, false)
-        end
+        clearOutline(playerIndex, zombie)
     end
     State.highlightedZombies = {}
 end
@@ -68,8 +74,8 @@ function Targets.RefreshHighlights(playerIndex)
         end
     end
     for id, zombie in pairs(previous) do
-        if current[id] ~= zombie and zombie and zombie.setOutlineHighlight then
-            zombie:setOutlineHighlight(playerIndex, false)
+        if current[id] ~= zombie then
+            clearOutline(playerIndex, zombie)
         end
     end
     State.highlightedZombies = current

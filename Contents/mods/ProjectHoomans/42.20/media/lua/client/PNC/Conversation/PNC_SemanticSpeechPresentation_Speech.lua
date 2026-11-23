@@ -76,7 +76,15 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
         if npcID then
             local active, view = activeConversationFor(npcID)
             local speaker = npcIdentity(npcID, target.name)
-            local playerIdentityValue = playerAddress(npcID, player)
+            local playerIdentityValue = playerAddress(npcID, player, {
+                relationshipKind = target.relationshipKind
+                    or target.relationshipCategory
+                    or target.relationshipState
+                    or target.socialRole or target.npcType,
+                tone = target.tone or target.beatTone,
+                persona = target.persona or target.personaStyle,
+                familiarity = target.familiarity,
+            })
             local interaction = context.interaction
                 or view and view.lastSemanticInteractionEnvelope
             local semantic
@@ -186,7 +194,17 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
         nil
     )
     local player = context.player or currentPlayer()
-    local identity = playerAddress(npcID, player)
+    local identity = playerAddress(npcID, player, {
+        relationshipKind = context.relationshipKind
+            or context.relationshipState or context.socialRole
+            or context.npcType or entry.relationshipKind
+            or entry.relationshipState or entry.socialRole or entry.npcType,
+        tone = context.tone or context.beatTone
+            or entry.tone or entry.beatTone,
+        persona = context.persona or context.personaStyle
+            or entry.persona or entry.personaStyle,
+        familiarity = context.familiarity or entry.familiarity,
+    })
     local role
     local speaker
     local eventID

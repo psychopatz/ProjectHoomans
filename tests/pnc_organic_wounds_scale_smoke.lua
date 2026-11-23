@@ -445,6 +445,56 @@ local sceneMs = (os.clock() - sceneStarted) * 1000
 T.equal(sceneOpened, 200, "production injury handoff opens 200 bounded Scenes")
 T.equal(sceneClosed, 200, "production SceneRuntime closes each opened Scene")
 
+-- Regression checks: continuous micro-healing must not spam sync/dirty/revision,
+-- witness cache stays bounded on observer runtime, and undelivered encounters back off.
+do
+    local dirtyCount = 0
+    local origDirty = PNC.Registry.MarkDirty
+    PNC.Registry.MarkDirty = function(_, rsn)
+        if rsn == "wounds" then dirtyCount = dirtyCount + 1 end
+    end
+    local healer = makeNPC(201)
+    Wounds.ApplyCombatDamage(healer, nil, { amount = 10, partId = "UpperArm_L", woundType = "laceration", attackerKind = "npc" })
+    Wounds.Bandage(healer, "UpperArm_L", nowMs, { bandageType = "Base.Bandage", dirtyAfterWorldHours = 24 })
+    healer.runtime.forceSyncEvent = nil
+    healer.runtime.lastWoundDirtyAt = nowMs
+    local revBefore = healer.runtime.injuryRevision
+    dirtyCount = 0
+    for step = 1, 3 do
+        nowMs = nowMs + 1000
+        worldHour = worldHour + 0.05
+        Wounds.Update(healer, nil, nowMs)
+    end
+    T.equal(healer.runtime.forceSyncEvent, nil, "partial healing ticks do not force network health sync")
+    T.equal(healer.runtime.injuryRevision, revBefore, "partial healing ticks do not bump injuryRevision")
+    T.equal(dirtyCount, 0, "partial healing throttles MarkDirty inside flush window")
+    nowMs = nowMs + 6000
+    worldHour = worldHour + 20.0
+    Wounds.Update(healer, nil, nowMs)
+    T.equal(healer.runtime.forceSyncEvent, "wound_healed", "completed wound healing emits forceSyncEvent")
+    T.truthy((healer.runtime.injuryRevision or 0) > revBefore, "completed wound healing bumps injuryRevision")
+    T.equal(dirtyCount, 1, "completed wound healing marks record dirty once")
+    PNC.Registry.MarkDirty = origDirty
+
+    local backoffObs = { id = "obs-reg", name = "Watcher", x = healer.x, y = healer.y, z = 0, alive = true, skills = {}, runtime = {} }
+    local openInjured = makeNPC(202)
+    openInjured.x, openInjured.y = healer.x + 1, healer.y
+    Wounds.ApplyCombatDamage(openInjured, nil, { amount = 12, partId = "ForeArm_R", woundType = "laceration", attackerKind = "npc" })
+    local origDeliver = Callouts.DeliverBark
+    Callouts.DeliverBark = function() return 0 end
+    local ok1, reason1 = Callouts.OnVisibleConditionObserved(backoffObs, openInjured, nowMs, { fromEncounter = true })
+    T.equal(ok1, false, "undelivered encounter fails cleanly")
+    T.equal(reason1, "observation_not_delivered", "undelivered encounter reports delivery failure")
+    local ok2, reason2 = Callouts.OnVisibleConditionObserved(backoffObs, openInjured, nowMs + 1000, { fromEncounter = true })
+    T.equal(ok2, false, "encounter repeats back off while undelivered")
+    T.equal(reason2, "observation_backoff", "undelivered encounter enters 5s backoff")
+    Callouts.DeliverBark = origDeliver
+    local ok3 = Callouts.OnVisibleConditionObserved(backoffObs, openInjured, nowMs + 6000, { fromEncounter = true })
+    T.truthy(ok3, "encounter observation recovers after backoff window")
+    T.truthy(type(backoffObs.runtime.observedInjuries) == "table" and #(backoffObs.runtime.observedInjuries.order or {}) == 1,
+        "witness observation cache lives on bounded observer runtime")
+end
+
 print(string.format(
     "WOUND_EVENTS debug_random_ms=%.2f random_types=%d treatment_physiology_ms=%.2f witnessed_debug_ms=%.2f raw_rows=%d neighbors=%d observer_cap=%d responder_candidates=%d max_responders=%d pair_selected=%d/8 encounter_ms=%.2f arbitration_ms=%.2f scenes=%d/%d scene_ms=%.2f deliveries=%d queued_replies=%d",
     debugMs, randomTypeCount, treatmentMs, witnessedDebugMs, nearbyRowCount, #rawRows,

@@ -249,9 +249,14 @@ function H.ProcessRecord(record, now)
     if Spatial and Spatial.UpdateNPC then
         local crossedCell = Spatial.UpdateNPC(record)
         if crossedCell and zombie then
-            local combat = PNC.Semantics and PNC.Semantics.CombatTargetCallouts
-            if combat and combat.OnInjuryEncounterCellChanged then
-                combat.OnInjuryEncounterCellChanged(record, now)
+            local rt = record.runtime
+            if not rt then rt = {}; record.runtime = rt end
+            if now >= (tonumber(rt.nextInjuryEncounterCheckAt) or 0) then
+                local combat = PNC.Semantics and PNC.Semantics.CombatTargetCallouts
+                if combat and combat.OnInjuryEncounterCellChanged then
+                    rt.nextInjuryEncounterCheckAt = now + 3000
+                    combat.OnInjuryEncounterCellChanged(record, now, { fromEncounter = true })
+                end
             end
         end
     end

@@ -258,6 +258,14 @@ function H.EnrichReceiveContext(receive)
             networkArgs and networkArgs.playerIsFemale,
             ambientFlavor.playerIsFemale
         ),
+        relationshipKind = receive.relationshipState
+            or ambientFlavor.relationshipKind
+            or ambientFlavor.relationshipState or role,
+        socialRole = role,
+        npcType = role,
+        tone = ambientFlavor.tone or ambientFlavor.beatTone,
+        persona = ambientFlavor.persona or ambientFlavor.personaStyle,
+        familiarity = ambientFlavor.familiarity,
     })
     local victimID = clean(
         ambientFlavor.victimNPCID or context.victimNPCID,

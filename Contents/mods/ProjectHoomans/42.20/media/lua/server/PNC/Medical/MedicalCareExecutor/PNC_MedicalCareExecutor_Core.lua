@@ -62,6 +62,27 @@ local function ownerKey(record)
         or nonempty(record and record.ownerUsername)
 end
 
+local function isCompanionOrColonist(record)
+    return (Treatment and Treatment.IsPlayerOwnedNPC and Treatment.IsPlayerOwnedNPC(record) == true)
+        or (Types and Types.IsColonist and Types.IsColonist(record) == true)
+        or tostring(record and record.tacticalClass or "") == tostring(Const and Const.TACTICAL_CLASS_COLONIST or "colonist")
+end
+
+local function playerFriendly(actor, player)
+    local oKey = ownerKey(actor)
+    local oid = player and player.getOnlineID and nonempty(player:getOnlineID()) or nil
+    local uname = player and player.getUsername and nonempty(player:getUsername()) or nil
+    if (oKey and (oKey == oid or oKey == uname)) or actor.recruited == true then return true end
+    local pKey = PNC.PlayerCharacters and PNC.PlayerCharacters.GetEntityKey and PNC.PlayerCharacters.GetEntityKey(player) or nil
+    local rel = pKey and ((PNC.Relationships and PNC.Relationships.Get and PNC.Relationships.Get(actor.id, pKey))
+        or (actor.social and actor.social.relationships and actor.social.relationships[pKey])) or nil
+    local st = string.lower(tostring(rel and (rel.state or rel.category) or ""))
+    local app = tonumber(rel and rel.approval) or 0
+    if st == "enemy" or st == "hostile" or app <= -20 then return false end
+    if st == "friend" or st == "family" or st == "lover" or app >= 10 then return true end
+    return Types and Types.IsColonist and Types.IsColonist(actor) == true
+end
+
 function Executor.IsDoctor(record)
     local source = affiliation(record)
     local role = string.lower(tostring(
@@ -70,11 +91,39 @@ function Executor.IsDoctor(record)
     local archetype = string.lower(tostring(record and record.archetypeID or ""))
     if not WorkPolicy.IsEnabled(record, "MedicalCare") then return false end
     local jobs = record and record.allowedJobs or nil
-    return role == "medic" or role == "caregiver"
-        or archetype == "doctor"
-        or jobs and jobs.MedicalCare == true
+    if role == "medic" or role == "caregiver" or archetype == "doctor" or (jobs and jobs.MedicalCare == true) then
+        return true
+    end
+    local fa = Treatment and Treatment.GetNPCFirstAidLevel and tonumber(Treatment.GetNPCFirstAidLevel(record)) or 0
+    return fa >= (tonumber(Const and Const.MEDICAL_CARE_COMPANION_MIN_FIRST_AID) or 3)
 end
 Internal.IsDoctor = Executor.IsDoctor
+
+function Executor.CanAssistPatient(actor, patient, patientKind)
+    if not actor or actor.alive == false then return false, "doctor_unavailable" end
+    if actor.health and actor.health.state == "incapacitated" then return false, "doctor_incapacitated" end
+    if not WorkPolicy.IsEnabled(actor, "MedicalCare") then return false, "medical_care_disabled" end
+    if patientKind == "player" then
+        if tostring(actor.tacticalClass or "") == tostring(Const and Const.TACTICAL_CLASS_HOSTILE or "hostile") then
+            return false, "hostile_actor"
+        end
+        if not playerFriendly(actor, patient) then return false, "player_not_friendly" end
+        if not Internal.IsDoctor(actor) then return false, "medical_skill_too_low" end
+        return true
+    end
+    if not patient or patient.alive == false then return false, "patient_unavailable" end
+    if tostring(patient.id) == tostring(actor.id) then return false, "self_treatment_is_not_doctor_care" end
+    if not Internal.SameCareGroup(actor, patient) then return false, "care_group_mismatch" end
+    if isCompanionOrColonist(actor) then
+        if not Internal.IsDoctor(actor) then return false, "medical_skill_too_low" end
+        return true
+    end
+    local af, pf = factionId(actor), factionId(patient)
+    if af and pf and af == pf then return true end
+    if not Internal.IsDoctor(actor) then return false, "medical_skill_too_low" end
+    return true
+end
+Internal.CanAssistPatient = Executor.CanAssistPatient
 
 function Executor.SameCareGroup(actor, patient)
     local actorFaction = factionId(actor)
@@ -98,11 +147,19 @@ end
 Internal.SameCareGroup = Executor.SameCareGroup
 
 function Internal.Patient(task)
-    if not task or task.patientKind ~= "npc" then return nil end
+    if not task then return nil end
+    if task.patientKind == "player" then
+        return Internal.ResolvePlayer and Internal.ResolvePlayer(task) or nil
+    end
+    if task.patientKind ~= "npc" then return nil end
     return Registry and Registry.Get and Registry.Get(task.patientId) or nil
 end
 
-function Internal.Treatable(patient)
+function Internal.Treatable(patient, task)
+    if task and task.patientKind == "player" then
+        local info = Internal.FindTreatablePlayerPart and Internal.FindTreatablePlayerPart(patient) or nil
+        return info and { info } or {}
+    end
     if not patient or not Wounds
         or not Wounds.GetTreatableWounds
     then
@@ -111,35 +168,31 @@ function Internal.Treatable(patient)
     return Wounds.GetTreatableWounds(patient)
 end
 
-function Executor.CurrentPart(patient)
+function Executor.CurrentPart(patient, task)
+    if task and task.patientKind == "player" then
+        local info = Internal.FindTreatablePlayerPart and Internal.FindTreatablePlayerPart(patient) or nil
+        return info and info.partId or nil, info
+    end
     local entries = Internal.Treatable(patient)
-    return entries[1] and tostring(entries[1].partId) or nil
+    return entries[1] and tostring(entries[1].partId) or nil, entries[1]
 end
 Internal.CurrentPart = Executor.CurrentPart
 
 function Internal.CanTreat(actor, task)
-    local patient
-    local plan
-    if not actor or actor.alive == false or not Internal.IsDoctor(actor) then
-        return false, "doctor_unavailable"
+    local patient = Internal.Patient(task)
+    local pKind = task and tostring(task.patientKind or "npc") or "npc"
+    if not patient or (pKind == "npc" and patient.alive == false) then
+        return false, "patient_unavailable"
     end
+    local allowed, denyReason = Internal.CanAssistPatient(actor, patient, pKind)
+    if not allowed then return false, denyReason end
     if task and task.actorId and tostring(task.actorId) ~= tostring(actor.id) then
         return false, "claimed_by_other_doctor"
     end
-    patient = Internal.Patient(task)
-    if not patient or patient.alive == false then
-        return false, "patient_unavailable"
-    end
-    if tostring(patient.id) == tostring(actor.id) then
-        return false, "self_treatment_is_not_doctor_care"
-    end
-    if not Internal.SameCareGroup(actor, patient) then
-        return false, "care_group_mismatch"
-    end
-    if not Internal.CurrentPart(patient) then
+    if not Internal.CurrentPart(patient, task) then
         return false, "patient_has_no_treatable_wound"
     end
-    plan = Treatment and Treatment.GetNPCBandagePlan
+    local plan = Treatment and Treatment.GetNPCBandagePlan
         and Treatment.GetNPCBandagePlan(actor, {
             consumeItem = task and task.policy
                 and task.policy.requireItem == true,
@@ -211,12 +264,8 @@ local function hasTaskBandage(record, task)
     return plan ~= nil and (not requireItem or plan.requiresItem == true)
 end
 
-local function isUsableDoctor(record, patient)
-    return record and record.alive ~= false
-        and not (record.health and record.health.state == "incapacitated")
-        and tostring(record.id or "") ~= tostring(patient and patient.id or "")
-        and Internal.IsDoctor(record)
-        and Internal.SameCareGroup(record, patient)
+local function isUsableDoctor(record, patient, task)
+    return Internal.CanAssistPatient(record, patient, task and task.patientKind or "npc") == true
 end
 
 local function groupDoctors(task, patient)
@@ -225,7 +274,7 @@ local function groupDoctors(task, patient)
         return output
     end
     Registry.ForEach(function(record)
-        if isUsableDoctor(record, patient) then
+        if isUsableDoctor(record, patient, task) then
             output[#output + 1] = record
         end
     end)

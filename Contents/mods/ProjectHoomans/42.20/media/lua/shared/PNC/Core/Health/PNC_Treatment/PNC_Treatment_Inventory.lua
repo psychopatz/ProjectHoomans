@@ -11,38 +11,36 @@ local Const = PNC.Const
 local Inventory = PNC.Inventory
 
 local function findNPCBandage(record, requestedType)
-    local inv
-    local types
-    local searchTypes
-    local i
-    local item
-    local stack
     if not record then return nil end
-    inv = Inventory and Inventory.EnsureRecordInventory
+    local inv = Inventory and Inventory.EnsureRecordInventory
         and Inventory.EnsureRecordInventory(record) or record.inventory
-    types = Internal.BandageTypes()
+    local rankByType = {}
     if requestedType ~= nil then
         if not Internal.IsBandageType(requestedType) then return nil end
-        searchTypes = { tostring(requestedType) }
+        rankByType[tostring(requestedType)] = 1
     else
-        searchTypes = types
-    end
-    for i = 1, #searchTypes do
-        local fullType = searchTypes[i]
-        if requestedType or not string.find(fullType, "Dirty", 1, true) then
-            for _, item in pairs(inv and inv.items or {}) do
-                stack = item and tonumber(item.stack) or 1
-                if item and item.type == fullType and stack > 0 then
-                    return {
-                        itemID = item.id,
-                        fullType = item.type,
-                        displayName = Internal.BandageDisplayName(item.type),
-                    }
-                end
+        local types = Internal.BandageTypes()
+        for i = 1, #types do
+            local t = types[i]
+            if not string.find(t, "Dirty", 1, true) then
+                rankByType[t] = i
             end
         end
     end
-    return nil
+    local bestItem, bestRank = nil, nil
+    for _, item in pairs(inv and inv.items or {}) do
+        local rank = item and item.type and rankByType[item.type] or nil
+        if rank and (tonumber(item.stack) or 1) > 0 and (bestRank == nil or rank < bestRank) then
+            bestItem = item
+            bestRank = rank
+        end
+    end
+    if not bestItem then return nil end
+    return {
+        itemID = bestItem.id,
+        fullType = bestItem.type,
+        displayName = Internal.BandageDisplayName(bestItem.type),
+    }
 end
 
 local function consumeNPCBandage(record, supply, reason, treatment)

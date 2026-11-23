@@ -125,6 +125,11 @@ local function playerAddress(npcID, player, options)
         playerUUID = playerUUID(),
         isFemale = options.playerIsFemale,
         playerNameKnown = options.playerNameKnown,
+        relationshipKind = options.relationshipKind or options.relationshipState
+            or options.socialRole or options.npcType,
+        tone = options.tone or options.beatTone or options.speechStyle,
+        persona = options.persona or options.personaStyle,
+        familiarity = options.familiarity,
         authoritative = options.authoritative,
         state = state,
     })

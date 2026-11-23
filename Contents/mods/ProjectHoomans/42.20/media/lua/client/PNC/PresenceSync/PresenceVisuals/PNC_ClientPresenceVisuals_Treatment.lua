@@ -11,7 +11,22 @@ local Sync = PNC.ClientPresenceSync
 local Internal = Sync.Internal
 local Animation = PNC.Animation
 
-local function patientBody(patientId)
+local function patientBody(patientId, patientKind)
+    if patientKind == "player" then
+        if PNC.Core and type(PNC.Core.ForEachPlayer) == "function" then
+            local found = nil
+            PNC.Core.ForEachPlayer(function(p)
+                if found or not p then return end
+                local key = PNC.PlayerCharacters and PNC.PlayerCharacters.GetEntityKey and PNC.PlayerCharacters.GetEntityKey(p)
+                local uname = p.getUsername and p:getUsername()
+                local oid = p.getOnlineID and p:getOnlineID()
+                if key == patientId or (uname and ("player:" .. tostring(uname)) == patientId)
+                    or (oid ~= nil and ("player:" .. tostring(oid)) == patientId) then found = p end
+            end)
+            if found then return found end
+        end
+        return type(getPlayer) == "function" and getPlayer() or nil
+    end
     local body = PNC.Registry and PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(patientId) or nil
     if body then return body end
@@ -117,6 +132,7 @@ local function getTreatmentPresentation(snapshot)
             anim = tostring(medical.bump or "Loot"),
             lootPosition = medical.lootPosition or "Mid",
             targetId = medical.patientId,
+            targetKind = medical.patientKind,
             finishAt = tonumber(medical.finishAt) or 0,
         }
     end
@@ -170,7 +186,7 @@ local function syncTreatmentAnimation(
                 "LootPosition", presentation.lootPosition or "Mid")
         end
         if zombie and zombie.faceThisObject then
-            local patient = patientBody(presentation.targetId)
+            local patient = patientBody(presentation.targetId, presentation.targetKind)
             if patient then zombie:faceThisObject(patient) end
         end
     end

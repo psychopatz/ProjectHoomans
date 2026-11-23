@@ -80,13 +80,20 @@ local function formatTokens(text, context)
     -- Populate addressee.name (when known/named), speaker.name, scene.location,
     -- and scene.clock, rejecting empty or "Unknown" placeholders so
     -- TokenFormatter collapses optional vocatives cleanly.
-    local addresseeKnown = ctx.playerNameKnown ~= false
+    -- Missing knowledge is fail-closed.  Only an explicit true may bind the
+    -- player's real name into a command token.
+    local addresseeKnown = ctx.playerNameKnown == true
     local rawAddressee = tokens["addressee.name"]
         or tokens.names
         or tokens.name
-        or ctx.addresseeName
-        or (addresseeKnown and (ctx.playerFirstName or ctx.playerAddressName or ctx.playerName))
-        or (ctx.npcIdentityKnown ~= false and (ctx.npcFirstName or ctx.npcName))
+    if rawAddressee == nil and addresseeKnown then
+        rawAddressee = ctx.addresseeName
+            or ctx.playerFirstName or ctx.playerAddressName or ctx.playerName
+    elseif rawAddressee == nil and ctx.playerNameKnown == false then
+        rawAddressee = ctx.playerAddressName or ctx.player
+    end
+    rawAddressee = rawAddressee
+        or (ctx.npcIdentityKnown == true and (ctx.npcFirstName or ctx.npcName))
     tokens["addressee.name"] = TokenFormatter.CleanName(rawAddressee)
 
     local rec = type(ctx.npcRecord) == "table" and ctx.npcRecord

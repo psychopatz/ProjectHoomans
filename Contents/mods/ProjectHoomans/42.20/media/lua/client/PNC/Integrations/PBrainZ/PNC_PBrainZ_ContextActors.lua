@@ -100,6 +100,18 @@ function Actors.ResolveConversation(view, entry, source, definition, presentatio
         playerFirstName = presentation.playerFirstName,
         playerSurname = presentation.playerSurname
             or presentation.playerLastName,
+        relationshipKind = presentation.relationshipKind
+            or presentation.relationshipCategory
+            or presentation.relationshipState
+            or presentation.socialRole or presentation.npcType
+            or source.relationshipKind or source.relationshipCategory
+            or source.relationshipState or source.socialRole
+            or source.npcType or source.tacticalClass,
+        tone = presentation.tone or presentation.beatTone
+            or source.tone or source.beatTone,
+        persona = presentation.persona or presentation.personaStyle
+            or source.persona or source.personaStyle,
+        familiarity = presentation.familiarity or source.familiarity,
         state = clientState,
     })
     local npcParts = Identity.Split(

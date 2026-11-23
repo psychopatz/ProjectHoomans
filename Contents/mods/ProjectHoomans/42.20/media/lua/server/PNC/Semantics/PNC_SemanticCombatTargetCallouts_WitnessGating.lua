@@ -34,7 +34,6 @@ S.CurrentWorldDayBucket = dayBucket
 
 local TreatmentSpeech = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_TreatmentSpeech"
 
-local observations = setmetatable({}, { __mode = "k" })
 local FEVER = { feverish = 1, high_fever = 2 }
 local SICKNESS = { moderate = 1, severe = 2 }
 
@@ -62,10 +61,11 @@ end
 
 function S.RecordWitnessObservation(obs, inj, prof, now, opts)
     local day = dayBucket(now)
-    local c = observations[obs]
-    if not c or c.day ~= day then
+    obs.runtime = type(obs.runtime) == "table" and obs.runtime or {}
+    local c = obs.runtime.observedInjuries
+    if type(c) ~= "table" or c.day ~= day then
         c = { day = day, byTarget = {}, order = {} }
-        observations[obs] = c
+        obs.runtime.observedInjuries = c
     end
     local target = tostring(inj.id)
     local prev = c.byTarget[target]
@@ -82,8 +82,8 @@ end
 function S.EvaluateWitnessObservationGate(obs, inj, prof, now, opts)
     if not obs or not inj or not prof then return false, "invalid_args" end
     local day = dayBucket(now)
-    local c = observations[obs]
-    local prev = c and c.day == day and c.byTarget[tostring(inj.id)] or nil
+    local c = type(obs.runtime) == "table" and obs.runtime.observedInjuries or nil
+    local prev = c and c.day == day and c.byTarget and c.byTarget[tostring(inj.id)] or nil
     local cur = signature(prof, opts)
     local reason
     local newWound = prev and (cur.count > prev.count or

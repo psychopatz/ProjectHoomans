@@ -32,7 +32,6 @@ function Pack.Register(core)
             { id = "hoomans.concept.gift", domain = "social", aliases = { "gift", "present", "offering" } },
             { id = "hoomans.concept.follow", domain = "command", aliases = { "follow", "follow me", "come with me" } },
             { id = "hoomans.concept.recruit", domain = "social", aliases = { "join me", "join us", "recruit" } },
-            { id = "hoomans.concept.camp", domain = "command", aliases = { "make camp", "camp", "rest here" } },
         },
         speechActs = {
             { id = "RECRUIT", intent = "RECRUIT", polarity = "positive", tone = "friendly" },
@@ -56,13 +55,6 @@ function Pack.Register(core)
                 priority = 10,
                 match = { { concept = "hoomans.concept.follow" } },
                 emit = { intent = "COMMAND", command = "follow", speechAct = "COMMAND" },
-            },
-            {
-                id = "hoomans.pattern.camp",
-                intent = "CAMP",
-                priority = 10,
-                match = { { concept = "hoomans.concept.camp" } },
-                emit = { intent = "CAMP", speechAct = "CAMP" },
             },
             {
                 id = "hoomans.pattern.wellbeing",

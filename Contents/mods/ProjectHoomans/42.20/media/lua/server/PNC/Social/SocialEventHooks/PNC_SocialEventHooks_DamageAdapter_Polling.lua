@@ -223,6 +223,10 @@ local function onTick()
     if Core and Core.ForEachPlayer then
         Core.ForEachPlayer(pollPlayer)
     end
+    local medical = PNC.MedicalCareExecutor
+    if medical and type(medical.PollInjuredPlayers) == "function" then
+        medical.PollInjuredPlayers(now)
+    end
 end
 
 if Events and Events.OnBeingHitByZombie

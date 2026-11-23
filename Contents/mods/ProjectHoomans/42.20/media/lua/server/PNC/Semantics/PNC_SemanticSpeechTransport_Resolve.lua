@@ -154,11 +154,21 @@ function Transport.ResolveLine(rec, opts)
     if mergedTokens["addressee.name"] == nil or cleanText(mergedTokens["addressee.name"]) == nil then
         local addr = type(opts.addressee) == "table" and opts.addressee or nil
         local addrAllowed = addr == nil or (addr.identityKnown ~= false and addr.isUnknown ~= true)
-        local rawAddressee = (addrAllowed and addr and (addr.name or addr.fullName or addr.displayName))
-            or opts.addresseeName or context.addresseeName or context.playerAddressName
-            or (context.playerNameKnown ~= false and context.playerName)
-            or (context.npcIdentityKnown ~= false and context.npcName)
-            or context.targetName
+        local rawAddressee = addrAllowed and addr
+            and (addr.name or addr.fullName or addr.displayName) or nil
+        if rawAddressee == nil then
+            if context.playerNameKnown == true then
+                rawAddressee = opts.addresseeName or context.addresseeName
+                    or context.playerAddressName or context.playerName
+            elseif context.playerNameKnown == false then
+                rawAddressee = context.playerAddressName or context.player
+            else
+                rawAddressee = opts.addresseeName or context.targetName
+            end
+        end
+        if rawAddressee == nil and context.npcIdentityKnown == true then
+            rawAddressee = context.npcName
+        end
         mergedTokens["addressee.name"] = TokenFormatter.FirstTokenName(rawAddressee)
     else
         mergedTokens["addressee.name"] = TokenFormatter.CleanName(mergedTokens["addressee.name"])

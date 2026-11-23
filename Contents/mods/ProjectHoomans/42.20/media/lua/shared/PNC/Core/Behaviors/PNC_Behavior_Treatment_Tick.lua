@@ -22,11 +22,42 @@ local startBandage = H.startBandage
 local tickAbstract = H.tickAbstract
 local requiresMedicalItem = H.requiresMedicalItem
 
+local function returnRecoveredItems(record, zombie, itemsToAdd)
+    local inventory = PNC.Inventory
+    if not inventory or not inventory.AddItems then return end
+    local specs = {}
+    for _, fullType in ipairs(itemsToAdd) do
+        if type(fullType) == "string" and fullType ~= "" and fullType ~= "PNC.AbstractMedical" then
+            specs[#specs + 1] = { type = fullType, stack = 1 }
+        end
+    end
+    if #specs == 0 then return end
+    local ok, _, ids = inventory.AddItems(record, specs, "root", "removed_healed_dressing")
+    if ok and ids and zombie and inventory.MaterializeItem then
+        for _, itemId in ipairs(ids) do inventory.MaterializeItem(record, zombie, itemId) end
+    end
+end
+
+local function removeHealedDressing(Wounds, Treatment, record, zombie, healedPart, healedKind, now, state)
+    local removeFn = healedKind == "splint" and Wounds.RemoveSplint or Wounds.RemoveBandage
+    if type(removeFn) ~= "function" then return false end
+    local ok, reason, itemA, itemB = removeFn(record, healedPart)
+    if not ok then return false end
+    if not Treatment.RequiresNPCMedicalItem or Treatment.RequiresNPCMedicalItem(record) then
+        returnRecoveredItems(record, zombie, { itemA, itemB })
+    end
+    state.retryAt = now + 750
+    state.lastResult = reason
+    record.runtime.forceSyncEvent = reason
+    if PNC.Network and PNC.Network.BroadcastRecord then PNC.Network.BroadcastRecord(record, reason) end
+    return true
+end
+
 function Behavior.Tick(record, zombie, now)
     local Wounds = PNC.NPCWounds
     local Treatment = PNC.Treatment
     local state
-    local partId
+    local partId, healedPart, healedKind
     local threat
     local groupAlert
     local safetyRadius
@@ -42,15 +73,24 @@ function Behavior.Tick(record, zombie, now)
     state = ensureState(record)
     now = tonumber(now) or Core.Now()
     if not partId then
-        if state.phase ~= "idle" then
-            clearAction(record, zombie, "no_treatable_wound")
+        if Wounds.FindRemovableHealedDressing then
+            healedPart, _, healedKind = Wounds.FindRemovableHealedDressing(record)
         end
-        return false
+        if not healedPart then
+            if state.phase ~= "idle" then
+                clearAction(record, zombie, "no_treatable_wound")
+            end
+            return false
+        end
+    end
+    if not partId and healedPart and (record.presenceState ~= Const.PRESENCE_LIVE or not zombie) then
+        if now < (tonumber(state.retryAt) or 0) then return false end
+        return removeHealedDressing(Wounds, Treatment, record, nil, healedPart, healedKind, now, state)
     end
     if record.presenceState ~= Const.PRESENCE_LIVE or not zombie then
         return tickAbstract(record, now, partId)
     end
-    if requiresMedicalItem(Treatment, record)
+    if partId and requiresMedicalItem(Treatment, record)
         and not Treatment.HasNPCBandage(record)
         and not (Treatment.GetNPCSplintPlan and Treatment.GetNPCSplintPlan(record, partId))
     then
@@ -160,6 +200,9 @@ function Behavior.Tick(record, zombie, now)
         record.runtime.tacticalState = nil
     end
     if now < (tonumber(state.retryAt) or 0) then return false end
+    if not partId and healedPart then
+        return removeHealedDressing(Wounds, Treatment, record, zombie, healedPart, healedKind, now, state)
+    end
     return startBandage(record, zombie, partId, now)
 end
 

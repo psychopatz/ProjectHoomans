@@ -123,7 +123,20 @@ getSpecificPlayer = function() return { id = "player" } end
 getTexture = function(path) return path end
 
 local function newMenu()
-    local menu = { options = {}, submenus = {} }
+    local menu = {
+        options = {},
+        submenus = {},
+        visible = true,
+        mouseOver = 1,
+        mouseOut = false,
+        topmost = nil,
+    }
+    function menu:isAnyVisible()
+        return self.visible
+    end
+    function menu:topmostMenuWithMouse()
+        return self.topmost
+    end
     function menu:addOption(label)
         local option = { name = label }
         self.options[#self.options + 1] = option
@@ -131,6 +144,7 @@ local function newMenu()
     end
     function menu:addSubMenu(option, submenu)
         option.submenu = submenu
+        submenu.parent = self
         self.submenus[#self.submenus + 1] = submenu
     end
     return menu
@@ -141,6 +155,14 @@ ISContextMenu = {
         return newMenu()
     end,
 }
+local hoverTick
+Events = {
+    OnTick = {
+        Add = function(callback) hoverTick = callback end,
+    },
+}
+getMouseX = function() return 0 end
+getMouseY = function() return 0 end
 
 T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
@@ -154,9 +176,18 @@ PNC.ContextHub.RegisterProvider({
 })
 
 entries = {
-    { id = "npc_one", displayName = "Nigel Hidalgo", archetypeLabel = "Foreman", tacticalClass = "neutral", activeBehavior = "FollowOwner", distSq = 1 },
-    { id = "npc_two", displayName = "Dario Hanna", archetypeLabel = "Foreman", tacticalClass = "hostile", distSq = 4 },
+    { id = "npc_one", displayName = "Nigel Hidalgo", archetypeLabel = "Foreman", tacticalClass = "neutral", activeBehavior = "FollowOwner", distSq = 1, zombie = { highlights = {} } },
+    { id = "npc_two", displayName = "Dario Hanna", archetypeLabel = "Foreman", tacticalClass = "hostile", distSq = 4, zombie = { highlights = {} } },
 }
+for _, entry in ipairs(entries) do
+    function entry.zombie:setOutlineHighlight(playerNum, enabled)
+        self.highlights[#self.highlights + 1] = {
+            playerNum = playerNum,
+            enabled = enabled,
+        }
+    end
+    function entry.zombie:setOutlineHighlightCol() end
+end
 local menu = newMenu()
 PNC.ContextHub.BuildWorldContext(0, menu, {}, false)
 T.equal(#menu.options, 2, "NPC entries are listed at context root")
@@ -179,4 +210,27 @@ PNC.ContextHub.BuildWorldContext(0, menu, {}, false)
 T.contains(menu.options[1].name, "[REC]", "recorded context indicator")
 T.contains(menu.options[1].name, "[Foreman]", "recorded NPC exposes debug metadata")
 T.equal(menu.options[2].name, "Dario Hanna", "unrecorded NPC remains uncluttered")
+
+-- A transient nil topmost-menu result is normal while vanilla refreshes its
+-- mouse-over bookkeeping. It must not drop the selected NPC's outline.
+menu.topmost = menu
+menu.mouseOver = 1
+hoverTick()
+T.equal(entries[1].zombie.highlights[#entries[1].zombie.highlights].enabled,
+    true, "context hover enables the selected NPC outline")
+menu.topmost = nil
+hoverTick()
+T.equal(entries[1].zombie.highlights[#entries[1].zombie.highlights].enabled,
+    true, "transient menu gap preserves the selected NPC outline")
+menu.mouseOver = 2
+menu.topmost = menu
+hoverTick()
+T.equal(entries[1].zombie.highlights[#entries[1].zombie.highlights].enabled,
+    false, "moving to another NPC clears the old outline")
+T.equal(entries[2].zombie.highlights[#entries[2].zombie.highlights].enabled,
+    true, "moving to another NPC highlights the new outline")
+menu.visible = false
+hoverTick()
+T.equal(entries[2].zombie.highlights[#entries[2].zombie.highlights].enabled,
+    false, "closing the context menu clears the outline")
 T.finish("pnc_record_debug_smoke")

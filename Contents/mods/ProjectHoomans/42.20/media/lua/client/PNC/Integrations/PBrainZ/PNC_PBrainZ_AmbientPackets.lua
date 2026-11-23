@@ -36,7 +36,7 @@ function AmbientPackets.Build(item, requestID)
         player_uuid = playerID,
         session_id = context.session_id,
         npc_name = identity.npcFullName,
-        player_name = identity.playerFirstName,
+        player_name = identity.player.addressName or identity.playerFirstName,
         victim_name = identity.victimFirstName,
         model = "default",
         conversation_context = context,

@@ -41,14 +41,15 @@ function Internal.UpdateOrdinaryWoundInfection(record, partId, wound, currentHou
     local nextLvl = Core.Clamp(lvl + delta, 0, 10)
     local wasInf = wound.infectedWound == true
     local nowInf = nextLvl >= 0.5
-    local changed = math.abs(nextLvl - lvl) >= 0.01 or wasInf ~= nowInf
+    local flipped = wasInf ~= nowInf
+    local changed = math.abs(nextLvl - lvl) >= 0.01 or flipped
     wound.woundInfectionLevel = nextLvl
     wound.infectedWound = nowInf
-    if wasInf ~= nowInf then
+    if flipped then
         if Wounds.InvalidateProjection then Wounds.InvalidateProjection(record, "ordinary_infection") end
         Internal.EmitWoundStateChange(record, partId, nowInf and "ordinary_infection_onset" or "ordinary_infection_cleared", wound)
     end
-    return changed
+    return changed, flipped
 end
 
 return Wounds

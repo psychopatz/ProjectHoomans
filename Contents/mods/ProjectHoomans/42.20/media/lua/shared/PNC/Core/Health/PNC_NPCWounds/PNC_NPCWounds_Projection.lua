@@ -10,8 +10,10 @@ function Wounds.InvalidateProjection(record, reason, summariesCurrent)
     rt.healthProjectionDirty = true
     rt.woundSummariesCurrent = summariesCurrent == true
     rt.healthProjectionDirtyReason = tostring(reason or "mutated")
-    rt.healthProjectionRev = (tonumber(rt.healthProjectionRev) or 0) + 1
-    rt.injuryRevision = rt.healthProjectionRev
+    if reason ~= "body_healed" then
+        rt.healthProjectionRev = (tonumber(rt.healthProjectionRev) or 0) + 1
+        rt.injuryRevision = rt.healthProjectionRev
+    end
 end
 
 local function computeProjection(record, prefPart, prefType, recalculate)

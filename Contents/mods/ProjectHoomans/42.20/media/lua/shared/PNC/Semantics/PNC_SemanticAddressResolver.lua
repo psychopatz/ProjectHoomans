@@ -267,6 +267,62 @@ local function firstNonEmpty(...)
     return nil
 end
 
+local function playerGender(options)
+    options = type(options) == "table" and options or {}
+    if type(options.isFemale) == "boolean" then
+        return options.isFemale and "female" or "male"
+    end
+    if options.isMale == true then return "male" end
+    local explicit = lower(options.gender or options.sex)
+    if explicit == "female" or explicit == "woman" then return "female" end
+    if explicit == "male" or explicit == "man" then return "male" end
+    local player = options.player
+    local value = player and call(player, "isFemale") or nil
+    if type(value) == "boolean" then return value and "female" or "male" end
+    local descriptor = player and call(player, "getDescriptor") or nil
+    value = descriptor and call(descriptor, "isFemale") or nil
+    if type(value) == "boolean" then return value and "female" or "male" end
+    return "neutral"
+end
+
+local function prefersFormalUnknown(options)
+    options = type(options) == "table" and options or {}
+    local relationship = lower(
+        options.relationshipKind or options.relationship
+            or options.relationshipState or options.socialRole
+            or options.npcType or options.tacticalClass
+    )
+    local tone = lower(options.tone or options.beatTone or options.speechStyle)
+    local persona = lower(options.persona or options.personaStyle)
+    local familiarity = tonumber(options.familiarity)
+    if tone == "formal" or tone == "guarded" or persona == "formal" then
+        return true
+    end
+    if tone == "friendly" or tone == "casual" or tone == "slang"
+        or persona == "friendly" or persona == "casual" or persona == "slang"
+    then
+        return false
+    end
+    if familiarity and familiarity >= 30 then return false end
+    if relationship == "friend" or relationship == "companion"
+        or relationship == "colonist" or relationship == "family"
+        or relationship == "lover" or relationship == "partner"
+        or relationship == "spouse" or relationship == "brother"
+        or relationship == "sister" or relationship == "mother"
+        or relationship == "father"
+    then
+        return false
+    end
+    -- Neutral, first-meeting, missing, and explicitly unknown relationship
+    -- states are the privacy-sensitive default: use the same formal address
+    -- vocabulary as Resolver.Resolve instead of a familiar nickname.
+    return relationship == "neutral"
+        or relationship == "stranger" or relationship == "acquaintance"
+        or relationship == "known" or relationship == "unknown"
+        or relationship == "firstmeet" or relationship == "first_meet"
+        or relationship == "first-meet"
+end
+
 local function knownFromMap(map, npcID, playerUUID)
     if type(map) ~= "table" then return nil end
     npcID = clean(npcID, 96)
@@ -373,6 +429,7 @@ function Resolver.ResolveForNPC(options)
     options = type(options) == "table" and options or {}
     local playerUUID = clean(options.playerUUID, 96)
     local npcID = clean(options.npcID, 96) or "unknown-npc"
+    local genderKind = playerGender(options)
     local isFemale = Resolver.ResolvePlayerIsFemale(options.player, options.isFemale)
     local seed = PNC.Identity.NormalizeSeed(options.npcIdentitySeed, npcID)
     local nicknameSeed = playerUUID and PNC.Identity.HashText(playerUUID, seed) or seed
@@ -400,6 +457,22 @@ function Resolver.ResolveForNPC(options)
                 nicknameID = nil,
             }
         end
+    end
+    if prefersFormalUnknown(options) then
+        local termID = genderKind == "female" and "miss"
+            or genderKind == "male" and "mister" or "stranger"
+        local term = TERMS[termID] or TERMS.stranger
+        local termText = translated(term, options.language)
+        return {
+            known = false,
+            isFemale = isFemale,
+            addressName = termText,
+            firstName = termText,
+            fullName = termText,
+            surname = "",
+            lastName = "",
+            nicknameID = term.id,
+        }
     end
     return {
         known = false,

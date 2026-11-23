@@ -27,7 +27,7 @@ function Internal.RegisterActionConcepts()
     registerConcept("WAIT", {
         "wait", "stay", "wait here", "stay here", "stay right here",
     })
-    registerConcept("CAMP", { "camp", "camping" })
+    registerConcept("CAMP", { "camp", "camping", "rest here" })
     registerConcept("CAMP_PREP", { "at", "in", "inside", "by", "near" })
     registerConcept("CAMPFIRE", {
         "campfire", "fire pit", "firepit", "fire",

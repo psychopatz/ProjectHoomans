@@ -1,0 +1,35 @@
+{
+  "schema": "psychopatz.convo-engine.translation.v1",
+  "family": "medical.care.assisted",
+  "locale": "TL",
+  "entries": {
+    "say.variants.start_patch_npc": [
+      "Huwag kang gagalaw, {addressee.name}, babalutin ko ang {slot.wound.part} mo.",
+      "Sandali lang, {addressee.name}, lalagyan ko ng bendahe ang {slot.wound.part} mo."
+    ],
+    "say.variants.start_patch_player": [
+      "Huwag kang gagalaw, {addressee.name}, gagamutin ko ang {slot.wound.part} mo.",
+      "Sandali lang, {addressee.name}, babalutin ko nang maayos ang {slot.wound.part} mo."
+    ],
+    "say.variants.start_change_dirty": [
+      "Marumi na ang bendahe sa {slot.wound.part} mo, {addressee.name}, papalitan ko.",
+      "Teka, {addressee.name}, papalitan ko muna ang maduming balot sa {slot.wound.part} mo."
+    ],
+    "say.variants.complete_patch": [
+      "Ayos na, {addressee.name}, mahigpit nang nakabalot ang {slot.wound.part} mo.",
+      "Tapos na, {addressee.name}, natakpan na ang dugo sa {slot.wound.part} mo."
+    ],
+    "say.variants.complete_change_dirty": [
+      "Bago at malinis na ang bendahe sa {slot.wound.part} mo, {addressee.name}.",
+      "Napalitan ko na ang maruming bendahe sa {slot.wound.part} mo, {addressee.name}."
+    ],
+    "say.variants.patient_thanks": [
+      "Salamat, {addressee.name}, malaking ginhawa iyan.",
+      "Maraming salamat, {addressee.name}, kailangan ko talaga iyan."
+    ],
+    "say.variants.default": [
+      "Huwag kang gagalaw, {addressee.name}, aasikasuhin ko ang {slot.wound.part} mo.",
+      "Lalagyan ko ng bendahe ang {slot.wound.part} mo, {addressee.name}."
+    ]
+  }
+}

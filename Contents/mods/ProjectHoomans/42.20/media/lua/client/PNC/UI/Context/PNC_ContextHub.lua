@@ -9,12 +9,81 @@ PNC.ContextHub = PNC.ContextHub or {}
 
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 
+local HighlightConfig = require "PNC/Conversation/InlineChat/PNC_InlineChatConfig"
+
 local ContextHub = PNC.ContextHub
 local Selection = PNC.NPCSelection
 local Identity = PNC.NPCIdentityPresentation
 
 ContextHub.Providers = ContextHub.Providers or {}
 ContextHub.ProviderOrder = ContextHub.ProviderOrder or {}
+
+local hoverByPlayer = {}
+
+function ContextHub.IsHighlighting(playerNum, zombie)
+    local hover = hoverByPlayer[playerNum]
+    return hover ~= nil and hover.zombie == zombie
+end
+
+local function clearOutline(playerNum, zombie)
+    if not zombie then return end
+    local chat = PNC.Conversation and PNC.Conversation.InlineChat
+    if playerNum == 0 and chat and chat.State then
+        for _, target in pairs(chat.State.highlightedZombies or {}) do
+            if target == zombie then return end
+        end
+    end
+    zombie:setOutlineHighlight(playerNum, false)
+end
+
+local function updateHover()
+    for playerNum, hover in pairs(hoverByPlayer) do
+        local root = hover.root
+        local visible = root:isAnyVisible()
+        local menu = visible and root:topmostMenuWithMouse(getMouseX(), getMouseY())
+        local zombie
+        local selectionKnown = false
+        -- Vanilla can briefly return no topmost menu while a context menu or
+        -- submenu is still visible (mouse-over bookkeeping is updated in
+        -- prerender). Keep the last valid target through that transient gap;
+        -- only a concrete option/submenu selection may replace it.
+        while menu do
+            local option = menu == root and not menu.mouseOut
+                and menu.options[menu.mouseOver] or nil
+            if menu == root then
+                if option then
+                    selectionKnown = true
+                    zombie = hover.targets[option]
+                end
+                break
+            end
+            zombie = hover.targets[menu]
+            if zombie then
+                selectionKnown = true
+                break
+            end
+            menu = menu.parent
+        end
+        if zombie and zombie.isDead and zombie:isDead() then zombie = nil end
+        if not visible then
+            clearOutline(playerNum, hover.zombie)
+            hover.zombie = nil
+        elseif selectionKnown and hover.zombie ~= zombie then
+            clearOutline(playerNum, hover.zombie)
+            hover.zombie = zombie
+            if zombie then
+                local color = HighlightConfig.HIGHLIGHT_COLOR
+                zombie:setOutlineHighlight(playerNum, true)
+                if zombie.setOutlineHighlightCol then
+                    zombie:setOutlineHighlightCol(playerNum, color.r, color.g, color.b, color.a)
+                end
+            end
+        end
+        if not visible then hoverByPlayer[playerNum] = nil end
+    end
+end
+
+if Events and Events.OnTick then Events.OnTick.Add(updateHover) end
 
 local function appendUnique(list, value)
     local i
@@ -108,6 +177,14 @@ function ContextHub.AddEntryOptions(menu, player, entry, contextData)
         option.iconTexture = resolveEntryIcon()
     end
     menu:addSubMenu(option, subMenu)
+    local targets = contextData and contextData.hoverTargets
+    local sync = PNC.ClientPresenceSync
+    local zombie = entry.zombie or (targets and sync and sync.ResolveBodyForNPC
+        and sync.ResolveBodyForNPC(entry.id, entry.snapshot))
+    if targets and option and zombie and zombie.setOutlineHighlight then
+        targets[option] = zombie
+        targets[subMenu] = zombie
+    end
     for i = 1, #ContextHub.ProviderOrder do
         provider = ContextHub.Providers[ContextHub.ProviderOrder[i]]
         if provider and (provider.isEnabled == nil or provider.isEnabled(entry, player, contextData) ~= false) then
@@ -129,11 +206,15 @@ function ContextHub.BuildWorldContext(playerNum, context, worldObjects, test)
     if not player or not context then
         return
     end
+    local previous = hoverByPlayer[playerNum]
+    if previous then clearOutline(playerNum, previous.zombie) end
+    hoverByPlayer[playerNum] = nil
     entries, square = Selection.CollectNearbyNPCs(player, worldObjects, 3.0)
     contextData = {
         playerNum = playerNum,
         worldObjects = worldObjects,
         square = square,
+        hoverTargets = {},
     }
     if #entries <= 0 then
         return
@@ -148,6 +229,7 @@ function ContextHub.BuildWorldContext(playerNum, context, worldObjects, test)
     if not anyEnabled then
         return
     end
+    hoverByPlayer[playerNum] = { root = context, targets = contextData.hoverTargets }
     for i = 1, #entries do
         if hasEnabledProvider(entries[i], player, contextData) then
             ContextHub.AddEntryOptions(context, player, entries[i], contextData)

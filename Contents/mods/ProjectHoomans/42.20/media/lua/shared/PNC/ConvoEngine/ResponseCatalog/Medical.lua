@@ -4,6 +4,7 @@ PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 require "PNC/ConvoEngine/ResponseCatalog/Medical_Core"
 
+local ConvoPlanFamily = require "PNC/ConvoEngine/ResponseCatalog/ConvoPlanFamily"
 local Catalog = PNC.ConvoEngine.ResponseCatalog
 if type(Catalog) ~= "table" or type(Catalog.Register) ~= "function" then
     return false
@@ -143,5 +144,32 @@ Catalog.Register("semantic.medical.distress.treatment", {
         },
     },
 })
+
+do
+    local roles = {
+        "start_patch_npc", "start_patch_player", "start_change_dirty",
+        "complete_patch", "complete_change_dirty", "patient_thanks", "default",
+    }
+    local vars = {}
+    for _, r in ipairs(roles) do
+        local tid = "medical.care.assisted." .. r
+        ConvoPlanFamily.install(tid, { defaultContentOwner = "projecthoomans.dialogue_content.events" })
+        vars[#vars + 1] = {
+            id = "semantic.medical.care.assisted." .. r,
+            templateID = tid,
+            when = r ~= "default" and { combatReactionRole = r } or nil,
+            priority = r == "default" and 10 or 90,
+            fallback = "Hold still, let me patch up that {slot.wound.part}.",
+            plan = {
+                dialogueAct = "REACT",
+                sourcePoolID = "semantic.medical.care.assisted",
+                topic = "medical",
+                presentationClass = "BARK",
+                turns = { { segments = { { kind = "translation", templateID = tid } }, offers = {} } },
+            },
+        }
+    end
+    Catalog.Register("semantic.medical.care.assisted", { variants = vars })
+end
 
 return true

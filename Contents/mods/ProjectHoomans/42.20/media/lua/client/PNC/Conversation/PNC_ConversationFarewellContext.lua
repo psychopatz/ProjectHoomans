@@ -91,6 +91,12 @@ function Context.Build(spec, role, npcID)
         playerUUID = playerID,
         playerNameKnown = source.playerNameKnown,
         isFemale = source.playerIsFemale,
+        relationshipKind = source.conversationRelationshipID
+            or source.relationshipState or role or source.socialRole
+            or source.npcType,
+        tone = source.tone or source.beatTone,
+        persona = source.persona or source.personaStyle,
+        familiarity = source.familiarity,
         state = state,
     })
     return {

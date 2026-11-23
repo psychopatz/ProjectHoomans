@@ -20,13 +20,27 @@ Integration.Internal.AmbientContext = AmbientContext
 local WorldContext = PNC.Semantics and PNC.Semantics.WorldContext
 local DialogueFacts = Integration.ContextPayloadDialogueFacts
 
-local function promptFor(eventType, playerMessage, playerFirstName, victimFirstName)
+local function promptFor(
+    eventType,
+    playerMessage,
+    playerAddressName,
+    playerNameKnown,
+    victimFirstName
+)
+    local addressInstruction
+    if playerNameKnown == true then
+        addressInstruction = "If you address the player, use only their first name ("
+            .. playerAddressName .. ")."
+    else
+        addressInstruction = "The player has not shared their name. If you address them, use only the neutral/formal address ("
+            .. playerAddressName
+            .. ") and never guess or reveal a real name."
+    end
     if eventType == "player_spoke" and playerMessage ~= "" then
         return (
             "Write one brief in-character reaction because the player just "
             .. "said: \"" .. playerMessage .. "\". Respond naturally to "
-            .. "what they said. Use only the player's first name if you "
-            .. "address them (" .. playerFirstName .. "). Do not mention "
+            .. "what they said. " .. addressInstruction .. " Do not mention "
             .. "being an AI, prompts, or game systems. Keep it under one "
             .. "sentence."
         )
@@ -43,9 +57,8 @@ local function promptFor(eventType, playerMessage, playerFirstName, victimFirstN
     return (
         "Write one brief in-character reaction because you witnessed "
         .. "the player kill a zombie. Do not mention being an AI, prompts, "
-        .. "or game systems. If you address the player, use only their first "
-        .. "name; never repeat their surname or full name. Keep it under one "
-        .. "sentence."
+        .. "or game systems. " .. addressInstruction
+        .. " Keep it under one sentence."
     )
 end
 
@@ -131,6 +144,13 @@ function AmbientContext.Build(item, source, npcID, playerID, identity, requestID
     local worldContext = WorldContext and WorldContext.Get and WorldContext.Get({
         player = player,
     }) or {}
+    local playerNameKnown = identity.player.known == true
+    local playerAddressName = identity.player.addressName
+        or identity.playerFirstName or "Stranger"
+    local playerFirstName = playerNameKnown
+        and identity.playerFirstName or playerAddressName
+    local playerFullName = playerNameKnown and identity.playerFullName or nil
+    local playerSurname = playerNameKnown and identity.playerSurname or nil
     return {
         world_uuid = Message.GetSaveID(),
         world_mode = memoryIdentity.world_mode,
@@ -141,16 +161,16 @@ function AmbientContext.Build(item, source, npcID, playerID, identity, requestID
         npc_uuid = npcID,
         session_id = "pnc_ambient_" .. tostring(requestID),
         npc_name = identity.npcFullName,
-        player_name = identity.playerFirstName,
-        player_address_name = identity.player.addressName,
-        player_name_known = identity.player.known,
+        player_name = playerAddressName,
+        player_address_name = playerAddressName,
+        player_name_known = playerNameKnown,
         player_is_female = identity.player.isFemale,
         npc_full_name = identity.npcFullName,
         npc_first_name = identity.npcFirstName,
         npc_surname = identity.npcSurname,
-        player_full_name = identity.playerFullName,
-        player_first_name = identity.playerFirstName,
-        player_surname = identity.playerSurname,
+        player_full_name = playerFullName,
+        player_first_name = playerFirstName,
+        player_surname = playerSurname,
         victim_npc_id = victimID ~= "" and victimID or nil,
         victim_name = identity.victimFirstName,
         victim_full_name = identity.victimFullName,
@@ -163,7 +183,8 @@ function AmbientContext.Build(item, source, npcID, playerID, identity, requestID
         message = promptFor(
             eventType,
             playerMessage,
-            identity.playerFirstName,
+            playerAddressName,
+            playerNameKnown,
             identity.victimFirstName
         ),
         character_card = {},
@@ -195,7 +216,7 @@ function AmbientContext.Build(item, source, npcID, playerID, identity, requestID
             event_type = eventType,
             victim_npc_id = victimID ~= "" and victimID or nil,
             victim_first_name = identity.victimFirstName,
-            player_name_known = identity.player.known,
+            player_name_known = playerNameKnown,
             player_message = playerMessage ~= "" and playerMessage or nil,
             social_role = source.socialRole or source.npcType,
             relationship_state = source.relationshipState,

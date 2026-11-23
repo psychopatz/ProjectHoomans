@@ -19,6 +19,25 @@ local I = PNC.Semantics.CombatTargetCalloutsInternal
 PNC.Semantics.CombatTargetCallouts = S
 
 local WoundComposition = require "PNC/Semantics/PNC_SemanticCombatTargetCallouts_WoundComposition"
+local Aid = nil
+
+local function getAid()
+    if not Aid then Aid = require "PNC/Semantics/PNC_SemanticInjuryAid" end
+    return Aid
+end
+
+local function recordBackoff(obs, tid, untilAt)
+    obs.runtime = type(obs.runtime) == "table" and obs.runtime or {}
+    local b = obs.runtime.visObsBackoffByTarget
+    if type(b) ~= "table" then b = {}; obs.runtime.visObsBackoffByTarget = b end
+    local ord = obs.runtime.visObsBackoffOrder
+    if type(ord) ~= "table" then ord = {}; obs.runtime.visObsBackoffOrder = ord end
+    if b[tid] == nil then
+        while #ord >= 12 do b[table.remove(ord, 1)] = nil end
+        ord[#ord + 1] = tid
+    end
+    b[tid] = untilAt
+end
 
 local OBS_OPTS = {
     family = "combat_injury_visible_observation",
@@ -75,21 +94,26 @@ local OPEN_OBSERVATION_ROLES = {
 function S.OnVisibleConditionObserved(obs, inj, now, opts)
     if type(obs) ~= "table" or obs.alive == false or obs.id == nil then return false, "invalid_observer" end
     if type(inj) ~= "table" or inj.alive == false or inj.id == nil then return false, "invalid_injured" end
-    local prof = S.ClassifyActorWoundProfile(inj)
     if obs.id == inj.id then return false, "same_actor" end
-    if not prof then return false, "target_not_injured" end
     now = I.SituationNow(now)
+    local fromEnc = opts and opts.fromEncounter == true
+    local tid = tostring(inj.id)
+    local backoff = fromEnc and type(obs.runtime) == "table" and obs.runtime.visObsBackoffByTarget or nil
+    if backoff and now < (tonumber(backoff[tid]) or 0) then
+        return false, "observation_backoff"
+    end
+    local prof = S.ClassifyActorWoundProfile(inj)
+    if not prof then return false, "target_not_injured" end
     local ok, gateR, delta = S.EvaluateWitnessObservationGate(obs, inj, prof, now, opts)
     if not ok then return false, gateR, delta end
 
+    if not I.CanSeeInjury(obs, inj) then return false, "no_line_of_sight" end
     local ep = epistemicPolicy(obs, inj, opts)
     local variant = S.ResolveVisibleObservationVariant(obs, inj, prof, delta, ep)
     if not variant then return false, "condition_not_visible" end
-    if not I.CanSeeInjury(obs, inj) then return false, "no_line_of_sight" end
     local openWound = variant == "open_wound" or variant == "medic_triage_offer"
     if openWound then
-        local aid = require "PNC/Semantics/PNC_SemanticInjuryAid"
-        variant = OPEN_OBSERVATION_ROLES[aid.ObserverPolicy(obs, inj)] or variant
+        variant = OPEN_OBSERVATION_ROLES[getAid().ObserverPolicy(obs, inj)] or variant
     end
     local addrName = (S.FirstTokenName and S.FirstTokenName(inj.name or inj.fullName)) or tostring(inj.name or "survivor")
     local toks = { ["addressee.name"] = addrName, ["slot.wound.part"] = prof.partToken, ["slot.wound.label"] = prof.woundLabel }
@@ -148,7 +172,10 @@ function S.OnVisibleConditionObserved(obs, inj, now, opts)
         eventRef = ref, text = text, presentationClass = interactive and "TACTICAL_PROMPT" or (res and res.presentationClass or "BARK"),
         context = presentation,
     })
-    if (tonumber(sent) or 0) <= 0 then return false, "observation_not_delivered" end
+    if (tonumber(sent) or 0) <= 0 then
+        if fromEnc then recordBackoff(obs, tid, now + 5000) end
+        return false, "observation_not_delivered"
+    end
     S.RecordWitnessObservation(obs, inj, prof, now, opts)
     if interactive then ObservationScene.Bind(obs, inj, ref, prof.partId, now) end
     return true, variant, { text = text, variant = variant, changeReason = gateR, deltaFacts = delta, epistemic = ep }
@@ -160,13 +187,13 @@ local function mayHaveVisibleWound(actor)
         or (tonumber(body.bandagedWoundCount) or 0) > 0 or (tonumber(body.bleedingRate) or 0) > 0)
 end
 
-function S.OnInjuryEncounterCellChanged(actor, now)
+function S.OnInjuryEncounterCellChanged(actor, now, opts)
     local injured = mayHaveVisibleWound(actor)
     local neighbors = I.FindInjuryEncounterNeighbors(actor, 6)
     for i = 1, math.min(4, #neighbors) do
         local other = neighbors[i].record
-        if injured and S.OnVisibleConditionObserved(other, actor, now) then return true end
-        if mayHaveVisibleWound(other) and S.OnVisibleConditionObserved(actor, other, now) then return true end
+        if injured and S.OnVisibleConditionObserved(other, actor, now, opts) then return true end
+        if mayHaveVisibleWound(other) and S.OnVisibleConditionObserved(actor, other, now, opts) then return true end
     end
     return false
 end
