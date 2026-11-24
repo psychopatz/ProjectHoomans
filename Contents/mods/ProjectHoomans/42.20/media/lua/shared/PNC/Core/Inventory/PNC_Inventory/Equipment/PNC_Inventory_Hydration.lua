@@ -333,11 +333,17 @@ end
 function Inventory.GetWeightState(record)
     local inv = Inventory.EnsureRecordInventory(record)
     local encumbrance = inv and Inventory.GetEncumbranceState(record, inv) or nil
+    local maxWeight = inv and (tonumber(inv.maxWeight) or 0) or 0
+    local bagCapacity = inv and (tonumber(inv.equippedBagCapacity) or 0) or 0
+    local bagUsed = inv and (tonumber(inv.equippedBagUsedWeight) or 0) or 0
     return inv and {
         usedWeight = tonumber(inv.cachedWeight) or 0,
-        maxWeight = tonumber(inv.maxWeight) or 0,
+        maxWeight = maxWeight,
+        equippedBagCapacity = bagCapacity,
+        equippedBagUsedWeight = bagUsed,
+        totalCapacity = tonumber(inv.totalCapacity) or (maxWeight + bagCapacity),
         remainingWeight = tonumber(inv.remainingWeight)
-            or math.max(0, (tonumber(inv.maxWeight) or 0) - (tonumber(inv.cachedWeight) or 0)),
+            or math.max(0, maxWeight - (tonumber(inv.cachedWeight) or 0)),
         ratio = encumbrance and encumbrance.ratio or 0,
         level = encumbrance and encumbrance.level or "normal",
     } or nil

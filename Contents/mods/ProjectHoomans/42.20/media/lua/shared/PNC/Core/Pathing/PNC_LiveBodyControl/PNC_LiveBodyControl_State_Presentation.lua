@@ -102,13 +102,37 @@ end
 function LiveBodyControl.IsSleeping(record)
     local runtime = record and record.runtime or nil
     local activity = runtime and runtime.facilityActivity or nil
-    local phase = activity and tostring(activity.phase or "") or ""
-    if not activity or tostring(activity.capability or "") ~= "sleep" then
-        return false
+    if activity and tostring(activity.capability or "") == "sleep" then
+        local phase = tostring(activity.phase or "")
+        if activity.sleepWakePending == true
+            or activity.sleepSceneActive == true
+            or (phase == "STARTING" and activity.arrivalSettled == true)
+        then
+            return true
+        end
     end
-    return activity.sleepWakePending == true
-        or activity.sleepSceneActive == true
-        or (phase == "STARTING" and activity.arrivalSettled == true)
+    local roamAmbient = runtime and runtime.roamAmbient or nil
+    if roamAmbient and tostring(roamAmbient.action or "") == "sleep" then
+        local phase = tostring(roamAmbient.phase or "")
+        if roamAmbient.sleepSurfaceEntered == true
+            or roamAmbient.positioned == true
+            or roamAmbient.wakeExitPending == true
+            or phase == "SLEEPING"
+            or (phase == "STARTING" and roamAmbient.arrivalSettled == true)
+        then
+            return true
+        end
+    end
+    local lifeActivity = runtime and runtime.lifeActivity or nil
+    if lifeActivity and tostring(lifeActivity.action or "") == "sleep" then
+        if lifeActivity.sleepSurfaceEntered == true
+            or lifeActivity.positioned == true
+            or tostring(lifeActivity.phase or "") == "SLEEPING"
+        then
+            return true
+        end
+    end
+    return false
 end
 
 function LiveBodyControl.IsSleepWakeActive(record)

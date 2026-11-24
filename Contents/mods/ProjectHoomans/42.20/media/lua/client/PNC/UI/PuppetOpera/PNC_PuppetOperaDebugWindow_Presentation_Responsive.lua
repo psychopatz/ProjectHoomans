@@ -71,11 +71,14 @@ function Class:onResponsiveLayout()
         self.playerAnimationTab,
         self.npcAnimationTab,
         self.beatsTab,
+        self.triggersTab,
         self.traceTab,
     }) do
-        Layout.SetBounds(view, 0, self.tabPanel.tabHeight,
-            self.tabPanel:getWidth(), viewHeight)
-        if view.onResponsiveLayout then view:onResponsiveLayout() end
+        if view then
+            Layout.SetBounds(view, 0, self.tabPanel.tabHeight,
+                self.tabPanel:getWidth(), viewHeight)
+            if view.onResponsiveLayout then view:onResponsiveLayout() end
+        end
     end
 
     local buttonWidth = math.max(1,

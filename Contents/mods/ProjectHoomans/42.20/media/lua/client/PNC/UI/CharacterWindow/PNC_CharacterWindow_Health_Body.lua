@@ -62,8 +62,77 @@ local function drawAlignedTexture(view, texture, x, y, scale, alpha)
         width * scale, height * scale, alpha or 1, 1, 1, 1)
 end
 
+local function resolvePartOverlays(sex, suffix, partId, wound, body)
+    local layers = {}
+    local prefix = "media/ui/BodyDamage/" .. sex .. "_"
+    local bandaged = wound.bandaged == true
+    local dirty = wound.bandageDirty == true
+    local woundType = tostring(wound.type or "")
+    local hasKnox = body and body.infection
+        and body.infection.sourcePart == partId
+        and (body.infection.active == true or body.infection.fatal == true)
+    local hasInfection = hasKnox
+        or wound.infected == true
+        or wound.ordinaryInfected == true
+        or (tonumber(wound.woundInfectionLevel) or 0) > 0
+
+    -- Layer 1: Infection glow (matches UI_BodyPart.java:76-80)
+    if not bandaged and hasInfection then
+        local level = tonumber(wound.woundInfectionLevel) or (hasKnox and 10 or 6)
+        layers[#layers + 1] = {
+            path = prefix .. "infection_" .. suffix,
+            alpha = Shared.Clamp(level / 10, 0.35, 1),
+        }
+    end
+
+    -- Layer 2: Primary dressing or wound overlay (matches UI_BodyPart.java:82-101)
+    if bandaged and not dirty then
+        layers[#layers + 1] = { path = prefix .. "bandage_" .. suffix, alpha = 1 }
+    elseif bandaged and dirty then
+        layers[#layers + 1] = { path = prefix .. "bandagedirty_" .. suffix, alpha = 1 }
+    elseif wound.stitched == true then
+        layers[#layers + 1] = { path = prefix .. "stitches_" .. suffix, alpha = 1 }
+    elseif woundType == "bite" or wound.bitten == true then
+        layers[#layers + 1] = { path = prefix .. "bite_" .. suffix, alpha = 1 }
+    elseif woundType == "deep_wound" or woundType == "deep_wound_glass"
+        or wound.deepWounded == true
+    then
+        layers[#layers + 1] = { path = prefix .. "deepwound_" .. suffix, alpha = 1 }
+    elseif woundType == "scratch" or woundType == "laceration" then
+        layers[#layers + 1] = { path = prefix .. "scratch_" .. suffix, alpha = 1 }
+    end
+
+    -- Layer 3: Fracture / Splint (matches UI_BodyPart.java:103-109)
+    if wound.splinted == true then
+        layers[#layers + 1] = { path = prefix .. "splint_" .. suffix, alpha = 1 }
+    elseif woundType == "fracture" or wound.fractured == true then
+        layers[#layers + 1] = { path = prefix .. "bones_" .. suffix, alpha = 1 }
+    end
+
+    -- Layer 4-6: Glass, Bullet, Burn when unbandaged (matches UI_BodyPart.java:111-121)
+    if not bandaged then
+        if woundType == "deep_wound_glass" or woundType == "glass"
+            or wound.haveGlass == true
+        then
+            layers[#layers + 1] = { path = prefix .. "glass_" .. suffix, alpha = 1 }
+        end
+        if woundType == "bullet" or wound.haveBullet == true then
+            layers[#layers + 1] = { path = prefix .. "bullet_" .. suffix, alpha = 1 }
+        end
+        if woundType == "burn" or wound.burned == true then
+            layers[#layers + 1] = { path = prefix .. "burn_" .. suffix, alpha = 1 }
+        end
+    end
+
+    -- Fallback for custom/unknown wound types with no matching vanilla layer
+    if #layers == 0 then
+        layers[#layers + 1] = { path = prefix .. "scratch_" .. suffix, alpha = 1 }
+    end
+    return layers
+end
+
 local function drawVanillaHealthBody(view, isFemale, x, y, availableWidth,
-    availableHeight, wounds, hpCurrent, hpMax)
+    availableHeight, wounds, hpCurrent, hpMax, body)
     local sex = isFemale and "female" or "male"
     local base = healthTexture("media/ui/BodyDamage/" .. sex .. "_base.png")
     local originalWidth = math.max(1, textureSize(base, true) > 0 and textureSize(base, true) or 123)
@@ -87,7 +156,6 @@ local function drawVanillaHealthBody(view, isFemale, x, y, availableWidth,
     local partId
     local suffix
     local wound
-    local overlay
     local part
     local centerX
     local centerY
@@ -96,15 +164,13 @@ local function drawVanillaHealthBody(view, isFemale, x, y, availableWidth,
     if base then view:drawTextureScaled(base, drawX, y, bodyWidth, bodyHeight, 1, 1, 1, 1) end
     for partId, wound in pairs(wounds or {}) do
         suffix = VANILLA_PART_TEXTURE[partId]
-        if suffix then
-            if wound.bandaged == true then
-                overlay = healthTexture("media/ui/BodyDamage/" .. sex .. "_bandage_" .. suffix)
-            elseif wound.type == "bite" then
-                overlay = healthTexture("media/ui/BodyDamage/" .. sex .. "_bite_" .. suffix)
-            else
-                overlay = healthTexture("media/ui/BodyDamage/" .. sex .. "_scratch_" .. suffix)
+        if suffix and type(wound) == "table" then
+            local layers = resolvePartOverlays(sex, suffix, partId, wound, body)
+            for l = 1, #layers do
+                local layer = layers[l]
+                local overlay = healthTexture(layer.path)
+                drawAlignedTexture(view, overlay, drawX, y, scale, layer.alpha)
             end
-            drawAlignedTexture(view, overlay, drawX, y, scale, 1)
         end
     end
     for i = 1, #partOrder do
@@ -136,6 +202,7 @@ end
 
 Health.BodyPartText = BODY_PART_TEXT
 Health.CurrentWorldHour = currentWorldHour
+Health.ResolvePartOverlays = resolvePartOverlays
 Health.DrawBody = drawVanillaHealthBody
 Debug.SetBodyPartText(BODY_PART_TEXT)
 

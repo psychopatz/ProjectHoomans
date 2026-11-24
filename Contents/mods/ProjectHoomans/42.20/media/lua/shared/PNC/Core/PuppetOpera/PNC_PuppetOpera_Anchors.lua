@@ -103,12 +103,13 @@ function Anchors.BuildPlan(blueprint, player, options)
     local originX
     local originY
     local originZ
+    local originActor = options.leadActor or player
     if options.origin then
         originX = integer(options.origin.x)
         originY = integer(options.origin.y)
         originZ = integer(options.origin.z)
     else
-        originX, originY, originZ = actorPosition(player)
+        originX, originY, originZ = actorPosition(originActor)
     end
     if not originX or not originY or not originZ then
         return nil, "anchor_origin_unavailable"
@@ -117,8 +118,10 @@ function Anchors.BuildPlan(blueprint, player, options)
     local orientation = options.orientation
     local orientationError
     if type(orientation) ~= "table" then
-        orientation, orientationError = Anchors.ReadForward(player)
-        if not orientation then return nil, orientationError end
+        orientation, orientationError = Anchors.ReadForward(originActor)
+        if not orientation then
+            orientation = { x = 0, y = 1, rightX = -1, rightY = 0 }
+        end
     end
     local forwardX = integer(orientation.x)
     local forwardY = integer(orientation.y)
@@ -157,19 +160,24 @@ function Anchors.BuildPlan(blueprint, player, options)
     local y
     local z
     local key
+    local allowOverlap = frame.allowOverlap == true
+    local originWorldX = originX + 0.5
+    local originWorldY = originY + 0.5
     for actorID, actorDefinition in pairs(actors) do
         anchor = anchors[actorDefinition.anchor]
         if not anchor then
             return nil, "anchor_missing:" .. tostring(actorID)
         end
-        x = originX + rightX * (tonumber(anchor.right) or 0)
-            + forwardX * (tonumber(anchor.forward) or 0)
-        y = originY + rightY * (tonumber(anchor.right) or 0)
-            + forwardY * (tonumber(anchor.forward) or 0)
-        z = originZ + (tonumber(anchor.z) or 0)
-        x, y, z = integer(x), integer(y), integer(z)
+        local anchorRight = tonumber(anchor.right) or 0
+        local anchorForward = tonumber(anchor.forward) or 0
+        local worldX = originWorldX + rightX * anchorRight
+            + forwardX * anchorForward
+        local worldY = originWorldY + rightY * anchorRight
+            + forwardY * anchorForward
+        local worldZ = originZ + (tonumber(anchor.z) or 0)
+        x, y, z = integer(worldX), integer(worldY), integer(worldZ)
         key = targetKey(x, y, z)
-        if plan.occupied[key] then
+        if not allowOverlap and plan.occupied[key] then
             return nil, "anchors_overlap:" .. tostring(actorID)
         end
         plan.occupied[key] = actorID
@@ -179,9 +187,9 @@ function Anchors.BuildPlan(blueprint, player, options)
             x = x,
             y = y,
             z = z,
-            worldX = x + 0.5,
-            worldY = y + 0.5,
-            worldZ = z,
+            worldX = worldX,
+            worldY = worldY,
+            worldZ = worldZ,
             faceTarget = anchor.faceTarget,
         }
     end

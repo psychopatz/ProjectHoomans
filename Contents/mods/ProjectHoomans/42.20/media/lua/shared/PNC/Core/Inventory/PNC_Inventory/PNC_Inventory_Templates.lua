@@ -262,6 +262,11 @@ function Inventory.CreateFromTemplate(record, options)
     Internal.refreshNextItemSerial(record, inv)
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)
+    if (not options or options.reconcileBestBags ~= false)
+        and Inventory.ReconcileBestBags
+    then
+        Inventory.ReconcileBestBags(record, "template_bag_reconcile")
+    end
     if (not options or options.reconcileWaterContainer ~= false)
         and Inventory.ReconcileWaterContainer
     then

@@ -65,6 +65,17 @@ local function isCorpse(object)
     return name == "corpse" or name == "isodeadbody"
 end
 
+local function isCurtain(object)
+    if not object then return false end
+    if instanceof then
+        local ok, result = pcall(instanceof, object, "IsoCurtain")
+        if ok and result == true then return true end
+    end
+    if object.isCurtain == true then return true end
+    local name = string.lower(tostring(safeCall(object, "getObjectName") or ""))
+    return name == "curtain" or name == "isocurtain"
+end
+
 local function pushEntry(entries, kind, square, obj, cont, ci, sx, sy, bz)
     if not cont then return end
     entries[#entries + 1] = {
@@ -88,6 +99,16 @@ local function inspectSquareSnapshot(square, sx, sy, bz)
         end
     end
 
+    local function pushCurtain(curtainObj)
+        if curtainObj and not seenObj[curtainObj] then
+            seenObj[curtainObj] = true
+            entries[#entries + 1] = {
+                sourceType = "curtain", square = square, object = curtainObj,
+                x = sx, y = sy, z = bz,
+            }
+        end
+    end
+
     for i = 1, #corpses do
         if isCorpse(corpses[i]) then pushCorpse(corpses[i]) end
     end
@@ -95,7 +116,13 @@ local function inspectSquareSnapshot(square, sx, sy, bz)
         local obj = objects[i]
         if isCorpse(obj) then
             pushCorpse(obj)
+        elseif isCurtain(obj) then
+            pushCurtain(obj)
         else
+            local winCurtain = safeCall(obj, "HasCurtains")
+            if winCurtain then
+                pushCurtain(winCurtain)
+            end
             local cCount = tonumber(safeCall(obj, "getContainerCount")) or 0
             if cCount > 0 and obj.getContainerByIndex then
                 for ci = 0, cCount - 1 do

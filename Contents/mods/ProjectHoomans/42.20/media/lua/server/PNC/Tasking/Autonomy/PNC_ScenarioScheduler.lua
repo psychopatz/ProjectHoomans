@@ -25,6 +25,13 @@ local function worldHourNow(worldHour)
         local h = tonumber(worldHour) or 0
         return h % 24
     end
+    local clock = PNC.WorldClock
+    if clock and type(clock.Snapshot) == "function" then
+        local snap = clock.Snapshot()
+        if snap and snap.available == true then
+            return snap.timeOfDay
+        end
+    end
     if type(getGameTime) == "function" then
         local gt = getGameTime()
         if gt and type(gt.getTimeOfDay) == "function" then

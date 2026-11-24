@@ -271,12 +271,18 @@ do
     local otherFaction = { id = "other-1", alive = true, tacticalClass = "neutral",
         affiliation = { factionID = "scavengers" }, runtime = {} }
 
-    T.falsy(Executor.CanAssistPatient(lowComp, colPatient, "npc"), "companion with FirstAid=2 cannot perform assisted care")
+    T.truthy(Executor.CanAssistPatient(lowComp, colPatient, "npc"), "same-group companion with FirstAid=2 can perform assisted care using First Aid efficiency")
     T.truthy(Executor.CanAssistPatient(hiComp, colPatient, "npc"), "companion with FirstAid=3 can perform assisted care")
     T.truthy(Executor.CanAssistPatient(bandAid, raiderAlly, "npc"), "non-companion with FirstAid=0 can treat same-faction NPC")
     T.falsy(Executor.CanAssistPatient(bandAid, otherFaction, "npc"), "non-companion cannot treat different-faction NPC")
-    T.falsy(Executor.CanAssistPatient(bandAid, playerObj, "player"), "non-friendly low-skill NPC cannot treat player")
+    T.falsy(Executor.CanAssistPatient(bandAid, playerObj, "player"), "non-friendly NPC cannot treat player")
+    T.truthy(Executor.CanAssistPatient(lowComp, playerObj, "player"), "friendly companion with FirstAid=2 can treat player")
     T.truthy(Executor.CanAssistPatient(hiComp, playerObj, "player"), "friendly companion with FirstAid>=3 can treat player")
+    -- Higher First Aid yields higher vanilla bandage life and faster treatment.
+    local Dressing = require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Dressing"
+    local profile = Dressing.Profile("Base.Bandage") or { power = 4 }
+    T.truthy(Dressing.Life(profile, 6) > Dressing.Life(profile, 0), "higher First Aid produces higher bandage life")
+    T.truthy(PNC.Treatment.GetNPCBandageDuration(hiComp) < PNC.Treatment.GetNPCBandageDuration(lowComp), "higher First Aid bandages faster")
 end
 
 -- 3. Player dirty/open wound detection + live walk + animation + SetBandaged + EN/TL speech.

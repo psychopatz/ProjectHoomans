@@ -87,6 +87,7 @@ function H.PumpAmbient(at, budget)
     local context = {
         ambientTargetSelectionBudget = selectionBudget,
         ambientTargetSelections = 0,
+        rainShelterActive = H.IsRainShelterActive and H.IsRainShelterActive() == true or false,
     }
     local discoveryTimingName, discoveryTimingStart = beginDiagnosticTiming(
         "MobileAmbient.FactionDiscovery"

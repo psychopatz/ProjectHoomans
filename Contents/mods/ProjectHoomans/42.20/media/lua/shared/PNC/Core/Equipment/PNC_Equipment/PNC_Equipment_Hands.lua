@@ -57,7 +57,27 @@ function Internal.applyHands(zombie, record, equipment, descriptor, attackMode)
 
     Internal.clearHands(zombie)
 
+    local secondaryDescriptor = equipment.secondaryFullType
+        and Internal.peekWeaponDescriptor
+        and Internal.peekWeaponDescriptor(equipment.secondaryFullType)
+        or nil
+    local secondaryIsContainer = secondaryDescriptor
+        and secondaryDescriptor.isContainer == true or false
+
     if not descriptor.fullType then
+        if secondaryIsContainer and equipment.secondaryFullType then
+            secondaryItem, secondaryReason = Equipment.CreateItem(
+                equipment.secondaryFullType
+            )
+            if secondaryItem then
+                Internal.safeInvoke(zombie, "setSecondaryHandItem", secondaryItem)
+                Internal.setEquipmentVariables(
+                    zombie, "barehand", nil, equipment.secondaryFullType
+                )
+                Internal.refreshHands(zombie)
+                return true, "secondary_container:" .. tostring(secondaryReason or "ok")
+            end
+        end
         Internal.setEquipmentVariables(zombie, "barehand", nil, nil)
         return true, descriptor.weaponStatus
     end
@@ -70,7 +90,16 @@ function Internal.applyHands(zombie, record, equipment, descriptor, attackMode)
 
     Internal.applyPrimaryInventoryState(item, record)
 
-    if attackMode ~= true then
+    if attackMode ~= true and descriptor.isContainer ~= true then
+        if secondaryIsContainer and equipment.secondaryFullType then
+            secondaryItem, secondaryReason = Equipment.CreateItem(
+                equipment.secondaryFullType
+            )
+            if secondaryItem then
+                Internal.safeInvoke(zombie, "setSecondaryHandItem", secondaryItem)
+                Internal.refreshHands(zombie)
+            end
+        end
         Internal.setEquipmentVariables(
             zombie,
             descriptor.primaryType,
@@ -81,6 +110,13 @@ function Internal.applyHands(zombie, record, equipment, descriptor, attackMode)
     end
 
     primaryType = descriptor.primaryType
+    if equipment.secondaryFullType
+        and equipment.secondaryFullType ~= descriptor.fullType
+        and descriptor.requiresBothHands ~= true
+        and (primaryType == "twohanded" or primaryType == "spear")
+    then
+        primaryType = "onehanded"
+    end
     ok, errorMessage = Internal.safeInvoke(zombie, "setPrimaryHandItem", item)
     if not acceptCompletedNativeHandCall(zombie, false, item, ok) then
         Internal.setEquipmentVariables(zombie, "barehand", nil, nil)
@@ -125,7 +161,7 @@ function Internal.applyCombatPresentation(zombie, record, equipment, descriptor,
     local handsReason
     local holsterFullType
 
-    if attackMode ~= true then
+    if attackMode ~= true and descriptor.isContainer ~= true then
         holsterFullType = descriptor.fullType
     end
     if descriptor.item then

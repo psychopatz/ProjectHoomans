@@ -38,11 +38,7 @@ function Class:onMouseDown(x, y)
                 if hasMethod(self.ownerWindow, "refreshViews") then
                     self.ownerWindow:refreshViews()
                 end
-                if accepted
-                    and hasMethod(self.ownerWindow, "requestPlacementPreview")
-                then
-                    self.ownerWindow:requestPlacementPreview()
-                end
+                -- Do not auto-move participants before the user clicks Play.
             end
             return accepted == true
         end
@@ -114,9 +110,7 @@ function Class:onMouseUp()
         if hasMethod(self.ownerWindow, "refreshViews") then
             self.ownerWindow:refreshViews()
         end
-        if hasMethod(self.ownerWindow, "requestPlacementPreview") then
-            self.ownerWindow:requestPlacementPreview()
-        end
+        -- Do not auto-move participants before the user clicks Play.
     end
     return true
 end

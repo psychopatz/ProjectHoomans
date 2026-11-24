@@ -99,6 +99,9 @@ return function(ir, state, context)
     if ir.subject == "COMMUNITY_ROLE_WHEREABOUTS" then
         return Internal.ResolveCommunityRoleWhereabouts(ir, state, context)
     end
+    if ir.subject == "CURRENT_LOCATION" then
+        return Internal.ResolveCurrentLocation(ir, state, context)
+    end
     if ir.subject == "NEEDS" or ir.subject == "QUANTITY" then
         return Internal.ResolveNeeds(ir, state, context)
     end

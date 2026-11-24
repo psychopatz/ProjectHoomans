@@ -243,7 +243,37 @@ local function deathMemoryCount(record)
 end
 
 
+local FAMILIARITY_NAME_THRESHOLD = 15
+
+local function knowsIdentity(
+    observer,
+    deceased,
+    identity,
+    relationship,
+    rawRelationship,
+    category,
+    sameFaction
+)
+    if category == "relative" or category == "friend" or sameFaction == true then
+        return true
+    end
+    local rel = type(relationship) == "table" and relationship
+        or type(rawRelationship) == "table" and rawRelationship
+        or nil
+    if not rel then return false end
+    if rel.knowsName == true then return true end
+    local familiarity = tonumber(rel.familiarity) or 0
+    if familiarity >= FAMILIARITY_NAME_THRESHOLD then return true end
+    local state = lower(rel.state)
+    if state == "friend" then return true end
+    if (state == "rival" or state == "enemy") and familiarity >= 10 then
+        return true
+    end
+    return false
+end
+
 Relationship.classify = classify
+Relationship.knowsIdentity = knowsIdentity
 Relationship.relationFor = relationFor
 Relationship.deathMemoryID = deathMemoryID
 Relationship.hasMemory = hasMemory

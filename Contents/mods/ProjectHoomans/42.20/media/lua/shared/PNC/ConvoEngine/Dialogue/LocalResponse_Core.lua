@@ -21,6 +21,11 @@ if type(Catalog) ~= "table" then
         "PNC/ConvoEngine/Dialogue/ResponseCatalog"
     Catalog = type(loaded) == "table" and loaded or nil
 end
+local Lexicon = PNC.ConvoEngine.Lexicon
+if type(Lexicon) ~= "table" then
+    local loaded = require "PNC/ConvoEngine/Lexicon"
+    Lexicon = type(loaded) == "table" and loaded or nil
+end
 
 local function identityKnown(context)
     context = type(context) == "table" and context or {}
@@ -109,13 +114,19 @@ local selectorContext = Response.Internal.SelectorContext
 
 local function catalogResponse(poolID, ir, state, context, args)
     if not Catalog or type(Catalog.Select) ~= "function" then return nil end
-    local selected = Catalog.Select(
-        poolID,
-        selectorContext(ir, state, context),
-        tostring(state and state.sequence or 0) .. ":"
-            .. tostring(ir and ir.rawText or "")
-    )
+    local selCtx = selectorContext(ir, state, context)
+    local salt = tostring(state and state.sequence or 0) .. ":"
+        .. tostring(ir and ir.rawText or "")
+    local selected = Catalog.Select(poolID, selCtx, salt)
     if type(selected) ~= "table" then return nil end
+    local fallback = renderFallback(
+        selected.fallback, args, selected.translationArgs
+    )
+    if type(fallback) == "string" and string.find(fallback, "{", 1, true)
+        and Lexicon and type(Lexicon.Expand) == "function"
+    then
+        fallback = Lexicon.Expand(fallback, selCtx, args, { salt = salt })
+    end
     local plan
     if type(selected.plan) == "table"
         and ResponsePlan and type(ResponsePlan.Build) == "function"
@@ -125,9 +136,7 @@ local function catalogResponse(poolID, ir, state, context, args)
     end
     return {
         templateID = selected.templateID or selected.id,
-        fallback = renderFallback(
-            selected.fallback, args, selected.translationArgs
-        ),
+        fallback = fallback,
         args = copyArgs(args),
         sourcePoolID = poolID,
         plan = plan,

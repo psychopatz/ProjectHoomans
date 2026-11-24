@@ -29,7 +29,13 @@ local function drawActorRow(list, y, row, alternate)
     local actor = row.item
     local selected = list.selected == row.index
     local width = math.max(32, list:getWidth() - 16)
-    if selected then
+    local dropHovered = list.dropHoverIndex == row.index
+    if dropHovered then
+        list:drawRect(0, y, list:getWidth(), list.itemheight,
+            0.40, 0.20, 0.72, 0.42)
+        list:drawRectBorder(0, y, list:getWidth(), list.itemheight,
+            0.90, 0.40, 0.95, 0.58)
+    elseif selected then
         list:drawRect(0, y, list:getWidth(), list.itemheight,
             0.35, 0.20, 0.48, 0.82)
     elseif alternate then
@@ -83,13 +89,19 @@ local function drawLiveRow(list, y, row, alternate)
     local width = math.max(32, list:getWidth() - 16)
     local assignment = actor.assignedActorID
         and ("BOUND slot=" .. tostring(actor.assignedActorID))
-        or tr("UI_PNC_PuppetOpera_FreeActor", "FREE - drag to graph")
+        or tr("UI_PNC_PuppetOpera_FreeActor", "FREE - drag to slot or graph")
     local readiness = actor.ready == true
         and tr("UI_PNC_PuppetOpera_Ready", "READY")
         or actor.ready == false
         and tr("UI_PNC_PuppetOpera_Blocked", "BLOCKED")
         or tr("UI_PNC_PuppetOpera_Checking", "CHECKING")
-    if selected then
+    local dropHovered = list.dropHoverIndex == row.index
+    if dropHovered then
+        list:drawRect(0, y, list:getWidth(), list.itemheight,
+            0.40, 0.20, 0.72, 0.42)
+        list:drawRectBorder(0, y, list:getWidth(), list.itemheight,
+            0.90, 0.40, 0.95, 0.58)
+    elseif selected then
         list:drawRect(0, y, list:getWidth(), list.itemheight,
             0.35, 0.20, 0.48, 0.82)
     elseif alternate then
@@ -118,7 +130,7 @@ local function drawLiveRow(list, y, row, alternate)
     )
     list:drawTextRight(
         string.format("%.1f tiles", math.sqrt(tonumber(actor.distSq) or 0)),
-        list:getWidth() - 8,
+        list:getWidth() - 22,
         y + 3,
         0.62,
         0.76,
@@ -128,7 +140,7 @@ local function drawLiveRow(list, y, row, alternate)
     )
     list:drawTextRight(
         readiness,
-        list:getWidth() - 8,
+        list:getWidth() - 22,
         y + 19,
         actor.ready == true and 0.40 or actor.ready == false and 1.00 or 0.80,
         actor.ready == true and 0.95 or actor.ready == false and 0.42 or 0.80,

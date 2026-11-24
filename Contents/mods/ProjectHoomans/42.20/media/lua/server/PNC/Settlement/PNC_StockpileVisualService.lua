@@ -16,9 +16,11 @@ local FacilityPointKeys = Service.FacilityPointKeys or {}
 local FacilityPoints = Service.FacilityPoints or {}
 local PENDING_RETRY_MS = 5000
 local pendingCount = 0
+local indexedPointCount = 0
 local nextRetryAt = Service.NextRetryAt
 
 for _ in pairs(Pending) do pendingCount = pendingCount + 1 end
+for _ in pairs(FacilityPointKeys) do indexedPointCount = indexedPointCount + 1 end
 
 local function logInfo(message)
     if PNC.Core and PNC.Core.LogInfo then
@@ -153,6 +155,9 @@ local function unindexFacilityPoint(facilityId)
             if empty then PointIndex[key] = nil end
         end
     end
+    if FacilityPointKeys[tostring(facilityId or "")] ~= nil then
+        indexedPointCount = math.max(0, indexedPointCount - 1)
+    end
     FacilityPointKeys[tostring(facilityId or "")] = nil
     FacilityPoints[tostring(facilityId or "")] = nil
 end
@@ -170,6 +175,7 @@ local function indexFacilityPoint(facilityId, point)
         PointIndex[key] = PointIndex[key] or {}
         PointIndex[key][id] = true
         FacilityPointKeys[id] = key
+        indexedPointCount = indexedPointCount + 1
     end
     FacilityPoints[id] = point
 end
@@ -365,6 +371,13 @@ local function retryPending()
 end
 
 local function markVisualRemoved(object)
+    if indexedPointCount <= 0 or not object then return end
+    local square = type(object.getSquare) == "function"
+        and object:getSquare() or nil
+    if square then
+        local key = World.SquareKey(square)
+        if key and not PointIndex[key] then return end
+    end
     local facilityId = World.OwnedFacilityId(object)
     if facilityId then setPending(facilityId, true) end
 end

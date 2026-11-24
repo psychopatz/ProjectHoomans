@@ -64,11 +64,41 @@ function Formatter.ResolveTokenRaw(tokens, key)
     return cursor
 end
 
+local function getGrammar()
+    local g = PsychopatzCore and PsychopatzCore.Semantics
+        and PsychopatzCore.Semantics.EnglishGrammar or nil
+    if type(g) == "table" then return g end
+    local ok, loaded = pcall(require, "PsychopatzCore/Semantics/PsychopatzSemanticEnglishGrammar")
+    if ok and type(loaded) == "table" then return loaded end
+    return nil
+end
+
 function Formatter.ResolveToken(tokens, key)
     local raw = Formatter.ResolveTokenRaw(tokens, key)
     if raw ~= nil and type(raw) ~= "table" then
         local cleaned = trim(raw)
         if cleaned ~= "" then return cleaned end
+    end
+    -- Dynamic grammar & morphology tokens ({subj.pron}, {subj.be}, {gram.v:walk}, {gram.a:office})
+    if type(key) == "string" then
+        local g = getGrammar()
+        if g then
+            if string.sub(key, 1, 5) == "subj." and type(tokens) == "table" and type(tokens._subject) == "table" then
+                local built = g.BuildSubjectTokens(tokens._subject, "subj")
+                if built and built[key] then return built[key] end
+            elseif string.sub(key, 1, 7) == "gram.v:" then
+                local verb = string.sub(key, 8)
+                local subj = type(tokens) == "table" and type(tokens._subject) == "table" and tokens._subject or {}
+                local person = tonumber(subj.person) or 3
+                local number = subj.number or "sg"
+                local gender = subj.gender or "any"
+                local verbNum = (person == 3 and number == "sg" and gender == "any") and "pl" or number
+                return g.Conjugate(verb, person, verbNum, subj.tense or "present", subj.mood or "indicative")
+            elseif string.sub(key, 1, 7) == "gram.a:" then
+                local word = string.sub(key, 8)
+                return g.Article(word) .. " " .. word
+            end
+        end
     end
     return nil
 end

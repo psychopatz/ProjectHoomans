@@ -15,6 +15,8 @@ local Opera = PNC.PuppetOpera
 local Registry = Opera.Blueprints
 local Capabilities = Opera.AnimationCapabilities
     or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_AnimationCapabilities"
+local TriggerRegistry = Opera.TriggerRegistry
+    or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_TriggerRegistry"
 local Normalization = require
     "PNC/Core/PuppetOpera/PNC_PuppetOpera_Blueprints_Normalization"
 
@@ -112,6 +114,19 @@ function Registry.Normalize(id, definition)
         return nil, "anchor_arrival_tolerance_invalid"
     end
     if gapMs == nil then return nil, "playback_gap_invalid" end
+    local hasCoupling = false
+    for _, actorDef in pairs(actors) do
+        if type(actorDef.coupling) == "table" and actorDef.coupling.attachTo then
+            if not actors[actorDef.coupling.attachTo] then
+                return nil, "actor_coupling_target_unknown:" .. tostring(actorDef.id)
+            end
+            hasCoupling = true
+        end
+    end
+    local allowOverlap = frame.allowOverlap == true or hasCoupling
+    local triggers = TriggerRegistry and TriggerRegistry.NormalizeTriggers
+        and TriggerRegistry.NormalizeTriggers(definition.triggers) or {}
+
     return {
         id = normalizedID,
         version = version,
@@ -127,14 +142,17 @@ function Registry.Normalize(id, definition)
         actors = actors,
         anchorFrame = {
             origin = cleanText(frame.origin or "server_player_relative", 64),
+            originActor = validID(frame.originActor, 64),
             orientation = cleanText(frame.orientation or "player_facing", 64),
             tolerance = tolerance,
             interactionDistance = interactionDistance,
             movementStopDistance = movementStopDistance,
             arrivalTolerance = arrivalTolerance,
+            allowOverlap = allowOverlap,
             anchors = anchors,
         },
         beats = beats,
+        triggers = triggers,
         playback = {
             defaultMode = defaultMode,
             allowLoop = playback.allowLoop ~= false,
@@ -150,18 +168,19 @@ function Registry.Register(id, definition)
         return false, reason
     end
     Registry.Definitions[normalized.id] = normalized
+    if TriggerRegistry and TriggerRegistry.IndexBlueprint then
+        TriggerRegistry.IndexBlueprint(normalized)
+    end
     Registry.LastError = nil
     return true, normalized
 end
 
 function Registry.IsRuntimePlayerAction(action)
-    return RUNTIME_PLAYER_ACTIONS[tostring(action or "")] == true
-        and Capabilities.IsRuntimePlayerAction(action) == true
+    return Capabilities.IsRuntimePlayerAction(action) == true
 end
 
 function Registry.IsRuntimeNPCBump(bump)
-    return RUNTIME_NPC_BUMPS[tostring(bump or "")] == true
-        and Capabilities.IsRuntimeNPCBump(bump) == true
+    return Capabilities.IsRuntimeNPCBump(bump) == true
 end
 
 function Registry.GetAnimationCapability(actorKind, track)

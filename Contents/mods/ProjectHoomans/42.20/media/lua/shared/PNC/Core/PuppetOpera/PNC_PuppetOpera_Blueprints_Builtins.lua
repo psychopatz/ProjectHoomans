@@ -172,8 +172,17 @@ local function dedicatedKissBlueprint(id, label, sceneType, actorKinds)
             {
                 id = "kiss",
                 durationMs = 900,
+                disableCollision = true,
                 synchronization = "arrival_and_start_barrier",
                 tracks = tracks,
+            },
+        },
+        triggers = {
+            {
+                event = "social_kiss",
+                priority = 50,
+                cooldownSec = 60,
+                filters = { minAffinity = 50 },
             },
         },
         playback = {
@@ -198,6 +207,334 @@ local npcNPCKiss = dedicatedKissBlueprint(
 )
 Registry.Register(playerNPCKiss.id, playerNPCKiss)
 Registry.Register(npcNPCKiss.id, npcNPCKiss)
+
+-- Showcase v3 Blueprint 1: NPC-to-NPC Incapacitated Teammate Carry
+Registry.Register("rescue.carry_incapacitated_npc", {
+    id = "rescue.carry_incapacitated_npc",
+    version = 3,
+    definitionType = "opera",
+    sceneType = "npc_rescue_carry",
+    label = "Rescue Carry (Incapacitated NPC)",
+    description = "Rescuer lifts and carries an incapacitated teammate using tethered locomotive beats and emergency combat drop.",
+    actors = {
+        actor_1 = {
+            kind = "nearby_live_npc",
+            allowedKinds = { "nearby_live_npc" },
+            required = true,
+            anchor = "carrier",
+            label = "Carrier",
+            allowedInitialStates = { "standing" },
+        },
+        actor_2 = {
+            kind = "nearby_live_npc",
+            allowedKinds = { "nearby_live_npc" },
+            required = true,
+            anchor = "passenger",
+            label = "Incapacitated Teammate",
+            stationary = true,
+            allowedInitialStates = { "incapacitated", "standing" },
+            coupling = {
+                attachTo = "actor_1",
+                offsetRight = 0,
+                offsetForward = 0,
+                offsetZ = 0,
+                facingMode = "match",
+                disableCollision = true,
+                groundedCheck = false,
+                blockVaulting = true,
+                abstractCoMove = true,
+            },
+        },
+    },
+    anchorFrame = {
+        origin = "target_actor",
+        originActor = "actor_2",
+        orientation = "lead_facing",
+        tolerance = 0.75,
+        allowOverlap = true,
+        anchors = {
+            carrier = { right = 0, forward = -0.45, z = 0, faceTarget = "actor_2" },
+            passenger = { right = 0, forward = 0, z = 0, faceTarget = "actor_1" },
+        },
+    },
+    beats = {
+        {
+            id = "lift",
+            durationMs = 700,
+            mode = "timed",
+            phaseLock = "leader_track",
+            tetherActive = true,
+            disableCollision = true,
+            interruptPolicy = "emergency_drop",
+            tracks = {
+                actor_1 = {
+                    route = "anim_vars",
+                    style = "carry_shoulder",
+                    role = "Carrier",
+                    phase = "lift",
+                    clip = "PNC_CarryShoulderLift",
+                },
+                actor_2 = {
+                    route = "anim_vars",
+                    style = "carry_shoulder",
+                    role = "Passenger",
+                    phase = "lift",
+                    clip = "PNC_CarriedShoulderLift",
+                },
+            },
+        },
+        {
+            id = "carry",
+            durationMs = 2000,
+            mode = "locomotive",
+            phaseLock = "leader_track",
+            tetherActive = true,
+            disableCollision = true,
+            interruptPolicy = "emergency_drop",
+            tracks = {
+                actor_1 = {
+                    route = "anim_vars",
+                    style = "carry_shoulder",
+                    role = "Carrier",
+                    phase = "carry",
+                    clip = "PNC_CarryShoulderWalk",
+                },
+                actor_2 = {
+                    route = "anim_vars",
+                    style = "carry_shoulder",
+                    role = "Passenger",
+                    phase = "carry",
+                    clip = "PNC_CarriedShoulderWalk",
+                },
+            },
+        },
+        {
+            id = "lower",
+            durationMs = 600,
+            mode = "timed",
+            phaseLock = "leader_track",
+            tetherActive = true,
+            disableCollision = true,
+            interruptPolicy = "emergency_drop",
+            tracks = {
+                actor_1 = {
+                    route = "anim_vars",
+                    style = "carry_shoulder",
+                    role = "Carrier",
+                    phase = "lower",
+                    clip = "PNC_CarryShoulderLower",
+                },
+                actor_2 = {
+                    route = "anim_vars",
+                    style = "carry_shoulder",
+                    role = "Passenger",
+                    phase = "lower",
+                    clip = "PNC_CarriedShoulderLower",
+                },
+            },
+        },
+    },
+    triggers = {
+        {
+            event = "teammate_incapacitated",
+            priority = 90,
+            cooldownSec = 10,
+            filters = { sameFaction = true, allowPlayer = false },
+        },
+    },
+    playback = { defaultMode = "once", allowLoop = false, gapMs = 100 },
+})
+
+-- Showcase v3 Blueprint 2: Holding Hands (Grounded Side-by-Side Locomotive)
+Registry.Register("social.hold_hands", {
+    id = "social.hold_hands",
+    version = 3,
+    definitionType = "opera",
+    sceneType = "social_handhold",
+    label = "Hold Hands Walk",
+    description = "Two actors walk side-by-side with grounded collision validation and phase-locked handhold animation.",
+    actors = {
+        actor_1 = {
+            allowedKinds = { "local_player", "nearby_live_npc" },
+            required = true,
+            anchor = "left",
+            label = "Leader",
+        },
+        actor_2 = {
+            allowedKinds = { "local_player", "nearby_live_npc" },
+            required = true,
+            anchor = "right",
+            label = "Partner",
+            coupling = {
+                attachTo = "actor_1",
+                offsetRight = 0.55,
+                offsetForward = 0,
+                offsetZ = 0,
+                facingMode = "match",
+                disableCollision = true,
+                groundedCheck = true,
+                blockVaulting = true,
+                abstractCoMove = true,
+            },
+        },
+    },
+    anchorFrame = {
+        origin = "lead_actor",
+        orientation = "lead_facing",
+        tolerance = 0.75,
+        allowOverlap = true,
+        anchors = {
+            left = { right = 0, forward = 0, z = 0, faceTarget = "actor_2" },
+            right = { right = 0.55, forward = 0, z = 0, faceTarget = "actor_1" },
+        },
+    },
+    beats = {
+        {
+            id = "walk_together",
+            durationMs = 1500,
+            mode = "locomotive",
+            phaseLock = "leader_track",
+            tetherActive = true,
+            tracks = {
+                actor_1 = {
+                    byKind = {
+                        local_player = {
+                            route = "anim_vars",
+                            style = "handhold",
+                            role = "Carrier",
+                            phase = "carry",
+                            clip = "PNC_HandholdLeft",
+                        },
+                        nearby_live_npc = {
+                            route = "anim_vars",
+                            style = "handhold",
+                            role = "Carrier",
+                            phase = "carry",
+                            clip = "PNC_HandholdLeft",
+                        },
+                    },
+                },
+                actor_2 = {
+                    byKind = {
+                        local_player = {
+                            route = "anim_vars",
+                            style = "handhold",
+                            role = "Passenger",
+                            phase = "carry",
+                            clip = "PNC_HandholdRight",
+                        },
+                        nearby_live_npc = {
+                            route = "anim_vars",
+                            style = "handhold",
+                            role = "Passenger",
+                            phase = "carry",
+                            clip = "PNC_HandholdRight",
+                        },
+                    },
+                },
+            },
+        },
+    },
+    triggers = {
+        {
+            event = "escort_handhold",
+            priority = 60,
+            cooldownSec = 30,
+            filters = { minAffinity = 40 },
+        },
+    },
+    playback = { defaultMode = "loop", allowLoop = true, gapMs = 100 },
+})
+
+-- Showcase v3 Blueprint 3: Partner Dance (Sustained Phase-Locked Loop)
+Registry.Register("social.dance_pair", {
+    id = "social.dance_pair",
+    version = 3,
+    definitionType = "opera",
+    sceneType = "social_dance",
+    label = "Partner Dance",
+    description = "Two actors face each other at sub-tile spacing and loop a phase-locked partner dance.",
+    actors = {
+        actor_1 = {
+            allowedKinds = { "local_player", "nearby_live_npc" },
+            required = true,
+            anchor = "left",
+            label = "Dancer 1",
+        },
+        actor_2 = {
+            allowedKinds = { "local_player", "nearby_live_npc" },
+            required = true,
+            anchor = "right",
+            label = "Dancer 2",
+        },
+    },
+    anchorFrame = {
+        origin = "lead_actor",
+        orientation = "lead_facing",
+        tolerance = 0.75,
+        allowOverlap = true,
+        anchors = {
+            left = { right = -0.30, forward = 0, z = 0, faceTarget = "actor_2" },
+            right = { right = 0.30, forward = 0, z = 0, faceTarget = "actor_1" },
+        },
+    },
+    beats = {
+        {
+            id = "dance_loop",
+            durationMs = 2400,
+            mode = "sustained",
+            phaseLock = "server_clock",
+            disableCollision = true,
+            tracks = {
+                actor_1 = {
+                    byKind = {
+                        local_player = {
+                            route = "anim_vars",
+                            style = "partner_dance",
+                            role = "Lead",
+                            phase = "loop",
+                            clip = "PNC_DanceLead",
+                        },
+                        nearby_live_npc = {
+                            route = "anim_vars",
+                            style = "partner_dance",
+                            role = "Lead",
+                            phase = "loop",
+                            clip = "PNC_DanceLead",
+                        },
+                    },
+                },
+                actor_2 = {
+                    byKind = {
+                        local_player = {
+                            route = "anim_vars",
+                            style = "partner_dance",
+                            role = "Follow",
+                            phase = "loop",
+                            clip = "PNC_DanceFollow",
+                        },
+                        nearby_live_npc = {
+                            route = "anim_vars",
+                            style = "partner_dance",
+                            role = "Follow",
+                            phase = "loop",
+                            clip = "PNC_DanceFollow",
+                        },
+                    },
+                },
+            },
+        },
+    },
+    triggers = {
+        {
+            event = "camp_dance",
+            priority = 55,
+            cooldownSec = 120,
+            filters = { sameFaction = true },
+        },
+    },
+    playback = { defaultMode = "loop", allowLoop = true, gapMs = 150 },
+})
 
 return true
 

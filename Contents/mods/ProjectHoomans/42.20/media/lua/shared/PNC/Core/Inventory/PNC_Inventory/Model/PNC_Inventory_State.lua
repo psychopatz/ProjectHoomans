@@ -114,11 +114,35 @@ function Internal.bumpRevision(record, ops, reason)
     return inv.revision
 end
 
+function Internal.resolveCapacityBonus(record)
+    local bonus = record and (
+        tonumber(record.carryCapacityBonus)
+        or tonumber(record.inventoryCapacityBonus)
+    ) or 0
+    return math.max(0, bonus)
+end
+
+function Internal.resolveCapacityMultiplier()
+    local sandbox = PNC.Sandbox
+    if sandbox and type(sandbox.NPCCarryCapacityMultiplier) == "function" then
+        return math.max(0.5, tonumber(sandbox.NPCCarryCapacityMultiplier()) or 1.0)
+    end
+    local vars = SandboxVars and SandboxVars.ProjectHoomans or nil
+    if vars and vars.NPCCarryCapacityMultiplier ~= nil then
+        local value = tonumber(vars.NPCCarryCapacityMultiplier) or 1.0
+        return math.max(0.5, math.min(10.0, value))
+    end
+    return 1.0
+end
+
 function Internal.buildBaseCarryWeight(record)
     local skills = PNC.Skills
     local strength = skills and skills.GetLevel and skills.GetLevel(record, "Strength") or 2
     local fitness = skills and skills.GetLevel and skills.GetLevel(record, "Fitness") or 2
-    return math.max(6, 6 + (tonumber(strength) or 0) + ((tonumber(fitness) or 0) * 0.5))
+    local base = math.max(6, 6 + (tonumber(strength) or 0) + ((tonumber(fitness) or 0) * 0.5))
+    local bonus = Internal.resolveCapacityBonus(record)
+    local multiplier = Internal.resolveCapacityMultiplier()
+    return (base + bonus) * multiplier
 end
 
 function Internal.createBaseInventory(record, options)

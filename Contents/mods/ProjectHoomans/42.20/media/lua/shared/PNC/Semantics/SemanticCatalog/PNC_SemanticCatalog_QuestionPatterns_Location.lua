@@ -22,6 +22,116 @@ local traderTarget = {
 }
 
 function Internal.RegisterLocationQuestions()
+    local currentLocationEmit = {
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "CURRENT_LOCATION",
+    }
+    registerPattern(
+        "pnc.question.current_location.where_are_we",
+        {
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "we" },
+            { kind = "literal", value = "right", optional = true },
+            { kind = "literal", value = "now", optional = true },
+            { kind = "literal", value = "at", optional = true },
+        },
+        currentLocationEmit,
+        0.98,
+        125
+    )
+    registerPattern(
+        "pnc.question.current_location.do_you_know_where_we_are",
+        {
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "know" },
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "we" },
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "right", optional = true },
+            { kind = "literal", value = "now", optional = true },
+        },
+        currentLocationEmit,
+        0.99,
+        126
+    )
+    registerPattern(
+        "pnc.question.current_location.what_place_is_this",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "place" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "this" },
+        },
+        currentLocationEmit,
+        0.97,
+        124
+    )
+    registerPattern(
+        "pnc.question.current_location.what_is_this_place",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "this" },
+            { kind = "literal", value = "place" },
+        },
+        currentLocationEmit,
+        0.97,
+        124
+    )
+    registerPattern(
+        "pnc.question.current_location.whats_this_place",
+        {
+            { kind = "literal", value = "whats" },
+            { kind = "literal", value = "this" },
+            { kind = "literal", value = "place" },
+        },
+        currentLocationEmit,
+        0.97,
+        124
+    )
+    registerPattern(
+        "pnc.question.current_location.where_is_this",
+        {
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "this" },
+        },
+        currentLocationEmit,
+        0.96,
+        123
+    )
+    for _, noun in ipairs({ "town", "building", "road", "street", "zone", "area" }) do
+        registerPattern(
+            "pnc.question.current_location.what_" .. noun .. "_is_this",
+            {
+                { kind = "literal", value = "what" },
+                { kind = "literal", value = noun },
+                { kind = "literal", value = "is" },
+                { kind = "literal", value = "this" },
+            },
+            currentLocationEmit,
+            0.97,
+            124
+        )
+        registerPattern(
+            "pnc.question.current_location.what_" .. noun .. "_are_we_in",
+            {
+                { kind = "literal", value = "what" },
+                { kind = "literal", value = noun },
+                { kind = "literal", value = "are" },
+                { kind = "literal", value = "we" },
+                { kind = "literal", value = "in", optional = true },
+                { kind = "literal", value = "on", optional = true },
+            },
+            currentLocationEmit,
+            0.97,
+            124
+        )
+    end
+
     registerPattern(
         "pnc.question.community_role_whereabouts.your_trader",
         {

@@ -16,7 +16,9 @@ Service.NextAttemptAt = Service.NextAttemptAt or {}
 Service.MIN_IDLE_MS = 1200
 Service.ACTION_COOLDOWN_MS = 30000
 Service.SCHEDULE_WINDOW_HOURS = 0.75
-Service.NIGHT_START_HOUR = 22
+Service.CAMP_START_HOUR = 19
+Service.SLEEP_CURFEW_HOUR = 23
+Service.NIGHT_START_HOUR = 19
 Service.NIGHT_END_HOUR = 6
 Service.NIGHT_MIN_REMAINING_HOURS = 1
 Service.SLEEP_WAKE_OFFSET_MINUTES = 25
@@ -36,11 +38,62 @@ function Service.CurrentTime(value)
 end
 
 function Service.GetWorldAgeHours()
+    local clock = PNC.WorldClock
+    if clock and type(clock.GetWorldAgeHours) == "function" then
+        return clock.GetWorldAgeHours()
+    end
     local gameTime = type(getGameTime) == "function" and getGameTime() or nil
     if gameTime and gameTime.getWorldAgeHours then
         return tonumber(gameTime:getWorldAgeHours()) or 0
     end
     return 0
+end
+
+function Service.GetTimeOfDay(hoursFallback)
+    local clock = PNC.WorldClock
+    if clock and type(clock.Snapshot) == "function" then
+        local snap = clock.Snapshot()
+        if snap and snap.available == true then
+            return snap.timeOfDay
+        end
+    end
+    local gameTime = type(getGameTime) == "function" and getGameTime() or nil
+    if gameTime and gameTime.getTimeOfDay then
+        local tod = tonumber(gameTime:getTimeOfDay())
+        if tod ~= nil then
+            return tod % 24
+        end
+    end
+    if hoursFallback ~= nil then
+        return (tonumber(hoursFallback) or 0) % 24
+    end
+    return Service.GetWorldAgeHours() % 24
+end
+
+function Service.IsNightCampHour(timeOfDay)
+    local clock = PNC.WorldClock
+    if clock and type(clock.IsNightCampHour) == "function" then
+        return clock.IsNightCampHour(timeOfDay)
+    end
+    local tod = tonumber(timeOfDay)
+    if tod == nil then tod = Service.GetTimeOfDay() end
+    tod = tod % 24
+    local startH = tonumber(Service.CAMP_START_HOUR or Service.NIGHT_START_HOUR) or 19
+    local endH = tonumber(Service.NIGHT_END_HOUR) or 6
+    return tod >= startH or tod < endH
+end
+
+function Service.IsSleepCurfewHour(timeOfDay)
+    local clock = PNC.WorldClock
+    if clock and type(clock.IsSleepCurfewHour) == "function" then
+        return clock.IsSleepCurfewHour(timeOfDay)
+    end
+    local tod = tonumber(timeOfDay)
+    if tod == nil then tod = Service.GetTimeOfDay() end
+    tod = tod % 24
+    local curfewH = tonumber(Service.SLEEP_CURFEW_HOUR) or 23
+    local endH = tonumber(Service.NIGHT_END_HOUR) or 6
+    return tod >= curfewH or tod < endH
 end
 
 function Service.ScheduleState(record)

@@ -31,6 +31,10 @@ function Internal.applyActionLeaseSafeguards(zombie, modData)
         zombie:setVariable("PNCLive", true)
     end
     if zombie.setNoTeeth then zombie:setNoTeeth(true) end
+    -- Prevent managed NPC shells from spreading fire to terrain/buildings or
+    -- dying to raw engine zombie burn drain outside PNC.Health's fire adapter.
+    if zombie.setFireSpreadProbability then zombie:setFireSpreadProbability(0) end
+    if zombie.setFireKillRate then zombie:setFireKillRate(0) end
     if zombie.setReanimatedForGrappleOnly and not nativeLosLeaseActive(zombie) then
         zombie:setReanimatedForGrappleOnly(false)
     end
@@ -119,6 +123,10 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(
         keepEngineMovementActive
     )
     if zombie.setNoTeeth then zombie:setNoTeeth(true) end
+    -- Prevent managed NPC shells from spreading fire to terrain/buildings or
+    -- dying to raw engine zombie burn drain outside PNC.Health's fire adapter.
+    if zombie.setFireSpreadProbability then zombie:setFireSpreadProbability(0) end
+    if zombie.setFireKillRate then zombie:setFireKillRate(0) end
     if zombie.setReanimatedForGrappleOnly and not nativeLosLeaseActive(zombie) then
         zombie:setReanimatedForGrappleOnly(false)
     end

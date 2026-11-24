@@ -384,6 +384,16 @@ option ProjectHoomans.NPCDamageDealtMultiplier
     translation = ProjectHoomans.NPCDamageDealtMultiplier,
 }
 
+option ProjectHoomans.NPCCarryCapacityMultiplier
+{
+    type = double,
+    default = 1.0,
+    min = 0.5,
+    max = 10.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCCarryCapacityMultiplier,
+}
+
 option ProjectHoomans.NPCPlayerWounds
 {
     type = boolean,

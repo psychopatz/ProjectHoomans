@@ -22,7 +22,9 @@ function Wounds.ApplyDebugWound(
     local part = partId
         and Wounds.Parts[tostring(partId)]
         or Internal.ChoosePart()
-    local selectedType = tostring(woundType or "")
+    local selectedType = Wounds.NormalizeWoundType
+        and Wounds.NormalizeWoundType(woundType)
+        or tostring(woundType or "")
     if not record or record.alive == false or not part then
         return false, { outcome = "invalid_target" }
     end
@@ -181,6 +183,102 @@ function Wounds.ApplyDebugInfection(
         )
     end
     return true, infection.stage
+end
+
+function Wounds.ApplyDebugWoundState(record, npcBody, partId, stateAction)
+    if not hasAuthority() then
+        return false, "not_authority"
+    end
+    if not record or record.alive == false then
+        return false, "invalid_target"
+    end
+    local action = string.lower(tostring(stateAction or ""))
+    if action == "heal_all" then
+        if PNC.Health and PNC.Health.Recover then
+            PNC.Health.Recover(record, npcBody)
+            return true, "healed"
+        end
+        return false, "health_unavailable"
+    end
+    if action == "incapacitate" then
+        if PNC.Health and PNC.Health.EnterIncapacitated then
+            PNC.Health.EnterIncapacitated(record, npcBody, "debug_incapacitate")
+            return true, "incapacitated"
+        end
+        record.health = record.health or {}
+        record.health.state = "incapacitated"
+        record.health.incapacitatedReason = "debug_incapacitate"
+        return true, "incapacitated"
+    end
+
+    local body = Wounds.Ensure(record)
+    local targetPartId = partId and Wounds.Parts[tostring(partId)]
+        and tostring(partId) or nil
+    if not targetPartId then
+        for existingPartId in pairs(body.wounds or {}) do
+            targetPartId = existingPartId
+            break
+        end
+        targetPartId = targetPartId or Wounds.ChoosePartId()
+    end
+    local part = Wounds.Parts[targetPartId]
+    if not part then return false, "invalid_part" end
+    local wound = body.wounds and body.wounds[targetPartId] or nil
+
+    if action == "clear_part_wound" then
+        if not wound then return false, "no_wound" end
+        body.wounds[targetPartId] = nil
+    elseif action == "dirty_bandage" then
+        if not wound then
+            wound = Internal.AddWound(record, part, "scratch", Core.Now())
+        end
+        wound.bandaged = true
+        wound.bandageDirty = true
+        wound.dirtyAtWorldHour = Internal.WorldHour()
+        wound.bandageType = wound.bandageType or "Base.Bandage"
+    elseif action == "toggle_stitched" then
+        if not wound then
+            wound = Internal.AddWound(record, part, "deep_wound", Core.Now())
+        end
+        wound.stitched = not (wound.stitched == true)
+        if wound.stitched then
+            wound.bandaged = false
+            wound.bleedingRate = 0
+        end
+    elseif action == "toggle_splint" then
+        if not wound then
+            wound = Internal.AddWound(record, part, "fracture", Core.Now())
+        end
+        wound.splinted = not (wound.splinted == true)
+        if wound.splinted then
+            wound.splintType = wound.splintType or "Base.Splint"
+        end
+    elseif action == "toggle_ordinary_infection" then
+        if not wound then
+            wound = Internal.AddWound(record, part, "scratch", Core.Now())
+        end
+        local infected = not (wound.infected == true or wound.ordinaryInfected == true)
+        wound.infected = infected
+        wound.ordinaryInfected = infected
+        wound.woundInfectionLevel = infected and 10 or 0
+    elseif action == "toggle_bleeding" then
+        if not wound then
+            wound = Internal.AddWound(record, part, "laceration", Core.Now())
+        end
+        local bleeding = (tonumber(wound.bleedingRate) or 0) <= 0
+        wound.bleedingRate = bleeding and 0.065 or 0
+        if bleeding then wound.bandaged = false end
+    else
+        return false, "unknown_state_action"
+    end
+
+    if Internal.RefreshBodySummary then Internal.RefreshBodySummary(record) end
+    record.runtime = record.runtime or {}
+    record.runtime.forceSyncEvent = "debug_wound_state"
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "wounds")
+    end
+    return true, action
 end
 
 return Wounds

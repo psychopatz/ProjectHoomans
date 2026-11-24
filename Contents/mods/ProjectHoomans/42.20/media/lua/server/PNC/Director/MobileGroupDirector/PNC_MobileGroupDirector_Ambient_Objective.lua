@@ -45,6 +45,28 @@ function H.AmbientPhase(at)
     return Constants.MOBILE_AMBIENT_NIGHT
 end
 
+-- Single cached rain-shelter check reusing WeatherDressingService's hysteretic
+-- weather sample. Cached on `context` so a pump evaluates climate at most once.
+function H.IsRainShelterActive(context)
+    if type(context) == "table" and context.rainShelterActive ~= nil then
+        return context.rainShelterActive == true
+    end
+    local raining = false
+    local weatherSvc = PNC and PNC.WeatherDressingService or nil
+    if weatherSvc and type(weatherSvc.IsRaining) == "function" then
+        raining = weatherSvc.IsRaining() == true
+    elseif type(getClimateManager) == "function" then
+        local cm = getClimateManager()
+        local intensity = cm and cm.getRainIntensity
+            and tonumber(cm:getRainIntensity()) or 0
+        raining = intensity >= 0.25
+    end
+    if type(context) == "table" then
+        context.rainShelterActive = raining
+    end
+    return raining
+end
+
 function H.FindPlayerBaseTarget(faction)
     local mobile = faction and faction.mobile or nil
     local current = mobile and mobile.strategicTarget or nil

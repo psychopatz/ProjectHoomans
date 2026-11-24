@@ -74,6 +74,57 @@ function Model.UnbindLiveActor(actorID)
     return true
 end
 
+function Model.AutoBindLiveActors()
+    local draft = currentDraft()
+    if not draft or type(draft.actors) ~= "table" then
+        return false, "actors_required", 0
+    end
+    local liveRows = Model.GetLiveActorRows
+        and Model.GetLiveActorRows(actorDiscoveryRadius()) or {}
+    local sortedLive = {}
+    for _, row in ipairs(liveRows) do
+        sortedLive[#sortedLive + 1] = row
+    end
+    table.sort(sortedLive, function(a, b)
+        return (tonumber(a.distSq) or 999999) < (tonumber(b.distSq) or 999999)
+    end)
+
+    local slotIDs = {}
+    for actorID in pairs(draft.actors) do
+        slotIDs[#slotIDs + 1] = tostring(actorID)
+    end
+    table.sort(slotIDs)
+
+    local used = {}
+    for _, boundID in pairs(bindingMap()) do
+        if boundID and boundID ~= "" then used[tostring(boundID)] = true end
+    end
+
+    local boundCount = 0
+    for _, slotID in ipairs(slotIDs) do
+        local def = draft.actors[slotID]
+        if def and not actorBinding(slotID, def) then
+            for _, live in ipairs(sortedLive) do
+                local lid = tostring(live.id or "")
+                if lid ~= "" and not used[lid]
+                    and kindAllowed(def, live.kind)
+                then
+                    local ok = Model.BindLiveActor(slotID, lid)
+                    if ok then
+                        used[lid] = true
+                        boundCount = boundCount + 1
+                        break
+                    end
+                end
+            end
+        end
+    end
+    if boundCount == 0 then
+        return false, "no_eligible_live_actors", 0
+    end
+    return true, "auto_bound_" .. tostring(boundCount), boundCount
+end
+
 function Model.GetRuntimeActorBindings()
     local draft = currentDraft()
     if not draft or type(draft.actors) ~= "table" then

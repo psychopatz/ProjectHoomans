@@ -210,4 +210,18 @@ T.equal(ownedFenceBlocked, false,
 T.equal(forcedIdleCount, 1,
     "owned PNC fence traversal is not forced idle")
 
+-- An active PNC pathing traversal/fence lane must also bypass the vanilla
+-- guard even before the bump lease has latched on the body.
+idleFenceBody.getModData = function() return {} end
+local laneFenceBlocked = LiveBodyControl.BlockVanillaPassage(
+    idleFenceBody, { traversalAction = { kind = "fence" } }, 52000)
+T.equal(laneFenceBlocked, false,
+    "active pathing traversalAction bypasses vanilla fence guard")
+local laneVanillaFenceBlocked = LiveBodyControl.BlockVanillaPassage(
+    idleFenceBody, { vanillaFenceAction = { kind = "fence" } }, 53000)
+T.equal(laneVanillaFenceBlocked, false,
+    "active pathing vanillaFenceAction bypasses vanilla fence guard")
+T.equal(forcedIdleCount, 1,
+    "active traversal lane is never forced idle by vanilla fence guard")
+
 T.finish("pnc_vanilla_passage_door_smoke")

@@ -55,11 +55,16 @@ function Service.Finish(record, zombie, reason, ownerReason)
     end
     state.finishing = true
     if state.action == "sleep" then
+        local reasonText = string.lower(tostring(ownerReason or reason or ""))
+        local isCombat = string.find(reasonText, "combat", 1, true) ~= nil
+            or string.find(reasonText, "preempt", 1, true) ~= nil
+            or string.find(reasonText, "threat", 1, true) ~= nil
         if sleep and sleep.RestoreSleepPosition
             and state.positioned == true
         then
             local restored = sleep.RestoreSleepPosition(
-                record, zombie, state, state)
+                record, zombie, state, state,
+                isCombat and { emergency = true, allowOccupied = true } or nil)
             if not restored then
                 state.finishing = false
                 state.wakeExitPending = true
@@ -75,6 +80,11 @@ function Service.Finish(record, zombie, reason, ownerReason)
         Service.ResetPath(record, zombie, reason or "roam_ambient_sleep_stopped")
         if PNC.SleepRuntime and PNC.SleepRuntime.LiveObjects then
             PNC.SleepRuntime.LiveObjects[id] = nil
+        end
+        if PNC.NightCampService
+            and type(PNC.NightCampService.ReleaseMember) == "function"
+        then
+            PNC.NightCampService.ReleaseMember(record)
         end
         releaseReservation(state, reason)
     end

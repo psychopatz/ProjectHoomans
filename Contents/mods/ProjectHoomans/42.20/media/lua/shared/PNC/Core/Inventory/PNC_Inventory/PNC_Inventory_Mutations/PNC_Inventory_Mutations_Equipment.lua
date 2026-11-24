@@ -25,6 +25,7 @@ function Inventory.SetEquipped(record, slot, itemID, reason)
     local item
     local op
     local oldSlot
+    local ops = {}
     slot = Internal.normalizeString(slot)
     if slot ~= "primary" and slot ~= "secondary" and slot ~= "bag" then
         return false, "invalid_equip_slot"
@@ -35,6 +36,26 @@ function Inventory.SetEquipped(record, slot, itemID, reason)
     if itemID and not item then return false, "item_not_found" end
     previousID = inv.equipped and inv.equipped[slot] or nil
     if previousID == itemID then return true, "unchanged" end
+    if item and item.container ~= "root" then
+        Internal.setItemContainer(inv, item, "root")
+        ops[#ops + 1] = Internal.buildOperation("move", {
+            itemID = item.id,
+            to = "root",
+        })
+    end
+    if item and item.wornSlot then
+        local oldWornSlot = item.wornSlot
+        preserveWornItemVisual(record, inv, oldWornSlot)
+        if inv.worn and inv.worn[oldWornSlot] == item.id then
+            inv.worn[oldWornSlot] = nil
+        end
+        item.wornSlot = nil
+        ops[#ops + 1] = Internal.buildOperation("wear", {
+            slot = oldWornSlot,
+            itemID = nil,
+            previousItemID = item.id,
+        })
+    end
     previous = previousID and inv.items[previousID] or nil
     if previous then previous.equipSlot = nil end
     oldSlot = item and item.equipSlot or nil
@@ -43,13 +64,46 @@ function Inventory.SetEquipped(record, slot, itemID, reason)
     end
     if item then item.equipSlot = slot end
     inv.equipped[slot] = itemID
+    local equipInternal = PNC.Equipment and PNC.Equipment.Internal or nil
+    if item and slot == "primary" and equipInternal
+        and equipInternal.peekWeaponDescriptor
+    then
+        local desc = equipInternal.peekWeaponDescriptor(item.type)
+        if desc and desc.requiresBothHands == true and inv.equipped.secondary then
+            local secID = inv.equipped.secondary
+            local secItem = inv.items[secID]
+            if secItem then secItem.equipSlot = nil end
+            inv.equipped.secondary = nil
+            ops[#ops + 1] = Internal.buildOperation("equip", {
+                slot = "secondary",
+                itemID = nil,
+                previousItemID = secID,
+            })
+        end
+    elseif item and slot == "secondary" and inv.equipped.primary
+        and equipInternal and equipInternal.peekWeaponDescriptor
+    then
+        local priID = inv.equipped.primary
+        local priItem = inv.items[priID]
+        local priDesc = priItem and equipInternal.peekWeaponDescriptor(priItem.type)
+        if priDesc and priDesc.requiresBothHands == true then
+            priItem.equipSlot = nil
+            inv.equipped.primary = nil
+            ops[#ops + 1] = Internal.buildOperation("equip", {
+                slot = "primary",
+                itemID = nil,
+                previousItemID = priID,
+            })
+        end
+    end
     op = Internal.buildOperation("equip", {
         slot = slot,
         itemID = itemID,
         previousItemID = previousID,
         oldSlot = oldSlot,
     })
-    Internal.bumpRevision(record, { op }, reason or ("equip_" .. slot))
+    ops[#ops + 1] = op
+    Internal.bumpRevision(record, ops, reason or ("equip_" .. slot))
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)
     if PNC.Registry and PNC.Registry.MarkDirty then
@@ -148,6 +202,18 @@ function Inventory.SetAttached(record, itemID, attachedSlot, reason)
                 to = "root",
             })
         end
+        if item.equipSlot then
+            local clearedEquipSlot = item.equipSlot
+            if inv.equipped and inv.equipped[clearedEquipSlot] == item.id then
+                inv.equipped[clearedEquipSlot] = nil
+            end
+            item.equipSlot = nil
+            ops[#ops + 1] = Internal.buildOperation("equip", {
+                slot = clearedEquipSlot,
+                itemID = nil,
+                previousItemID = item.id,
+            })
+        end
         oldSlot = item.attachedSlot
         if oldSlot and inv.attached[oldSlot] == itemID then
             inv.attached[oldSlot] = nil
@@ -228,6 +294,18 @@ function Inventory.SetWorn(record, itemID, wornSlot, reason)
             ops[#ops + 1] = Internal.buildOperation("move", {
                 itemID = item.id,
                 to = "root",
+            })
+        end
+        if item.equipSlot then
+            local clearedEquipSlot = item.equipSlot
+            if inv.equipped and inv.equipped[clearedEquipSlot] == item.id then
+                inv.equipped[clearedEquipSlot] = nil
+            end
+            item.equipSlot = nil
+            ops[#ops + 1] = Internal.buildOperation("equip", {
+                slot = clearedEquipSlot,
+                itemID = nil,
+                previousItemID = item.id,
             })
         end
         oldSlot = item.wornSlot

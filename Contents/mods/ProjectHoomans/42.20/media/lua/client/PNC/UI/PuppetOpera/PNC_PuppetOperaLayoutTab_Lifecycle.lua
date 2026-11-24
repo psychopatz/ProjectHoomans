@@ -22,7 +22,28 @@ function Class:createChildren()
         ISScrollingListBox.onMouseDown(list, x, y)
         local selected = list:getItem()
         if selected and selected.item and self.model then
-            self.model.SelectActor(selected.item.id)
+            local pendingLive = self.model.GetPendingLiveActorID
+                and self.model.GetPendingLiveActorID() or nil
+            if pendingLive and self.model.BindLiveActor then
+                if selected.item.liveID
+                    and tostring(selected.item.liveID) ~= tostring(pendingLive)
+                    and self.model.UnbindLiveActor
+                then
+                    self.model.UnbindLiveActor(selected.item.id)
+                end
+                local ok, reason = self.model.BindLiveActor(
+                    selected.item.id,
+                    pendingLive
+                )
+                if self.ownerWindow and self.ownerWindow.setEditorStatus then
+                    self.ownerWindow:setEditorStatus(
+                        ok and "live_actor_added_to_scene" or reason,
+                        not ok
+                    )
+                end
+            else
+                self.model.SelectActor(selected.item.id)
+            end
             self:refresh()
             if self.ownerWindow then self.ownerWindow:refreshViews() end
         end

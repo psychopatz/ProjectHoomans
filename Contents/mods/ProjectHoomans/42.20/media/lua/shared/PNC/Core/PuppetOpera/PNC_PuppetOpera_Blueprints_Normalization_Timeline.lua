@@ -212,9 +212,30 @@ local function normalizeBeats(rawBeats, actors)
         if rawTracks.npc == nil and raw.npc ~= nil then
             rawTracks.npc = raw.npc
         end
+        local beatMode = cleanText(raw.mode or "timed", 24)
+        if beatMode ~= "timed" and beatMode ~= "sustained"
+            and beatMode ~= "locomotive"
+        then
+            beatMode = "timed"
+        end
+        local phaseLock = cleanText(raw.phaseLock or "none", 24)
+        if phaseLock ~= "none" and phaseLock ~= "leader_track"
+            and phaseLock ~= "server_clock"
+        then
+            phaseLock = "none"
+        end
+        local interruptPolicy = cleanText(raw.interruptPolicy or "abort", 24)
+        if interruptPolicy ~= "abort" and interruptPolicy ~= "emergency_drop" then
+            interruptPolicy = "abort"
+        end
         normalizedBeat = {
             id = beatID,
             durationMs = durationMs,
+            mode = beatMode,
+            phaseLock = phaseLock,
+            disableCollision = raw.disableCollision == true,
+            tetherActive = raw.tetherActive == true or beatMode == "locomotive",
+            interruptPolicy = interruptPolicy,
             synchronization = cleanText(
                 raw.synchronization or "arrival_and_start_barrier",
                 64

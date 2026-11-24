@@ -114,9 +114,19 @@ function Policy.EvaluateEligibility(relationship, bond, compatible, available, a
     return result
 end
 
-function Policy.AcceptanceProbability(relationship, npcProfile)
+function Policy.AcceptanceProbability(relationship, npcProfile, attractionWeight)
     relationship = type(relationship) == "table" and relationship or {}
     npcProfile = type(npcProfile) == "table" and npcProfile or {}
+    if attractionWeight ~= nil then
+        local weight = clamp(attractionWeight, 0, 1)
+        if weight <= 0 then return 0 end
+        local base = Policy.AcceptanceProbability(relationship, npcProfile, nil)
+        return clamp(
+            base * (0.45 + 0.55 * weight),
+            Constants.RELATIONSHIP_PROPOSAL_ACCEPTANCE_MIN * 0.5,
+            Constants.RELATIONSHIP_PROPOSAL_ACCEPTANCE_MAX
+        )
+    end
     local probability = Constants.RELATIONSHIP_PROPOSAL_ACCEPTANCE_BASE
     probability = probability
         + surplus(relationship.approval,
@@ -152,13 +162,18 @@ function Policy.Roll(seed, salt)
     return value / 2147483646
 end
 
-function Policy.EvaluateAcceptance(seed, salt, relationship, npcProfile)
-    local probability = Policy.AcceptanceProbability(relationship, npcProfile)
+function Policy.EvaluateAcceptance(
+    seed, salt, relationship, npcProfile, attractionWeight
+)
+    local probability = Policy.AcceptanceProbability(
+        relationship, npcProfile, attractionWeight
+    )
     local roll = Policy.Roll(seed, salt)
     return {
         accepted = roll <= probability,
         probability = probability,
         roll = roll,
+        attractionWeight = attractionWeight,
         romanceStyle = npcProfile and npcProfile.romanceStyle or "neutral",
     }
 end

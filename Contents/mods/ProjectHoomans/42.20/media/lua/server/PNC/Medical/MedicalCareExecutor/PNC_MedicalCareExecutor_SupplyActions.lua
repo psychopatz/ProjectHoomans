@@ -167,6 +167,36 @@ function Executor.RequestBandageSupport(taskID)
             local fulfilled = Executor.FulfillBandageSupport(task.id)
             if fulfilled then return true, "fulfilled" end
         end
+        -- No teammate has spare bandages: dispatch the rescuer to rip nearby
+        -- corpses/clothing into rags so they can stabilize the patient themselves.
+        local worldItems = PNC.WorldItemService
+        if worldItems and type(worldItems.RequestBandageRip) == "function"
+            and not combatActive(requester)
+        then
+            local ripOk, _, ripIntent = worldItems.RequestBandageRip(requester, {
+                urgent = true,
+                targetCount = 2,
+                medicalTaskId = task.id,
+                source = "medical_rescue_no_bandage",
+                now = at,
+                cooldownMs = 3000,
+                allowRestrictedZones = false,
+            })
+            if ripOk == true then
+                local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+                if beats and type(beats.Emit) == "function" then
+                    beats.Emit("medical_rescue.scavenge_rags", {
+                        rescuer = requester,
+                        patient = patient,
+                        taskId = task.id,
+                        sourceType = ripIntent and ripIntent.candidate and ripIntent.candidate.sourceType or nil,
+                        incapacitated = patient.health and patient.health.state == "incapacitated",
+                        now = at,
+                    }, at)
+                end
+                return true, "ripping_bandage"
+            end
+        end
     end
     Executor.NotifyBandageSupportState(task, "needed")
     return true, "waiting_for_supply"

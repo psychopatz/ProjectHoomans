@@ -71,6 +71,9 @@ local function handleHealth(record, npcId, command, args)
             args and args.partId
         )
     end
+    if command == "debug_wound_state" then
+        return true, API.ApplyDebugWoundState(npcId, args or {})
+    end
     return false
 end
 

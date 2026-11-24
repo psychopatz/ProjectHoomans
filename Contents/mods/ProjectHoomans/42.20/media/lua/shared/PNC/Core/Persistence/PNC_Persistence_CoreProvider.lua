@@ -636,6 +636,18 @@ function Adapter.IsAliveCoreActor(actorID, core)
     return type(reg.Get) == "function" and reg:Get(id) ~= nil
 end
 
+function Adapter.IsRetiredCoreActor(actorID, core)
+    if actorID == nil or tostring(actorID) == "" then return false end
+    local reg = coreRegistry(core)
+    if not reg then return false end
+    local id = tostring(actorID)
+    if type(reg.GetTombstone) == "function" then
+        return reg:GetTombstone(id) ~= nil
+    end
+    return (type(reg.tombstones) == "table" and reg.tombstones[id] ~= nil)
+        or (type(reg.tombstoneAliases) == "table" and reg.tombstoneAliases[id] ~= nil)
+end
+
 function Adapter.GetCoreActorExtension(actorID, core)
     if actorID == nil or tostring(actorID) == "" then return nil end
     local reg = coreRegistry(core)

@@ -17,6 +17,7 @@ local function woundLabel(wound)
         fracture = { "UI_PNC_Wound_fracture", "Fracture" },
         burn = { "UI_PNC_Wound_burn", "Burn" },
         glass = { "UI_PNC_Wound_glass", "Lodged Glass Shards" },
+        deep_wound_glass = { "UI_PNC_Wound_glass", "Lodged Glass Shards" },
     }
     local definition = keys[woundType]
     return definition and Shared.Text(definition[1], definition[2])
@@ -223,11 +224,20 @@ local function renderWoundRows(view, x, y, width, fontHeight, rows, body, debugA
             end
         else
             view:drawText("- " .. woundLabel(wound), x + 15, y, 0.89, 0.28, 0.28, 1, UIFont.Small)
+            if wound.stitched == true then
+                y = y + fontHeight
+                view:drawText("- " .. Shared.Text("IGUI_health_Stitched", "Stitched"), x + 15, y, 0.28, 0.89, 0.45, 1, UIFont.Small)
+            end
             if (tonumber(wound.bleedingRate) or 0) > 0 then
                 y = y + fontHeight
                 view:drawText("- " .. Shared.Text("IGUI_health_Bleeding", "Bleeding"), x + 15, y, 0.89, 0.28, 0.28, 1, UIFont.Small)
             end
-            if body.infection and body.infection.sourcePart == row.partId and (body.infection.active == true or body.infection.fatal == true) then
+            local isKnoxSource = body.infection and body.infection.sourcePart == row.partId
+                and (body.infection.active == true or body.infection.fatal == true)
+            local isOrdinaryInfected = wound.infected == true
+                or wound.ordinaryInfected == true
+                or (tonumber(wound.woundInfectionLevel) or 0) > 0
+            if isKnoxSource or isOrdinaryInfected then
                 y = y + fontHeight
                 view:drawText("- " .. Shared.Text("IGUI_health_Infected", "Infected"), x + 15, y, 1, 0.28, 0, 1, UIFont.Small)
             end

@@ -36,9 +36,12 @@ function H.RefreshAmbient(faction, at, context)
         "MobileAmbient.RefreshAmbient"
     )
     local phase = H.AmbientPhase(at)
+    local rainShelter = H.IsRainShelterActive
+        and H.IsRainShelterActive(context) == true or false
     local ambient = mobile.ambient or {}
     local prevObjective = ambient.objective
-    local objective = phase == Constants.MOBILE_AMBIENT_DAY
+    local prevRainShelter = ambient.rainShelter == true
+    local objective = (phase == Constants.MOBILE_AMBIENT_DAY and not rainShelter)
         and Constants.MOBILE_AMBIENT_ROAD
         or Constants.MOBILE_AMBIENT_SHELTER
     local target = ambient.target
@@ -114,6 +117,7 @@ function H.RefreshAmbient(faction, at, context)
             ambient = {
                 phase = phase,
                 objective = objective,
+                rainShelter = rainShelter and objective == Constants.MOBILE_AMBIENT_SHELTER or false,
                 target = target,
                 nextCheckAt = at + Constants.MOBILE_AMBIENT_CHECK_HOURS,
                 nextObjectiveAt = at + Constants.MOBILE_AMBIENT_OBJECTIVE_HOURS,
@@ -189,9 +193,12 @@ function H.RefreshAmbient(faction, at, context)
                     or (PNC.AmbientVisitService.IsActive
                         and PNC.AmbientVisitService.IsActive(record, at)))
             then
+                local releaseReason = prevRainShelter
+                    and "mobile_shelter_weather_cleared"
+                    or "mobile_shelter_day_started"
                 PNC.AmbientVisitService.ReleaseMobileShelter(
                     record,
-                    "mobile_shelter_day_started",
+                    releaseReason,
                     at
                 )
             end

@@ -32,6 +32,12 @@ function H.AwardBuildXP(order, descriptor)
     then
         return false, "BUILD_XP_WORKER_UNAVAILABLE"
     end
+    if PNC.Skills.CanLearn and not PNC.Skills.CanLearn(record) then
+        payload.xpAwarded = awarded
+        payload.xpGranted = true
+        Repository.MarkDirty()
+        return true
+    end
 
     for index, award in ipairs(awards) do
         local key = tostring(index)

@@ -83,7 +83,18 @@ function Starting.Ensure(player, characterUUID, at, options)
                 { reason = "starting_companion_ensure" }
             )
         end
-        if not grant or grant.status ~= "granted"
+        local retired = not existing
+            and grant and grant.status == "granted"
+            and grant.npcID
+            and coreProvider
+            and type(coreProvider.IsRetiredCoreActor) == "function"
+            and coreProvider.IsRetiredCoreActor(grant.npcID, PsychopatzCore) == true
+        local departed = existing
+            and existing.colonistDeparture
+            and existing.colonistDeparture.state == "completed"
+        if retired or departed then
+            -- Permanently dead/retired or departed companions must not be respawned.
+        elseif not grant or grant.status ~= "granted"
             or (tonumber(grant.enrichmentVersion) or 0)
                 < Starting.ENRICHMENT_VERSION
             or (grant.status == "granted"

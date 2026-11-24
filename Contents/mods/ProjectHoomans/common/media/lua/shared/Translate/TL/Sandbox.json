@@ -124,6 +124,8 @@
     "Sandbox_ProjectHoomans.EnableWeaponDamage_tooltip": "Ginagamit ang pinsala ng kagamitang sandata at kasanayan sa pakikipaglaban ng bawat NPC. Huwag paganahin upang gamitin ang dating halaga ng pinsala ayon sa combat profile.",
     "Sandbox_ProjectHoomans.NPCDamageDealtMultiplier": "Multiplier ng pinsalang ginagawa ng NPC",
     "Sandbox_ProjectHoomans.NPCDamageDealtMultiplier_tooltip": "Pinapalaki ang pinsalang nakabatay sa armas na hinarap ng mga PNC NPC. Normal ang 1.0 at pinipigilan ng 0 ang pinsalang nakabatay sa armas.",
+    "Sandbox_ProjectHoomans.NPCCarryCapacityMultiplier": "Multiplier ng Kapasidad ng Dala ng NPC",
+    "Sandbox_ProjectHoomans.NPCCarryCapacityMultiplier_tooltip": "Pinapalaki ang pangunahing kapasidad ng dala ng NPC at mga opsyonal na bonus sa kapasidad (tulad ng mga trader). Normal ang 1.0.",
     "Sandbox_ProjectHoomans.NPCPlayerWounds": "Mga Sugat ng NPC Player",
     "Sandbox_ProjectHoomans.NPCPlayerWounds_tooltip": "Nagbibigay-daan sa mga pag-atake ng PNC NPC na magdulot ng pananakit, mga gasgas, at pagdurugo sa mga manlalaro bilang karagdagan sa pangkalahatang pagkawala ng kalusugan.",
     "Sandbox_ProjectHoomans.NPCAmmoConsumption": "Pagkonsumo ng Ammo ng NPC",

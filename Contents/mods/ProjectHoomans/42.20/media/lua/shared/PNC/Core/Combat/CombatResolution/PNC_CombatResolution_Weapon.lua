@@ -42,7 +42,20 @@ function Resolution.GetAttackDamage(record, attackType, weaponItem, fallback, sk
     end
     dealtMultiplier = PNC.Sandbox and PNC.Sandbox.NPCDamageDealtMultiplier
         and PNC.Sandbox.NPCDamageDealtMultiplier() or 1
-    return base * attackMultiplier * dealtMultiplier
+    local damage = base * attackMultiplier * dealtMultiplier
+    if attackType ~= "ranged"
+        and PNC.Equipment and PNC.Equipment.IsUsingTwoHandedOneHanded
+        and PNC.Equipment.IsUsingTwoHandedOneHanded(record, weaponItem)
+    then
+        damage = damage * 0.5
+    end
+    if attackType ~= "ranged"
+        and PNC.Mood and PNC.Mood.GetCombatModifiers
+    then
+        local moodMods = PNC.Mood.GetCombatModifiers(record)
+        damage = damage * (tonumber(moodMods and moodMods.damageMultiplier) or 1.0)
+    end
+    return damage
 end
 
 return Resolution

@@ -94,7 +94,7 @@ function Internal.PrepareArrival(record, zombie, runtime, order, definition)
                 and 0.45 or SEAT_STOP_DISTANCE)
         or 0.7
     if distance > arrivalDistance
-        or math.abs((tonumber(record.z) or 0) - order.z) >= 0.5
+        or math.floor(tonumber(record.z) or 0) ~= math.floor(tonumber(order.z) or 0)
     then
         runtime.phase = "TRAVELLING"
         if runtime.taskLeaseId ~= "" and PNC.Tasking
@@ -210,10 +210,13 @@ function Internal.PrepareArrival(record, zombie, runtime, order, definition)
             )
         end
     end
-    if runtime.facingApplied ~= true and zombie then
-        local directionName = tostring(order.interactionFacing or "")
-        if order.interactionAxis == "x" then directionName = "E"
-        elseif order.interactionAxis == "y" then directionName = "S" end
+    if runtime.seating ~= true and runtime.facingApplied ~= true and zombie then
+        local directionName = tostring(order.sleepFacing
+            or order.interactionFacing or "")
+        if directionName == "" then
+            if order.interactionAxis == "x" then directionName = "E"
+            elseif order.interactionAxis == "y" then directionName = "S" end
+        end
         if directionName ~= "" and IsoDirections
             and zombie.setForwardIsoDirection
         then

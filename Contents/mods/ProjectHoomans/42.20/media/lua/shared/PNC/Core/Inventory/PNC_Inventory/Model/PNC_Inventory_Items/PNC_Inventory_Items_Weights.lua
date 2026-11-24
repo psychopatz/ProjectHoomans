@@ -1,6 +1,34 @@
 local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
 
+function Internal.getWornEncumbranceMultiplier()
+    local globals = rawget(_G, "ZomboidGlobals")
+    local value = globals and (
+        tonumber(globals.EquippedOrWornEncumbranceMultiplier)
+        or tonumber(globals.equippedOrWornEncumbranceMultiplier)
+    )
+    if value and value > 0 and value <= 1 then return value end
+    return 0.3
+end
+
+local function isEquippedOnBody(inv, item)
+    if not inv or not item then return false end
+    if item.wornSlot and inv.worn and inv.worn[item.wornSlot] == item.id then
+        return true
+    end
+    if item.attachedSlot and inv.attached
+        and inv.attached[item.attachedSlot] == item.id
+    then
+        return true
+    end
+    if (item.equipSlot == "primary" or item.equipSlot == "secondary")
+        and inv.equipped and inv.equipped[item.equipSlot] == item.id
+    then
+        return true
+    end
+    return false
+end
+
 local function resolveContainerReduction(
     inv, owners, reductions, containerID, depth
 )
@@ -14,7 +42,10 @@ local function resolveContainerReduction(
         reductions[containerID] = 0
         return 0
     end
-    if owner.wornSlot and inv.worn[owner.wornSlot] == owner.id then
+    local equippedContainer = Internal.isItemEquippedContainer
+        and Internal.isItemEquippedContainer(inv, owner)
+        or (owner.wornSlot and inv.worn and inv.worn[owner.wornSlot] == owner.id)
+    if equippedContainer then
         reduction = Internal.normalizeItemWeightReduction(
             owner.weightReduction
         )
@@ -46,20 +77,27 @@ function Internal.calculateWeights(inv)
         or tonumber(inv.maxWeight) or 0
     local owners = mapContainerOwners(inv)
     local reductions = { root = 0 }
+    local wornMultiplier = Internal.getWornEncumbranceMultiplier()
     local item
     local itemWeight
     local reduction
+    local containerID
     for _, item in pairs(inv.items) do
         itemWeight = Internal.getItemWeight(item.type)
             * math.max(1, tonumber(item.stack) or 1)
-        reduction = resolveContainerReduction(
-            inv,
-            owners,
-            reductions,
-            item.container or "root",
-            0
-        )
-        usedWeight = usedWeight + (itemWeight * (1 - reduction))
+        containerID = item.container or "root"
+        if containerID == "root" and isEquippedOnBody(inv, item) then
+            usedWeight = usedWeight + (itemWeight * wornMultiplier)
+        else
+            reduction = resolveContainerReduction(
+                inv,
+                owners,
+                reductions,
+                containerID,
+                0
+            )
+            usedWeight = usedWeight + (itemWeight * (1 - reduction))
+        end
     end
     inv.cachedWeight = usedWeight
     inv.maxWeight = maxWeight
@@ -173,6 +211,13 @@ function Inventory.RebuildCaches(record)
     Internal.ensureContainer(inv, "root", inv.rootMaxWeight)
     inv.containers.root.maxWeight = inv.rootMaxWeight
     Internal.calculateWeights(inv)
+    local bagCapacity, bagUsed = 0, 0
+    if Internal.getEquippedBagTotals then
+        bagCapacity, bagUsed = Internal.getEquippedBagTotals(inv)
+    end
+    inv.equippedBagCapacity = bagCapacity
+    inv.equippedBagUsedWeight = bagUsed
+    inv.totalCapacity = (tonumber(inv.maxWeight) or 0) + bagCapacity
     inv.itemCount = Internal.countMapEntries(inv.items)
     inv.containerCount = Internal.countMapEntries(inv.containers)
     inv.remainingWeight = math.max(

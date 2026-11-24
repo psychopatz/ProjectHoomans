@@ -90,6 +90,98 @@ end
 registerAmbientSleep("ambient.roam.sleep.bed", "Ambient Roam Sleep in Bed")
 registerAmbientSleep("ambient.roam.sleep.sofa", "Ambient Roam Sleep on Sofa")
 
+Scenes.Register("ambient.roam.sleep.floor", {
+    label = "Ambient Roam Sleep on Floor",
+    description = "A persistent ground sleep pose for indoor rooms or outdoor camps.",
+    category = "ambient",
+    priority = 30,
+    repeatMode = "loop",
+    blocking = true,
+    keepManagedUseless = true,
+    steps = {
+        { id = "sleep", bump = "Sleep", durationMs = 0, loop = true },
+    },
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = ambientRoamTick,
+    onStop = ambientRoamStopped,
+})
+
+Scenes.Register("ambient.roam.camp.build", {
+    label = "Ambient Night Campfire Build",
+    description = "Crouched lower-reach animation while assembling and lighting a campfire.",
+    category = "ambient",
+    priority = 32,
+    repeatMode = "loop",
+    blocking = true,
+    keepManagedUseless = true,
+    steps = {
+        { id = "build_fire", bump = "LootLow", durationMs = 1400, loop = true },
+    },
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = ambientRoamTick,
+    onStop = ambientRoamStopped,
+})
+
+Scenes.Register("ambient.roam.camp.fireside", {
+    label = "Ambient Night Camp Fireside Circle",
+    description = "Seated fireside circle pose for evening stories and warming hands before sleep curfew.",
+    category = "ambient",
+    priority = 28,
+    repeatMode = "loop",
+    blocking = true,
+    keepManagedUseless = true,
+    retainBump = true,
+    stepGapMs = 0,
+    sequenceMode = "shuffle",
+    steps = {
+        { id = "warm_hands", bump = "SitRubHands", durationMs = 4500, loop = true },
+        { id = "fireside_sit", bump = "Sit", durationMs = 5200, loop = true },
+    },
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = ambientRoamTick,
+    onStop = ambientRoamStopped,
+})
+
+Scenes.Register("ambient.roam.camp.sentry", {
+    label = "Ambient Night Camp Sentry",
+    description = "An awake fireside watch pose for an outdoor night-camp sentry.",
+    category = "ambient",
+    priority = 28,
+    repeatMode = "loop",
+    blocking = true,
+    keepManagedUseless = true,
+    retainBump = true,
+    stepGapMs = 0,
+    sequenceMode = "shuffle",
+    steps = {
+        { id = "warm_hands", bump = "SitRubHands", durationMs = 4200, loop = true },
+        { id = "watch_sit", bump = "Sit", durationMs = 4600, loop = true },
+    },
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = ambientRoamTick,
+    onStop = ambientRoamStopped,
+})
+
 Scenes.Register("survival.drink.inventory", {
     label = "Drink from Personal Inventory",
     description = "Pause a follow order to drink from a carried item.",

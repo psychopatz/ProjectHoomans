@@ -28,7 +28,6 @@ function H.CloneSpec(record)
     local spec = ItemState.Decode(record)
     spec.type = CoreInventory.getItemFullType(record[C.TYPE_ID])
     spec.stack = record[C.QUANTITY]
-    spec.container = "root"
     return spec
 end
 
@@ -48,7 +47,7 @@ function SupplyInventory.AddCoreRecords(record, records, reason)
         if not spec.type then return false, "unknown_type_id" end
         specs[#specs + 1] = spec
     end
-    local accepted, why = PNC.Inventory.CanAccept(record, specs, "root")
+    local accepted, why = PNC.Inventory.CanAccept(record, specs, "auto")
     if not accepted then return false, why end
     local body = H.LiveBody(record)
     local physical
@@ -74,7 +73,7 @@ function SupplyInventory.AddCoreRecords(record, records, reason)
         end
     end
     local added, addReason, itemIDs = InventoryCommands.AddItems(
-        record, specs, "root", reason or "supply_acquisition"
+        record, specs, "auto", reason or "supply_acquisition"
     )
     if not added then
         if physical then H.RemoveNativeList(physical, physicalItems) end

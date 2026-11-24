@@ -1,0 +1,140 @@
+# World gossip, auto-discovered story rumors, radio/AEBS news, 7-day raid
+# patterns, mundane/reminiscent/belief banter, and NPC-to-NPC social exchanges.
+lang EN
+namespace hoomans
+
+lex clause.gossip_closure
+  [default] (pri 6): "That's all I know about it, honestly." | "Honestly, that's everything I saw—couldn't tell you much more." | "That's about all I caught."
+
+lex clause.banter_closure
+  [default] (pri 6): "Anyway, no use dwelling on it—gotta keep moving." | "That's about it. Just thinking out loud." | "Anyway, back to reality."
+
+flow semantic.gossip.world.opening
+  offer world_gossip.ask_where:
+    label: "Where was that?"
+    say: "Where was that?"
+    utility: curiosity
+    intent: QUESTION
+    subject: LOCATION
+  offer world_gossip.ask_when:
+    label: "When did that happen?"
+    say: "When did that happen?"
+    utility: curiosity
+    intent: QUESTION
+    subject: TIME
+  offer world_gossip.ask_more:
+    label: "Tell me more"
+    say: "Tell me more about that."
+    utility: curiosity
+    intent: QUESTION
+    subject: CONVERSATION_TOPIC
+  say [topic=threat_pattern_7d, world.raider_surge] (pri 11) as threat_chopper_linked:
+    "Ever since that chopper passed over, the raids and the dead haven't stopped pushing in."
+  say [topic=threat_pattern_7d] (pri 10) as threat_constant:
+    "We've been hit {slot.gossip_raid_count} times in the past week—someone or something is definitely testing our perimeter."
+  say [topic=helicopter_event] (pri 10) as chopper:
+    "That chopper came over {slot.gossip_time} and drew half the dead in the county right through here."
+  say [topic=aebs_air_activity] (pri 10) as aebs_air:
+    "Caught the emergency broadcast earlier: \"{slot.gossip_headline}\""
+  say [topic=aebs_utilities] (pri 9) as aebs_utilities:
+    "The emergency broadcast warned about the grid: \"{slot.gossip_headline}\""
+  say [topic=radio_broadcast] (pri 8) as radio_news:
+    "Caught something on the radio {slot.gossip_time}: \"{slot.gossip_headline}\""
+  say [topic=medical_wreck] (pri 8) as medical_wreck:
+    "I saw a crashed ambulance {slot.gossip_time}, {slot.gossip_location}—might still have medical supplies."
+  say [topic=police_blockade] (pri 8) as police_blockade:
+    "Ran into a police blockade {slot.gossip_time}, {slot.gossip_location}. Looked like things went sideways."
+  say [topic=bandit_activity] (pri 8) as bandit_activity:
+    "People spotted bandits on the road {slot.gossip_time}, {slot.gossip_location}. Best to stay sharp."
+  say [topic=horde_sighting] (pri 8) as horde_sighting:
+    "Saw a big horde {slot.gossip_time}, {slot.gossip_location}. Wouldn't wander over there alone."
+  say [topic=meta_gunshot] (pri 8) as meta_gunshot:
+    "Heard gunfire {slot.gossip_time}, {slot.gossip_location}. Somebody's still fighting out there."
+  say [topic=meta_scream] (pri 8) as meta_scream:
+    "Heard someone screaming {slot.gossip_time}, {slot.gossip_location}. Doesn't sound like they made it."
+  say [default] (pri 5) as default:
+    "I spotted something strange {slot.gossip_time}, {slot.gossip_location}."
+
+flow semantic.gossip.world.followup
+  say [action=where] (pri 9) as detail_where:
+    "It was {slot.gossip_location}. {clause.gossip_closure}"
+  say [action=when] (pri 9) as detail_when:
+    "Happened {slot.gossip_time}, right before things quieted down. {clause.gossip_closure}"
+  say [action=who] (pri 9) as detail_who:
+    "Couldn't make out any faces—I kept my distance. {clause.gossip_closure}"
+  say [topic=medical_wreck, action=more] (pri 9) as more_medical:
+    "Looked like somebody already checked the cab, though the back doors were still jammed shut. {clause.gossip_closure}"
+  say [topic=police_blockade, action=more] (pri 9) as more_police:
+    "Saw shell casings and overturned barricades—didn't stick around long enough to check the trunks. {clause.gossip_closure}"
+  say [topic=bandit_activity, action=more] (pri 9) as more_bandit:
+    "They were armed and moving fast. I kept my head down until they cleared out. {clause.gossip_closure}"
+  say [default] (pri 5) as default:
+    "Didn't stay long enough to search everything—too many stragglers wandering around. {clause.gossip_closure}"
+
+flow semantic.gossip.world.closure
+  say [default] (pri 5) as default:
+    "{clause.gossip_closure}"
+
+flow semantic.banter.mundane
+  offer banter.ask_more:
+    label: "Tell me more"
+    say: "Tell me more about that."
+    utility: warmth
+    intent: QUESTION
+    subject: CONVERSATION_TOPIC
+  say [topic=reminisce_sunset] (pri 9) as reminisce_sunset:
+    "I miss just sitting on the porch watching the sunset without worrying about walkers."
+  say [topic=reminisce_comforts] (pri 8) as reminisce_comforts:
+    "Funny what you miss—I'd trade half my pack for a hot shower and a cold soda."
+  say [topic=reminisce_music] (pri 8) as reminisce_music:
+    "Every time I pass an old car, I half expect the radio to kick on with some late-night rock station."
+  say [topic=personal_belief, actor.social_style=friendly] (pri 9) as belief_compassionate:
+    "I still think people are worth saving, even after everything we've seen."
+  say [topic=personal_belief] (pri 8) as belief_pragmatic:
+    "Out here, you only make it if you watch your own back first and trust slow."
+  say [topic=mundane_food] (pri 7) as mundane_food:
+    "If I have to eat one more cold can of beans straight out of the tin, I might lose my mind."
+  say [default] (pri 5) as mundane_default:
+    "My feet are killing me—feels like we've walked half of Knox County this week."
+
+flow semantic.banter.mundane.followup
+  say [topic=reminisce_sunset] (pri 9) as followup_sunset:
+    "Used to be my favorite part of the day—just quiet air, orange sky, and nowhere else to be. {clause.banter_closure}"
+  say [topic=reminisce_comforts] (pri 8) as followup_comforts:
+    "You don't realize how much the little stuff kept you sane until it's all gone. {clause.banter_closure}"
+  say [topic=personal_belief, actor.social_style=friendly] (pri 9) as followup_belief_warm:
+    "If we stop looking out for each other, then what's the point of surviving at all? {clause.banter_closure}"
+  say [topic=personal_belief] (pri 8) as followup_belief_pragmatic:
+    "Seen too many good folks get burned because they assumed a stranger meant well. {clause.banter_closure}"
+  say [default] (pri 5) as default:
+    "Dry socks and a warm meal are worth more than gold out here. {clause.banter_closure}"
+
+beat semantic.social.npc_exchange.intro
+  say [role=open] (pri 8) as open:
+    "Hey, I don't think we've met. I'm {speaker.name}."
+  say [role=reply] (pri 8) as reply:
+    "I'm {speaker.name}. Stay safe out here."
+
+beat semantic.social.npc_exchange.friend
+  say [role=open] (pri 8) as open:
+    "Honestly {addressee.name}, it's good knowing I can count on you."
+  say [role=reply] (pri 8) as reply:
+    "Same goes for you, {addressee.name}. We'll look out for each other."
+
+beat semantic.social.npc_exchange.lover
+  say [role=open] (pri 8) as open:
+    "You know, {addressee.name}, I'm really glad we found each other out here."
+  say [role=reply] (pri 8) as reply:
+    "Me too, {addressee.name}. I've got your back—always."
+
+beat semantic.social.npc_exchange.gossip
+  say [role=open] (pri 8) as open:
+    "Hey {addressee.name}, did you hear what happened {slot.gossip_time}, {slot.gossip_location}?"
+  say [role=reply] (pri 8) as reply:
+    "Really? Good to know, {addressee.name}. I'll keep an eye out."
+
+beat semantic.social.npc_exchange.chat
+  say [role=open] (pri 8) as open:
+    "Holding up alright, {addressee.name}?"
+  say [role=reply] (pri 8) as reply:
+    "Managing so far, {addressee.name}. Just taking it day by day."

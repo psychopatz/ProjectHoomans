@@ -37,7 +37,9 @@ function Class:createChildren()
     for _, definition in ipairs({
         { "create", "UI_PNC_PuppetOpera_CreateNew", "CREATE NEW", "quiet" },
         { "duplicate", "UI_PNC_PuppetOpera_Duplicate", "DUPLICATE", "quiet" },
+        { "autobind", "UI_PNC_PuppetOpera_AutoBind", "AUTO-BIND", "quiet" },
         { "save", "UI_PNC_PuppetOpera_SaveDraft", "SAVE DRAFT", "selected" },
+        { "export", "UI_PNC_PuppetOpera_ExportLua", "EXPORT LUA", "selected" },
         { "reset", "UI_PNC_PuppetOpera_ResetDraft", "RESET DRAFT", "quiet" },
     }) do
         local button = UI.CreateButton(self, {

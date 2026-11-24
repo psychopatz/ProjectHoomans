@@ -46,10 +46,14 @@ function InlineChat.SetMode(_, mode, part)
         Diagnostics.LogMode("mode_rejected", requestedMode, previousMode, "llm_pending")
         return false
     end
+    if previousMode == requestedMode then
+        Diagnostics.LogMode("mode_unchanged", requestedMode, previousMode, "already_selected")
+        return true
+    end
     local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
     local resolved = Targets.ResolveRecipients(player, {
         mode = requestedMode,
-        cycleNearest = previousMode == Config.MODE_NEAREST and requestedMode == Config.MODE_NEAREST,
+        cycleNearest = false,
         selectClosest = previousMode == Config.MODE_NEARBY and requestedMode == Config.MODE_NEAREST,
     })
     if not resolved or #resolved.targets == 0 then
@@ -67,6 +71,7 @@ function InlineChat.SetMode(_, mode, part)
     resetRecovery()
     Targets.RefreshHighlights(0)
     State.part.owner = State.host
+    if State.part.refreshControls then State.part:refreshControls() end
     Targets.Position(0, player)
     Diagnostics.LogMode("mode_transaction_accepted", requestedMode, State.mode, nil)
     return true
@@ -91,6 +96,7 @@ function InlineChat.SetScope(_, value, part)
     resetRecovery()
     Targets.RefreshHighlights(0)
     State.part.owner = State.host
+    if State.part.refreshControls then State.part:refreshControls() end
     Targets.Position(0, player)
     return true
 end

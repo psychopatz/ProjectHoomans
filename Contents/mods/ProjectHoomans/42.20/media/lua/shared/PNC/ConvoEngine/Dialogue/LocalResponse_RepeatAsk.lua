@@ -1,8 +1,27 @@
 -- Immersive branching for "Tell me about yourself", relationship-gated
 -- identity refusals, and repeat-ask annoyance when the player keeps asking
 -- for facts the NPC already disclosed.
+-- All authored prose lives in repeat_ask_and_about_you.convo (ConvoDSL).
 
 local RepeatAsk = {}
+
+local function getCatalog()
+    local catalog = PNC and PNC.ConvoEngine and PNC.ConvoEngine.ResponseCatalog or nil
+    if type(catalog) ~= "table" then
+        local loaded = require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
+        catalog = type(loaded) == "table" and loaded or nil
+    end
+    return catalog
+end
+
+local function getLexicon()
+    local lex = PNC and PNC.ConvoEngine and PNC.ConvoEngine.Lexicon or nil
+    if type(lex) ~= "table" then
+        local loaded = require "PNC/ConvoEngine/Lexicon"
+        lex = type(loaded) == "table" and loaded or nil
+    end
+    return lex
+end
 
 local function counterStore(context, state)
     local container = (type(context) == "table" and (
@@ -16,69 +35,88 @@ local function counterStore(context, state)
     return container.knownFacetAskCounts
 end
 
-local function socialTone(context)
+local function resolveSocialStyle(context)
     local personality = type(context) == "table" and context.npcPersonality or nil
     local style = type(personality) == "table"
         and string.lower(tostring(personality.socialStyle or "")) or ""
-    if style == "friendly" or style == "protective" then return "warm" end
-    if style == "withdrawn" or style == "cautious" or style == "hostile" then
-        return "guarded"
+    if style == "friendly" or style == "protective" then return style, "warm" end
+    if style == "withdrawn" or style == "guarded" or style == "hostile" then
+        return style, "guarded"
     end
+    if style == "cautious" then return "guarded", "guarded" end
     local actor = type(context) == "table" and context.actorConversationContext or nil
     local rel = actor and type(actor.relationship) == "table" and actor.relationship
         or (type(context) == "table" and type(context.relationship) == "table"
             and context.relationship) or nil
     local familiarity = rel and (tonumber(rel.familiarity) or tonumber(rel.trust)) or 0
-    if familiarity >= 45 then return "warm" end
-    if familiarity < 15 then return "guarded" end
-    return "neutral"
+    if familiarity >= 45 then return "friendly", "warm" end
+    if familiarity < 15 then return "guarded", "guarded" end
+    return "neutral", "neutral"
+end
+
+local function selectPool(poolID, selCtx, tokens, salt)
+    local catalog = getCatalog()
+    if not catalog or type(catalog.Select) ~= "function" then return nil end
+    local selected = catalog.Select(poolID, selCtx, salt)
+    if type(selected) ~= "table" then return nil end
+    local text = selected.fallback
+    if type(text) == "string" and string.find(text, "{", 1, true) then
+        local lex = getLexicon()
+        if lex and type(lex.Expand) == "function" then
+            text = lex.Expand(text, selCtx, tokens, { salt = salt })
+        end
+    end
+    return selected, text
 end
 
 function RepeatAsk.ResolveAboutYou(ir, state, context)
-    local tone = socialTone(context)
-    local fallback
-    if tone == "warm" then
-        fallback = "Sure thing — what do you want to know about me?"
-    elseif tone == "guarded" then
-        fallback = "Depends on what you're asking. What about me?"
-    else
-        fallback = "What do you want to know about me?"
-    end
+    local style, tone = resolveSocialStyle(context)
+    local salt = tostring(state and state.sequence or 0) .. ":about_you"
+    local selected, text = selectPool(
+        "semantic.question.about_you",
+        {
+            npcID = type(context) == "table" and context.npcID or nil,
+            socialStyle = style,
+        },
+        nil,
+        salt
+    )
     return {
-        templateID = "semantic.question.about_you." .. tone,
-        fallback = fallback,
+        templateID = selected and selected.templateID or ("semantic.question.about_you." .. tone),
+        fallback = text,
+        sourcePoolID = "semantic.question.about_you",
         dialogueAct = "PROMPT",
         topic = "about_you",
         tone = tone,
-        selectionSource = "about_you_hub",
+        selectionSource = "catalog",
+        selectionID = selected and selected.id or nil,
     }
 end
 
 function RepeatAsk.ResolveRelationshipGate(facetKey, minFamiliarity, context)
-    local tone = socialTone(context)
-    local fallback
-    if facetKey == "faction" then
-        fallback = tone == "guarded"
-            and "I don't hand out who I run with to someone I barely know."
-            or "We haven't known each other long enough for me to get into who I'm with."
-    elseif facetKey == "surname" then
-        fallback = tone == "guarded"
-            and "First name's enough for now. We're not that close."
-            or "Let's stick to first names until we know each other a bit better."
-    else
-        fallback = tone == "guarded"
-            and "That's personal. We're not there yet."
-            or "I'm not ready to get into that yet — maybe once we know each other better."
-    end
+    local style = resolveSocialStyle(context)
+    local key = tostring(facetKey or "personal")
+    local selected, text = selectPool(
+        "semantic.question.about_you.gated",
+        {
+            npcID = type(context) == "table" and context.npcID or nil,
+            socialStyle = style,
+            topic = key,
+        },
+        nil,
+        "about_you_gate:" .. key
+    )
     return {
-        templateID = "semantic.question.about_you.gated." .. tostring(facetKey or "personal"),
-        fallback = fallback,
+        templateID = selected and selected.templateID or ("semantic.question.about_you.gated." .. key),
+        fallback = text,
+        sourcePoolID = "semantic.question.about_you.gated",
         dialogueAct = "REFUSAL",
         topic = "about_you",
         uncertainty = "gated",
         tone = "guarded",
         minFamiliarity = minFamiliarity,
-        selectionSource = "about_you_relationship_gate",
+        selectionSource = "catalog",
+        selectionID = selected and selected.id or nil,
     }
 end
 
@@ -93,60 +131,33 @@ end
 
 function RepeatAsk.BuildKnownRepeatResponse(facetKey, displayValue, context, state)
     local count = RepeatAsk.BumpCount(facetKey, context, state)
+    local key = tostring(facetKey or "identity")
     local value = tostring(displayValue or "")
-    local tone = "direct"
-    local fallback
-
-    if count == 1 then
-        tone = "direct"
-        if facetKey == "identity" then
-            fallback = "I already told you — it's " .. value .. ". Everything alright?"
-        elseif facetKey == "faction" then
-            fallback = "I told you before, I'm with " .. value .. "."
-        elseif facetKey == "surname" then
-            fallback = "Already told you — my surname is " .. value .. "."
-        elseif facetKey == "nickname" then
-            fallback = "I already said most people call me " .. value .. "."
-        else
-            fallback = "I told you already — " .. value .. "."
-        end
-    elseif count == 2 then
-        tone = "pointed"
-        if facetKey == "identity" then
-            fallback = "Seriously? It's " .. value .. ". You already asked me that."
-        elseif facetKey == "faction" then
-            fallback = "You've asked me twice now — " .. value .. ". Are you even listening?"
-        elseif facetKey == "surname" then
-            fallback = "Again? It's " .. value .. ". Try to keep up."
-        elseif facetKey == "nickname" then
-            fallback = "Still " .. value .. ". You just asked me that."
-        else
-            fallback = "You already asked me that. " .. value .. "."
-        end
-    else
-        tone = "annoyed"
-        if facetKey == "identity" then
-            fallback = "You don't even remember my name, do you? It's " .. value .. ". Stop asking."
-        elseif facetKey == "faction" then
-            fallback = "How many times are you going to ask? " .. value .. ". Drop it already."
-        elseif facetKey == "surname" then
-            fallback = "Do you remember anything I tell you? It's " .. value .. ". I'm not saying it again."
-        elseif facetKey == "nickname" then
-            fallback = "Forget it — if you can't remember " .. value .. " by now, stop asking."
-        else
-            fallback = "Do you even remember anything I tell you? I'm not repeating myself again."
-        end
-    end
-
+    local tone = count == 1 and "direct" or (count == 2 and "pointed" or "annoyed")
+    local tokens = { ["slot.known_value"] = value }
+    local selected, text = selectPool(
+        "semantic.question.repeat_known",
+        {
+            npcID = type(context) == "table" and context.npcID or nil,
+            topic = key,
+            npcAnnoyed = count == 2,
+            npcFedUp = count >= 3,
+        },
+        tokens,
+        "repeat_known:" .. key .. ":" .. tostring(count)
+    )
     return {
-        templateID = "semantic.question.known_repeat." .. tostring(facetKey) .. "." .. tone,
-        fallback = fallback,
+        templateID = selected and selected.templateID or ("semantic.question.repeat_known." .. key .. "." .. tone),
+        fallback = text,
+        args = tokens,
+        sourcePoolID = "semantic.question.repeat_known",
         dialogueAct = "FACT_ANSWER",
-        topic = tostring(facetKey),
+        topic = key,
         uncertainty = "known",
         tone = tone,
         repeatCount = count,
-        selectionSource = "known_facet_repeat_branch",
+        selectionSource = "catalog",
+        selectionID = selected and selected.id or nil,
     }
 end
 

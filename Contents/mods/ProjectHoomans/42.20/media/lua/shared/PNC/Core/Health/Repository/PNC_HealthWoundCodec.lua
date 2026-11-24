@@ -6,7 +6,7 @@ local Helper = {}
 local num = Codec.normalizeNumber
 local str = Codec.normalizeString
 
-local WOUND_BOOLS = { "bandaged", "stitched", "splinted", "cauterized", "haveGlass", "haveBullet", "infectedWound", "bandageDirty", "sterileDressing", "dressingLifeTracked", "dressingHealed", "virtualDressing", "zombieWound" }
+local WOUND_BOOLS = { "bandaged", "stitched", "splinted", "cauterized", "haveGlass", "haveBullet", "burned", "infectedWound", "bandageDirty", "sterileDressing", "dressingLifeTracked", "dressingHealed", "virtualDressing", "zombieWound" }
 local WOUND_POS_NUMS = { "alcoholLevel", "bandageLife", "splintFactor", "createdAt", "bandagedAt", "dirtyAtWorldHour", "lastHealWorldHour", "healAtWorldHour" }
 local INF_BOOLS = { "active", "fatal", "pendingFatal", "nonLethalFever", "fakePeakReached" }
 local INF_NUMS = { "infectedAtWorldHour", "fatalAtWorldHour", "reanimateAtWorldHour", "progress", "fever", "lastUpdatedWorldHour", "lastDamageWorldHour" }

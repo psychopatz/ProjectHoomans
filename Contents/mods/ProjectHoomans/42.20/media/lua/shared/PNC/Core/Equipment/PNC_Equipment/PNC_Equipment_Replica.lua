@@ -285,11 +285,14 @@ function Equipment.ApplyReplicaHands(zombie, record, options)
     -- our virtual inventory snapshots. Like Bandits, create that item locally
     -- for presentation. Latch the synchronized state so the update loop does
     -- not clear/recreate hand and attachment models every frame.
+    local primaryHeld = attackMode or descriptor.isContainer == true
     signatureParts = {
         tostring(primaryFullType or ""),
         Internal.VisualStateSignature(equipment.primaryVisual),
         tostring(equipment.secondaryFullType or ""),
-        attackMode and (workHeld and "work" or "attack")
+        primaryHeld and (workHeld and "work"
+            or descriptor.isContainer == true and "container"
+            or "attack")
             or "idle",
     }
     attachedEntries = Equipment.GetOrderedAttachedEntries(equipment)
@@ -305,7 +308,7 @@ function Equipment.ApplyReplicaHands(zombie, record, options)
     handStateCurrent = Internal.isPrimaryHandStateCurrent(
         zombie,
         descriptor,
-        attackMode
+        primaryHeld
     )
     if modData
         and modData.PNCReplicaHandsSignature == signature
@@ -323,7 +326,7 @@ function Equipment.ApplyReplicaHands(zombie, record, options)
         record,
         equipment,
         descriptor,
-        attackMode
+        primaryHeld
     )
     Visuals.RefreshModel(zombie)
     if ok and modData then

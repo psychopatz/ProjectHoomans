@@ -17,6 +17,7 @@ require "PNC/UI/Nameplates/PNC_NameplateToolFeedback"
 require "PNC/UI/Nameplates/PNC_NameplateToolFeedbackRenderer"
 require "PNC/UI/Nameplates/PNC_NameplateScopes"
 require "PNC/UI/Nameplates/PNC_NameplateStealthIndicator"
+require "PNC/UI/Nameplates/PNC_NameplateDialoguePromptIndicator"
 require "PNC/UI/Nameplates/PNC_NameplateEntries"
 require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer"
 

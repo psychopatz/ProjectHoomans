@@ -8,6 +8,7 @@ local Core = PNC.Core
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 local ActorControl = PNC.ActorControl
 local plantProtectionState = setmetatable({}, { __mode = "k" })
+local campfireProtectionState = setmetatable({}, { __mode = "k" })
 
 local function canAdvanceNative(record, zombie)
     local bodyLifecycle = PNC.BodyLifecycle
@@ -27,6 +28,60 @@ end
 local function hasFarmingPlant(square)
     return square and square.hasFarmingPlant
         and square:hasFarmingPlant() == true
+end
+
+local function hasLitCampfire(square)
+    local objects
+    local count
+    local i
+    local obj
+    if not square then
+        return false
+    end
+    if square.hasLitCampfire and square:hasLitCampfire() == true then
+        return true
+    end
+    objects = square.getObjects and square:getObjects() or nil
+    count = objects and objects.size and objects:size() or 0
+    for i = 0, count - 1 do
+        obj = objects:get(i)
+        if obj and obj.isCampfire and obj:isCampfire() == true then
+            return true
+        end
+    end
+    return false
+end
+
+local function isSquareBurning(square)
+    local props
+    if not square then
+        return false
+    end
+    if square.isFire and square:isFire() == true then
+        return true
+    end
+    props = square.getProperties and square:getProperties() or nil
+    if props and props.has and IsoFlagType and IsoFlagType.burning then
+        return props:has(IsoFlagType.burning) == true
+    end
+    return false
+end
+
+local function isZombieOnFire(zombie)
+    return zombie and zombie.isOnFire and zombie:isOnFire() == true or false
+end
+
+local function extinguishZombie(zombie)
+    if not zombie then return false end
+    if zombie.StopBurning then
+        zombie:StopBurning()
+        return true
+    end
+    if zombie.setOnFire then
+        zombie:setOnFire(false)
+        return true
+    end
+    return false
 end
 
 local function relocateToSquare(zombie, square)
@@ -76,6 +131,8 @@ local function findNearbyPlantFreeSquare(zombie, square)
                 if math.abs(dx) == radius or math.abs(dy) == radius then
                     candidate = cell:getGridSquare(x + dx, y + dy, z)
                     if candidate and not hasFarmingPlant(candidate)
+                        and not hasLitCampfire(candidate)
+                        and not isSquareBurning(candidate)
                         and (not candidate.isFree or candidate:isFree(false))
                     then
                         return candidate
@@ -141,6 +198,94 @@ function LiveBodyControl.ProtectManagedPlant(zombie)
         return true
     end
     return false
+end
+
+local function setCampfireProtectionState(zombie, state, square, wasOnFire)
+    if state then
+        if square ~= nil then
+            state.square = square
+            state.x = zombie:getX()
+            state.y = zombie:getY()
+            state.z = zombie:getZ()
+        end
+        state.wasOnFireOutsideCampfire = wasOnFire == true
+    else
+        campfireProtectionState[zombie] = {
+            square = square,
+            x = zombie:getX(),
+            y = zombie:getY(),
+            z = zombie:getZ(),
+            wasOnFireOutsideCampfire = wasOnFire == true,
+        }
+    end
+end
+
+function LiveBodyControl.ProtectManagedCampfire(zombie)
+    local square
+    local state
+    local safeSquare
+    local record
+    local extinguished = false
+    if not zombie or not Core or not Core.IsManagedNPCBody
+        or not Core.IsManagedNPCBody(zombie)
+    then
+        return false
+    end
+    if zombie.setFireSpreadProbability then
+        zombie:setFireSpreadProbability(0)
+    end
+    if zombie.setFireKillRate then
+        zombie:setFireKillRate(0)
+    end
+    square = zombie.getSquare and zombie:getSquare() or nil
+    if not square then
+        return false
+    end
+    state = campfireProtectionState[zombie]
+    if not hasLitCampfire(square) then
+        local safeCandidate = (not isSquareBurning(square)
+            and not hasFarmingPlant(square)) and square or nil
+        setCampfireProtectionState(
+            zombie,
+            state,
+            safeCandidate,
+            isZombieOnFire(zombie)
+        )
+        return false
+    end
+    -- A lit campfire sets IsoFlagType.burning on its tile every tick, which
+    -- makes IsoGameCharacter.FireCheck() ignite IsoZombie shells immediately.
+    -- Extinguish campfire-only ignition while preserving fire caught elsewhere.
+    if isZombieOnFire(zombie)
+        and not (state and state.wasOnFireOutsideCampfire == true)
+    then
+        extinguished = extinguishZombie(zombie)
+    end
+    record = PNC.Registry and PNC.Registry.FindRecordByZombie
+        and PNC.Registry.FindRecordByZombie(zombie) or nil
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        return extinguished
+    end
+    safeSquare = state and state.square or nil
+    if not safeSquare
+        or hasLitCampfire(safeSquare)
+        or isSquareBurning(safeSquare)
+        or hasFarmingPlant(safeSquare)
+    then
+        safeSquare = findNearbyPlantFreeSquare(zombie, square)
+    end
+    if safeSquare and relocateToSquare(zombie, safeSquare) then
+        setCampfireProtectionState(
+            zombie,
+            state,
+            safeSquare,
+            state and state.wasOnFireOutsideCampfire == true
+        )
+        return true
+    end
+    return extinguished
 end
 
 function LiveBodyControl.ScanLoadedManagedBodies(source)
@@ -218,6 +363,7 @@ function LiveBodyControl.OnZombieUpdate(zombie)
         if Core.ProtectVisualClothingFromFall then
             Core.ProtectVisualClothingFromFall(zombie)
         end
+        LiveBodyControl.ProtectManagedCampfire(zombie)
         LiveBodyControl.ProtectManagedPlant(zombie)
     end
     if Diagnostics then
@@ -261,16 +407,21 @@ function LiveBodyControl.OnZombieUpdate(zombie)
                 -- PathFindBehavior2:update(), because Behavior2 can otherwise
                 -- enter player-only ClimbOverFenceState and throw an NPE on
                 -- an IsoZombie before the post-pump guard runs.
+                local pathLane = record and record.runtime
+                    and record.runtime.pathing or nil
                 local prePassageBlocked = false
                 if LiveBodyControl.BlockVanillaPassage then
                     prePassageBlocked = LiveBodyControl.BlockVanillaPassage(
                         zombie,
-                        nil,
+                        pathLane,
                         Core and Core.Now and Core.Now() or 0
                     ) == true
                 end
                 if not prePassageBlocked then
                     PNC.EnginePathPlanner.PumpFrame(record, zombie)
+                end
+                if record and record.runtime then
+                    record.runtime._prePassageBlockedFrame = prePassageBlocked
                 end
                 if PNC.EnginePathPlanner.ReconcileNativeMovementOwner then
                     PNC.EnginePathPlanner.ReconcileNativeMovementOwner(
@@ -330,10 +481,17 @@ function LiveBodyControl.OnZombieUpdate(zombie)
     -- zombie movement state here so it cannot enter the player-only climb
     -- implementation.
     local passageBlocked = false
-    if LiveBodyControl.BlockVanillaPassage then
+    local alreadyBlockedPrePump = record and record.runtime
+        and record.runtime._prePassageBlockedFrame == true or false
+    if record and record.runtime then
+        record.runtime._prePassageBlockedFrame = nil
+    end
+    if not alreadyBlockedPrePump and LiveBodyControl.BlockVanillaPassage then
+        local pathLane = record and record.runtime
+            and record.runtime.pathing or nil
         passageBlocked = LiveBodyControl.BlockVanillaPassage(
             zombie,
-            nil,
+            pathLane,
             Core and Core.Now and Core.Now() or 0
         ) == true
     end

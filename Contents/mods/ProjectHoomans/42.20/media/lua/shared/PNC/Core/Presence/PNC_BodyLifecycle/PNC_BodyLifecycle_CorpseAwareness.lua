@@ -101,6 +101,10 @@ local function classify(...)
     return Relationship.classify(...)
 end
 
+local function knowsIdentity(...)
+    return Relationship.knowsIdentity(...)
+end
+
 local function relationFor(...)
     return Relationship.relationFor(...)
 end
@@ -164,6 +168,7 @@ require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_CorpseAwareness_R
 Awareness.Internal.CandidateDeps = {
     relationFor = relationFor,
     classify = classify,
+    knowsIdentity = knowsIdentity,
     RELATION_PRIORITY = RELATION_PRIORITY,
     DETECTION_RADIUS = DETECTION_RADIUS,
     DETECTION_RADIUS_SQ = DETECTION_RADIUS_SQ,

@@ -153,7 +153,7 @@ local function sleepSpotTargets(component, context)
     local surfaceZ = tonumber(surface.z) or tonumber(component.z) or 0
     local surfaceOffset = tonumber(surface.surfaceOffset)
     if surfaceOffset and surfaceOffset > 0 then
-        surfaceZ = surfaceZ + (surfaceOffset + 1) / 96
+        surfaceZ = surfaceZ + math.min(0.42, (surfaceOffset + 1) / 96)
     end
     surface.sleepCapacity = component.sleepCapacity
         or component.bedCapacity or surface.sleepCapacity
@@ -200,10 +200,9 @@ local function resourceSleepTargets(resource, context)
     local interactionZ = tonumber(surface.z) or originZ
     local surfaceOffset = tonumber(surface.surfaceOffset)
     if surfaceOffset and surfaceOffset > 0 then
-        -- Project Zomboid stores furniture surface height in pixels. Match
-        -- Offline Survivor's supported-bed placement conversion so the live
-        -- NPC and its abstract position use the furniture surface height.
-        interactionZ = interactionZ + (surfaceOffset + 1) / 96
+        -- Project Zomboid stores furniture surface height in pixels. Clamp to
+        -- < 0.42 so the live body never crosses a half-floor boundary.
+        interactionZ = interactionZ + math.min(0.42, (surfaceOffset + 1) / 96)
     end
     surface.sleepCapacity = resource.sleepCapacity
         or resource.bedCapacity or surface.sleepCapacity

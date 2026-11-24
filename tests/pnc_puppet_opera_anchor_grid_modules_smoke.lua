@@ -209,8 +209,8 @@ T.equal(calls.add.forward, -1, "pending placement lost its forward offset")
 T.equal(ownerCalls.status.reason, "live_actor_added_to_scene",
     "accepted placement changed its stable status")
 T.falsy(ownerCalls.status.failed, "accepted placement was marked as failed")
-T.equal(ownerCalls.previews, 1,
-    "accepted placement did not request a preview refresh")
+T.falsy(ownerCalls.previews,
+    "accepted placement must not auto-start preview before Play")
 
 -- Rejected/duplicate placement must remain bounded and user-readable.
 ownerCalls.status = nil
@@ -245,8 +245,8 @@ T.equal(calls.anchor.forward, 1, "drag lost its forward offset")
 T.equal(calls.anchor.z, 3, "drag lost the actor height")
 T.truthy(grid:onMouseUpOutside(), "mouse-up-outside did not complete cleanup")
 T.falsy(grid.capture, "mouse-up-outside did not release pointer capture")
-T.truthy(ownerCalls.previews > 0,
-    "successful drag did not request a placement preview")
+T.equal(ownerCalls.previews, 0,
+    "successful drag must not auto-start preview before Play")
 
 -- Outside clicks and stale/missing model contracts must fail safely without
 -- invoking authoritative mutation.

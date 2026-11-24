@@ -11,6 +11,7 @@
     "UI_PNC_Inventory_DragHint": "Bag icons select containers. Drag between sides; right-click NPC items.",
     "UI_PNC_Inventory_Drop": "Drop",
     "UI_PNC_Inventory_Equip": "Equip Primary",
+    "UI_PNC_Inventory_EquipSecondary": "Equip Secondary",
     "UI_PNC_Inventory_EquipContainer": "Equip",
     "UI_PNC_Inventory_EquipWaterContainer": "Equip Water Container",
     "UI_PNC_Inventory_Failed": "Inventory action failed",

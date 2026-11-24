@@ -24,14 +24,32 @@ local function seededRange(record, salt, low, high)
     return (tonumber(low) or 0) + (seed % span)
 end
 
-local function nightKey(hours)
-    return math.floor((hours - Service.NIGHT_START_HOUR) / 24)
+local function nightRemainingHours(timeOfDay)
+    local clock = PNC.WorldClock
+    if clock and type(clock.NightRemainingHours) == "function" then
+        return clock.NightRemainingHours(timeOfDay)
+    end
+    local endH = tonumber(Service.NIGHT_END_HOUR) or 6
+    local startH = tonumber(Service.CAMP_START_HOUR or Service.NIGHT_START_HOUR) or 19
+    local tod = (tonumber(timeOfDay) or 0) % 24
+    if tod >= startH then
+        return (24 - tod) + endH
+    end
+    if tod < endH then
+        return endH - tod
+    end
+    return 0
 end
 
-local function nightBounds(key)
-    local startAt = key * 24 + Service.NIGHT_START_HOUR
-    local endAt = key * 24 + 24 + Service.NIGHT_END_HOUR
-    return startAt, endAt
+local function nightCycleKey(hours, timeOfDay)
+    local clock = PNC.WorldClock
+    if clock and type(clock.NightCycleKey) == "function" then
+        return clock.NightCycleKey(hours, timeOfDay)
+    end
+    local tod = (tonumber(timeOfDay) or 0) % 24
+    local remaining = nightRemainingHours(tod)
+    local dawnWorldHour = math.floor((hours + remaining) / 24 + 0.5)
+    return dawnWorldHour, hours + remaining
 end
 
 local function addSlotPlan(record, hours, day, slot, action)
@@ -54,26 +72,33 @@ local function addSlotPlan(record, hours, day, slot, action)
     return nil
 end
 
-function Service.GetActionPlan(record, hours)
+function Service.GetActionPlan(record, hours, timeOfDayOverride)
     hours = tonumber(hours)
         or (Service.GetWorldAgeHours and Service.GetWorldAgeHours() or 0)
+    local tod = tonumber(timeOfDayOverride)
+    if tod == nil then
+        tod = Service.GetTimeOfDay and Service.GetTimeOfDay(hours) or (hours % 24)
+    end
     local day = math.floor(hours / 24)
-    local key = nightKey(hours)
-    local nightStart, nightEnd = nightBounds(key)
     local schedule = Service.ScheduleState(record)
-    local sleepKey = "sleep:" .. tostring(key)
-    if hours >= nightStart
-        and hours < nightEnd - Service.NIGHT_MIN_REMAINING_HOURS
-        and schedule.lastAttemptKey ~= sleepKey
-    then
-        local wakeOffset = seededRange(record,
-            "roam_ambient:sleep_wake:" .. tostring(key),
-            -Service.SLEEP_WAKE_OFFSET_MINUTES,
-            Service.SLEEP_WAKE_OFFSET_MINUTES) / 60
-        return {
-            action = "sleep", key = sleepKey,
-            wakeAt = nightEnd + wakeOffset,
-        }
+    local isNight = Service.IsNightCampHour and Service.IsNightCampHour(tod)
+        or (tod >= (tonumber(Service.NIGHT_START_HOUR) or 19)
+            or tod < (tonumber(Service.NIGHT_END_HOUR) or 6))
+    local remaining = nightRemainingHours(tod)
+    if isNight and remaining > (tonumber(Service.NIGHT_MIN_REMAINING_HOURS) or 1) then
+        local key, nightEnd = nightCycleKey(hours, tod)
+        local sleepKey = "sleep:" .. tostring(key)
+        if schedule.lastAttemptKey ~= sleepKey then
+            local wakeOffset = seededRange(record,
+                "roam_ambient:sleep_wake:" .. tostring(key),
+                -Service.SLEEP_WAKE_OFFSET_MINUTES,
+                Service.SLEEP_WAKE_OFFSET_MINUTES) / 60
+            return {
+                action = "sleep", key = sleepKey,
+                wakeAt = nightEnd + wakeOffset,
+                timeOfDay = tod,
+            }
+        end
     end
     local slots = Service.EAT_SLOTS or {}
     local index

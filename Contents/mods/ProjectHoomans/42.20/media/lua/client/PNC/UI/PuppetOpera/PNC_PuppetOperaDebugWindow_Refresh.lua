@@ -40,6 +40,7 @@ function Class:refreshAnimationTabs()
     local visible = {
         layout = true,
         beats = true,
+        triggers = true,
         trace = true,
         player = actorKind == "local_player",
         npc = actorKind == "nearby_live_npc",
@@ -115,6 +116,9 @@ function Class:refreshViews()
     self.playerAnimationTab:refreshCatalog()
     self.npcAnimationTab:refreshCatalog()
     self.beatsTab:refresh()
+    if self.triggersTab and self.triggersTab.refresh then
+        self.triggersTab:refresh()
+    end
     self.traceTab:refresh()
     if Model.EndRefresh then Model.EndRefresh() end
 end

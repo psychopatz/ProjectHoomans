@@ -76,20 +76,40 @@ local function combatDamageScale(eventType, eventSpec)
     return clamp(damage / unit, 0.25, 4)
 end
 
-function Math.IsGenderCompatible(profile, ownerGender, targetGender)
-    profile = Types.NormalizePlayerSocialProfile(profile)
+function Math.KinseyScore(profile)
+    local normalized = Types.NormalizePlayerSocialProfile(profile)
+    if tonumber(normalized.kinsey) ~= nil then
+        return clamp(math.floor(normalized.kinsey + 0.5), 0, 6)
+    end
+    if normalized.orientation == Constants.ORIENTATION_GAY then return 6 end
+    if normalized.orientation == Constants.ORIENTATION_BISEXUAL then return 3 end
+    return 0
+end
+
+function Math.AttractionWeight(profile, ownerGender, targetGender)
     ownerGender = normalizedGender(ownerGender)
     targetGender = normalizedGender(targetGender)
     if not ownerGender or not targetGender then
-        return false
+        return 0
     end
-    if profile.orientation == Constants.ORIENTATION_BISEXUAL then
-        return true
+    local kinsey = Math.KinseyScore(profile)
+    if ownerGender == targetGender then
+        return round(kinsey / 6)
     end
-    if profile.orientation == Constants.ORIENTATION_GAY then
-        return ownerGender == targetGender
+    return round((6 - kinsey) / 6)
+end
+
+function Math.MutualAttractionWeight(profileA, genderA, profileB, genderB)
+    local weightA = Math.AttractionWeight(profileA, genderA, genderB)
+    local weightB = Math.AttractionWeight(profileB, genderB, genderA)
+    if weightA <= 0 or weightB <= 0 then
+        return 0
     end
-    return ownerGender ~= targetGender
+    return round(math.sqrt(weightA * weightB))
+end
+
+function Math.IsGenderCompatible(profile, ownerGender, targetGender)
+    return Math.AttractionWeight(profile, ownerGender, targetGender) > 0
 end
 
 function Math.AreMutuallyOrientationCompatible(
@@ -98,8 +118,27 @@ function Math.AreMutuallyOrientationCompatible(
     profileB,
     genderB
 )
-    return Math.IsGenderCompatible(profileA, genderA, genderB)
-        and Math.IsGenderCompatible(profileB, genderB, genderA)
+    return Math.MutualAttractionWeight(profileA, genderA, profileB, genderB) > 0
+end
+
+function Math.PersonalityChemistry(profileA, profileB)
+    local a = type(profileA) == "table" and profileA or {}
+    local b = type(profileB) == "table" and profileB or {}
+    local compassionDiff = math.abs(finite(a.compassion, 0.5) - finite(b.compassion, 0.5))
+    local sociabilityAvg = (finite(a.sociability, 0.5) + finite(b.sociability, 0.5)) * 0.5
+    local aggressionAvg = (finite(a.aggression, 0.5) + finite(b.aggression, 0.5)) * 0.5
+    local loyaltyAvg = (finite(a.loyalty, 0.5) + finite(b.loyalty, 0.5)) * 0.5
+    local score = (0.5 - compassionDiff) * 0.7
+        + (sociabilityAvg - 0.5) * 0.6
+        + (loyaltyAvg - 0.5) * 0.4
+        - (aggressionAvg - 0.5) * 0.7
+    if a.socialStyle == "friendly" or b.socialStyle == "friendly" then
+        score = score + 0.12
+    end
+    if a.socialStyle == "withdrawn" and b.socialStyle == "withdrawn" then
+        score = score - 0.10
+    end
+    return round(clamp(score, -1, 1))
 end
 
 function Math.ModifySocialEvent(

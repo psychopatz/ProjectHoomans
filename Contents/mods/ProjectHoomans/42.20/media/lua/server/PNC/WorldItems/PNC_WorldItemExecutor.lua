@@ -18,7 +18,10 @@ local function nowMs()
     return PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
 end
 
-local function clearRuntime(record, body, reason)
+local function clearRuntime(record, body, reason, intent)
+    if intent and Internal and Internal.RestoreRipHandProp then
+        Internal.RestoreRipHandProp(intent, record, body)
+    end
     if Common and Common.HaltMovement then
         Common.HaltMovement(record, body, reason or "world_item_end")
     end
@@ -34,7 +37,7 @@ local function clearRuntime(record, body, reason)
 end
 
 local function finishLease(lease, intent, record, body, reason)
-    clearRuntime(record, body, reason)
+    clearRuntime(record, body, reason, intent)
     Service.ClearIntent(intent.npcId, nil)
     if lease and PNC.Tasking and PNC.Tasking.Commands and PNC.Tasking.Commands.Complete then
         PNC.Tasking.Commands.Complete(lease.leaseId, reason or "WORLD_ITEM_DONE")
@@ -43,7 +46,7 @@ local function finishLease(lease, intent, record, body, reason)
 end
 
 local function abortLease(lease, intent, record, body, reason)
-    clearRuntime(record, body, reason)
+    clearRuntime(record, body, reason, intent)
     Service.ClearIntent(intent.npcId, nil)
     if PNC.Tasking and PNC.Tasking.Commands and PNC.Tasking.Commands.CancelForNPC then
         PNC.Tasking.Commands.CancelForNPC(lease.npcId, reason or "WORLD_ITEM_FAILED")

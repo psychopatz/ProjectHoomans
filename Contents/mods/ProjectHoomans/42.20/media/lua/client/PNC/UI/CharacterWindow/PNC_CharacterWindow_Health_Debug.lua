@@ -19,10 +19,38 @@ local function localizedPartName(partId)
     return Shared.Text(bodyPartText[partId], part and part.label or tostring(partId or ""))
 end
 
+local DEBUG_WOUND_OPTIONS = {
+    { id = "scratch", labelKey = "UI_PNC_Wound_scratch", fallback = "Scratch" },
+    { id = "laceration", labelKey = "UI_PNC_Wound_laceration", fallback = "Laceration" },
+    { id = "bite", labelKey = "UI_PNC_Wound_bite", fallback = "Bite" },
+    { id = "burn", labelKey = "UI_PNC_Wound_burn", fallback = "Burn" },
+    { id = "fracture", labelKey = "UI_PNC_Wound_fracture", fallback = "Fracture" },
+    { id = "deep_wound", labelKey = "UI_PNC_Wound_deep_wound", fallback = "Deep Wound" },
+    { id = "deep_wound_glass", labelKey = "UI_PNC_Wound_glass", fallback = "Lodged Glass Shards" },
+    { id = "bullet", labelKey = "UI_PNC_Wound_bullet", fallback = "Lodged Bullet" },
+}
+
+local function addWoundTypeEntries(menu, view, partId)
+    for i = 1, #DEBUG_WOUND_OPTIONS do
+        local entry = DEBUG_WOUND_OPTIONS[i]
+        local woundType = entry.id
+        menu:addOption(Shared.Text(entry.labelKey, entry.fallback), nil, function()
+            PNC.Client.SendDebug("damage_part", {
+                id = view.npcId,
+                partId = partId,
+                woundType = woundType,
+            })
+        end)
+    end
+end
+
 local function addDebugDamageMenu(context, view, selectedPartId)
     local damageMenu = context:getNew(context)
+    local typeMenu = context:getNew(context)
     local partMenu = context:getNew(context)
     local order = PNC.NPCWounds and PNC.NPCWounds.PartOrder or {}
+    local validSelected = selectedPartId and PNC.NPCWounds
+        and PNC.NPCWounds.Parts[selectedPartId] and selectedPartId or nil
     local i
     context:addSubMenu(
         context:addOption(Shared.Text("UI_PNC_DebugDamage", "Debug Injury"), nil),
@@ -31,24 +59,73 @@ local function addDebugDamageMenu(context, view, selectedPartId)
     damageMenu:addOption(Shared.Text("UI_PNC_DebugDamageRandom", "Random Body Part"), nil, function()
         PNC.Client.SendDebug("damage_part", { id = view.npcId })
     end)
-    if selectedPartId and PNC.NPCWounds and PNC.NPCWounds.Parts[selectedPartId] then
-        damageMenu:addOption(
-            Shared.Text("UI_PNC_DebugDamageSelected", "Injure") .. " " .. localizedPartName(selectedPartId),
-            nil,
-            function()
-                PNC.Client.SendDebug("damage_part", { id = view.npcId, partId = selectedPartId })
-            end
-        )
-    end
+    local typeTitle = validSelected
+        and (Shared.Text("UI_PNC_DebugDamageSelected", "Injure") .. " " .. localizedPartName(validSelected))
+        or Shared.Text("UI_PNC_DebugDamageByType", "Inflict Wound Type")
+    local typeOption = damageMenu:addOption(typeTitle, nil, validSelected and function()
+        PNC.Client.SendDebug("damage_part", { id = view.npcId, partId = validSelected })
+    end or nil)
+    damageMenu:addSubMenu(typeOption, typeMenu)
+    addWoundTypeEntries(typeMenu, view, validSelected)
     damageMenu:addSubMenu(
         damageMenu:addOption(Shared.Text("UI_PNC_DebugDamageSpecific", "Choose Body Part"), nil),
         partMenu
     )
     for i = 1, #order do
         local damagePartId = order[i]
-        partMenu:addOption(localizedPartName(damagePartId), nil, function()
+        local perPartMenu = context:getNew(context)
+        local partOption = partMenu:addOption(localizedPartName(damagePartId), nil, function()
             PNC.Client.SendDebug("damage_part", { id = view.npcId, partId = damagePartId })
         end)
+        partMenu:addSubMenu(partOption, perPartMenu)
+        perPartMenu:addOption(Shared.Text("UI_PNC_DebugDamageRandomType", "Random Wound"), nil, function()
+            PNC.Client.SendDebug("damage_part", { id = view.npcId, partId = damagePartId })
+        end)
+        addWoundTypeEntries(perPartMenu, view, damagePartId)
+    end
+end
+
+local function addDebugWoundStateMenu(context, view, selectedPartId, wound)
+    local stateMenu = context:getNew(context)
+    local validPart = selectedPartId and PNC.NPCWounds
+        and PNC.NPCWounds.Parts[selectedPartId] and selectedPartId or nil
+    context:addSubMenu(
+        context:addOption(Shared.Text("UI_PNC_DebugWoundStates", "Debug Wound & Body States"), nil),
+        stateMenu
+    )
+    local states = {
+        { action = "dirty_bandage", labelKey = "UI_PNC_DebugWoundState_DirtyBandage", fallback = "Make Bandage Dirty Now" },
+        { action = "toggle_splint", labelKey = "UI_PNC_DebugWoundState_ToggleSplint", fallback = "Toggle Splint" },
+        { action = "toggle_stitched", labelKey = "UI_PNC_DebugWoundState_ToggleStitched", fallback = "Toggle Stitches" },
+        { action = "toggle_ordinary_infection", labelKey = "UI_PNC_DebugWoundState_ToggleInfection", fallback = "Toggle Wound Infection" },
+        { action = "toggle_bleeding", labelKey = "UI_PNC_DebugWoundState_ToggleBleeding", fallback = "Toggle Bleeding" },
+        { action = "clear_part_wound", labelKey = "UI_PNC_DebugWoundState_ClearPart", fallback = "Clear Part Wound" },
+        { action = "incapacitate", labelKey = "UI_PNC_DebugWoundState_Incapacitate", fallback = "Trigger Incapacitated" },
+        { action = "heal_all", labelKey = "UI_PNC_DebugWoundState_HealAll", fallback = "Full Heal & Revive" },
+    }
+    for i = 1, #states do
+        local entry = states[i]
+        local stateAction = entry.action
+        stateMenu:addOption(Shared.Text(entry.labelKey, entry.fallback), nil, function()
+            PNC.Client.SendDebug("debug_wound_state", {
+                id = view.npcId,
+                partId = validPart,
+                stateAction = stateAction,
+            })
+        end)
+    end
+    if wound and wound.bandaged == true and validPart then
+        local almostDirty = stateMenu:addOption(
+            Shared.Text("UI_PNC_DebugBandageAlmostDirty", "Make Bandage Almost Dirty"),
+            nil,
+            function()
+                PNC.Client.SendDebug("bandage_almost_dirty", {
+                    id = view.npcId,
+                    partId = validPart,
+                })
+            end
+        )
+        almostDirty.notAvailable = wound.bandageDirty == true
     end
 end
 
@@ -219,6 +296,7 @@ function Debug.ShowHealthMenu(view, partId, x, y)
         addDebugBandageMenu(context, view, partId, wound)
         addDebugDamageMenu(context, view, partId)
         addDebugInfectionMenu(context, view, partId, body)
+        addDebugWoundStateMenu(context, view, partId, wound)
     end
     return true
 end

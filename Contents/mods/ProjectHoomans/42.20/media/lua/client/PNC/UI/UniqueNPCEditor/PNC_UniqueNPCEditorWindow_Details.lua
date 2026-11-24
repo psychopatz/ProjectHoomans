@@ -68,32 +68,121 @@ local function vanillaTraitLabel(id)
     return humanize(id)
 end
 
-local function configuredRows(self)
+local function resolvePreviewRecord(self)
+    local draft = self and self.draft or nil
+    if not draft then return nil end
+    if draft.runtimeRecord then return draft.runtimeRecord end
+    if Model and Model.EnsureRuntimeRecord then
+        return Model.EnsureRuntimeRecord(draft, false)
+    end
+    return nil
+end
+
+local function seedSkillMap(self)
+    local record = resolvePreviewRecord(self)
+    if not record or not PNC.Skills or not PNC.Skills.GetBaseLevel then
+        return {}
+    end
+    local catalog = PNC.SkillCatalog
+    local ids = catalog and catalog.GetAllSkillIDs and catalog.GetAllSkillIDs() or {}
+    local output = {}
+    for i = 1, #ids do
+        local skillID = ids[i]
+        local level = tonumber(PNC.Skills.GetBaseLevel(record, skillID)) or 0
+        if level > 0 then output[skillID] = level end
+    end
+    return output
+end
+
+local function seedTraitList(self, kind)
+    local record = resolvePreviewRecord(self)
+    if not record then return {} end
+    if kind == "dynamicTrait" then
+        if PNC.ConditionStats and PNC.ConditionStats.GetActiveTraitIDs then
+            return PNC.ConditionStats.GetActiveTraitIDs(record) or {}
+        end
+        return collectionIDs(record.dynamicTraits)
+    elseif kind == "vanillaTrait" then
+        if PNC.PlayerNeedsModel and PNC.PlayerNeedsModel.GetActiveTraitIDs then
+            return PNC.PlayerNeedsModel.GetActiveTraitIDs(record) or {}
+        end
+        if PNC.PlayerNeedsModel and PNC.PlayerNeedsModel.GetTraits then
+            return collectionIDs(PNC.PlayerNeedsModel.GetTraits(record))
+        end
+        return collectionIDs(record.vanillaTraits)
+    elseif kind == "npcTrait" then
+        return collectionIDs(record.npcTraits or record.traits)
+    end
+    return {}
+end
+
+local function effectiveSkillMap(self)
     local draft = self.draft or {}
+    local authored = type(draft.skillLevels) == "table" and draft.skillLevels or {}
+    local merged = {}
+    local generated = {}
+    local isAuthored = draft.authoredFields and draft.authoredFields.skillLevels == true
+    if not isAuthored then
+        for skillID, level in pairs(seedSkillMap(self)) do
+            merged[skillID] = level
+            generated[skillID] = true
+        end
+    end
+    for skillID, level in pairs(authored) do
+        merged[skillID] = tonumber(level) or 0
+        generated[skillID] = false
+    end
+    return merged, generated
+end
+
+local function effectiveTraitList(self, kind, field)
+    local draft = self.draft or {}
+    local isAuthored = draft.authoredFields and draft.authoredFields[field] == true
+    local authored = collectionIDs(draft[field])
+    if isAuthored or #authored > 0 then
+        return authored, false
+    end
+    return seedTraitList(self, kind), true
+end
+
+local function configuredRows(self)
     local rows = {}
-    local function add(label, value, kind, key)
+    local function add(label, value, kind, key, level, isGenerated)
+        local displayValue = value == nil and "—" or tostring(value)
+        if isGenerated and displayValue ~= "" then
+            displayValue = displayValue .. " (Seed)"
+        elseif isGenerated then
+            displayValue = "Seed"
+        end
         rows[#rows + 1] = {
             label = label,
-            value = value == nil and "—" or tostring(value),
+            value = displayValue,
             kind = kind,
             key = key,
+            level = level,
+            generated = isGenerated == true,
             removable = true,
         }
     end
-    for _, skillID in ipairs(collectionIDs(draft.skillLevels, true)) do
-        add(skillLabel(skillID),
-            tostring(draft.skillLevels[skillID]),
-            "skill", skillID)
+    local skills, generatedSkills = effectiveSkillMap(self)
+    for _, skillID in ipairs(collectionIDs(skills, true)) do
+        local level = tonumber(skills[skillID]) or 0
+        if level > 0 or generatedSkills[skillID] == false then
+            add(skillLabel(skillID), tostring(level), "skill", skillID,
+                level, generatedSkills[skillID] == true)
+        end
     end
-    for _, traitID in ipairs(collectionIDs(draft.npcTraits)) do
-        add(npcTraitLabel(traitID), "", "npcTrait", traitID)
+    local npcList, npcGen = effectiveTraitList(self, "npcTrait", "npcTraits")
+    for _, traitID in ipairs(npcList) do
+        add(npcTraitLabel(traitID), "", "npcTrait", traitID, nil, npcGen)
     end
-    for _, traitID in ipairs(collectionIDs(draft.vanillaTraits)) do
-        add(vanillaTraitLabel(traitID), "",
-            "vanillaTrait", traitID)
+    local vanillaList, vanillaGen = effectiveTraitList(self, "vanillaTrait", "vanillaTraits")
+    for _, traitID in ipairs(vanillaList) do
+        add(vanillaTraitLabel(traitID), "", "vanillaTrait", traitID, nil, vanillaGen)
     end
-    for _, traitID in ipairs(collectionIDs(draft.dynamicTraits)) do
-        add(npcTraitLabel(traitID), "", "dynamicTrait", traitID)
+    local dynamicList, dynamicGen = effectiveTraitList(self, "dynamicTrait", "dynamicTraits")
+    for _, traitID in ipairs(dynamicList) do
+        add(npcTraitLabel(traitID), "", "dynamicTrait", traitID, nil, dynamicGen)
     end
     return rows
 end
@@ -284,6 +373,36 @@ function Window:refreshConfiguredDetails()
     list:setVisible(self.draft ~= nil)
 end
 
+local function materializeSeedSkills(self)
+    local draft = self and self.draft or nil
+    if not draft then return end
+    draft.authoredFields = draft.authoredFields or {}
+    if draft.authoredFields.skillLevels == true then return end
+    local seeded = seedSkillMap(self)
+    draft.skillLevels = type(draft.skillLevels) == "table" and draft.skillLevels or {}
+    for skillID, level in pairs(seeded) do
+        if draft.skillLevels[skillID] == nil then
+            draft.skillLevels[skillID] = level
+        end
+    end
+    draft.authoredFields.skillLevels = true
+end
+
+local function materializeSeedTraits(self, kind, field)
+    local draft = self and self.draft or nil
+    if not draft then return end
+    draft.authoredFields = draft.authoredFields or {}
+    if draft.authoredFields[field] == true then return end
+    if #collectionIDs(draft[field]) == 0 then
+        local seeded = seedTraitList(self, kind)
+        if #seeded > 0 then
+            draft[field] = {}
+            for i = 1, #seeded do draft[field][i] = seeded[i] end
+        end
+    end
+    draft.authoredFields[field] = true
+end
+
 function Window:addSkill()
     local skill = comboData(self.skillCombo)
     local level = comboData(self.skillLevelCombo)
@@ -292,6 +411,7 @@ function Window:addSkill()
             "Choose a skill and level"))
         return
     end
+    materializeSeedSkills(self)
     if self.draft.skillLevels and self.draft.skillLevels[skill] ~= nil then
         self.draft.skillLevels[skill] = tonumber(level)
         self.draft.authoredFields = self.draft.authoredFields or {}
@@ -320,6 +440,9 @@ function Window:addTrait(kind, combo)
             "Choose a trait first"))
         return
     end
+    local field = kind == "npcTrait" and "npcTraits"
+        or kind == "vanillaTrait" and "vanillaTraits" or "dynamicTraits"
+    materializeSeedTraits(self, kind, field)
     local ok, reason, normalized = Model.TryAddTrait(
         self.draft,
         kind == "npcTrait" and "npc"
@@ -347,13 +470,21 @@ function Window:removeConfiguredRow(row)
         or row.kind == "vanillaTrait" and "traits.physiological" or "traits.dynamic"
     if self:fieldCapability(fieldID).editable == false then return end
     if row.kind == "skill" then
-        if self.draft.skillLevels then self.draft.skillLevels[row.key] = nil end
+        materializeSeedSkills(self)
+        if self.draft.skillLevels then
+            if row.generated == true then
+                self.draft.skillLevels[row.key] = 0
+            else
+                self.draft.skillLevels[row.key] = nil
+            end
+        end
         self.draft.authoredFields = self.draft.authoredFields or {}
         self.draft.authoredFields.skillLevels = true
     else
         local field = row.kind == "npcTrait" and "npcTraits"
             or row.kind == "vanillaTrait" and "vanillaTraits"
             or "dynamicTraits"
+        materializeSeedTraits(self, row.kind, field)
         self.draft[field] = removeCollection(self.draft[field], row.key)
         self.draft.authoredFields = self.draft.authoredFields or {}
         self.draft.authoredFields[field] = true

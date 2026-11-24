@@ -127,7 +127,9 @@ function Client.Pump()
     local snapshot = State.snapshot
     if not snapshot or finalPhase(snapshot.phase) then return end
     local sessionID = snapshot.sessionId
+    local activeLocalActorID = localActor(snapshot)
     if snapshot.phase == Opera.Phases.MOVING
+        and activeLocalActorID ~= nil
         and State.movementSessionId == sessionID
     then
         local ok, status = Movement.Observe(sessionID)
@@ -147,6 +149,7 @@ function Client.Pump()
             })
         end
     elseif snapshot.phase == Opera.Phases.FACING
+        and activeLocalActorID ~= nil
         and State.facingSessionId == sessionID
     then
         local body = Movement.GetPlayer()

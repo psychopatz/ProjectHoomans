@@ -98,19 +98,55 @@ local function speakCareLine(speaker, addressee, patientKind, variant, partId, n
 end
 
 function Internal.SpeakTreatmentStart(medic, patient, patientKind, partId, isDirty, now)
+    if patientKind == "npc" and type(patient) == "table"
+        and patient.health and patient.health.state == "incapacitated"
+    then
+        local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+        if beats and type(beats.Emit) == "function" then
+            local ok = beats.Emit("medical_rescue.approach", {
+                rescuer = medic,
+                patient = patient,
+                partId = partId,
+                now = now,
+            }, now)
+            if ok then return true, nil, "medical_rescue_approach" end
+        end
+    end
     local variant = isDirty and "start_change_dirty"
         or (patientKind == "player" and "start_patch_player" or "start_patch_npc")
     return speakCareLine(medic, patient, patientKind, variant, partId, now, "start", "OFFER")
 end
 
 function Internal.SpeakTreatmentComplete(medic, patient, patientKind, partId, isDirty, now)
-    local variant = isDirty and "complete_change_dirty" or "complete_patch"
-    local ok, text, v = speakCareLine(medic, patient, patientKind, variant, partId, now, "done", "INFORM")
+    local handledIncap = false
+    if patientKind == "npc" and type(patient) == "table"
+        and patient.alive ~= false
+        and patient.health and patient.health.state == "incapacitated"
+    then
+        local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+        if beats and type(beats.Emit) == "function" then
+            handledIncap = beats.Emit("medical_rescue.stabilized", {
+                rescuer = medic,
+                patient = patient,
+                partId = partId,
+                now = now,
+            }, now) == true
+        end
+    end
+    local ok, text, v = handledIncap, nil, handledIncap and "medical_rescue_stabilized" or nil
+    if not handledIncap then
+        local variant = isDirty and "complete_change_dirty" or "complete_patch"
+        ok, text, v = speakCareLine(medic, patient, patientKind, variant, partId, now, "done", "INFORM")
+    end
     if patientKind == "npc" and type(patient) == "table" and patient.alive ~= false then
-        speakCareLine(patient, medic, "npc", "patient_thanks", partId, (tonumber(now) or 0) + 1250, "thanks", "ACK")
+        if not handledIncap then
+            speakCareLine(patient, medic, "npc", "patient_thanks", partId, (tonumber(now) or 0) + 1250, "thanks", "ACK")
+        end
         if PNC.Relationships and type(PNC.Relationships.ApplyConversationEffect) == "function" then
-            local gt = getGameTime and getGameTime()
-            local worldAge = gt and gt.getWorldAgeHours and gt:getWorldAgeHours() or 0
+            local clock = PNC.WorldClock
+            local worldAge = (clock and clock.GetWorldAgeHours and clock.GetWorldAgeHours())
+                or (getGameTime and getGameTime() and getGameTime().getWorldAgeHours and getGameTime():getWorldAgeHours())
+                or 0
             PNC.Relationships.ApplyConversationEffect(tostring(patient.id), "npc:" .. tostring(medic.id), {
                 interactionType = "injury_aid_received", memoryType = "injury_aid_received",
                 approval = 3, familiarity = 1, decayPerDay = 0.15, tags = { injury = true, aid = true },

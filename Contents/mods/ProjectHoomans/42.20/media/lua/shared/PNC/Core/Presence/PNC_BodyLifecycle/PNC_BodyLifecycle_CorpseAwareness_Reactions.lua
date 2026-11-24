@@ -107,7 +107,8 @@ local function rememberWitness(
     identity,
     category,
     memoryID,
-    attribution
+    attribution,
+    knowsSubject
 )
     local relationships = PNC.Relationships
     local tags = {
@@ -115,6 +116,7 @@ local function rememberWitness(
         death = true,
         witnessed = true,
         death_witnessed = true,
+        subject_known = knowsSubject == true,
         ["relation_" .. category] = true,
     }
     local factionID = tostring(identity.factionID or "")
@@ -225,6 +227,11 @@ local function sendToNearbyPlayers(observer, actor, greeting)
     return sent
 end
 
+local function anonymousSubjectFor(category)
+    if category == "hostile" then return "a hostile" end
+    return "someone"
+end
+
 local function speak(
     observer,
     actor,
@@ -232,7 +239,8 @@ local function speak(
     category,
     token,
     attribution,
-    revenge
+    revenge,
+    knowsSubject
 )
     local memory = PNC.Conversation
     and PNC.Conversation.Memory or nil
@@ -243,10 +251,14 @@ local function speak(
     local speechEventID = "corpse_seen_" .. category
     local semantic
     local revengeMeaning = revenge and knownKillerName(attribution) ~= nil
+    local subjectKnown = knowsSubject == true
+    local subjectText = subjectKnown and identity.name
+        or anonymousSubjectFor(category)
+    local factionText = subjectKnown and identity.factionName ~= ""
+        and identity.factionName or "an unknown faction"
     local arguments = {
-        subject = identity.name,
-        faction = identity.factionName ~= ""
-            and identity.factionName or "an unknown faction",
+        subject = subjectText,
+        faction = factionText,
     }
     if not memory or type(memory.SelectGossipTemplate) ~= "function"
         or type(memory.BuildGossipPacket) ~= "function"
@@ -301,8 +313,9 @@ local function speak(
         eventType = "corpse_reaction",
         gossipPacket = gossipPacket,
         corpseNPCID = identity.npcID,
-        corpseName = identity.name,
-        factionName = identity.factionName,
+        corpseName = subjectKnown and identity.name or nil,
+        subjectKnown = subjectKnown,
+        factionName = subjectKnown and identity.factionName or "",
         relationshipKind = category,
         memoryID = memoryID,
         memoryType = MEMORY_TYPE,

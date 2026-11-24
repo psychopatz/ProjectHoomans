@@ -143,6 +143,23 @@ function Storage.LoadAll()
     return result
 end
 
+function Storage.AutoRegisterAll()
+    local count = 0
+    for _, definition in ipairs(Storage.LoadAll()) do
+        if Blueprints and Blueprints.Register then
+            local ok = Blueprints.Register(definition.id, definition)
+            if ok then count = count + 1 end
+        end
+    end
+    return count
+end
+
+if Events and Events.OnGameStart and Events.OnGameStart.Add then
+    Events.OnGameStart.Add(function()
+        Storage.AutoRegisterAll()
+    end)
+end
+
 Storage.ROOT = ROOT
 Storage.INDEX = INDEX
 Storage.DIRECTORY = DIRECTORY

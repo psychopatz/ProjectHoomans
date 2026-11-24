@@ -78,6 +78,23 @@ local function orientationWeights()
     }
 end
 
+local function rollKinseyForOrientation(seed, salt, orientation)
+    local byOrientation = Constants.KINSEY_WEIGHTS_BY_ORIENTATION or {}
+    local weights = byOrientation[orientation]
+    local defaultMap = Constants.KINSEY_DEFAULT_BY_ORIENTATION or {}
+    local fallback = defaultMap[orientation] or 0
+    if type(weights) ~= "table" then return fallback end
+    local scores = {}
+    local score
+    for score = (Constants.KINSEY_MIN or 0), (Constants.KINSEY_MAX or 6) do
+        if (tonumber(weights[score]) or 0) > 0 then
+            scores[#scores + 1] = score
+        end
+    end
+    if #scores == 0 then return fallback end
+    return weightedChoice(seed, salt, scores, weights)
+end
+
 local function validOverride(overrides, key, allowed)
     local value = type(overrides) == "table" and overrides[key] or nil
     return allowed[value] and value or nil
@@ -167,6 +184,29 @@ function Generator.Generate(identitySeed, archetypeID, overrides, traitSource)
         "orientation",
         Constants.VALID_ORIENTATIONS
     ) or profile.orientation
+    if type(overrides) == "table" and tonumber(overrides.kinsey) ~= nil then
+        local low = tonumber(Constants.KINSEY_MIN) or 0
+        local high = tonumber(Constants.KINSEY_MAX) or 6
+        profile.kinsey = math.max(
+            low,
+            math.min(high, math.floor(tonumber(overrides.kinsey) + 0.5))
+        )
+        if not validOverride(overrides, "orientation", Constants.VALID_ORIENTATIONS) then
+            if profile.kinsey <= 1 then
+                profile.orientation = Constants.ORIENTATION_STRAIGHT
+            elseif profile.kinsey >= 5 then
+                profile.orientation = Constants.ORIENTATION_GAY
+            else
+                profile.orientation = Constants.ORIENTATION_BISEXUAL
+            end
+        end
+    else
+        profile.kinsey = rollKinseyForOrientation(
+            seed,
+            saltPrefix .. "kinsey",
+            profile.orientation
+        )
+    end
     profile.foodPreference = validOverride(
         overrides,
         "foodPreference",

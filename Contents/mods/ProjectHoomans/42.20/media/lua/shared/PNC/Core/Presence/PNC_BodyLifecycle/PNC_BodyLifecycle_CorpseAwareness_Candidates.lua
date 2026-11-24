@@ -5,6 +5,7 @@ local Internal = Awareness.Internal or {}
 local Deps = Internal.CandidateDeps or {}
 local relationFor = Deps.relationFor
 local classify = Deps.classify
+local knowsIdentity = Deps.knowsIdentity
 local RELATION_PRIORITY = Deps.RELATION_PRIORITY
 local DETECTION_RADIUS = Deps.DETECTION_RADIUS
 local DETECTION_RADIUS_SQ = Deps.DETECTION_RADIUS_SQ
@@ -43,7 +44,16 @@ local function candidateRelation(observer, deceased, identity)
         rawRelationship,
         sameFaction
     )
-    return targetKey, relationship, category, sameFaction
+    local knowsSubject = type(knowsIdentity) == "function" and knowsIdentity(
+        observer,
+        deceased,
+        identity,
+        relationship,
+        rawRelationship,
+        category,
+        sameFaction
+    ) == true or false
+    return targetKey, relationship, category, sameFaction, knowsSubject
 end
 
 local function collectCandidates(record, corpse, corpseData, identity)
@@ -69,6 +79,7 @@ local function collectCandidates(record, corpse, corpseData, identity)
     local relationship
     local category
     local sameFaction
+    local knowsSubject
     local corpsePresenceState = PNC.Const
         and PNC.Const.PRESENCE_CORPSE or "corpse"
     if not x or not y or not spatial
@@ -102,7 +113,7 @@ local function collectCandidates(record, corpse, corpseData, identity)
                 dy = (tonumber(actorY) or y) - y
                 dz = math.abs((tonumber(actorZ) or z) - z)
                 if dz < 1 and dx * dx + dy * dy <= DETECTION_RADIUS_SQ then
-                    targetKey, relationship, category, sameFaction =
+                    targetKey, relationship, category, sameFaction, knowsSubject =
                         candidateRelation(observer, record, identity)
                     candidates[#candidates + 1] = {
                         record = observer,
@@ -111,6 +122,7 @@ local function collectCandidates(record, corpse, corpseData, identity)
                         relationship = relationship,
                         category = category,
                         sameFaction = sameFaction,
+                        knowsSubject = knowsSubject,
                         priority = (sameFaction and 10 or 0)
                             + (RELATION_PRIORITY[category] or 1),
                         distanceSq = dx * dx + dy * dy,

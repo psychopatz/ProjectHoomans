@@ -55,8 +55,12 @@ function Service.StartSleep(record, zombie, plan, candidate, at)
     if not ok or type(reservation) ~= "table" then return false end
     local state = {
         action = "sleep",
-        sceneId = "ambient.roam.sleep." .. tostring(
-            candidate.resource.sleepSurface or "bed"),
+        sceneId = tostring(candidate.target and candidate.target.sceneId
+            or ("ambient.roam.sleep." .. tostring(
+                candidate.resource.sleepSurface or "bed"))),
+        campRole = candidate.role or (candidate.target and candidate.target.campRole),
+        tempCampfireKey = candidate.tempCampfireKey
+            or (candidate.target and candidate.target.tempCampfireKey),
         scheduleKey = plan.key, wakeAt = plan.wakeAt,
         startedAt = at, phase = "TRAVELLING", reservationId = reservation.id,
         resourceKey = candidate.resource.resourceKey,

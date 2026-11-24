@@ -9,6 +9,36 @@ local Service = PNC.CraftingService
 local H = PNC.CraftingServiceInternal
 local Registry = PNC.RecipeKnowledgeRegistry
 
+local function awardRecipeXP(order, descriptor, scale)
+    local payload = order and order.payload or nil
+    if not payload or payload.xpGranted == true then return end
+    local awards = descriptor and descriptor.xpAwards or nil
+    if type(awards) ~= "table" or #awards < 1 then
+        payload.xpGranted = true
+        return
+    end
+    local worker = order.workerId and PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(order.workerId) or nil
+    if worker and PNC.Skills and PNC.Skills.AddXPBatch
+        and PNC.Skills.CanLearn and PNC.Skills.CanLearn(worker)
+    then
+        local mult = math.max(0.1, tonumber(scale) or 1)
+        local batch = {}
+        for i = 1, #awards do
+            local a = awards[i]
+            local amt = (tonumber(a and a.amount) or 0) * mult
+            if a and a.skillId and amt > 0 then
+                batch[#batch + 1] = { skillId = a.skillId, amount = amt }
+            end
+        end
+        if #batch > 0 then
+            PNC.Skills.AddXPBatch(worker, batch)
+        end
+    end
+    payload.xpGranted = true
+    PNC.WorkRepository.MarkDirty()
+end
+
 function H.CraftCompletion(order)
     local payload = order.payload or {}
     local resolved = Registry.Queries.Resolve(order.recipeId)
@@ -52,6 +82,7 @@ function H.CraftCompletion(order)
         payload.outputCommitted = true
         PNC.WorkRepository.MarkDirty()
     end
+    awardRecipeXP(order, resolved.descriptor, math.max(1, tonumber(order.quantity) or 1))
     return true
 end
 
@@ -121,6 +152,7 @@ function H.DisassemblyCompletion(order)
         payload.salvageCommitted = true
         PNC.WorkRepository.MarkDirty()
     end
+    awardRecipeXP(order, resolved.descriptor, 0.5)
     return true
 end
 

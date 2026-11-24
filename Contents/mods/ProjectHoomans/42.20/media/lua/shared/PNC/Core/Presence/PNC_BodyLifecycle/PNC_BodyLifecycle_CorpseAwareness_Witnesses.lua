@@ -61,7 +61,8 @@ local function processWitnesses(
                         identity,
                         candidate.category,
                         memoryID,
-                        attribution
+                        attribution,
+                        candidate.knowsSubject
                     )
                     if added then
                         witnessCount = witnessCount + 1
@@ -90,7 +91,8 @@ local function processWitnesses(
                             identity.token,
                             attribution,
                             candidate.sameFaction
-                                and knownKillerName(attribution)
+                                and knownKillerName(attribution),
+                            candidate.knowsSubject
                         ) then
                             reactions = reactions + 1
                         end

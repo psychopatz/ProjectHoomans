@@ -127,8 +127,15 @@ local function buildContextMap(record, at)
             local plan = roamAmbient.GetActionPlan(record, hours)
             if plan then
                 local sleepCandidate = nil
-                if plan.action == "sleep" and roamAmbient.FindSleepSurface then
-                    sleepCandidate = roamAmbient.FindSleepSurface(live)
+                if plan.action == "sleep" then
+                    if PNC.NightCampService
+                        and type(PNC.NightCampService.ResolveNightCandidate) == "function"
+                    then
+                        sleepCandidate = PNC.NightCampService.ResolveNightCandidate(
+                            record, live, plan, at)
+                    elseif roamAmbient.FindSleepSurface then
+                        sleepCandidate = roamAmbient.FindSleepSurface(live)
+                    end
                 end
                 if plan.action ~= "sleep" or sleepCandidate then
                     contexts["ad.roam_patrol"] = {
@@ -411,8 +418,12 @@ function Provider.Tick(lease)
         if not runtime.facilityActivity then
             return PNC.Tasking.Commands.Complete(lease.leaseId, "AUTONOMY_FACILITY_COMPLETE")
         end
-        if PNC.FacilityJobs and type(PNC.FacilityJobs.TickRecord) == "function" then
-            PNC.FacilityJobs.TickRecord(record, live, at)
+        if PNC.FacilityJobs then
+            if type(PNC.FacilityJobs.TickRecord) == "function" then
+                PNC.FacilityJobs.TickRecord(record, live, at)
+            elseif type(PNC.FacilityJobs.Tick) == "function" then
+                PNC.FacilityJobs.Tick(record, live, at)
+            end
         end
         if not runtime.facilityActivity then
             return PNC.Tasking.Commands.Complete(lease.leaseId, "AUTONOMY_FACILITY_COMPLETE")
@@ -534,9 +545,27 @@ function Provider.GetRecoveryState(lease)
     if not record or record.alive == false then return { terminal = true } end
     local ok = Provider.CanContinue(lease)
     if not ok then return { terminal = true } end
+    local runtime = type(record.runtime) == "table" and record.runtime or {}
+    local activePose = runtime.animationScene ~= nil
+        or (runtime.facilityActivity and (
+            runtime.facilityActivity.seatEntered == true
+            or runtime.facilityActivity.phase == "SEATED"
+            or runtime.facilityActivity.sleepSceneActive == true
+        ))
+        or (runtime.roamingSeat and (
+            runtime.roamingSeat.seatEntered == true
+            or runtime.roamingSeat.phase == "SEATED"
+        ))
+        or (runtime.roamAmbient and (
+            runtime.roamAmbient.phase == "SLEEPING"
+            or runtime.roamAmbient.phase == "ACTIVE"
+        ))
+    local progressAt = activePose and nowMs()
+        or tonumber(lease.lastProgressAt) or nowMs()
     return {
-        lastProgressAt = tonumber(lease.lastProgressAt) or nowMs(),
+        lastProgressAt = progressAt,
         phase = tostring(lease.phase or "WORKING"),
+        watchable = not activePose,
     }
 end
 

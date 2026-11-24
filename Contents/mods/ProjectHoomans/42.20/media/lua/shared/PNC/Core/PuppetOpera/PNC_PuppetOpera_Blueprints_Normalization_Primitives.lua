@@ -80,8 +80,10 @@ local function normalizeAnchor(raw, anchorID)
     if type(raw) ~= "table" then
         return nil, "anchor_not_a_table:" .. tostring(anchorID)
     end
-    local right = integerInRange(raw.right, -8, 8, 0)
-    local forward = integerInRange(raw.forward, -8, 8, 0)
+    -- Support both integer tile offsets and sub-tile float offsets (e.g. 0.42
+    -- for close social scenes or 0.0 for overlapping carry scenes).
+    local right = numberInRange(raw.right, -8, 8, 0)
+    local forward = numberInRange(raw.forward, -8, 8, 0)
     local z = integerInRange(raw.z, -1, 1, 0)
     local faceTarget = validID(raw.faceTarget, 64)
     if right == nil or forward == nil or z == nil then

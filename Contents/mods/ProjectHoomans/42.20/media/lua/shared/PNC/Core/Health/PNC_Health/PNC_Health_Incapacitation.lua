@@ -58,6 +58,15 @@ function Health.EnterIncapacitated(record, zombie, reason)
     if Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "health")
     end
+    if PNC.MedicalCareService and type(PNC.MedicalCareService.RequestNPC) == "function" then
+        pcall(PNC.MedicalCareService.RequestNPC, record, {
+            source = "incapacitated",
+            sourceRef = tostring(record.id) .. ":incapacitated",
+            severity = 100,
+            priority = 100,
+            incapacitated = true,
+        })
+    end
     -- Distress speech is presentation, not simulation: it must never be able
     -- to fail the health transition, so it is pcall-guarded and runs last.
     if PNC.SocialEventHooks

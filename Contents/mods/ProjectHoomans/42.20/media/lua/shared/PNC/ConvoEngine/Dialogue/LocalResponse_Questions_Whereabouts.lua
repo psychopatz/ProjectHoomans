@@ -125,6 +125,94 @@ local function resolveCommunityRoleWhereabouts(ir, state, context)
     return response or fallbackResponse(role, fact, value, context)
 end
 
+local function resolveCurrentLocation(ir, state, context)
+    local okLoc, locResolver = pcall(require, "PNC/ConvoEngine/Dialogue/CurrentLocationResolver")
+    local resolver = (okLoc and type(locResolver) == "table" and locResolver)
+        or (PNC.ConvoEngine and PNC.ConvoEngine.CurrentLocationResolver)
+    local npcRecord = type(context) == "table" and (
+        context.npcRecord
+        or (type(context.entry) == "table" and (context.entry.record or context.entry))
+        or {
+            id = context.npcID,
+            identitySeed = context.npcIdentitySeed,
+            npcType = context.npcType,
+            hometown = context.hometown,
+            spawnTown = context.spawnTown,
+        }
+    ) or nil
+    local loc, fam
+    if resolver and type(resolver.ResolveForNPC) == "function" then
+        loc, fam = resolver.ResolveForNPC(npcRecord, context)
+    elseif resolver and type(resolver.ResolveForContext) == "function" then
+        loc = resolver.ResolveForContext(context)
+        fam = { level = "familiar", familiar = true, isHometown = false }
+    else
+        loc = { known = false }
+        fam = { level = "unfamiliar", familiar = false }
+    end
+
+    local known = loc and loc.known == true and tostring(loc.phrase or "") ~= ""
+    local immediate = loc and tostring(loc.immediatePhrase or "") or ""
+    local poolID
+    if not known then
+        poolID = "semantic.question.current_location.unknown"
+    elseif fam and fam.level == "local" and fam.isHometown == true then
+        poolID = "semantic.question.current_location.local"
+    elseif fam and fam.familiar == false then
+        poolID = immediate ~= "" and "semantic.question.current_location.unfamiliar_room"
+            or "semantic.question.current_location.unfamiliar"
+    else
+        poolID = "semantic.question.current_location"
+    end
+
+    local args = {
+        ["location.phrase"] = known and loc.phrase or "",
+        ["location.immediate"] = immediate,
+        location = known and loc.phrase or "",
+        town = loc and loc.townName or nil,
+        room = loc and loc.roomLabel or nil,
+        zone = loc and loc.zoneLabel or nil,
+        familiarity = fam and fam.level or "unknown",
+        hometown = fam and fam.hometown or nil,
+    }
+    local response = catalogResponse(poolID, ir, state, context, args)
+    if response then
+        if type(response.fallback) == "string" then
+            if known then
+                response.fallback = string.gsub(response.fallback, "{location%.phrase}", function()
+                    return tostring(loc.phrase)
+                end)
+            end
+            if immediate ~= "" then
+                response.fallback = string.gsub(response.fallback, "{location%.immediate}", function()
+                    return immediate
+                end)
+            end
+        end
+        return response
+    end
+    local fallbackLine
+    if not known then
+        fallbackLine = "Honestly, I'm not completely sure where we are right now."
+    elseif fam and fam.familiar == false then
+        fallbackLine = immediate ~= ""
+            and ("We're " .. immediate .. ", though I'm not really familiar with this town.")
+            or "Honestly, I'm not from around here—I don't really know this area."
+    else
+        fallbackLine = "We're " .. tostring(loc.phrase) .. "."
+    end
+    return {
+        templateID = poolID,
+        fallback = fallbackLine,
+        args = copyArgs(args),
+        sourcePoolID = poolID,
+        dialogueAct = "FACT_ANSWER",
+        topic = "CURRENT_LOCATION",
+        tone = "direct",
+    }
+end
+
 Internal.ResolveCommunityRoleWhereabouts = resolveCommunityRoleWhereabouts
+Internal.ResolveCurrentLocation = resolveCurrentLocation
 
 return Response

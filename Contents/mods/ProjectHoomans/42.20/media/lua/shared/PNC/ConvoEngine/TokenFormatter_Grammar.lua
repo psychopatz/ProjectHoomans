@@ -193,9 +193,14 @@ function Formatter.CleanPunctuation(text)
     out = string.gsub(out, "%s%s+", " ")
     out = string.gsub(out, "^%s+", "")
     out = string.gsub(out, "%s+$", "")
-    -- Auto-capitalize letter after sentence-ending punctuation
-    out = string.gsub(out, "([%.%!%?])%s+([a-z])", function(p, c)
-        return p .. " " .. string.upper(c)
+    -- Auto-capitalize letter after sentence-ending punctuation.
+    -- Single-capture callback for Kahlua2 compatibility (Kahlua2's string.gsub
+    -- only forwards the first capture to function replacements).
+    out = string.gsub(out, "([%.%!%?]%s+[a-z])", function(match)
+        if type(match) ~= "string" or #match < 2 then
+            return match
+        end
+        return string.sub(match, 1, 1) .. " " .. string.upper(string.sub(match, -1))
     end)
     return out
 end

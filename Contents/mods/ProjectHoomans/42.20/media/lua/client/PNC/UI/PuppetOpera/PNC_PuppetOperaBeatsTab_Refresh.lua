@@ -47,7 +47,9 @@ function Class:refresh()
         return
     end
     addDetail(self.details, "Beat", beat.id)
+    addDetail(self.details, "Mode", tostring(beat.mode or "timed"))
     addDetail(self.details, "Duration", tostring(beat.durationMs) .. " ms")
+    addDetail(self.details, "Phase lock", tostring(beat.phaseLock or "none"))
     addDetail(self.details, "Synchronization",
         beat.synchronization or "arrival_and_start_barrier")
     if hasMethod(model, "GetActorRows") then
@@ -55,19 +57,19 @@ function Class:refresh()
         if type(actors) == "table" then
             for _, actor in ipairs(actors) do
                 if type(actor) == "table" then
-                    local trackLabel = tostring(actor.label)
-                        .. " [slot=" .. tostring(actor.id) .. "]"
-                    if actor.liveName and actor.liveID then
-                        trackLabel = trackLabel .. " -> "
-                            .. tostring(actor.liveName) .. " ["
-                            .. tostring(actor.liveID) .. "]"
-                    end
+                    local actorDisplay = actor.liveName
+                        and (tostring(actor.liveName) .. " (" .. tostring(actor.label) .. ")")
+                        or tostring(actor.label)
                     local summary = "-"
                     if hasMethod(model, "GetSelectionSummary") then
                         summary = model.GetSelectionSummary(actor.id)
                     end
-                    addDetail(self.details, "Track " .. trackLabel,
-                        summary, actor.supported ~= true)
+                    addDetail(
+                        self.details,
+                        "Track " .. tostring(actor.id),
+                        actorDisplay .. " -> " .. tostring(summary),
+                        actor.supported ~= true
+                    )
                 end
             end
         end

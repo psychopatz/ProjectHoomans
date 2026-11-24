@@ -182,6 +182,11 @@ local function deliverTurn(t, tid, now, ctx)
         domain = domain,
         poolID = t.poolID,
         role = t.role,
+        templateID = t.templateID,
+        fallback = t.fallback,
+        realizationID = t.realizationID,
+        addressee = t.addressee,
+        addresseeName = t.addresseeName,
         tokens = turnTokens(t, ctx),
         context = t.context,
         inCombat = t.inCombat == true,
@@ -487,5 +492,7 @@ require "PNC/Semantics/Beats/PNC_SemanticBeats_Utilities"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_WorldObjects"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_Television"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_CombatAssist"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_NightCamp"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_MedicalRescue"
 
 return Beats

@@ -129,10 +129,20 @@ function Transport.ResolveLine(rec, opts)
     end
     if opts.inCombat ~= nil then context.inCombat = opts.inCombat == true end
 
-    local res = react.Resolve({
-        eventType = evType, eventID = ref, npcID = tostring(rec.id),
-        act = act, topic = topic, poolID = opts.poolID, context = context,
-    })
+    local res
+    if opts.templateID ~= nil or opts.fallback ~= nil then
+        res = {
+            realizationID = opts.realizationID or opts.templateID or ("semantic.beat." .. tostring(role or evType)),
+            templateID = opts.templateID,
+            fallback = opts.fallback,
+            presentationClass = opts.presentationClass or "BARK",
+        }
+    else
+        res = react.Resolve({
+            eventType = evType, eventID = ref, npcID = tostring(rec.id),
+            act = act, topic = topic, poolID = opts.poolID, context = context,
+        })
+    end
     if type(res) ~= "table" then return nil, nil end
 
     local raw = res.fallback or res.text

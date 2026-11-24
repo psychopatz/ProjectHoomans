@@ -42,10 +42,11 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
         primaryFullType = workPresentation.fullType
     end
     descriptor = Internal.peekWeaponDescriptor(primaryFullType)
+    local primaryHeld = attackMode or workHeld or descriptor.isContainer == true
     handStateCurrent = Internal.isPrimaryHandStateCurrent(
         zombie,
         descriptor,
-        attackMode or workHeld
+        primaryHeld
     )
     if force ~= true
         and record.runtime.equipmentAttackModeApplied == attackMode
@@ -57,7 +58,7 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
 
     descriptor = Internal.buildWeaponDescriptor(primaryFullType, true)
     ok, attachedReason, handsReason = Internal.applyCombatPresentation(
-        zombie, record, equipment, descriptor, attackMode or workHeld
+        zombie, record, equipment, descriptor, primaryHeld
     )
     Visuals.RefreshModel(zombie)
     return ok, tostring(attachedReason) .. "|" .. tostring(handsReason)
@@ -126,13 +127,16 @@ local function clearTemporaryFallback(runtime)
 end
 
 function Equipment.ActivateMeleeFallback(record, zombie, fallbackReason)
-    local inv = Inventory and Inventory.EnsureRecordInventory
-        and Inventory.EnsureRecordInventory(record)
+    local invModule = PNC.Inventory or Inventory
+    local inv = invModule and invModule.EnsureRecordInventory
+        and invModule.EnsureRecordInventory(record)
         or nil
     local currentID = inv and inv.equipped and inv.equipped.primary or nil
-    local currentType = currentID and inv.items and inv.items[currentID]
-        and inv.items[currentID].type
-        or nil
+    local currentItem = currentID and inv.items and inv.items[currentID] or nil
+    local currentType = currentItem and currentItem.type or nil
+    if currentItem and currentItem.bagContainer ~= nil then
+        return false, "carrying_container_shove_only"
+    end
     local candidates = {}
     local itemID
     local state
@@ -144,7 +148,7 @@ function Equipment.ActivateMeleeFallback(record, zombie, fallbackReason)
     fallbackReason = tostring(fallbackReason or "out_of_ammo")
     temporary = fallbackReason == "mixed_close"
         or fallbackReason == "friendly_fire_risk"
-    if not record or not inv or not Inventory.EquipPrimary then
+    if not record or not inv or not invModule.EquipPrimary then
         return false, "inventory_fallback_unavailable"
     end
     for itemID, state in pairs(inv.items or {}) do

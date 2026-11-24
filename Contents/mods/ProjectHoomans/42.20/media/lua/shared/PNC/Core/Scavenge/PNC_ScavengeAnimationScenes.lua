@@ -28,7 +28,12 @@ Scenes.Register("scavenge.loot_low", {
 
 Scenes.Register("scavenge.rip", {
     category = "scavenge", priority = 48, blocking = false,
-    bump = "LootLow", durationMs = 1200, interrupts = interrupts(),
+    repeatMode = "once",
+    steps = {
+        { id = "grab_cloth", bump = "LootLow", durationMs = 400 },
+        { id = "rip_cloth", bump = "Making", durationMs = 1050, loop = true },
+    },
+    interrupts = interrupts(),
     weight = 1,
 })
 

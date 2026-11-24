@@ -218,7 +218,12 @@ function Controller.ResolveSpeakerRoster(view)
         or ""
     )
     local roster = {}
-    if ctx and type(ctx.speakerRoster) == "table" and #ctx.speakerRoster > 0 then
+    if view and type(view.session) == "table"
+        and type(view.session.speakerRoster) == "table"
+        and #view.session.speakerRoster > 0
+    then
+        roster = view.session.speakerRoster
+    elseif ctx and type(ctx.speakerRoster) == "table" and #ctx.speakerRoster > 0 then
         roster = ctx.speakerRoster
     elseif view and view.groupConversation and type(view.groupConversation.members) == "table" then
         for _, m in ipairs(view.groupConversation.members) do
@@ -275,11 +280,15 @@ local function executeSwitch(req)
         writeLogMessages(view, {})
     end
 
-    local line, poolID = Controller.ResolveOpeningLine(
-        session, nextActor, req.partner, req.nextContext, "switch:" .. nextID
-    )
-    if line ~= "" then
-        appendLog(view, nextActor.name or nextID, line, "npc")
+    local poolID = nil
+    if req.skipOpeningLine ~= true then
+        local line
+        line, poolID = Controller.ResolveOpeningLine(
+            session, nextActor, req.partner, req.nextContext, "switch:" .. nextID
+        )
+        if line ~= "" then
+            appendLog(view, nextActor.name or nextID, line, "npc")
+        end
     end
     session.activeActorID = nextID
     session.pendingSpeakerSwitch = nil
@@ -355,11 +364,29 @@ function Controller.RequestSpeakerSwitch(view, direction, opts)
         return executeSwitch(jumpReq), "switched_immediate"
     end
 
+    if opts.skipHandoffLines == true or (tonumber(opts.delayMs) == 0) then
+        local immediateReq = {
+            view = view,
+            session = session,
+            fromActorID = curActor and curActor.id,
+            toActor = nextActor,
+            toIndex = nextIdx,
+            partner = opts.partner,
+            nextContext = opts.nextContext,
+            applySwitch = opts.applySwitch,
+            skipOpeningLine = opts.skipOpeningLine == true,
+        }
+        return executeSwitch(immediateReq), "switched_immediate"
+    end
+
     local sayLine, ackLine = Controller.ResolvePauseSwitch(
         curActor, opts.partner, opts.currentContext, "sw:" .. tostring(curActor and curActor.id or "")
     )
     appendLog(view, opts.speakerLabel or "YOU", sayLine, "player")
     appendLog(view, (curActor and curActor.name) or "NPC", ackLine, "npc")
+    if type(opts.onHandoffLines) == "function" then
+        pcall(opts.onHandoffLines, sayLine, ackLine, curActor, nextActor)
+    end
 
     local ts = nowMs(opts.now)
     local delay = tonumber(opts.delayMs) or Controller.SWITCH_DELAY_MS

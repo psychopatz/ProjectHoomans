@@ -51,8 +51,10 @@ local function activeSafety(session, timestamp)
     local npcAnimation = NPCAnimation
     local npcOverride = NPCOverride
 
-    local playerReason = invalidPlayer(session.playerBody)
-    if playerReason then return false, playerReason end
+    if session.playerBody ~= nil then
+        local playerReason = invalidPlayer(session.playerBody)
+        if playerReason then return false, playerReason end
+    end
     for actorID, actor in pairs(session.actors or {}) do
         if actor.kind == "nearby_live_npc" then
             local live = Registry and Registry.GetLiveZombie
@@ -128,7 +130,9 @@ local function activeSafety(session, timestamp)
                         .. tostring(actorID)
                 end
             end
-            if not inRange(session.playerBody, actor.body, 20) then
+            if session.playerBody ~= nil
+                and not inRange(session.playerBody, actor.body, 20)
+            then
                 return false, "actors_out_of_range:" .. tostring(actorID)
             end
         end

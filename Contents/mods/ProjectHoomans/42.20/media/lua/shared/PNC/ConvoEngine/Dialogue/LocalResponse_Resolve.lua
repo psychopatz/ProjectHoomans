@@ -97,8 +97,89 @@ function Response.ResolveFlow(ir, state, context, flow)
     return response
 end
 
+local function detectWorldTopicFollowUpKind(ir)
+    if type(ir) ~= "table" then return nil end
+    local act = ir.slots and tostring(ir.slots.dialogueAct or "") or ""
+    if act == "ASK_WHERE" then return "where" end
+    if act == "ASK_WHEN" then return "when" end
+    if act == "ASK_WHO" then return "who" end
+    if act == "ASK_ELABORATE" then return "more" end
+    local text = string.lower(tostring(ir.normalizedText or ir.rawText or ""))
+    if text == "where" or text == "where was that" or text == "where is that" then
+        return "where"
+    end
+    if text == "when" or text == "when did that happen" or text == "when was that" then
+        return "when"
+    end
+    if text == "who" or text == "who was that" or text == "who told you" then
+        return "who"
+    end
+    if text == "tell me more" or text == "more" or text == "what else"
+        or text == "elaborate"
+    then
+        return "more"
+    end
+    return nil
+end
+
+local function buildWorldTopicTokens(topic)
+    local timeLabel = type(topic.timeLabel) == "string" and topic.timeLabel ~= ""
+        and topic.timeLabel or "recently"
+    local locLabel = type(topic.locationLabel) == "string" and topic.locationLabel ~= ""
+        and topic.locationLabel or "nearby"
+    local headline = type(topic.headline) == "string" and topic.headline ~= ""
+        and topic.headline or ""
+    local raidCount = tonumber(topic.raidCount or (topic.meta and topic.meta.count)) or 3
+    return {
+        ["slot.gossip_time"] = timeLabel,
+        ["slot.gossip_location"] = locLabel,
+        ["slot.gossip_headline"] = headline,
+        ["slot.gossip_raid_count"] = tostring(raidCount),
+    }
+end
+
 function Response.Resolve(ir, state, context, branch)
     if type(ir) ~= "table" then return nil end
+    local activeWorldTopic = type(state) == "table" and state.activeWorldTopic or nil
+    if type(activeWorldTopic) == "table"
+        and activeWorldTopic.exhausted ~= true
+        and type(activeWorldTopic.topic) == "table"
+    then
+        local followKind = detectWorldTopicFollowUpKind(ir)
+        local WKG = PsychopatzCore and PsychopatzCore.WorldKnowledge or nil
+        if followKind and WKG and type(WKG.AdvanceTopicFollowUp) == "function" then
+            local resolved = WKG.AdvanceTopicFollowUp(
+                activeWorldTopic.topic,
+                followKind,
+                activeWorldTopic.depth
+            )
+            if type(resolved) == "table" then
+                activeWorldTopic.depth = resolved.nextDepth
+                activeWorldTopic.exhausted = resolved.exhausted == true
+                local topic = activeWorldTopic.topic
+                local poolID
+                if topic.source == "banter" then
+                    poolID = "semantic.banter.mundane.followup"
+                elseif activeWorldTopic.exhausted then
+                    poolID = "semantic.gossip.world.closure"
+                else
+                    poolID = "semantic.gossip.world.followup"
+                end
+                local followCtx = copyArgs(context)
+                followCtx.currentTopic = topic.topic
+                followCtx.action = followKind
+                local slotTokens = buildWorldTopicTokens(topic)
+                local resp = catalogResponse(poolID, ir, state, followCtx, slotTokens)
+                if type(resp) == "table" then
+                    resp.dialogueAct = "FACT_ANSWER"
+                    resp.topic = topic.topic
+                    resp.referenceTopic = topic.subjectLabel or topic.topic
+                    resp.worldTopicExhausted = activeWorldTopic.exhausted
+                    return resp
+                end
+            end
+        end
+    end
     if branch == "GREET_ACKNOWLEDGED" then
         local situation = type(context) == "table" and context.dialogueSituation or nil
         local actorCtx = type(context) == "table" and context.actorConversationContext or nil
@@ -249,6 +330,49 @@ function Response.Resolve(ir, state, context, branch)
                     response.fallback = "I haven't heard anything new about "
                         .. name .. " lately."
                 else
+                    local WKG = PsychopatzCore and PsychopatzCore.WorldKnowledge or nil
+                    if WKG and type(WKG.QueryConversationTopics) == "function" then
+                        local worldHour = context and tonumber(context.worldAgeHours)
+                            or (getGameTime and getGameTime() and getGameTime().getWorldAgeHours
+                                and tonumber(getGameTime():getWorldAgeHours()))
+                            or nil
+                        local topics = WKG.QueryConversationTopics(
+                            context and (context.actorID or context.npcID) or nil,
+                            {
+                                npcID = context and context.npcID,
+                                identitySeed = context and context.identitySeed,
+                                x = context and context.npcX,
+                                y = context and context.npcY,
+                                worldHour = worldHour,
+                                worldDay = worldHour and math.floor(worldHour / 24) or 0,
+                            },
+                            { limit = 1 }
+                        )
+                        local top = type(topics) == "table" and topics[1] or nil
+                        if top and type(top.topic) == "string" and top.topic ~= "" then
+                            if type(state) == "table" then
+                                state.activeWorldTopic = {
+                                    topic = top,
+                                    depth = 0,
+                                    exhausted = false,
+                                }
+                            end
+                            local poolID = top.source == "banter"
+                                and "semantic.banter.mundane"
+                                or "semantic.gossip.world.opening"
+                            local topicCtx = copyArgs(context)
+                            topicCtx.currentTopic = top.topic
+                            topicCtx.worldRaiderSurge = (top.meta and top.meta.chopperLinked == true)
+                                or (top.chopperLinked == true)
+                            local slotTokens = buildWorldTopicTokens(top)
+                            local compiled = catalogResponse(poolID, ir, state, topicCtx, slotTokens)
+                            if type(compiled) == "table" then
+                                compiled.topic = top.topic
+                                compiled.referenceTopic = top.subjectLabel or top.topic
+                                return compiled
+                            end
+                        end
+                    end
                     response.fallback = "I haven't heard any news lately."
                 end
             else

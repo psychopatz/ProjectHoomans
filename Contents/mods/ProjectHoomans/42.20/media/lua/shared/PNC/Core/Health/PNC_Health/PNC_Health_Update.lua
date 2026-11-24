@@ -11,6 +11,10 @@ function Health.Update(record, zombie, now)
         PNC.NPCWounds.Update(record, zombie, now)
         if record.alive == false then return end
     end
+    if Health.UpdateFireDamage then
+        Health.UpdateFireDamage(record, zombie, now)
+        if record.alive == false then return end
+    end
     if health.state == "incapacitated" then
         if (tonumber(health.current) or 0)
             >= (tonumber(Const.INCAPACITATED_RECOVERY_HP) or 5)

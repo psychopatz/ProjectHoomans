@@ -3,10 +3,38 @@ local TransferEndpoint = PNC.InventoryTransferEndpoint
 local Helpers = require "PNC/UI/Inventory/InventoryWindow/_Helpers"
 local tr = Helpers.tr
 
+function InventoryWindow.HasAnyNPCBulkTransferItems(inventory)
+    if type(inventory) ~= "table" or type(inventory.items) ~= "table" then
+        return false
+    end
+    for _, item in pairs(inventory.items) do
+        if type(item) == "table"
+            and item.fav ~= true
+            and item.interactionLocked ~= true
+            and item.equipSlot == nil
+            and item.wornSlot == nil
+            and item.attachedSlot == nil
+        then
+            local bagContainer = item.bagContainer
+                and inventory.containers
+                and inventory.containers[item.bagContainer]
+                or nil
+            if not bagContainer or #(bagContainer.items or {}) < 1 then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 function ISPNCInventoryWindow:onDepositAllStorage()
     if self.tradeMode then return false end
     if not self.npcId then return false end
-    if #InventoryWindow.CollectBulkTransferIDs(self.npcList) < 1 then
+    local inventory = self.inventory and self:inventory() or nil
+    local hasItems = inventory
+        and InventoryWindow.HasAnyNPCBulkTransferItems(inventory)
+        or #InventoryWindow.CollectBulkTransferIDs(self.npcList) >= 1
+    if not hasItems then
         self.statusText = tr("UI_PNC_Storage_NoCourierItems",
             "No valid items to deposit")
         return false

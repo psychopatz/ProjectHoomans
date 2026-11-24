@@ -4,6 +4,42 @@ PNC = PNC or {}
 
 local Internal = PNC.PuppetOperaLayoutTabInternal
 
+local function pointInsideWidget(widget, px, py)
+    if not widget
+        or type(widget.getAbsoluteX) ~= "function"
+        or type(widget.getAbsoluteY) ~= "function"
+        or type(widget.getWidth) ~= "function"
+        or type(widget.getHeight) ~= "function"
+    then
+        return false
+    end
+    local ax = widget:getAbsoluteX()
+    local ay = widget:getAbsoluteY()
+    return px >= ax and px <= ax + widget:getWidth()
+        and py >= ay and py <= ay + widget:getHeight()
+end
+
+local function actorSlotAtScreenPoint(self, px, py)
+    local list = self.actorList
+    if not pointInsideWidget(list, px, py) then return nil, nil end
+    local localY = py - list:getAbsoluteY()
+    local rowIndex = nil
+    if type(list.rowAt) == "function" then
+        rowIndex = list:rowAt(px - list:getAbsoluteX(), localY)
+    else
+        local scrollY = type(list.getYScroll) == "function"
+            and list:getYScroll() or 0
+        local itemH = math.max(1, tonumber(list.itemheight) or 44)
+        rowIndex = math.floor((localY - scrollY) / itemH) + 1
+    end
+    local items = list.items or {}
+    if rowIndex and rowIndex >= 1 and rowIndex <= #items then
+        local row = items[rowIndex]
+        return row and row.item or nil, rowIndex
+    end
+    return nil, nil
+end
+
 local function setLivePointerFromEvent(self, list, x, y)
     if not list then
         return false
@@ -17,10 +53,6 @@ local function setLivePointerFromEvent(self, list, x, y)
             }
         end
     end
-    -- Mouse-up-outside coordinates are list-local in some ISUI paths and
-    -- stale capture coordinates in others. Prefer the global screen point,
-    -- but accept the event-local projection when it is the one that lands on
-    -- the graph.
     if type(getMouseX) == "function" and type(getMouseY) == "function" then
         addCandidate(getMouseX(), getMouseY())
     end
@@ -33,6 +65,11 @@ local function setLivePointerFromEvent(self, list, x, y)
         addCandidate(x, y)
     end
     for _, candidate in ipairs(candidates) do
+        if pointInsideWidget(self.actorList, candidate.x, candidate.y) then
+            self.livePointerX = candidate.x
+            self.livePointerY = candidate.y
+            return true
+        end
         if self.grid and type(self.grid.containsGraphPoint) == "function"
             and type(self.grid.getAbsoluteX) == "function"
             and type(self.grid.getAbsoluteY) == "function"
@@ -55,6 +92,18 @@ end
 
 local function updateLiveDropPreview(self)
     if not self.livePointerX or not self.livePointerY then return false end
+    if self.actorList then
+        local _, hoverIdx = actorSlotAtScreenPoint(
+            self,
+            self.livePointerX,
+            self.livePointerY
+        )
+        self.actorList.dropHoverIndex = hoverIdx
+        if hoverIdx then
+            if self.grid then self.grid.dropPreview = nil end
+            return true
+        end
+    end
     if not self.grid or type(self.grid.containsGraphPoint) ~= "function"
         or type(self.grid.getAbsoluteX) ~= "function"
         or type(self.grid.getAbsoluteY) ~= "function"
@@ -81,6 +130,8 @@ local function updateLiveDropPreview(self)
     return inside
 end
 
+Internal.pointInsideWidget = pointInsideWidget
+Internal.actorSlotAtScreenPoint = actorSlotAtScreenPoint
 Internal.setLivePointerFromEvent = setLivePointerFromEvent
 Internal.updateLiveDropPreview = updateLiveDropPreview
 

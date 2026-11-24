@@ -62,6 +62,29 @@ if PNC and PNC.ConversationDebugUI and PNC.ConversationDebugUI.Toggle then
 end
 
 PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.beatDebug",
+    source = "Project Hoomans",
+    order = 205.5,
+    title = translateHubText("UI_PNC_DebugHub_BeatDebug_Title",
+        "ConvoEngine Beat Lab"),
+    description = translateHubText(
+        "UI_PNC_DebugHub_BeatDebug_Description",
+        "Inspect live ConvoEngine beat usage and cached variables, or assign nearby NPCs and the player to execute beats on demand."),
+    available = function()
+        return PNC
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        require "PNC/UI/ConvoEngine/PNC_BeatDebugWindow"
+        if PNC.BeatDebugUI and PNC.BeatDebugUI.Toggle then
+            PNC.BeatDebugUI.Toggle()
+        end
+    end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.audio",
     source = "Project Hoomans",
     order = 206,

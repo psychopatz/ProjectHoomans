@@ -43,6 +43,24 @@ function Types.NormalizeUnitValue(value, fallback)
     return math.max(0, math.min(1, finite(value, fallback or 0.5)))
 end
 
+function Types.OrientationFromKinsey(kinsey)
+    local score = math.floor(finite(kinsey, 0) + 0.5)
+    if score <= 1 then return Constants.ORIENTATION_STRAIGHT end
+    if score >= 5 then return Constants.ORIENTATION_GAY end
+    return Constants.ORIENTATION_BISEXUAL
+end
+
+function Types.NormalizeKinsey(value, orientationFallback)
+    local defaultMap = Constants.KINSEY_DEFAULT_BY_ORIENTATION or {}
+    local fallback = defaultMap[orientationFallback]
+    if fallback == nil then fallback = 0 end
+    if tonumber(value) == nil then return fallback end
+    local score = math.floor(finite(value, fallback) + 0.5)
+    local low = tonumber(Constants.KINSEY_MIN) or 0
+    local high = tonumber(Constants.KINSEY_MAX) or 6
+    return math.max(low, math.min(high, score))
+end
+
 local function normalizeSourceTraits(value)
     local output = {}
     local key
@@ -69,15 +87,25 @@ end
 
 function Types.NormalizePlayerSocialProfile(value)
     local source = type(value) == "table" and value or {}
+    local orientation = Types.NormalizeEnum(
+        source.orientation,
+        Constants.VALID_ORIENTATIONS,
+        nil
+    )
+    local kinsey
+    if tonumber(source.kinsey) ~= nil then
+        kinsey = Types.NormalizeKinsey(source.kinsey, orientation)
+        orientation = orientation or Types.OrientationFromKinsey(kinsey)
+    else
+        orientation = orientation or Constants.ORIENTATION_STRAIGHT
+        kinsey = Types.NormalizeKinsey(nil, orientation)
+    end
     return {
         schemaVersion = Constants.PLAYER_PROFILE_SCHEMA_VERSION,
         revision = revision(source.revision),
         resolvedAt = timestamp(source.resolvedAt),
-        orientation = Types.NormalizeEnum(
-            source.orientation,
-            Constants.VALID_ORIENTATIONS,
-            Constants.ORIENTATION_STRAIGHT
-        ),
+        orientation = orientation,
+        kinsey = kinsey,
         foodPreference = Types.NormalizeEnum(
             source.foodPreference,
             Constants.VALID_FOOD_PREFERENCES,
@@ -121,6 +149,9 @@ function Types.NormalizeNPCPersonalityOverrides(value)
         if type(source[key]) == "string" and allowed[source[key]] then
             output[key] = source[key]
         end
+    end
+    if tonumber(source.kinsey) ~= nil then
+        output.kinsey = Types.NormalizeKinsey(source.kinsey, output.orientation)
     end
     for index = 1, #Constants.NUMERIC_DIMENSIONS do
         dimension = Constants.NUMERIC_DIMENSIONS[index]
@@ -196,13 +227,18 @@ function Types.NormalizeNPCPersonality(
         return generated
     end
     generationVersion = sourceVersion
+    local resolvedOrientation = Types.NormalizeEnum(
+        source.orientation,
+        Constants.VALID_ORIENTATIONS,
+        generated.orientation
+    )
+    local resolvedKinsey = tonumber(source.kinsey) ~= nil
+        and Types.NormalizeKinsey(source.kinsey, resolvedOrientation)
+        or Types.NormalizeKinsey(nil, resolvedOrientation)
     output = {
         schemaVersion = Constants.NPC_PERSONALITY_SCHEMA_VERSION,
-        orientation = Types.NormalizeEnum(
-            source.orientation,
-            Constants.VALID_ORIENTATIONS,
-            generated.orientation
-        ),
+        orientation = resolvedOrientation,
+        kinsey = resolvedKinsey,
         foodPreference = Types.NormalizeEnum(
             source.foodPreference,
             Constants.VALID_FOOD_PREFERENCES,

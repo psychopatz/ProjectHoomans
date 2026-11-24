@@ -43,6 +43,38 @@ local function preserveCombatThreatForWake(record, runtime, reason, now)
     }
 end
 
+local function isCombatWakeReason(reason)
+    local text = string.lower(tostring(reason or ""))
+    return string.find(text, "combat", 1, true) ~= nil
+        or string.find(text, "threat", 1, true) ~= nil
+        or string.find(text, "damage", 1, true) ~= nil
+        or string.find(text, "emergency", 1, true) ~= nil
+end
+
+local function forceReleaseSleepBumpForCombat(zombie)
+    if not zombie then return end
+    if zombie.setBumpDone then zombie:setBumpDone(true) end
+    if zombie.setVariable then
+        zombie:setVariable("BumpDone", true)
+        zombie:setVariable("BumpAnimFinished", true)
+    end
+    if zombie.setBumpType then zombie:setBumpType("") end
+    if zombie.changeState and ZombieIdleState and ZombieIdleState.instance then
+        zombie:changeState(ZombieIdleState.instance())
+    end
+    local modData = zombie.getModData and zombie:getModData() or nil
+    if modData then
+        modData.PNC_BumpReleasePending = nil
+        modData.PNC_BumpReleaseAt = nil
+        modData.PNC_BumpActionLease = nil
+        modData.PNC_BumpActionLeaseUntil = nil
+        modData.PNC_BumpActionLeaseStartedAt = nil
+        modData.PNC_BumpRequestedType = nil
+        modData.PNC_BumpKeepUseless = nil
+        modData.PNC_BumpNonCombat = nil
+    end
+end
+
 local function logSleepWake(eventName, record, zombie, runtime, reason)
     local modData
     if not PNC.Core or not PNC.Core.LogInfo then return end
@@ -76,12 +108,25 @@ end
 function Internal.RestorePosition(record, zombie, runtime)
     if not runtime or runtime.positioned ~= true then return end
     local position = runtime.approachPosition
+    if position and Internal.ValidateSleepSquare
+        and Internal.FindSleepExit
+    then
+        local valid = Internal.ValidateSleepSquare(
+            position.x, position.y, position.z, zombie)
+        if not valid then
+            local fallback = Internal.FindSleepExit(
+                record, zombie, runtime, record and record.orderSpec,
+                { emergency = true })
+            if fallback then position = fallback end
+        end
+    end
     if zombie and position and PNC.LiveBodyControl
         and PNC.LiveBodyControl.SetAuthoritativePosition
     then
+        local restoreZ = math.floor(tonumber(position.z) or 0)
         PNC.LiveBodyControl.SetAuthoritativePosition(
-            zombie, position.x, position.y, position.z)
-        record.x, record.y, record.z = position.x, position.y, position.z
+            zombie, position.x, position.y, restoreZ)
+        record.x, record.y, record.z = position.x, position.y, restoreZ
     end
     runtime.positioned = false
 end
@@ -146,7 +191,12 @@ function Internal.TickSleepWake(record, zombie)
     end
     deadline = tonumber(runtime.sleepWakeDeadlineAt) or (now + 1000)
     surface = tostring(runtime.sleepSurface or "")
-    if runtime.sleepWakeAnimationStarted ~= true then
+    local combatFastWake = isCombatWakeReason(runtime.sleepWakeReason)
+    if combatFastWake then
+        -- Combat/emergency wake skips the slow AwakeBed animation and bump
+        -- settle waits so the NPC stands up and defends itself immediately.
+        forceReleaseSleepBumpForCombat(zombie)
+    elseif runtime.sleepWakeAnimationStarted ~= true then
         if PNC.Animation and PNC.Animation.PumpBumpRelease then
             releasePending = PNC.Animation.PumpBumpRelease(zombie, now)
         end
@@ -246,7 +296,8 @@ function Internal.TickSleepWake(record, zombie)
         and Internal.FindSleepExit
     then
         wakeExit, wakeExitReason = Internal.FindSleepExit(
-            record, zombie, runtime, record.orderSpec)
+            record, zombie, runtime, record.orderSpec,
+            combatFastWake and { emergency = true } or nil)
         if not wakeExit then
             runtime.sleepWakeExitPending = true
             runtime.sleepWakeExitRetryAt = now + 250
@@ -259,7 +310,8 @@ function Internal.TickSleepWake(record, zombie)
     Internal.ClearSleepSurface(record, zombie, runtime)
     if wakeExit and Internal.CommitSleepExit then
         wakeExitPlaced, wakeExitReason = Internal.CommitSleepExit(
-            record, zombie, runtime, wakeExit)
+            record, zombie, runtime, wakeExit,
+            combatFastWake and { allowOccupied = true } or nil)
         if not wakeExitPlaced then
             runtime.sleepWakeExitPending = true
             runtime.sleepWakeExitRetryAt = now + 250

@@ -47,7 +47,15 @@ local explosion = context.Normalize({
     damageClass = "explosion",
     woundType = "burn",
 })
-T.equal(explosion.woundType, "scratch",
-    "unsupported fire wound did not use the explicit safe fallback")
+T.equal(explosion.woundType, "burn",
+    "burn wound type was not preserved")
+
+local fireAlias = context.Normalize({
+    amount = 4,
+    damageClass = "explosion",
+    woundType = "fire",
+})
+T.equal(fireAlias.woundType, "burn",
+    "fire wound alias did not normalize to burn")
 
 T.finish("pnc_compatibility_damage_context_smoke")

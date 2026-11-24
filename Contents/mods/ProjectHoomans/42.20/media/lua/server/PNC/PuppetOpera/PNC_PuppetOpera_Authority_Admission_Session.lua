@@ -86,6 +86,7 @@ local function makeSession(player, blueprint, resolvedActors, plan, loopEnabled)
             bindingID = resolved.bindingID,
             label = definition.label,
             anchor = definition.anchor,
+            stationary = definition.stationary == true,
             target = plan.actors[actorID],
             body = resolved.body,
             record = resolved.record,
@@ -146,6 +147,9 @@ local function startSession(player, args, previewOnly)
     if current then
         if current.previewOnly then
             closeSession(current, Opera.Phases.RESTORED, "preview_replaced")
+            current = nil
+        elseif args.replaceActive == true then
+            closeSession(current, Opera.Phases.RESTORED, "session_replaced")
             current = nil
         else
             return false, "owner_session_already_active"
@@ -230,7 +234,15 @@ local function startSession(player, args, previewOnly)
     if npcCount == 0 then
         return false, "runtime_actor_missing"
     end
-    plan, reason = Anchors.BuildPlan(blueprint, player)
+    local planOptions = nil
+    local originActorID = blueprint.anchorFrame
+        and blueprint.anchorFrame.originActor or nil
+    if originActorID and resolvedActors[originActorID]
+        and resolvedActors[originActorID].body
+    then
+        planOptions = { leadActor = resolvedActors[originActorID].body }
+    end
+    plan, reason = Anchors.BuildPlan(blueprint, player, planOptions)
     if not plan then return false, reason end
     planOK, reason = validatePlan(plan)
     if not planOK then return false, reason end
@@ -266,14 +278,23 @@ local function startSession(player, args, previewOnly)
                 ownerKind = actor.overrideOwnerKind,
                 reason = actor.lastReason,
             })
-            accepted, reason = NPCMovement.Start(session, actor)
-            if not accepted then
-                releaseActors(session)
-                unindexSession(session)
-                return false, reason or "npc_movement_start_failed"
+            if actor.stationary == true then
+                -- Anchored/incapacitated target does not walk or turn; only
+                -- the executor (e.g. carrier) walks to the target.
+                actor.arrived = true
+                actor.facing = true
+                actor.state = "arrived"
+                actor.movementOwned = false
+            else
+                accepted, reason = NPCMovement.Start(session, actor)
+                if not accepted then
+                    releaseActors(session)
+                    unindexSession(session)
+                    return false, reason or "npc_movement_start_failed"
+                end
+                actor.state = "moving"
+                actor.movementOwned = true
             end
-            actor.state = "moving"
-            actor.movementOwned = true
         elseif actor.kind == "local_player" then
             actor.state = "moving"
         end

@@ -93,7 +93,7 @@ local function selectorContext(ir, state, context)
         lastAction = state and state.lastAction or context.lastAction,
         lastSpeaker = state and state.lastSpeaker or context.lastSpeaker,
         intent = ir and ir.intent,
-        action = ir and ir.action,
+        action = (ir and ir.action) or context.action,
         subject = ir and ir.subject,
         stateValue = ir and (ir.stateValue or (ir.slots and ir.slots.state and ir.slots.state.value)),
         pattern = ir and ir.provenance and ir.provenance.pattern,
@@ -125,6 +125,9 @@ local function selectorContext(ir, state, context)
         lastSpeechAct = lastSpeechAct,
         socialRole = context.socialRole or social.role,
         farewellSpeaker = context.farewellSpeaker,
+        worldRaiderSurge = context.worldRaiderSurge,
+        npcAnnoyed = context.npcAnnoyed,
+        npcFedUp = context.npcFedUp,
     }
 end
 

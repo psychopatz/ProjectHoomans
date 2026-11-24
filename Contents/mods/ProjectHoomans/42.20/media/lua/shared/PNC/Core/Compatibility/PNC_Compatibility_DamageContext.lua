@@ -132,10 +132,8 @@ function DamageContext.Normalize(context)
         or normalized.woundType == "fire"
         or normalized.woundType == "explosion"
     then
-        -- Hoomans currently has no separate burn wound stat. Preserve the
-        -- old safe fallback explicitly instead of letting providers create an
-        -- unsupported wound type in the health record.
-        normalized.woundType = "scratch"
+        -- Normalize fire/explosion aliases onto the canonical burn wound type.
+        normalized.woundType = "burn"
     end
     return normalized
 end

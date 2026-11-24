@@ -57,24 +57,32 @@ function BC.GetWorldWeather(now, force)
         return weatherCache.data
     end
     local cm = type(getClimateManager) == "function" and getClimateManager() or nil
-    local gt = type(getGameTime) == "function" and getGameTime() or nil
     local isRain = safeCall(cm, "isRaining") == true
     local rain = tonumber(safeCall(cm, "getRainIntensity")) or (isRain and 0.5 or 0)
     local fog = tonumber(safeCall(cm, "getFogIntensity")) or 0
     local isSnow = safeCall(cm, "isSnowing") == true
     local temp = tonumber(safeCall(cm, "getTemperature"))
-    local hour = tonumber(safeCall(gt, "getTimeOfDay")) or 12
+    local clock = PNC.WorldClock
+    local hour
+    local tod
+    if clock and type(clock.Snapshot) == "function" then
+        local snap = clock.Snapshot(now, force)
+        hour = snap.timeOfDay
+        tod = snap.band
+    else
+        local gt = type(getGameTime) == "function" and getGameTime() or nil
+        hour = tonumber(safeCall(gt, "getTimeOfDay")) or 12
+        tod = "day"
+        if hour >= 5 and hour < 8 then tod = "dawn"
+        elseif hour >= 17 and hour < 21 then tod = "dusk"
+        elseif hour < 5 or hour >= 21 then tod = "night" end
+    end
 
     local weather = "clear"
     if isSnow then weather = "snow"
     elseif isRain or rain >= 0.15 then weather = rain >= 0.7 and "storm" or "rain"
     elseif fog >= 0.35 then weather = "fog"
     elseif temp ~= nil and temp <= 5 then weather = "cold" end
-
-    local tod = "day"
-    if hour >= 5 and hour < 8 then tod = "dawn"
-    elseif hour >= 17 and hour < 21 then tod = "dusk"
-    elseif hour < 5 or hour >= 21 then tod = "night" end
 
     local data = {
         weather = weather,

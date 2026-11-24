@@ -10,6 +10,7 @@ if type(H) ~= "table" then
 end
 
 local LiveBodyControl = H.LiveBodyControl
+local FireSafety = H.FireSafety
 local Combat = H.Combat
 local ThreatGuard = H.ThreatGuard
 local AnimationScenes = H.AnimationScenes
@@ -19,6 +20,12 @@ local puppetOperaOwnsBehavior = H.puppetOperaOwnsBehavior
 function H.Run(record, zombie, now)
     if LiveBodyControl and LiveBodyControl.TickGroundedRecovery
         and LiveBodyControl.TickGroundedRecovery(record, zombie, now)
+    then
+        return true
+    end
+
+    if FireSafety and FireSafety.Tick
+        and FireSafety.Tick(record, zombie, now)
     then
         return true
     end
@@ -63,6 +70,11 @@ function H.Run(record, zombie, now)
                 runtime.roamAmbient = nil
             end
         else
+            if runtime.animationScene ~= nil
+                and AnimationScenes and AnimationScenes.Tick
+            then
+                AnimationScenes.Tick(record, zombie, now)
+            end
             return true
         end
     end
@@ -85,6 +97,11 @@ function H.Run(record, zombie, now)
                 runtime.roamingSeat = nil
             end
         else
+            if runtime.animationScene ~= nil
+                and AnimationScenes and AnimationScenes.Tick
+            then
+                AnimationScenes.Tick(record, zombie, now)
+            end
             return true
         end
     end

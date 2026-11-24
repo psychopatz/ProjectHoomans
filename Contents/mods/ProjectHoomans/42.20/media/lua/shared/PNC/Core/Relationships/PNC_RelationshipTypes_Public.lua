@@ -339,6 +339,9 @@ function Types.NormalizeRelationship(value, targetKey)
         interactionRevision = revision(source.interactionRevision),
         lastInteractionAt = nonNegative(source.lastInteractionAt, 0),
         lastEvaluatedAt = nonNegative(source.lastEvaluatedAt, 0),
+        knowsName = source.knowsName == true and true or nil,
+        firstMetAt = tonumber(source.firstMetAt) ~= nil
+            and nonNegative(source.firstMetAt, 0) or nil,
         revision = revision(source.revision),
         bond = normalizeBond(source.bond),
         extensions = copyExtensions(source.extensions),

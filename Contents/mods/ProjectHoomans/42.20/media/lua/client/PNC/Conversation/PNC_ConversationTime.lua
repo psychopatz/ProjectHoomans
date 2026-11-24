@@ -15,6 +15,13 @@ Time.bands = {
 }
 
 function Time.GetHour()
+    local clock = PNC.WorldClock
+    if clock and type(clock.Snapshot) == "function" then
+        local snap = clock.Snapshot()
+        if snap and snap.available == true then
+            return snap.timeOfDay
+        end
+    end
     local gameTime = getGameTime and getGameTime() or nil
     if gameTime and gameTime.getTimeOfDay then
         return tonumber(gameTime:getTimeOfDay()) or 12

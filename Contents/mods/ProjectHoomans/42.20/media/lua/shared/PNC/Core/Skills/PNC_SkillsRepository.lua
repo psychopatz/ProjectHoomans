@@ -40,6 +40,35 @@ function Repository.NormalizeProgression(rawProgression)
             if value ~= 0 then output.skillXP[tostring(key)] = value end
         end
     end
+    if type(source.exercise) == "table" then
+        local ex = {
+            stiffness = math.max(0, math.min(100, Codec.normalizeNumber(source.exercise.stiffness, 0))),
+            pendingStiffness = math.max(0, math.min(100, Codec.normalizeNumber(source.exercise.pendingStiffness, 0))),
+            onsetHours = math.max(0, Codec.normalizeNumber(source.exercise.onsetHours, 0)),
+            regularity = {},
+        }
+        if type(source.exercise.regularity) == "table" then
+            for key, value in pairs(source.exercise.regularity) do
+                value = math.max(0, math.min(100, Codec.normalizeNumber(value, 0)))
+                if value > 0 then ex.regularity[tostring(key)] = value end
+            end
+        end
+        if ex.stiffness > 0 or ex.pendingStiffness > 0 or Codec.hasTableEntries(ex.regularity) then
+            output.exercise = ex
+        end
+    end
+    if type(source.mood) == "table" then
+        local mood = {}
+        local hasMood = false
+        for _, field in ipairs({ "stress", "boredom", "unhappiness", "pain" }) do
+            local val = math.max(0, math.min(1, Codec.normalizeNumber(source.mood[field], 0)))
+            if val > 0.001 then
+                mood[field] = math.floor(val * 1000 + 0.5) / 1000
+                hasMood = true
+            end
+        end
+        if hasMood then output.mood = mood end
+    end
     return output
 end
 
@@ -55,6 +84,8 @@ function Repository.SerializeRecord(record)
     if progression.recruited ~= true
         and progression.skillLevelDeltas == nil
         and progression.skillXP == nil
+        and progression.exercise == nil
+        and progression.mood == nil
     then
         return nil
     end
@@ -70,6 +101,8 @@ function Repository.RestoreRecord(record, progression)
     record.progression = {
         skillLevelDeltas = progression.skillLevelDeltas,
         skillXP = progression.skillXP,
+        exercise = progression.exercise,
+        mood = progression.mood,
     }
     record.recruited = progression.recruited == true or record.recruited == true
     return record

@@ -193,4 +193,38 @@ function Internal.EnterFurnitureSeat(record, zombie, runtime, order)
 end
 
 
+function Internal.MaintainFurnitureSeat(record, zombie, runtime, order)
+    if not runtime or runtime.seating ~= true
+        or runtime.seatEntered ~= true
+        or Internal.IsFloorSeating(runtime, order)
+        or not zombie
+    then
+        return false
+    end
+    local directionName = tostring(runtime.seatDirection or "")
+    if directionName == "" and order then
+        directionName = tostring(order.seatDirection or "")
+    end
+    local direction = directionName ~= "" and IsoDirections
+        and IsoDirections[directionName] or nil
+    if not direction and directionName ~= "" and IsoDirections
+        and IsoDirections.fromString
+    then
+        direction = IsoDirections.fromString(directionName)
+    end
+    if direction and zombie.setForwardIsoDirection then
+        zombie:setForwardIsoDirection(direction)
+    end
+    if zombie.setSittingOnFurniture then
+        zombie:setSittingOnFurniture(true)
+    end
+    if zombie.setVariable then
+        zombie:setVariable("PNCSeated", true)
+    end
+    if zombie.setIsResting then
+        zombie:setIsResting(true)
+    end
+    return true
+end
+
 return Internal

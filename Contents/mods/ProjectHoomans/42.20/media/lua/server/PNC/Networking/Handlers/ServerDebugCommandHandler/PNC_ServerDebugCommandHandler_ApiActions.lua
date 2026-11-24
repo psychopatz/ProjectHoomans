@@ -16,6 +16,7 @@ local directDebugActions = {
     infection = true,
     clear_infection = true,
     bandage_almost_dirty = true,
+    debug_wound_state = true,
     animation_scene_play = true,
     animation_scene_pool_step = true,
     animation_scene_pool_start = true,

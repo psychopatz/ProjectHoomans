@@ -90,6 +90,18 @@ function Behavior.Tick(record, zombie, now)
     if record.presenceState ~= Const.PRESENCE_LIVE or not zombie then
         return tickAbstract(record, now, partId)
     end
+    local onFire = zombie.isOnFire and zombie:isOnFire() == true or false
+    local bodySquare = zombie.getSquare and zombie:getSquare() or nil
+    local onHazardFire = PNC.BehaviorFireSafety
+        and PNC.BehaviorFireSafety.IsHazardFireSquare
+        and PNC.BehaviorFireSafety.IsHazardFireSquare(bodySquare) == true
+        or false
+    if onFire or onHazardFire then
+        if state.phase ~= "idle" then
+            clearAction(record, zombie, "fire_hazard")
+        end
+        return false
+    end
     if partId and requiresMedicalItem(Treatment, record)
         and not Treatment.HasNPCBandage(record)
         and not (Treatment.GetNPCSplintPlan and Treatment.GetNPCSplintPlan(record, partId))

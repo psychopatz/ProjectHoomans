@@ -32,11 +32,13 @@ function Internal.ClearSleepSurface(record, zombie, runtime, objectOverride,
         end
         if zombie then
             ClearFurnitureOccupancy(zombie)
+            if zombie.setOnBed then zombie:setOnBed(false) end
             if zombie.setBed then zombie:setBed(nil) end
             if zombie.clearVariable then
                 zombie:clearVariable("OnBedDirection")
                 zombie:clearVariable("OnBedStarted")
                 zombie:clearVariable("OnBedAnim")
+                zombie:clearVariable("PNCSleeping")
             end
         end
     end
@@ -127,16 +129,23 @@ function Internal.PrepareSleepSurface(record, zombie, runtime, order)
     if object.setSatChair then object:setSatChair(true) end
     if zombie.setOnFloor then zombie:setOnFloor(false) end
     if zombie.setSitOnGround then zombie:setSitOnGround(false) end
+    if zombie.setSittingOnFurniture then zombie:setSittingOnFurniture(false) end
     if zombie.setSitOnFurnitureObject then
         zombie:setSitOnFurnitureObject(object)
     end
-    local direction = Internal.SleepDirection(order)
-    if direction and zombie.setSitOnFurnitureDirection then
-        zombie:setSitOnFurnitureDirection(direction)
+    local direction = Internal.SleepDirection(order or runtime)
+    if direction then
+        if zombie.setSitOnFurnitureDirection then
+            zombie:setSitOnFurnitureDirection(direction)
+        end
+        if zombie.setForwardIsoDirection then
+            zombie:setForwardIsoDirection(direction)
+        end
     end
-    if zombie.reportEvent then zombie:reportEvent("EventSitOnFurniture") end
+    if zombie.setOnBed then zombie:setOnBed(true) end
     if zombie.setIsResting then zombie:setIsResting(true) end
     if zombie.setBed then zombie:setBed(object) end
+    if zombie.setVariable then zombie:setVariable("PNCSleeping", true) end
     runtime.sleepSurfaceEntered = true
     AuditSleep("sleep_surface_entry_complete", record, zombie, runtime,
         "prepared", {
@@ -147,5 +156,22 @@ function Internal.PrepareSleepSurface(record, zombie, runtime, order)
     return true
 end
 
+
+function Internal.MaintainSleepPresentation(record, zombie, runtime, order)
+    if not runtime or not zombie then return false end
+    local surface = tostring(runtime.sleepSurface
+        or order and order.sleepSurface or "")
+    local direction = Internal.SleepDirection(order or runtime)
+    if direction and zombie.setForwardIsoDirection then
+        zombie:setForwardIsoDirection(direction)
+    end
+    if surface == "bed" or surface == "sofa" then
+        if zombie.setOnBed then zombie:setOnBed(true) end
+        if zombie.setOnFloor then zombie:setOnFloor(false) end
+    end
+    if zombie.setIsResting then zombie:setIsResting(true) end
+    if zombie.setVariable then zombie:setVariable("PNCSleeping", true) end
+    return true
+end
 
 return Internal

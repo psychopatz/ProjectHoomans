@@ -254,17 +254,43 @@ T.truthy(categories.corpse_seen_hostile, "hostile reply category")
 T.truthy(categories.corpse_seen_comrade, "faction comrade reply category")
 T.truthy(categories.corpse_seen_neutral, "neutral reply category")
 local comradeGreeting
+local neutralGreeting
+local hostileGreeting
+local friendGreeting
 for _, event in ipairs(sentGreetings) do
     if event.payload.speechEventID == "corpse_seen_comrade" then
         comradeGreeting = event.payload
-        break
+    elseif event.payload.speechEventID == "corpse_seen_neutral" then
+        neutralGreeting = event.payload
+    elseif event.payload.speechEventID == "corpse_seen_hostile" then
+        hostileGreeting = event.payload
+    elseif event.payload.speechEventID == "corpse_seen_friend" then
+        friendGreeting = event.payload
     end
 end
 T.truthy(comradeGreeting, "comrade reaction has a localized gossip packet")
 T.equal(comradeGreeting.gossipPacket.a[1], "Avery Reed",
-    "ID card name is passed as the corpse subject")
+    "ID card name is passed as the corpse subject for same-faction comrades")
 T.equal(comradeGreeting.gossipPacket.a[2], "North Watch",
-    "dogtag faction name is passed to the reaction template")
+    "dogtag faction name is passed to the reaction template for comrades")
+T.equal(comradeGreeting.subjectKnown, true,
+    "comrade reaction marks subject as known")
+T.equal(friendGreeting.gossipPacket.a[1], "Avery Reed",
+    "friend reaction uses the deceased NPC name")
+T.equal(friendGreeting.subjectKnown, true,
+    "friend reaction marks subject as known")
+T.equal(neutralGreeting.gossipPacket.a[1], "someone",
+    "unfamiliar neutral observer does not leak the dead NPC name")
+T.equal(neutralGreeting.corpseName, nil,
+    "unfamiliar neutral payload omits true corpseName")
+T.equal(neutralGreeting.subjectKnown, false,
+    "unfamiliar neutral observer marks subject as unknown")
+T.equal(hostileGreeting.gossipPacket.a[1], "a hostile",
+    "unfamiliar hostile observer uses anonymous hostile subject")
+T.equal(hostileGreeting.corpseName, nil,
+    "unfamiliar hostile payload omits true corpseName")
+T.equal(hostileGreeting.subjectKnown, false,
+    "unfamiliar hostile observer marks subject as unknown")
 for _, entry in ipairs(memoryAdds) do
     T.equal(entry.spec.type, "death_witnessed", "long-term memory type")
     T.equal(entry.spec.permanent, true, "death memory does not decay")
@@ -280,11 +306,34 @@ T.equal(#sentGreetings, 5, "repeat scan does not repeat replies")
 
 now = now + 20000
 local lateObserver = addObserver("late_observer", nil)
+local acquaintedNeutral = addObserver("acquainted_neutral", {
+    state = "neutral",
+    familiarity = 20,
+    memories = {},
+})
 indexedNPCs[#indexedNPCs + 1] = lateObserver
-T.equal(PNC.CorpseAwareness.ObserveCorpse(dead, corpse), 6,
-    "later nearby NPC can discover a still present corpse")
-T.equal(#memoryAdds, 6, "late discovery adds one new memory")
-T.equal(#sentGreetings, 6, "late discovery can produce a reply")
+indexedNPCs[#indexedNPCs + 1] = acquaintedNeutral
+T.equal(PNC.CorpseAwareness.ObserveCorpse(dead, corpse), 7,
+    "later nearby NPCs can discover a still present corpse")
+T.equal(#memoryAdds, 7, "late discovery adds one new memory per observer")
+T.equal(#sentGreetings, 7, "late discovery can produce replies")
+local lateGreeting
+local acquaintedGreeting
+for _, event in ipairs(sentGreetings) do
+    if event.payload.npcID == "late_observer" then
+        lateGreeting = event.payload
+    elseif event.payload.npcID == "acquainted_neutral" then
+        acquaintedGreeting = event.payload
+    end
+end
+T.equal(lateGreeting.gossipPacket.a[1], "someone",
+    "observer with no relationship edge does not leak dead NPC name")
+T.equal(lateGreeting.subjectKnown, false,
+    "observer with no relationship edge marks subject unknown")
+T.equal(acquaintedGreeting.gossipPacket.a[1], "Avery Reed",
+    "familiar neutral acquaintance recognizes and names the dead NPC")
+T.equal(acquaintedGreeting.subjectKnown, true,
+    "familiar neutral acquaintance marks subject known")
 
 local hiddenDead = {
     id = "dead_hidden",
@@ -314,7 +363,7 @@ local hiddenWitnesses = PNC.CorpseAwareness.ObserveCorpse(
     hiddenCorpse
 )
 T.equal(hiddenWitnesses, 0, "blocked line of sight prevents reaction")
-T.equal(#memoryAdds, 6, "blocked line of sight does not add memories")
+T.equal(#memoryAdds, 7, "blocked line of sight does not add memories")
 T.equal(visibilityChecks, 12, "visibility checks have a hard cap per scan")
 T.equal(liveLookups, 64, "candidate scans have a hard cap per scan")
 
@@ -348,7 +397,7 @@ local fullCorpse = makeCorpse(
 )
 T.equal(PNC.CorpseAwareness.ObserveCorpse(fullDead, fullCorpse), 0,
     "per-NPC long-term memory cap blocks further additions")
-T.equal(#memoryAdds, 6, "memory cap prevents a flood of death records")
+T.equal(#memoryAdds, 7, "memory cap prevents a flood of death records")
 
 local oversizedObserver = addObserver("oversized_history", nil)
 local oversizedMemories = {}
@@ -381,7 +430,7 @@ T.equal(PNC.CorpseAwareness.ObserveCorpse(
     oversizedDead,
     oversizedCorpse
 ), 0, "oversized relationship memory arrays fail closed")
-T.equal(#memoryAdds, 6,
+T.equal(#memoryAdds, 7,
     "oversized history scan does not exceed the memory budget")
 
 local networkObserver = addObserver("network_observer", nil)

@@ -81,6 +81,25 @@ local function isEligible(record, zombie, now)
     if runtime and runtime.animationScene ~= nil then
         return false
     end
+    local liveControl = PNC and PNC.LiveBodyControl or nil
+    if liveControl then
+        if type(liveControl.IsBodyRotationLocked) == "function"
+            and liveControl.IsBodyRotationLocked(record, zombie) == true
+        then
+            return false
+        end
+        if type(liveControl.AllowsStandingIdle) == "function"
+            and liveControl.AllowsStandingIdle(record, zombie) ~= true
+        then
+            return false
+        end
+    elseif runtime and (
+        runtime.facilityActivity ~= nil
+        or runtime.roamingSeat ~= nil
+        or runtime.roamAmbient ~= nil
+    ) then
+        return false
+    end
     if zombie.getActionStateName then
         actionState = string.lower(tostring(zombie:getActionStateName() or ""))
         if actionState ~= "" and actionState ~= "idle" then

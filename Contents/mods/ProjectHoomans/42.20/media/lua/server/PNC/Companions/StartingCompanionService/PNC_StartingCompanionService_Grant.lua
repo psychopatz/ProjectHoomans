@@ -47,6 +47,15 @@ function H.EnsureOne(player, character, state, spec, index, at, options)
             { reason = "starting_companion_ensure" }
         )
     end
+    if not record
+        and grant and grant.status == "granted"
+        and npcID
+        and coreProvider
+        and type(coreProvider.IsRetiredCoreActor) == "function"
+        and coreProvider.IsRetiredCoreActor(npcID, PsychopatzCore) == true
+    then
+        return true, "companion_retired"
+    end
     if record and record.colonistDeparture
         and record.colonistDeparture.state == "completed"
     then

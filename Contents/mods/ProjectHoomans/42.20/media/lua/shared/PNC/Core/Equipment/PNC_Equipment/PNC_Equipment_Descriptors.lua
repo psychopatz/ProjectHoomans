@@ -24,6 +24,9 @@ function Internal.copyDescriptor(source, item, createReason)
         primaryType = source and source.primaryType or "barehand",
         resolvedMode = source and source.resolvedMode or "melee",
         hasWeapon = source and source.hasWeapon == true or false,
+        isContainer = source and source.isContainer == true or false,
+        isTwoHandWeapon = source and source.isTwoHandWeapon == true or false,
+        requiresBothHands = source and source.requiresBothHands == true or false,
         hasUsableFirearm = source and source.hasUsableFirearm == true or false,
         weaponStatus = source and source.weaponStatus or "barehand",
         createReason = createReason or source and source.createReason or "unknown",
@@ -36,6 +39,9 @@ local BAREHAND_DESCRIPTOR = {
     primaryType = "barehand",
     resolvedMode = "melee",
     hasWeapon = false,
+    isContainer = false,
+    isTwoHandWeapon = false,
+    requiresBothHands = false,
     hasUsableFirearm = false,
     weaponStatus = "barehand",
     item = nil,
@@ -107,13 +113,27 @@ function Internal.buildWeaponDescriptor(fullType, includeItem)
     end
 
     primaryType = Internal.resolvePrimaryType(item)
+    local isContainer = false
+    if item.getCapacity and (tonumber(item:getCapacity()) or 0) > 0 then
+        isContainer = true
+    elseif PNC.Inventory and PNC.Inventory.GetContainerProfile then
+        local profile = PNC.Inventory.GetContainerProfile(fullType)
+        isContainer = profile ~= nil and (tonumber(profile.capacity) or 0) > 0
+    end
+    local isTwoHand = item.isTwoHandWeapon and item:isTwoHandWeapon() == true or false
+    local requiresBoth = item.isRequiresEquippedBothHands
+        and item:isRequiresEquippedBothHands() == true or false
     cached = {
         fullType = fullType,
         primaryType = primaryType,
         resolvedMode = Internal.resolveModeFromPrimaryType(primaryType),
         hasWeapon = item.IsWeapon and item:IsWeapon() or false,
+        isContainer = isContainer,
+        isTwoHandWeapon = isTwoHand,
+        requiresBothHands = requiresBoth,
         hasUsableFirearm = primaryType == "rifle" or primaryType == "handgun",
-        weaponStatus = primaryType == "barehand" and "barehand" or ("equipped_" .. tostring(primaryType)),
+        weaponStatus = isContainer and "carried_container"
+            or (primaryType == "barehand" and "barehand" or ("equipped_" .. tostring(primaryType))),
         createReason = createReason or "unknown",
     }
     Equipment.DescriptorCache[fullType] = cached
@@ -178,9 +198,10 @@ function Internal.isPrimaryHandStateCurrent(zombie, descriptor, attackMode)
     if not readable then
         return nil
     end
-    if attackMode ~= true or not descriptor or not descriptor.fullType
-        or descriptor.hasWeapon ~= true
-    then
+    local shouldHold = descriptor and descriptor.fullType
+        and ((attackMode == true and descriptor.hasWeapon == true)
+            or descriptor.isContainer == true)
+    if not shouldHold then
         return item == nil
     end
     if not item then
@@ -196,4 +217,32 @@ function Internal.isPrimaryHandStateCurrent(zombie, descriptor, attackMode)
         return true
     end
     return tostring(fullType) == tostring(descriptor.fullType)
+end
+
+-- Vanilla PZ parity: a two-handed weapon swung while the off-hand holds
+-- another item (such as a carried bag) incurs one-handed penalties.
+function Equipment.IsUsingTwoHandedOneHanded(record, weaponItem)
+    local equipment = record and record.equipment or nil
+    local inv = record and record.inventory or nil
+    local secondaryFullType = equipment and equipment.secondaryFullType or nil
+    local primaryFullType = equipment and equipment.primaryFullType or nil
+    if not secondaryFullType and inv and inv.equipped and inv.equipped.secondary then
+        local secItem = inv.items and inv.items[inv.equipped.secondary] or nil
+        secondaryFullType = secItem and secItem.type or nil
+    end
+    if not secondaryFullType or secondaryFullType == "" then
+        return false
+    end
+    if weaponItem and weaponItem.isTwoHandWeapon then
+        return weaponItem:isTwoHandWeapon() == true
+    end
+    if not primaryFullType and inv and inv.equipped and inv.equipped.primary then
+        local priItem = inv.items and inv.items[inv.equipped.primary] or nil
+        primaryFullType = priItem and priItem.type or nil
+    end
+    if not primaryFullType or primaryFullType == "" then
+        return false
+    end
+    local descriptor = Internal.peekWeaponDescriptor(primaryFullType)
+    return descriptor and descriptor.isTwoHandWeapon == true or false
 end

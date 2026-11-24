@@ -20,6 +20,15 @@ end
 
 function Class:onBlueprintChanged()
     self:clearEditorStatus()
+    local snapshot = Client and Client.GetSnapshot and Client.GetSnapshot() or nil
+    if snapshot and snapshot.sessionId
+        and snapshot.phase ~= "completed"
+        and snapshot.phase ~= "aborted"
+        and snapshot.phase ~= "restored"
+        and Client.Stop
+    then
+        Client.Stop()
+    end
     local index = tonumber(self.blueprintCombo.selected) or 1
     local blueprint = self.blueprints and self.blueprints[index]
     if blueprint then
@@ -50,8 +59,29 @@ function Class:onTopAction(button)
         accepted, reason = Model.CreateNew()
     elseif id == "duplicate" then
         accepted, reason = Model.DuplicateBlueprint()
+    elseif id == "autobind" then
+        if Model.AutoBindLiveActors then
+            accepted, reason = Model.AutoBindLiveActors()
+        else
+            accepted, reason = false, "auto_bind_unavailable"
+        end
     elseif id == "save" then
         accepted, reason = Model.SaveDraft()
+    elseif id == "export" then
+        local Exporter = PNC.PuppetOpera and PNC.PuppetOpera.Exporter
+            or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Exporter"
+        local draft = Model.GetDraft and Model.GetDraft() or nil
+        if draft and Exporter and Exporter.Export then
+            local ok, res = Exporter.Export(draft, {
+                publish = true,
+                includeXml = true,
+            })
+            accepted = ok == true
+            reason = accepted and ("exported:" .. tostring(res.luaPath))
+                or tostring(res)
+        else
+            accepted, reason = false, "export_unavailable"
+        end
     elseif id == "reset" then
         accepted, reason = Model.ResetDraft()
     end

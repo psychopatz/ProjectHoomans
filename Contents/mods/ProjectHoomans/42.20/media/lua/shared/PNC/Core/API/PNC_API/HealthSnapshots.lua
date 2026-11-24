@@ -129,6 +129,26 @@ function API.DebugBandageAlmostDirty(npcId, partId)
     return true, reason
 end
 
+function API.ApplyDebugWoundState(npcId, args)
+    local record = Registry.Get(npcId)
+    if not record or not Core or type(Core.IsAuthority) ~= "function"
+        or Core.IsAuthority() ~= true
+        or not PNC.NPCWounds or not PNC.NPCWounds.ApplyDebugWoundState
+    then
+        return false, "not_authority_or_missing"
+    end
+    local zombie = Registry.GetLiveZombie(npcId)
+    local applied, reason = PNC.NPCWounds.ApplyDebugWoundState(
+        record,
+        zombie,
+        args and args.partId,
+        args and args.stateAction
+    )
+    if not applied then return false, reason end
+    Network.BroadcastRecord(record, "debug_wound_state")
+    return true, reason
+end
+
 function API.GetSnapshot(npcId)
     local record = Registry.Get(npcId)
     if record then

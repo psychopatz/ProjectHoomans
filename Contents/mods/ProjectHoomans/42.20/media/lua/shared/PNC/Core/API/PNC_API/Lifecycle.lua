@@ -83,6 +83,23 @@ function Internal.ApplyLiveEquipment(record, reason, scope)
     return applied, applyReason
 end
 
+local function clearAbortedDirty(record)
+    local id = record and record.id or nil
+    if not id or not Registry then return end
+    if type(Registry.Get) == "function" and Registry.Get(id) ~= nil then
+        return
+    end
+    if type(Registry.DirtyByID) == "table" then
+        Registry.DirtyByID[id] = nil
+    end
+    if type(Registry.DirtyDomains) == "table" then
+        Registry.DirtyDomains[id] = nil
+    end
+    if type(Registry.RetryState) == "table" then
+        Registry.RetryState[id] = nil
+    end
+end
+
 local function finalizeNewRecord(record, definition, prepare)
     if Inventory then
         if definition.inventory and Inventory.Deserialize then
@@ -98,6 +115,7 @@ local function finalizeNewRecord(record, definition, prepare)
                     { personalInventory = definition.personalInventory }
                 )
             if not hydrated then
+                clearAbortedDirty(record)
                 Core.LogWarn(
                     "PNC canonical inventory hydration failed id="
                         .. tostring(record.id) .. " reason="
@@ -132,6 +150,7 @@ local function finalizeNewRecord(record, definition, prepare)
         local adopted, adoptionReason = coreProvider.EnsureActor(
             record, PsychopatzCore)
         if not adopted then
+            clearAbortedDirty(record)
             Core.LogWarn(
                 "PNC Core actor adoption failed id=" .. tostring(record.id)
                     .. " reason=" .. tostring(adoptionReason or "unknown")

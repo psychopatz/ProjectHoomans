@@ -19,10 +19,16 @@ function Internal.NPCBulkSource(record)
     local body = PNC.Registry.GetLiveZombie(record.id)
     local entries = {}
     for _, item in pairs(inventory.items or {}) do
+        local bagContainer = item.bagContainer
+            and inventory.containers
+            and inventory.containers[item.bagContainer]
+            or nil
+        local hasBagContents = bagContainer and #(bagContainer.items or {}) > 0
         if not Internal.IsNPCDepositForbiddenItem(item)
             and item.fav ~= true
             and not item.equipSlot and not item.wornSlot
             and not item.attachedSlot
+            and not hasBagContents
         then
             entries[#entries + 1] = item
         end

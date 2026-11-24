@@ -74,15 +74,21 @@ end
 
 function Internal.SleepDirection(order)
     local directionName = tostring(order and order.sleepFacing or "")
-    local axis = tostring(order and (order.sleepAxis or order.interactionAxis)
-        or "")
-    if axis == "x" then directionName = "E"
-    elseif axis == "y" then directionName = "S" end
     if directionName == "" then
         directionName = tostring(order and order.interactionFacing or "")
     end
+    if directionName == "" then
+        local axis = tostring(order and (order.sleepAxis or order.interactionAxis)
+            or "")
+        if axis == "x" then directionName = "E"
+        elseif axis == "y" then directionName = "S" end
+    end
     if IsoDirections and IsoDirections[directionName] then
         return IsoDirections[directionName]
+    end
+    if IsoDirections and IsoDirections.fromString and directionName ~= "" then
+        local parsed = IsoDirections.fromString(directionName)
+        if parsed then return parsed end
     end
     return IsoDirections and IsoDirections.S or nil
 end

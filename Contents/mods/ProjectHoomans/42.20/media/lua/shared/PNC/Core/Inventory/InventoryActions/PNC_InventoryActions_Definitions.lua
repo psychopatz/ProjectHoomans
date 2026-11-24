@@ -109,12 +109,27 @@ Actions.Register({
     isAvailable = function(_, item)
         return item.equipSlot ~= "primary"
             and item.wornSlot == nil
-            and item.bagContainer == nil
             and not (Inventory.IsWaterContainer
                 and Inventory.IsWaterContainer(item))
     end,
     execute = function(_, record, item)
         return Inventory.SetEquipped(record, "primary", item.id, "inventory_action_equip")
+    end,
+})
+
+Actions.Register({
+    id = "equip_secondary",
+    labelKey = "UI_PNC_Inventory_EquipSecondary",
+    label = "Equip Secondary",
+    isAvailable = function(_, item)
+        return item.equipSlot ~= "secondary"
+            and item.wornSlot == nil
+            and item.bagContainer ~= nil
+    end,
+    execute = function(_, record, item)
+        return Inventory.SetEquipped(
+            record, "secondary", item.id, "inventory_action_equip_secondary"
+        )
     end,
 })
 

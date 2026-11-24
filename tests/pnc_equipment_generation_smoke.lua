@@ -397,7 +397,7 @@ T.equal(interactionInventory.items[addedItem.id], nil, "item removed")
 
 local bagAdded, _, bagIDs = PNC.Inventory.AddItems(interactionRecord, {
     { type = "Base.Bag_Test", stack = 1 },
-}, "root", "smoke_bag_add")
+}, "root", "smoke_bag_add", { autoEquipBags = false })
 T.equal(bagAdded, true, "wearable container add")
 local bagItem = interactionInventory.items[bagIDs[1]]
 T.equal(bagItem.wearableSlot, "base:back", "container equipment slot")
@@ -413,9 +413,17 @@ T.equal(PNC.InventoryActions.Execute(
 ), true, "modular bag equip action")
 T.equal(bagItem.wornSlot, "base:back", "bag worn slot")
 T.equal(interactionInventory.worn["base:back"], bagItem.id, "bag worn reference")
+local wornMult = PNC.Inventory.Internal.getWornEncumbranceMultiplier()
+local reducedBagSelfWeight =
+    PNC.Inventory.Internal.getItemWeight("Base.Bag_Test") * (1 - wornMult)
 local reducedContentsWeight =
     PNC.Inventory.Internal.getItemWeight("Base.Bandage") * 5 * 0.8
-T.near(interactionInventory.cachedWeight, weightBeforeBagEquip - reducedContentsWeight, 0.0001, "equipped bag reduces contents weight")
+T.near(
+    interactionInventory.cachedWeight,
+    weightBeforeBagEquip - reducedContentsWeight - reducedBagSelfWeight,
+    0.0001,
+    "equipped bag reduces contents and worn bag weight"
+)
 local bagPayload = PNC.Inventory.BuildFullPayload(interactionRecord)
 T.equal(bagPayload.items[bagItem.id].weightReduction, 0.8,
     "bag reduction replicated")

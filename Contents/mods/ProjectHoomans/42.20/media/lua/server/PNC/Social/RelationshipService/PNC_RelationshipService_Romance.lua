@@ -170,16 +170,25 @@ local function relationshipEvaluation(
     if not npcProfile then return nil, "npc_social_profile_unavailable" end
     playerGender = playerIsFemale(player)
     npcGender = npcIsFemale(record)
-    if playerGender ~= nil and npcGender ~= nil
-        and ProfileMath
-        and type(ProfileMath.AreMutuallyOrientationCompatible) == "function"
-    then
-        compatible = ProfileMath.AreMutuallyOrientationCompatible(
-            npcProfile,
-            npcGender,
-            playerProfile,
-            playerGender
-        ) == true
+    local attractionWeight = 0
+    if playerGender ~= nil and npcGender ~= nil and ProfileMath then
+        if type(ProfileMath.MutualAttractionWeight) == "function" then
+            attractionWeight = ProfileMath.MutualAttractionWeight(
+                npcProfile,
+                npcGender,
+                playerProfile,
+                playerGender
+            )
+            compatible = attractionWeight > 0
+        elseif type(ProfileMath.AreMutuallyOrientationCompatible) == "function" then
+            compatible = ProfileMath.AreMutuallyOrientationCompatible(
+                npcProfile,
+                npcGender,
+                playerProfile,
+                playerGender
+            ) == true
+            attractionWeight = compatible and 1 or 0
+        end
     end
     evaluation = Policy.EvaluateEligibility(
         relationship,
@@ -188,6 +197,7 @@ local function relationshipEvaluation(
         npcIsAvailable(record) and playerIsAvailable(player),
         at
     )
+    evaluation.attractionWeight = attractionWeight
     evaluation.observerNPCID = tostring(observerNPCID)
     evaluation.targetKey = targetKey
     evaluation.bond = bond
@@ -269,7 +279,8 @@ function Relationships.Propose(
         targetKey .. ":" .. tostring(evaluation.relationship.revision)
             .. ":" .. Policy.ActionID(),
         evaluation.relationship,
-        evaluation.npcProfile
+        evaluation.npcProfile,
+        evaluation.attractionWeight
     )
     accepted = acceptance.accepted == true
     eventID = "social:relationship_proposal_"

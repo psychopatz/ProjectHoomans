@@ -29,6 +29,36 @@ local function actorID(entry)
     ) or "")
 end
 
+local function findByCoreActorID(coreID)
+    if coreID == "" then return nil, nil end
+    if PNC.ClientState and type(PNC.ClientState.snapshots) == "table" then
+        for _, snap in pairs(PNC.ClientState.snapshots) do
+            if type(snap) == "table"
+                and tostring(snap.coreActorID or "") == coreID
+            then
+                return snap, nil
+            end
+        end
+    end
+    local isClientOnly = PNC.Core
+        and type(PNC.Core.IsClientOnly) == "function"
+        and PNC.Core.IsClientOnly() == true
+    if not isClientOnly and PNC.Registry
+        and type(PNC.Registry.Data) == "table"
+    then
+        for _, rec in pairs(PNC.Registry.Data) do
+            if type(rec) == "table"
+                and (tostring(rec.coreActorID or "") == coreID
+                    or (type(rec.runtime) == "table"
+                        and tostring(rec.runtime.coreActorID or "") == coreID))
+            then
+                return nil, rec
+            end
+        end
+    end
+    return nil, nil
+end
+
 local function resolveHoomansContext(entry)
     if type(entry) ~= "table" then return entry end
     local id = actorID(entry)
@@ -40,6 +70,12 @@ local function resolveHoomansContext(entry)
         and type(PNC.ClientState.snapshots) == "table"
     then
         snapshot = PNC.ClientState.snapshots[id]
+        if type(snapshot) ~= "table" and type(entry.aliases) == "table" then
+            for _, alias in ipairs(entry.aliases) do
+                snapshot = PNC.ClientState.snapshots[tostring(alias or "")]
+                if type(snapshot) == "table" then break end
+            end
+        end
     end
 
     local record = entry.record
@@ -52,6 +88,18 @@ local function resolveHoomansContext(entry)
         and type(PNC.Registry.Get) == "function"
     then
         record = PNC.Registry.Get(id)
+        if type(record) ~= "table" and type(entry.aliases) == "table" then
+            for _, alias in ipairs(entry.aliases) do
+                record = PNC.Registry.Get(tostring(alias or ""))
+                if type(record) == "table" then break end
+            end
+        end
+    end
+
+    if type(snapshot) ~= "table" and type(record) ~= "table" then
+        local foundSnap, foundRec = findByCoreActorID(id)
+        snapshot = snapshot or foundSnap
+        record = record or foundRec
     end
 
     if type(snapshot) ~= "table" and type(record) ~= "table" then

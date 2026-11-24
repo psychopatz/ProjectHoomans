@@ -12,7 +12,7 @@ local Zones = PNC.WorldItemContext.Zones
 local Common = PNC.BehaviorCommon
 
 local ACTION_SCENE = {
-    rip_bandage = { id = "scavenge.rip", bump = "LootLow", durationMs = 1200 },
+    rip_bandage = { id = "scavenge.rip", bump = "Making", durationMs = 1450 },
     corpse = { id = "scavenge.loot_low", bump = "LootLow", durationMs = 650 },
     floor = { id = "scavenge.loot_low", bump = "LootLow", durationMs = 650 },
     container = { id = "scavenge.loot", bump = "Loot", durationMs = 650 },
@@ -48,6 +48,13 @@ function Internal.IsCandidateStillValid(intent)
         allowRestrictedZones = intent.allowRestrictedZones == true,
     }) then
         return false, "restricted_zone"
+    end
+    if cand.sourceType == "curtain" then
+        local objs = safeCall(cand.square, "getObjects")
+        if objs and not listContains(objs, cand.object) then
+            return false, "curtain_missing"
+        end
+        return cand.object ~= nil, cand.object ~= nil and nil or "curtain_missing"
     end
     if cand.sourceType == "floor" then
         local objs = safeCall(cand.square, "getWorldObjects")
@@ -109,6 +116,54 @@ function Internal.WithinInteractionRadius(record, body, cand)
     return dx * dx + dy * dy <= radius * radius
 end
 
+local function attachRipHandProp(intent, body, cand)
+    if not body or not body.setPrimaryHandItem then return false end
+    local fullType = (cand and cand.itemCtx and cand.itemCtx.fullType)
+        or (cand and cand.item and safeCall(cand.item, "getFullType"))
+        or "Base.RippedSheets"
+    local prop = nil
+    if type(instanceItem) == "function" then
+        local ok, created = pcall(instanceItem, tostring(fullType))
+        if ok and created then prop = created end
+        if not prop then
+            local okFallback, fallback = pcall(instanceItem, "Base.RippedSheets")
+            if okFallback and fallback then prop = fallback end
+        end
+    end
+    if not prop then return false end
+    intent._savedHands = {
+        primary = safeCall(body, "getPrimaryHandItem"),
+        secondary = safeCall(body, "getSecondaryHandItem"),
+    }
+    pcall(body.setPrimaryHandItem, body, prop)
+    if body.setSecondaryHandItem then
+        pcall(body.setSecondaryHandItem, body, nil)
+    end
+    if body.resetEquippedHandsModels then
+        pcall(body.resetEquippedHandsModels, body)
+    end
+    return true
+end
+
+function Internal.RestoreRipHandProp(intent, record, body)
+    local saved = intent and intent._savedHands or nil
+    if not saved then return false end
+    intent._savedHands = nil
+    if not body then return false end
+    if body.setPrimaryHandItem then
+        pcall(body.setPrimaryHandItem, body, saved.primary)
+    end
+    if body.setSecondaryHandItem then
+        pcall(body.setSecondaryHandItem, body, saved.secondary)
+    end
+    if PNC.Equipment and type(PNC.Equipment.RefreshLiveHands) == "function" then
+        pcall(PNC.Equipment.RefreshLiveHands, record, body)
+    elseif body.resetEquippedHandsModels then
+        pcall(body.resetEquippedHandsModels, body)
+    end
+    return true
+end
+
 function Internal.BeginInteract(intent, record, body, now)
     local cand = intent.candidate
     if Common and Common.HaltMovement then
@@ -120,6 +175,9 @@ function Internal.BeginInteract(intent, record, body, now)
         elseif body.faceLocation then
             pcall(body.faceLocation, body, cand.x + 0.5, cand.y + 0.5)
         end
+    end
+    if intent.action == "rip_bandage" then
+        attachRipHandProp(intent, body, cand)
     end
     local spec = intent.action == "rip_bandage" and ACTION_SCENE.rip_bandage
         or ACTION_SCENE[cand.sourceType] or ACTION_SCENE.container

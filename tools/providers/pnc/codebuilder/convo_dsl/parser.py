@@ -26,7 +26,9 @@ TOKEN_RE = re.compile(r"\{([^}]+)\}")
 RUNTIME_TOKEN_PREFIXES = (
     "speaker.",
     "addressee.",
-    "subject.",
+    "location.",
+    "subj.",
+    "gram.",
     "target.",
     "claimed.",
     "player.",

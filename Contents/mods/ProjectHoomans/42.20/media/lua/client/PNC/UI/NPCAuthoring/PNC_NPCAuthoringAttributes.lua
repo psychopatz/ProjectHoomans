@@ -17,10 +17,15 @@ function Window:buildAttributeGroups()
             end, variant = 'quiet' })
         row.empty = I.addLabel(self.pages.attributes, tr('UI_PNC_Authoring_NoConfigured', 'No entries yet'))
         row.configured:setOnMouseDownFunction(self, function(target, value)
-            if row.id == 'skill' then
+            if row.id == 'skill' and value then
                 I.selectCombo(target.skillCombo, value.key)
-                target.skillLevelCombo:selectData(target.draft.skillLevels[value.key])
-                target.skillLevelCombo:refreshValue()
+                local currentLevel = target.draft and target.draft.skillLevels
+                    and target.draft.skillLevels[value.key]
+                if currentLevel == nil then currentLevel = value.level end
+                if currentLevel ~= nil then
+                    target.skillLevelCombo:selectData(tonumber(currentLevel))
+                    target.skillLevelCombo:refreshValue()
+                end
             end
         end)
         self.attributeGroups[#self.attributeGroups + 1] = row

@@ -54,7 +54,12 @@ local function updateHostLifecycles()
     for index, host in ipairs(hosts) do
         local interruption = host and host.updateLifecycle and host:updateLifecycle() or nil
         if not interruption and host and host.session and type(host.session.update) == "function" then
+            local wasBusy = host.session.busy == true or #(host.session.queue or {}) > 0
             host.session:update()
+            local isBusy = host.session.busy == true or #(host.session.queue or {}) > 0
+            if wasBusy ~= isBusy then
+                State.nextControlsRefreshAt = 0
+            end
         end
         if interruption or (host and host.closed) then
             failureReason = failureReason or interruption or "conversation_interrupted"

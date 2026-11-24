@@ -47,10 +47,13 @@ function Internal.createItemProbe(fullType)
 end
 
 local function readContainerProfile(item, capacity, reduction, wearableSlot)
-    if item and item.getMaxCapacity then
-        capacity = tonumber(item:getMaxCapacity()) or capacity
-    elseif item and item.getCapacity then
-        capacity = tonumber(item:getCapacity()) or capacity
+    if item and item.getCapacity then
+        local cap = tonumber(item:getCapacity())
+        if cap and cap > 0 then capacity = cap end
+    end
+    if capacity <= 0 and item and item.getMaxCapacity then
+        local cap = tonumber(item:getMaxCapacity())
+        if cap and cap > 0 then capacity = cap end
     end
     if item and item.getWeightReduction then
         reduction = Internal.normalizeItemWeightReduction(

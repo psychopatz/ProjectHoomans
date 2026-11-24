@@ -81,6 +81,18 @@ function Needs.Update(record, elapsedHours, reason, stateOverride,
             anyChanged = true
         end
     end
+    local currentActivity = Needs.GetActivity(record)
+    local isResting = currentActivity == "sleeping" or currentActivity == "resting"
+    if PNC.Exercise and type(PNC.Exercise.Update) == "function" then
+        if PNC.Exercise.Update(record, elapsedHours, isResting) then
+            anyChanged = true
+        end
+    end
+    if PNC.Mood and type(PNC.Mood.Update) == "function" then
+        if PNC.Mood.Update(record, elapsedHours, currentActivity) then
+            anyChanged = true
+        end
+    end
     local nutrition = Needs.IsNutritionRealismEnabled()
         and Needs.EnsureNutrition(record) or nil
     if nutrition and NutritionModel then

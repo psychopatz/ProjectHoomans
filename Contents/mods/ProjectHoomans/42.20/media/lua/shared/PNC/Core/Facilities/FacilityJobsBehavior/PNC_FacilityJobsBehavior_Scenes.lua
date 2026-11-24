@@ -20,6 +20,10 @@ function Internal.OnSceneTick(record, zombie, scene, now)
         -- animation scene has been accepted. Reaching the bed is not sleep.
         runtime.sleepSceneActive = true
         runtime.phase = "SLEEPING"
+        if Internal.MaintainSleepPresentation then
+            Internal.MaintainSleepPresentation(
+                record, zombie, runtime, record.orderSpec)
+        end
         if not sleepWasActive
             and Diagnostics and Diagnostics.SleepAuditEnabled == true
             and Diagnostics.LogSleepState
@@ -51,9 +55,21 @@ function Internal.OnSceneTick(record, zombie, scene, now)
     end
     if runtime.seating == true
         and runtime.seatEntered == true
-        and Internal.MaintainFloorSeat
     then
-        Internal.MaintainFloorSeat(record, zombie, runtime, record.orderSpec)
+        if Internal.IsFloorSeating(runtime, record.orderSpec) then
+            if Internal.MaintainFloorSeat then
+                Internal.MaintainFloorSeat(
+                    record, zombie, runtime, record.orderSpec)
+            end
+        elseif Internal.MaintainFurnitureSeat then
+            Internal.MaintainFurnitureSeat(
+                record, zombie, runtime, record.orderSpec)
+        end
+        if Internal.RecordProgress
+            and now >= (tonumber(runtime.lastProgressAt) or 0) + 5000
+        then
+            Internal.RecordProgress(record, now, "seated_active")
+        end
     end
     if PNC.FacilityReservations and runtime.reservationId ~= ""
         and now >= (tonumber(runtime.nextReservationRenewAt) or 0)

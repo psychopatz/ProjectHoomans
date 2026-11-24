@@ -112,7 +112,13 @@ function Adapter.captureLoose(record, body)
     for i = 1, #removeIds do
         ops[#ops + 1] = { op = "remove", itemID = removeIds[i] }
     end
+    local plan = Internal.planContainerPlacement
+        and Internal.planContainerPlacement(inv, capturedSpecs, "auto")
+        or nil
     for i = 1, #capturedSpecs do
+        if plan and plan.assignments and plan.assignments[i] then
+            capturedSpecs[i].container = plan.assignments[i]
+        end
         ops[#ops + 1] = { op = "add", item = capturedSpecs[i] }
     end
     if #ops > 0 then

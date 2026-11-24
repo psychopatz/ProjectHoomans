@@ -26,7 +26,7 @@ function Tabs.RenderHealth(view, snapshot, payload, topY)
     local silhouetteHeight = math.min(302, math.max(220, view.height - padding * 2 - 24))
     local hpCurrent = tonumber(health.current) or tonumber(body.overallPercent) or 0
     local hpMax = math.max(1, tonumber(health.max) or 100)
-    local bodyBounds = Health.DrawBody(view, resolved.isFemale == true, padding, padding, silhouetteWidth, silhouetteHeight, wounds, hpCurrent, hpMax)
+    local bodyBounds = Health.DrawBody(view, resolved.isFemale == true, padding, padding, silhouetteWidth, silhouetteHeight, wounds, hpCurrent, hpMax, body)
     local x = padding + silhouetteWidth + 10
     local width = math.max(150, view.width - x - padding)
     local y = topY

@@ -362,3 +362,5 @@ function Core.LogRecordDebug(record, message)
         Core.Log("DEBUG", message)
     end
 end
+
+require "PNC/Core/Base/PNC_WorldClock"

@@ -80,6 +80,10 @@ function Settings.NPCDamageDealtMultiplier()
     return Settings.GetNumber("NPCDamageDealtMultiplier", 1, 0, 10)
 end
 
+function Settings.NPCCarryCapacityMultiplier()
+    return Settings.GetNumber("NPCCarryCapacityMultiplier", 1.0, 0.5, 10.0)
+end
+
 function Settings.NPCPlayerWoundsEnabled()
     return Settings.GetBoolean("NPCPlayerWounds", true)
 end

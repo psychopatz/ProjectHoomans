@@ -73,6 +73,39 @@ local function clean(value)
     return value ~= "" and value or nil
 end
 
+local COMBAT_BUMP_PREFIXES = {
+    "PNC_Shove",
+    "PNC_Aim",
+    "PNC_Attack",
+    "PNC_Melee",
+    "PNC_Shoot",
+    "PNC_Reload",
+    "PNC_Rack",
+    "PNC_Gun",
+    "PNC_Hit",
+    "PNC_Stagger",
+}
+
+local function isCombatBumpName(bump)
+    bump = tostring(bump or "")
+    if bump == "" then return true end
+    for _, prefix in ipairs(COMBAT_BUMP_PREFIXES) do
+        if string.sub(bump, 1, #prefix) == prefix then
+            return true
+        end
+    end
+    return false
+end
+
+function Capabilities.Register(id, definition)
+    id = clean(id)
+    if not id or type(definition) ~= "table" then return false end
+    local entry = copy(definition)
+    entry.id = id
+    DEFINITIONS[id] = entry
+    return true
+end
+
 function Capabilities.Get(id)
     local definition = DEFINITIONS[tostring(id or "")]
     return definition and copy(definition) or nil
@@ -80,6 +113,23 @@ end
 
 function Capabilities.ForTrack(actorKind, track)
     if type(track) ~= "table" then return nil end
+    if track.route == "anim_vars" or track.mode == "anim_vars" then
+        local style = clean(track.style or track.anim or "custom")
+        local role = clean(track.role or "Actor")
+        local varID = tostring(actorKind or "actor")
+            .. ".anim_vars." .. tostring(style) .. "." .. tostring(role)
+        if DEFINITIONS[varID] then return copy(DEFINITIONS[varID]) end
+        return {
+            id = varID,
+            actorKind = actorKind,
+            route = "anim_vars",
+            source = "PNC_anim_vars",
+            scenePolicy = "scene_approved",
+            gameplayEvents = false,
+            loopable = true,
+            nonCombatRequired = actorKind == "nearby_live_npc",
+        }
+    end
     local id
     if actorKind == "local_player" then
         if track.mode == "emote" or track.emote then
@@ -93,7 +143,52 @@ function Capabilities.ForTrack(actorKind, track)
     if track.capabilityId and DEFINITIONS[tostring(track.capabilityId)] then
         id = tostring(track.capabilityId)
     end
-    return id and Capabilities.Get(id) or nil
+    local existing = id and Capabilities.Get(id) or nil
+    if existing then return existing end
+
+    -- Policy-driven approval so creators can mix and match safe emotes and
+    -- non-combat PNC AnimSet bumps without editing a hardcoded allowlist.
+    if actorKind == "local_player"
+        and (track.mode == "emote" or track.emote)
+        and clean(track.emote)
+    then
+        return {
+            id = "player.emote." .. tostring(track.emote),
+            actorKind = "local_player",
+            route = "player_emote",
+            source = "player_native",
+            scenePolicy = "scene_approved",
+            gameplayEvents = false,
+            loopable = true,
+        }
+    end
+    if actorKind == "nearby_live_npc" and clean(track.bump) then
+        local bump = tostring(track.bump)
+        if isCombatBumpName(bump) then
+            return {
+                id = "npc.bump." .. bump,
+                actorKind = "nearby_live_npc",
+                route = "zombie_bump",
+                source = "PNC_xml",
+                scenePolicy = "preview_only",
+                gameplayEvents = false,
+                loopable = false,
+                nonCombatRequired = true,
+                warning = "combat-classified bump; preview only",
+            }
+        end
+        return {
+            id = "npc.bump." .. bump,
+            actorKind = "nearby_live_npc",
+            route = "zombie_bump",
+            source = "PNC_xml",
+            scenePolicy = "scene_approved",
+            gameplayEvents = false,
+            loopable = true,
+            nonCombatRequired = true,
+        }
+    end
+    return nil
 end
 
 function Capabilities.IsSceneApproved(actorKind, track)

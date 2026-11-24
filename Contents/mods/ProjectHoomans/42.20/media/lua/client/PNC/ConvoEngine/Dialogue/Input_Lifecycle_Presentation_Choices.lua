@@ -212,7 +212,9 @@ local function presentSemanticChoices(view, authoredChoices)
     local projection = view and view.semanticSuggestions or nil
     if type(projection) ~= "table" then return nil end
     if view then view.semanticAuthoredChoices = authoredChoices end
-    if view and view.session and view.session.busy == true then
+    if view and view.session
+        and (view.session.busy == true or #(view.session.queue or {}) > 0)
+    then
         -- Do not replace Core's authored/pending surface while the opening or
         -- a response is still being delivered. Core rejects clicks in this
         -- state, so exposing semantic rows here creates dead buttons.
@@ -237,7 +239,7 @@ local function applyCoreChoices(view, projection, authoredChoices)
     authoredChoices = authoredChoices
         or view and view.semanticAuthoredChoices
     local rows = buildCoreChoices(view, projection, authoredChoices)
-    if session.busy == true then
+    if session.busy == true or #(session.queue or {}) > 0 then
         -- Session:finishPending will call setChoices after the queued NPC
         -- response, at which point the presentation callback will apply the
         -- same production projection with an interactive Core session.

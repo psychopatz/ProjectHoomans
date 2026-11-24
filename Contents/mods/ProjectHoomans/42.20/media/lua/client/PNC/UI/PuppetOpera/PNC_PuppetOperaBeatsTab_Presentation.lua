@@ -25,23 +25,25 @@ local function drawBeatItem(list, y, row, alternate)
         list:drawRect(0, y, list:getWidth(), list.itemheight,
             0.12, 0.16, 0.18, 0.20)
     end
+    local modeTag = beat.mode and beat.mode ~= "timed"
+        and (" [" .. tostring(beat.mode) .. "]") or ""
     list:drawText(
-        tostring(row.index) .. ".  " .. tostring(beat.id),
+        tostring(row.index) .. ".  " .. tostring(beat.id) .. modeTag,
         8, y + 5,
         0.92, 0.94, 1.00, 1, UIFont.Small
     )
     list:drawText(
         Layout.Ellipsize(
-            tostring(row.summary or "No tracks assigned"),
+            tostring(beat.summary or row.summary or "No tracks assigned"),
             UIFont.Small,
-            math.max(32, list:getWidth() - 16)
+            math.max(32, list:getWidth() - 28)
         ),
         8, y + 24,
         0.62, 0.82, 0.95, 1, UIFont.Small
     )
     list:drawTextRight(
         tostring(beat.durationMs or "-") .. " ms",
-        list:getWidth() - 8,
+        list:getWidth() - 20,
         y + 5,
         0.72, 0.78, 0.84, 1, UIFont.Small
     )

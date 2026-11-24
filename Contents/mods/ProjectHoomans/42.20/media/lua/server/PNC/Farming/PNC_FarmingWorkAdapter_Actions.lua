@@ -109,16 +109,36 @@ function Internal.CollectStockpileInputs(order, worker, body, target, reqs, tag,
     return true, nil
 end
 
+local FARM_XP = {
+    PLOW = 2,
+    PLANT = 4,
+    WATER = 2,
+    HARVEST = 10,
+}
+
+local function awardFarmingXP(worker, action)
+    local amount = FARM_XP[action]
+    if amount and worker and PNC.Skills and PNC.Skills.AddXP then
+        PNC.Skills.AddXP(worker, "Agriculture", amount)
+    end
+end
+
 function Internal.PerformTileAction(order, worker, body, target, tile, action)
     local anim = oneShotFarmAnimation(
         order, worker, body, "facility.farm.work", "farm_" .. string.lower(action))
     if anim ~= "completed" then return "animating", nil end
     if action == "PLOW" then
-        return FarmingAdapter.Plow(worker, body, tile)
+        local ok, reason = FarmingAdapter.Plow(worker, body, tile)
+        if ok then awardFarmingXP(worker, "PLOW") end
+        return ok, reason
     elseif action == "PLANT" then
-        return FarmingAdapter.Plant(worker, body, target, tile, target.desiredCrop)
+        local ok, reason = FarmingAdapter.Plant(worker, body, target, tile, target.desiredCrop)
+        if ok then awardFarmingXP(worker, "PLANT") end
+        return ok, reason
     elseif action == "WATER" then
-        return FarmingAdapter.Water(worker, body, tile)
+        local ok, reason = FarmingAdapter.Water(worker, body, tile)
+        if ok then awardFarmingXP(worker, "WATER") end
+        return ok, reason
     elseif action == "HARVEST" then
         local beforeInv = inventorySnapshot(worker)
         local cell = getCell and getCell() or nil
@@ -127,6 +147,7 @@ function Internal.PerformTileAction(order, worker, body, target, tile, action)
             and PNC.WorkOutputService.CaptureGroundOutput(sq, nil, nil, { snapshotOnly = true }) or nil
         local ok, reason = FarmingAdapter.Harvest(worker, body, tile)
         if not ok then return false, reason end
+        awardFarmingXP(worker, "HARVEST")
         if PNC.WorkOutputService then
             local gained = diffHarvestItems(beforeInv, inventorySnapshot(worker))
             local effect = PNC.WorkOutputService.EnsureOutputEffect(order, "FARMING", {})

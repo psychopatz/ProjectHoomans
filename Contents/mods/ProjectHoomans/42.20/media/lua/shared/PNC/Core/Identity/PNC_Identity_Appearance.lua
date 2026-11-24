@@ -325,6 +325,34 @@ function Appearance.Resolve(record, baseItems)
         end
     end
 
+    local overlay = record and record.runtime
+        and record.runtime.weatherOverlay or nil
+    if type(overlay) == "table" then
+        if type(overlay.hideSlots) == "table" then
+            for hideSlot, shouldHide in pairs(overlay.hideSlots) do
+                if shouldHide == true then
+                    base = removeSlot(base, hideSlot)
+                end
+            end
+        end
+        if type(overlay.addItems) == "table" then
+            for _, addSpec in ipairs(overlay.addItems) do
+                if type(addSpec) == "table" and stringValue(addSpec.type) then
+                    local addSlot = stringValue(addSpec.wornSlot)
+                        or Appearance.ResolveBodyLocation(addSpec.type)
+                    if addSlot then
+                        base = removeSlot(base, addSlot)
+                    end
+                    base[#base + 1] = {
+                        type = stringValue(addSpec.type),
+                        wornSlot = addSlot,
+                        itemState = nil,
+                    }
+                end
+            end
+        end
+    end
+
     for _, item in ipairs(base) do
         if item.type then
             output[#output + 1] = item

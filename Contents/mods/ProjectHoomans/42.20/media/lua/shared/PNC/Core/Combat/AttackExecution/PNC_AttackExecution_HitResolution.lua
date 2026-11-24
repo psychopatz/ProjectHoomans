@@ -105,6 +105,25 @@ local function resolveMeleeOutcome(record, target, action)
         action.meleeOutcome.profile
 end
 
+local function awardMeleeHitXP(record, action)
+    if not Skills then return end
+    local weaponSkill = action.skillID or "Strength"
+    local weaponXP = action.attackKind == "ground" and 4 or 5
+    if Skills.AddXPBatch then
+        local batch = {
+            { skillId = weaponSkill, amount = weaponXP },
+            { skillId = "Maintenance", amount = 1 },
+        }
+        if weaponSkill ~= "Strength" then
+            batch[#batch + 1] = { skillId = "Strength", amount = 2 }
+        end
+        Skills.AddXPBatch(record, batch)
+    elseif Skills.AddXP then
+        Skills.AddXP(record, weaponSkill, weaponXP)
+        Skills.AddXP(record, "Maintenance", 1)
+    end
+end
+
 local function commitMeleeSwingResources(record, zombie, action, weaponItem)
     if action.meleeResourcesCommitted == true then return end
     action.meleeResourcesCommitted = true
@@ -215,10 +234,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
                 end
-                if Skills and Skills.AddXP then
-                    Skills.AddXP(record, action.skillID or "Strength", action.attackKind == "ground" and 4 or 5)
-                    Skills.AddXP(record, "Maintenance", 1)
-                end
+                awardMeleeHitXP(record, action)
                 return true, attackReason or "hit_player"
             end
             return false, attackReason or "invalid_player_target"
@@ -242,10 +258,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
                 end
-                if Skills and Skills.AddXP then
-                    Skills.AddXP(record, action.skillID or "Strength", 5)
-                    Skills.AddXP(record, "Maintenance", 1)
-                end
+                awardMeleeHitXP(record, action)
                 return true, attackReason or "hit_npc", attackDetail
             end
             return false, attackReason or "npc_damage_rejected", attackDetail
@@ -265,10 +278,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
                 end
-                if Skills and Skills.AddXP then
-                    Skills.AddXP(record, action.skillID or "Strength", 5)
-                    Skills.AddXP(record, "Maintenance", 1)
-                end
+                awardMeleeHitXP(record, action)
                 return true, attackReason or "hit_foreign_npc"
             end
             return false, attackReason or "foreign_damage_rejected"
@@ -283,10 +293,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
                 end
-                if Skills and Skills.AddXP then
-                    Skills.AddXP(record, action.skillID or "Strength", action.attackKind == "ground" and 4 or 5)
-                    Skills.AddXP(record, "Maintenance", 1)
-                end
+                awardMeleeHitXP(record, action)
             end
             return attackApplied, attackReason
         end

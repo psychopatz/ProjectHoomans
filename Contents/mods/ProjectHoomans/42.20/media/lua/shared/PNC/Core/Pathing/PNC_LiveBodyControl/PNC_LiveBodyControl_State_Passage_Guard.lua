@@ -68,6 +68,12 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
             return false, kind
         end
     end
+    if lane and (
+        lane.traversalAction ~= nil
+        or lane.vanillaFenceAction ~= nil
+    ) then
+        return false
+    end
     if modData
         and modData.PNC_BumpActionLease == true
         and LiveBodyControl.IsTraversalBumpType(
@@ -122,9 +128,13 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
                 "LiveBodyControl.VanillaFenceBlocked")
         end
     end
+    if lane and fenceHazard then
+        lane.lastVanillaFenceGuardAt = tonumber(now)
+            or (PNC.Core and PNC.Core.Now and PNC.Core.Now()) or 0
+    end
     local logNow = tonumber(now) or (PNC.Core and PNC.Core.Now and PNC.Core.Now()) or 0
     local lastLoggedAt = tonumber(VANILLA_PASSAGE_GUARD_LOGGED[zombie]) or -1
-    if (lastLoggedAt < 0 or (logNow - lastLoggedAt) >= 10000)
+    if (lastLoggedAt < 0 or (logNow - lastLoggedAt) >= 30000)
         and PNC.Core
         and PNC.Core.LogWarn
     then

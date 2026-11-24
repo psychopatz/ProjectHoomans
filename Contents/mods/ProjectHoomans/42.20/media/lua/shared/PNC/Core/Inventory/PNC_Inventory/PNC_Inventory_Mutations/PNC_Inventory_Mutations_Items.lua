@@ -10,71 +10,53 @@ local function addedWeight(spec)
             math.floor(tonumber(spec.stack) or 1))
 end
 
-function Inventory.CanAccept(record, specs, containerID)
+local function resolveHardCapacity(record, weightState)
+    local hardMultiplier = tonumber(PNC.Const
+        and PNC.Const.INVENTORY_HARD_CAPACITY_MULTIPLIER) or 3
+    local baseHardCap = tonumber(PNC.Const
+        and PNC.Const.INVENTORY_HARD_CAPACITY)
+    local multiplier = Internal.resolveCapacityMultiplier
+        and Internal.resolveCapacityMultiplier() or 1.0
+    local bonus = Internal.resolveCapacityBonus
+        and Internal.resolveCapacityBonus(record) or 0
+    local scaledMax = (tonumber(weightState and weightState.maxWeight) or 0)
+        * hardMultiplier
+    if baseHardCap then
+        local scaledHardCap = (baseHardCap + bonus) * multiplier
+        return math.max(scaledHardCap, scaledMax)
+    end
+    return scaledMax
+end
+
+function Inventory.CanAccept(record, specs, containerID, options)
     local inv = Inventory.EnsureRecordInventory(record, {
         reconcileWaterContainer = false,
     })
     local weightState = Inventory.GetWeightState(record)
-    local incomingWeight = 0
-    local destination
-    local destinationWeight
-    local destinationMax
-    local owner
-    local destinationReduction = 0
-    local hardMultiplier = tonumber(PNC.Const
-        and PNC.Const.INVENTORY_HARD_CAPACITY_MULTIPLIER) or 3
-    local hardCapacity = tonumber(PNC.Const
-        and PNC.Const.INVENTORY_HARD_CAPACITY)
-    local weight
-    local index
     if not inv or type(specs) ~= "table" or #specs < 1 then
         return false, "items_missing"
     end
-    containerID = Internal.normalizeString(containerID) or "root"
-    destination = inv.containers[containerID]
-    if not destination then return false, "container_not_found" end
-    for index = 1, #specs do
-        weight = addedWeight(specs[index])
-        if not weight then return false, "invalid_item_spec" end
-        incomingWeight = incomingWeight + weight
-    end
-
-    if containerID ~= "root" then
-        destinationWeight = Internal.getContainerRawWeight(inv, containerID) or 0
-        destinationMax = math.max(0, tonumber(destination.maxWeight) or 0)
-        if destinationMax <= 0
-            or destinationWeight + incomingWeight > destinationMax
-        then
-            return false, "container_full"
-        end
-        for _, candidate in pairs(inv.items or {}) do
-            if candidate.bagContainer == containerID then
-                owner = candidate
-                break
-            end
-        end
-        if owner and owner.wornSlot and inv.worn[owner.wornSlot] == owner.id then
-            destinationReduction = math.max(0,
-                math.min(1, tonumber(owner.weightReduction) or 0))
-        end
-    end
-
+    local plan, planReason = Internal.planContainerPlacement(
+        inv, specs, containerID, options
+    )
+    if not plan then return false, planReason end
+    local hardLimit = resolveHardCapacity(record, weightState)
     if (tonumber(weightState.usedWeight) or 0)
-        + (incomingWeight * (1 - destinationReduction))
-        > (hardCapacity
-            or ((tonumber(weightState.maxWeight) or 0) * hardMultiplier))
+        + (tonumber(plan.effectiveAddedWeight) or 0)
+        > hardLimit
     then
         return false, "no_capacity"
     end
-    return true, "accepted", incomingWeight
+    return true, "accepted", plan.rawAddedWeight, plan
 end
 
-function Inventory.AddItems(record, specs, containerID, reason)
-    containerID = Internal.normalizeString(containerID) or "root"
-    local canAccept, acceptReason = Inventory.CanAccept(
+function Inventory.AddItems(record, specs, containerID, reason, options)
+    options = type(options) == "table" and options or {}
+    local canAccept, acceptReason, _, plan = Inventory.CanAccept(
         record,
         specs,
-        containerID
+        containerID,
+        options
     )
     local ops = {}
     local index
@@ -83,13 +65,15 @@ function Inventory.AddItems(record, specs, containerID, reason)
     local inv = Inventory.EnsureRecordInventory(record, {
         reconcileWaterContainer = false,
     })
-    if not inv.containers[containerID] then
-        return false, "container_not_found", {}
-    end
     for index = 1, #specs do
+        local destID = plan and plan.assignments and plan.assignments[index]
+            or Internal.normalizeString(containerID) or "root"
+        if not inv.containers[destID] then
+            return false, "container_not_found", {}
+        end
         spec = {}
         for key, value in pairs(specs[index]) do spec[key] = value end
-        spec.container = containerID
+        spec.container = destID
         ops[#ops + 1] = { op = "add", item = spec }
     end
     local applied, appliedOps = Inventory.ApplyDelta(
@@ -102,10 +86,25 @@ function Inventory.AddItems(record, specs, containerID, reason)
         Inventory.ReconcileWaterContainer(record)
     end
     local itemIDs = {}
+    local hasWearableBag = false
     for index = 1, #appliedOps do
-        if appliedOps[index].item and appliedOps[index].item.id then
-            itemIDs[#itemIDs + 1] = appliedOps[index].item.id
+        local added = appliedOps[index].item
+        if added and added.id then
+            itemIDs[#itemIDs + 1] = added.id
+            if added.bagContainer and added.wearableSlot then
+                hasWearableBag = true
+            end
         end
+    end
+    if hasWearableBag
+        and options.autoEquipBags ~= false
+        and Inventory.ReconcileBestBags
+    then
+        Inventory.ReconcileBestBags(
+            record,
+            (reason or "inventory_add") .. "_auto_equip_bag",
+            { candidateIDs = itemIDs }
+        )
     end
     return true, "added", itemIDs
 end

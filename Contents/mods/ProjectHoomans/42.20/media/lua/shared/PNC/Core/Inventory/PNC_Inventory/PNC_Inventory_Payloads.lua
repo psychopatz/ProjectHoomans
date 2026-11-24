@@ -95,6 +95,11 @@ local function buildSummaryPayload(record, inv)
         revision = inv.revision,
         usedWeight = tonumber(inv.cachedWeight) or 0,
         maxWeight = tonumber(inv.maxWeight) or 0,
+        equippedBagCapacity = tonumber(inv.equippedBagCapacity) or 0,
+        equippedBagUsedWeight = tonumber(inv.equippedBagUsedWeight) or 0,
+        totalCapacity = tonumber(inv.totalCapacity)
+            or ((tonumber(inv.maxWeight) or 0)
+                + (tonumber(inv.equippedBagCapacity) or 0)),
         remainingWeight = tonumber(inv.remainingWeight) or 0,
         encumbranceRatio = encumbrance and encumbrance.ratio or 0,
         encumbranceLevel = encumbrance and encumbrance.level or "normal",

@@ -36,8 +36,14 @@ function Service.Tick(record, zombie, at)
         stop(record, zombie, "roaming_seat_order_changed")
         return true
     end
+    local isIncapacitated = (record.health and record.health.incapacitated == true)
+        or (PNC.Health and type(PNC.Health.IsIncapacitated) == "function"
+            and PNC.Health.IsIncapacitated(record) == true)
+    local onFire = zombie.isOnFire and zombie:isOnFire() == true
     if runtime.facilityActivity or runtime.workOrderId
         or runtime.attackAction or runtime.combatTarget
+        or runtime.medicalCare ~= nil or runtime.treatment ~= nil
+        or isIncapacitated or onFire
     then
         stop(record, zombie, "roaming_seat_preempted")
         return true

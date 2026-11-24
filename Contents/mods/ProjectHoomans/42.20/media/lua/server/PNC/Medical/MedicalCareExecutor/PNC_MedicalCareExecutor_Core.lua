@@ -33,7 +33,8 @@ local lastSupplyPreflightAt = {}
 local supplyNoticeRecipients = {}
 
 local function id(value)
-    return value == nil and nil or tostring(value)
+    if value == nil then return nil end
+    return tostring(value)
 end
 
 local function nonempty(value)
@@ -60,6 +61,27 @@ end
 local function ownerKey(record)
     return nonempty(record and record.ownerOnlineID)
         or nonempty(record and record.ownerUsername)
+end
+
+local function groupKey(record)
+    if type(record) ~= "table" then return nil end
+    local source = affiliation(record)
+    return nonempty(
+        record.groupId or record.groupID
+            or record.mobileGroupId or record.mobileGroupID
+            or record.abstractGroupId or record.abstractGroupID
+            or record.squadId or record.squadID
+            or record.caravanId or record.caravanID
+            or source.groupId or source.groupID
+            or source.mobileGroupId or source.mobileGroupID
+            or (record.orderSpec and (record.orderSpec.groupId or record.orderSpec.mobileGroupId))
+    )
+end
+
+local function isPatientIncapacitated(patient)
+    return type(patient) == "table"
+        and type(patient.health) == "table"
+        and tostring(patient.health.state or "") == "incapacitated"
 end
 
 local function isCompanionOrColonist(record)
@@ -108,38 +130,57 @@ function Executor.CanAssistPatient(actor, patient, patientKind)
             return false, "hostile_actor"
         end
         if not playerFriendly(actor, patient) then return false, "player_not_friendly" end
-        if not Internal.IsDoctor(actor) then return false, "medical_skill_too_low" end
+        -- Any friendly NPC can bandage the player; First Aid skill scales
+        -- bandage duration and vanilla Dressing.Life efficiency instead of gating.
         return true
     end
     if not patient or patient.alive == false then return false, "patient_unavailable" end
     if tostring(patient.id) == tostring(actor.id) then return false, "self_treatment_is_not_doctor_care" end
     if not Internal.SameCareGroup(actor, patient) then return false, "care_group_mismatch" end
-    if isCompanionOrColonist(actor) then
-        if not Internal.IsDoctor(actor) then return false, "medical_skill_too_low" end
-        return true
-    end
-    local af, pf = factionId(actor), factionId(patient)
-    if af and pf and af == pf then return true end
-    if not Internal.IsDoctor(actor) then return false, "medical_skill_too_low" end
+    -- Any healthy teammate in the same care group can assist; First Aid skill
+    -- governs speed, bandage life, and healing efficiency like vanilla PZ.
     return true
 end
 Internal.CanAssistPatient = Executor.CanAssistPatient
 
 function Executor.SameCareGroup(actor, patient)
+    if not actor or not patient then return false end
+    local rels = PNC.Relationships
+    if rels and type(rels.AreNPCsEnemies) == "function" then
+        if rels.AreNPCsEnemies(actor, patient, { ignoreAttackNPCPolicy = true })
+            or rels.AreNPCsEnemies(patient, actor, { ignoreAttackNPCPolicy = true })
+        then
+            return false
+        end
+    end
+    local actorGroup = groupKey(actor)
+    local patientGroup = groupKey(patient)
+    if actorGroup and patientGroup and actorGroup == patientGroup then
+        return true
+    end
     local actorFaction = factionId(actor)
     local patientFaction = factionId(patient)
+    if actorFaction and patientFaction then
+        if actorFaction == patientFaction then return true end
+        if PNC.Factions and type(PNC.Factions.AreAllied) == "function"
+            and PNC.Factions.AreAllied(actorFaction, patientFaction) == true
+        then
+            return true
+        end
+    end
     local actorCommunity = communityId(actor)
     local patientCommunity = communityId(patient)
-    local actorOwner = ownerKey(actor)
-    local patientOwner = ownerKey(patient)
-    if actorFaction and patientFaction then
-        return actorFaction == patientFaction
-    end
     if actorCommunity and patientCommunity then
         return actorCommunity == patientCommunity
     end
+    local actorOwner = ownerKey(actor)
+    local patientOwner = ownerKey(patient)
     if actorOwner and patientOwner then
         return actorOwner == patientOwner
+    end
+    if PNC.Perception and type(PNC.Perception.AreWarningAllies) == "function" then
+        local allied = PNC.Perception.AreWarningAllies(actor, patient)
+        if allied == true then return true end
     end
     return Types and Types.IsColonist
         and Types.IsColonist(actor) and Types.IsColonist(patient) or false
@@ -279,6 +320,9 @@ local function groupDoctors(task, patient)
         end
     end)
     table.sort(output, function(left, right)
+        local lfa = Treatment and Treatment.GetNPCFirstAidLevel and tonumber(Treatment.GetNPCFirstAidLevel(left)) or 0
+        local rfa = Treatment and Treatment.GetNPCFirstAidLevel and tonumber(Treatment.GetNPCFirstAidLevel(right)) or 0
+        if lfa ~= rfa then return lfa > rfa end
         return tostring(left.id) < tostring(right.id)
     end)
     return output

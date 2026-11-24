@@ -119,6 +119,7 @@ function Service.RequestIntent(record, spec, options)
         collectedCount = 0, urgent = options.urgent == true, radius = spec.radius,
         ownerKey = spec.ownerKey, ownerX = spec.ownerX, ownerY = spec.ownerY, ownerZ = spec.ownerZ,
         maxLeashDist = spec.maxLeashDist, candidate = cand, phase = "READY",
+        medicalTaskId = options.medicalTaskId,
         createdAt = now, updatedAt = now, revision = 1,
     }
     Service.ActiveByNPC[npcId] = intent
@@ -134,7 +135,7 @@ function Service.RequestBandageRip(record, options)
         precedence = urgent and "CRITICAL_NEED" or "NORMAL_NEED", urgency = urgent and 0.92 or 0.72,
         radius = tonumber(options.radius) or (urgent and 12 or 10),
         filter = { mode = "rip_bandage" },
-        sourceTypes = options.sourceTypes or { corpses = true, containers = true, floorItems = true },
+        sourceTypes = options.sourceTypes or { corpses = true, containers = true, floorItems = true, curtains = true },
     }, options)
 end
 

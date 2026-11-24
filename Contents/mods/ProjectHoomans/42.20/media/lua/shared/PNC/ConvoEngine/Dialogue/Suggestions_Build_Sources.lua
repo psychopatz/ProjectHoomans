@@ -135,6 +135,7 @@ function Internal.CollectSuggestionBuildSources(state)
         ir,
         predicateTrace
     )
+
     local offerRealizer = PNC.ConvoEngine and PNC.ConvoEngine.OfferRealizer or nil
     local activePoolID = response.poolID or response.responsePool
         or (type(flow) == "table" and flow.responsePool) or nil

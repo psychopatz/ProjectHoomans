@@ -22,6 +22,19 @@ Constants.VALID_ORIENTATIONS = {
     bisexual = true,
 }
 
+Constants.KINSEY_MIN = 0
+Constants.KINSEY_MAX = 6
+Constants.KINSEY_DEFAULT_BY_ORIENTATION = {
+    straight = 0,
+    bisexual = 3,
+    gay = 6,
+}
+Constants.KINSEY_WEIGHTS_BY_ORIENTATION = {
+    straight = { [0] = 82, [1] = 18 },
+    bisexual = { [2] = 30, [3] = 40, [4] = 30 },
+    gay = { [5] = 18, [6] = 82 },
+}
+
 Constants.FOOD_NEUTRAL = "neutral"
 Constants.FOOD_BLAND = "bland"
 Constants.FOOD_SPICY = "spicy"

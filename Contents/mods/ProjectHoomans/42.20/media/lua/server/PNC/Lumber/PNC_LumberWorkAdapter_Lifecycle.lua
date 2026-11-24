@@ -271,6 +271,13 @@ function Adapter.Complete(order)
         Service.Internal.ReleaseOutputCapacity(job)
     end
     local record = recordFor(order.workerId)
+    if record and PNC.Skills and PNC.Skills.AddXPBatch then
+        PNC.Skills.AddXPBatch(record, {
+            { skillId = "Axe", amount = 6 },
+            { skillId = "Strength", amount = 4 },
+            { skillId = "Maintenance", amount = 2 },
+        })
+    end
     if record and PNC.WorkItemService and PNC.WorkItemService.Release then
         local released, releaseReason = PNC.WorkItemService.Release(
             record, "LUMBER", nil, {

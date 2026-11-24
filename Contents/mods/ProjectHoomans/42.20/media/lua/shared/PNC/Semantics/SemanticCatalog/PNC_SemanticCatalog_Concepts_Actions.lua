@@ -21,7 +21,12 @@ end
 function Internal.RegisterActionConcepts()
     registerConcept(
         "FOLLOW",
-        { "follow", "follow me", "come with me", "come along" }
+        {
+            "follow", "follow me", "come with me", "come along",
+            "lets go", "let's go", "lets go guys", "let's go guys",
+            "lets move", "let's move", "move out", "come on", "come on guys",
+            "with me", "on me", "roll out",
+        }
     )
     registerConcept("STOP", { "stop", "halt" })
     registerConcept("WAIT", {

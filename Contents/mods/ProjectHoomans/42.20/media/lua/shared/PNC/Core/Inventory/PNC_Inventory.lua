@@ -37,6 +37,7 @@ Inventory.Commands.RebuildCaches = Inventory.RebuildCaches
 Inventory.Commands.RestoreSnapshot = Inventory.RestoreSnapshot
 Inventory.Commands.SetWaterContainer = Inventory.SetWaterContainer
 Inventory.Commands.ClearWaterContainer = Inventory.ClearWaterContainer
+Inventory.Commands.ReconcileBestBags = Inventory.ReconcileBestBags
 Inventory.Commands.AdvanceFoodLifecycle = Inventory.AdvanceFoodLifecycle
 
 require "PNC/Core/Inventory/PNC_InventoryRepository"

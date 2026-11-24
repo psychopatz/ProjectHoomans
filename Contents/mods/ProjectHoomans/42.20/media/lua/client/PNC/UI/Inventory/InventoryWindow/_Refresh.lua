@@ -153,9 +153,15 @@ local function refreshInventoryLists(self, endpoint, player, currentPlayerContai
         )
     end
     if self.depositStorageButton and self.depositStorageButton.setEnable then
+        local npcInventory = endpoint.kind == "npc"
+            and endpoint.inventory and endpoint:inventory() or nil
+        local hasDepositable = npcInventory
+            and InventoryWindow.HasAnyNPCBulkTransferItems
+            and InventoryWindow.HasAnyNPCBulkTransferItems(npcInventory)
+            or InventoryWindow.HasBulkTransferItems(self.npcList)
         self.depositStorageButton:setEnable(
             endpoint.kind == "npc" and not self.giftMode
-                and InventoryWindow.HasBulkTransferItems(self.npcList)
+                and hasDepositable == true
         )
     end
     self:updateInventoryRefreshButton(inventoryNow())

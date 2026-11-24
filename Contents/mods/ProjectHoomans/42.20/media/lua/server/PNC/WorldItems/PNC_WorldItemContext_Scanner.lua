@@ -48,6 +48,7 @@ local function sourceAllowed(sourceType, types)
     if sourceType == "corpse" then return types.corpses ~= false end
     if sourceType == "container" then return types.containers ~= false end
     if sourceType == "floor" then return types.floorItems ~= false end
+    if sourceType == "curtain" then return types.curtains ~= false end
     return true
 end
 
@@ -70,6 +71,28 @@ end
 local function inspectSource(source, npcId, filter, options, distSq, now)
     if not sourceAllowed(source.sourceType, type(options.sourceTypes) == "table" and options.sourceTypes or nil) then
         return nil, 0
+    end
+    if source.sourceType == "curtain" then
+        if not filter or filter.mode ~= "rip_bandage" or not source.object then
+            return nil, 0
+        end
+        local key = Claims.MakeKey("curtain", source.x, source.y, source.z, source.object)
+        if Claims.IsClaimedByOther(key, npcId, now) then return nil, 1 end
+        local score = 3
+        return {
+            sourceType = "curtain", square = source.square, object = source.object,
+            container = nil, worldObject = nil, item = source.object,
+            itemCtx = {
+                fullType = "Base.Sheet",
+                rippable = {
+                    canRip = true, fabricType = "cotton",
+                    outputType = "Base.RippedSheets", outputCount = 4,
+                    requiresScissors = false, usableForBandage = true, clean = true,
+                },
+            },
+            x = source.x, y = source.y, z = source.z,
+            distanceSq = distSq, claimKey = key, score = score, rank = (score * 100) - distSq,
+        }, 1
     end
     local raw = collectRawEntries(source)
     local limit = math.min(#raw, math.max(1, tonumber(options.maxItems) or 256))

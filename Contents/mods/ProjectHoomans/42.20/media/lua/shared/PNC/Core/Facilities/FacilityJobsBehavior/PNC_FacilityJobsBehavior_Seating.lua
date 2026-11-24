@@ -161,20 +161,14 @@ function Internal.RefreshLiveSeatTarget(record, zombie, runtime, order)
 end
 
 function Internal.ApplySeatFacing(zombie, direction, side)
-    local before = direction
     if not direction then return false end
-    if side == "Left" and direction.RotRight then
-        before = direction:RotRight(2)
-    elseif side == "Right" and direction.RotLeft then
-        before = direction:RotLeft(2)
-    end
+    -- PNC_Anim_SitChair plays Bob_SatChair directly (no 90-degree deferred
+    -- turn clip like vanilla's SitOnFurnitureLeft/Right). Always face the
+    -- chair's actual forward direction (N/S/E/W) regardless of approach side;
+    -- rotating Left/Right by 90 degrees leaves the NPC seated sideways.
     if zombie.setForwardIsoDirection then
-        zombie:setForwardIsoDirection(before)
+        zombie:setForwardIsoDirection(direction)
     end
-    -- AnimationPlayer is opaque Java userdata in Kahlua on this build. The
-    -- vanilla player state can index it internally, but Lua must not probe or
-    -- call methods on that object. setForwardIsoDirection is the exposed
-    -- character boundary and the PNC bump node consumes that facing.
     return true
 end
 

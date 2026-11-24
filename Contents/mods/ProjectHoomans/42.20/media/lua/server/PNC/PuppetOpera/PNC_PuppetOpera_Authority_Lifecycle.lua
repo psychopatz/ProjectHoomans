@@ -20,8 +20,29 @@ local NPCMovement = Opera.NPCMovement
     or require "PNC/PuppetOpera/PNC_PuppetOpera_NPCMovementAdapter"
 local NPCAnimation = Opera.NPCAnimation
     or require "PNC/PuppetOpera/PNC_PuppetOpera_NPCAnimationAdapter"
+local Tether = Opera.Tether
+    or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Tether"
+local AnimVars = Opera.AnimVarAdapter
+    or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_AnimVarAdapter"
+local Telemetry = Opera.Telemetry
+    or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Telemetry"
 local NPCOverride = Opera.Override
     or require "PNC/PuppetOpera/PNC_PuppetOpera_OverrideAdapter"
+
+if PNC.LiveBodyControl and PNC.LiveBodyControl.RegisterPostureProvider then
+    PNC.LiveBodyControl.RegisterPostureProvider("puppet_opera", function(record)
+        local runtime = type(record) == "table" and record.runtime or nil
+        local lease = runtime and runtime.puppetOperaLease or nil
+        if type(lease) ~= "table" or not lease.sessionId then return nil end
+        if lease.tethered == true then
+            return PNC.LiveBodyControl.POSTURE_OPERA_CARRIED
+        end
+        if lease.carrying == true then
+            return PNC.LiveBodyControl.POSTURE_OPERA_CARRYING
+        end
+        return PNC.LiveBodyControl.POSTURE_OPERA_STATIONARY
+    end)
+end
 local now = Internal.now
 local trace = Internal.trace
 
@@ -41,6 +62,9 @@ local function setPhase(session, phase, deadline, reason, notify)
         reason = reason,
         revision = session.revision,
     })
+    if Telemetry and Telemetry.LogPhase then
+        Telemetry.LogPhase(session, phase, reason)
+    end
     if notify ~= false then sendState(session, false) end
 end
 
@@ -97,6 +121,20 @@ end
 
 local function releaseActors(session)
     for _, actor in pairs(session.actors or {}) do
+        if (actor.tethered or actor.collisionDisabled) and actor.body then
+            local leader = actor.tetherLeaderID
+                and session.actors
+                and session.actors[actor.tetherLeaderID] or nil
+            local dropSq = actor.tethered and leader and leader.body
+                and Tether.FindSafeDropSquare(leader.body) or nil
+            Tether.RestoreBody(actor.body, dropSq)
+            actor.tethered = false
+            actor.collisionDisabled = false
+            actor.tetherLeaderID = nil
+        end
+        if actor.body and AnimVars and AnimVars.Clear then
+            AnimVars.Clear(actor.body, actor.animationTrack)
+        end
         if actor.kind == "nearby_live_npc" then
             if actor.animationOwned
                 or NPCAnimation.IsOwned(actor.body, session.sessionId)

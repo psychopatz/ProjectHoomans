@@ -118,6 +118,23 @@ function Service.TickFollowCompanion(record, zombie, owner, now, options)
     })
 end
 
+local function emitNoRagsBeat(record, now, sourceType)
+    local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if not beats or type(beats.Emit) ~= "function" then return end
+    local partner = nil
+    if type(beats.FindCalmSpeakerNearPoint) == "function" and record.x and record.y then
+        local a, b = beats.FindCalmSpeakerNearPoint(record.x, record.y, 10, now)
+        if a and a.id ~= record.id then partner = a
+        elseif b and b.id ~= record.id then partner = b end
+    end
+    beats.Emit("medical_rescue.no_rags_notice", {
+        speaker = record,
+        partner = partner,
+        sourceType = sourceType,
+        now = now,
+    }, now)
+end
+
 function Service.TickAutonomous(record, now, options)
     if not record or record.alive == false then return false, "npc_missing" end
     if record.presenceState ~= (PNC.Const and PNC.Const.PRESENCE_LIVE or "live") then return false, "not_live" end
@@ -141,12 +158,32 @@ function Service.TickAutonomous(record, now, options)
         or Treatment.RequiresNPCMedicalItem(record) == true
     local wounds = PNC.NPCWounds and PNC.NPCWounds.FindTreatableWound
         and PNC.NPCWounds.FindTreatableWound(record) or nil
-    if needMed and wounds and bandageCount(record) < 1 then
-        return Service.RequestBandageRip(record, {
+    local bandages = needMed and bandageCount(record) or 1
+    if needMed and wounds and bandages < 1 then
+        local okWoundRip, wReason, wIntent = Service.RequestBandageRip(record, {
             urgent = true, targetCount = 1, now = now, cooldownMs = DEFAULT_RIP_COOLDOWN_MS,
             cell = options and options.cell or nil,
             allowRestrictedZones = options and options.allowRestrictedZones == true,
         })
+        if okWoundRip then
+            emitNoRagsBeat(record, now, wIntent and wIntent.candidate and wIntent.candidate.sourceType)
+        end
+        return okWoundRip, wReason, wIntent
+    end
+    -- Proactive rag replenishment from corpses, curtains, drawers, and floor items
+    -- outside restricted base/safehouse zones (strictly throttled & bucket-cached).
+    if needMed and bandages < 1 and now >= (tonumber(cdMap.provisionRip) or 0) then
+        cdMap.provisionRip = now + 15000
+        local okRip, ripReason, ripIntent = Service.RequestBandageRip(record, {
+            urgent = false, targetCount = 2, now = now, cooldownMs = 15000,
+            sourceTypes = { corpses = true, containers = true, floorItems = true, curtains = true },
+            cell = options and options.cell or nil,
+            allowRestrictedZones = false,
+        })
+        if okRip then
+            emitNoRagsBeat(record, now, ripIntent and ripIntent.candidate and ripIntent.candidate.sourceType)
+            return true, ripReason, ripIntent
+        end
     end
 
     local hunger = PNC.IndividualNeeds and PNC.IndividualNeeds.Get

@@ -39,6 +39,15 @@ local coreActors = {
         factionID = "faction_player",
     },
     {
+        actorID = "core_actor_camped_tod",
+        label = "Tod patz",
+        provider = "ProjectHoomans",
+        providerState = "abstract",
+        presenceState = "abstract",
+        position = { x = 115, y = 100, z = 0 },
+        factionID = "faction_player",
+    },
+    {
         actorID = "npc_hostile",
         label = "Raider Bob",
         provider = "ProjectHoomans",
@@ -83,6 +92,15 @@ PNC.ClientState = {
             colonyOwned = true,
             tacticalClass = "colonist",
             orderKind = "guard",
+            alive = true,
+        },
+        npc_camped_tod = {
+            id = "npc_camped_tod",
+            coreActorID = "core_actor_camped_tod",
+            recruited = true,
+            colonyOwned = true,
+            tacticalClass = "colonist",
+            orderKind = "camp",
             alive = true,
         },
         npc_hostile = {
@@ -159,6 +177,8 @@ assertColor(byID.npc_follower.color, Palette.COLORS.follower,
     "following companion must render bright green (not yellow)")
 assertColor(byID.npc_colonist.color, Palette.COLORS.colonist,
     "colony-owned colonist must render dark green (not yellow)")
+assertColor(byID.core_actor_camped_tod.color, Palette.COLORS.colonist,
+    "abstract camped colonist with separate coreActorID must render dark green (not yellow)")
 assertColor(byID.npc_hostile.color, Palette.COLORS.hostile,
     "hostile NPC must render red")
 assertColor(byID.npc_neutral.color, Palette.COLORS.neutral,

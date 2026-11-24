@@ -19,6 +19,23 @@ local function safeCall(obj, method, ...)
 end
 
 local function removeFromWorldSource(cand)
+    if cand.sourceType == "curtain" then
+        local sq, obj = cand.square, cand.object
+        if not obj then return false, "curtain_missing" end
+        if sq and sq.transmitRemoveItemFromSquare then
+            sq:transmitRemoveItemFromSquare(obj)
+        elseif sq and sq.RemoveTileObject then
+            sq:RemoveTileObject(obj)
+        elseif obj.removeFromSquare then
+            obj:removeFromSquare()
+        else
+            return false, "curtain_remove_failed"
+        end
+        if IsoGridSquare and IsoGridSquare.setRecalcLightTime then
+            pcall(IsoGridSquare.setRecalcLightTime, -1.0)
+        end
+        return true
+    end
     if cand.sourceType == "floor" then
         local sq, wo = cand.square, cand.worldObject
         if sq and sq.transmitRemoveItemFromSquare and wo then
@@ -117,6 +134,12 @@ function Internal.CommitAction(intent, record, body)
         intent.collectedCount = intent.collectedCount + (tonumber(rip.outputCount) or 2)
         if PNC.ProvisionScheduler and PNC.ProvisionScheduler.MarkDirty then
             PNC.ProvisionScheduler.MarkDirty(record, "bandage", 0)
+        end
+        if intent.medicalTaskId
+            and PNC.MedicalCareExecutor
+            and type(PNC.MedicalCareExecutor.FulfillBandageSupport) == "function"
+        then
+            PNC.MedicalCareExecutor.FulfillBandageSupport(intent.medicalTaskId)
         end
     end
     record.runtime = record.runtime or {}

@@ -428,9 +428,17 @@ T.truthy(viewStartupState.visible,
 
 session.busy = true
 local queuedTurnState = Input.GetState(view)
-T.truthy(queuedTurnState.enabled,
-    "local semantic input remains enabled while an NPC line is queued")
+T.falsy(queuedTurnState.enabled,
+    "local semantic input stays disabled while an NPC line is queued")
 session.busy = nil
+session.queue = { { speaker = "npc", payload = { text = "Follow-up." } } }
+local multiQueuedTurnState = Input.GetState(view)
+T.falsy(multiQueuedTurnState.enabled,
+    "local semantic input stays disabled while queued NPC messages remain")
+session.queue = {}
+local idleTurnState = Input.GetState(view)
+T.truthy(idleTurnState.enabled,
+    "local semantic input re-enables once queued NPC messages finish")
 
 local choiceProjection = {
     currentGroupID = "conversation",

@@ -79,6 +79,7 @@ Internal.IDLE_RESET_STATES = {
 
 require "PNC/Core/Pathing/PNC_LiveBodyControl/PNC_LiveBodyControl_State_Core"
 require "PNC/Core/Pathing/PNC_LiveBodyControl/PNC_LiveBodyControl_State_Presentation"
+require "PNC/Core/Pathing/PNC_LiveBodyControl/PNC_LiveBodyControl_State_Posture"
 require "PNC/Core/Pathing/PNC_LiveBodyControl/PNC_LiveBodyControl_State_Passage_Probe"
 require "PNC/Core/Pathing/PNC_LiveBodyControl/PNC_LiveBodyControl_HeavyItems"
 require "PNC/Core/Pathing/PNC_LiveBodyControl/PNC_LiveBodyControl_State_Passage_Guard"

@@ -194,12 +194,42 @@ function Resources.BuildSeatSpots(character, object)
                 local seatX = worldPos:x()
                 local seatY = worldPos:y()
                 local seatZ = worldPos:z()
+                local anchorX = seatX
+                local anchorY = seatY
+                local anchorZ = seatZ
                 local approachX
                 local approachY
                 local approachValid
                 local rejectionReason
                 local objectSquare = object.getSquare
                     and object:getSquare() or nil
+                local sprite = object.getSprite and object:getSprite() or nil
+                -- SeatingManager.getTranslation returns the exact vanilla
+                -- seated center relative to (square.x + 0.5, square.y + 0.5).
+                -- Use it for the final seated anchor so NPCs land on the exact
+                -- cushion offset regardless of approach side or deferred motion.
+                if sprite and objectSquare
+                    and type(manager.getTranslation) == "function"
+                then
+                    local xln = Vector3f.new()
+                    local okXln, resolved = pcall(
+                        manager.getTranslation,
+                        manager,
+                        sprite,
+                        direction,
+                        xln
+                    )
+                    local vec = (okXln and resolved) or xln
+                    if okXln and vec and vec.x and vec.y then
+                        local tx = tonumber(vec:x())
+                        local ty = tonumber(vec:y())
+                        if tx and ty then
+                            anchorX = objectSquare:getX() + 0.5 + tx
+                            anchorY = objectSquare:getY() + 0.5 + ty
+                            anchorZ = objectSquare:getZ()
+                        end
+                    end
+                end
                 approachX, approachY = seatApproachPoint(
                     objectSquare, direction, side, seatX, seatY)
                 approachValid, rejectionReason = validateSeatApproach(
@@ -213,19 +243,19 @@ function Resources.BuildSeatSpots(character, object)
                     approachX,
                     approachY
                 )
-                if tonumber(seatX) and tonumber(seatY)
-                    and tonumber(seatZ)
+                if tonumber(anchorX) and tonumber(anchorY)
+                    and tonumber(anchorZ)
                 then
                     spots[#spots + 1] = {
                         -- x/y are the movement approach point. The exact
-                        -- SeatingManager pose is retained separately because
-                        -- solid furniture may require walking outside its
-                        -- square before entering the animation.
+                        -- SeatingManager seat center is retained separately
+                        -- because solid furniture may require walking outside
+                        -- its square before entering the seated pose.
                         x = tonumber(approachX), y = tonumber(approachY),
                         z = tonumber(seatZ),
-                        seatAnchorX = tonumber(seatX),
-                        seatAnchorY = tonumber(seatY),
-                        seatAnchorZ = tonumber(seatZ),
+                        seatAnchorX = tonumber(anchorX),
+                        seatAnchorY = tonumber(anchorY),
+                        seatAnchorZ = tonumber(anchorZ),
                         direction = direction, side = side,
                         approachKey = direction .. ":" .. side,
                         valid = approachValid == true,

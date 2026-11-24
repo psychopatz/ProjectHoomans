@@ -242,7 +242,21 @@ function Stamina.GetAttackDrain(record, attackType, skillID)
     end
     skillLevel = Skills.GetLevel(record, skillID or "Strength")
     normalized = clamp(skillLevel / 10, 0, 1)
-    return math.max(1, baseCost * (1 - (normalized * 0.65)))
+    local drain = math.max(1, baseCost * (1 - (normalized * 0.65)))
+    if tostring(attackType or "") ~= "ranged"
+        and tostring(attackType or "") ~= "downed_shove"
+        and PNC.Equipment and PNC.Equipment.IsUsingTwoHandedOneHanded
+        and PNC.Equipment.IsUsingTwoHandedOneHanded(record)
+    then
+        drain = drain * 1.75
+    end
+    if tostring(attackType or "") ~= "ranged"
+        and PNC.Mood and PNC.Mood.GetCombatModifiers
+    then
+        local moodMods = PNC.Mood.GetCombatModifiers(record)
+        drain = drain * (tonumber(moodMods and moodMods.staminaDrainMultiplier) or 1.0)
+    end
+    return drain
 end
 
 function Stamina.CanSpendAttack(record, attackType, skillID)

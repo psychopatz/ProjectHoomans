@@ -48,6 +48,14 @@ local function createTabs(window)
         window.beatsTab
     )
 
+    window.triggersTab = ISPNCPuppetOperaTriggersTab:new(0, 0, 1, 1)
+    window.triggersTab:initialise()
+    window.triggersTab:instantiate()
+    window.tabPanel:addView(
+        tr("UI_PNC_PuppetOpera_TriggersExport", "Triggers & Export"),
+        window.triggersTab
+    )
+
     window.traceTab = ISPNCPuppetOperaTraceTab:new(0, 0, 1, 1)
     window.traceTab:initialise()
     window.traceTab:instantiate()
@@ -77,6 +85,11 @@ local function createTabs(window)
             view = window.beatsTab,
         },
         {
+            key = "triggers",
+            name = tr("UI_PNC_PuppetOpera_TriggersExport", "Triggers & Export"),
+            view = window.triggersTab,
+        },
+        {
             key = "trace",
             name = tr("UI_PNC_PuppetOpera_Trace", "Trace"),
             view = window.traceTab,
@@ -87,6 +100,7 @@ local function createTabs(window)
         player = true,
         npc = true,
         beats = true,
+        triggers = true,
         trace = true,
     }
 
@@ -94,6 +108,7 @@ local function createTabs(window)
     window.playerAnimationTab:setContext(window, "player")
     window.npcAnimationTab:setContext(window, "npc")
     window.beatsTab:setContext(window)
+    window.triggersTab:setContext(window)
     window.traceTab:setContext(window)
 end
 

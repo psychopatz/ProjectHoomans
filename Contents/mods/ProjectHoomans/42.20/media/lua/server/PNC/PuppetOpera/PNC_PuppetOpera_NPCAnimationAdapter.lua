@@ -10,9 +10,14 @@ PNC.PuppetOpera.NPCAnimation = PNC.PuppetOpera.NPCAnimation or {}
 
 local Adapter = PNC.PuppetOpera.NPCAnimation
 local Animation = PNC.Animation
+local AnimVars = PNC.PuppetOpera.AnimVarAdapter
+    or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_AnimVarAdapter"
+local Telemetry = PNC.PuppetOpera.Telemetry
+    or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Telemetry"
 
 local SESSION_KEY = "PNC_PuppetOperaAnimationSession"
 local BUMP_KEY = "PNC_PuppetOperaAnimationBump"
+local ROUTE_KEY = "PNC_PuppetOperaAnimationRoute"
 
 local function modDataOf(body)
     return body and body.getModData and body:getModData() or nil
@@ -27,12 +32,12 @@ end
 
 local function owns(body, sessionID)
     local modData = modDataOf(body)
+    if not sessionMarkerMatches(body, sessionID) then return false end
+    if modData and modData[ROUTE_KEY] == "anim_vars" then return true end
     local expected = modData and tostring(modData[BUMP_KEY] or "") or ""
     local requested = modData
         and tostring(modData.PNC_BumpRequestedType or "") or ""
-    return sessionMarkerMatches(body, sessionID)
-        and expected ~= ""
-        and requested == expected
+    return expected ~= "" and requested == expected
 end
 
 local function bumpFinished(body)
@@ -63,6 +68,37 @@ function Adapter.Start(session, actor, beat, track)
     end
     local body = actor.body
     local record = actor.record
+    if track.route == "anim_vars" then
+        if not body or not record then
+            return false, "npc_animation_actor_unavailable"
+        end
+        local modData = modDataOf(body)
+        if not modData then return false, "npc_mod_data_unavailable" end
+        if modData[SESSION_KEY] ~= nil
+            and tostring(modData[SESSION_KEY] or "")
+                ~= tostring(session.sessionId or "")
+        then
+            return false, "npc_animation_owned_by_other"
+        end
+        local ok, reason = AnimVars.Apply(body, track, {
+            phase = track.phase or "play",
+            moving = false,
+            progress = 0,
+        })
+        if not ok then return false, reason or "npc_anim_vars_failed" end
+        modData[SESSION_KEY] = tostring(session.sessionId)
+        modData[ROUTE_KEY] = "anim_vars"
+        modData[BUMP_KEY] = nil
+        actor.animationStartedAt = PNC.Core and PNC.Core.Now
+            and PNC.Core.Now() or 0
+        actor.animationOwned = true
+        actor.animationTrack = track
+        actor.lastReason = "npc_anim_vars_started"
+        if Telemetry and Telemetry.LogAnimStart then
+            Telemetry.LogAnimStart(session, actor, track)
+        end
+        return true, "npc_anim_vars_started"
+    end
     local bump = tostring(track.bump or "")
     if not body or not record or bump == "" then
         return false, "npc_animation_actor_unavailable"
@@ -102,6 +138,9 @@ function Adapter.Start(session, actor, beat, track)
         and PNC.Core.Now() or 0
     actor.animationOwned = true
     actor.lastReason = "npc_animation_started"
+    if Telemetry and Telemetry.LogAnimStart then
+        Telemetry.LogAnimStart(session, actor, track)
+    end
     return true, "npc_animation_started"
 end
 
@@ -112,6 +151,20 @@ function Adapter.Observe(session, actor, beat)
     local body = actor.body
     if not owns(body, session.sessionId) then
         return false, "npc_animation_ownership_lost"
+    end
+    local modData = modDataOf(body)
+    if modData and modData[ROUTE_KEY] == "anim_vars" then
+        local startedAt = tonumber(actor.animationStartedAt) or 0
+        local current = PNC.Core and PNC.Core.Now and PNC.Core.Now() or startedAt
+        local duration = tonumber(beat and beat.durationMs) or 900
+        local progress = duration > 0
+            and ((current - startedAt) / duration) % 1 or 0
+        AnimVars.UpdateProgress(body, progress, actor.isMoving == true)
+        if current - startedAt >= duration then
+            actor.lastReason = "npc_animation_duration_complete"
+            return true, "finished"
+        end
+        return true, "playing"
     end
     local active = Animation and Animation.IsBumpActionActive
         and Animation.IsBumpActionActive(
@@ -138,6 +191,9 @@ function Adapter.Maintain(session, actor, beat, leaseUntil, track)
     track = track or beat and beat.npc
     if not owns(actor.body, session.sessionId) then
         return false, "npc_animation_ownership_lost"
+    end
+    if type(track) == "table" and track.route == "anim_vars" then
+        return true, "npc_anim_vars_maintained"
     end
     if type(track) ~= "table" or not track.bump then
         return false, "npc_animation_track_missing"
@@ -177,6 +233,16 @@ function Adapter.Release(session, actor)
         actor.animationOwned = false
         actor.lastReason = "npc_animation_ownership_lost"
         return false, "npc_animation_ownership_lost"
+    end
+    if modData[ROUTE_KEY] == "anim_vars" then
+        AnimVars.Clear(body, actor.animationTrack)
+        modData[SESSION_KEY] = nil
+        modData[ROUTE_KEY] = nil
+        modData[BUMP_KEY] = nil
+        actor.animationOwned = false
+        actor.animationTrack = nil
+        actor.lastReason = "npc_anim_vars_released"
+        return true, "released"
     end
     if Animation and Animation.FinishBump then
         Animation.FinishBump(

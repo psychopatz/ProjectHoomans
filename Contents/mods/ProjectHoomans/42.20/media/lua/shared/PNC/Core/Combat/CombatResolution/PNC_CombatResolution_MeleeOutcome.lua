@@ -70,7 +70,17 @@ function Resolution.GetMeleeCooldown(record, baseCooldown, modifiers, options)
     local rate = number(modifiers and modifiers.attackRateMultiplier, 1) or 1
     local actionDuration = number(options and options.actionDurationMs, 760)
     local minimum = math.max(250, actionDuration)
-    return clamp(base / clamp(rate, 0.50, 3.00), minimum, 10000)
+    local cooldown = base / clamp(rate, 0.50, 3.00)
+    if PNC.Equipment and PNC.Equipment.IsUsingTwoHandedOneHanded
+        and PNC.Equipment.IsUsingTwoHandedOneHanded(record)
+    then
+        cooldown = cooldown * 1.25
+    end
+    if PNC.Mood and PNC.Mood.GetCombatModifiers then
+        local moodMods = PNC.Mood.GetCombatModifiers(record)
+        cooldown = cooldown * (tonumber(moodMods and moodMods.cooldownMultiplier) or 1.0)
+    end
+    return clamp(cooldown, minimum, 10000)
 end
 
 function Resolution.GetMeleeTiming(baseHitDelay, baseDuration, modifiers)
@@ -105,6 +115,9 @@ function Resolution.BuildMeleeStrikeProfile(record, target, options)
         + (number(modifiers.hitChanceBias, 0) or 0)
         + (number(modifiers.pressureAccuracyBias, 0) or 0)
             * math.min(pressure, 4)
+        + (PNC.Mood and PNC.Mood.GetCombatModifiers
+            and (tonumber(PNC.Mood.GetCombatModifiers(record).hitChanceBias) or 0)
+            or 0)
     return {
         hitChance = clamp(chance, 0.10, 0.98),
         distance = distance,

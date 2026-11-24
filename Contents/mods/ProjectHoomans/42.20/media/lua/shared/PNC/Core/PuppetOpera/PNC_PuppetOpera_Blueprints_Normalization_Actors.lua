@@ -16,6 +16,56 @@ local DEFAULT_ACTOR_KINDS = {
     "nearby_live_npc",
 }
 
+local numberInRange = Normalization._NumberInRange
+
+local VALID_FACING_MODES = {
+    match = true,
+    opposite = true,
+    face_target = true,
+    free = true,
+}
+
+local VALID_INITIAL_STATES = {
+    standing = true,
+    incapacitated = true,
+    seated = true,
+    sleeping = true,
+    any = true,
+}
+
+local function normalizeInitialStates(rawStates)
+    if type(rawStates) ~= "table" then return nil end
+    local list = {}
+    local seen = {}
+    for _, raw in ipairs(rawStates) do
+        local name = cleanText(raw, 32)
+        if VALID_INITIAL_STATES[name] and not seen[name] then
+            seen[name] = true
+            list[#list + 1] = name
+        end
+    end
+    return #list > 0 and list or nil
+end
+
+local function normalizeCoupling(rawCoupling, actorID)
+    if type(rawCoupling) ~= "table" then return nil end
+    local attachTo = validID(rawCoupling.attachTo, 64)
+    if not attachTo or attachTo == actorID then return nil end
+    local facingMode = cleanText(rawCoupling.facingMode or "match", 24)
+    if not VALID_FACING_MODES[facingMode] then facingMode = "match" end
+    return {
+        attachTo = attachTo,
+        offsetRight = numberInRange(rawCoupling.offsetRight, -2.0, 2.0, 0) or 0,
+        offsetForward = numberInRange(rawCoupling.offsetForward, -2.0, 2.0, 0) or 0,
+        offsetZ = numberInRange(rawCoupling.offsetZ, -1.0, 1.0, 0) or 0,
+        facingMode = facingMode,
+        disableCollision = rawCoupling.disableCollision ~= false,
+        groundedCheck = rawCoupling.groundedCheck == true,
+        blockVaulting = rawCoupling.blockVaulting ~= false,
+        abstractCoMove = rawCoupling.abstractCoMove ~= false,
+    }
+end
+
 local function normalizeActors(rawActors, rawAnchors)
     if type(rawActors) ~= "table" then
         return nil, "actors_required"
@@ -81,6 +131,11 @@ local function normalizeActors(rawActors, rawAnchors)
             anchor = anchor,
             labelKey = validID(raw.labelKey, 128),
             label = cleanText(raw.label, 96),
+            allowedInitialStates = normalizeInitialStates(
+                raw.allowedInitialStates
+            ),
+            stationary = raw.stationary == true,
+            coupling = normalizeCoupling(raw.coupling, actorID),
         }
         actors[actorID] = normalized
         actorCount = actorCount + 1
@@ -102,9 +157,36 @@ local function normalizeActors(rawActors, rawAnchors)
     return actors
 end
 
+local function normalizeAnimVarsTrack(raw, actorKind, beatID, durationMs)
+    local style = validID(raw.style or raw.anim or "custom", 64)
+    local role = validID(raw.role or "Actor", 64)
+    local phase = validID(raw.phase or "play", 64)
+    if not style then
+        return nil, "anim_vars_style_missing:" .. tostring(beatID)
+    end
+    local normalized = {
+        route = "anim_vars",
+        mode = "anim_vars",
+        catalog = actorKind == "local_player" and "player" or "npc",
+        entryId = validID(raw.entryId or raw.entryID, 192),
+        style = style,
+        role = role,
+        phase = phase,
+        anim = validID(raw.animation or raw.anim or style, 128),
+        clip = validID(raw.clip or raw.animation or raw.anim, 128),
+        durationMs = durationMs,
+        nonCombat = raw.nonCombat ~= false,
+        variables = normalizeVariables(raw.variables),
+    }
+    return Capabilities.NormalizeTrack(actorKind, normalized)
+end
+
 local function normalizePlayerBeat(raw, beatID, durationMs)
     if type(raw) ~= "table" then
         return nil, "player_beat_missing:" .. tostring(beatID)
+    end
+    if raw.route == "anim_vars" or raw.mode == "anim_vars" then
+        return normalizeAnimVarsTrack(raw, "local_player", beatID, durationMs)
     end
     local mode = cleanText(
         raw.mode or (raw.emote and "emote" or "action"),
@@ -164,6 +246,14 @@ end
 local function normalizeNPCBeat(raw, beatID, durationMs)
     if type(raw) ~= "table" then
         return nil, "npc_beat_missing:" .. tostring(beatID)
+    end
+    if raw.route == "anim_vars" or raw.mode == "anim_vars" then
+        return normalizeAnimVarsTrack(
+            raw,
+            "nearby_live_npc",
+            beatID,
+            durationMs
+        )
     end
     local route = cleanText(raw.route or "zombie_bump", 32)
     local bump = validID(raw.bump, 96)

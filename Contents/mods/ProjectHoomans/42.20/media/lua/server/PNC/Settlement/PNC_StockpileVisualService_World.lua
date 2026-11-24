@@ -63,8 +63,15 @@ local function isPresent(square, target)
 end
 
 local function markerFor(object)
-    local data = call(object, "getModData")
-    local marker = data and data[VISUAL_DATA_KEY] or nil
+    if not object then return nil end
+    -- Avoid pcall + lazy ModData allocation inside re-entrant engine events
+    -- such as OnObjectAboutToBeRemoved (Kahlua2 ReturnValues pool corruption).
+    if type(object.hasModData) == "function" and not object:hasModData() then
+        return nil
+    end
+    if type(object.getModData) ~= "function" then return nil end
+    local data = object:getModData()
+    local marker = type(data) == "table" and data[VISUAL_DATA_KEY] or nil
     return type(marker) == "table" and marker or nil
 end
 

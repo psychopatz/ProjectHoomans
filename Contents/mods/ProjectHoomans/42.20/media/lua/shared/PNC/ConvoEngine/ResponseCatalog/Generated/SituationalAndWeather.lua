@@ -41,6 +41,50 @@ Catalog.Register("semantic.flow.weather.unknown", {
     },
 })
 
+Catalog.Register("semantic.question.current_location", {
+    variants = {
+        v("semantic.question.current_location.annoyed", "hoomans.question.current_location.annoyed", "We're {location.phrase}. Keep your bearings.", { npcAnnoyed = true }, 11, true),
+        v("semantic.question.current_location.panicked", "hoomans.question.current_location.panicked", "We're {location.phrase}—just keep moving and stay sharp!", { moodPanicked = true }, 11, true),
+        v("semantic.question.current_location.lover", "hoomans.question.current_location.lover", "We're {location.phrase}, {?term.address}. Stick close to me.", { relBond = { "lover", "spouse" } }, 10, true),
+        v("semantic.question.current_location.trader", "hoomans.question.current_location.trader", "We're {location.phrase}. Good landmark to keep on your map.", { actorRole = "trader" }, 9, true),
+        v("semantic.question.current_location.bandit_looter", "hoomans.question.current_location.bandit_looter", "You're {location.phrase}. Why do you care?", { actorRole = { "looter", "bandit" } }, 9, true),
+        v("semantic.question.current_location.default", "hoomans.question.current_location.default", "We're {location.phrase}.", nil, 6, true),
+        v("semantic.question.current_location.default_2", "hoomans.question.current_location.default_2", "Looks like we're {location.phrase}.", nil, 6, true),
+        v("semantic.question.current_location.default_3", "hoomans.question.current_location.default_3", "Right now we're {location.phrase}.", nil, 6, true),
+    },
+})
+
+Catalog.Register("semantic.question.current_location.local", {
+    variants = {
+        v("semantic.question.current_location.local.lover", "hoomans.question.current_location.local.lover", "I grew up around here, {?term.address}—we're {location.phrase}.", { relBond = { "lover", "spouse" } }, 10, true),
+        v("semantic.question.current_location.local.trader", "hoomans.question.current_location.local.trader", "Home turf for me—we're {location.phrase}.", { actorRole = "trader" }, 9, true),
+        v("semantic.question.current_location.local.default", "hoomans.question.current_location.local.default", "I know this area well—we're {location.phrase}.", nil, 6, true),
+        v("semantic.question.current_location.local.default_2", "hoomans.question.current_location.local.default_2", "I grew up around here. We're {location.phrase}.", nil, 6, true),
+        v("semantic.question.current_location.local.default_3", "hoomans.question.current_location.local.default_3", "Familiar ground—we're {location.phrase}.", nil, 6, true),
+    },
+})
+
+Catalog.Register("semantic.question.current_location.unfamiliar_room", {
+    variants = {
+        v("semantic.question.current_location.unfamiliar_room.default", "hoomans.question.current_location.unfamiliar_room.default", "We're {location.immediate}, though I'm not really familiar with this town.", nil, 6, true),
+        v("semantic.question.current_location.unfamiliar_room.default_2", "hoomans.question.current_location.unfamiliar_room.default_2", "Looks like we're {location.immediate}, but I don't know this area well.", nil, 6, true),
+    },
+})
+
+Catalog.Register("semantic.question.current_location.unfamiliar", {
+    variants = {
+        v("semantic.question.current_location.unfamiliar.default", "hoomans.question.current_location.unfamiliar.default", "Honestly, I'm not from around here—I don't really know this area.", nil, 6, false),
+        v("semantic.question.current_location.unfamiliar.default_2", "hoomans.question.current_location.unfamiliar.default_2", "Couldn't tell you for sure. I'm not familiar with this town.", nil, 6, false),
+    },
+})
+
+Catalog.Register("semantic.question.current_location.unknown", {
+    variants = {
+        v("semantic.question.current_location.unknown.default", "hoomans.question.current_location.unknown.default", "Honestly, I'm not completely sure where we are right now.", nil, 6, false),
+        v("semantic.question.current_location.unknown.default_2", "hoomans.question.current_location.unknown.default_2", "Hard to tell from here—everything out here starts looking the same.", nil, 6, false),
+    },
+})
+
 Catalog.Register("semantic.greeting", {
     variants = {
         v("semantic.greeting.fed_up", "hoomans.greeting.fed_up", "What now? You've been talking my ear off.", { npcFedUp = true }, 13, false),

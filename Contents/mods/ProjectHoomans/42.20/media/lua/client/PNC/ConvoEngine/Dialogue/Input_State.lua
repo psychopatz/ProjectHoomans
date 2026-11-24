@@ -39,8 +39,9 @@ local function switchTarget(view, direction)
             then
                 local okDef, nextDef = pcall(PNC.Conversation.BuildDefinition, entry, player)
                 if okDef and type(nextDef) == "table" then
-                    nextDef.context = nextDef.context or {}
-                    nextDef.context.speakerRoster = roster
+                    if type(view.session) == "table" then
+                        view.session.speakerRoster = roster
+                    end
                     view:refreshConversationSpec(nextDef)
                 end
             end
@@ -48,7 +49,7 @@ local function switchTarget(view, direction)
     })
 end
 
-function Input.GetState(view)
+function Input.GetState(view, part)
     if not view or not view.session then
         -- The full-screen view constructs extension parts before it creates
         -- its Session. Keep the field mounted during that short lifecycle
@@ -56,13 +57,22 @@ function Input.GetState(view)
         -- child updates may be skipped while the part is hidden.
         return { visible = view ~= nil, enabled = false, statusText = "", hasMultipleTargets = false }
     end
+    local isGroupMode = (type(part) == "table" and part.inputMode == "nearby")
+        or (PNC.Conversation and PNC.Conversation.InlineChat
+            and PNC.Conversation.InlineChat.State
+            and PNC.Conversation.InlineChat.State.part == part
+            and PNC.Conversation.InlineChat.State.mode == "nearby")
     local ctrl = loadSwitchController()
     local hasMultiple = false
-    if type(ctrl) == "table" and type(ctrl.ResolveSpeakerRoster) == "function" then
+    if not isGroupMode and type(ctrl) == "table" and type(ctrl.ResolveSpeakerRoster) == "function" then
         local roster = ctrl.ResolveSpeakerRoster(view)
         hasMultiple = type(roster) == "table" and #roster >= 2
     end
-    if view.session.llmPending or view.session.semanticDialoguePending then
+    if view.session.llmPending
+        or view.session.semanticDialoguePending
+        or view.session.busy == true
+        or #(view.session.queue or {}) > 0
+    then
         return {
             visible = true,
             enabled = false,

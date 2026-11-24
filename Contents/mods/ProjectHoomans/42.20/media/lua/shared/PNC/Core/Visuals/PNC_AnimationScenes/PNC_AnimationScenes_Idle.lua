@@ -56,16 +56,50 @@ function Internal.IsIdleEligible(record, zombie, now)
     return true
 end
 
+local function allowsStandingIdle(record, zombie)
+    local liveControl = PNC and PNC.LiveBodyControl or nil
+    local runtime = record and record.runtime or nil
+    if liveControl and type(liveControl.AllowsStandingIdle) == "function" then
+        return liveControl.AllowsStandingIdle(record, zombie) == true
+    end
+    if record and record.orderSpec
+        and record.orderSpec.kind == "facility_activity"
+    then
+        return false
+    end
+    if runtime and (
+        runtime.facilityActivity ~= nil
+        or runtime.roamingSeat ~= nil
+        or runtime.roamAmbient ~= nil
+        or runtime.lifeActivity ~= nil
+    ) then
+        return false
+    end
+    if zombie then
+        if zombie.isSittingOnFurniture
+            and zombie:isSittingOnFurniture() == true
+        then
+            return false
+        end
+        if zombie.isSitOnGround and zombie:isSitOnGround() == true then
+            return false
+        end
+        if zombie.getVariableBoolean
+            and zombie:getVariableBoolean("PNCSeated") == true
+        then
+            return false
+        end
+    end
+    return true
+end
+
 local function idlePrerequisites(record, zombie)
     return record
         and record.presenceState == Const.PRESENCE_LIVE
         and zombie ~= nil
         and Scenes.Pools.idle ~= nil
         and #Scenes.Pools.idle > 0
-        and not (
-            record.orderSpec
-                and record.orderSpec.kind == "facility_activity"
-        )
+        and allowsStandingIdle(record, zombie)
 end
 
 function Scenes.TryIdle(record, zombie, now)

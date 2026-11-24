@@ -36,50 +36,84 @@ local function clearOutline(playerNum, zombie)
     zombie:setOutlineHighlight(playerNum, false)
 end
 
+local function resolveTargetZombie(target)
+    if type(target) ~= "table" then return nil end
+    local id = tostring(target.id or "")
+    local registry = PNC.Registry
+    if id ~= "" and registry and type(registry.GetLiveZombie) == "function" then
+        local live = registry.GetLiveZombie(id)
+        if live and (not live.isDead or live:isDead() ~= true) then return live end
+    end
+    local sync = PNC.ClientPresenceSync
+    if id ~= "" and sync and type(sync.ResolveBodyForNPC) == "function" then
+        local body = sync.ResolveBodyForNPC(id, target.snapshot)
+        if body and (not body.isDead or body:isDead() ~= true) then return body end
+    end
+    local z = target.zombie
+    if z and (not z.isDead or z:isDead() ~= true) then return z end
+    return nil
+end
+
+local function applyOutline(playerNum, zombie)
+    if not zombie or not zombie.setOutlineHighlight then return end
+    local color = HighlightConfig.HIGHLIGHT_COLOR
+    zombie:setOutlineHighlight(playerNum, true)
+    if zombie.setOutlineHighlightCol then
+        zombie:setOutlineHighlightCol(playerNum, color.r, color.g, color.b, color.a)
+    end
+end
+
 local function updateHover()
     for playerNum, hover in pairs(hoverByPlayer) do
         local root = hover.root
-        local visible = root:isAnyVisible()
-        local menu = visible and root:topmostMenuWithMouse(getMouseX(), getMouseY())
-        local zombie
+        local visible = root and root.isAnyVisible and root:isAnyVisible() == true
+        local menu = visible and root.topmostMenuWithMouse
+            and root:topmostMenuWithMouse(getMouseX(), getMouseY()) or nil
+        local targetEntry
         local selectionKnown = false
-        -- Vanilla can briefly return no topmost menu while a context menu or
-        -- submenu is still visible (mouse-over bookkeeping is updated in
-        -- prerender). Keep the last valid target through that transient gap;
-        -- only a concrete option/submenu selection may replace it.
         while menu do
-            local option = menu == root and not menu.mouseOut
-                and menu.options[menu.mouseOver] or nil
+            local option = not menu.mouseOut
+                and menu.options and menu.options[menu.mouseOver] or nil
+            if option and hover.targets[option] then
+                selectionKnown = true
+                targetEntry = hover.targets[option]
+                break
+            end
+            if hover.targets[menu] then
+                selectionKnown = true
+                targetEntry = hover.targets[menu]
+                break
+            end
             if menu == root then
                 if option then
                     selectionKnown = true
-                    zombie = hover.targets[option]
+                    targetEntry = nil
                 end
-                break
-            end
-            zombie = hover.targets[menu]
-            if zombie then
-                selectionKnown = true
                 break
             end
             menu = menu.parent
         end
-        if zombie and zombie.isDead and zombie:isDead() then zombie = nil end
+        local zombie = resolveTargetZombie(targetEntry)
         if not visible then
             clearOutline(playerNum, hover.zombie)
             hover.zombie = nil
-        elseif selectionKnown and hover.zombie ~= zombie then
-            clearOutline(playerNum, hover.zombie)
-            hover.zombie = zombie
-            if zombie then
-                local color = HighlightConfig.HIGHLIGHT_COLOR
-                zombie:setOutlineHighlight(playerNum, true)
-                if zombie.setOutlineHighlightCol then
-                    zombie:setOutlineHighlightCol(playerNum, color.r, color.g, color.b, color.a)
+            hoverByPlayer[playerNum] = nil
+        else
+            if selectionKnown and hover.zombie ~= zombie then
+                clearOutline(playerNum, hover.zombie)
+                hover.zombie = zombie
+            end
+            -- Re-assert outline while actively hovered so vanilla/other
+            -- highlighters cannot silently clear it mid-hover.
+            if hover.zombie then
+                if hover.zombie.isDead and hover.zombie:isDead() then
+                    clearOutline(playerNum, hover.zombie)
+                    hover.zombie = nil
+                else
+                    applyOutline(playerNum, hover.zombie)
                 end
             end
         end
-        if not visible then hoverByPlayer[playerNum] = nil end
     end
 end
 
@@ -178,12 +212,14 @@ function ContextHub.AddEntryOptions(menu, player, entry, contextData)
     end
     menu:addSubMenu(option, subMenu)
     local targets = contextData and contextData.hoverTargets
-    local sync = PNC.ClientPresenceSync
-    local zombie = entry.zombie or (targets and sync and sync.ResolveBodyForNPC
-        and sync.ResolveBodyForNPC(entry.id, entry.snapshot))
-    if targets and option and zombie and zombie.setOutlineHighlight then
-        targets[option] = zombie
-        targets[subMenu] = zombie
+    if targets and option and entry then
+        local targetRef = {
+            id = tostring(entry.id or ""),
+            zombie = entry.zombie,
+            snapshot = entry.snapshot,
+        }
+        targets[option] = targetRef
+        targets[subMenu] = targetRef
     end
     for i = 1, #ContextHub.ProviderOrder do
         provider = ContextHub.Providers[ContextHub.ProviderOrder[i]]

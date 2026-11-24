@@ -18,11 +18,16 @@ local function canContinue(record, zombie, state, at)
     then
         return false
     end
+    local isIncapacitated = (health and health.incapacitated == true)
+        or (PNC.Health and type(PNC.Health.IsIncapacitated) == "function"
+            and PNC.Health.IsIncapacitated(record) == true)
+    local onFire = zombie and zombie.isOnFire and zombie:isOnFire() == true
     if runtime.target ~= nil or runtime.combatTarget ~= nil
         or runtime.attackAction ~= nil or runtime.facilityActivity ~= nil
         or runtime.workOrderId ~= nil
         or (runtime.taskLeaseId ~= nil and runtime.taskLeaseId ~= state.taskLeaseId)
         or runtime.medicalCare ~= nil or runtime.treatment ~= nil
+        or isIncapacitated or onFire
         or at < (tonumber(runtime.inCombatUntil) or 0)
         or at < (tonumber(health and health.recentDamageUntil) or 0)
     then
@@ -39,7 +44,8 @@ function Service.Tick(record, zombie, at)
     if not state then return false end
     if state.action == "sleep" and state.wakeExitPending == true then
         local restored = sleep and sleep.RestoreSleepPosition
-            and sleep.RestoreSleepPosition(record, zombie, state, state)
+            and sleep.RestoreSleepPosition(record, zombie, state, state,
+                { emergency = true, allowOccupied = true })
         if not restored then return true end
         state.wakeExitPending = nil
         return Service.Finish(record, zombie,
@@ -56,6 +62,15 @@ function Service.Tick(record, zombie, at)
     end
     local scene = runtime.animationScene
     if scene and scene.id == state.sceneId then
+        if state.action == "sleep"
+            and state.tempCampfireKey
+            and PNC.NightCampService
+            and type(PNC.NightCampService.TickCampMember) == "function"
+        then
+            if PNC.NightCampService.TickCampMember(record, zombie, state, at) then
+                return true
+            end
+        end
         if state.action == "sleep"
             and (Service.GetWorldAgeHours and Service.GetWorldAgeHours() or 0)
                 >= (tonumber(state.wakeAt) or math.huge)
@@ -81,8 +96,8 @@ function Service.Tick(record, zombie, at)
     local distance = PNC.Core.Distance(zombie:getX(), zombie:getY(),
         state.target.x, state.target.y)
     if distance > 0.85
-        or math.abs((tonumber(zombie:getZ()) or 0)
-            - (tonumber(state.target.z) or 0)) >= 0.5
+        or math.floor(tonumber(zombie:getZ()) or 0)
+            ~= math.floor(tonumber(state.target.z) or 0)
     then
         local common = PNC.BehaviorCommon
         state.phase = "TRAVELLING"
@@ -165,6 +180,10 @@ function Service.OnSceneTick(record, zombie, scene, at)
         return false
     end
     if state.action == "sleep" then
+        local sleep = PNC.FacilityJobs and PNC.FacilityJobs.Sleep
+        if sleep and sleep.MaintainSleepPresentation then
+            sleep.MaintainSleepPresentation(record, zombie, state, state)
+        end
         local hours = Service.GetWorldAgeHours and Service.GetWorldAgeHours() or 0
         return hours < (tonumber(state.wakeAt) or math.huge)
     end

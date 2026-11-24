@@ -98,6 +98,14 @@ function H.PrepareTick(now)
         safeOptional("server_prepare.colonist_departure",
             PNC.ColonistDeparture, "Pump", nil, worldAge)
     end
+    if PNC.NightCampService and PNC.NightCampService.Prune then
+        safeOptional("server_prepare.night_camp_prune",
+            PNC.NightCampService, "Prune", nil, now)
+    end
+    if PNC.WeatherDressingService and PNC.WeatherDressingService.Pump then
+        safeOptional("server_prepare.weather_dressing",
+            PNC.WeatherDressingService, "Pump", nil, now)
+    end
     if PNC.FactionIncidentService
         and type(PNC.FactionIncidentService.PumpRuntime) == "function"
     then

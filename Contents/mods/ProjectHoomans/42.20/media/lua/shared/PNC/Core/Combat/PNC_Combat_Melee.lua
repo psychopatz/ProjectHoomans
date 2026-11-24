@@ -114,7 +114,12 @@ function Combat.TryMelee(record, zombie, target)
         return false, "cooldown_active"
     end
     skillID = Skills and Skills.ResolveWeaponSkill
-        and Skills.ResolveWeaponSkill(record, record.equipment and record.equipment.primaryFullType, "melee")
+        and Skills.ResolveWeaponSkill(
+            record,
+            record.equipment and record.equipment.primaryFullType,
+            "melee",
+            weaponItem
+        )
         or "Strength"
     emergencyMelee = target.kind == "zombie"
         and record.runtime

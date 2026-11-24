@@ -17,6 +17,7 @@ for _, moduleName in ipairs({
     "PNC/UI/PuppetOpera/PNC_PuppetOperaLayoutTab",
     "PNC/UI/PuppetOpera/PNC_PuppetOperaAnimationTab",
     "PNC/UI/PuppetOpera/PNC_PuppetOperaBeatsTab",
+    "PNC/UI/PuppetOpera/PNC_PuppetOperaTriggersTab",
     "PNC/UI/PuppetOpera/PNC_PuppetOperaTraceTab",
 }) do
     package.loaded[moduleName] = true
@@ -66,6 +67,7 @@ ISComboBox = {
 ISPNCPuppetOperaLayoutTab = tabClass()
 ISPNCPuppetOperaAnimationTab = tabClass()
 ISPNCPuppetOperaBeatsTab = tabClass()
+ISPNCPuppetOperaTriggersTab = tabClass()
 ISPNCPuppetOperaTraceTab = tabClass()
 
 PsychopatzCore = {
@@ -154,13 +156,13 @@ local window = setmetatable({
     requestResponsiveLayout = function() end,
 }, { __index = Class })
 window:createChildren()
-T.equal(#window.topButtons, 4,
+T.equal(#window.topButtons, 6,
     "debug window lifecycle did not create the top action controls")
 T.equal(#window.controls, 6,
     "debug window lifecycle did not create the runtime controls")
-T.equal(#window.tabPanel.views, 5,
+T.equal(#window.tabPanel.views, 6,
     "debug window tab spoke did not create all tabs")
-T.equal(#window.tabDefinitions, 5,
+T.equal(#window.tabDefinitions, 6,
     "debug window tab definitions were not preserved")
 
 local instance = setmetatable({}, { __index = Class })

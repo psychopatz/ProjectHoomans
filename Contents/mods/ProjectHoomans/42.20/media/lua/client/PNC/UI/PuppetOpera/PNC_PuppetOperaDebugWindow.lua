@@ -12,6 +12,7 @@ require "PNC/UI/PuppetOpera/PNC_PuppetOperaDebugModel"
 require "PNC/UI/PuppetOpera/PNC_PuppetOperaLayoutTab"
 require "PNC/UI/PuppetOpera/PNC_PuppetOperaAnimationTab"
 require "PNC/UI/PuppetOpera/PNC_PuppetOperaBeatsTab"
+require "PNC/UI/PuppetOpera/PNC_PuppetOperaTriggersTab"
 require "PNC/UI/PuppetOpera/PNC_PuppetOperaTraceTab"
 
 PNC = PNC or {}

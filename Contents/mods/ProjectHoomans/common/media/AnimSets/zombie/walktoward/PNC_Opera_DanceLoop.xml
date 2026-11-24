@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode>
+  <m_Name>PNC_Opera_DanceLoop</m_Name>
+  <m_AnimName>Bob_EmoteWaveHi</m_AnimName>
+  <m_Priority>100</m_Priority>
+  <m_ConditionPriority>1000</m_ConditionPriority>
+  <m_Looped>true</m_Looped>
+  <m_BlendTime>0.15</m_BlendTime>
+  <m_SpeedScale>1.0</m_SpeedScale>
+  <m_useDeferredMovement>false</m_useDeferredMovement>
+  <m_Conditions><m_Name>PNC_OperaActive</m_Name><m_Type>BOOL</m_Type><m_BoolValue>true</m_BoolValue></m_Conditions>
+  <m_Conditions><m_Name>PNC_OperaStyle</m_Name><m_Type>STRING</m_Type><m_Value>partner_dance</m_Value></m_Conditions>
+</animNode>

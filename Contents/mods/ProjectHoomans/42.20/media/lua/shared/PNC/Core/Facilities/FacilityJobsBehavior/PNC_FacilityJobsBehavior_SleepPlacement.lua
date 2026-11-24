@@ -41,8 +41,10 @@ local function movingObjectAt(objects, index)
     return objects[index + 1]
 end
 
-function Internal.ValidateSleepSquare(x, y, z, zombie)
+function Internal.ValidateSleepSquare(x, y, z, zombie, options)
     local square = SquareRules.GetSquare(x, y, z)
+    local allowOccupied = type(options) == "table"
+        and options.allowOccupied == true
     local index
     local count
     local objects
@@ -51,6 +53,15 @@ function Internal.ValidateSleepSquare(x, y, z, zombie)
         -- An abstract worker may resolve geometry before its chunk is loaded.
         -- A live worker must not be committed into an unloaded or unknown tile.
         return type(getCell) ~= "function", "SLEEP_SQUARE_UNLOADED"
+    end
+    if allowOccupied then
+        if square.isSolid and square:isSolid() == true then
+            return false, "SLEEP_SQUARE_BLOCKED"
+        end
+        if square.isSolidTrans and square:isSolidTrans() == true then
+            return false, "SLEEP_SQUARE_BLOCKED"
+        end
+        return true
     end
     if square.isFree then
         if square:isFree(false) ~= true then
@@ -176,12 +187,13 @@ local function exitCandidates(runtime, order, zombie)
     return output
 end
 
-function Internal.FindSleepExit(record, zombie, runtime, order)
+function Internal.FindSleepExit(record, zombie, runtime, order, options)
     local candidates = exitCandidates(
         runtime,
         order or record and record.orderSpec,
         zombie
     )
+    local emergency = type(options) == "table" and options.emergency == true
     local index
     local valid
     local reason
@@ -192,33 +204,43 @@ function Internal.FindSleepExit(record, zombie, runtime, order)
             zombie)
         if valid then return candidates[index] end
     end
+    if emergency then
+        for index = 1, #candidates do
+            valid, reason = Internal.ValidateSleepSquare(
+                candidates[index].x, candidates[index].y, candidates[index].z,
+                zombie, { allowOccupied = true })
+            if valid then return candidates[index] end
+        end
+    end
     return nil, reason or "SLEEP_EXIT_UNAVAILABLE"
 end
 
-function Internal.CommitSleepExit(record, zombie, runtime, candidate)
+function Internal.CommitSleepExit(record, zombie, runtime, candidate, options)
     local ok
     local reason
+    local exitZ
     if not candidate then return false, "SLEEP_EXIT_UNAVAILABLE" end
     if not isAuthority() then return false, "SLEEP_NOT_AUTHORITY" end
     if not canWrite(record, "sleep_exit_placement") then
         return false, "puppet_opera_writer_blocked:sleep_placement"
     end
     ok, reason = Internal.ValidateSleepSquare(
-        candidate.x, candidate.y, candidate.z, zombie)
+        candidate.x, candidate.y, candidate.z, zombie, options)
     if not ok then return false, reason end
+    exitZ = math.floor(tonumber(candidate.z) or 0)
     if zombie and PNC.LiveBodyControl
         and PNC.LiveBodyControl.SetAuthoritativePosition
     then
         if PNC.LiveBodyControl.SetAuthoritativePosition(
-            zombie, candidate.x, candidate.y, candidate.z) == false
+            zombie, candidate.x, candidate.y, exitZ) == false
         then
             return false, "SLEEP_EXIT_WRITE_FAILED"
         end
     end
-    record.x, record.y, record.z = candidate.x, candidate.y, candidate.z
+    record.x, record.y, record.z = candidate.x, candidate.y, exitZ
     runtime.approachPosition = nil
     runtime.sleepExitPosition = {
-        x = candidate.x, y = candidate.y, z = candidate.z,
+        x = candidate.x, y = candidate.y, z = exitZ,
     }
     runtime.positioned = false
     runtime.phase = "WAKING_EXITED"
@@ -253,7 +275,7 @@ function Internal.TrySnapToSleep(record, zombie, runtime, order)
             + (y - order.y) * (y - order.y))
     arrivalDistance = tonumber(order.arrivalDistance) or 0.85
     if distance > arrivalDistance
-        or math.abs(z - (tonumber(order.z) or z)) >= 0.5
+        or math.floor(z) ~= math.floor(tonumber(order.z) or z)
     then
         return false, "SLEEP_NOT_CLOSE"
     end
@@ -291,12 +313,14 @@ function Internal.TrySnapToSleep(record, zombie, runtime, order)
     return true, "SLEEP_POSITIONED"
 end
 
-function Internal.RestoreSleepPosition(record, zombie, runtime, order)
+function Internal.RestoreSleepPosition(record, zombie, runtime, order, options)
     if not runtime or runtime.positioned ~= true then return true end
     local candidate, reason = Internal.FindSleepExit(
-        record, zombie, runtime, order or record and record.orderSpec)
+        record, zombie, runtime, order or record and record.orderSpec, options)
     if not candidate then return false, reason end
-    return Internal.CommitSleepExit(record, zombie, runtime, candidate)
+    local commitOpts = type(options) == "table" and options.emergency == true
+        and { allowOccupied = true } or options
+    return Internal.CommitSleepExit(record, zombie, runtime, candidate, commitOpts)
 end
 
 return Internal

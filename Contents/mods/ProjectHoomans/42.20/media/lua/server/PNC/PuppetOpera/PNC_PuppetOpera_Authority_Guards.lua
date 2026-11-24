@@ -121,7 +121,23 @@ local function invalidPlayer(player)
     return nil
 end
 
-local function invalidNPC(record, body, activeSession)
+local function allowsInitialState(actorDefinition, stateName)
+    local allowed = type(actorDefinition) == "table"
+        and actorDefinition.allowedInitialStates or nil
+    if type(allowed) ~= "table" then return false end
+    for _, name in ipairs(allowed) do
+        if name == stateName or name == "any" then return true end
+    end
+    return false
+end
+
+local DOWNED_ACTION_STATES = {
+    onground = true,
+    ["onground-ragdoll"] = true,
+    falldown = true,
+}
+
+local function invalidNPC(record, body, activeSession, actorDefinition)
     if not record then return "npc_record_missing" end
     if not body then return "npc_body_unavailable" end
     if body.isDead and body:isDead() then return "npc_dead" end
@@ -130,7 +146,12 @@ local function invalidNPC(record, body, activeSession)
         return "npc_seated"
     end
     if not activeSession and unsafeNPCActionState(body) then
-        return "npc_action_state_busy"
+        local state = npcActionState(body)
+        if not (DOWNED_ACTION_STATES[state]
+            and allowsInitialState(actorDefinition, "incapacitated"))
+        then
+            return "npc_action_state_busy"
+        end
     end
 
     local runtime = record.runtime or {}

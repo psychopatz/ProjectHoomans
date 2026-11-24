@@ -4,6 +4,7 @@ local State = Nameplates.State
 local Entries = PNC.NameplateEntries
 local Renderer = PNC.NameplateRenderer
 local StealthIndicator = PNC.NameplateStealthIndicator
+local DialoguePromptIndicator = PNC.NameplateDialoguePromptIndicator
 
 ISPNCNameplateManager = ISUIElement:derive("ISPNCNameplateManager")
 
@@ -23,6 +24,9 @@ function ISPNCNameplateManager:render()
     Renderer.Render(self, Settings)
     if StealthIndicator and StealthIndicator.Render then
         StealthIndicator.Render(self, Settings)
+    end
+    if DialoguePromptIndicator and DialoguePromptIndicator.Render then
+        DialoguePromptIndicator.Render(self, Settings)
     end
 end
 

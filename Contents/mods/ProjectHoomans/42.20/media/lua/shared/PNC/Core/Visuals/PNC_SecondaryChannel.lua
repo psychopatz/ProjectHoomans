@@ -96,6 +96,12 @@ end
 function Secondary.ApplyGaze(record, zombie, at)
     local sc = record and record.runtime and record.runtime.secondaryChannel or nil
     if not sc then return false, "NO_SECONDARY_STATE" end
+    local liveControl = PNC and PNC.LiveBodyControl or nil
+    if liveControl and type(liveControl.IsBodyRotationLocked) == "function"
+        and liveControl.IsBodyRotationLocked(record, zombie) == true
+    then
+        return false, "BODY_ROTATION_LOCKED"
+    end
     local current = nowMs(at)
     if sc.gazeX == nil or sc.gazeY == nil or current >= (tonumber(sc.gazeUntil) or 0) then
         sc.gazeX = nil
@@ -303,7 +309,13 @@ function Secondary.ApplyClientSnapshot(snapshot, zombie, modData)
         modData.PNC_SecondaryApplied = true
     end
     if sc.gazeX ~= nil and sc.gazeY ~= nil then
-        Secondary.ApplyGazeToBody(zombie, sc.gazeX, sc.gazeY)
+        local locked = (zombie.isSittingOnFurniture
+            and zombie:isSittingOnFurniture() == true)
+            or (zombie.getVariableBoolean
+                and zombie:getVariableBoolean("PNCSeated") == true)
+        if not locked then
+            Secondary.ApplyGazeToBody(zombie, sc.gazeX, sc.gazeY)
+        end
     end
     local barkSeq = tonumber(sc.barkSeq) or 0
     if barkSeq > 0 and sc.barkVoiceEvent and (not modData or modData.PNC_LastBarkSeq ~= barkSeq) then

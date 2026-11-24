@@ -155,25 +155,33 @@ function Conversation.ReceiveDisclosureResult(result)
     if not view or not result
         or tostring(result.npcID) ~= tostring(view.spec and view.spec.npcID)
     then return false end
+    local function deliverNpcPayload(payload)
+        if not view or not view.session then return end
+        if type(view.session.queueMessage) == "function" then
+            view.session:queueMessage("npc", payload)
+        elseif type(view.session.append) == "function" then
+            view.session:append("npc", payload)
+        end
+    end
     local translatedPayload = disclosureResponsePayload(result)
     if translatedPayload
-        and view.session and view.session.append
+        and view.session and (view.session.queueMessage or view.session.append)
     then
         local responseText = translatedPayload.text
             or translatedPayload.fallback
             or result.responseText
-        view.session:append("npc", translatedPayload)
+        deliverNpcPayload(translatedPayload)
         recordBackstoryResponse(responseText)
     elseif result.responseText
-        and view.session and view.session.append
+        and view.session and (view.session.queueMessage or view.session.append)
     then
         local responseText = tostring(result.responseText)
-        view.session:append("npc", { text = responseText, fallback = responseText })
+        deliverNpcPayload({ text = responseText, fallback = responseText })
         recordBackstoryResponse(responseText)
     elseif result.success == true and reaction
-        and view.session and view.session.append
+        and view.session and (view.session.queueMessage or view.session.append)
     then
-        view.session:append("npc", {
+        deliverNpcPayload({
             key = reaction.key,
             domain = GIFT_SOURCE.domain,
             text = reaction.text,
@@ -185,10 +193,10 @@ function Conversation.ReceiveDisclosureResult(result)
             or result.reason == "invalid_gift_item_type"
             or result.reason == "gift_preference_unavailable"
             or result.reason == "marketsense_unavailable")
-        and view.session and view.session.append
+        and view.session and (view.session.queueMessage or view.session.append)
     then
         local unknown = GIFT_PREFERENCE_RESPONSES.unknown
-        view.session:append("npc", {
+        deliverNpcPayload({
             key = unknown.key,
             domain = GIFT_SOURCE.domain,
             text = unknown.text,

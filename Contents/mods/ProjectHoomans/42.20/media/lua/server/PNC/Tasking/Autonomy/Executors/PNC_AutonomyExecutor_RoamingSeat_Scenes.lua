@@ -35,10 +35,12 @@ function Service.OnSceneTick(record, zombie, scene, at)
     local jobs = facilityJobs()
     local seating = jobs and jobs.Seating
     local reservations = facilityReservations()
-    if state.floorSeating == true and seating
-        and seating.MaintainFloorSeat
-    then
-        seating.MaintainFloorSeat(record, zombie, state, state)
+    if state.floorSeating == true then
+        if seating and seating.MaintainFloorSeat then
+            seating.MaintainFloorSeat(record, zombie, state, state)
+        end
+    elseif seating and seating.MaintainFurnitureSeat then
+        seating.MaintainFurnitureSeat(record, zombie, state, state)
     end
     if reservations and reservations.Start
         and at >= (tonumber(state.nextReservationRenewAt) or 0)

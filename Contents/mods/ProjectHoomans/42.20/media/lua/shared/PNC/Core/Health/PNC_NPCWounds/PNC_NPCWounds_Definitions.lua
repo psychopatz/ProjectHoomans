@@ -45,7 +45,16 @@ function Wounds.GetWoundStats(woundType)
     return normalized and Internal.WoundStats[normalized] or nil
 end
 
-Internal.DebugWoundTypes = { "scratch", "laceration", "bite" }
+Internal.DebugWoundTypes = {
+    "scratch",
+    "laceration",
+    "bite",
+    "burn",
+    "fracture",
+    "deep_wound",
+    "deep_wound_glass",
+    "bullet",
+}
 Internal.CoveragePartAliases = {
     UpperBody = "Torso_Upper",
     LowerBody = "Torso_Lower",

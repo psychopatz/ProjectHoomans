@@ -127,7 +127,27 @@ function Opera.BuildSnapshot(session, includeTrace)
         preview = session.previewOnly == true,
         plan = copyTable(session.plan),
         actors = {},
+        tethers = nil,
     }
+    local bpActors = session.blueprint and session.blueprint.actors or nil
+    if type(bpActors) == "table" then
+        local tethers = {}
+        for actorID, def in pairs(bpActors) do
+            if type(def.coupling) == "table" and def.coupling.attachTo then
+                tethers[#tethers + 1] = {
+                    follower = tostring(actorID),
+                    leader = tostring(def.coupling.attachTo),
+                    offsetRight = def.coupling.offsetRight or 0,
+                    offsetForward = def.coupling.offsetForward or 0,
+                    offsetZ = def.coupling.offsetZ or 0,
+                    facingMode = def.coupling.facingMode or "match",
+                    disableCollision = def.coupling.disableCollision ~= false,
+                    groundedCheck = def.coupling.groundedCheck == true,
+                }
+            end
+        end
+        if #tethers > 0 then snapshot.tethers = tethers end
+    end
     local actorID
     local actor
     for actorID, actor in pairs(session.actors or {}) do
