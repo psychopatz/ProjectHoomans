@@ -17,14 +17,14 @@ local function currentConversationView(npcID)
     return nil
 end
 
-function IdentityChoice.Request(npcID)
+function IdentityChoice.Request(npcID, options)
     local view = currentConversationView(npcID)
     local input = PNC.ConvoEngine and PNC.ConvoEngine.DialogueInput or nil
     if not view then return false, "conversation_unavailable" end
     if not input or type(input.Submit) ~= "function" then
         return false, "semantic_dialogue_input_unavailable"
     end
-    return input.Submit(view, "what is your name")
+    return input.Submit(view, "what is your name", options)
 end
 
 function IdentityChoice.Build(npcID, projection, identityArguments)
@@ -49,7 +49,7 @@ function IdentityChoice.Build(npcID, projection, identityArguments)
             projection.requestState = "prompting"
             projection.knowledgePending = false
             projection.canAskName = false
-            local accepted = IdentityChoice.Request(npcID)
+            local accepted = IdentityChoice.Request(npcID, { skipInputPresentation = true })
             if accepted ~= true then
                 projection.requestState = "error"
                 projection.knowledgePending = false

@@ -94,13 +94,11 @@ local function formatPoolError(poolID, reason, meta, detail)
         .. " realization=" .. tostring(realization)
 end
 
-local function preflightArtifact(artifact, responses)
-    local poolContext = collectPoolContext(artifact)
+local function preflightArtifact(artifact, responses, poolContext)
+    poolContext = poolContext or collectPoolContext(artifact)
     local preflightedPools = {}
-    local existingCount = 0
-    for _ in pairs(responses.POOLS or {}) do
-        existingCount = existingCount + 1
-    end
+    local maxPools = tonumber(responses.MAX_POOLS)
+    local existingCount = tonumber(responses.POOL_COUNT) or 0
     local newDistinctCount = 0
     for index = 1, #(artifact.responsePools or {}) do
         local pool = artifact.responsePools[index]
@@ -118,7 +116,7 @@ local function preflightArtifact(artifact, responses)
         end
         if not preflightedPools[poolID] and info.isNewPool then
             newDistinctCount = newDistinctCount + 1
-            if (existingCount + newDistinctCount) > (responses.MAX_POOLS or 256) then
+            if maxPools and maxPools > 0 and (existingCount + newDistinctCount) > maxPools then
                 return false, formatPoolError(poolID, "response_pool_limit", meta)
             end
         end
@@ -154,11 +152,11 @@ local function register(capabilityCatalog, artifact)
     artifact = type(artifact) == "table" and artifact or build(
         capabilityCatalog
     )
-    local preflightOk, preflightError = preflightArtifact(artifact, responses)
+    local poolContext = collectPoolContext(artifact)
+    local preflightOk, preflightError = preflightArtifact(artifact, responses, poolContext)
     if not preflightOk then
         error(preflightError)
     end
-    local poolContext = collectPoolContext(artifact)
     artifact.regeneratedFlowIDs = {}
     for index = 1, #artifact.responsePools do
         local pool = artifact.responsePools[index]

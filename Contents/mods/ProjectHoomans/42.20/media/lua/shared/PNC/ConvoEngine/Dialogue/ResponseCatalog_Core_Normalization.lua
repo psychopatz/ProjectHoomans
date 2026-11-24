@@ -206,14 +206,17 @@ return function(Core)
 
     function Core.install(Catalog)
         Catalog.VERSION = 1
-        Catalog.MAX_POOLS = 256
+        Catalog.MAX_POOLS = nil
         Catalog.MAX_VARIANTS = 32
-        Catalog.MAX_LAST_VARIANTS = 256
+        Catalog.MAX_LAST_VARIANTS = 512
         Catalog.POOLS = Catalog.POOLS or {}
+        Catalog.POOL_COUNT = tonumber(Catalog.POOL_COUNT) or 0
         Catalog.REVISION = Catalog.REVISION or 0
         Catalog.REGISTRATION_ORIGINS = Catalog.REGISTRATION_ORIGINS or {}
         Catalog.LAST_VARIANTS = Catalog.LAST_VARIANTS or {}
         Catalog.LAST_VARIANT_ORDER = Catalog.LAST_VARIANT_ORDER or {}
+        Catalog._lastVariantHead = tonumber(Catalog._lastVariantHead) or 1
+        Catalog._lastVariantCount = tonumber(Catalog._lastVariantCount) or 0
     end
 
     return Core

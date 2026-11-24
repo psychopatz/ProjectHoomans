@@ -218,43 +218,28 @@ local function stablePortraitSignature(value, depth)
     return "{" .. table.concat(parts, ";") .. "}"
 end
 
+local ClientPortraitSpec = require "PNC/UI/PNC_ClientPortraitSpec"
+
 local function portraitSpec(entry)
-    local snapshot = entry and entry.snapshot or {}
-    local record = entry and entry.record or {}
-    local summary = snapshot.portrait
-    if not summary and not snapshot.appearance and entry and entry.id
-        and PNC.Client and PNC.Client.GetRosterPortrait
-    then
-        summary = PNC.Client.GetRosterPortrait(tostring(entry.id))
-    end
-    summary = summary or {}
-    local equipment = snapshot.equipmentSummary
-        or summary.equipment
-        or record.equipment
-        or { worn = {} }
+    local built = ClientPortraitSpec.Build(entry, {
+        id = entry and entry.id or nil,
+        snapshot = entry and entry.snapshot or nil,
+        record = entry and entry.record or nil,
+        faceOnly = true,
+        includeCurrentClothing = true,
+        clothingMode = "current",
+    })
+    if built then return built end
     return {
         id = entry and entry.id,
-        key = table.concat({
-            tostring(entry and entry.id or ""),
-            tostring(snapshot.identitySeed or summary.identitySeed
-                or record.identitySeed or 1),
-            tostring(snapshot.presenceRevision or 0),
-            stablePortraitSignature(equipment),
-        }, "|"),
-        identitySeed = snapshot.identitySeed or summary.identitySeed
-            or record.identitySeed or 1,
-        isFemale = snapshot.isFemale == true
-            or summary.isFemale == true or record.isFemale == true,
-        -- Live NPCs use IsoZombie carriers for engine animation/replication.
-        -- Conversation portraits must render the descriptor-backed human
-        -- preview instead of exposing that carrier's zombie appearance.
+        identitySeed = 1,
+        isFemale = false,
         preferDescriptor = true,
         faceOnly = true,
         includeCurrentClothing = true,
         clothingMode = "current",
-        appearance = snapshot.appearance or summary.appearance
-            or record.appearance or {},
-        equipment = equipment,
+        appearance = {},
+        equipment = { worn = {} },
     }
 end
 

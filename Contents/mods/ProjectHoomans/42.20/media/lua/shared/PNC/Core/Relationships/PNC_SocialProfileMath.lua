@@ -180,6 +180,16 @@ function Math.ModifySocialEvent(
             factor
         )
         breakdown.braveryRespect = factor
+        local ctx = type(eventSpec) == "table" and type(eventSpec.context) == "table" and eventSpec.context or nil
+        local threatCount = ctx and math.floor(tonumber(ctx.threatCount or ctx.killsByHelper) or 1) or 1
+        if threatCount > 1 then
+            local threatScale = math.min(2.25, 1.0 + math.min(threatCount - 1, 10) * 0.125)
+            effects.approvalEffect = scalePositive(effects.approvalEffect, threatScale)
+            effects.respectEffect = scalePositive(effects.respectEffect, threatScale)
+            effects.moraleEffect = scalePositive(effects.moraleEffect, threatScale)
+            effects.familiarityGain = scalePositive(effects.familiarityGain, threatScale)
+            breakdown.threatScale = threatScale
+        end
     end
 
     if eventType == "survived_combat_together"

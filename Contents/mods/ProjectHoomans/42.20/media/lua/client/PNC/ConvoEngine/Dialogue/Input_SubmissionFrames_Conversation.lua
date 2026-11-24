@@ -23,11 +23,20 @@ function Internal.SubmitCoreAuthoredFrame(view, frame, options)
         local context = view and view.session
             and view.session.context
             or view and view.spec and view.spec.context or {}
-        authoredChoice.action(
+        local prevSuppress = view and view._suppressNextPlayerInputEcho or nil
+        if type(view) == "table" then
+            view._suppressNextPlayerInputEcho = true
+        end
+        local okAction, errAction = pcall(
+            authoredChoice.action,
             context,
             authoredChoice.source,
             view and view.session
         )
+        if type(view) == "table" then
+            view._suppressNextPlayerInputEcho = prevSuppress
+        end
+        if not okAction then error(errAction) end
     end
     Internal.FinishDirectFrame(view, receiptOrReason)
     return true, true, "accepted"

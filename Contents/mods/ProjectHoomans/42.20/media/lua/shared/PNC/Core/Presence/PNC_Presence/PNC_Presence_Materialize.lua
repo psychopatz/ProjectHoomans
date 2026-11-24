@@ -421,6 +421,15 @@ local function finishMaterialization(
         record.runtime.abstractFollowMaterializeRequested = nil
     end
     Registry.RegisterLiveZombie(record, zombie)
+    if PNC.Persistence and PNC.Persistence.CoreProvider
+        and type(PNC.Persistence.CoreProvider.SyncPresenceLease) == "function"
+    then
+        PNC.Persistence.CoreProvider.SyncPresenceLease(
+            record,
+            zombie,
+            PsychopatzCore
+        )
+    end
     if Presence.LogTraversal then
         Presence.LogTraversal(record, "presence_transition", zombie, {
             "from=" .. tostring(fromState or Const.PRESENCE_ABSTRACT),

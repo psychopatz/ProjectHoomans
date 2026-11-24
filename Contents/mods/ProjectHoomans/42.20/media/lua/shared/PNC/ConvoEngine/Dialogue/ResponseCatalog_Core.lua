@@ -31,6 +31,8 @@ Core.CONDITION_FIELDS = {
     "hordePhase", "socialRole", "farewellSpeaker",
     "milestoneStage", "worldEventType", "epistemicProvenance",
     "stateValue", "knoxExposure", "salivaTransmissible", "isBitten", "hasOpenWounds",
+    "speakerStyle", "partnerStyle", "speakerInjured", "anyInjured", "anyExhausted",
+    "isNightOrDusk", "isCrossGroup",
 }
 
 local PASSTHROUGH_FIELDS = {
@@ -50,6 +52,8 @@ local PASSTHROUGH_FIELDS = {
     "combatWeaponNamed", "assaultKind", "friendlyPushTier", "lootCategory",
     "hordePhase", "farewellSpeaker", "milestoneStage", "worldEventType",
     "stateValue", "knoxExposure", "salivaTransmissible", "isBitten", "hasOpenWounds",
+    "speakerStyle", "partnerStyle", "speakerInjured", "anyInjured", "anyExhausted",
+    "isNightOrDusk", "isCrossGroup",
 }
 
 local function scalarMatches(expected, actual)

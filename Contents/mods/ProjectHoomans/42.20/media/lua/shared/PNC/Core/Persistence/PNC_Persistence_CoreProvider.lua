@@ -239,10 +239,14 @@ function Adapter.AnnotateExistingCoreRecord(record, core)
     record.coreRevision = tonumber(actor.revision) or record.coreRevision
     record.runtime = runtime
     record.runtime.coreActorID = canonicalID
+    local liveState = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
+    local hasLiveBody = record.presenceState == liveState
+        or (PNC.Registry and type(PNC.Registry.GetLiveZombie) == "function"
+            and PNC.Registry.GetLiveZombie(record.id) ~= nil)
     local expectedPresence
     if lease.state == "materialized" then
-        expectedPresence = PNC.Const.PRESENCE_LIVE
-    elseif lease.state == "abstract" then
+        expectedPresence = liveState
+    elseif lease.state == "abstract" and not hasLiveBody then
         expectedPresence = PNC.Const.PRESENCE_ABSTRACT
     end
     if expectedPresence ~= nil
@@ -297,13 +301,58 @@ function Adapter.EnsureActor(record, core)
             return nil, "core_actor_ensure_unavailable"
         end
 
+        local resolvedFemale = record.isFemale == true
+            or (type(record.identity) == "table"
+                and record.identity.isFemale == true)
+        local rawAppearance
+        if record.appearanceAuthored and type(record.appearance) == "table" then
+            rawAppearance = record.appearance
+        elseif type(record.runtime) == "table"
+            and type(record.runtime.appearanceCache) == "table"
+        then
+            rawAppearance = record.runtime.appearanceCache
+        elseif PNC.Identity and type(PNC.Identity.RollAppearance) == "function" then
+            rawAppearance = PNC.Identity.RollAppearance(record)
+        end
+        local ensureAppearance
+        if type(rawAppearance) == "table" then
+            if type(rawAppearance.policy) == "table"
+                or rawAppearance.schemaVersion ~= nil
+            then
+                ensureAppearance = rawAppearance
+            else
+                local resolvedCopy = cloneTable(rawAppearance)
+                resolvedCopy.gender = resolvedCopy.gender
+                    or (resolvedFemale and "female" or "male")
+                local policySchema = (api.Factory
+                    and tonumber(api.Factory.APPEARANCE_POLICY_SCHEMA)) or 2
+                ensureAppearance = {
+                    policy = {
+                        schemaVersion = policySchema,
+                        mode = "authored",
+                        skinTexture = resolvedCopy.skinTexture,
+                        skinColor = cloneTable(resolvedCopy.skinColor),
+                        hairModel = resolvedCopy.hairModel,
+                        hairColor = cloneTable(resolvedCopy.hairColor),
+                        beardModel = resolvedCopy.beardModel,
+                        hairStubble = resolvedCopy.hairStubble,
+                        beardStubble = resolvedCopy.beardStubble,
+                        chestHair = resolvedCopy.chestHair,
+                        outfit = resolvedCopy.outfit,
+                    },
+                    resolved = resolvedCopy,
+                }
+            end
+        end
+
         actor = ensure({
             actorId = tostring(record.id),
             ownerMod = "ProjectHoomans",
             identitySeed = record.identitySeed,
             identity = record.identity,
+            isFemale = resolvedFemale,
             displayName = record.displayName or record.name,
-            appearance = record.appearanceAuthored and record.appearance or nil,
+            appearance = ensureAppearance,
             archetypeID = record.archetypeID or "core.survivor",
             world = {
                 location = {
@@ -507,7 +556,9 @@ local function applyCoreActorProjection(record, actor, projected, options)
         == "materialized"
         and PNC.Const.PRESENCE_LIVE
         or PNC.Const.PRESENCE_ABSTRACT
-    if record.presenceState ~= expectedPresence then
+    if (not isLive or expectedPresence == PNC.Const.PRESENCE_LIVE)
+        and record.presenceState ~= expectedPresence
+    then
         record.presenceState = expectedPresence
         changed = true
     end
@@ -878,6 +929,340 @@ function Adapter.HasActiveHoomansResponsibility(record, now, options)
     return false, "eligible_for_demotion"
 end
 
+local function isServerAuthority()
+    if PNC.Core and type(PNC.Core.IsAuthority) == "function" then
+        return PNC.Core.IsAuthority() == true
+    end
+    local clientOnly = type(isClient) == "function" and isClient() == true
+        and (type(isServer) ~= "function" or isServer() ~= true)
+    return not clientOnly
+end
+
+local function worldAgeHours()
+    if type(getGameTime) == "function" then
+        local gt = getGameTime()
+        if gt and type(gt.getWorldAgeHours) == "function" then
+            local hours = tonumber(gt:getWorldAgeHours())
+            if hours and hours == hours then return math.max(0, hours) end
+        end
+    end
+    return 0
+end
+
+local function resolveLiveBodyID(record, body)
+    if body ~= nil then
+        if type(body.getPersistentOutfitID) == "function" then
+            local ok, value = pcall(body.getPersistentOutfitID, body)
+            if ok and value ~= nil and tostring(value) ~= ""
+                and tostring(value) ~= "0"
+            then
+                return tostring(value)
+            end
+        end
+        if type(body.getOnlineID) == "function" then
+            local ok, value = pcall(body.getOnlineID, body)
+            if ok and value ~= nil and tonumber(value)
+                and tonumber(value) >= 0
+            then
+                return tostring(value)
+            end
+        end
+        if type(body) == "table" then
+            local value = body.bodyID or body.bodyId or body.id
+            if value ~= nil and tostring(value) ~= ""
+                and tostring(value) ~= "0"
+            then
+                return tostring(value)
+            end
+        end
+    end
+    if type(record) == "table" then
+        local runtime = type(record.runtime) == "table" and record.runtime or nil
+        local fallback = record.liveBodyInstanceID
+            or record.liveBodyPopulationID
+            or (runtime and runtime.bodyLease)
+            or (record.id and ("live:" .. tostring(record.id)))
+        if fallback ~= nil and tostring(fallback) ~= ""
+            and tostring(fallback) ~= "0"
+        then
+            return tostring(fallback)
+        end
+    end
+    return nil
+end
+
+local function markProjectionDirty(core, reason)
+    local sync = core and core.ActorProjectionSync or nil
+    if sync and type(sync.MarkDirty) == "function" then
+        sync.MarkDirty(reason)
+    end
+end
+
+local function buildSyncedAppearancePatch(actor, record)
+    if type(actor) ~= "table" or type(actor.appearance) ~= "table"
+        or type(actor.appearance.resolved) ~= "table"
+    then
+        return nil
+    end
+    local resolved = type(record.runtime) == "table"
+        and type(record.runtime.appearanceCache) == "table"
+        and record.runtime.appearanceCache or nil
+    if not resolved and PNC.Identity
+        and type(PNC.Identity.RollAppearance) == "function"
+    then
+        resolved = PNC.Identity.RollAppearance(record)
+    end
+    if not resolved and type(record.appearance) == "table" then
+        resolved = type(record.appearance.resolved) == "table"
+            and record.appearance.resolved or record.appearance
+    end
+    if type(resolved) ~= "table" then return nil end
+
+    local current = actor.appearance.resolved
+    local nextAppearance = cloneTable(actor.appearance)
+    local target = nextAppearance.resolved
+    local changed = false
+    local function syncField(key, value)
+        if value ~= nil and not tablesEqual(current[key], value) then
+            target[key] = cloneTable(value)
+            changed = true
+        end
+    end
+
+    syncField("skinTexture", resolved.skinTexture)
+    syncField("skinColor", resolved.skinColor)
+    syncField("hairModel", resolved.hairModel)
+    syncField("hairColor", resolved.hairColor)
+    syncField("beardModel", resolved.beardModel)
+    syncField("hairStubble", resolved.hairStubble)
+    syncField("beardStubble", resolved.beardStubble)
+    syncField("chestHair", resolved.chestHair)
+    if record.isFemale ~= nil or (type(record.identity) == "table"
+        and record.identity.isFemale ~= nil)
+    then
+        local female = record.isFemale == true
+            or (type(record.identity) == "table"
+                and record.identity.isFemale == true)
+        syncField("gender", female and "female" or "male")
+    end
+    return changed and nextAppearance or nil
+end
+
+local function buildSyncedIdentityPatch(actor, record)
+    if type(actor) ~= "table" or type(actor.identity) ~= "table"
+        or type(actor.identity.survivor) ~= "table"
+    then
+        return nil
+    end
+    local nextIdentity = cloneTable(actor.identity)
+    local targetSurvivor = nextIdentity.survivor
+    local srcIdentity = type(record.identity) == "table"
+        and record.identity or {}
+    local srcSurvivor = type(srcIdentity.survivor) == "table"
+        and srcIdentity.survivor or {}
+    local changed = false
+
+    local displayNameValue = record.displayName or record.name
+        or srcIdentity.displayName
+    if type(displayNameValue) == "string" and displayNameValue ~= ""
+        and nextIdentity.displayName ~= displayNameValue
+    then
+        nextIdentity.displayName = displayNameValue
+        changed = true
+    end
+    if record.isFemale ~= nil or srcIdentity.isFemale ~= nil then
+        local gender = (record.isFemale == true
+            or srcIdentity.isFemale == true) and "female" or "male"
+        if nextIdentity.gender ~= gender then
+            nextIdentity.gender = gender
+            changed = true
+        end
+        if targetSurvivor.gender ~= gender then
+            targetSurvivor.gender = gender
+            changed = true
+        end
+    end
+    for _, key in ipairs({
+        "forename", "surname", "skinTexture", "skinColor", "hairModel",
+        "hairColor", "beardModel", "hairStubble", "beardStubble", "chestHair",
+    }) do
+        local value = srcSurvivor[key]
+        if value ~= nil and not tablesEqual(targetSurvivor[key], value) then
+            targetSurvivor[key] = cloneTable(value)
+            changed = true
+        end
+    end
+    return changed and nextIdentity or nil
+end
+
+local function mirrorLeaseRuntime(record, actor)
+    if type(record) ~= "table" or type(actor) ~= "table" then return end
+    local lease = type(actor.providerLease) == "table"
+        and actor.providerLease or {}
+    record.runtime = type(record.runtime) == "table" and record.runtime or {}
+    record.runtime.coreProvider = lease.provider
+    record.runtime.coreProviderLease = lease.leaseID
+    record.runtime.coreProviderState = lease.state
+    record.runtime.coreProviderBodyID = lease.bodyID
+    if tonumber(actor.revision) ~= nil then
+        record.coreRevision = tonumber(actor.revision)
+    end
+end
+
+--- Synchronizes Project Hoomans' live/abstract presence state into
+--- PsychopatzCore's canonical `actor.providerLease` so SurvivorWorld map
+--- projections, hover cards, diagnostics, and startup restore stay in sync.
+function Adapter.SyncPresenceLease(record, zombie, core, options)
+    if not isServerAuthority() then
+        return false, "server_authority_required"
+    end
+    core = core or PsychopatzCore
+    options = type(options) == "table" and options or {}
+    if type(record) ~= "table" or type(core) ~= "table" then
+        return false, "record_and_core_required"
+    end
+    local reg = coreRegistry(core)
+    if not reg then
+        return false, "core_registry_unavailable"
+    end
+    local actorID = tostring(
+        record.coreActorID
+            or (type(record.runtime) == "table" and record.runtime.coreActorID)
+            or record.id
+            or ""
+    )
+    if actorID == "" then
+        return false, "actor_id_required"
+    end
+    local actor = (type(reg.Peek) == "function" and reg:Peek(actorID))
+        or (type(reg.Get) == "function" and reg:Get(actorID))
+        or nil
+    if not actor then
+        return false, "core_actor_not_found"
+    end
+
+    local liveState = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
+    local isLive = record.presenceState == liveState
+    if isLive and zombie == nil and PNC.Registry
+        and type(PNC.Registry.GetLiveZombie) == "function"
+    then
+        zombie = PNC.Registry.GetLiveZombie(record.id)
+    end
+    local lease = type(actor.providerLease) == "table"
+        and actor.providerLease or {}
+    local nowHours = tonumber(options.now) or worldAgeHours()
+
+    if isLive then
+        local idValue = resolveLiveBodyID(record, zombie)
+        if not idValue then
+            return false, "body_id_required"
+        end
+        if lease.state == "materialized" then
+            if lease.provider == "ProjectHoomans" then
+                if tostring(lease.bodyID or "") == tostring(idValue) then
+                    mirrorLeaseRuntime(record, actor)
+                    return true, "already_materialized"
+                end
+                if type(reg.DematerializeProvider) == "function" then
+                    local demat, dematErr = reg:DematerializeProvider(actorID, {
+                        provider = "ProjectHoomans",
+                        owner = lease.owner,
+                        bodyID = lease.bodyID,
+                        authority = "server",
+                        now = nowHours,
+                    })
+                    if not demat then
+                        return false, dematErr or "core_dematerialize_failed"
+                    end
+                    actor = demat
+                    lease = type(actor.providerLease) == "table"
+                        and actor.providerLease or {}
+                end
+            else
+                return false, "body_lease_active"
+            end
+        end
+
+        if lease.state == "released" or lease.state == nil then
+            if type(reg.AcquireProvider) ~= "function" then
+                return false, "core_acquire_unavailable"
+            end
+            local acquired, acqErr = reg:AcquireProvider(actorID, {
+                provider = "ProjectHoomans",
+                owner = "ProjectHoomans:live",
+                authority = "server",
+                now = nowHours,
+            })
+            if not acquired then
+                return false, acqErr or "core_acquire_failed"
+            end
+            actor = acquired
+            lease = type(actor.providerLease) == "table"
+                and actor.providerLease or {}
+        elseif lease.state == "abstract"
+            and lease.provider ~= "ProjectHoomans"
+        then
+            if type(reg.SwitchProvider) ~= "function" then
+                return false, "core_switch_unavailable"
+            end
+            local switched, switchErr = reg:SwitchProvider(actorID, {
+                provider = "ProjectHoomans",
+                owner = "ProjectHoomans:live",
+                handoffFrom = lease.owner,
+                authority = "server",
+                now = nowHours,
+            })
+            if not switched then
+                return false, switchErr or "core_switch_failed"
+            end
+            actor = switched
+            lease = type(actor.providerLease) == "table"
+                and actor.providerLease or {}
+        end
+
+        if type(reg.MaterializeProvider) ~= "function" then
+            return false, "core_materialize_unavailable"
+        end
+        local committed, matErr = reg:MaterializeProvider(actorID, {
+            provider = "ProjectHoomans",
+            owner = lease.owner or "ProjectHoomans:live",
+            bodyID = idValue,
+            authority = "server",
+            now = nowHours,
+        })
+        if not committed then
+            return false, matErr or "core_materialize_failed"
+        end
+        mirrorLeaseRuntime(record, committed)
+        markProjectionDirty(core, "presence_materialize")
+        return true, "materialized"
+    end
+
+    if lease.state == "materialized"
+        and lease.provider == "ProjectHoomans"
+    then
+        if type(reg.DematerializeProvider) ~= "function" then
+            return false, "core_dematerialize_unavailable"
+        end
+        local committed, dematErr = reg:DematerializeProvider(actorID, {
+            provider = "ProjectHoomans",
+            owner = lease.owner,
+            bodyID = lease.bodyID,
+            authority = "server",
+            now = nowHours,
+        })
+        if not committed then
+            return false, dematErr or "core_dematerialize_failed"
+        end
+        mirrorLeaseRuntime(record, committed)
+        markProjectionDirty(core, "presence_abstract")
+        return true, "abstract"
+    end
+
+    mirrorLeaseRuntime(record, actor)
+    return true, "already_abstract"
+end
+
 function Adapter.SyncPromotedCoreActorToCore(record, core, options)
     core = core or PsychopatzCore
     options = type(options) == "table" and options or {}
@@ -907,6 +1292,25 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
         or reg:Get(actorID)
     if not actor then
         return false, "core_actor_not_found", OUTCOME_TERMINAL
+    end
+
+    local liveState = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
+    local recordIsLive = record.presenceState == liveState
+        or (PNC.Registry and type(PNC.Registry.GetLiveZombie) == "function"
+            and PNC.Registry.GetLiveZombie(record.id) ~= nil)
+    local lease = type(actor.providerLease) == "table"
+        and actor.providerLease or nil
+    local leaseState = lease and lease.state or nil
+    if (recordIsLive and leaseState ~= "materialized")
+        or (not recordIsLive and leaseState == "materialized"
+            and lease.provider == "ProjectHoomans")
+    then
+        Adapter.SyncPresenceLease(record, nil, core)
+        actor = (type(reg.Peek) == "function" and reg:Peek(actorID))
+            or reg:Get(actorID)
+        if not actor then
+            return false, "core_actor_not_found", OUTCOME_TERMINAL
+        end
     end
 
     local coreSocialAdapter = PNC.Persistence and PNC.Persistence.CoreSocial or nil
@@ -1027,6 +1431,18 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
         hasPatch = true
     end
 
+    local nextAppearance = buildSyncedAppearancePatch(actor, record)
+    if nextAppearance then
+        patch.appearance = nextAppearance
+        hasPatch = true
+    end
+
+    local nextIdentity = buildSyncedIdentityPatch(actor, record)
+    if nextIdentity then
+        patch.identity = nextIdentity
+        hasPatch = true
+    end
+
     if hasPatch then
         local committed, commitErr = reg:Commit(
             actorID, patch, actor.revision, { returnClone = false }
@@ -1045,6 +1461,11 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
         if record.runtime then record.runtime.coreAffiliationDirty = nil end
         if PNC.Registry then
             PNC.Registry.CoreStoreDirty = true
+        end
+        if patch.appearance ~= nil or patch.identity ~= nil
+            or patch.personalInventory ~= nil
+        then
+            markProjectionDirty(core, "core_actor_presentation_sync")
         end
         return true, {
             committed = true,

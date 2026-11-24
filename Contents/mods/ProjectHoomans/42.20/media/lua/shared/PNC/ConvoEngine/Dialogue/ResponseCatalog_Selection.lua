@@ -9,8 +9,16 @@ return function(Catalog, Core)
         local rows = explain and {} or nil
         local bestScore = nil
         local condCtx = nil
-        for index = 1, #pool.variants do
-            local variant = pool.variants[index]
+        local variants = pool.variants or {}
+        local evalOrder = (not explain and type(pool._evalOrder) == "table" and #pool._evalOrder == #variants)
+            and pool._evalOrder or nil
+        local total = #variants
+        for step = 1, total do
+            local index = evalOrder and evalOrder[step] or step
+            local variant = variants[index]
+            if not explain and bestScore ~= nil and variant._maxScore ~= nil and variant._maxScore < bestScore then
+                break
+            end
             local matched, specificity, checks
             if type(variant.when) ~= "table"
                 or (variant._whenCompiled == true and variant._whenKeys == nil)
@@ -94,12 +102,22 @@ return function(Catalog, Core)
         end
 
         if previousIndex == nil then
-            while #Catalog.LAST_VARIANT_ORDER >= Catalog.MAX_LAST_VARIANTS do
-                local oldest = table.remove(Catalog.LAST_VARIANT_ORDER, 1)
-                Catalog.LAST_VARIANTS[oldest] = nil
+            local cap = tonumber(Catalog.MAX_LAST_VARIANTS) or 512
+            local order = Catalog.LAST_VARIANT_ORDER
+            local count = tonumber(Catalog._lastVariantCount) or 0
+            local head = tonumber(Catalog._lastVariantHead) or 1
+            if count >= cap then
+                local oldest = order[head]
+                if oldest ~= nil then
+                    Catalog.LAST_VARIANTS[oldest] = nil
+                end
+                order[head] = selectionKey
+                Catalog._lastVariantHead = (head % cap) + 1
+            else
+                local slot = ((head + count - 1) % cap) + 1
+                order[slot] = selectionKey
+                Catalog._lastVariantCount = count + 1
             end
-            Catalog.LAST_VARIANT_ORDER[#Catalog.LAST_VARIANT_ORDER + 1] =
-                selectionKey
         end
         Catalog.LAST_VARIANTS[selectionKey] = selectedIndex
         local variant = pool.variants[selectedIndex]
@@ -131,6 +149,8 @@ return function(Catalog, Core)
     function Catalog.ResetSelections()
         Catalog.LAST_VARIANTS = {}
         Catalog.LAST_VARIANT_ORDER = {}
+        Catalog._lastVariantHead = 1
+        Catalog._lastVariantCount = 0
         return true
     end
 end

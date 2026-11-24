@@ -191,6 +191,8 @@ function Tracker.OnThreatNeutralized(spec)
     if encounter.protectedTargetPairs[pairKey] then
         return true, "protection_already_aggregated", encounter.id
     end
+    local threatCount = math.max(1, Internal.countEntries(encounter.threatIDs))
+    local killsByHelper = math.max(1, tonumber(encounter.killsByParticipant[spec.actorKey]) or 1)
     eventResult = emit({
         id = "social:protect:" .. encounter.id .. ":"
             .. spec.actorKey .. ":" .. targetKey,
@@ -205,11 +207,27 @@ function Tracker.OnThreatNeutralized(spec)
         context = {
             encounterID = encounter.id,
             threatID = threatID,
+            threatCount = threatCount,
+            killsByHelper = killsByHelper,
             attribution = "targeted_threat_neutralized",
         },
     })
     if eventResult.ok or eventResult.reason == "duplicate_event" then
         encounter.protectedTargetPairs[pairKey] = true
+    end
+    if eventResult.ok == true then
+        local beats = PNC.Semantics and PNC.Semantics.DialogueBeats
+        if beats and type(beats.OnCombatAssistProtected) == "function" then
+            pcall(beats.OnCombatAssistProtected, {
+                encounterID = encounter.id,
+                actorKey = spec.actorKey,
+                targetKey = targetKey,
+                threatID = threatID,
+                threatCount = threatCount,
+                hordeAttack = encounter.hordeAttack == true,
+                earnedDelta = tonumber(eventResult.memoriesCreated) or 1,
+            })
+        end
     end
     return eventResult.ok == true, eventResult.reason, encounter.id
 end

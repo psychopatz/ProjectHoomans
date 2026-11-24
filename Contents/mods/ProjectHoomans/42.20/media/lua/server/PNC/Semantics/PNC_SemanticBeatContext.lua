@@ -12,10 +12,14 @@ BC.VERSION = 1
 
 local WEATHER_TTL_MS = 2000
 local UTILITIES_TTL_MS = 5000
+local ACTOR_STATS_TTL_MS = 1500
+local MAX_ACTOR_CACHE = 64
 local providers = {}
 local providerOrder = {}
 local weatherCache = { expiresAt = -1, data = nil }
 local utilitiesCache = { expiresAt = -1, data = nil }
+local actorStatsCache = {}
+local actorStatsOrder = {}
 
 local function safeCall(obj, method, ...)
     if not obj or type(obj[method]) ~= "function" then return nil end
@@ -280,16 +284,40 @@ local function statsFromFallback(sp, opts)
     }
 end
 
-BC.RegisterProvider("actor_stats", function(ctx, sp, _, opts)
-    if type(sp) ~= "table" then return end
+local function cacheActorStats(key, data, now)
+    if actorStatsCache[key] == nil then
+        while #actorStatsOrder >= MAX_ACTOR_CACHE do
+            local oldest = table.remove(actorStatsOrder, 1)
+            actorStatsCache[oldest] = nil
+        end
+        actorStatsOrder[#actorStatsOrder + 1] = key
+    end
+    actorStatsCache[key] = { expiresAt = now + ACTOR_STATS_TTL_MS, data = data }
+end
+
+function BC.ResolveActorStats(sp, opts, now)
+    if type(sp) ~= "table" then return {} end
+    opts = type(opts) == "table" and opts or {}
+    now = tonumber(now) or (PNC.Core and type(PNC.Core.Now) == "function" and tonumber(PNC.Core.Now())) or 0
+    local role = tostring(opts.role or "witness")
+    local inCombat = opts.inCombat == true
+    local useCache = sp.id ~= nil and opts.temporaryDemeanor == nil and opts.weaponItem == nil and opts.bypassCache ~= true
+    local cacheKey = useCache and (tostring(sp.id) .. "|" .. (inCombat and "1" or "0") .. "|" .. role) or nil
+    if cacheKey then
+        local cached = actorStatsCache[cacheKey]
+        if cached and now < (tonumber(cached.expiresAt) or 0) then
+            return cached.data
+        end
+    end
+
     local Prof = PNC.Semantics and PNC.Semantics.CombatReactionProfile or nil
     local st
     if Prof and type(Prof.Build) == "function" then
         local pr = Prof.Build(sp, "", {
-            role = opts and opts.role or "witness",
+            role = role,
             actorKind = "npc",
-            inCombat = opts and opts.inCombat == true,
-            temporaryDemeanor = opts and opts.temporaryDemeanor,
+            inCombat = inCombat,
+            temporaryDemeanor = opts.temporaryDemeanor,
         })
         st = {
             style = pr.allyWarnStyle or pr.combatReactionStyle or "neutral",
@@ -302,18 +330,30 @@ BC.RegisterProvider("actor_stats", function(ctx, sp, _, opts)
             panic = pr.panic, stress = pr.stress, fatigue = pr.fatigue, pain = pr.pain,
             bleeding = pr.bleeding, healthState = pr.healthState, hpRatio = pr.hpRatio,
             isCowardly = pr.isCowardly, isBrave = pr.isBrave, isExhausted = pr.isExhausted,
+            isInjured = pr.bleeding == true
+                or pr.healthState == "injured" or pr.healthState == "wounded" or pr.healthState == "critical"
+                or (tonumber(pr.hpRatio) or 1) < 0.75,
         }
     else
         st = statsFromFallback(sp, opts)
+        st.isInjured = st.bleeding == true
+            or st.healthState == "injured" or st.healthState == "wounded" or st.healthState == "critical"
+            or (tonumber(st.hpRatio) or 1) < 0.75
     end
     local rt = type(sp.runtime) == "table" and sp.runtime or nil
     local wFam = rt and rt.combatWeaponFamily or nil
-    if not wFam and opts and opts.weaponItem and PNC.Semantics.CombatWeaponContext then
+    if not wFam and opts.weaponItem and PNC.Semantics.CombatWeaponContext then
         local w = PNC.Semantics.CombatWeaponContext.Build(sp, { weaponItem = opts.weaponItem })
         wFam = w and w.weaponFamily or nil
     end
     st.weaponFamily = wFam
-    ctx.actor = st
+    if cacheKey then cacheActorStats(cacheKey, st, now) end
+    return st
+end
+
+BC.RegisterProvider("actor_stats", function(ctx, sp, _, opts)
+    if type(sp) ~= "table" then return end
+    ctx.actor = BC.ResolveActorStats(sp, opts, ctx.now)
 end)
 
 BC.RegisterProvider("environment_weather", function(ctx, sp)
@@ -340,6 +380,8 @@ function BC.Build(speaker, addressee, opts)
         addressee = addressee,
         opts = opts,
         actor = {},
+        partner = {},
+        relationship = {},
         env = {},
         tokens = {},
     }
@@ -355,6 +397,10 @@ function BC.ResetRuntime()
     weatherCache.data = nil
     utilitiesCache.expiresAt = -1
     utilitiesCache.data = nil
+    actorStatsCache = {}
+    actorStatsOrder = {}
 end
+
+require "PNC/Semantics/PNC_SemanticBeatContext_Pair"
 
 return BC

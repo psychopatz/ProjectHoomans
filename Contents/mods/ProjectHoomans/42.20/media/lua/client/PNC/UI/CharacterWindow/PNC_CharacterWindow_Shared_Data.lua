@@ -41,18 +41,27 @@ function Shared.GetLiveCharacter(npcId)
     return nil
 end
 
+local ClientPortraitSpec = require "PNC/UI/PNC_ClientPortraitSpec"
+
 function Shared.BuildPortraitSpec(npcId, snapshot, payload)
     local resolved = Shared.GetSnapshot(snapshot, payload)
+    local id = npcId or resolved.id
+    local built = ClientPortraitSpec.Build(id, {
+        id = id,
+        snapshot = resolved,
+        payload = payload,
+        faceOnly = false,
+        includeCurrentClothing = true,
+        clothingMode = "current",
+    })
+    if built then return built end
     return {
-        id = npcId or resolved.id,
-        key = table.concat({
-            tostring(npcId or resolved.id or ""),
-            tostring(resolved.identitySeed or 1),
-            tostring(resolved.presenceRevision or 0),
-        }, "|"),
+        id = id,
         identitySeed = resolved.identitySeed or 1,
         preferDescriptor = true,
-        isFemale = resolved.isFemale == true,
+        faceOnly = false,
+        includeCurrentClothing = true,
+        clothingMode = "current",
         outfit = resolved.appearance and resolved.appearance.outfit or nil,
         appearance = resolved.appearance or {},
         equipment = Shared.GetEquipment(snapshot, payload),

@@ -229,6 +229,15 @@ function Presence.Abstract(record, reason)
     end
     notifyAbstraction(record, reason, zombie)
     record.presenceState = Const.PRESENCE_ABSTRACT
+    if PNC.Persistence and PNC.Persistence.CoreProvider
+        and type(PNC.Persistence.CoreProvider.SyncPresenceLease) == "function"
+    then
+        PNC.Persistence.CoreProvider.SyncPresenceLease(
+            record,
+            nil,
+            PsychopatzCore
+        )
+    end
     record.runtime = record.runtime or {}
     local abstractNow = Core.Now()
     record.runtime.abstractedAt = abstractNow

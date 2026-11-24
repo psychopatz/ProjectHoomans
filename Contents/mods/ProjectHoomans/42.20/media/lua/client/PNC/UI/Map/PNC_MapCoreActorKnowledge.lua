@@ -3,6 +3,7 @@
 -- learned-identity cache, request transport, and legacy portrait projection.
 
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+local ClientPortraitSpec = require "PNC/UI/PNC_ClientPortraitSpec"
 
 local SurvivorWorldClient = require
     "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldClient"
@@ -20,33 +21,13 @@ local function actorIDFor(entryOrID)
 end
 
 local function portraitSpec(entry)
-    local portrait = entry and entry.portrait or nil
-    if type(portrait) == "table" and type(portrait.face) == "table" then
-        return SurvivorWorldClient.GetPortraitSpec(entry)
-    end
-    local revision
-    local client = PNC.Client
-    local id = actorIDFor(entry)
-    local state = PNC.Network and PNC.Network.ClientState
-    local snapshot = state and state.snapshots and state.snapshots[id]
-    if client and client.GetRosterPortrait and snapshot and snapshot.portraitRef
-        and not (entry and entry.deathMarker)
-    then
-        portrait, revision = client.GetRosterPortrait(id)
-    end
-    if type(portrait) ~= "table" then return nil end
-    return {
-        id = actorIDFor(entry),
-        revision = revision or portrait.revision,
-        identitySeed = portrait.identitySeed or 1,
-        isFemale = portrait.isFemale == true,
-        preferDescriptor = true,
+    return ClientPortraitSpec.Build(entry, {
         faceOnly = true,
         includeCurrentClothing = true,
         clothingMode = "current",
-        appearance = portrait.appearance or {},
-        equipment = portrait.equipment or { worn = {} },
-    }
+        coreFallback = SurvivorWorldClient
+            and SurvivorWorldClient.GetPortraitSpec or nil,
+    })
 end
 
 local function knowledge(entryOrID)

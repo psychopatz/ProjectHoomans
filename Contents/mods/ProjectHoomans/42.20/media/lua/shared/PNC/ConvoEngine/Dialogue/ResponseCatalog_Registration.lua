@@ -19,6 +19,42 @@ return function(Catalog, Core)
         return nil
     end
 
+    local function variantMaxScore(variant)
+        local keyCount = 0
+        if type(variant._whenKeys) == "table" then
+            keyCount = #variant._whenKeys
+        elseif type(variant.when) == "table" then
+            for _ in pairs(variant.when) do keyCount = keyCount + 1 end
+        end
+        return (tonumber(variant.priority) or 0) * 100 + keyCount
+    end
+
+    local function rebuildPoolIndices(pool)
+        local byID = {}
+        local evalOrder = {}
+        local variants = pool.variants or {}
+        for index = 1, #variants do
+            local v = variants[index]
+            v._maxScore = variantMaxScore(v)
+            if v.id ~= nil then byID[tostring(v.id)] = v end
+            evalOrder[index] = index
+        end
+        table.sort(evalOrder, function(a, b)
+            local sa = variants[a]._maxScore or 0
+            local sb = variants[b]._maxScore or 0
+            if sa ~= sb then return sa > sb end
+            return a < b
+        end)
+        pool.byID = byID
+        pool._evalOrder = evalOrder
+    end
+
+    local function isOverOptionalPoolLimit()
+        local limit = tonumber(Catalog.MAX_POOLS)
+        if not limit or limit <= 0 then return false end
+        return (tonumber(Catalog.POOL_COUNT) or 0) >= limit
+    end
+
     function Catalog.Preflight(id, definition, options)
         id = tostring(id or "")
         options = type(options) == "table" and options or {}
@@ -85,15 +121,11 @@ return function(Catalog, Core)
             return false, emptyDetail
         end
         local isNew = Catalog.POOLS[id] == nil
-        if isNew then
-            local count = 0
-            for _ in pairs(Catalog.POOLS) do count = count + 1 end
-            if count >= Catalog.MAX_POOLS then
-                return false, {
-                    reason = "response_pool_limit",
-                    poolID = id,
-                }
-            end
+        if isNew and isOverOptionalPoolLimit() then
+            return false, {
+                reason = "response_pool_limit",
+                poolID = id,
+            }
         end
         return true, {
             id = id,
@@ -124,20 +156,23 @@ return function(Catalog, Core)
             if variant then pool.variants[#pool.variants + 1] = variant end
         end
         if #pool.variants == 0 then return false, "response_pool_empty" end
-        if not Catalog.POOLS[id] then
-            local count = 0
-            for _ in pairs(Catalog.POOLS) do count = count + 1 end
-            if count >= Catalog.MAX_POOLS then
-                return false, "response_pool_limit"
-            end
+        local isNew = Catalog.POOLS[id] == nil
+        if isNew and isOverOptionalPoolLimit() then
+            return false, "response_pool_limit"
         end
+        rebuildPoolIndices(pool)
         Catalog.POOLS[id] = pool
-        local origin = registrationSource()
-        local origins = {}
-        for _, item in ipairs(pool.variants) do
-            origins[item.id] = origin or "UNKNOWN"
+        if isNew then
+            Catalog.POOL_COUNT = (tonumber(Catalog.POOL_COUNT) or 0) + 1
         end
-        Catalog.REGISTRATION_ORIGINS[id] = origins
+        local origin = registrationSource()
+        if origin ~= nil then
+            local origins = {}
+            for _, item in ipairs(pool.variants) do
+                origins[item.id] = origin
+            end
+            Catalog.REGISTRATION_ORIGINS[id] = origins
+        end
         Catalog.REVISION = (Catalog.REVISION or 0) + 1
         return true, pool
     end
@@ -153,6 +188,9 @@ return function(Catalog, Core)
         local pool = Catalog.Get(id)
         local requested = tostring(realizationID or "")
         if not pool or requested == "" then return nil end
+        if type(pool.byID) == "table" then
+            return pool.byID[requested]
+        end
         for _, variant in ipairs(pool.variants or {}) do
             if tostring(variant.id or "") == requested then
                 return variant
@@ -192,9 +230,13 @@ return function(Catalog, Core)
         local seenIDs = {}
         local index
         local variant
-        for index = 1, #pool.variants do
-            variant = pool.variants[index]
-            seenIDs[variant.id] = true
+        if type(pool.byID) == "table" then
+            for existingID in pairs(pool.byID) do seenIDs[existingID] = true end
+        else
+            for index = 1, #pool.variants do
+                variant = pool.variants[index]
+                seenIDs[variant.id] = true
+            end
         end
         local additions = {}
         local normalized
@@ -210,12 +252,13 @@ return function(Catalog, Core)
             additions[#additions + 1] = normalized
         end
         local origin = registrationSource()
-        local origins = Catalog.REGISTRATION_ORIGINS[id] or {}
+        local origins = origin ~= nil and (Catalog.REGISTRATION_ORIGINS[id] or {}) or nil
         for index = 1, #additions do
             pool.variants[#pool.variants + 1] = additions[index]
-            origins[additions[index].id] = origin or "UNKNOWN"
+            if origins then origins[additions[index].id] = origin end
         end
-        Catalog.REGISTRATION_ORIGINS[id] = origins
+        rebuildPoolIndices(pool)
+        if origins then Catalog.REGISTRATION_ORIGINS[id] = origins end
         Catalog.REVISION = (Catalog.REVISION or 0) + 1
         return true, pool
     end

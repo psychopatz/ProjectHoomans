@@ -45,7 +45,8 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
     reason = enqueueReason
     if accepted == true
         and receive.context
-        and receive.context.presentationClass == "TACTICAL_PROMPT"
+        and (receive.context.presentationClass == "TACTICAL_PROMPT"
+            or receive.context.presentationClass == "SOCIAL_PROMPT")
     then
         local surface = PNC.ConvoEngine and PNC.ConvoEngine.CombatResponseSurface or nil
         if type(surface) ~= "table" then

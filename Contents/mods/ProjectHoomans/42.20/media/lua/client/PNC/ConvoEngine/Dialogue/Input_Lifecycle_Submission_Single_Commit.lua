@@ -259,7 +259,9 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
             or deferCompoundResponse == true
             or closeOnFarewell == true,
             skipInputPresentation = transientSemanticSurface
-                or compoundPart and compoundIndex ~= 1,
+                or (type(view) == "table" and view._suppressNextPlayerInputEcho == true)
+                or (type(part) == "table" and part.skipInputPresentation == true)
+                or (compoundPart and compoundIndex ~= 1),
             inputValue = compoundPart and compoundIndex == 1
                 and part.compoundRoot or value }
     )

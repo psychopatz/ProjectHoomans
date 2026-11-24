@@ -124,6 +124,17 @@ function Tracker.EndEncounter(encounterID, occurredAt)
                     if resultValue.ok then
                         emitted = emitted
                             + (resultValue.memoriesCreated or 0)
+                        local beats = PNC.Semantics and PNC.Semantics.DialogueBeats
+                        if beats and type(beats.OnCombatEncounterCleared) == "function" then
+                            pcall(beats.OnCombatEncounterCleared, {
+                                encounterID = encounter.id,
+                                actorKey = actorKey,
+                                targetKey = targetKey,
+                                hordeAttack = hordeAttack,
+                                threatCount = countEntries(encounter.threatIDs),
+                                earnedDelta = tonumber(resultValue.memoriesCreated) or 1,
+                            })
+                        end
                     end
                 end
             end

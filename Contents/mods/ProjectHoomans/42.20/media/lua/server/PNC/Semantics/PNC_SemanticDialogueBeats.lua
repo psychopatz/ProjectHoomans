@@ -190,38 +190,59 @@ local function deliverTurn(t, tid, now, ctx)
     if t.barkId and PNC.SecondaryChannel and PNC.SecondaryChannel.RequestBark then
         PNC.SecondaryChannel.RequestBark(sp, t.barkId, now)
     end
+    local lane = (t.lane == "scene") and "scene" or "beat"
+    local deliveredCtx = {}
+    if type(t.context) == "table" then
+        for k, v in pairs(t.context) do deliveredCtx[k] = v end
+    end
+    deliveredCtx.eventType = ev
+    deliveredCtx.eventRef = ref
+    deliveredCtx.threadID = tid
+    deliveredCtx.lane = lane
+    deliveredCtx.domain = domain
+    deliveredCtx.topic = topic
+    if deliveredCtx.transient == nil then deliveredCtx.transient = (lane ~= "scene") end
+
     local sent = Transport.Deliver(sp, now, {
         eventType = ev,
-        speechEventID = res and res.realizationID or ("semantic.beat." .. tostring(t.role or "line")),
+        speechEventID = t.realizationID or (res and res.realizationID) or ("semantic.beat." .. tostring(t.role or "line")),
+        realizationID = t.realizationID or (res and res.realizationID),
+        responsePlanID = t.responsePlanID,
+        poolID = t.poolID,
+        flowID = t.flowID,
         act = act,
         domain = domain,
         topic = topic,
         channel = channel,
-        lane = "beat",
+        lane = lane,
         family = t.family or "semantic_beat",
         threadID = tid,
+        sceneID = t.sceneID,
         priority = tonumber(t.priority) or 30,
         priorityHoldMs = tonumber(t.priorityHoldMs) or 500,
         holdMs = tonumber(t.holdMs) or 700,
+        ttlMs = t.ttlMs,
         cooldownMs = tonumber(t.cooldownMs) or 1500,
         familyCooldownMs = tonumber(t.familyCooldownMs) or 1500,
         clientCooldowns = t.clientCooldowns,
         tts = t.tts ~= false,
-        streamKey = "beat:" .. tostring(sp.id),
+        streamKey = t.streamKey or ("beat:" .. tostring(sp.id)),
         eventRef = ref,
         text = lineText,
-        presentationClass = res and res.presentationClass or "BARK",
-        context = {
-            eventType = ev,
-            eventRef = ref,
-            threadID = tid,
-            lane = "beat",
-            domain = domain,
-            topic = topic,
-            transient = true,
-        },
+        presentationClass = t.presentationClass or (res and res.presentationClass) or "BARK",
+        offerIDs = t.offerIDs,
+        factRefs = t.factRefs,
+        observerOnly = t.observerOnly,
+        recipientKind = t.recipientKind,
+        semanticEventFacts = t.semanticEventFacts,
+        meaningful = t.meaningful == true,
+        context = deliveredCtx,
     })
-    return (tonumber(sent) or 0) > 0
+    local okSent = (tonumber(sent) or 0) > 0
+    if okSent and type(t.onDelivered) == "function" then
+        pcall(t.onDelivered, t, tid, now, ctx)
+    end
+    return okSent
 end
 
 function Beats.StartThread(plan, now, ctx)
@@ -392,7 +413,10 @@ function Beats.Emit(eventName, payload, now)
     local ctx = BC and BC.Build and BC.Build(payload.anchor or payload.speaker, payload.partner or payload.addressee, {
         now = now,
         inCombat = payload.inCombat == true,
-    }) or { now = now, actor = {}, env = payload.env or {}, tokens = {} }
+        partnerKey = payload.partnerKey,
+        addresseeIsPlayer = payload.addresseeIsPlayer == true,
+        earnedDelta = payload.earnedDelta,
+    }) or { now = now, actor = {}, partner = {}, relationship = {}, env = payload.env or {}, tokens = {} }
     for i = 1, #m do
         local h = m[i]
         local ok, plan = pcall(h.evaluate, eventName, payload, ctx)
@@ -417,6 +441,8 @@ function Beats.Pump(now)
                     and now < (Beats.ActiveThreads[e.threadID].expiresAt or math.huge))
             local spOk, resolvedSpeaker = isActorAvailable(e.turn.speaker, e.speakerRegistered, reg)
             local addrOk = (type(e.turn.addressee) ~= "table")
+                or e.turn.addresseeIsPlayer == true
+                or e.turn.addressee.isPlayer == true
                 or isActorAvailable(e.turn.addressee, e.addresseeRegistered, reg)
             if threadActive and spOk and addrOk and now < (e.expiresAt or math.huge) then
                 if now < e.dueAt then
@@ -452,6 +478,7 @@ function Beats.ResetRuntime()
     if type(Beats.ResetUtilitiesRuntime) == "function" then Beats.ResetUtilitiesRuntime() end
     if type(Beats.ResetWorldObjectRuntime) == "function" then Beats.ResetWorldObjectRuntime() end
     if type(Beats.ResetTelevisionRuntime) == "function" then Beats.ResetTelevisionRuntime() end
+    if type(Beats.ResetCombatAssistRuntime) == "function" then Beats.ResetCombatAssistRuntime() end
 end
 
 require "PNC/Semantics/PNC_SemanticDialogueBeats_Environment"
@@ -459,5 +486,6 @@ require "PNC/Semantics/Beats/PNC_SemanticBeats_HouseAlarm"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_Utilities"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_WorldObjects"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_Television"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_CombatAssist"
 
 return Beats

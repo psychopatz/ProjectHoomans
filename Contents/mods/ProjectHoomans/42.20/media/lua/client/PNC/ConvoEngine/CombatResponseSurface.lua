@@ -164,15 +164,27 @@ local function buildTransientView(receive, lifecycle)
     context.characterUUID = context.characterUUID or uuid
     context.interactionLifecycle = lifecycle
     local injuryPrompt = lifecycle.activeBeat.flowID == "combat.injury.triage_exchange"
-    context.currentTopic = injuryPrompt and "combat_injury" or "combat"
-    if not injuryPrompt then
+    local identityPrompt = lifecycle.activeBeat.flowID == "social.identity.ask_name_proactive"
+        or type(context.pendingIdentityExchange) == "table"
+        or (type(receive.ambientFlavor) == "table" and type(receive.ambientFlavor.pendingIdentityExchange) == "table")
+    context.currentTopic = identityPrompt and "identity"
+        or (injuryPrompt and "combat_injury" or "combat")
+    if identityPrompt then
+        context.pendingIdentityExchange = context.pendingIdentityExchange
+            or (type(receive.ambientFlavor) == "table" and receive.ambientFlavor.pendingIdentityExchange)
+            or {
+                kind = "PLAYER_NAME",
+                initiator = "npc",
+                eventRef = lifecycle.activeBeat.eventRef,
+            }
+    elseif not injuryPrompt then
         context.actorAuthority = context.actorAuthority or { owned = true, companion = true }
     end
     context.npcState = context.npcState
         or type(snapshot) == "table" and snapshot
         or { activeBehavior = "FollowOwner" }
-    context.combatTacticalPrompt = not injuryPrompt
-    context.presentationClass = "TACTICAL_PROMPT"
+    context.combatTacticalPrompt = (not injuryPrompt) and (not identityPrompt)
+    context.presentationClass = identityPrompt and "SOCIAL_PROMPT" or "TACTICAL_PROMPT"
 
     local session = {
         conversationID = "combat-prompt:"
@@ -193,7 +205,7 @@ local function buildTransientView(receive, lifecycle)
     return view, context
 end
 
-local function rowsForProjection(projection, wanted, eventRef)
+local function rowsForProjection(projection, wanted, eventRef, identityPrompt)
     local rows = {}
     for _, candidate in ipairs(
         type(projection) == "table" and projection.candidates or {}
@@ -201,11 +213,12 @@ local function rowsForProjection(projection, wanted, eventRef)
         local id = tostring(candidate.id or "")
         local frame = candidate.frame
         local origin = type(frame) == "table" and frame.origin or nil
-        if wanted[id]
-            and type(frame) == "table"
-            and tostring(frame.eventRef
-                or origin and origin.eventRef or "") == eventRef
-        then
+        local refMatches = identityPrompt == true
+            or tostring(frame and (frame.eventRef or origin and origin.eventRef) or "") == eventRef
+        if wanted[id] and type(frame) == "table" and refMatches then
+            if identityPrompt == true and frame.eventRef == nil then
+                frame.eventRef = eventRef
+            end
             rows[#rows + 1] = {
                 id = id,
                 label = candidate.display
@@ -228,15 +241,19 @@ local function rowsForProjection(projection, wanted, eventRef)
     return rows
 end
 
+local function isSupportedPromptClass(value)
+    return value == "TACTICAL_PROMPT" or value == "SOCIAL_PROMPT"
+end
+
 function Surface.ObserveReceive(receive)
     receive = type(receive) == "table" and receive or {}
     local context = type(receive.context) == "table"
         and receive.context or {}
     local ambient = type(receive.ambientFlavor) == "table"
         and receive.ambientFlavor or {}
-    if context.presentationClass ~= "TACTICAL_PROMPT"
-        and ambient.presentationClass ~= "TACTICAL_PROMPT"
-    then
+    local promptClass = isSupportedPromptClass(ambient.presentationClass) and ambient.presentationClass
+        or (isSupportedPromptClass(context.presentationClass) and context.presentationClass or nil)
+    if not promptClass then
         return false, "not_tactical_prompt"
     end
 
@@ -271,9 +288,16 @@ function Surface.ObserveReceive(receive)
     if type(router) ~= "table" or type(router.state) ~= "table" then
         return false, "semantic_router_unavailable"
     end
+    local identityPrompt = type(buildContext.pendingIdentityExchange) == "table"
+    if identityPrompt then
+        router.state.pendingIdentityExchange = buildContext.pendingIdentityExchange
+    end
     local revision = tonumber(router.state.sequence) or 0
     local projectionContext = type(input.Internal.ShallowContext) == "function"
         and input.Internal.ShallowContext(view) or buildContext
+    if identityPrompt then
+        projectionContext.pendingIdentityExchange = buildContext.pendingIdentityExchange
+    end
     local projection = Suggestions.Build({
         sequence = revision,
         accepted = true,
@@ -282,7 +306,7 @@ function Surface.ObserveReceive(receive)
     }, projectionContext, {})
     local wanted = {}
     for _, id in ipairs(offerIDs) do wanted[id] = true end
-    local rows = rowsForProjection(projection, wanted, eventRef)
+    local rows = rowsForProjection(projection, wanted, eventRef, identityPrompt)
     if #rows == 0 then return false, "tactical_offers_unavailable" end
 
     view.semanticSuggestions = projection
@@ -292,7 +316,7 @@ function Surface.ObserveReceive(receive)
         eventRef = eventRef,
         npcID = npcID,
         eventType = receive.eventType,
-        presentationClass = "TACTICAL_PROMPT",
+        presentationClass = promptClass,
         responsePlanID = ambient.responsePlanID,
         realizationID = ambient.realizationID,
         offerIDs = offerIDs,
@@ -303,6 +327,16 @@ function Surface.ObserveReceive(receive)
         uiVisible = false,
     }
     if conversationOpen(npcID) then
+        if identityPrompt then
+            local conv = PsychopatzCore and PsychopatzCore.Conversation
+                and PsychopatzCore.Conversation.instance or nil
+            if conv and input and input.Internal and type(input.Internal.RouterFor) == "function" then
+                local openRouter = input.Internal.RouterFor(conv)
+                if type(openRouter) == "table" and type(openRouter.state) == "table" then
+                    openRouter.state.pendingIdentityExchange = buildContext.pendingIdentityExchange
+                end
+            end
+        end
         return true, "conversation_owns_prompt"
     end
     show()

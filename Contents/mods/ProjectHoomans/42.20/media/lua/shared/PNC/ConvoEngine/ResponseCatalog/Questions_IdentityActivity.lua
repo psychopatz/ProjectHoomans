@@ -8,15 +8,29 @@ Catalog.Register("semantic.question.identity", {
     variants = {
         {
             id = "semantic.question.identity.default",
-            templateID = "question.identity",
-            fallback = "I'll tell you my name once we've established some trust. What's your name?",
+            templateID = "question.identity.ask_first",
+            fallback = "Who's asking? Tell me your name first, and maybe I'll tell you mine.",
+        },
+        {
+            id = "semantic.question.identity.guarded",
+            templateID = "question.identity.ask_first_guarded",
+            fallback = "Names don't come free out here. Tell me yours first—who am I talking to?",
+            when = { relationshipTier = "wary" },
+            priority = 2,
+        },
+        {
+            id = "semantic.question.identity.warm",
+            templateID = "question.identity.ask_first_warm",
+            fallback = "Fair question—how about you go first? What's your name?",
+            when = { socialStyle = "friendly" },
+            priority = 2,
         },
         {
             id = "semantic.question.identity.untrustworthy",
-            templateID = "question.identity",
+            templateID = "question.identity.untrustworthy_ask_first",
             fallback = "I don't share my name with liars. What's yours, truthfully?",
             when = { identityTrust = "untrustworthy" },
-            priority = 2,
+            priority = 3,
         },
     },
 })
