@@ -195,7 +195,14 @@ listing:close()
 -- _ObservationScene, PNC_SemanticInjuryAid, _AllyReplies_Dispatch, _SituationQuery, _TargetHelpers,
 -- PNC_SemanticSpeechTransport_Resolve, MedicalCareExecutor_Player, MedicalCareExecutor_Speech)
 -- are server-only, guarded by AllowsServerCode(), and loaded by their roots.
-T.equal(#serverOnlyFiles, 1108,
+-- Seventeen legacy scavenge modules (PNC_ScavengeService + 8, PNC_ScavengeExecutor + 7)
+-- were retired and replaced by thirteen guarded WorldItems modules (PNC_WorldItemContext,
+-- _Zones, _RipRules, _Classifier, _Claims, _Cache, _Scanner, PNC_WorldItemService,
+-- _Requests, PNC_WorldItemExecutor, _Actions, _Commit, _Lifecycle), net 1104 files.
+-- PNC_WorldItemContext_Objects and PNC_WorldItemContext_Approach add unified
+-- object discovery and walkable approach helpers onto the shared WorldItemContext
+-- bucket cache (1106 files).
+T.equal(#serverOnlyFiles, 1106,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

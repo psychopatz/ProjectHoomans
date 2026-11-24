@@ -140,4 +140,5 @@ function Inventory.CaptureLooseInventory(record, body)
 end
 
 Inventory.CoreBridge = Bridge
+Bridge.StateCodec = StateCodec
 return Bridge

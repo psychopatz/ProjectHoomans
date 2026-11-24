@@ -180,6 +180,9 @@ local function canonicalTopic(value)
     if value == "whats_up" or string.find(value, "whats_up", 1, true) then
         return "whats_up"
     end
+    if value == "about_you" or string.find(value, "about_you", 1, true) then
+        return "about_you"
+    end
     if value == "greeting" or string.find(value, "greet", 1, true) then
         return "greeting"
     end

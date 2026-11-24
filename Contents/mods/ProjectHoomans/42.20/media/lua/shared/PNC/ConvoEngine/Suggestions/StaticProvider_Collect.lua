@@ -1,17 +1,20 @@
 -- Static provider collection and context routing.
+local AboutYou = require "PNC/ConvoEngine/Suggestions/AboutYouCatalog"
+
+local ABOUT_YOU_FACET_IDS = {
+    ["question.identity_nickname"] = true,
+    ["question.identity_surname"] = true,
+    ["question.identity_faction"] = true,
+}
 
 return function(Provider, Identity, Context, hubCandidate, IdentityAlias)
     local function available(definition, context)
         if definition.id == "question.identity" then
             return not Identity.identityKnown(context)
         end
-        local facets = {
-            ["question.identity_nickname"] = "nickname",
-            ["question.identity_surname"] = "surname",
-            ["question.identity_faction"] = "factionName",
-        }
-        local facet = facets[definition.id]
-        if facet then return not Identity.identityFacetKnown(context, facet) end
+        if ABOUT_YOU_FACET_IDS[definition.id] then
+            return false
+        end
         return true
     end
 
@@ -22,6 +25,9 @@ return function(Provider, Identity, Context, hubCandidate, IdentityAlias)
                 context, Provider, IdentityAlias
             )
         end
+        if context.activeHubID == AboutYou.HUB_ID then
+            return AboutYou.CollectHubCandidates(Provider, context, hubCandidate)
+        end
         local definitions = type(Provider.GetDefinitions) == "function"
             and Provider.GetDefinitions(context) or Provider.Definitions
         if context.activeHubID ~= "whats_up" then
@@ -30,6 +36,11 @@ return function(Provider, Identity, Context, hubCandidate, IdentityAlias)
                 if available(definition, context) then
                     output[#output + 1] = definition
                 end
+            end
+            if Identity.identityKnown(context)
+                and AboutYou.HasRemainingFacets(context)
+            then
+                output[#output + 1] = AboutYou.ROOT_DEFINITION
             end
             return output
         end

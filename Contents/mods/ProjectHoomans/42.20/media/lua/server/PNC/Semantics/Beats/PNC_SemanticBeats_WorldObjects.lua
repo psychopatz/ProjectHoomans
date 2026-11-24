@@ -211,31 +211,47 @@ function Beats.CheckNearbyWorldObjects(now)
     local ay = math.floor(tonumber(anchor.y) or 0)
     local az = math.floor(tonumber(anchor.z) or 0)
     local ctx = buildContext(anchor, partner, now)
+    local worldCtx = PNC and PNC.WorldItemContext
+
+    local function checkObject(obj, sq, distSq)
+        if not obj then return nil end
+        for hi = 1, #activeHooks do
+            local h = activeHooks[hi]
+            if distSq <= (h.maxDistance * h.maxDistance) then
+                local okM, matched = pcall(h.matches, obj, sq, anchor, ctx)
+                if okM and matched == true then
+                    local okE, plan = pcall(h.evaluate, obj, sq, anchor, partner, ctx)
+                    if okE and type(plan) == "table" and (plan.opening or plan.replies) then
+                        objectHookCooldowns[h.id] = now + h.cooldownMs
+                        globalObjectBeatCooldownUntil = now + GLOBAL_OBJECT_BEAT_COOLDOWN_MS
+                        Beats.StartThread(plan, now, ctx)
+                        return h.id
+                    end
+                end
+            end
+        end
+        return nil
+    end
 
     for dx = -OBJECT_SCAN_RADIUS, OBJECT_SCAN_RADIUS do
         for dy = -OBJECT_SCAN_RADIUS, OBJECT_SCAN_RADIUS do
-            local sq = safeCall(cell, "getGridSquare", ax + dx, ay + dy, az)
-            if sq then
-                local objs, n = countAndGetObjects(sq)
-                for oi = 1, n do
-                    local obj = objectAt(objs, oi)
-                    if obj then
-                        local distSq = dx * dx + dy * dy
-                        for hi = 1, #activeHooks do
-                            local h = activeHooks[hi]
-                            if distSq <= (h.maxDistance * h.maxDistance) then
-                                local okM, matched = pcall(h.matches, obj, sq, anchor, ctx)
-                                if okM and matched == true then
-                                    local okE, plan = pcall(h.evaluate, obj, sq, anchor, partner, ctx)
-                                    if okE and type(plan) == "table" and (plan.opening or plan.replies) then
-                                        objectHookCooldowns[h.id] = now + h.cooldownMs
-                                        globalObjectBeatCooldownUntil = now + GLOBAL_OBJECT_BEAT_COOLDOWN_MS
-                                        Beats.StartThread(plan, now, ctx)
-                                        return true, h.id
-                                    end
-                                end
-                            end
-                        end
+            local distSq = dx * dx + dy * dy
+            if worldCtx and worldCtx.GetSquareSnapshot then
+                local snap = worldCtx.GetSquareSnapshot(cell, ax + dx, ay + dy, az, now)
+                if snap and snap.square then
+                    local objs = snap.objects or {}
+                    for oi = 1, #objs do
+                        local hitId = checkObject(objs[oi], snap.square, distSq)
+                        if hitId then return true, hitId end
+                    end
+                end
+            else
+                local sq = safeCall(cell, "getGridSquare", ax + dx, ay + dy, az)
+                if sq then
+                    local objs, n = countAndGetObjects(sq)
+                    for oi = 1, n do
+                        local hitId = checkObject(objectAt(objs, oi), sq, distSq)
+                        if hitId then return true, hitId end
                     end
                 end
             end

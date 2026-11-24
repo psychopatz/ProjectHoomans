@@ -207,42 +207,31 @@ T.equal(fishing.workItemDiagnostic.missingCandidates[1],
     "Base.FishingRod", "fishing diagnostic omits missing candidates")
 
 PNC.Const = { ORDER_SCAVENGE = "scavenge" }
-PNC.ScavengeService = { Internal = {
-    SessionForNPC = function(id)
-        return id == "bob" and { workers = {
-            bob = {
-                currentKind = "loot", phase = "LOOTING",
-                currentEntry = { fullType = "Base.CannedBeans" },
-            },
-        } } or nil
-    end,
-} }
 local scavenging = Status.Build({
     id = "bob",
     alive = true,
     activeJob = "Scavenge",
-    activeBehavior = "Scavenge",
-    orderSpec = { kind = "scavenge" },
-    runtime = {},
+    activeBehavior = "ScavengeItem",
+    runtime = {
+        worldItem = {
+            action = "grab",
+            phase = "INTERACTING",
+            itemFullType = "Base.CannedBeans",
+        },
+    },
 })
 T.equal(scavenging.activityItemFullType, "Base.CannedBeans",
-    "scavenging activity exposes the exact queued loot item")
-T.equal(scavenging.phase, "LOOTING",
-    "scavenging activity exposes the worker loot phase")
+    "world-item scavenging activity exposes the exact target item")
+T.equal(scavenging.phase, "INTERACTING",
+    "world-item scavenging activity exposes the worker phase")
 
-PNC.ScavengeService.Internal.SessionForNPC = function()
-    return { workers = { bob = {
-        currentKind = "search", phase = "SEARCHING_SOURCE",
-        currentEntry = { fullType = "Base.CannedBeans" },
-    } } }
-end
 local searching = Status.Build({
     id = "bob", alive = true, activeJob = "Scavenge",
-    activeBehavior = "Scavenge", orderSpec = { kind = "scavenge" },
+    activeBehavior = "ScavengeItem",
     runtime = {},
 })
 T.falsy(searching.activityItemFullType,
-    "searching never guesses an item before loot is selected")
+    "world-item status never guesses an item before target metadata exists")
 
 local combat = Status.Build({
     alive = true,

@@ -20,6 +20,8 @@ Names.Compose = CoreNames.Compose
 Names.FormatDisplayName = CoreNames.FormatDisplayName
 Names.ResolveParts = CoreNames.ResolveParts
 Names.ResolveNickname = CoreNames.ResolveNickname
+Names.HasAuthoredNickname = CoreNames.HasAuthoredNickname
+Names.NicknameCatalog = CoreNames.NicknameCatalog
 Names.Generate = CoreNames.Generate
 
 function Names.CatalogInfo(catalog)

@@ -20,9 +20,6 @@ local isJournalOpen = Internal.IsJournalOpen
 local openColonist = Internal.OpenColonist
 local openStorage = Internal.OpenStorage
 local openResearch = Internal.OpenResearch
-local scavengeAvailable = Internal.ScavengeAvailable
-local openScavenge = Internal.OpenScavenge
-local isScavengeOpen = Internal.IsScavengeOpen
 local stockpileBootstrapVisible = Internal.StockpileBootstrapVisible
 local stockpileBootstrapEnabled = Internal.StockpileBootstrapEnabled
 local stockpileBootstrapDisabledTooltip = Internal.StockpileBootstrapDisabledTooltip
@@ -35,7 +32,7 @@ then
     return Registry
 end
 
-Registry.SetCategoryOrder({ "work", "workshop", "zone", "scavenge", "colony", "events", "colonist", "storage",
+Registry.SetCategoryOrder({ "work", "workshop", "zone", "colony", "events", "colonist", "storage",
     "research", "stockpile", "base" })
 
 Registry.RegisterCategory({
@@ -142,22 +139,6 @@ Registry.RegisterCategory({
     tooltipFallback = "Open the colony journal",
     onClick = toggleChild("events", toggleEvents),
     selected = isJournalOpen,
-    closeHub = false,
-})
-
-Registry.RegisterCategory({
-    id = "scavenge",
-    source = "ProjectHoomans",
-    order = 30,
-    useChildren = false,
-    titleKey = "UI_PNC_CommandHub_Category_Scavenge",
-    titleFallback = "Scavenge",
-    tooltipKey = "UI_PNC_CommandHub_ScavengeHelp",
-    tooltipFallback = "Assign a scavenging team and search nearby loot",
-    visible = scavengeAvailable,
-    enabled = scavengeAvailable,
-    onClick = openScavenge,
-    selected = isScavengeOpen,
     closeHub = false,
 })
 

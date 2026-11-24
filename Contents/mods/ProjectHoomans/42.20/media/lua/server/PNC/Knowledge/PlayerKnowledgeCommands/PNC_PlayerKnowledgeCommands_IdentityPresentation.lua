@@ -95,10 +95,15 @@ local function npcNickname(record)
         and type(PNC.IdentityNames.ResolveNickname) == "function"
     then
         local survivor = identity and identity.survivor or {}
+        local isFemale = identity and identity.isFemale
+        if isFemale == nil and record then isFemale = record.isFemale end
         local resolved = clean(PNC.IdentityNames.ResolveNickname(
             survivor and survivor.forename,
             identity and identity.seed or record and record.identitySeed,
-            { version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION }
+            {
+                isFemale = isFemale,
+                version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION,
+            }
         ))
         if resolved ~= "" then return resolved end
     end

@@ -97,6 +97,16 @@ function Behavior.Tick(record, zombie, now)
         if PNC.NeedSupplyBridge and PNC.NeedSupplyBridge.EnsureMedical then
             PNC.NeedSupplyBridge.EnsureMedical(record, "BANDAGE", partId, false)
         end
+        if PNC.ProvisionScheduler and PNC.ProvisionScheduler.MarkDirty then
+            PNC.ProvisionScheduler.MarkDirty(record, "bandage", 0)
+        end
+        if PNC.WorldItemService and PNC.WorldItemService.RequestBandageRip then
+            PNC.WorldItemService.RequestBandageRip(record, {
+                urgent = true,
+                targetCount = 1,
+                source = "wounded_no_bandage",
+            })
+        end
         if state.phase ~= "idle" then
             clearAction(record, zombie, "missing_bandage")
         end

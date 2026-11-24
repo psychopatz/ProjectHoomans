@@ -12,6 +12,7 @@ Response.Internal = Internal
 local Semantic = PsychopatzCore and PsychopatzCore.Semantics or nil
 local IR = Semantic and Semantic.IR or nil
 
+local RepeatAsk = require "PNC/ConvoEngine/Dialogue/LocalResponse_RepeatAsk"
 require "PNC/ConvoEngine/Dialogue/LocalResponse_Questions_Observations"
 require "PNC/ConvoEngine/Dialogue/LocalResponse_Questions_Facts"
 require "PNC/ConvoEngine/Dialogue/LocalResponse_Questions_Context"
@@ -58,6 +59,12 @@ return function(ir, state, context)
         and ir.extensions.topic == "whats_up"
     then
         return Internal.ResolveWhatsUp(ir, state, context)
+    end
+    if ir.subject == "CONVERSATION_TOPIC"
+        and ir.extensions
+        and ir.extensions.topic == "about_you"
+    then
+        return RepeatAsk.ResolveAboutYou(ir, state, context)
     end
     if ir.subject == "WELLBEING" then
         return Internal.ResolveWellbeing(ir, state, context)

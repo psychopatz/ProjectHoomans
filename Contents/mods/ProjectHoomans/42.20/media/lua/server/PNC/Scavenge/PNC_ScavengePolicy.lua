@@ -30,6 +30,21 @@ local function normalizePreferences(value)
     }
 end
 
+local function normalizeCategories(value)
+    local categories = PNC.WorldItemCategories
+    if categories and type(categories.NormalizeCategories) == "function" then
+        return categories.NormalizeCategories(value)
+    end
+    local output = {}
+    for _, key in ipairs({
+        "food", "water", "medical", "weapons",
+        "ammo", "tools", "materials", "clothing",
+    }) do
+        output[key] = type(value) == "table" and value[key] == true or false
+    end
+    return output
+end
+
 local function normalizeAutoGrab(value)
     local output = {}
     local count = 0
@@ -51,7 +66,9 @@ local function normalizeData(value)
         ownerKey = tostring(ownerKey or "")
         if ownerKey ~= "" then
             output.owners[ownerKey] = {
+                enabled = entry == nil or entry.enabled ~= false,
                 preferences = normalizePreferences(entry and entry.preferences),
+                categories = normalizeCategories(entry and entry.categories),
                 autoGrab = normalizeAutoGrab(entry and entry.autoGrab),
             }
         end
@@ -106,13 +123,63 @@ local function ownerEntry(player, create)
     if not ownerKey then return nil, "owner_identity_unavailable" end
     local entry = Policy.Data.owners[ownerKey]
     if not entry and create then
-        entry = { preferences = normalizePreferences(), autoGrab = {} }
+        entry = {
+            enabled = true,
+            preferences = normalizePreferences(),
+            categories = normalizeCategories(),
+            autoGrab = {},
+        }
         Policy.Data.owners[ownerKey] = entry
         Policy.Dirty = true
     end
     return entry or {
-        preferences = normalizePreferences(), autoGrab = {},
+        enabled = true,
+        preferences = normalizePreferences(),
+        categories = normalizeCategories(),
+        autoGrab = {},
     }, nil, ownerKey
+end
+
+function Policy.IsEnabled(player)
+    local entry, reason = ownerEntry(player, false)
+    if not entry then return false, reason end
+    return entry.enabled ~= false
+end
+
+function Policy.SetEnabled(player, enabled)
+    local entry, reason = ownerEntry(player, true)
+    if not entry then return false, reason end
+    entry.enabled = enabled ~= false
+    Policy.Dirty = true
+    return true, entry.enabled
+end
+
+function Policy.GetCategories(player)
+    local entry, reason = ownerEntry(player, false)
+    return entry and copy(normalizeCategories(entry.categories)) or nil, reason
+end
+
+function Policy.SetCategory(player, categoryId, enabled)
+    local categories = PNC.WorldItemCategories
+    local resolved = categories and categories.ResolveID
+        and categories.ResolveID(categoryId) or string.lower(tostring(categoryId or ""))
+    if resolved == "" or (categories and not categories.Get(resolved)) then
+        return false, "category_invalid"
+    end
+    local entry, reason = ownerEntry(player, true)
+    if not entry then return false, reason end
+    entry.categories = normalizeCategories(entry.categories)
+    entry.categories[resolved] = enabled == true
+    Policy.Dirty = true
+    return true, copy(entry.categories)
+end
+
+function Policy.SetCategories(player, map)
+    local entry, reason = ownerEntry(player, true)
+    if not entry then return false, reason end
+    entry.categories = normalizeCategories(map)
+    Policy.Dirty = true
+    return true, copy(entry.categories)
 end
 
 function Policy.GetPreferences(player)
@@ -159,7 +226,10 @@ end
 
 function Policy.Snapshot(player)
     return {
+        policyOnly = true,
+        enabled = Policy.IsEnabled(player) == true,
         preferences = Policy.GetPreferences(player),
+        categories = Policy.GetCategories(player),
         autoGrab = Policy.GetAutoGrab(player),
     }
 end

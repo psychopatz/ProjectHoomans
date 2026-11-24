@@ -43,6 +43,7 @@ local function floorSeatCandidate(record, zombie, cell)
     local start = idHash(record and record.id, #offsets) + 1
     local resourceKey = AMBIENT_FACILITY_ID .. ":floor_sit:"
         .. tostring(record and record.id or "npc")
+    local worldContext = PNC and PNC.WorldItemContext
     for offset = 0, #offsets - 1 do
         local index = ((start - 1 + offset) % #offsets) + 1
         local delta = offsets[index]
@@ -50,7 +51,13 @@ local function floorSeatCandidate(record, zombie, cell)
         local gridY = originY + delta[2]
         local x = gridX + 0.5
         local y = gridY + 0.5
-        local square = cell:getGridSquare(gridX, gridY, originZ)
+        local square
+        if worldContext and worldContext.GetSquareSnapshot then
+            local snap = worldContext.GetSquareSnapshot(cell, gridX, gridY, originZ)
+            square = snap and snap.square or nil
+        else
+            square = cell:getGridSquare(gridX, gridY, originZ)
+        end
         if floorSquareUsable(
             square,
             delta[1] == 0 and delta[2] == 0,
@@ -102,70 +109,85 @@ local function findSeat(record, zombie)
         and type(detector.describe) == "function"
         and targetsService and targetsService.ResolveResource
     then
+        local worldContext = PNC and PNC.WorldItemContext
+        local function checkObject(square, object, objectIndex)
+            local resource
+            local targets
+            local target
+            local distance
+            local called
+            local matched
+            local described
+            local resolved
+            called, matched = pcall(
+                detector.matches,
+                square,
+                object
+            )
+            if not called or matched ~= true then return end
+            if examined >= Service.MAX_OBJECTS then return end
+            examined = examined + 1
+            described, resource = pcall(
+                detector.describe,
+                square,
+                object,
+                {
+                    objectIndex = objectIndex,
+                    character = zombie,
+                }
+            )
+            if not described or type(resource) ~= "table"
+                or isReserved(resource)
+            then
+                return
+            end
+            resolved, targets = pcall(
+                targetsService.ResolveResource,
+                resource,
+                { abstract = false, character = zombie }
+            )
+            if not resolved then return end
+            target = targets and targets[1] or nil
+            if not target or target.validSpot == false then return end
+            distance = distanceTo(zombie, target.x, target.y)
+            local resourceKey = tostring(resource.resourceKey or "")
+            local bestKey = tostring(best
+                and best.resource
+                and best.resource.resourceKey or "")
+            if not bestDistance or distance < bestDistance
+                or distance == bestDistance
+                    and resourceKey < bestKey
+            then
+                bestDistance = distance
+                best = {
+                    object = object,
+                    resource = resource,
+                    target = target,
+                    targets = targets,
+                }
+            end
+        end
         for dx = -Service.SEARCH_RADIUS, Service.SEARCH_RADIUS do
             for dy = -Service.SEARCH_RADIUS, Service.SEARCH_RADIUS do
                 if dx * dx + dy * dy <= Service.SEARCH_RADIUS
                     * Service.SEARCH_RADIUS
                 then
-                    local square = cell:getGridSquare(
-                        originX + dx, originY + dy, originZ)
-                    eachObject(square, function(object, objectIndex)
-                        local resource
-                        local targets
-                        local target
-                        local distance
-                        local called
-                        local matched
-                        local described
-                        local resolved
-                        called, matched = pcall(
-                            detector.matches,
-                            square,
-                            object
-                        )
-                        if not called or matched ~= true then return end
-                        if examined >= Service.MAX_OBJECTS then return end
-                        examined = examined + 1
-                        described, resource = pcall(
-                            detector.describe,
-                            square,
-                            object,
-                            {
-                                objectIndex = objectIndex,
-                                character = zombie,
-                            }
-                        )
-                        if not described or type(resource) ~= "table"
-                            or isReserved(resource)
-                        then
-                            return
+                    if worldContext and worldContext.GetSquareSnapshot then
+                        local snap = worldContext.GetSquareSnapshot(
+                            cell, originX + dx, originY + dy, originZ)
+                        if snap and snap.square then
+                            local objs = snap.objects or {}
+                            for oi = 1, #objs do
+                                checkObject(snap.square, objs[oi], oi - 1)
+                            end
                         end
-                        resolved, targets = pcall(
-                            targetsService.ResolveResource,
-                            resource,
-                            { abstract = false, character = zombie }
-                        )
-                        if not resolved then return end
-                        target = targets and targets[1] or nil
-                        if not target or target.validSpot == false then return end
-                        distance = distanceTo(zombie, target.x, target.y)
-                        local resourceKey = tostring(resource.resourceKey or "")
-                        local bestKey = tostring(best
-                            and best.resource
-                            and best.resource.resourceKey or "")
-                        if not bestDistance or distance < bestDistance
-                            or distance == bestDistance
-                                and resourceKey < bestKey
-                        then
-                            bestDistance = distance
-                            best = {
-                                object = object,
-                                resource = resource,
-                                target = target,
-                                targets = targets,
-                            }
-                        end
-                    end)
+                    else
+                        local square = cell:getGridSquare(
+                            originX + dx, originY + dy, originZ)
+                        eachObject(square, function(object, objectIndex)
+                            checkObject(square, object, objectIndex)
+                        end)
+                    end
                 end
             end
         end

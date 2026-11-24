@@ -1,6 +1,7 @@
 -- Hub-avenue candidate projection for static suggestions.
 
-return function(Provider, definition, contextReason)
+return function(Provider, definition, contextReason, hubID)
+    hubID = tostring(hubID or definition.hubID or "whats_up")
     local extensions = {}
     for key, value in pairs(type(definition.extensions) == "table"
         and definition.extensions or {}) do
@@ -8,12 +9,12 @@ return function(Provider, definition, contextReason)
     end
     extensions.route = "semantic_provider"
     extensions.providerID = Provider.id
-    extensions.hubID = "whats_up"
+    extensions.hubID = hubID
     extensions.hubAvenue = true
     return {
         id = definition.id,
         topic = definition.topic,
-        groupID = "semantic_hub.whats_up",
+        groupID = "semantic_hub." .. hubID,
         rank = definition.order,
         providerID = Provider.id,
         semanticOwner = definition.semanticOwner

@@ -163,44 +163,6 @@ local function openBase(_, owner)
     return false
 end
 
-local function scavengeSnapshot()
-    local state = PNC.Network and PNC.Network.ClientState or nil
-    local sessionId = state and state.activeScavengeSessionId or nil
-    return sessionId and state.scavengeSessions
-        and state.scavengeSessions[sessionId] or nil
-end
-
-local function scavengeAvailable()
-    local controller = PNC.ScavengeController
-    local team = controller and controller.TeamIDs
-        and controller.TeamIDs() or {}
-    return #team > 0 or scavengeSnapshot() ~= nil
-end
-
-local function isScavengeOpen()
-    local scavenge = PNC.ScavengeUI
-    return scavenge and scavenge.instance
-        and scavenge.instance.getIsVisible
-        and scavenge.instance:getIsVisible() == true or false
-end
-
-local function openScavenge(_, owner)
-    local controller = PNC.ScavengeController
-    if not controller or type(controller.Open) ~= "function"
-        or not scavengeAvailable()
-    then
-        return false
-    end
-    local team = controller.TeamIDs and controller.TeamIDs() or {}
-    local snapshot = scavengeSnapshot()
-    local npcId = team[1] or snapshot and snapshot.npcId
-    return controller.Open(npcId, {
-        npcIds = team,
-        name = #team > 0 and (tostring(#team) .. " scavengers") or nil,
-        owner = owner,
-    })
-end
-
 local function stockpileBootstrapVisible()
     return not Gates.GetBaseAndStockpileStatus().hasStockpileFacility
 end
@@ -254,9 +216,6 @@ Internal.IsJournalOpen = isJournalOpen
 Internal.OpenColonist = openColonist
 Internal.OpenStorage = openStorage
 Internal.OpenResearch = openResearch
-Internal.ScavengeAvailable = scavengeAvailable
-Internal.OpenScavenge = openScavenge
-Internal.IsScavengeOpen = isScavengeOpen
 Internal.StockpileBootstrapVisible = stockpileBootstrapVisible
 Internal.StockpileBootstrapEnabled = stockpileBootstrapEnabled
 Internal.StockpileBootstrapDisabledTooltip = stockpileBootstrapDisabledTooltip

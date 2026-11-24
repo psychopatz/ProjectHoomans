@@ -58,6 +58,32 @@ function H.ScanSquare(output, seen, square, originX, originY, originZ)
     end
 end
 
+function H.ScanSnapshot(output, seen, snap, originX, originY, originZ)
+    local square = snap and snap.square
+    if not square then return end
+    local objects = snap.objects or {}
+    for index = 1, #objects do
+        local object = objects[index]
+        local container = H.Call(object, "getContainer")
+        if container then
+            H.WalkContainer(output, seen, container, object, square, originX,
+                originY, originZ, 0)
+        end
+    end
+    local worldObjects = snap.worldObjects or {}
+    for index = 1, #worldObjects do
+        local worldObject = worldObjects[index]
+        local item = H.Call(worldObject, "getItem")
+        H.AddItem(output, seen, item, worldObject, square, index - 1,
+            originX, originY, originZ)
+        local container = H.Call(item, "getItemContainer")
+        if container then
+            H.WalkContainer(output, seen, container, worldObject, square,
+                originX, originY, originZ, 0)
+        end
+    end
+end
+
 function Locator.Find(origin, options)
     options = type(options) == "table" and options or {}
     if not origin then return nil end
@@ -80,21 +106,35 @@ function Locator.Find(origin, options)
     local cell = options.cell or (getCell and getCell() or nil)
     if not cell or not cell.getGridSquare then return nil end
     local output, seen = {}, {}
-    local baseX, baseY = math.floor(originX), math.floor(originY)
-    -- Include the whole origin square while excluding diagonal corners that
-    -- lie outside the requested tile radius.
-    local scanRadius = radius + 0.5
-    local radiusSq = scanRadius * scanRadius
-    for dx = -radius, radius do
-        for dy = -radius, radius do
-            local squareDX = baseX + dx + 0.5 - originX
-            local squareDY = baseY + dy + 0.5 - originY
-            if squareDX * squareDX + squareDY * squareDY <= radiusSq then
-                local square = cell:getGridSquare(baseX + dx, baseY + dy,
-                    originZ)
-                if square then
-                    H.ScanSquare(output, seen, square, originX, originY,
+    local context = PNC and PNC.WorldItemContext
+    if context and context.ForEachSquareInRadius then
+        context.ForEachSquareInRadius(cell, originX, originY, originZ, radius,
+            function(snap)
+                H.ScanSnapshot(output, seen, snap, originX, originY, originZ)
+            end, {
+                originX = originX,
+                originY = originY,
+                allowRestrictedZones = options.allowRestrictedZones ~= false,
+                now = timestamp,
+                mode = "box",
+            })
+    else
+        local baseX, baseY = math.floor(originX), math.floor(originY)
+        -- Include the whole origin square while excluding diagonal corners that
+        -- lie outside the requested tile radius.
+        local scanRadius = radius + 0.5
+        local radiusSq = scanRadius * scanRadius
+        for dx = -radius, radius do
+            for dy = -radius, radius do
+                local squareDX = baseX + dx + 0.5 - originX
+                local squareDY = baseY + dy + 0.5 - originY
+                if squareDX * squareDX + squareDY * squareDY <= radiusSq then
+                    local square = cell:getGridSquare(baseX + dx, baseY + dy,
                         originZ)
+                    if square then
+                        H.ScanSquare(output, seen, square, originX, originY,
+                            originZ)
+                    end
                 end
             end
         end

@@ -71,6 +71,10 @@ function Locator.Invalidate(cacheKeyValue)
             Locator.Cache[key] = nil
         end
     end
+    local context = PNC and PNC.WorldItemContext
+    if context and context.InvalidateCache then
+        context.InvalidateCache()
+    end
 end
 
 Locator.KeyFor = H.KeyFor

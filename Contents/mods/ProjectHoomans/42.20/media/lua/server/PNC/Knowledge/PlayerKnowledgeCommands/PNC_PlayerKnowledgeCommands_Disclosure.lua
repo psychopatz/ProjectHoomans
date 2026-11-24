@@ -25,10 +25,15 @@ function H.NicknameText(npcID)
         and type(PNC.IdentityNames.ResolveNickname) == "function"
     then
         local survivor = identity and identity.survivor or {}
+        local isFemale = identity and identity.isFemale
+        if isFemale == nil and record then isFemale = record.isFemale end
         nickname = PNC.IdentityNames.ResolveNickname(
             survivor and survivor.forename,
             identity and identity.seed or record and record.identitySeed,
-            { version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION }
+            {
+                isFemale = isFemale,
+                version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION,
+            }
         )
     end
     nickname = tostring(nickname or "")

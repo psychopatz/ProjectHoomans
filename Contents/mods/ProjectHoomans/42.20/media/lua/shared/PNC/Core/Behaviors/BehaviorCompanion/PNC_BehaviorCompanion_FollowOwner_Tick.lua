@@ -110,6 +110,15 @@ function Companion.TickFollowOwner(record, zombie)
     then
         return true
     end
+    if not ownerVehicle
+        and not ownerEngaged
+        and not (hazard and hazard.active == true)
+        and ownerDist <= 10
+        and PNC.WorldItemService
+        and type(PNC.WorldItemService.TickFollowCompanion) == "function"
+    then
+        PNC.WorldItemService.TickFollowCompanion(record, zombie, owner, now)
+    end
     local movementHandoff = Internal.FollowOwnerMovementHandoff
     if movementHandoff and movementHandoff.TryHandle
         and movementHandoff.TryHandle(

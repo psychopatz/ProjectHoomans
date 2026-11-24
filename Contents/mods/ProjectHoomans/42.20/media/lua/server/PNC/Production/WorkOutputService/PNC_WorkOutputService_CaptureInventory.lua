@@ -9,19 +9,24 @@ local nowMs = Internal.Now
 local recomputeTotals = Internal.RecomputeTotals
 local floorOutputItems = Internal.FloorOutputItems
 local bodyHasOutputItem = Internal.BodyHasOutputItem
+local clearSquareCache = Internal.ClearSquareCache
 
 local function removeWorldObject(square, worldObject)
+    local removed = false
     if type(square and square.removeWorldObject) == "function" then
         square:removeWorldObject(worldObject)
-        return true
+        removed = true
+    else
+        if type(worldObject and worldObject.removeFromWorld) == "function" then
+            worldObject:removeFromWorld()
+        end
+        if type(worldObject and worldObject.removeFromSquare) == "function" then
+            worldObject:removeFromSquare()
+        end
+        removed = true
     end
-    if type(worldObject and worldObject.removeFromWorld) == "function" then
-        worldObject:removeFromWorld()
-    end
-    if type(worldObject and worldObject.removeFromSquare) == "function" then
-        worldObject:removeFromSquare()
-    end
-    return true
+    if removed and clearSquareCache then clearSquareCache(square) end
+    return removed
 end
 
 local function pickupWorldItem(square, worldObject, item, body)

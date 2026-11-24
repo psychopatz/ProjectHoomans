@@ -87,10 +87,16 @@ local function scanRegion(region, ids)
                 local first = tonumber(spans[spanIndex]) or 0
                 local last = tonumber(spans[spanIndex + 1]) or first
                 for x = first, last do
-                    local square = cell:getGridSquare(x, y, z)
+                    local worldContext = PNC and PNC.WorldItemContext
+                    local snap = worldContext and worldContext.GetSquareSnapshot
+                        and worldContext.GetSquareSnapshot(cell, x, y, z) or nil
+                    local square = snap and snap.square
+                        or (not (worldContext and worldContext.GetSquareSnapshot)
+                            and cell:getGridSquare(x, y, z) or nil)
                     if not square then
                         result.status = "UNLOADED"
                     else
+                        local cachedObjects = snap and snap.objects or nil
                         for detectorIndex = 1, #detectors do
                             local detector = detectors[detectorIndex]
                             local function emit(object, alreadyMatched, objectIndex)
@@ -131,9 +137,15 @@ local function scanRegion(region, ids)
                                     emit(object, true, objectIndex)
                                 end)
                             end
-                            eachObject(square, function(object, objectIndex)
-                                emit(object, false, objectIndex)
-                            end)
+                            if cachedObjects then
+                                for objectIndex = 1, #cachedObjects do
+                                    emit(cachedObjects[objectIndex], false, objectIndex - 1)
+                                end
+                            else
+                                eachObject(square, function(object, objectIndex)
+                                    emit(object, false, objectIndex)
+                                end)
+                            end
                         end
                     end
                 end

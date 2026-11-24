@@ -63,11 +63,49 @@ function Service.FindSleepSurface(zombie)
     then
         return nil
     end
+    local worldContext = PNC and PNC.WorldItemContext
     for detectorIndex = 1, #detectorIDs do
         local detector = resources.GetDetector(detectorIDs[detectorIndex])
         if detector and type(detector.matches) == "function"
             and type(detector.describe) == "function"
         then
+            local function inspectObject(square, object, objectIndex)
+                if examined >= Service.MAX_OBJECTS then return end
+                examined = examined + 1
+                if detector.matches(square, object) ~= true then return end
+                local resource = detector.describe(square, object, {
+                    objectIndex = objectIndex, character = zombie,
+                })
+                if type(resource) ~= "table" then
+                    return
+                end
+                local targets = targetsSvc.ResolveResource(resource, {
+                    abstract = false, character = zombie,
+                })
+                local target
+                local targetIndex
+                for targetIndex = 1, #(targets or {}) do
+                    if not reserved(resource, targets[targetIndex]) then
+                        target = targets[targetIndex]
+                        break
+                    end
+                end
+                if not target or target.validSpot == false then return end
+                local priority = tonumber(resource.sleepPriority) or
+                    (detectorIDs[detectorIndex] == "bed" and 100 or 50)
+                local distance = distanceTo(zombie, target.x, target.y)
+                if not best or priority > best.priority
+                    or priority == best.priority
+                        and distance < best.distance
+                then
+                    best = {
+                        object = object, resource = resource,
+                        target = target, targets = targets,
+                        priority = priority,
+                        distance = distance,
+                    }
+                end
+            end
             local dx
             local dy
             for dx = -Service.SEARCH_RADIUS, Service.SEARCH_RADIUS do
@@ -75,46 +113,22 @@ function Service.FindSleepSurface(zombie)
                     if dx * dx + dy * dy <= Service.SEARCH_RADIUS
                         * Service.SEARCH_RADIUS
                     then
-                        local square = cell:getGridSquare(
-                            originX + dx, originY + dy, originZ)
-                        eachObject(square, function(object, objectIndex)
-                            if examined >= Service.MAX_OBJECTS then return end
-                            examined = examined + 1
-                            if detector.matches(square, object) ~= true then return end
-                            local resource = detector.describe(square, object, {
-                                objectIndex = objectIndex, character = zombie,
-                            })
-                            if type(resource) ~= "table" then
-                                return
-                            end
-                            local targets = targetsSvc.ResolveResource(resource, {
-                                abstract = false, character = zombie,
-                            })
-                            local target
-                            local targetIndex
-                            for targetIndex = 1, #(targets or {}) do
-                                if not reserved(resource, targets[targetIndex])
-                                then
-                                    target = targets[targetIndex]
-                                    break
+                        if worldContext and worldContext.GetSquareSnapshot then
+                            local snap = worldContext.GetSquareSnapshot(
+                                cell, originX + dx, originY + dy, originZ)
+                            if snap and snap.square then
+                                local objs = snap.objects or {}
+                                for oi = 1, #objs do
+                                    inspectObject(snap.square, objs[oi], oi - 1)
                                 end
                             end
-                            if not target or target.validSpot == false then return end
-                            local priority = tonumber(resource.sleepPriority) or
-                                (detectorIDs[detectorIndex] == "bed" and 100 or 50)
-                            local distance = distanceTo(zombie, target.x, target.y)
-                            if not best or priority > best.priority
-                                or priority == best.priority
-                                    and distance < best.distance
-                            then
-                                best = {
-                                    object = object, resource = resource,
-                                    target = target, targets = targets,
-                                    priority = priority,
-                                    distance = distance,
-                                }
-                            end
-                        end)
+                        else
+                            local square = cell:getGridSquare(
+                                originX + dx, originY + dy, originZ)
+                            eachObject(square, function(object, objectIndex)
+                                inspectObject(square, object, objectIndex)
+                            end)
+                        end
                     end
                 end
             end

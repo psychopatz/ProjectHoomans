@@ -29,6 +29,40 @@ local function listItem(list, index)
     return type(list) == "table" and list[index + 1] or nil
 end
 
+local function squareCoords(square)
+    local sx = call(square, "getX")
+    local sy = call(square, "getY")
+    local sz = call(square, "getZ")
+    if sx == nil or sy == nil then return nil end
+    return sx, sy, sz or 0
+end
+
+local function clearSquareCache(square)
+    local worldCtx = PNC and PNC.WorldItemContext
+    if not (worldCtx and worldCtx.ClearSquare and square) then return end
+    local cell = type(getCell) == "function" and getCell() or nil
+    if not cell then return end
+    local sx, sy, sz = squareCoords(square)
+    if sx ~= nil then worldCtx.ClearSquare(cell, sx, sy, sz) end
+end
+
+local function readWorldObjects(square, invalidateFirst)
+    if not square then return nil end
+    if invalidateFirst then clearSquareCache(square) end
+    local worldCtx = PNC and PNC.WorldItemContext
+    local cell = type(getCell) == "function" and getCell() or nil
+    if worldCtx and worldCtx.GetSquareSnapshot and cell then
+        local sx, sy, sz = squareCoords(square)
+        if sx ~= nil then
+            local snap = worldCtx.GetSquareSnapshot(cell, sx, sy, sz)
+            if snap and snap.square == square and snap.worldObjects then
+                return snap.worldObjects
+            end
+        end
+    end
+    return call(square, "getWorldObjects")
+end
+
 local function itemID(item, worldObject)
     return call(item, "getID") or call(worldObject, "getKeyId")
 end
@@ -112,7 +146,7 @@ end
 
 local function floorOutputItems(square, effect, opts)
     local output = {}
-    local objects = square and call(square, "getWorldObjects") or nil
+    local objects = readWorldObjects(square, false)
     for index = 0, listSize(objects) - 1 do
         local worldObject = listItem(objects, index)
         local item = worldObject and call(worldObject, "getItem") or nil
@@ -172,7 +206,7 @@ end
 ---Snapshots or captures newly spawned ground items into a durable output effect.
 function Service.CaptureGroundOutput(square, beforeSnapshot, effect, opts)
     opts = opts or {}
-    local objects = square and call(square, "getWorldObjects") or nil
+    local objects = readWorldObjects(square, opts.snapshotOnly ~= true)
     local seen, captured = {}, 0
     for index = 0, listSize(objects) - 1 do
         local worldObject = listItem(objects, index)
@@ -184,6 +218,7 @@ function Service.CaptureGroundOutput(square, beforeSnapshot, effect, opts)
         end
     end
     if opts.snapshotOnly == true then return seen end
+    if captured > 0 then clearSquareCache(square) end
     if effect then
         recomputeTotals(effect)
         if type(opts.markDirty) == "function" then opts.markDirty() end
@@ -196,5 +231,6 @@ Internal.Now = nowMs
 Internal.RecomputeTotals = recomputeTotals
 Internal.FloorOutputItems = floorOutputItems
 Internal.BodyHasOutputItem = bodyHasOutputItem
+Internal.ClearSquareCache = clearSquareCache
 
 return Service

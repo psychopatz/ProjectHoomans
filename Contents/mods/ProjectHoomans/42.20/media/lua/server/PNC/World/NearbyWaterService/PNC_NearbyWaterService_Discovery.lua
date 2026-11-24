@@ -47,6 +47,11 @@ function H.WorldAvailability(origin)
     local x, y, z = H.Call(origin, "getX"), H.Call(origin, "getY"),
         H.Call(origin, "getZ") or 0
     if x == nil or y == nil then return "origin_missing" end
+    local context = PNC and PNC.WorldItemContext
+    if context and context.GetSquareSnapshot then
+        local snap = context.GetSquareSnapshot(cell, x, y, z)
+        return (snap and snap.square) and "loaded" or "unloaded"
+    end
     local square = cell:getGridSquare(math.floor(x), math.floor(y), math.floor(z))
     return square and "loaded" or "unloaded"
 end
@@ -388,6 +393,17 @@ function Service.FindAt(record, x, y, z)
     x, y, z = math.floor(tonumber(x) or 0), math.floor(tonumber(y) or 0),
         math.floor(tonumber(z) or 0)
     local cell = getCell and getCell() or nil
+    local context = PNC and PNC.WorldItemContext
+    if context and context.GetSquareSnapshot and cell then
+        local snap = context.GetSquareSnapshot(cell, x, y, z)
+        if not snap or not snap.square then return nil end
+        local objects = snap.objects or {}
+        for index = 1, #objects do
+            local entry = H.SourceEntry(objects[index], snap.square, index - 1)
+            if entry then return entry end
+        end
+        return nil
+    end
     local square = cell and cell.getGridSquare
         and cell:getGridSquare(x, y, z) or nil
     local objects = square and H.Call(square, "getObjects") or nil

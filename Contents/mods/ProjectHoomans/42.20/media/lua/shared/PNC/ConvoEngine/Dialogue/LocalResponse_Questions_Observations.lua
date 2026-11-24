@@ -63,6 +63,9 @@ local function resolveWeather(world)
     }
 end
 
+local RepeatAsk = require "PNC/ConvoEngine/Dialogue/LocalResponse_RepeatAsk"
+local AboutYou = require "PNC/ConvoEngine/Suggestions/AboutYouCatalog"
+
 local function resolveIdentityQuestion(ir, state, context)
     local text
     if context and context.identityTrust == "untrustworthy" then
@@ -71,16 +74,16 @@ local function resolveIdentityQuestion(ir, state, context)
         )
         if response then return response end
         text = "I don't share my name with liars. What's yours, truthfully?"
-    elseif Internal.IdentityKnown(context)
-    then
-        return {
-            templateID = "question.identity.known",
-            fallback = identityText(context) .. " We already know each other.",
-            args = copyArgs({
-                npcName = context.npcFullName or context.npcName,
-                ["speaker.name"] = context.npcFullName or context.npcName,
-            }),
-        }
+    elseif Internal.IdentityKnown(context) then
+        local knownName = context.npcFullName or context.npcName
+        local repeatResp = RepeatAsk.BuildKnownRepeatResponse(
+            "identity", knownName, context, state
+        )
+        repeatResp.args = copyArgs({
+            npcName = knownName,
+            ["speaker.name"] = knownName,
+        })
+        return repeatResp
     else
         local response = catalogResponse(
             "semantic.question.identity", ir, state, context
@@ -170,6 +173,23 @@ end
 
 local function resolveIdentityFacetQuestion(facet, ir, state, context)
     local value = identityFacetValue(context, facet)
+    if value then
+        local repeatResp = RepeatAsk.BuildKnownRepeatResponse(
+            facet, value, context, state
+        )
+        repeatResp.args = copyArgs({
+            nickname = facet == "nickname" and value or nil,
+            surname = facet == "surname" and value or nil,
+            factionName = facet == "faction" and value or nil,
+        })
+        repeatResp.groundedFactRefs = { "identity." .. facet }
+        return repeatResp
+    end
+    local facetDef = AboutYou.FindByKey(facet)
+    local minFam = facetDef and tonumber(facetDef.minFamiliarity) or 0
+    if minFam > 0 and AboutYou.Familiarity(context) < minFam then
+        return RepeatAsk.ResolveRelationshipGate(facet, minFam, context)
+    end
     local templateID
     local fallback
     local unknown

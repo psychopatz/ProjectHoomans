@@ -172,6 +172,11 @@ function H.ProcessRecord(record, now)
             now - (tonumber(record.lastThinkAt) or now)
         )
         Behavior.Tick(record, zombie, now)
+        if zombie and PNC.WorldItemService
+            and type(PNC.WorldItemService.TickAutonomous) == "function"
+        then
+            PNC.WorldItemService.TickAutonomous(record, now)
+        end
         -- Ambient zombie awareness is a bounded consumer of the same cached
         -- Perception frame used by combat/follow behavior. The scheduler/LOD
         -- cadence controls how often an idle NPC reaches this point; there is

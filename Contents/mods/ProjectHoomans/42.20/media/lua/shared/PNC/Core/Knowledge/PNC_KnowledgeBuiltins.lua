@@ -149,10 +149,15 @@ Providers.Register("pnc_identity", {
             then
                 local survivor = type(identity.survivor) == "table"
                     and identity.survivor or {}
+                local isFemale = identity.isFemale
+                if isFemale == nil then isFemale = record.isFemale end
                 name = PNC.IdentityNames.ResolveNickname(
                     survivor.forename,
                     identity.seed or record.identitySeed,
-                    { version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION }
+                    {
+                        isFemale = isFemale,
+                        version = PNC.IdentityNames.NICKNAME_GENERATOR_VERSION,
+                    }
                 )
             end
             if type(name) == "string" and name ~= "" then return name end

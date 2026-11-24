@@ -240,8 +240,8 @@ local directProviders = {
         name = "fishing" },
     { path = ROOT .. "PNC/Lumber/PNC_LumberExecutor.lua",
         name = "lumber" },
-    { path = ROOT .. "PNC/Scavenge/ScavengeExecutor/PNC_ScavengeExecutor_Provider.lua",
-        name = "scavenge" },
+    { path = ROOT .. "PNC/WorldItems/PNC_WorldItemExecutor_Lifecycle.lua",
+        name = "world_item" },
 }
 for _, item in ipairs(directProviders) do
     T.contains(T.read(item.path), "GetRecoveryState",

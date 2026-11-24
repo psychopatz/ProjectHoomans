@@ -52,6 +52,14 @@ local function quarantineRule(runtime, ruleID, reason)
     runtime.lastRequestResult = reason
 end
 
+local function canUseWorldBandageRip(record, definition)
+    if tostring(definition and definition.id or "") ~= "bandage" then return false end
+    local liveConst = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
+    return record and record.presenceState == liveConst
+        and PNC.WorldItemService ~= nil
+        and type(PNC.WorldItemService.RequestBandageRip) == "function"
+end
+
 function H.Process(entry)
     local record = PNC.Registry and PNC.Registry.Get(entry.npcID)
     if not record or record.alive == false then
@@ -61,15 +69,17 @@ function H.Process(entry)
     if not definition then
         return true, nil, { ok = false, reason = "unknown_rule" }
     end
-    if isFollowing(record) then
+    local allowAwayWorldRip = canUseWorldBandageRip(record, definition)
+    local following = isFollowing(record)
+    local awayFromHome = PNC.HomeDutyService and PNC.HomeDutyService.IsAtHome
+        and not PNC.HomeDutyService.IsAtHome(record)
+    if following and not allowAwayWorldRip then
         return false, H.WorldHour() + 0.25, {
             ruleId = definition.id, ok = false, attempted = false,
             reason = "provision_blocked_while_following",
         }
     end
-    if PNC.HomeDutyService and PNC.HomeDutyService.IsAtHome
-        and not PNC.HomeDutyService.IsAtHome(record)
-    then
+    if awayFromHome and not allowAwayWorldRip then
         return false, H.WorldHour() + 0.25, {
             ruleId = definition.id, ok = false, attempted = false,
             reason = "provision_waiting_for_home",
@@ -152,11 +162,19 @@ function H.Process(entry)
     runtime.incoming[entry.ruleID] = evaluation.deficit
     runtime.lastRequest = PNC.Core.DeepCopy(request)
     Metrics.Increment("provisionRequestsCreated")
-    local ok, reason, details = PNC.NPCSupplyService.Process(request, {
-        acquireOnly = true,
-        ignorePersonal = true,
-        force = true,
-    })
+    local ok, reason, details
+    if not following and not awayFromHome and PNC.NPCSupplyService
+        and PNC.NPCSupplyService.Process
+    then
+        ok, reason, details = PNC.NPCSupplyService.Process(request, {
+            acquireOnly = true,
+            ignorePersonal = true,
+            force = true,
+        })
+    else
+        ok, reason, details = false, following and "provision_blocked_while_following"
+            or "provision_waiting_for_home", nil
+    end
     if reason == "provision_pickup_queued" then
         setIncomingProjection(record, entry.ruleID, request)
         runtime.pending = runtime.pending or {}
@@ -174,6 +192,20 @@ function H.Process(entry)
     end
     runtime.incoming[entry.ruleID] = nil
     runtime.incomingProjection[entry.ruleID] = nil
+    if not ok and allowAwayWorldRip then
+        local ripOK, ripReason = PNC.WorldItemService.RequestBandageRip(record, {
+            targetCount = math.max(1, math.ceil(evaluation.deficit)),
+            urgent = false,
+            source = "bandage_provision",
+        })
+        if ripOK then
+            runtime.lastRequestResult = "world_rip_queued"
+            return false, H.WorldHour() + 0.05, {
+                ruleId = definition.id, ok = true, attempted = true,
+                reason = ripReason or "world_rip_queued", onHand = evaluation.onHand,
+            }
+        end
+    end
     if ok then
         runtime.quarantined = runtime.quarantined or {}
         runtime.quarantined[entry.ruleID] = nil

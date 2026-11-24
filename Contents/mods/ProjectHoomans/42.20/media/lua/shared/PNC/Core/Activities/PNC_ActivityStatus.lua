@@ -113,20 +113,14 @@ local function supplyItemFullType(record, kind)
         or available(candidate and candidate.fullType)
 end
 
-local function scavengeActivity(record)
-    local service = PNC.ScavengeService
-    local internal = service and service.Internal or nil
-    local session = internal and internal.SessionForNPC
-        and internal.SessionForNPC(record and record.id) or nil
-    local worker = session and session.workers
-        and session.workers[tostring(record and record.id or "")] or nil
-    if not worker or worker.currentKind ~= "loot" then return nil end
-    local entry = worker.currentEntry
-    local fullType = tostring(entry and entry.fullType or "")
-    if fullType == "" then return nil end
+local function worldItemActivity(record)
+    local rt = record and record.runtime and record.runtime.worldItem or nil
+    if type(rt) ~= "table" then return nil end
+    local fullType = tostring(rt.itemFullType or "")
     return {
-        fullType = fullType,
-        phase = tostring(worker.phase or ""),
+        action = tostring(rt.action or ""),
+        phase = tostring(rt.phase or ""),
+        fullType = fullType ~= "" and fullType or nil,
     }
 end
 
@@ -388,14 +382,17 @@ Status.Register("current_job", 10, function(record)
         behavior = tostring(record.activeBehavior or ""),
         orderKind = tostring(record.orderSpec and record.orderSpec.kind or ""),
     }
-    if tostring(record.activeJob or "") == "Scavenge"
+    local worldItem = worldItemActivity(record)
+    if worldItem
+        or tostring(record.activeBehavior or "") == "RipClothing"
+        or tostring(record.activeBehavior or "") == "ScavengeItem"
+        or tostring(record.activeJob or "") == "Scavenge"
         or tostring(record.orderSpec and record.orderSpec.kind or "")
             == tostring(PNC.Const and PNC.Const.ORDER_SCAVENGE or "scavenge")
     then
-        local scavenge = scavengeActivity(record)
-        if scavenge then
-            information.phase = scavenge.phase
-            information.activityItemFullType = scavenge.fullType
+        if worldItem then
+            information.phase = worldItem.phase
+            information.activityItemFullType = worldItem.fullType
         end
     end
     local fishing = runtime.fishing

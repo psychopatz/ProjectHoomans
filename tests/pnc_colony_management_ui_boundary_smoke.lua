@@ -53,6 +53,8 @@ for _, relative in ipairs({
     "client/PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_ScavengeTab.lua",
     "client/PNC/UI/Building/PNC_Building.lua",
     "client/PNC/UI/Building/PNC_BuildingWindow.lua",
+    "client/PNC/Scavenge/PNC_ScavengeController.lua",
+    "client/PNC/UI/Scavenge/PNC_ScavengeWindow.lua",
 }) do
     T.falsy(exists(relative), "retired UI file still exists: " .. relative)
 end
@@ -65,13 +67,13 @@ T.falsy(composition:find("PNC/UI/Communities/ColonyManagement/PNC_ColonyManageme
     1, true), "composition still loads the retired colony UI")
 T.falsy(composition:find("PNC/UI/Building/PNC_Building", 1, true),
     "composition still loads the retired Building shim")
+T.falsy(composition:find("PNC/UI/Scavenge/PNC_ScavengeWindow", 1, true),
+    "composition still loads the retired Scavenge window")
 
 local router = T.read(ROOT
     .. "client/PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Exploration.lua")
-T.contains(router, "PNC.ScavengeController.ReceiveSnapshot",
-    "scavenge router lost the canonical controller")
-T.contains(router, "PNC.ScavengeUI.ReceiveSnapshot",
-    "scavenge router lost the canonical window")
+T.contains(router, "ClientState.scavengePolicy",
+    "scavenge router lost policy state projection")
 T.falsy(router:find("PNC.ColonyScavengeTab", 1, true),
     "scavenge router still targets the retired colony tab")
 

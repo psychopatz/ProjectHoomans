@@ -176,6 +176,22 @@ local function pumpCapture(capture, budget)
     then
         return finishCapture(capture), 0
     end
+    local worldContext = PNC and PNC.WorldItemContext
+    local function getCachedSquare(cx, cy)
+        Internal._cachedSquareRef = nil
+        Internal._cachedSquareObjects = nil
+        if worldContext and worldContext.GetSquareSnapshot then
+            local snap = worldContext.GetSquareSnapshot(
+                capture.cell, cx, cy, capture.originZ)
+            if snap and snap.square then
+                Internal._cachedSquareRef = snap.square
+                Internal._cachedSquareObjects = snap.objects
+                return snap.square
+            end
+            return nil
+        end
+        return capture.cell:getGridSquare(cx, cy, capture.originZ)
+    end
     while processed < limit do
         if capture.scope == CampSite.SCOPES.ROOM then
             if capture.scanX > capture.maxX then break end
@@ -185,7 +201,7 @@ local function pumpCapture(capture, budget)
                 capture.scanX = capture.scanX + 1
                 capture.scanY = capture.minY
             end
-            square = capture.cell:getGridSquare(x, y, capture.originZ)
+            square = getCachedSquare(x, y)
             if square and Geometry.MatchesRoom
                 and not Geometry.MatchesRoom(square, capture.order)
             then
@@ -202,7 +218,7 @@ local function pumpCapture(capture, budget)
             x, y = capture.originX + dx, capture.originY + dy
             square = nil
             if dx * dx + dy * dy <= capture.radius * capture.radius then
-                square = capture.cell:getGridSquare(x, y, capture.originZ)
+                square = getCachedSquare(x, y)
             end
         end
         processed = processed + 1
@@ -224,6 +240,8 @@ local function pumpCapture(capture, budget)
                 )
             end
         end
+        Internal._cachedSquareRef = nil
+        Internal._cachedSquareObjects = nil
     end
     if (capture.scope == CampSite.SCOPES.ROOM
         and capture.scanX > capture.maxX)

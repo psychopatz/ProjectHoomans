@@ -33,40 +33,33 @@ end
 
 function Internal.ApplyScavengeSnapshot(payload)
     if type(payload) ~= "table" then return false end
-    ClientState.scavengeSessions = ClientState.scavengeSessions or {}
-    local sessionId = payload.sessionId and tostring(payload.sessionId) or nil
     if payload.requestFailed == true then
         ClientState.lastScavengeFailure = payload.reason
-        if PNC.ScavengeUI and PNC.ScavengeUI.ReceiveSnapshot then
-            PNC.ScavengeUI.ReceiveSnapshot(payload)
-        end
         return false
     end
-    local current = sessionId and ClientState.scavengeSessions[sessionId] or nil
-    local incomingRevision = tonumber(payload.revision)
-    if current and incomingRevision
-        < (tonumber(current.revision) or 0)
-    then return false end
-    if payload.disbanded == true then
-        if sessionId then ClientState.scavengeSessions[sessionId] = nil end
-        if tostring(ClientState.activeScavengeSessionId or "")
-            == tostring(sessionId or "")
-        then ClientState.activeScavengeSessionId = nil end
-    else
-        if sessionId then ClientState.scavengeSessions[sessionId] = payload end
-        ClientState.activeScavengeSessionId = sessionId
-            or ClientState.activeScavengeSessionId
+    local cats = PNC.WorldItemCategories
+    local current = ClientState.scavengePolicy or {}
+    if payload.enabled ~= nil then
+        current.enabled = payload.enabled == true
+    elseif current.enabled == nil then
+        current.enabled = true
     end
+    if type(payload.categories) == "table" then
+        current.categories = cats and cats.NormalizeCategories
+            and cats.NormalizeCategories(payload.categories) or payload.categories
+    elseif not current.categories then
+        current.categories = cats and cats.Defaults and cats.Defaults(false) or {}
+    end
+    if type(payload.preferences) == "table" then
+        current.preferences = {
+            containers = payload.preferences.containers ~= false,
+            floorItems = payload.preferences.floorItems ~= false,
+            corpses = payload.preferences.corpses ~= false,
+        }
+    end
+    ClientState.scavengePolicy = current
+    ClientState.scavengePolicySynced = true
     ClientState.lastScavengeFailure = nil
-    if PNC.ScavengeController and PNC.ScavengeController.ReceiveSnapshot then
-        PNC.ScavengeController.ReceiveSnapshot(payload)
-    end
-    if PNC.ScavengeNotifications and PNC.ScavengeNotifications.Receive then
-        PNC.ScavengeNotifications.Receive(current, payload)
-    end
-    if PNC.ScavengeUI and PNC.ScavengeUI.ReceiveSnapshot then
-        PNC.ScavengeUI.ReceiveSnapshot(payload)
-    end
     return true
 end
 

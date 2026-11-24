@@ -95,7 +95,12 @@ function Treatment.TryNPCMedicalTreatment(actorRecord, targetRecord,
             policy.mode, firstAid)
         return false, reason
     end
-    if policy.requiresItem then returnDressing(actorRecord, returnedItem) end
+    if policy.requiresItem then
+        returnDressing(actorRecord, returnedItem)
+        if PNC.ProvisionScheduler and PNC.ProvisionScheduler.MarkDirty then
+            PNC.ProvisionScheduler.MarkDirty(actorRecord, "bandage", 0)
+        end
+    end
     if Skills and Skills.AddXP then
         Skills.AddXP(actorRecord, "FirstAid", 1)
     end

@@ -17,6 +17,10 @@ local GROUP_LABELS = {
             or "UI_PNC_Conversation_Suggestion_Group_WhatsUp_Label",
         fallback = "What's up",
     },
+    about_you = {
+        key = "UI_PNC_Conversation_Choice_AboutYou",
+        fallback = "Tell me about yourself",
+    },
     wellbeing = {
         key = "UI_PNC_Conversation_Suggestion_Group_Wellbeing_Label",
         fallback = "Wellbeing",
@@ -90,6 +94,16 @@ local function groupPresentation(id, topic)
             topic = "whats_up",
             label = resolvedText(label.key, label.fallback),
             labelKey = label.key,
+        }
+    end
+    if id == "semantic_hub.about_you" then
+        local label = GROUP_LABELS.about_you
+        return {
+            id = id,
+            topic = "about_you",
+            label = resolvedText(label.key, label.fallback),
+            labelKey = label.key,
+            allowBack = true,
         }
     end
     if id == Suggestions.COMPANION_ORDERS_GROUP_ID then
@@ -277,6 +291,9 @@ local function buildGroups(
         or currentTopic == "whats_up"
         and byID["semantic_hub.whats_up"]
         and "semantic_hub.whats_up"
+        or currentTopic == "about_you"
+        and byID["semantic_hub.about_you"]
+        and "semantic_hub.about_you"
         or topicGroup and byID[topicGroup] and topicGroup
         -- A conversational turn owns the immediate response surface. The
         -- root landing group is navigation/fallback, so it must not hide a

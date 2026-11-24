@@ -100,9 +100,16 @@ local colonist = {
     } },
     runtime = { debug = true },
 }
+local neutralDoctor = {
+    id = "neutral-doctor",
+    tacticalClass = "neutral",
+    alive = true,
+    inventory = { items = {} },
+    runtime = {},
+}
 local abstract = {
     id = "abstract-doctor",
-    tacticalClass = "neutral",
+    tacticalClass = "hostile",
     alive = true,
     inventory = { items = {} },
     runtime = {},
@@ -117,8 +124,12 @@ local patient = {
 
 T.truthy(PNC.Treatment.RequiresNPCMedicalItem(colonist),
     "colonist medical care requires a real item")
+T.truthy(PNC.Treatment.RequiresNPCMedicalItem(neutralDoctor),
+    "neutral NPCs now require a real medical item (no unlimited bandages)")
 T.falsy(PNC.Treatment.RequiresNPCMedicalItem(abstract),
-    "abstract medical care does not require an item")
+    "hostile abstract medical care does not require an item")
+T.falsy(PNC.Treatment.RequiresNPCMedicalItem(neutralDoctor, { allowAbstract = true }),
+    "explicit allowAbstract option permits abstract medical mode")
 T.equal(PNC.Treatment.GetNPCBandagePlan(abstract).mode,
     "abstract", "abstract treatment plan mode")
 
@@ -137,6 +148,10 @@ T.contains(treatmentDebugMessages[2],
     "health.treatment event=complete route=npc_self")
 T.contains(treatmentDebugMessages[2],
     "status=applied reason=bandaged")
+
+local neutralApplied, neutralReason = PNC.Treatment.TryNPCBandage(neutralDoctor, "Hand_L")
+T.falsy(neutralApplied, "neutral NPC with 0 bandages cannot use unlimited abstract bandages")
+T.equal(neutralReason, "missing_bandage", "neutral empty inventory rejects with missing_bandage")
 
 before = consumed
 T.equal(PNC.Treatment.TryNPCBandage(abstract, "Hand_L"), true,

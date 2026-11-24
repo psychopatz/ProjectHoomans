@@ -26,4 +26,10 @@ Scenes.Register("scavenge.loot_low", {
     pool = "scavenge.loot", weight = 1,
 })
 
+Scenes.Register("scavenge.rip", {
+    category = "scavenge", priority = 48, blocking = false,
+    bump = "LootLow", durationMs = 1200, interrupts = interrupts(),
+    weight = 1,
+})
+
 return true

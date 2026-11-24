@@ -9,44 +9,34 @@ PNC.FactionNameGenerator =
 
 local Generator = PNC.FactionNameGenerator
 
-local POOLS = {
-    settler = {
-        first = {
-            "Ashwood", "Cedar", "Clearwater", "Fairview",
-            "Greenfield", "Maple", "Oakridge", "Pinecrest",
-            "Riverside", "Stonebridge", "Westhaven", "Willow",
-        },
-        second = {
-            "Community", "Enclave", "Haven", "Homestead",
-            "Refuge", "Settlement",
-        },
-        site = { "Haven", "Homestead", "Settlement" },
-    },
-    looter = {
-        first = {
-            "Ash", "Black", "Broken", "Burning", "Cold",
-            "Crimson", "Iron", "Ragged", "Red", "Rust",
-            "Scar", "Vulture",
-        },
-        second = {
-            "Crows", "Fangs", "Hand", "Hounds", "Jackals",
-            "Knives", "Raiders", "Ravens", "Reavers", "Wolves",
-        },
-        site = { "Den", "Hideout", "Hold", "Lair" },
-        article = true,
-    },
-    refugee = {
-        first = {
-            "Dawn", "Eastbound", "Hope", "Lantern", "New Day",
-            "Northbound", "Open Road", "Safe Harbor", "Westward",
-        },
-        second = {
-            "Caravan", "Collective", "Refugees", "Sanctuary",
-            "Survivors",
-        },
-        site = { "Camp", "Refuge", "Sanctuary", "Shelter" },
-    },
+local POOLS = {}
+local FALLBACK_POOL = {
+    first = { "Survivor" },
+    second = { "Group" },
+    site = { "Camp" },
 }
+
+function Generator.RegisterPool(archetypeID, pool)
+    archetypeID = tostring(archetypeID or "")
+    if archetypeID == "" or type(pool) ~= "table"
+        or type(pool.first) ~= "table" or #pool.first == 0
+        or type(pool.second) ~= "table" or #pool.second == 0
+        or type(pool.site) ~= "table" or #pool.site == 0
+    then
+        return false
+    end
+    POOLS[archetypeID] = pool
+    return true
+end
+
+function Generator.GetPool(archetypeID)
+    return POOLS[tostring(archetypeID or "")]
+end
+
+local okReg, reg = pcall(require, "PNC/Definitions/Factions/Register")
+if okReg and type(reg) == "table" and type(reg.Apply) == "function" then
+    reg.Apply(nil, Generator)
+end
 
 local function stableNumber(value)
     local hash = 5381
@@ -63,6 +53,7 @@ end
 local function poolFor(archetypeID)
     return POOLS[tostring(archetypeID or "")]
         or POOLS.settler
+        or FALLBACK_POOL
 end
 
 local function pick(values, seed, salt)

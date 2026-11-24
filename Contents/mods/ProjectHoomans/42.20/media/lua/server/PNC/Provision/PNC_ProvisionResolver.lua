@@ -24,15 +24,15 @@ end
 
 function Resolver.GetEffectivePolicy(record)
     if not record then return nil, "npc_missing" end
-    local faction, reason = PNC.Factions.GetNPCFaction(record.id)
-    if not faction then return nil, reason end
-    local provision = Policy.Normalize(faction.provision)
+    local faction = PNC.Factions and PNC.Factions.GetNPCFaction
+        and PNC.Factions.GetNPCFaction(record.id) or nil
+    local provision = Policy.Normalize(faction and faction.provision or nil)
     local source = provision.policies.default or {}
     local effective = {
         schemaVersion = provision.schemaVersion,
         revision = provision.revision,
         policyId = "default",
-        source = "faction_default",
+        source = faction and "faction_default" or "default_fallback",
         rules = {},
     }
     for _, definition in ipairs(Registry.List()) do

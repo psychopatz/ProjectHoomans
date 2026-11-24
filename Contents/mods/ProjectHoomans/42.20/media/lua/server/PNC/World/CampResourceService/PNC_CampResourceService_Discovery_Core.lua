@@ -25,6 +25,13 @@ local function worldHour()
 end
 
 local function eachObject(square, visitor)
+    if Internal._cachedSquareRef == square
+        and type(Internal._cachedSquareObjects) == "table"
+    then
+        local cached = Internal._cachedSquareObjects
+        for index = 1, #cached do visitor(cached[index], index - 1) end
+        return
+    end
     local objects = square and square.getObjects
         and square:getObjects() or nil
     if not objects then return end

@@ -17,20 +17,31 @@ local APPROACH_OFFSETS = {
 }
 
 function H.FacingToward(fromX, fromY, toX, toY)
+    local context = PNC and PNC.WorldItemContext
+    if context and context.FacingToward then
+        return context.FacingToward(fromX, fromY, toX, toY)
+    end
     local dx, dy = toX - fromX, toY - fromY
     local vertical = dy > 0.25 and "S" or dy < -0.25 and "N" or ""
     local horizontal = dx > 0.25 and "E" or dx < -0.25 and "W" or ""
     return vertical .. horizontal
 end
 
-function H.CanOccupy(x, y, z)
+function H.CanOccupy(x, y, z, square)
     local pathService = PNC.PathService
     if pathService and pathService.IsSquareWalkable then
         return pathService.IsSquareWalkable(x, y, z) == true
     end
-    local cell = getCell and getCell() or nil
-    local square = cell and cell.getGridSquare
-        and cell:getGridSquare(math.floor(x), math.floor(y), z) or nil
+    if not square then
+        local context = PNC and PNC.WorldItemContext
+        local cell = getCell and getCell() or nil
+        if context and context.GetSquareSnapshot and cell then
+            local snap = context.GetSquareSnapshot(cell, x, y, z)
+            square = snap and snap.square or nil
+        elseif cell and cell.getGridSquare then
+            square = cell:getGridSquare(math.floor(x), math.floor(y), z)
+        end
+    end
     if not square then return false end
     if type(square.isFree) == "function" then
         return square:isFree(false) == true
@@ -48,6 +59,28 @@ function Service.BuildApproach(record, entry)
     local origin = H.OriginFor(record)
     local originX = origin and tonumber(H.Call(origin, "getX")) or sourceX
     local originY = origin and tonumber(H.Call(origin, "getY")) or sourceY
+    local context = PNC and PNC.WorldItemContext
+    local cell = getCell and getCell() or nil
+    if context and context.BuildApproachTiles and cell then
+        local tiles = context.BuildApproachTiles(cell, sourceX, sourceY, sourceZ,
+            originX, originY, {
+                isWalkable = function(square, wx, wy, wz)
+                    return H.CanOccupy(wx, wy, wz, square)
+                end,
+            })
+        if #tiles == 0 then return nil, "WATER_APPROACH_UNAVAILABLE" end
+        local candidates = {}
+        for _, tile in ipairs(tiles) do
+            candidates[#candidates + 1] = {
+                x = tile.x,
+                y = tile.y,
+                z = tile.z,
+                interactionFacing = tile.interactionFacing,
+                approachKey = tile.approachKey,
+            }
+        end
+        return candidates[1], candidates
+    end
     local candidates = {}
     local baseX, baseY = math.floor(sourceX), math.floor(sourceY)
     for _, offset in ipairs(APPROACH_OFFSETS) do

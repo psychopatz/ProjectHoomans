@@ -60,9 +60,7 @@ local function knowledge(entryOrID)
     local faction = Identity
         and type(Identity.GetFaction) == "function"
         and Identity.GetFaction(actorID) or nil
-    local factionName = Identity
-        and type(Identity.GetFactionName) == "function"
-        and Identity.GetFactionName(actorID) or nil
+    local factionName = faction and faction.name or nil
     local identityParts = Identity
         and type(Identity.GetIdentityParts) == "function"
         and Identity.GetIdentityParts(actorID) or {}
@@ -108,23 +106,22 @@ local function requestKnowledge(actorID)
 end
 
 local function context(entry)
+    local actorID = actorIDFor(entry)
     local presentation = PNC.FactionPresentation
         and type(PNC.FactionPresentation.Resolve) == "function"
         and PNC.FactionPresentation.Resolve(entry) or nil
-    local faction = presentation or entry and entry.organizationalFaction
-        or nil
+    local faction = Identity
+        and type(Identity.GetFaction) == "function"
+        and Identity.GetFaction(actorID) or nil
     local knownName = Identity
         and type(Identity.GetKnownName) == "function"
-        and Identity.GetKnownName(actorIDFor(entry)) or nil
+        and Identity.GetKnownName(actorID) or nil
     return {
-        name = knownName or entry and (entry.name or entry.displayName),
-        factionID = presentation and presentation.factionID
-            or faction and (faction.factionID or faction.id),
-        factionName = presentation and presentation.factionName
-            or faction and (faction.name or faction.factionName),
-        factionRole = presentation and presentation.factionRole
-            or faction and (faction.role or faction.rank),
-        factionPresentation = faction,
+        name = knownName or "Stranger",
+        factionID = faction and (faction.factionID or faction.id) or nil,
+        factionName = faction and (faction.name or faction.factionName) or "",
+        factionRole = faction and (faction.role or faction.rank) or "",
+        factionPresentation = faction and presentation or nil,
         presence = entry and entry.presenceState,
         provider = entry and entry.provider,
         providerState = entry and entry.providerState,
@@ -144,9 +141,11 @@ if SurvivorWorldClient
 then
     SurvivorWorldClient.RegisterActorKnowledgeProvider(
         "ProjectHoomans", Adapter)
-    -- DTHoomans projects the same Hoomans knowledge under its provider ID.
+    -- DTHoomans and DTAbstract project the same PNC knowledge under their provider IDs.
     SurvivorWorldClient.RegisterActorKnowledgeProvider(
         "DTHoomans", Adapter)
+    SurvivorWorldClient.RegisterActorKnowledgeProvider(
+        "DTAbstract", Adapter)
 end
 
 if Hover and type(Hover.RegisterProvider) == "function" then

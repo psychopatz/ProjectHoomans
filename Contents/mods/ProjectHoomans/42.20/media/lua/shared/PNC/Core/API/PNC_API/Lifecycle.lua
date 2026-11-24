@@ -105,7 +105,10 @@ local function finalizeNewRecord(record, definition, prepare)
                 )
                 return nil
             end
-        elseif hasExplicitEquipment(definition.equipment) and Inventory.SyncFromEquipment then
+        elseif definition.inventoryAuthority ~= "canonical"
+            and hasExplicitEquipment(definition.equipment)
+            and Inventory.SyncFromEquipment
+        then
             Inventory.SyncFromEquipment(record, "spawn_definition_equipment")
         elseif Inventory.EnsureRecordInventory then
             Inventory.EnsureRecordInventory(record)

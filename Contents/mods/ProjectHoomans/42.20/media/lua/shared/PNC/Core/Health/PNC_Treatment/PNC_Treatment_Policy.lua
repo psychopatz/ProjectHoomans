@@ -88,16 +88,26 @@ function Treatment.IsPlayerOwnedNPC(record)
     return isPlayerOwned(record)
 end
 
--- Colonists use the player-managed inventory; other actors can represent
--- abstract treatment unless a caller explicitly requests item consumption.
+-- Colonists and neutral NPCs consume real medical items from inventory (or
+-- rip nearby clothing via world-item provisioning when out of bandages).
+-- Abstract treatment is reserved for hostile NPCs or explicit overrides.
 function Treatment.RequiresNPCMedicalItem(record, options)
     options = type(options) == "table" and options or {}
+    if options.consumeItem == true then return true end
+    if options.allowAbstract == true then return false end
     local colonist = Types and Types.IsColonist
         and Types.IsColonist(record) == true
         or tostring(record and record.tacticalClass or "")
             == tostring(Const.TACTICAL_CLASS_COLONIST or "colonist")
     if colonist then return true end
-    return options.consumeItem == true
+    local tacticalClass = Types and Types.ResolveTacticalClass
+        and Types.ResolveTacticalClass(record)
+        or string.lower(tostring(record and record.tacticalClass or ""))
+    local hostileClass = tostring(Const.TACTICAL_CLASS_HOSTILE or "hostile")
+    if tacticalClass == hostileClass or tacticalClass == "hostile" then
+        return false
+    end
+    return true
 end
 
 function Treatment.GetNPCMedicalPolicy(record, options)

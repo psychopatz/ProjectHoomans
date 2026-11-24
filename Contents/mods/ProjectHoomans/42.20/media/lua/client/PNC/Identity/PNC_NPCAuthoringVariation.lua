@@ -82,7 +82,10 @@ function V.Generate(source, scope, seed)
         if not first or not last then return nil, "name_generation_unavailable" end
         survivor.forename, survivor.surname = first, last
         out.displayName = full
-        out.identity.nickname = PNC.IdentityNames.ResolveNickname(first, seed, { namespace = "projecthoomans.editor.nickname" })
+        out.identity.nickname = PNC.IdentityNames.ResolveNickname(first, seed, {
+            isFemale = out.isFemale,
+            namespace = "projecthoomans.editor.nickname",
+        })
         out.nicknameCleared = out.identity.nickname == nil
     elseif scope == "attributes" then
         out.skillLevels, out.npcTraits, out.vanillaTraits, out.dynamicTraits = {}, {}, {}, {}

@@ -53,22 +53,20 @@ T.equal(categories[1].id, "work", "work is not first in the manual hierarchy")
 T.equal(categories[2].id, "workshop",
     "workshop is not second in the manual hierarchy")
 T.equal(categories[3].id, "zone", "zone is not third in the manual hierarchy")
-T.equal(categories[4].id, "scavenge",
-    "scavenge is not fourth in the manual hierarchy")
-T.equal(categories[5].id, "colony",
-    "colony is not fifth in the manual hierarchy")
-T.equal(categories[6].id, "events",
-    "events is not sixth in the manual hierarchy")
-T.equal(categories[7].id, "colonist",
-    "colonist is not seventh in the manual hierarchy")
-T.equal(categories[8].id, "storage",
-    "storage is not eighth in the manual hierarchy")
-T.equal(categories[9].id, "research",
-    "research is not ninth in the manual hierarchy")
-T.equal(categories[10].id, "stockpile",
-    "stockpile bootstrap is not tenth in the manual hierarchy")
-T.equal(categories[11].id, "base",
-    "base is not eleventh in the manual hierarchy")
+T.equal(categories[4].id, "colony",
+    "colony is not fourth in the manual hierarchy")
+T.equal(categories[5].id, "events",
+    "events is not fifth in the manual hierarchy")
+T.equal(categories[6].id, "colonist",
+    "colonist is not sixth in the manual hierarchy")
+T.equal(categories[7].id, "storage",
+    "storage is not seventh in the manual hierarchy")
+T.equal(categories[8].id, "research",
+    "research is not eighth in the manual hierarchy")
+T.equal(categories[9].id, "stockpile",
+    "stockpile bootstrap is not ninth in the manual hierarchy")
+T.equal(categories[10].id, "base",
+    "base is not tenth in the manual hierarchy")
 for _, id in ipairs({
     "structure", "production", "furniture", "external_furniture",
     "genetics", "power", "pipe_networks", "security", "misc", "floors",
@@ -383,8 +381,7 @@ Registry.Get("research").onClick()
 T.truthy(openedResearch, "research category is not wired to its window")
 Registry.Get("base").onClick()
 T.truthy(openedBase, "base category is not wired to its window")
-Registry.Get("scavenge").onClick(nil, {})
-T.truthy(openedScavenge, "scavenge category is not wired to its controller")
+T.falsy(Registry.Get("scavenge"), "retired scavenge category survived")
 zone.actions[1].onClick()
 zone.actions[2].onClick()
 zone.actions[3].onClick()

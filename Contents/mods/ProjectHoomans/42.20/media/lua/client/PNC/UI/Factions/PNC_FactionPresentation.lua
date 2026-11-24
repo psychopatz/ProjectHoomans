@@ -65,7 +65,7 @@ function FactionPresentation.Resolve(targetOrEntry)
     if Identity and Identity.GetFaction then
         factionObj = Identity.GetFaction(entry)
     end
-    if not factionObj and context then
+    if not factionObj and context and context.factionKnown ~= false then
         if type(context.factionEmblem) == "table" or sanitizeString(context.factionName) then
             factionObj = {
                 name = context.factionName,
@@ -73,13 +73,6 @@ function FactionPresentation.Resolve(targetOrEntry)
                 id = context.factionID,
                 emblem = context.factionEmblem,
             }
-        end
-    end
-
-    if type(factionObj) ~= "table" then
-        local source = entry and (entry.snapshot or entry.record or entry.source or entry)
-        if type(source) == "table" and source.organizationalFaction then
-            factionObj = source.organizationalFaction
         end
     end
 

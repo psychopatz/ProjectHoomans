@@ -33,7 +33,11 @@ local function stepApproachAndPickup(context, record, body, effect, at, opts)
         and opts.getSquare(effect.x, effect.y, effect.z) or nil
     if not square then
         local cell = getCell and getCell() or nil
-        if cell and type(cell.getGridSquare) == "function" then
+        local worldCtx = PNC and PNC.WorldItemContext
+        if worldCtx and worldCtx.GetSquareSnapshot and cell then
+            local snap = worldCtx.GetSquareSnapshot(cell, effect.x, effect.y, effect.z)
+            square = snap and snap.square or nil
+        elseif cell and type(cell.getGridSquare) == "function" then
             square = cell:getGridSquare(effect.x, effect.y, effect.z)
         end
     end

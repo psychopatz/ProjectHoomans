@@ -6,6 +6,8 @@ PNC.ConvoEngine = PNC.ConvoEngine or {}
 local Response = PNC.ConvoEngine.LocalResponse
 local Internal = Response and Response.Internal or {}
 Response.Internal = Internal
+local RepeatAsk = require "PNC/ConvoEngine/Dialogue/LocalResponse_RepeatAsk"
+local AboutYou = require "PNC/ConvoEngine/Suggestions/AboutYouCatalog"
 local copyArgs = Internal.CopyArgs
 local catalogResponse = Internal.CatalogResponse
 local factFor = Internal.FactFor
@@ -348,6 +350,16 @@ local function resolveBackstoryQuestion(ir, state, context)
     if fact and fact.status == "known"
         and type(content) == "string" and content ~= ""
     then
+        local facetDef = AboutYou.FindByKey("backstory:" .. tostring(kind))
+        if facetDef and AboutYou.IsFacetKnown(context, facetDef) then
+            local repeatResp = RepeatAsk.BuildKnownRepeatResponse(
+                facetDef.facetKey, content, context, state
+            )
+            repeatResp.topic = "NPC_BACKSTORY"
+            repeatResp.groundedFactRefs = refs
+            repeatResp.args = copyArgs({ kind = kind, content = content })
+            return repeatResp
+        end
         local extensions = ir and type(ir.extensions) == "table"
             and ir.extensions or {}
         local authoredPool = extensions.responsePoolID

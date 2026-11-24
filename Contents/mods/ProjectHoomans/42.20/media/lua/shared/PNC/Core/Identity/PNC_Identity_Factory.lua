@@ -193,6 +193,7 @@ function Identity.GenerateResolvedIdentity(source)
     nickname = explicitNickname
         or Names and type(Names.ResolveNickname) == "function"
         and Names.ResolveNickname(forename, seed, {
+            isFemale = resolvedFemale,
             version = Names.NICKNAME_GENERATOR_VERSION,
         })
         or nil

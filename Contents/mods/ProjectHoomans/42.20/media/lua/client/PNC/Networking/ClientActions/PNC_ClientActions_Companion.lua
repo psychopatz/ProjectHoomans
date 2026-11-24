@@ -119,17 +119,15 @@ function Client.ExecuteCompanionCommand(commandID, npcId, scope, context)
     if not definition then return false end
     if definition.clientOnly == true then
         if commandID == "scavenge_nearby" then
-            if not PNC.ScavengeController then
-                require "PNC/Scavenge/PNC_ScavengeController"
-            end
-            local opened = PNC.ScavengeController
-                and PNC.ScavengeController.Open
-                and PNC.ScavengeController.Open(npcId, context) or false
+            local policy = Client.GetScavengePolicy and Client.GetScavengePolicy() or {}
+            local nextEnabled = policy.enabled == false
+            local toggled = Client.SetScavengeEnabled
+                and Client.SetScavengeEnabled(nextEnabled) == true or false
             Internal.TraceCompanionCommand(commandID, npcId, scope, context, {
-                status = opened and "opened" or "rejected",
-                reason = opened and nil or "client_action_rejected",
+                status = toggled and "toggled" or "rejected",
+                reason = toggled and nil or "client_action_rejected",
             })
-            return opened
+            return toggled
         end
         Internal.TraceCompanionCommand(commandID, npcId, scope, context, {
             status = "rejected",

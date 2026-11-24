@@ -185,7 +185,10 @@ function Identity.ApplyRecordIdentity(record, source)
         resolvedIdentity.nickname = Names.ResolveNickname(
             survivor.forename,
             seed,
-            { version = Names.NICKNAME_GENERATOR_VERSION }
+            {
+                isFemale = resolvedIdentity.isFemale,
+                version = Names.NICKNAME_GENERATOR_VERSION,
+            }
         )
     end
     record.identity = resolvedIdentity

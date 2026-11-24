@@ -85,35 +85,54 @@ function Locator.FindObject(origin, options)
     end
     local cell = options.cell or (getCell and getCell() or nil)
     if not cell or not cell.getGridSquare then return nil end
-    local output, seen = {}, {}
-    local baseX, baseY = math.floor(originX), math.floor(originY)
-    -- Include the whole origin square while excluding diagonal corners that
-    -- lie outside the requested tile radius.
-    local scanRadius = radius + 0.5
-    local radiusSq = scanRadius * scanRadius
-    for dx = -radius, radius do
-        for dy = -radius, radius do
-            local squareDX = baseX + dx + 0.5 - originX
-            local squareDY = baseY + dy + 0.5 - originY
-            if squareDX * squareDX + squareDY * squareDY <= radiusSq then
-                local square = cell:getGridSquare(baseX + dx, baseY + dy,
-                    originZ)
-                if square then
-                    H.ScanSquareObjects(output, seen, square, originX,
-                        originY, originZ, options)
+    local accepted
+    local context = PNC and PNC.WorldItemContext
+    if context and context.FindBestObject then
+        accepted = context.FindBestObject(origin, {
+            cell = cell,
+            x = originX,
+            y = originY,
+            z = originZ,
+            radius = radius,
+            allowRestrictedZones = options.allowRestrictedZones ~= false,
+            specialObject = options.specialObject,
+            accept = options.accept,
+            score = options.score,
+            earlyExit = options.earlyExit,
+            scanFullRadius = options.scanFullRadius,
+            objectKey = H.ObjectKeyFor,
+            now = timestamp,
+        })
+    else
+        local output, seen = {}, {}
+        local baseX, baseY = math.floor(originX), math.floor(originY)
+        -- Include the whole origin square while excluding diagonal corners that
+        -- lie outside the requested tile radius.
+        local scanRadius = radius + 0.5
+        local radiusSq = scanRadius * scanRadius
+        for dx = -radius, radius do
+            for dy = -radius, radius do
+                local squareDX = baseX + dx + 0.5 - originX
+                local squareDY = baseY + dy + 0.5 - originY
+                if squareDX * squareDX + squareDY * squareDY <= radiusSq then
+                    local square = cell:getGridSquare(baseX + dx, baseY + dy,
+                        originZ)
+                    if square then
+                        H.ScanSquareObjects(output, seen, square, originX,
+                            originY, originZ, options)
+                    end
                 end
             end
         end
-    end
-    table.sort(output, function(a, b)
-        if a.distSq ~= b.distSq then return a.distSq < b.distSq end
-        return tostring(a.key) < tostring(b.key)
-    end)
-    local accepted
-    for index = 1, #output do
-        if not options.accept or options.accept(output[index]) then
-            accepted = output[index]
-            break
+        table.sort(output, function(a, b)
+            if a.distSq ~= b.distSq then return a.distSq < b.distSq end
+            return tostring(a.key) < tostring(b.key)
+        end)
+        for index = 1, #output do
+            if not options.accept or options.accept(output[index]) then
+                accepted = output[index]
+                break
+            end
         end
     end
     if key then
