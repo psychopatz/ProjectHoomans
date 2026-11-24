@@ -38,7 +38,8 @@ local function stageGiftConsent(view, result, decision, group, session, options)
         and tostring(response.id or "") or ""
     local responseTemplateID = type(response) == "table"
         and tostring(response.templateID or "") or ""
-    local interestedOffer = responseTemplateID == "semantic.offer.interested"
+    local interestedOffer = responseTemplateID == "hoomans.offer.hungry"
+        or responseID == "semantic.offer.hungry"
         or string.find(responseID, "semantic.offer.dataset.hungry_", 1, true)
         or string.find(responseTemplateID, "semantic.offer.dataset.hungry_", 1, true)
     if decision.branch ~= "OFFER_RECEIVED"

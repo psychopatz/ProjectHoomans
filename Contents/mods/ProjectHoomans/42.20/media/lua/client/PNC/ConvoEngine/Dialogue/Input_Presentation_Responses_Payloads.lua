@@ -16,6 +16,8 @@ local SpeechRealization = require
     "PNC/ConvoEngine/SpeechRealization"
 local TokenFormatter = PNC.ConvoEngine.TokenFormatter
     or require "PNC/ConvoEngine/TokenFormatter"
+local Lexicon = PNC.ConvoEngine.Lexicon
+    or require "PNC/ConvoEngine/Lexicon"
 local ResponseAdapter = Internal.ResponseAdapter or {}
 Internal.ResponseAdapter = ResponseAdapter
 
@@ -23,7 +25,11 @@ local function formatTemplateText(text, args)
     text = tostring(text or "")
     args = type(args) == "table" and args or {}
     if text ~= "" and string.find(text, "{", 1, true) then
-        text = TokenFormatter.Format(text, args)
+        if Lexicon and type(Lexicon.Expand) == "function" then
+            text = Lexicon.Expand(text, args, args)
+        else
+            text = TokenFormatter.Format(text, args)
+        end
     end
     local firstArg = args.familyAddress or args.familyTerm or args.npcName
         or args.target or args.object or args.location or args.topic

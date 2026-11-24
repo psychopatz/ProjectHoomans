@@ -347,6 +347,32 @@ function Conversation.BuildDefinition(
             return type(context) ~= "table"
                 or context.pendingConversationRequest == nil
         end,
+        -- Standardized close-as-goodbye: clicking X or pressing ESC routes
+        -- through the exact same actor-agnostic farewell controller as the red
+        -- Goodbye choice and headless TYPE TO TALK close button.
+        onStandardizedClose = function(view, reason, doClose)
+            local ok, ctrl = pcall(require, "PNC/ConvoEngine/Dialogue/ConversationSwitchAndFarewell")
+            local farewellCtrl = (ok and type(ctrl) == "table" and ctrl)
+                or (PNC.ConvoEngine and PNC.ConvoEngine.ConversationSwitchAndFarewell)
+            if type(farewellCtrl) == "table"
+                and type(farewellCtrl.TriggerStandardizedGoodbye) == "function"
+            then
+                local ctx = view and view.spec and view.spec.context or {}
+                local actor = type(ctx.entry) == "table" and ctx.entry
+                    or { id = npcID, name = ctx.npcName, npcType = ctx.npcType }
+                farewellCtrl.TriggerStandardizedGoodbye(view, doClose, {
+                    actor = actor,
+                    context = {
+                        actorRole = ctx.npcType,
+                        relationshipState = ctx.conversationRelationshipID,
+                        phraseSalt = tostring(npcID) .. ":" .. tostring(reason or "close"),
+                    },
+                    salt = tostring(npcID) .. ":" .. tostring(reason or "close"),
+                })
+                return
+            end
+            if type(doClose) == "function" then doClose() end
+        end,
         portrait = Context.PortraitSpec(entry),
         backgroundID = Backgrounds.Get(timeID),
         theme = Palette.BuildConversationTheme(entry),

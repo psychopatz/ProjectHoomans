@@ -1,0 +1,127 @@
+# Social event reactions: farewells, medical distress, leader loss, horde, combat kills, retreat, safety, and corpses.
+lang EN
+namespace hoomans
+
+flow semantic.social.farewell.depart
+  say [social.farewell_speaker=player, social.role=hostile] (pri 21) as player_hostile:
+    "We're done talking."
+  say [social.farewell_speaker=player, social.role=wary] (pri 20) as player_wary:
+    "I'm heading out. Stay sharp."
+  say [social.farewell_speaker=player, social.role=lover] (pri 21) as player_lover:
+    "Stay safe for me. I'll come right back to you."
+  say [social.farewell_speaker=player, social.role=family] (pri 21) as player_family:
+    "Be safe while I'm out, {addressee.name}. I'll be right back."
+  say [social.farewell_speaker=player, social.role=friend] (pri 20) as player_friend:
+    "Take care of yourself, {addressee.name}. Talk soon."
+  say [social.farewell_speaker=player, social.role=colonist] (pri 19) as player_colonist:
+    "Keep holding the line, {addressee.name}. I'll check back soon."
+  say [social.farewell_speaker=player] (pri 15) as player_default:
+    "Stay safe out there."
+  say [social.role=hostile] (pri 11) as hostile:
+    "Get out of my sight."
+  say [social.role=wary] (pri 10) as wary:
+    "Keep your distance out there."
+  say [social.role=lover] (pri 11) as lover:
+    "Come back to me safely, {addressee.name}. Please don't stay gone long."
+  say [social.role=family] (pri 11) as family:
+    "Be careful out there. You know how much you mean to me."
+  say [social.role=friend] (pri 10) as friend:
+    "Stay safe out there, {addressee.name}. Come back in one piece."
+  say [social.role=colonist] (pri 9) as colonist:
+    "Watch your perimeter out there, {addressee.name}."
+  say [actor.social_style=friendly|protective] (pri 7) as friendly:
+    "Take care, {addressee.name}. I will see you soon."
+  say [default] (pri 5) as default:
+    "Take care."
+
+flow semantic.medical.distress
+  say [downed.audience=hostile, downed.need=mercy] (pri 10) as mercy:
+    "Please. I need help with this wound, don't let me die."
+  say [downed.need=bleedout|rescue] (pri 9) as urgent:
+    "I am hurt! I need help now!"
+  say [default] (pri 5) as default:
+    "I need help with this wound."
+
+flow semantic.leader_loss.reaction
+  say [leader.grief=devoted] (pri 9) as devoted:
+    "We lost someone important. We need to stay together."
+  say [leader.grief=dissent] (pri 8) as dissent:
+    "The old order is gone. What happens next is up to us."
+  say [leader.grief=close] (pri 7) as close:
+    "We lost someone close to us. We need to stay together."
+  say [leader.grief=colonist] (pri 7) as colonist:
+    "Our leader is gone. We keep the group together."
+  say [leader.grief=distant] (pri 7) as distant:
+    "The leader is gone. Someone needs to decide what comes next."
+  say [default] (pri 5) as default:
+    "We lost our leader. We need to decide what comes next."
+
+flow semantic.combat.horde.prompt
+  offer semantic.combat.horde.choice.engage:
+    label: "Take them."
+    say: "Take them."
+    utility: directness
+    intent: REQUEST
+    action: COMBAT_ENGAGE
+  offer semantic.combat.horde.choice.avoid:
+    label: "Go around."
+    say: "Go around."
+    utility: caution
+    intent: REQUEST
+    action: COMBAT_AVOID
+  offer semantic.combat.horde.choice.hold:
+    label: "Hold for now."
+    say: "Hold for now."
+    utility: caution
+    intent: REQUEST
+    action: COMBAT_HOLD
+  say [combat.style=aggressive|brave] (pri 9) as eager:
+    "That's a hell of a crowd. We taking them?"
+  say [combat.style=shaken] (pri 9) as shaken:
+    "God... that's a lot. Are we really fighting all of them?"
+  say [combat.style=reserved|cold] (pri 8) as reserved:
+    "Horde ahead. Engage or go around?"
+  say [default] (pri 5) as default:
+    "That's a lot of them. We fighting or going around?"
+
+flow semantic.combat.horde
+  say [event.horde_phase=escalated] (pri 9) as escalated:
+    "More are piling in. This is getting bad."
+  say [event.horde_phase=deescalated] (pri 8) as deescalated:
+    "They're thinning out. Don't relax yet."
+  say [event.horde_phase=started] (pri 7) as started:
+    "That's a lot of them. Stay sharp."
+  say [default] (pri 5) as default:
+    "Horde nearby. Keep your eyes up."
+
+flow semantic.combat.reaction
+  say [event.type=zombie_stamina_retreat] (pri 9) as retreat:
+    "I need a moment before I can swing again."
+  say [event.type=combat_awareness|zombie_horde_detected] (pri 8) as threat:
+    "That threat is down. Stay alert."
+  say [default] (pri 5) as default:
+    "Good work. Keep watching the area."
+
+flow semantic.companion.reaction
+  say [command.id=camp, event.type=companion_command_rejection] (pri 13) as camp_rejected:
+    "I can't find a safe room or campfire nearby."
+  say [event.type=follower_abandoned_zombie|follower_abandoned_hostile_npc] (pri 8) as abandonment:
+    "Stay with me next time. We watch each other's backs."
+  say [default] (pri 5) as default:
+    "I heard you. We will handle it together."
+
+flow semantic.social.reaction
+  say [default] (pri 5) as default:
+    "I hear you."
+
+flow semantic.conversation.safety
+  say [event.type=conversation_safety] (pri 7) as danger:
+    "Watch out. We need to move now."
+  say [default] (pri 5) as default:
+    "Stay alert."
+
+flow semantic.corpse.reaction
+  say [corpse.revenge] (pri 8) as revenge:
+    "Someone is going to answer for this."
+  say [default] (pri 5) as default:
+    "Someone died here. We should remember that."

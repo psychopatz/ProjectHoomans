@@ -15,6 +15,14 @@ local traceTurn = Internal.traceTurn
 local SemanticTelemetryPrompt = require
     "PNC/Semantics/PNC_SemanticTelemetryPrompt"
 local FarewellRole = require "PNC/ConvoEngine/Dialogue/FarewellRole"
+local Patience = require "PNC/ConvoEngine/PatienceTracker"
+if type(Patience) ~= "table" then
+    Patience = PNC.ConvoEngine and PNC.ConvoEngine.PatienceTracker or nil
+end
+local GroupFloor = require "PNC/ConvoEngine/GroupFloor"
+if type(GroupFloor) ~= "table" then
+    GroupFloor = PNC.ConvoEngine and PNC.ConvoEngine.GroupFloor or nil
+end
 
 local function markFarewellEvaluated(view)
     local ls = view and (view.lifecycleState
@@ -118,6 +126,11 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
         end
     end
 
+    local patMod = type(Patience) == "table" and Patience or (PNC.ConvoEngine and PNC.ConvoEngine.PatienceTracker)
+    if type(patMod) == "table" and type(patMod.EnrichContext) == "function" then
+        patMod.EnrichContext(preview and preview.ir or nil, context)
+    end
+
     local result = preview
     if service and type(service.ProcessIR) == "function" then
         result = service:ProcessIR(preview.ir, context, options)
@@ -171,6 +184,23 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
 
     Internal.RecordAcceptedContextTurn(view, result, options)
     Internal.RecordConversationTopics(view, result, value)
+    local gfMod = type(GroupFloor) == "table" and GroupFloor or (PNC.ConvoEngine and PNC.ConvoEngine.GroupFloor)
+    if view and view.groupConversation and type(gfMod) == "table" and type(gfMod.RecordTurn) == "function" then
+        local ir = result and result.ir or {}
+        gfMod.RecordTurn(view.groupConversation.id or context.conversationID or "group", {
+            speakerID = context.npcID,
+            speakerName = context.npcFullName,
+            speakerIsPlayer = false,
+            addresseeID = context.characterUUID or "player",
+            intent = ir.intent,
+            action = ir.action,
+            subject = ir.subject,
+            moodPrimary = context.moodPrimary,
+            npcAnnoyed = context.npcAnnoyed == true,
+            npcFedUp = context.npcFedUp == true,
+            speakerInjured = context.speakerInjured == true,
+        })
+    end
 
     -- A deterministic parser result that already names an authored
     -- conversation category must use the same category authority lane as a

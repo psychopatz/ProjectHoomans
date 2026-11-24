@@ -1,0 +1,160 @@
+# Core English survival, combat, and social lexicon pack.
+lang EN
+namespace hoomans
+
+lex noun.zombie
+  [actor.style=tactical] (pri 8):   "hostile" | "infected" | "dead"
+  [actor.style=shaken] (pri 8):     "thing" | "dead" | "biter"
+  [actor.style=aggressive] (pri 8): "rotter" | "biter" | "walker"
+  [default]:                        "walker" | "dead" | "biter"
+
+lex noun.pack
+  [actor.style=tactical] (pri 8):   "cluster" | "pack" | "group"
+  [default]:                        "pack" | "swarm" | "mob" | "bunch"
+
+lex noun.group
+  [actor.style=tactical] (pri 8):   "squad" | "unit" | "team"
+  [default]:                        "crew" | "group" | "folks" | "outfit"
+
+lex noun.dark
+  [default]: "the dark" | "nightfall" | "the shadows" | "this dim light"
+
+lex noun.road
+  [default]: "road" | "street" | "block" | "stretch"
+
+lex adj.fight
+  [actor.style=aggressive] (pri 8): "brutal" | "bloody" | "vicious"
+  [actor.style=shaken] (pri 8):     "awful" | "ugly" | "terrifying"
+  [default]:                        "rough" | "ugly" | "nasty" | "close"
+
+lex adj.hit
+  [default]: "rough" | "nasty" | "bad" | "heavy"
+
+lex adv.fast
+  [default]: "fast" | "quick" | "in a hurry" | "out of nowhere"
+
+lex adv.barely
+  [default]: "barely" | "just barely" | "by the skin of my teeth"
+
+lex opener.relief
+  [actor.style=shaken] (pri 8):     "Christ" | "Thank God" | "Jesus"
+  [actor.style=brave] (pri 8):      "Whew" | "Hell" | "Alright"
+  [actor.style=aggressive] (pri 8): "Damn right" | "Hell yeah" | "About time"
+  [actor.style=cold] (pri 8):       "Good" | "Well" | "Alright"
+  [default]:                        "Whew" | "Man" | "Hey"
+
+lex opener.casual
+  [default]: "Hey" | "Look" | "Listen" | "Alright"
+
+lex opener.wary
+  [default]: "Easy" | "Hold on" | "Look" | "Alright"
+
+lex clause.thanks_backup
+  [actor.style=supportive] (pri 8): "Thank you for stepping in—I really appreciate the backup." | "You really came through for me back there."
+  [actor.style=brave] (pri 8):      "Appreciate the backup—always easier with another pair of hands." | "Good stand. Glad you jumped in."
+  [actor.style=cold] (pri 8):       "Good timing. Saved me some trouble." | "Appreciate the assist."
+  [actor.style=shaken] (pri 8):     "I didn't think I'd make it out of that—thank you." | "You saved my skin back there."
+  [default]:                        "Appreciate you jumping in like that." | "Thanks for watching my back."
+
+lex clause.night_warning
+  [env.night_or_dusk] (pri 8): "Hard enough spotting {noun.zombie|s} in {noun.dark}." | "They get nastier once the sun drops." | "Stick to cover with the light gone."
+
+lex clause.rain_note
+  [env.raining] (pri 8): "This rain makes it even harder to hear them coming." | "Wet ground didn't help any either."
+
+lex clause.stay_sharp
+  [default]: "Stay sharp out here." | "Keep your head on a swivel." | "Watch your corners." | "Don't let your guard down."
+
+lex clause.breath_check
+  [default]: "Take a second to catch your breath." | "Give it a second—looks clear for now." | "Catch your breath while we can."
+
+lex clause.wary_tail
+  [default]: "That's all you need to know for now." | "No need to get any friendlier than that." | "Let's leave it at that."
+
+# Discourse connectors & conversational glue
+lex glue.continue
+  [default]: "Also," | "On top of that," | "And by the way,"
+
+lex glue.shift
+  [default]: "Anyway," | "Changing subjects—" | "Moving on,"
+
+lex glue.pushback_rude
+  [player.shouting] (pri 9): "Easy, no need to yell—" | "Lower your voice—"
+  [player.rude] (pri 8):     "Watch the tone—" | "No need to snap—" | "Hey, take it easy—"
+
+lex glue.followup
+  [default]: "Well," | "Like I said," | "Thing is,"
+
+# Mood-colored speech micro-clauses
+lex mood.opener
+  [mood.panicked] (pri 10): "Oh god—" | "Wait—hold on—" | "Keep it quick—"
+  [mood.in_pain] (pri 10):  "Ngh—" | "Ugh, hold on—" | "Easy, it hurts—"
+  [npc.fed_up] (pri 9):     "Seriously—" | "Come on—" | "Look, I already said—"
+  [mood.stressed] (pri 8):  "Look, I'm on edge—" | "Make it quick—"
+  [mood.tired] (pri 8):     "Ugh..." | "Man, I'm beat—"
+  [mood.unhappy] (pri 7):   "Sigh..." | "Whatever..."
+  [mood.bored] (pri 7):     "Finally, something to talk about—" | "Well..."
+  [mood.cheerful] (pri 7):  "Hey!" | "Sure thing!" | "Glad you asked—"
+
+lex mood.tail
+  [mood.hungry] (pri 8):    "Could really use some food though." | "Stomach's been growling nonstop."
+  [mood.tired] (pri 8):     "Need some rest before I drop." | "Running on fumes here."
+  [mood.stressed] (pri 8):  "Nerves are shot right now." | "Hard to stay calm out here."
+  [mood.bored] (pri 7):     "Honestly bored out of my mind." | "Nothing much happening around here."
+  [mood.unhappy] (pri 7):   "Just trying to get through the day." | "Not my best day."
+  [mood.cheerful] (pri 7):  "Feeling pretty good today, all things considered."
+
+# Orthogonal persona-address & role-flavor lexicons (compose across all pools without duplication)
+lex term.address
+  [rel.bond=lover|spouse] (pri 12):   "love" | "babe" | "sweetheart" | "{addressee.name}"
+  [rel.bond=parent] (pri 12):         "{rel.kin_title}" | "{addressee.name}"
+  [rel.bond=child] (pri 11):          "kiddo" | "kid" | "{addressee.name}"
+  [rel.bond=sibling|family] (pri 10): "{addressee.name}" | "fam"
+  [actor.role=looter|bandit] (pri 9): "pal" | "tough guy" | "stranger"
+  [actor.role=trader] (pri 9):        "traveler" | "friend" | "{addressee.name}"
+  [actor.age_band=elder] (pri 8):     "kiddo" | "youngster" | "{addressee.name}"
+  [rel.tier=ally|trusted] (pri 7):    "partner" | "{addressee.name}"
+  [default]:                          "{addressee.name}"
+
+lex role.greeting_tail
+  [actor.role=trader] (pri 10):                "Looking to buy or sell?" | "Got fresh stock if you're trading."
+  [actor.role=looter|bandit] (pri 10):         "Make it quick. What do you want?" | "Keep your hands where I can see them."
+  [actor.role=colonist, state.working] (pri 9): "Busy {state.job} here at {place.name}." | "Just wrapping up {state.job}."
+  [actor.role=colonist, state.sitting] (pri 9): "Just catching a breather here." | "Taking the weight off my feet for a minute."
+  [actor.role=colonist] (pri 8):               "Everything holding steady around camp?" | "What do you need?"
+  [actor.role=companion] (pri 8):              "Right with you—what's the call?" | "Watching your back. Need something?"
+  [actor.role=guard] (pri 8):                  "Perimeter's quiet so far." | "Eyes are on the road. What's up?"
+  [default]:                                   "What's on your mind?" | "Need something?"
+
+# Reusable dynamic suggestion-button blueprints
+blueprint offer.social_repair
+  offer repair.apologize:
+    when: [player.rude]
+    label: "Apologize for snapping"
+    say: "Sorry, {addressee.name}—didn't mean to snap like that."
+    utility: openness
+    intent: APOLOGIZE
+    subject: SOCIAL
+
+blueprint offer.post_assist_nudges
+  offer assist.check_wound:
+    when: [any.injured]
+    label: "Check on {addressee.pos} wound"
+    say: "Hold still—let me check {addressee.pos} wound{end}"
+    utility: compassion
+    intent: OFFER
+    subject: MEDICAL
+
+  offer assist.ask_supplies:
+    label: "Ask about {mention.items|list_a}"
+    say: "You got any spare {mention.items|list}?"
+    utility: openness
+    intent: QUESTION
+    subject: INVENTORY
+
+  offer assist.stay_safe:
+    label: "Tell {addressee.obj} to stay safe"
+    say: "{clause.stay_sharp}"
+    utility: caution
+    intent: FAREWELL
+    subject: SOCIAL

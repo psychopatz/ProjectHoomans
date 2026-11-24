@@ -133,33 +133,60 @@ function Choices.Build(context, options, greetingBlock)
     end
 
     Loader.EnsureSource(RECRUITMENT_SOURCE, RECRUIT_RESPONSE_KEYS)
+    local okFw, fwCtrl = pcall(require, "PNC/ConvoEngine/Dialogue/ConversationSwitchAndFarewell")
+    local farewellCtrl = (okFw and type(fwCtrl) == "table" and fwCtrl)
+        or (PNC.ConvoEngine and PNC.ConvoEngine.ConversationSwitchAndFarewell)
+    local dynamicFw = nil
+    if type(farewellCtrl) == "table" and type(farewellCtrl.ResolveFarewell) == "function" then
+        local entry = context and context.entry or nil
+        local actor = type(entry) == "table" and entry or {
+            id = context and context.npcID,
+            name = context and context.npcName,
+            npcType = context and context.npcType,
+        }
+        local fwSalt = tostring(context and (context.phraseSalt or context.npcID) or "bye")
+        local okRes, res = pcall(farewellCtrl.ResolveFarewell, actor, nil, {
+            actorRole = context and context.npcType or nil,
+            relationshipState = context and (context.relationshipID or context.conversationRelationshipID) or nil,
+        }, fwSalt)
+        if okRes and type(res) == "table" and tostring(res.playerLine or "") ~= "" then
+            dynamicFw = res
+        end
+    end
     local goodbyeValid = Loader.EnsureSource(GOODBYE_SOURCE, {
         "choice.goodbye", "response.goodbye",
     })
-    if goodbyeValid then
-        local goodbyeKey = "response.goodbye"
-        local salt = context and (context.phraseSalt or context.caseID or context.utterancePlanSalt)
-        if salt then
-            local saltHash = 0
-            local saltStr = tostring(salt)
-            for i = 1, #saltStr do
-                saltHash = (saltHash * 31 + string.byte(saltStr, i)) % 2147483647
+    if dynamicFw or goodbyeValid then
+        local goodbyeText = dynamicFw and { fallback = dynamicFw.playerLine, text = dynamicFw.playerLine }
+            or dialoguePayload(GOODBYE_SOURCE, "choice.goodbye", context)
+        local goodbyeResp
+        if dynamicFw and tostring(dynamicFw.npcReply or "") ~= "" then
+            goodbyeResp = { fallback = dynamicFw.npcReply, text = dynamicFw.npcReply }
+        else
+            local goodbyeKey = "response.goodbye"
+            local salt = context and (context.phraseSalt or context.caseID or context.utterancePlanSalt)
+            if salt then
+                local saltHash = 0
+                local saltStr = tostring(salt)
+                for i = 1, #saltStr do
+                    saltHash = (saltHash * 31 + string.byte(saltStr, i)) % 2147483647
+                end
+                goodbyeKey = "response.goodbye." .. tostring((saltHash % 10) + 1)
             end
-            goodbyeKey = "response.goodbye." .. tostring((saltHash % 10) + 1)
+            goodbyeResp = dialoguePayload(GOODBYE_SOURCE, goodbyeKey, context)
         end
         choices[#choices + 1] = {
             id = "goodbye",
-            text = dialoguePayload(
-                GOODBYE_SOURCE, "choice.goodbye", context
-            ),
+            semanticRole = "farewell",
+            isFarewell = true,
+            variant = "danger",
+            text = goodbyeText,
             semantic = {
                 route = "conversation_root_choice",
                 actionID = "goodbye",
                 groupID = "conversation_utilities",
             },
-            response = dialoguePayload(
-                GOODBYE_SOURCE, goodbyeKey, context
-            ),
+            response = goodbyeResp,
             close = true,
             closeReason = "goodbye",
         }

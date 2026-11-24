@@ -1,0 +1,153 @@
+# Vanilla emote replies, world utility/alarm/media/weather reactions, chronology milestones, and scoped world-event beats.
+lang EN
+namespace hoomans
+
+flow semantic.emote.reply
+  say [action=thumbsup, convo.prev_topic=water] (pri 9) as thumbsup_active:
+    "Good—glad we're staying ahead on water."
+  say [action=thumbsup] (pri 7) as thumbsup:
+    "Right back at you{end}"
+  say [action=thumbsdown] (pri 7) as thumbsdown:
+    "Alright, noted. Not a fan of that."
+  say [action=insult] (pri 7) as insult:
+    "Watch it. No need for that."
+  say [action=wavehi] (pri 7) as wavehi:
+    "Hey there{end}"
+  say [action=wavebye] (pri 7) as wavebye:
+    "Take care out there."
+  say [action=thankyou] (pri 7) as thankyou:
+    "Anytime."
+  say [action=clap] (pri 7) as clap:
+    "Appreciate that!"
+  say [action=salute] (pri 7) as salute:
+    "Right back at you, partner."
+  say [default] (pri 5) as default:
+    "Got it."
+
+flow semantic.world.alarm.react
+  say [role=house_alarm_open] (pri 8) as house_alarm_open:
+    "Damn—house alarm! Every {noun.zombie} on this {noun.road} is going to hear that!"
+  say [role=house_alarm_reply] (pri 8) as house_alarm_reply:
+    "Yeah, let's get clear before {noun.pack|a} shows up!"
+  say [default] (pri 5) as default:
+    "That alarm is going to draw trouble—stay sharp!"
+
+flow semantic.world.utility.outage
+  say [role=power_shutoff_open] (pri 8) as power_shutoff_open:
+    "The grid's finally gone... no more power."
+  say [role=power_shutoff_reply] (pri 8) as power_shutoff_reply:
+    "Knew it was coming. We'll need generators and flashlights now."
+  say [role=water_shutoff_open] (pri 8) as water_shutoff_open:
+    "Taps just ran dry. Water pressure's gone."
+  say [role=water_shutoff_reply] (pri 8) as water_shutoff_reply:
+    "Time to start collecting rain and rationing every bottle."
+  say [default] (pri 5) as default:
+    "Utilities are failing—things are about to get tougher."
+
+flow semantic.world.object.notice
+  say [role=tv_reminisce_open] (pri 8) as tv_reminisce_open:
+    "Weird seeing a TV still sitting there like the world didn't end."
+  say [role=tv_reminisce_reply] (pri 8) as tv_reminisce_reply:
+    "Feels like a lifetime ago."
+  say [role=tv_power_out_open] (pri 8) as tv_power_out_open:
+    "Just dead glass now without power."
+  say [role=tv_power_out_reply] (pri 8) as tv_power_out_reply:
+    "Yeah, nothing left on the air anyway."
+  say [default] (pri 5) as default:
+    "Strange reminder of how things used to be."
+
+flow semantic.world.media.broadcast
+  say [role=tv_watching_life_and_living_open] (pri 8) as tv_watching_life_and_living_open:
+    "Catching {slot.show.name} on Life and Living while the signal still holds—might learn something useful."
+  say [role=tv_watching_life_and_living_reply] (pri 8) as tv_watching_life_and_living_reply:
+    "Smart move—{slot.show.name} always has good tips."
+  say [role=tv_watching_show_open] (pri 8) as tv_watching_show_open:
+    "Keeping an eye on {slot.show.name} while we still have power."
+  say [role=tv_watching_show_reply] (pri 8) as tv_watching_show_reply:
+    "Good call—never know what news might come through."
+  say [default] (pri 5) as default:
+    "Still catching a signal on that broadcast."
+
+flow semantic.world.weather.rain
+  say [role=weather_rain_open] (pri 8) as weather_rain_open:
+    "Rain's picking up, {addressee.name}. {?clause.rain_note}"
+  say [role=weather_rain_reply] (pri 8) as weather_rain_reply:
+    "Yeah, {addressee.name}, let's keep dry and watch our footing."
+  say [default] (pri 5) as default:
+    "Wet weather out here—stay alert."
+
+flow semantic.world.chronology.milestone
+  say [milestone.stage=first_week, actor.social_style=warm|friendly|protective] (pri 10) as first_week_warm:
+    "We made it through the first week together, {addressee.name}—glad you're still here."
+  say [milestone.stage=first_week, actor.social_style=guarded|withdrawn|hostile] (pri 10) as first_week_guarded:
+    "One week down. Don't get comfortable."
+  say [milestone.stage=first_week] (pri 8) as first_week_steady:
+    "A full week since this started, and we're still standing."
+  say [milestone.stage=first_month, actor.social_style=warm|friendly|protective] (pri 10) as first_month_warm:
+    "A whole month out here—we've come a long way."
+  say [milestone.stage=first_month, actor.social_style=guarded|withdrawn|hostile] (pri 10) as first_month_guarded:
+    "A month in and the roads haven't gotten any kinder."
+  say [milestone.stage=first_month] (pri 8) as first_month_steady:
+    "One month survived. Keep doing what works."
+  say [milestone.stage=first_season, actor.social_style=warm|friendly|protective] (pri 10) as first_season_warm:
+    "Seasons are turning and we're still kicking."
+  say [milestone.stage=first_season, actor.social_style=guarded|withdrawn|hostile] (pri 10) as first_season_guarded:
+    "New season means new problems. Stay ready."
+  say [milestone.stage=first_season] (pri 8) as first_season_steady:
+    "Made it through a whole season out here."
+  say [milestone.stage=first_year, actor.social_style=warm|friendly|protective] (pri 10) as first_year_warm:
+    "A whole year... I honestly didn't think we'd make it this far."
+  say [milestone.stage=first_year, actor.social_style=guarded|withdrawn|hostile] (pri 10) as first_year_guarded:
+    "One year alive. Still plenty left that wants us dead."
+  say [milestone.stage=first_year] (pri 8) as first_year_steady:
+    "A full year since the outbreak. Still standing."
+  say [milestone.stage=anniversary, actor.social_style=warm|friendly|protective] (pri 10) as anniversary_warm:
+    "Another year under our belts—proud of how far we've come."
+  say [milestone.stage=anniversary, actor.social_style=guarded|withdrawn|hostile] (pri 10) as anniversary_guarded:
+    "Another year gone. Stay sharp."
+  say [milestone.stage=anniversary] (pri 8) as anniversary_steady:
+    "Another year survived out here."
+  say [role=chronology_anniversary] (pri 6) as anniversary_role_fallback:
+    "Another year survived out here."
+  say [role=chronology_milestone] (pri 5) as survival_role_fallback:
+    "Still standing after all this time."
+  say [default] (pri 4) as default:
+    "Hard to believe how long we've kept going."
+
+flow semantic.world.event.food_crisis
+  say [role=world_event_reply] (pri 12) as reply:
+    "Yeah, we'll need to stretch every ration until supplies pick back up."
+  say [epistemic.provenance=experienced|witnessed] (pri 10) as experienced:
+    "I've seen the shelves myself—food's running dangerously low around here."
+  say [epistemic.provenance=uncertain] (pri 9) as uncertain:
+    "Not totally sure how bad it is, but people say food is getting scarce."
+  say [epistemic.provenance=rumor|told|public] (pri 8) as rumor:
+    "Word going around is food's getting tight everywhere."
+  say [default] (pri 5) as default:
+    "Sounds like food is getting harder to come by."
+
+flow semantic.world.event.raider_surge
+  say [role=world_event_reply] (pri 12) as reply:
+    "Agreed—we keep our weapons close and watch the perimeter."
+  say [epistemic.provenance=experienced] (pri 10) as experienced:
+    "Ran into raiders myself recently—they're getting bolder out there."
+  say [epistemic.provenance=witnessed] (pri 10) as witnessed:
+    "I've spotted raider groups moving along the {noun.road}. Stay alert."
+  say [epistemic.provenance=uncertain] (pri 9) as uncertain:
+    "Can't confirm it firsthand, but there's talk of more raiders lately."
+  say [epistemic.provenance=rumor|told|public] (pri 8) as rumor:
+    "Word is raiders have been hitting camps around the area."
+  say [default] (pri 5) as default:
+    "Keep your head down—raiders have been active."
+
+flow semantic.world.event.surplus
+  say [role=world_event_reply] (pri 12) as reply:
+    "Good to hear—let's stock up while we have the chance."
+  say [epistemic.provenance=experienced|witnessed] (pri 10) as experienced:
+    "Supplies are looking solid right now—saw plenty stocked up."
+  say [epistemic.provenance=uncertain] (pri 9) as uncertain:
+    "Heard supplies might be easing up a bit, though I haven't seen it myself."
+  say [epistemic.provenance=rumor|told|public] (pri 8) as rumor:
+    "Word is there's a surplus of supplies making the rounds."
+  say [default] (pri 5) as default:
+    "Things are looking a little better on supplies right now."

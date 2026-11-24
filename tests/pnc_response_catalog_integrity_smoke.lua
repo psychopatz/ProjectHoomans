@@ -4,8 +4,7 @@ T.addPackagePaths()
 
 local Catalog = require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
 local Core = require "PNC/ConvoEngine/Dialogue/ResponseCatalog_Core"
-require "PNC/ConvoEngine/ResponseCatalog/Social"
-require "PNC/ConvoEngine/ResponseCatalog/Questions"
+require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
 
 local allowedFields = {}
 for _, field in ipairs(Core.CONDITION_FIELDS or {}) do

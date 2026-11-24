@@ -11,6 +11,8 @@ PNC.Semantics.SpeechTransport = Transport
 
 local TokenFormatter = PNC.ConvoEngine.TokenFormatter
     or require "PNC/ConvoEngine/TokenFormatter"
+local Lexicon = PNC.ConvoEngine.Lexicon
+    or require "PNC/ConvoEngine/Lexicon"
 
 local MAX_COOLDOWN_KEYS = 256
 local sr = nil
@@ -187,6 +189,18 @@ function Transport.ResolveLine(rec, opts)
         mergedTokens["scene.clock"] = TokenFormatter.CleanName(
             opts.sceneClock or context.sceneClock or context.timeOfDay
         )
+    end
+    if type(TokenFormatter.AttachPronouns) == "function" then
+        TokenFormatter.AttachPronouns(mergedTokens, "speaker", rec)
+        if type(opts.addressee) == "table" or opts.addressee ~= nil then
+            TokenFormatter.AttachPronouns(mergedTokens, "addressee", opts.addressee)
+        end
+    end
+    if Lexicon and type(Lexicon.Expand) == "function" then
+        context.npcID = context.npcID or tostring(rec.id)
+        return Lexicon.Expand(raw, context, mergedTokens, {
+            salt = tostring(ref or "") .. ":" .. tostring(rec.id),
+        }), res
     end
     return Transport.FormatTokens(raw, mergedTokens), res
 end

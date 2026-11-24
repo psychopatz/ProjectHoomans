@@ -402,5 +402,6 @@ function BC.ResetRuntime()
 end
 
 require "PNC/Semantics/PNC_SemanticBeatContext_Pair"
+require "PNC/Semantics/PNC_SemanticBeatContext_MemoryWorld"
 
 return BC

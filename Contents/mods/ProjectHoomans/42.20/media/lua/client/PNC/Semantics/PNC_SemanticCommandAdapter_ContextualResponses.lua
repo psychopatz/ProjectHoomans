@@ -50,6 +50,12 @@ local function attachContextualQueuedResponses()
                     when = { previousAction = action },
                     priority = 4,
                 },
+                {
+                    id = "redundant",
+                    templateID = base .. ".repeated",
+                    when = { commandRedundant = true },
+                    priority = 5,
+                },
             }
         end
     end

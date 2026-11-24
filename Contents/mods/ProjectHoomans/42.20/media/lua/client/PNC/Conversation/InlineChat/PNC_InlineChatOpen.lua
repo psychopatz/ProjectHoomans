@@ -33,6 +33,69 @@ local function semanticInput()
     return nil
 end
 
+local function loadSwitchController()
+    local ok, ctrl = pcall(require, "PNC/ConvoEngine/Dialogue/ConversationSwitchAndFarewell")
+    if ok and type(ctrl) == "table" then return ctrl end
+    return PNC.ConvoEngine and PNC.ConvoEngine.ConversationSwitchAndFarewell or nil
+end
+
+local function switchInlineTarget(direction)
+    local ctrl = loadSwitchController()
+    if type(ctrl) ~= "table" or type(ctrl.RequestSpeakerSwitch) ~= "function" then
+        return false
+    end
+    local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
+    if not player then return false end
+    local roster = {}
+    if Resolver and type(Resolver.CollectNearbyTargets) == "function" then
+        local ok, nearby = pcall(Resolver.CollectNearbyTargets, player, nil, State.scope or Config.SCOPE_COLONISTS)
+        if ok and type(nearby) == "table" then roster = nearby end
+    end
+    if #roster < 2 and type(State.entries) == "table" and #State.entries >= 2 then
+        roster = State.entries
+    end
+    if #roster < 2 then return false end
+    local currentIndex = 1
+    for i = 1, #roster do
+        if tostring(roster[i] and roster[i].id or "") == tostring(State.targetID or "") then
+            currentIndex = i
+            break
+        end
+    end
+    return ctrl.RequestSpeakerSwitch(State.host, direction, {
+        roster = roster,
+        currentIndex = currentIndex,
+        applySwitch = function(nextActor)
+            if not nextActor then return end
+            State.targetID = tostring(nextActor.id or "")
+            local nextResolved = { primary = nextActor, targets = { nextActor }, scope = State.scope }
+            if Hosts.Rebuild(player, nextResolved, State.mode) then
+                if State.part then
+                    State.part.owner = State.host
+                    if State.part.refreshControls then State.part:refreshControls() end
+                end
+                Targets.RefreshHighlights(0)
+                Targets.Position(0, player)
+            end
+        end,
+    })
+end
+
+local function closeInlineAsGoodbye()
+    local ctrl = loadSwitchController()
+    if type(ctrl) == "table" and type(ctrl.TriggerStandardizedGoodbye) == "function" then
+        local actor = State.target or { id = State.targetID }
+        ctrl.TriggerStandardizedGoodbye(State.host, function()
+            InlineChat.Close("goodbye")
+        end, {
+            actor = actor,
+            salt = "inline:" .. tostring(State.targetID or ""),
+        })
+        return
+    end
+    InlineChat.Close("user_closed")
+end
+
 function InlineChat.Submit(view, value, part)
     local input = semanticInput()
     local accepted, reason
@@ -125,8 +188,10 @@ function InlineChat.Open(binding)
         maxInputLines = 6,
         maxInputHeight = 122,
         showClose = true,
-        onClose = function() InlineChat.Close("user_closed") end,
+        onClose = closeInlineAsGoodbye,
         closeTitle = "X",
+        onPrevTarget = function() return switchInlineTarget(-1) end,
+        onNextTarget = function() return switchInlineTarget(1) end,
     })
     if not part then return reject("input_widget_unavailable") end
     part:initialise()

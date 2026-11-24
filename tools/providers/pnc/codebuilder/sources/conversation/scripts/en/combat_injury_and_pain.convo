@@ -1,0 +1,274 @@
+# Combat injury callouts, received-wound reactions, ally wound cover, immediate pain barks, and visible injury observations.
+lang EN
+namespace hoomans
+
+blueprint offer.combat_injury_nudges
+  offer combat.injury.check_where_hit:
+    label: "Ask where you're hit and how bad it is"
+    say: "Where did they get you? Is that wrap still holding?"
+    utility: directness
+    intent: QUESTION
+    subject: COMBAT_INJURY
+  offer combat.injury.offer_cover_wrap:
+    when: [medical.open_wounds]
+    label: "Cover them while they patch up"
+    say: "I have eyes on the dead. Tie that wound off right now!"
+    utility: openness
+    intent: ACCEPT
+    subject: COMBAT_INJURY
+  offer combat.injury.check_bite_exposure:
+    when: [medical.is_bitten]
+    label: "Check the bite mark immediately"
+    say: "Wait, was that teeth? Let me see that bite right now!"
+    utility: directness
+    intent: WARN
+    subject: COMBAT_INJURY
+
+flow semantic.combat.fighting.injured_callout
+  use offer.combat_injury_nudges
+  say [role=with_wounds_head_neck_critical] (pri 12) as with_wounds_head_neck_critical:
+    "Blood is getting in my eyes, {addressee.name}! My {slot.wound.part} is torn open, keep them off me!"
+  say [role=with_wounds_head_neck] (pri 12) as with_wounds_head_neck:
+    "Watch my blind side, {addressee.name}, took an open cut to my {slot.wound.part}!"
+  say [role=with_wounds_torso_critical] (pri 12) as with_wounds_torso_critical:
+    "Holding my ribs together, {addressee.name}! Open wound on my {slot.wound.part}, don't let them close in!"
+  say [role=with_wounds_torso] (pri 12) as with_wounds_torso:
+    "Still standing, {addressee.name}, though my {slot.wound.part} is bleeding through my shirt!"
+  say [role=with_wounds_pelvis_groin_severe] (pri 12) as with_wounds_pelvis_groin_severe:
+    "My hip and {slot.wound.part} are torn open, {addressee.name}! I can barely pivot, hold my flank!"
+  say [role=with_wounds_pelvis_groin] (pri 12) as with_wounds_pelvis_groin:
+    "Caught an open gash across my {slot.wound.part}, {addressee.name}, can't twist fast so watch my side!"
+  say [role=with_wounds_upper_limb_severe] (pri 12) as with_wounds_upper_limb_severe:
+    "My {slot.wound.part} is bleeding bad, {addressee.name}, weapon feels heavy but I'm not stopping!"
+  say [role=with_wounds_upper_limb] (pri 12) as with_wounds_upper_limb:
+    "Got an open wound on my {slot.wound.part}, {addressee.name}, still fighting though!"
+  say [role=with_wounds_lower_limb_severe] (pri 12) as with_wounds_lower_limb_severe:
+    "My {slot.wound.part} is giving way, {addressee.name}! Can't sprint with this bleeding wound, hold the line!"
+  say [role=with_wounds_lower_limb] (pri 12) as with_wounds_lower_limb:
+    "Footwork's sluggish with this open hit on my {slot.wound.part}, {addressee.name}, stay tight with me!"
+  say [role=with_wounds_minor] (pri 12) as with_wounds_minor:
+    "Still fighting through a fresh {slot.wound.label} on my {slot.wound.part}, {addressee.name}, we got this."
+  say [role=with_wounds_dirty_bandage] (pri 12) as with_wounds_dirty_bandage:
+    "The dressing on my {slot.wound.part} is soaked filthy, {addressee.name}! I need a clean wrap once we clear!"
+  say [role=patched_up_head_neck_severe] (pri 12) as patched_up_head_neck_severe:
+    "Bandages around my {slot.wound.part} are barely holding, {addressee.name}, help me finish these fast!"
+  say [role=patched_up_head_neck] (pri 12) as patched_up_head_neck:
+    "Dressing on my {slot.wound.part} is holding for now, {addressee.name}, keep fighting!"
+  say [role=patched_up_torso_severe] (pri 12) as patched_up_torso_severe:
+    "Wraps across my {slot.wound.part} are soaking red, {addressee.name}, help me drop the rest quick!"
+  say [role=patched_up_torso] (pri 12) as patched_up_torso:
+    "Bandage on my {slot.wound.part} is holding, {addressee.name}, breathing hurts a bit but I'm steady."
+  say [role=patched_up_pelvis_groin_severe] (pri 12) as patched_up_pelvis_groin_severe:
+    "Bound my {slot.wound.part} as tight as I could, {addressee.name}, can't lunge far so keep them in front!"
+  say [role=patched_up_pelvis_groin] (pri 12) as patched_up_pelvis_groin:
+    "Got my {slot.wound.part} wrapped up, {addressee.name}, stride's short but I'm holding the line!"
+  say [role=patched_up_upper_limb_severe] (pri 12) as patched_up_upper_limb_severe:
+    "Wrap on my {slot.wound.part} is tight, {addressee.name}, hurts like hell to swing but I'll keep swinging!"
+  say [role=patched_up_upper_limb] (pri 12) as patched_up_upper_limb:
+    "Bandaged my {slot.wound.part} and I'm still fighting, {addressee.name}, watch the left!"
+  say [role=patched_up_lower_limb_severe] (pri 12) as patched_up_lower_limb_severe:
+    "Dressing on my {slot.wound.part} is taking all I've got, {addressee.name}, stay on my shoulder!"
+  say [role=patched_up_lower_limb] (pri 12) as patched_up_lower_limb:
+    "Got my {slot.wound.part} patched up, {addressee.name}, still standing my ground!"
+  say [role=patched_up_minor] (pri 12) as patched_up_minor:
+    "Already patched that scrape on my {slot.wound.part}, {addressee.name}, ready to clear the rest."
+  say [role=with_wounds_bite_lethal] (pri 12) as with_wounds_bite_lethal:
+    "I'm bleeding from this bite on my {slot.wound.part}, {addressee.name}! I'll fight till I drop, keep them off me!"
+  say [role=with_wounds_bite_possible_exposure] (pri 12) as with_wounds_bite_possible_exposure:
+    "Teeth tore my {slot.wound.part}, {addressee.name}! I don't feel feverish yet, just help me fight clear so I can wrap it!"
+  say [role=with_wounds_bite_confirmed_symptomatic] (pri 12) as with_wounds_bite_confirmed_symptomatic:
+    "Fever's burning and my {slot.wound.part} bite is still bleeding, {addressee.name}! Let me take these dead down with me!"
+  say [role=with_wounds_bite_non_transmissible] (pri 12) as with_wounds_bite_non_transmissible:
+    "Fighting with an open bite on my {slot.wound.part}, {addressee.name}, hurts awful but saliva won't turn me!"
+  say [role=patched_up_bite_lethal] (pri 12) as patched_up_bite_lethal:
+    "Wrapped the bite on my {slot.wound.part}, {addressee.name}, buying every minute I can to help you clear out!"
+  say [role=patched_up_bite_possible_exposure] (pri 12) as patched_up_bite_possible_exposure:
+    "Wrapped the bite on my {slot.wound.part} tight, {addressee.name}, praying the fever doesn't come while we clear this!"
+  say [role=patched_up_bite_confirmed_symptomatic] (pri 12) as patched_up_bite_confirmed_symptomatic:
+    "Bite on my {slot.wound.part} is wrapped, {addressee.name}, but the fever's setting in—let me hold the front for you!"
+  say [role=patched_up_bite_non_transmissible] (pri 12) as patched_up_bite_non_transmissible:
+    "Got the bite on my {slot.wound.part} wrapped tight, {addressee.name}, sore as hell but I'm not turning!"
+  say [default] (pri 5) as default:
+    "Still fighting with a hit on my {slot.wound.part}, {addressee.name}, keep our spacing tight!"
+
+flow semantic.combat.wound.received_beat
+  use offer.combat_injury_nudges
+  say [combat.wound_type=bite_lethal] (pri 12) as bite_lethal:
+    "No, no! It bit my {slot.wound.part}, {addressee.name}! Teeth went straight through!"
+  say [combat.wound_type=bite_possible_exposure] (pri 12) as bite_possible_exposure:
+    "Agh! Teeth broke skin on my {slot.wound.part}, {addressee.name}! Help me clear out so we can see how deep that bite went!"
+  say [combat.wound_type=bite_confirmed_symptomatic] (pri 12) as bite_confirmed_symptomatic:
+    "My skin's burning up and that bite on my {slot.wound.part} is throbbing, {addressee.name}! The fever's taking hold!"
+  say [combat.wound_type=bite_non_transmissible] (pri 12) as bite_non_transmissible:
+    "Agh! Teeth tore right into my {slot.wound.part}, {addressee.name}! Hurts like hell, help me wrap it once we clear!"
+  say [combat.wound_type=bullet] (pri 12) as bullet:
+    "I'm shot! Took a round in my {slot.wound.part}, {addressee.name}!"
+  say [combat.wound_type=deep_wound_glass] (pri 12) as deep_wound_glass:
+    "Agh! Glass went deep into my {slot.wound.part}, {addressee.name}, bleeding everywhere!"
+  say [combat.wound_type=deep_wound] (pri 12) as deep_wound:
+    "Ripped wide open on my {slot.wound.part}, {addressee.name}! Deep gash, I need stitches after this!"
+  say [combat.wound_type=fracture] (pri 12) as fracture:
+    "Crack! Something snapped in my {slot.wound.part}, {addressee.name}!"
+  say [combat.wound_type=burn] (pri 12) as burn:
+    "Agh! Burned my {slot.wound.part}, {addressee.name}, skin's blistering bad!"
+  say [combat.wound_type=laceration] (pri 12) as laceration:
+    "Slashed my {slot.wound.part}, {addressee.name}! Nasty laceration, keep them back!"
+  say [combat.wound_type=scratch] (pri 12) as scratch:
+    "Tch, grazed my {slot.wound.part}, {addressee.name}, just a scratch."
+  say [combat.wound_type=post_combat_injury_check] (pri 12) as post_combat_injury_check:
+    "Area's clear, {addressee.name}, but this {slot.wound.label} on my {slot.wound.part} needs attention right now."
+  say [combat.wound_type=severity_escalation] (pri 12) as severity_escalation:
+    "My {slot.wound.part} is getting worse, {addressee.name}! I'm losing too much blood!"
+  say [combat.wound_type=bandage_dirty] (pri 12) as bandage_dirty:
+    "Bandage on my {slot.wound.part} is soaked and dirty, {addressee.name}, I need a fresh dressing soon."
+  say [combat.wound_type=treatment_stabilized] (pri 12) as treatment_stabilized:
+    "Got my {slot.wound.part} bound up tight, {addressee.name}. Bleeding's finally under control."
+  say [combat.wound_type=knox_symptom_onset] (pri 12) as knox_symptom_onset:
+    "Stomach's turning and my skin feels clammy, {addressee.name}... something's wrong after that wound on my {slot.wound.part}."
+  say [combat.wound_type=fever_onset] (pri 12) as fever_onset:
+    "Burning up with fever, {addressee.name}... my head is pounding and I can barely focus."
+  say [combat.wound_type=cold_illness_onset] (pri 12) as cold_illness_onset:
+    "Caught a nasty chill in my chest, {addressee.name}, can't stop coughing and sneezing."
+  say [combat.wound_type=hypothermia_onset] (pri 12) as hypothermia_onset:
+    "Hands are numb and I can't stop shivering, {addressee.name}! I'm freezing out here!"
+  say [combat.wound_type=hyperthermia_onset] (pri 12) as hyperthermia_onset:
+    "Dizzy from the heat, {addressee.name}... I'm overheating in this gear!"
+  say [combat.wound_type=soaked_chill] (pri 12) as soaked_chill:
+    "Soaked to the bone and shivering, {addressee.name}—I'll catch a fever if I stay wet like this."
+  say [default] (pri 5) as default:
+    "Took a hit to my {slot.wound.part}, {addressee.name}, watch that angle!"
+
+flow semantic.combat.wound.ally_reaction
+  use offer.combat_injury_nudges
+  say [role=close_bond_bite_lethal] (pri 12) as close_bond_bite_lethal:
+    "No! Don't talk like that, {addressee.name}! Stay beside me, I'm not leaving you out here!"
+  say [role=close_bond_critical] (pri 12) as close_bond_critical:
+    "Stay with me, {addressee.name}! Don't you dare go down on my watch, I've got you!"
+  say [role=close_bond_patched] (pri 12) as close_bond_patched:
+    "Easy, {addressee.name}, watch that patched {slot.wound.part}! Stick right by my shoulder, I'm not losing you!"
+  say [role=supportive_cover_wounded] (pri 12) as supportive_cover_wounded:
+    "Fall back behind me, {addressee.name}, your {slot.wound.part} needs wrapping before you bleed out!"
+  say [role=supportive_cover_patched] (pri 12) as supportive_cover_patched:
+    "Watch your dressing on that {slot.wound.part}, {addressee.name}, shout if it starts soaking through!"
+  say [role=tactical_cover_wounded] (pri 12) as tactical_cover_wounded:
+    "Copy that, {addressee.name}, pull behind the line and tie off your {slot.wound.part}!"
+  say [role=tactical_cover_patched] (pri 12) as tactical_cover_patched:
+    "Keep your {slot.wound.part} protected, {addressee.name}, we hold spacing until clear!"
+  say [role=squad_crossfire_wingman] (pri 12) as squad_crossfire_wingman:
+    "I'm closing the gap on your flank, {addressee.name}! Squad, tighten up and cover that {slot.wound.part}!"
+  say [role=bite_non_transmissible_relief] (pri 12) as bite_non_transmissible_relief:
+    "You're not turning, {addressee.name}, saliva doesn't spread it! Keep pressure on your {slot.wound.part} and keep moving!"
+  say [role=low_rel_dismissive] (pri 12) as low_rel_dismissive:
+    "Quit groaning about your {slot.wound.part}, {addressee.name}, either hold your corner or get out of my way."
+  say [role=low_rel_bite_execution_threat] (pri 12) as low_rel_bite_execution_threat:
+    "You got bit, {addressee.name}. Stay five steps back, and the second you look feverish I'm ending you."
+  say [role=psychopath_bite_execution_threat] (pri 12) as psychopath_bite_execution_threat:
+    "You're bitten, {addressee.name}. Forget bandages. I'm putting you down myself before you turn on us."
+  say [default] (pri 5) as default:
+    "Stay sharp on your feet, {addressee.name}, keep watching your {slot.wound.part}!"
+
+flow semantic.combat.injury.pain_reaction
+  use offer.combat_injury_nudges
+  say [role=scratch_minor] (pri 12) as scratch_minor:
+    "Ah, scratched my {slot.wound.part}!"
+  say [role=scratch_stoic] (pri 12) as scratch_stoic:
+    "Hmph. Barely grazed my {slot.wound.part}."
+  say [role=scratch_aggressive] (pri 12) as scratch_aggressive:
+    "Bastard nicked my {slot.wound.part}!"
+  say [role=laceration_moderate] (pri 12) as laceration_moderate:
+    "Gah! Cut open my {slot.wound.part}!"
+  say [role=laceration_severe] (pri 12) as laceration_severe:
+    "Agh! Torn deep across my {slot.wound.part}, bleeding fast!"
+  say [role=laceration_aggressive] (pri 12) as laceration_aggressive:
+    "Son of a bitch sliced my {slot.wound.part}!"
+  say [role=laceration_stoic] (pri 12) as laceration_stoic:
+    "Ngh, bad cut on my {slot.wound.part}. Still standing."
+  say [role=fracture] (pri 12) as fracture:
+    "Crack, agh! Something broke in my {slot.wound.part}!"
+  say [role=deep_wound] (pri 12) as deep_wound:
+    "Gah! Ripped wide open on my {slot.wound.part}!"
+  say [role=deep_wound_glass] (pri 12) as deep_wound_glass:
+    "Agh! Shards drove straight into my {slot.wound.part}!"
+  say [role=burn] (pri 12) as burn:
+    "Agh! Searing burn across my {slot.wound.part}!"
+  say [role=bullet] (pri 12) as bullet:
+    "Agh, I'm shot! Round hit my {slot.wound.part}!"
+  say [role=bullet_stoic] (pri 12) as bullet_stoic:
+    "Ngh, took a round in my {slot.wound.part}!"
+  say [role=bite] (pri 12) as bite:
+    "No, agh! Teeth sank into my {slot.wound.part}!"
+  say [role=bite_panicked] (pri 12) as bite_panicked:
+    "No, no, no! It bit my {slot.wound.part}, get it off me!"
+  say [role=bite_non_transmissible] (pri 12) as bite_non_transmissible:
+    "Agh! Filthy teeth tore my {slot.wound.part}, won't turn me, but it's bleeding hard!"
+  say [role=multiple_hits_severe] (pri 12) as multiple_hits_severe:
+    "Agh, another hard hit on my {slot.wound.part}! I'm taking too many wounds!"
+  say [default] (pri 5) as default:
+    "Gah, took a hit to my {slot.wound.part}!"
+
+flow semantic.combat.injury.visible_observation
+  use offer.combat_injury_nudges
+  say [role=open_wound] (pri 12) as open_wound:
+    "You've got an open wound on your {slot.wound.part}, {addressee.name}. You should get that covered."
+  say [role=heavy_bleeding] (pri 12) as heavy_bleeding:
+    "You're bleeding hard from your {slot.wound.part}, {addressee.name}! Patch it up right now!"
+  say [role=dirty_bandage] (pri 12) as dirty_bandage:
+    "That bandage on your {slot.wound.part} looks filthy, {addressee.name}. Change it when you can."
+  say [role=suspected_infection] (pri 12) as suspected_infection:
+    "That wound on your {slot.wound.part} might be infected, {addressee.name}."
+  say [role=medic_infection_assessment] (pri 12) as medic_infection_assessment:
+    "Hold still, {addressee.name}. That wound on your {slot.wound.part} is inflamed, we need to disinfect and dress it."
+  say [role=medic_triage_offer] (pri 12) as medic_triage_offer:
+    "Hold still, {addressee.name}. Let me see that {slot.wound.part}."
+  say [role=limp_mobility] (pri 12) as limp_mobility:
+    "You're favoring your {slot.wound.part} and limping, {addressee.name}. Don't push your stride too hard."
+  say [role=multiple_wounds_escalation] (pri 12) as multiple_wounds_escalation:
+    "You got hit again on your {slot.wound.part}, {addressee.name}! You're taking too many wounds!"
+  say [role=new_wound_noticed] (pri 12) as new_wound_noticed:
+    "Wait, {addressee.name}, you took a new hit on your {slot.wound.part} too?"
+  say [role=visible_bite] (pri 12) as visible_bite:
+    "Wait... is that a bite mark on your {slot.wound.part}, {addressee.name}?"
+  say [role=feverish_weak] (pri 12) as feverish_weak:
+    "You look feverish, {addressee.name}. Can you sit for a minute?"
+  say [role=aid_supply_offer] (pri 12) as aid_supply_offer:
+    "I've got a bandage I can spare. Want it?"
+  say [role=aid_treatment_offer] (pri 12) as aid_treatment_offer:
+    "If you can hold still, I can put a dressing on that."
+  say [role=aid_no_supply] (pri 12) as aid_no_supply:
+    "I don't have any bandages either."
+  say [role=aid_refused] (pri 12) as aid_refused:
+    "I can't spare a dressing right now."
+  say [role=aid_acknowledged] (pri 12) as aid_acknowledged:
+    "All right. Let me know if that changes."
+  say [role=aid_dismissed] (pri 12) as aid_dismissed:
+    "Fine. I'll give you some room."
+  say [role=aid_taken] (pri 12) as aid_taken:
+    "There. You've got a bandage now."
+  say [role=aid_treated] (pri 12) as aid_treated:
+    "There. The dressing's on."
+  say [role=aid_changed] (pri 12) as aid_changed:
+    "Hang on. I can't help with it right now."
+  say [role=observer_supportive] (pri 12) as observer_supportive:
+    "Sit down a second. Let me help you with that."
+  say [role=observer_clinical] (pri 12) as observer_clinical:
+    "Hold still. Let me take a look at that wound."
+  say [role=observer_protective] (pri 12) as observer_protective:
+    "Get that wound covered before we move."
+  say [role=observer_dismissive] (pri 12) as observer_dismissive:
+    "Get that dealt with. We can't keep stopping."
+  say [role=observer_hostile] (pri 12) as observer_hostile:
+    "That's your problem. Keep it away from me."
+  say [role=aid_scarce] (pri 12) as aid_scarce:
+    "It's the last dressing I've got. I need to keep it."
+  say [role=aid_disappointed] (pri 12) as aid_disappointed:
+    "You went out without a dressing? I can spare this one."
+  say [role=aid_hostile] (pri 12) as aid_hostile:
+    "Sounds like your problem."
+  say [role=aid_gratitude] (pri 12) as aid_gratitude:
+    "Anytime. Take it easy for a minute."
+  say [role=aid_debt] (pri 12) as aid_debt:
+    "You don't owe me anything. Just get better."
+  say [role=aid_reassured] (pri 12) as aid_reassured:
+    "I'm sure. You're the one who needs it."
+  say [default] (pri 5) as default:
+    "You're hurt on your {slot.wound.part}, {addressee.name}. Take care of that wound."

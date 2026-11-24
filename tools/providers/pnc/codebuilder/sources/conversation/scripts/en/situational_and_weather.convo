@@ -1,0 +1,73 @@
+# Situational greetings, offers, and weather-gate flow responses.
+lang EN
+namespace hoomans
+
+flow semantic.flow.weather.raining
+  say [default] (pri 6) as default:
+    "It is raining right now. I would wait for a break. {?clause.rain_note}"
+
+flow semantic.flow.weather.clear
+  say [default] (pri 6) as default:
+    "The weather looks clear right now{end} {?clause.night_warning}"
+
+flow semantic.flow.weather.unknown
+  say [default] (pri 6) as default:
+    "I cannot confirm the weather from here."
+
+flow semantic.greeting
+  say [npc.fed_up] (pri 13) as fed_up:
+    "What now? You've been talking my ear off."
+  say [player.rude] (pri 12) as rude_player:
+    "{glue.pushback_rude} what do you want?"
+  say [mood.panicked] (pri 12) as panicked:
+    "Hey—keep it quick, I've got a bad feeling out here!"
+  say [mood.in_pain] (pri 12) as in_pain:
+    "Ngh... hey, {?term.address}. Not doing great right now."
+  say [rel.bond=lover|spouse] (pri 11) as lover:
+    "Hey, {?term.address}! Good to have a moment with you. {?mood.tail}"
+  say [rel.bond=parent] (pri 11) as parent:
+    "Hey, {?term.address}. Glad you're safe. {?mood.tail}"
+  say [rel.bond=child] (pri 11) as child:
+    "Hey, {?term.address}! Everything okay?"
+  say [actor.role=looter|bandit] (pri 11) as bandit_looter:
+    "Hold it right there, {?term.address}. {?role.greeting_tail}"
+  say [actor.role=trader] (pri 10) as trader:
+    "Good to see you, {?term.address}. {?role.greeting_tail}"
+  say [rel.state=FirstMeet] (pri 9) as first_meet:
+    "Hey. Don't think we've met. {?clause.night_warning}"
+  say [actor.role=colonist, state.working] (pri 9) as colonist_working:
+    "{?mood.opener} Hey, {?term.address}. {?role.greeting_tail} {?clause.world_pressure}"
+  say [actor.role=colonist, state.sitting] (pri 9) as colonist_sitting:
+    "Hey, {?term.address}. {?role.greeting_tail} {?mood.tail}"
+  say [actor.role=companion] (pri 9) as companion:
+    "Hey, {?term.address}! {?role.greeting_tail} {?mood.tail}"
+  say [env.time_band=dawn] (pri 8) as dawn:
+    "Good morning—early start, {?term.address}{end} {?role.greeting_tail}"
+  say [env.raining] (pri 8) as rain:
+    "Hey there. Wet one today. {?clause.rain_note}"
+  say [env.foggy] (pri 8) as fog:
+    "Hey there. Hard to see much in this fog."
+  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] (pri 7) as thirsty:
+    "Hey there. You wouldn't happen to have water, would you?"
+  say [actor.busy] (pri 7) as busy:
+    "Hey. I'm in the middle of something."
+  say [actor.social_style=friendly] (pri 7) as friendly:
+    "Hey! Good to see you, {?term.address}. {?mood.tail}"
+  say [actor.social_style=withdrawn] (pri 7) as withdrawn:
+    "Hey."
+  say [default] (pri 5) as default:
+    "Hey there, {?term.address}{end} {?role.greeting_tail} {?mood.tail}"
+
+flow semantic.offer
+  say [emotion.type=stress|panic, emotion.urgency=moderate|severe|critical|emergency] (pri 10) as stressed:
+    "I appreciate it, but I need a moment before I can think about food."
+  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] (pri 9) as hungry:
+    "I'd really like one. Could I have it?"
+  say [rel.state=Friend|Trusted|Ally|Member|Lover] (pri 8) as trusted:
+    "Thanks. I know I can count on you."
+  say [actor.social_style=friendly] (pri 8) as friendly:
+    "That's kind of you. I'll keep it in mind."
+  say [actor.social_style=withdrawn] (pri 8) as withdrawn:
+    "No, thanks. I'd rather handle it myself."
+  say [default] (pri 5) as default:
+    "No thanks, I'm not hungry."

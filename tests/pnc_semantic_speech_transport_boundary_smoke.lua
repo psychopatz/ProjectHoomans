@@ -224,8 +224,8 @@ T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueRouter.lu
 T.load("ProjectHoomans", "common_lua", "PNC/ConvoEngine/Registry.lua")
 T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/Dialogue/ResponseCatalog.lua")
 T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/SpeechRealization.lua")
-T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/ResponseCatalog/EventReactions_Core.lua")
-T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/ResponseCatalog/Social_Conflict.lua")
+T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/ResponseCatalog/Generated/Init.lua")
+T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/ResponseCatalog/Generated/Init.lua")
 T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/Social/Reaction.lua")
 T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/CombatBanterArbiter.lua")
 

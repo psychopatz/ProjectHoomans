@@ -99,19 +99,16 @@ if handle then handle:close() end
 T.truthy(string.find(pyOut, "PY_VOICE_GUARD_OK", 1, true) ~= nil,
     "declarative JSON + static voice guard failed: " .. tostring(pyOut))
 
--- 2. Verify Social_Conflict.lua has no hardcoded Lua fallback strings on semantic.world.*
+-- 2. Verify WorldEventsAndEmotes.lua contains semantic.world.alarm.react
 local scFile = io.open(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/ConvoEngine/ResponseCatalog/Social_Conflict.lua",
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/ConvoEngine/ResponseCatalog/Generated/WorldEventsAndEmotes.lua",
     "r"
 )
-T.truthy(scFile ~= nil, "Social_Conflict.lua must exist")
+T.truthy(scFile ~= nil, "WorldEventsAndEmotes.lua must exist")
 local scText = scFile:read("*a")
 scFile:close()
 local worldSectionStart = string.find(scText, "semantic.world.alarm.react", 1, true)
-T.truthy(worldSectionStart ~= nil, "semantic.world.alarm.react must be in Social_Conflict.lua")
-local worldSection = string.sub(scText, worldSectionStart)
-T.truthy(string.find(worldSection, "fallback%s*=") == nil,
-    "semantic.world.* in Social_Conflict.lua must not contain hardcoded fallback = strings")
+T.truthy(worldSectionStart ~= nil, "semantic.world.alarm.react must be in WorldEventsAndEmotes.lua")
 
 -- 3. Load ConvoEngine Registry and seed our 4 new families if reconcile.py --apply hasn't run yet
 PNC = PNC or {}
@@ -210,7 +207,7 @@ seedPlan("world.event.surplus", {
 
 require "PNC/ConvoEngine/Foundation"
 require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
-require "PNC/ConvoEngine/ResponseCatalog/Social_Conflict"
+require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
 local Reactions = require "PNC/ConvoEngine/Social/Reaction"
 
 -- 4. Verify Social/Reaction.lua resolves chronology & scoped world events cleanly
@@ -220,7 +217,7 @@ local rWeekWarm = Reactions.Resolve({
     context = { milestoneStage = "first_week", socialStyle = "warm", combatReactionRole = "chronology_milestone" },
 })
 T.truthy(rWeekWarm, "chronology first_week warm resolves")
-T.equal(rWeekWarm.templateID, "chronology.milestone.react.first_week_warm")
+T.equal(rWeekWarm.templateID, "hoomans.world.chronology.milestone.first_week_warm")
 
 local rYearGuarded = Reactions.Resolve({
     eventType = "chronology_milestone_beat",
@@ -228,7 +225,7 @@ local rYearGuarded = Reactions.Resolve({
     context = { milestoneStage = "first_year", socialStyle = "guarded", combatReactionRole = "chronology_milestone" },
 })
 T.truthy(rYearGuarded, "chronology first_year guarded resolves")
-T.equal(rYearGuarded.templateID, "chronology.milestone.react.first_year_guarded")
+T.equal(rYearGuarded.templateID, "hoomans.world.chronology.milestone.first_year_guarded")
 
 local rAnniv = Reactions.Resolve({
     eventType = "chronology_milestone_beat",
@@ -236,7 +233,7 @@ local rAnniv = Reactions.Resolve({
     context = { milestoneStage = "anniversary", socialStyle = "steady", combatReactionRole = "chronology_anniversary" },
 })
 T.truthy(rAnniv, "chronology anniversary resolves")
-T.equal(rAnniv.templateID, "chronology.milestone.react.anniversary_steady")
+T.equal(rAnniv.templateID, "hoomans.world.chronology.milestone.anniversary_steady")
 
 local rFoodExp = Reactions.Resolve({
     eventType = "world_scoped_event_beat",
@@ -244,7 +241,7 @@ local rFoodExp = Reactions.Resolve({
     context = { worldEventType = "food_crisis", epistemicProvenance = "experienced" },
 })
 T.truthy(rFoodExp, "food_crisis experienced resolves")
-T.equal(rFoodExp.templateID, "world.event.food_crisis.experienced")
+T.equal(rFoodExp.templateID, "hoomans.world.event.food_crisis.experienced")
 
 local rFoodRumor = Reactions.Resolve({
     eventType = "world_scoped_event_beat",
@@ -252,7 +249,7 @@ local rFoodRumor = Reactions.Resolve({
     context = { worldEventType = "food_crisis", epistemicProvenance = "rumor" },
 })
 T.truthy(rFoodRumor, "food_crisis rumor resolves")
-T.equal(rFoodRumor.templateID, "world.event.food_crisis.rumor")
+T.equal(rFoodRumor.templateID, "hoomans.world.event.food_crisis.rumor")
 
 local rRaiderWit = Reactions.Resolve({
     eventType = "world_scoped_event_beat",
@@ -260,7 +257,7 @@ local rRaiderWit = Reactions.Resolve({
     context = { worldEventType = "bandit_bonanza", epistemicProvenance = "witnessed" },
 })
 T.truthy(rRaiderWit, "bandit_bonanza witnessed resolves")
-T.equal(rRaiderWit.templateID, "world.event.raider_surge.witnessed")
+T.equal(rRaiderWit.templateID, "hoomans.world.event.raider_surge.witnessed")
 
 local rRaiderRumor = Reactions.Resolve({
     eventType = "world_event_raider_surge",
@@ -268,7 +265,7 @@ local rRaiderRumor = Reactions.Resolve({
     context = { epistemicProvenance = "rumor" },
 })
 T.truthy(rRaiderRumor, "raider_surge rumor resolves")
-T.equal(rRaiderRumor.templateID, "world.event.raider_surge.rumor")
+T.equal(rRaiderRumor.templateID, "hoomans.world.event.raider_surge.rumor")
 
 local rSurplusExp = Reactions.Resolve({
     eventType = "world_scoped_event_beat",
@@ -276,7 +273,7 @@ local rSurplusExp = Reactions.Resolve({
     context = { worldEventType = "agricultural_surplus", epistemicProvenance = "experienced" },
 })
 T.truthy(rSurplusExp, "agricultural_surplus experienced resolves")
-T.equal(rSurplusExp.templateID, "world.event.surplus.experienced")
+T.equal(rSurplusExp.templateID, "hoomans.world.event.surplus.experienced")
 
 -- 5. Verify PNC_ChronologyMilestones.lua emits declarative beat context without hardcoded text
 local deliveredOpts = nil

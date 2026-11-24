@@ -50,26 +50,24 @@ function Formatter.CleanLocation(raw)
     return cleaned
 end
 
-function Formatter.ResolveToken(tokens, key)
+function Formatter.ResolveTokenRaw(tokens, key)
     if type(tokens) ~= "table" or type(key) ~= "string" or key == "" then
         return nil
     end
     local direct = tokens[key]
-    if direct ~= nil and type(direct) ~= "table" then
-        local cleaned = trim(direct)
-        if cleaned ~= "" then return cleaned end
-        return nil
-    end
+    if direct ~= nil then return direct end
     local cursor = tokens
     for part in string.gmatch(key, "[^%.]+") do
-        if type(cursor) ~= "table" then
-            cursor = nil
-            break
-        end
+        if type(cursor) ~= "table" then return nil end
         cursor = cursor[part]
     end
-    if cursor ~= nil and type(cursor) ~= "table" then
-        local cleaned = trim(cursor)
+    return cursor
+end
+
+function Formatter.ResolveToken(tokens, key)
+    local raw = Formatter.ResolveTokenRaw(tokens, key)
+    if raw ~= nil and type(raw) ~= "table" then
+        local cleaned = trim(raw)
         if cleaned ~= "" then return cleaned end
     end
     return nil
@@ -78,30 +76,30 @@ end
 local function collapseMissingTokens(text)
     if not string.find(text, "{", 1, true) then return text end
     local out = text
-    local strippedLeading = string.find(out, "^%s*{[%w_%.]+}") ~= nil
+    local strippedLeading = string.find(out, "^%s*{[^}]+}") ~= nil
 
     -- Leading optional token with trailing separator (comma, colon, semicolon, dash, em-dash).
-    out = string.gsub(out, "^%s*{[%w_%.]+}%s*\226\128\148%s*", "")
-    out = string.gsub(out, "^%s*{[%w_%.]+}%s*%-%-%s*", "")
-    out = string.gsub(out, "^%s*{[%w_%.]+}%s*[,;:!%-]*%s*", "")
+    out = string.gsub(out, "^%s*{[^}]+}%s*\226\128\148%s*", "")
+    out = string.gsub(out, "^%s*{[^}]+}%s*%-%-%s*", "")
+    out = string.gsub(out, "^%s*{[^}]+}%s*[,;:!%-]*%s*", "")
 
     -- Parenthesized optional token.
-    out = string.gsub(out, "%s*%({[%w_%.]+}%)", "")
+    out = string.gsub(out, "%s*%({[^}]+}%)", "")
 
     -- Comma- or dash-bounded middle vocative: "Hey, {addressee.name}, watch out".
-    out = string.gsub(out, ",%s*{[%w_%.]+}%s*,%s*", ", ")
-    out = string.gsub(out, "%s*\226\128\148%s*{[%w_%.]+}%s*\226\128\148%s*", " ")
-    out = string.gsub(out, "%s*%-%-%s*{[%w_%.]+}%s*%-%-%s*", " ")
+    out = string.gsub(out, ",%s*{[^}]+}%s*,%s*", ", ")
+    out = string.gsub(out, "%s*\226\128\148%s*{[^}]+}%s*\226\128\148%s*", " ")
+    out = string.gsub(out, "%s*%-%-%s*{[^}]+}%s*%-%-%s*", " ")
 
     -- Trailing or pre-punctuation vocative: "Watch out, {addressee.name}!".
-    out = string.gsub(out, ",%s*{[%w_%.]+}%s*([%.%!%?%;%:])", "%1")
-    out = string.gsub(out, "\226\128\148%s*{[%w_%.]+}%s*([%.%!%?%;%:])", "%1")
-    out = string.gsub(out, "{[%w_%.]+}%s*,%s*", "")
-    out = string.gsub(out, ",%s*{[%w_%.]+}", "")
-    out = string.gsub(out, "\226\128\148%s*{[%w_%.]+}", "")
-    out = string.gsub(out, "{[%w_%.]+}%s*\226\128\148%s*", "")
-    out = string.gsub(out, "%s+{[%w_%.]+}%s*([%.%!%?%;%:,])", "%1")
-    out = string.gsub(out, "%s*{[%w_%.]+}%s*", " ")
+    out = string.gsub(out, ",%s*{[^}]+}%s*([%.%!%?%;%:])", "%1")
+    out = string.gsub(out, "\226\128\148%s*{[^}]+}%s*([%.%!%?%;%:])", "%1")
+    out = string.gsub(out, "{[^}]+}%s*,%s*", "")
+    out = string.gsub(out, ",%s*{[^}]+}", "")
+    out = string.gsub(out, "\226\128\148%s*{[^}]+}", "")
+    out = string.gsub(out, "{[^}]+}%s*\226\128\148%s*", "")
+    out = string.gsub(out, "%s+{[^}]+}%s*([%.%!%?%;%:,])", "%1")
+    out = string.gsub(out, "%s*{[^}]+}%s*", " ")
 
     -- Clean residual punctuation spacing artifacts.
     out = string.gsub(out, "%s+([%.%!%?%;%:,])", "%1")
@@ -117,20 +115,58 @@ local function collapseMissingTokens(text)
     return out
 end
 
-function Formatter.Format(text, tokens)
+function Formatter.Format(text, tokens, opts)
     local out = tostring(text or "")
     if out == "" then return "" end
+    opts = type(opts) == "table" and opts or {}
+    local lang = opts.language or "EN"
     if string.find(out, "{", 1, true) then
-        if type(tokens) == "table" then
-            out = string.gsub(out, "{([%w_%.]+)}", function(key)
-                local val = Formatter.ResolveToken(tokens, key)
-                if val ~= nil then return val end
-                return "{" .. key .. "}"
-            end)
-        end
+        out = string.gsub(out, "{([^}]+)}", function(expr)
+            local raw = expr
+            local optional = false
+            if string.sub(raw, 1, 1) == "?" then
+                optional = true
+                raw = string.sub(raw, 2)
+            end
+            local key, filters = string.match(raw, "^([^|]+)|?(.*)$")
+            if not key or key == "" then return "" end
+            if key == "end" and type(Formatter.ResolveEndPunct) == "function" then
+                return Formatter.ResolveEndPunct(opts.context or tokens)
+            end
+            if type(tokens) == "table" then
+                local rawVal = Formatter.ResolveTokenRaw(tokens, key)
+                if type(rawVal) == "table" then
+                    if filters and filters ~= "" and type(Formatter.ApplyFilters) == "function" then
+                        local res = Formatter.ApplyFilters(rawVal, filters, tokens, lang)
+                        if res ~= "" then return res end
+                    elseif type(Formatter.FormatList) == "function" then
+                        local res = Formatter.FormatList(rawVal, "and", false)
+                        if res ~= "" then return res end
+                    end
+                else
+                    local val = Formatter.ResolveToken(tokens, key)
+                    if val ~= nil then
+                        if filters and filters ~= "" and type(Formatter.ApplyFilters) == "function" then
+                            return Formatter.ApplyFilters(val, filters, tokens, lang)
+                        end
+                        return val
+                    end
+                end
+            end
+            if optional then return "" end
+            return "{" .. expr .. "}"
+        end)
         out = collapseMissingTokens(out)
+        if type(Formatter.CleanPunctuation) == "function" then
+            out = Formatter.CleanPunctuation(out)
+        else
+            out = string.gsub(out, "%s%s+", " ")
+            out = string.gsub(out, "%s+$", "")
+        end
     end
     return out
 end
+
+require "PNC/ConvoEngine/TokenFormatter_Grammar"
 
 return Formatter

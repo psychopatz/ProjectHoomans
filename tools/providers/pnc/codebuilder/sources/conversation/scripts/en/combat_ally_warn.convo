@@ -1,0 +1,153 @@
+# Ally combat threat warnings and tactical replies.
+lang EN
+namespace hoomans
+
+flow semantic.combat.ally_warn.callout.zombie
+  say [role=crawler] (pri 14) as crawler:
+    "Watch your feet! Got {target.name} dragging {scene.location}!"
+  say [role=blindside] (pri 14) as blindside:
+    "Look out, {addressee.name}! Got {target.name} right behind you!"
+  say [role=last_one] (pri 14) as last_one:
+    "Just this last one left! Put {target.name} down!"
+  say [role=bandaging_self] (pri 14) as bandaging_self:
+    "Cover me, {addressee.name}, I'm bandaging up!"
+  say [role=bandaging_ally] (pri 14) as bandaging_ally:
+    "Cover us {scene.location}, {addressee.name}, I'm bandaging {target.name}!"
+  say [role=checkin_injured] (pri 14) as checkin_injured:
+    "All clear! Are you okay, {addressee.name}?"
+  say [role=checkin_clear] (pri 14) as checkin_clear:
+    "That's the last of them, {addressee.name}. Everybody good?"
+  say [role=weather_rain_open] (pri 14) as weather_rain_open:
+    "Great, it's starting to pour, {addressee.name}. We might want some cover soon."
+  say [role=stamina_winded] (pri 14) as stamina_winded:
+    "Whoa, {addressee.name}, give me a second to catch my breath."
+  say [role=stamina_exhausted] (pri 14) as stamina_exhausted:
+    "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!"
+  say [combat.style=hostile] (pri 11) as hostile:
+    "Drop them! {target.name} prowling {scene.location}!"
+  say [combat.style=tactical] (pri 10) as tactical:
+    "Contact, {scene.location}! {target.name}, weapons up!"
+  say [default] (pri 6) as neutral:
+    "Heads up, {addressee.name}, {target.name} moving {scene.location}!"
+
+flow semantic.combat.ally_warn.callout.hostile
+  say [role=crawler] (pri 14) as crawler:
+    "Watch your feet! Got {target.name} dragging {scene.location}!"
+  say [role=blindside] (pri 14) as blindside:
+    "Look out, {addressee.name}! Got {target.name} right behind you!"
+  say [role=last_one] (pri 14) as last_one:
+    "Just this last one left! Put {target.name} down!"
+  say [role=bandaging_self] (pri 14) as bandaging_self:
+    "Cover me, {addressee.name}, I'm bandaging up!"
+  say [role=bandaging_ally] (pri 14) as bandaging_ally:
+    "Cover us {scene.location}, {addressee.name}, I'm bandaging {target.name}!"
+  say [role=checkin_injured] (pri 14) as checkin_injured:
+    "All clear! Are you okay, {addressee.name}?"
+  say [role=checkin_clear] (pri 14) as checkin_clear:
+    "That's the last of them, {addressee.name}. Everybody good?"
+  say [role=weather_rain_open] (pri 14) as weather_rain_open:
+    "Great, it's starting to pour, {addressee.name}. We might want some cover soon."
+  say [role=stamina_winded] (pri 14) as stamina_winded:
+    "Whoa, {addressee.name}, give me a second to catch my breath."
+  say [role=stamina_exhausted] (pri 14) as stamina_exhausted:
+    "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!"
+  say [combat.style=hostile] (pri 11) as hostile:
+    "Flush them out! Got {target.name} {scene.location}!"
+  say [combat.style=tactical] (pri 10) as tactical:
+    "Hostile contact! {target.name} {scene.location}, weapons ready!"
+  say [default] (pri 6) as neutral:
+    "Watch out, {target.name} spotted {scene.location}!"
+
+flow semantic.combat.ally_warn.reply.engaging
+  say [role=wingman, combat.style=shaken] (pri 13) as wingman_shaken:
+    "Oh shit, there's more? Stay close, {addressee.name}!"
+  say [role=wingman, combat.style=brave] (pri 12) as wingman_brave:
+    "I'm ready too, {addressee.name}. Let's finish them."
+  say [role=wingman, combat.style=aggressive] (pri 13) as wingman_aggressive:
+    "Save one for me, {addressee.name}!"
+  say [role=anchor, combat.style=tactical] (pri 14) as anchor_tactical:
+    "Rear guard set, {addressee.name}, push forward!"
+  say [role=anchor] (pri 11) as anchor_combat:
+    "I've got the rear covered, {addressee.name}!"
+  say [role=wingman, combat.style=hostile] (pri 13) as wingman_engaging_hostile:
+    "Save some of {target.name} for me, {addressee.name}! Going around!"
+  say [role=wingman, combat.style=tactical] (pri 12) as wingman_engaging_tactical:
+    "Flanking wide, {addressee.name}, keep {target.name} pinned!"
+  say [role=wingman] (pri 11) as wingman_engaging_neutral:
+    "Right behind you, {addressee.name}! I'll flank {target.name}!"
+  say [combat.style=shaken] (pri 10) as engaging_shaken:
+    "Oh shit, {addressee.name}, {target.name}?! Stay right by me!"
+  say [combat.style=hostile] (pri 9) as engaging_hostile:
+    "Got {target.name} in my sights {scene.location}, {addressee.name}! Finishing this!"
+  say [combat.style=aggressive] (pri 9) as engaging_aggressive:
+    "Hell yeah, {addressee.name}, save {target.name} for me!"
+  say [combat.style=exhausted] (pri 9) as engaging_exhausted:
+    "I'm beat, {addressee.name}, but I'll still watch your flank."
+  say [combat.style=brave] (pri 8) as engaging_brave:
+    "I'm ready, {addressee.name}. Let's drop {target.name}."
+  say [combat.style=supportive] (pri 8) as engaging_supportive:
+    "Stay behind me if it gets ugly, {addressee.name}!"
+  say [combat.style=tactical] (pri 8) as engaging_tactical:
+    "Visual confirmed on {target.name} {scene.location}, {addressee.name}, engaging!"
+  say [default] (pri 5) as engaging_neutral:
+    "I see {target.name} {scene.location}, {addressee.name}! Moving in!"
+
+flow semantic.combat.ally_warn.reply.alerted
+  say [role=wingman, combat.style=shaken] (pri 13) as wingman_shaken:
+    "Oh shit, there's more? Stay close, {addressee.name}!"
+  say [role=wingman, combat.style=brave] (pri 12) as wingman_brave:
+    "I'm ready too, {addressee.name}. Let's finish them."
+  say [role=wingman, combat.style=aggressive] (pri 13) as wingman_aggressive:
+    "Save one for me, {addressee.name}!"
+  say [role=anchor, combat.style=tactical] (pri 14) as anchor_tactical:
+    "Rear guard set, {addressee.name}, push forward!"
+  say [role=anchor] (pri 11) as anchor_combat:
+    "I've got the rear covered, {addressee.name}!"
+  say [role=wingman, combat.style=tactical] (pri 13) as wingman_alerted_tactical:
+    "Covering your six, {addressee.name}, scanning for {target.name}!"
+  say [role=wingman] (pri 11) as wingman_alerted_neutral:
+    "Moving up behind you, {addressee.name}! Watching for {target.name}!"
+  say [combat.style=shaken] (pri 10) as engaging_shaken:
+    "Oh shit, {addressee.name}, {target.name}?! Stay right by me!"
+  say [combat.style=hostile] (pri 9) as alerted_hostile:
+    "Keep {target.name} busy {scene.location}, {addressee.name}! Coming over now!"
+  say [combat.style=aggressive] (pri 9) as engaging_aggressive:
+    "Hell yeah, {addressee.name}, save {target.name} for me!"
+  say [combat.style=exhausted] (pri 9) as engaging_exhausted:
+    "I'm beat, {addressee.name}, but I'll still watch your flank."
+  say [combat.style=brave] (pri 8) as engaging_brave:
+    "I'm ready, {addressee.name}. Let's drop {target.name}."
+  say [combat.style=supportive] (pri 8) as engaging_supportive:
+    "Stay behind me if it gets ugly, {addressee.name}!"
+  say [combat.style=tactical] (pri 8) as alerted_tactical:
+    "Copy contact, {addressee.name}! Scanning for {target.name} {scene.location}!"
+  say [default] (pri 5) as alerted_neutral:
+    "Heard you, {addressee.name}! Looking for {target.name} {scene.location} now!"
+
+flow semantic.combat.ally_warn.reply.defensive
+  say [role=blindside_reply] (pri 14) as blindside_reply:
+    "Whoa, good catch, {addressee.name}! I'm on it!"
+  say [role=last_one_reply] (pri 14) as last_one_reply:
+    "Finish it off, {addressee.name}, I've got your back!"
+  say [role=cover_bandage] (pri 14) as cover_bandage_reply:
+    "I've got you covered, {addressee.name}! Take your time!"
+  say [role=injured_has_bandage] (pri 14) as injured_has_bandage_reply:
+    "I'm bleeding a bit, {addressee.name}, got bandages on me so I'll patch it up."
+  say [role=injured_no_bandage] (pri 14) as injured_no_bandage_reply:
+    "I'm bleeding, {addressee.name}, and I'm out of bandages!"
+  say [role=medic_has_bandage] (pri 14) as medic_has_bandage_reply:
+    "Hang on, {addressee.name}, I've got a spare bandage! Hold still!"
+  say [role=medic_no_bandage] (pri 14) as medic_no_bandage_reply:
+    "I'm out too, {addressee.name}! Keep pressure on it while we look for bandages!"
+  say [role=checkin_ok] (pri 14) as checkin_ok_reply:
+    "All good here, {addressee.name}, barely broke a sweat."
+  say [role=weather_rain_reply] (pri 14) as weather_rain_reply:
+    "Tell me about it, {addressee.name}. Keep your eyes peeled, rain hides their footsteps."
+  say [role=cover_winded] (pri 14) as cover_winded:
+    "I've got you covered, {addressee.name}! Catch your breath!"
+  say [role=wingman] (pri 11) as wingman_defensive:
+    "You handle {target.name}, {addressee.name}! I'm staying clear!"
+  say [combat.style=shaken] (pri 9) as defensive_shaken:
+    "Be careful with {target.name} {scene.location}, {addressee.name}, I'm staying back!"
+  say [default] (pri 5) as defensive_neutral:
+    "Whoa, {addressee.name}, keeping clear of {target.name} {scene.location}!"

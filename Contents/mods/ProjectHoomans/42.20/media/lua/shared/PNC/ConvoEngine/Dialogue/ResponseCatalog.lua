@@ -23,23 +23,8 @@ Core.install(Catalog)
 registerCatalog(Catalog, Core)
 installSelection(Catalog, Core)
 
--- Built-in pools are grouped by semantic responsibility. The entry owns
--- catalog mechanics and loads providers before generated extensions.
-require "PNC/ConvoEngine/ResponseCatalog/Situational"
--- Install Core-compiled ConvoEngine wording before providers normalize response
--- variants. Existing semantic providers use the shared content fallback seam
--- during registration; load order must not make that fallback depend on the
--- retired generated Content modules.
-require "PNC/ConvoEngine/ResponseCatalog/SocialContent_Core"
-require "PNC/ConvoEngine/ResponseCatalog/FlowGreeting"
-require "PNC/ConvoEngine/ResponseCatalog/FlowWeather"
-require "PNC/ConvoEngine/ResponseCatalog/Questions"
-require "PNC/ConvoEngine/ResponseCatalog/Social"
-require "PNC/ConvoEngine/ResponseCatalog/ToolReplies"
-require "PNC/ConvoEngine/ResponseCatalog/Compatibility"
-require "PNC/ConvoEngine/ResponseCatalog/PlayerEmote"
-require "PNC/ConvoEngine/ResponseCatalog/CompanionCommands"
-require "PNC/ConvoEngine/ResponseCatalog/Navigation"
+-- Unified .convo generated packs are the single authored response authority.
+require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
 
 registerConversationPools(
     Catalog,

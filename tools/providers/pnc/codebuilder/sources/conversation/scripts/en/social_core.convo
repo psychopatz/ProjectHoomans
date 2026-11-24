@@ -1,0 +1,91 @@
+# Core social interactions: thanks, apologies, compliments, accept/refuse, gossip, self-reflection, and identity evasion.
+lang EN
+namespace hoomans
+
+flow semantic.thanks
+  say [mood.cheerful] (pri 8) as cheerful:
+    "Anytime! Glad I could help."
+  say [actor.social_style=withdrawn] (pri 7) as withdrawn:
+    "Don't mention it."
+  say [default] (pri 5) as default:
+    "You're welcome."
+
+flow semantic.apology
+  say [emotion.type=stress|panic, emotion.urgency=moderate|severe|critical|emergency] (pri 10) as stressed:
+    "I know things are tense. Let's keep it calm."
+  say [actor.social_style=friendly|protective] (pri 9) as friendly:
+    "It's okay. We can put that behind us."
+  say [rel.state=Friend|Trusted|Ally|Member|Lover] (pri 8) as trusted:
+    "I appreciate you saying that. We're all under pressure."
+  say [actor.social_style=withdrawn] (pri 7) as withdrawn:
+    "All right. Let's leave it there."
+  say [default] (pri 5) as default:
+    "Noted. Let's move on."
+
+flow semantic.compliment
+  say [actor.social_style=friendly|protective] (pri 9) as friendly:
+    "Thanks. You seem pretty great yourself."
+  say [rel.state=Member|Lover] (pri 8) as trusted:
+    "Thanks. Hearing that from you means a lot."
+  say [actor.social_style=withdrawn] (pri 8) as withdrawn:
+    "Oh. Thank you, that's kind of you."
+  say [default] (pri 5) as default:
+    "Thanks. That's kind of you."
+  say [default] (pri 5) as alternate:
+    "I appreciate you saying that."
+
+flow semantic.accept
+  say [convo.pending_request] (pri 8) as request:
+    "All right, I'll take care of it."
+  say [default] (pri 5) as default:
+    "All right."
+
+flow semantic.conversation.acknowledged
+  say [actor.social_style=friendly|protective] (pri 8) as friendly:
+    "All right. Ask if you want to talk about it more."
+  say [actor.social_style=withdrawn] (pri 8) as withdrawn:
+    "All right. We can leave it there for now."
+  say [default] (pri 5) as default:
+    "All right. Ask if you want to talk about it more."
+
+flow semantic.refuse
+  say [convo.pending_request] (pri 10) as request:
+    "No problem. I'll leave it."
+  say [emotion.type=stress|panic, emotion.urgency=moderate|severe|critical|emergency] (pri 9) as stressed:
+    "I hear you, but I can't take that on while I'm this tense."
+  say [actor.social_style=friendly|protective] (pri 8) as friendly:
+    "I see it differently, but we're okay."
+  say [rel.state=Friend|Trusted|Ally|Member|Lover] (pri 7) as trusted:
+    "I respect that. I still don't agree."
+  say [actor.social_style=withdrawn] (pri 7) as withdrawn:
+    "Let's leave it there."
+  say [default] (pri 5) as default:
+    "No."
+
+flow semantic.gossip
+  say [memory.available] (pri 8) as memory:
+    "I have something I remember about that."
+  say [default] (pri 5) as unknown:
+    "I haven't heard anything about that yet."
+
+flow semantic.self_reflection
+  say [actor.social_style=friendly|protective] (pri 10) as friendly:
+    "Hey. Don't talk about yourself like that. You matter."
+  say [rel.state=Friend|Trusted|Ally|Member|Lover] (pri 9) as trusted:
+    "You're harder on yourself than you need to be."
+  say [actor.social_style=withdrawn] (pri 8) as withdrawn:
+    "Don't make a habit of saying things like that."
+  say [emotion.type=stress|panic] (pri 7) as stressed:
+    "We've all made mistakes. Focus on what comes next."
+  say [default] (pri 5) as default:
+    "Don't talk about yourself like that."
+
+flow semantic.identity.evasion
+  say [rel.identity_trust=untrustworthy] (pri 10) as untrustworthy:
+    "You avoided my question. I can't trust you with my name."
+  say [actor.social_style=friendly|protective] (pri 8) as friendly:
+    "I asked you your name. Changing the subject makes me question your honesty."
+  say [actor.social_style=withdrawn] (pri 7) as withdrawn:
+    "Forget it. Keep your name to yourself; I don't trust evasive people."
+  say [default] (pri 5) as default:
+    "You avoided my question. That makes you seem untrustworthy."

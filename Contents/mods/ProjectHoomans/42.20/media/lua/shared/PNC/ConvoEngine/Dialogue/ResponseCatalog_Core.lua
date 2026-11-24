@@ -32,7 +32,18 @@ Core.CONDITION_FIELDS = {
     "milestoneStage", "worldEventType", "epistemicProvenance",
     "stateValue", "knoxExposure", "salivaTransmissible", "isBitten", "hasOpenWounds",
     "speakerStyle", "partnerStyle", "speakerInjured", "anyInjured", "anyExhausted",
-    "isNightOrDusk", "isCrossGroup",
+    "isNightOrDusk", "isCrossGroup", "playerTone", "playerRude", "playerShouting", "playerPolite",
+    "memHasAny", "memSavedMe", "memFoughtTogether", "memTreatedMe", "memBetrayed",
+    "worldPowerOff", "worldWaterOff", "worldHasEvent", "worldFoodCrisis", "worldRaiderSurge",
+    "knowHasGossip", "placeInSettlement",
+    "statePosture", "stateJob", "stateOrderKind", "stateAlreadyFollowing",
+    "stateSitting", "stateSleeping", "stateWorking",
+    "moodPrimary", "moodPanicked", "moodInPain", "moodStressed", "moodTired",
+    "moodUnhappy", "moodBored", "moodHungry", "moodCheerful",
+    "npcAnnoyance", "npcAnnoyed", "npcFedUp", "convoRepeatCount", "commandRedundant",
+    "groupSize", "groupBroadcast", "floorSpeakerIsNPC", "floorInterjectionKind",
+    "floorSideWithSpeaker", "floorSpeakerAnnoyed", "floorSpeakerInjured",
+    "actorRole", "relBond", "actorAgeBand",
 }
 
 local PASSTHROUGH_FIELDS = {
@@ -53,7 +64,18 @@ local PASSTHROUGH_FIELDS = {
     "hordePhase", "farewellSpeaker", "milestoneStage", "worldEventType",
     "stateValue", "knoxExposure", "salivaTransmissible", "isBitten", "hasOpenWounds",
     "speakerStyle", "partnerStyle", "speakerInjured", "anyInjured", "anyExhausted",
-    "isNightOrDusk", "isCrossGroup",
+    "isNightOrDusk", "isCrossGroup", "playerTone", "playerRude", "playerShouting", "playerPolite",
+    "memHasAny", "memSavedMe", "memFoughtTogether", "memTreatedMe", "memBetrayed",
+    "worldPowerOff", "worldWaterOff", "worldHasEvent", "worldFoodCrisis", "worldRaiderSurge",
+    "knowHasGossip", "placeInSettlement",
+    "statePosture", "stateJob", "stateOrderKind", "stateAlreadyFollowing",
+    "stateSitting", "stateSleeping", "stateWorking",
+    "moodPrimary", "moodPanicked", "moodInPain", "moodStressed", "moodTired",
+    "moodUnhappy", "moodBored", "moodHungry", "moodCheerful",
+    "npcAnnoyance", "npcAnnoyed", "npcFedUp", "convoRepeatCount", "commandRedundant",
+    "groupSize", "groupBroadcast", "floorSpeakerIsNPC", "floorInterjectionKind",
+    "floorSideWithSpeaker", "floorSpeakerAnnoyed", "floorSpeakerInjured",
+    "actorRole", "relBond", "actorAgeBand",
 }
 
 local function scalarMatches(expected, actual)

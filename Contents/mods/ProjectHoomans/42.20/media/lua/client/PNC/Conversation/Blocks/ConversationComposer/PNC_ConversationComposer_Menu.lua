@@ -146,14 +146,49 @@ function Composer.BuildCategoryDiagnostics(context)
 end
 
 function Composer.BuildGreeting(context)
+    local block = nil
     local categoryEligible = Selector.IsCategoryEligible(
         "projecthoomans:greetings", context, true
     )
+    if categoryEligible then
+        block = Selector.SelectBlock("projecthoomans:greetings", context)
+        if block then
+            local valid = ensureBlockText(block)
+            if not valid then block = nil end
+        end
+    end
+    local ok, ctrl = pcall(require, "PNC/ConvoEngine/Dialogue/ConversationSwitchAndFarewell")
+    local switchCtrl = (ok and type(ctrl) == "table" and ctrl)
+        or (PNC.ConvoEngine and PNC.ConvoEngine.ConversationSwitchAndFarewell)
+    if type(switchCtrl) == "table" and type(switchCtrl.ResolveOpeningLine) == "function" then
+        local entry = context and context.entry or nil
+        local actor = type(entry) == "table" and entry or {
+            id = context and context.npcID,
+            name = context and context.npcName,
+            npcType = context and context.npcType,
+        }
+        local resolvedTimeBand = context and (context.time or context.conversationTimeID or context.timeID) or nil
+        if not resolvedTimeBand and context and tonumber(context.hour) ~= nil then
+            local h = tonumber(context.hour) % 24
+            if h >= 5 and h < 8 then resolvedTimeBand = "dawn"
+            elseif h >= 8 and h < 17 then resolvedTimeBand = "day"
+            elseif h >= 17 and h < 20 then resolvedTimeBand = "dusk"
+            else resolvedTimeBand = "night" end
+        end
+        local baseCtx = {
+            actorRole = context and (context.npcType or (context.audiences and context.audiences.hostile and "bandit")) or nil,
+            relationshipState = context and (context.relationshipID or context.conversationRelationshipID or context.relationship) or nil,
+            timeBand = resolvedTimeBand,
+        }
+        local salt = tostring(context and (context.phraseSalt or context.npcID) or "greet")
+            .. ":" .. tostring(context and (context.timeID or "") or "")
+        local dynamicLine = switchCtrl.ResolveOpeningLine(nil, actor, nil, baseCtx, salt)
+        if type(dynamicLine) == "string" and dynamicLine ~= "" then
+            return { fallback = dynamicLine, text = dynamicLine }, block
+        end
+    end
     if not categoryEligible then return nil, "greeting_category_unavailable" end
-    local block = Selector.SelectBlock("projecthoomans:greetings", context)
     if not block then return nil, "no_greeting" end
-    local valid, reason = ensureBlockText(block)
-    if not valid then return nil, reason end
     local node = block.nodes[block.entryNode]
     return dialoguePayload(
         block.textSource,

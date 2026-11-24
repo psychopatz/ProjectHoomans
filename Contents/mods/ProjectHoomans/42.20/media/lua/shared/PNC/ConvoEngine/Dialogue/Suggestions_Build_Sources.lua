@@ -135,6 +135,36 @@ function Internal.CollectSuggestionBuildSources(state)
         ir,
         predicateTrace
     )
+    local offerRealizer = PNC.ConvoEngine and PNC.ConvoEngine.OfferRealizer or nil
+    local activePoolID = response.poolID or response.responsePool
+        or (type(flow) == "table" and flow.responsePool) or nil
+    if activePoolID and offerRealizer and type(offerRealizer.BuildForPool) == "function" then
+        local realized = offerRealizer.BuildForPool(activePoolID, context, context, { maxOffers = 4 })
+        if type(realized) == "table" and #realized > 0 then
+            local mapped = {}
+            for i = 1, #realized do
+                local ro = realized[i]
+                mapped[#mapped + 1] = {
+                    id = ro.id,
+                    label = ro.label,
+                    utterance = ro.say,
+                    intent = ro.intent,
+                    subject = ro.subject,
+                }
+            end
+            appendBranchOffers(
+                candidates,
+                seen,
+                mapped,
+                "convo_dsl_blueprint",
+                revision,
+                context,
+                ir,
+                predicateTrace,
+                { kind = "convo_dsl_blueprint", poolID = activePoolID }
+            )
+        end
+    end
     appendBranchOffers(
         candidates,
         seen,

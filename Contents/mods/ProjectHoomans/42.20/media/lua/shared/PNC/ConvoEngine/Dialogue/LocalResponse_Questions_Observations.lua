@@ -235,12 +235,58 @@ local function resolveIdentityFacetQuestion(facet, ir, state, context)
 end
 
 local function resolveActivity(ir, state, context)
+    context = type(context) == "table" and context or {}
+    local npc = context.dialogueSituation and context.dialogueSituation.npc or {}
+    local npcState = type(context.npcState) == "table" and context.npcState or {}
+    local actID = npc.activity and npc.activity.id or nil
+    local posture = string.lower(tostring(npcState.posture or context.statePosture or ""))
+    local isSleeping = context.stateSleeping == true or npcState.sleeping == true or posture == "sleeping"
+    local isSitting = (not isSleeping) and (context.stateSitting == true or npcState.sitting == true or posture == "sitting")
+    local rawJob = context.stateJob or npcState.currentJob or npcState.jobID
+        or (type(npcState.facilityJob) == "table" and (npcState.facilityJob.jobID or npcState.facilityJob.type))
+        or nil
+    local jobLabel = context["state.job"] or (rawJob and ("working on " .. tostring(rawJob)) or nil)
+    local isWorking = context.stateWorking == true or (rawJob ~= nil and not isSleeping)
+    local placeName = context["place.name"] or npcState.settlementName or npcState.zoneName or nil
+    local inSettlement = context.placeInSettlement == true or (npcState.settlementID ~= nil)
+    local world = type(context.worldContext) == "table" and context.worldContext or {}
+    local util = type(world.utilities) == "table" and world.utilities or {}
+    local Patience = PNC.ConvoEngine and PNC.ConvoEngine.PatienceTracker
+    local md = (context.moodPrimary == nil and Patience and type(Patience.ResolveMood) == "function")
+        and Patience.ResolveMood(npcState, {
+            level = context.npcAnnoyance or "calm",
+            annoyed = context.npcAnnoyed == true,
+            fedUp = context.npcFedUp == true,
+            repeatCount = tonumber(context.convoRepeatCount) or 0,
+        }) or nil
     return catalogResponse(
         "semantic.question.activity", ir, state, context, {
-            activity = context and context.dialogueSituation
-                and context.dialogueSituation.npc
-                and context.dialogueSituation.npc.activity
-                and context.dialogueSituation.npc.activity.id,
+            activity = actID,
+            statePosture = posture ~= "" and posture or nil,
+            stateSitting = isSitting,
+            stateSleeping = isSleeping,
+            stateWorking = isWorking,
+            stateJob = rawJob,
+            ["state.job"] = jobLabel,
+            ["place.name"] = placeName,
+            placeInSettlement = inSettlement,
+            worldPowerOff = context.worldPowerOff == true or util.powerOn == false,
+            worldWaterOff = context.worldWaterOff == true or util.waterOn == false,
+            worldFoodCrisis = context.worldFoodCrisis == true,
+            worldRaiderSurge = context.worldRaiderSurge == true,
+            npcAnnoyance = context.npcAnnoyance or (md and md.annoyanceLevel) or "calm",
+            npcAnnoyed = context.npcAnnoyed == true or (md and md.annoyed == true) or false,
+            npcFedUp = context.npcFedUp == true or (md and md.fedUp == true) or false,
+            convoRepeatCount = tonumber(context.convoRepeatCount) or 0,
+            moodPrimary = context.moodPrimary or (md and md.primary) or "calm",
+            moodPanicked = context.moodPanicked == true or (md and md.panicked == true) or false,
+            moodInPain = context.moodInPain == true or (md and md.inPain == true) or false,
+            moodStressed = context.moodStressed == true or (md and md.stressed == true) or false,
+            moodTired = context.moodTired == true or (md and md.tired == true) or false,
+            moodUnhappy = context.moodUnhappy == true or (md and md.unhappy == true) or false,
+            moodBored = context.moodBored == true or (md and md.bored == true) or false,
+            moodHungry = context.moodHungry == true or (md and md.hungry == true) or false,
+            moodCheerful = context.moodCheerful == true or (md and md.cheerful == true) or false,
         }
     )
 end

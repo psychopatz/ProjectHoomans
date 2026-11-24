@@ -189,7 +189,7 @@ PNC = {
     },
 }
 
-require "PNC/ConvoEngine/ResponseCatalog/Social_Reactions_CombatAssist"
+require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
 local Beats = require "PNC/Semantics/PNC_SemanticDialogueBeats"
 local BC = PNC.Semantics.BeatContext
 local IdentityBeat = PNC.Semantics.CombatAssistIdentity
@@ -248,8 +248,9 @@ local okProt, tid = Beats.OnCombatAssistProtected({
 })
 T.truthy(okProt == true and tid ~= nil, "OnCombatAssistProtected starts beat thread")
 T.equal(#delivered, 1, "opening gratitude delivered immediately")
-T.truthy(string.find(delivered[1].payload.ambientFlavor.text, "light gone", 1, true) ~= nil,
-    "night-time gratitude line selected")
+T.truthy(string.find(delivered[1].payload.ambientFlavor.text, "cutting it close", 1, true) ~= nil
+    and not string.find(delivered[1].payload.ambientFlavor.text, "{", 1, true),
+    "night-time compositional gratitude line expanded cleanly")
 
 -- Pump forward to fire delayed proactive ask-name turn
 nowMs = nowMs + 1600

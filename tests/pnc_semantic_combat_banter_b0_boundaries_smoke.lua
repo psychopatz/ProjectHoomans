@@ -28,7 +28,7 @@ local reactionService = T.read(
 local catalog = T.read(
     "ProjectHoomans",
     "shared",
-    "PNC/ConvoEngine/ResponseCatalog/Social_Reactions.lua"
+    "PNC/ConvoEngine/ResponseCatalog/Generated/Init.lua"
 )
 
 T.contains(receiveSource,
@@ -69,11 +69,24 @@ T.contains(reactionService, "llmEligible = false",
 T.contains(reactionService, "memoryEligible = false",
     "routine kill reaction remains non-memory")
 
-T.contains(catalog, "\"camp_rejected\"",
+local directives = io.open(
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/ConvoEngine/ResponseCatalog/Generated/CompanionDirectives.lua",
+    "r"
+)
+local dirText = directives and directives:read("*a") or ""
+if directives then directives:close() end
+local reactions = io.open(
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/ConvoEngine/ResponseCatalog/Generated/SocialReactions.lua",
+    "r"
+)
+local reactText = reactions and reactions:read("*a") or ""
+if reactions then reactions:close() end
+
+T.contains(dirText, "camp_rejected",
     "combat-adjacent catalog includes offerless companion rejection")
-T.contains(catalog, "\"default\"",
+T.contains(reactText, "default",
     "catalog contains generic offerless/default families")
-T.contains(catalog, "KILLER_WEAPON_VARIANTS",
-    "weapon-aware combat variants are explicit catalog predicates")
+T.contains(reactText, "combatReactionStyle",
+    "style-aware combat variants are explicit catalog predicates")
 
 T.finish("pnc_semantic_combat_banter_b0_boundaries_smoke")

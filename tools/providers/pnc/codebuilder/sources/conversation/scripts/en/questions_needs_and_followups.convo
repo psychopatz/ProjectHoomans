@@ -1,0 +1,141 @@
+# Needs offers/quantities/proposals, wellbeing follow-ups, self-state, relationship status, and event follow-ups.
+lang EN
+namespace hoomans
+
+flow semantic.question.needs.offer
+  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] (pri 8) as hunger:
+    "Food would help, but I don't have an exact amount yet. {?clause.world_pressure}"
+  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] (pri 8) as thirst:
+    "Water would help, but I don't have an exact amount yet. {?clause.world_pressure}"
+  say [need.type=fatigue, need.urgency=moderate|severe|emergency|critical] (pri 7) as fatigue:
+    "A little rest would help, but this isn't something I can count."
+  say [default] (pri 5) as unknown:
+    "I don't know what I need right now."
+
+flow semantic.question.needs.quantity
+  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] (pri 8) as hunger:
+    "I know food is what I need, but I can't give you an exact amount yet."
+  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] (pri 8) as thirst:
+    "I know water is what I need, but I can't give you an exact amount yet."
+  say [default] (pri 5) as unknown:
+    "I can't confirm an exact amount yet. Which item do you mean?"
+
+flow semantic.question.needs.proposal
+  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] (pri 8) as hunger:
+    "I can keep that as a proposal, but I still need the item and amount before I record a commitment."
+  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] (pri 8) as thirst:
+    "I can keep that as a proposal, but I still need the item and amount before I record a commitment."
+  say [default] (pri 5) as unknown:
+    "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment."
+
+flow semantic.question.wellbeing.unknown
+  say [default] (pri 5) as default:
+    "I'm not sure how I'm doing right now."
+
+flow semantic.question.wellbeing.follow_up
+  say [emotion.type=panic, emotion.urgency=critical|emergency] (pri 9) as panic:
+    "I'm still pretty shaken up{end}"
+  say [emotion.type=stress, emotion.urgency=critical|emergency] (pri 8) as stress:
+    "I'm still tense and having trouble settling down."
+  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] (pri 8) as thirst:
+    "I'm still pretty thirsty."
+  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] (pri 7) as hunger:
+    "I'm still hungry."
+  say [need.type=fatigue, need.urgency=moderate|severe|emergency|critical] (pri 7) as fatigue:
+    "I'm still worn out."
+  say [actor.health=injured|wounded|critical] (pri 7) as injured:
+    "I took a {adj.hit} hit. It's still bothering me."
+  say [actor.health=unknown] (pri 6) as unknown:
+    "I don't have enough detail to say what's wrong yet."
+  say [default] (pri 5) as default:
+    "I don't have enough detail to say what's wrong yet."
+
+flow semantic.self_state
+  say [subject=WELLBEING] (pri 7) as wellbeing:
+    "I'm glad to hear it. Thanks for checking in."
+  say [subject=WELLBEING] (pri 7) as wellbeing_alt:
+    "That's good to hear. I appreciate you asking."
+  say [subject=HUNGER] (pri 7) as hunger:
+    "Sorry to hear that. I hope we find something to eat soon."
+  say [subject=HUNGER] (pri 7) as hunger_alt:
+    "That sounds rough. Let's keep an eye out for food."
+  say [subject=THIRST] (pri 7) as thirst:
+    "I hope we can find some water for you soon."
+  say [subject=THIRST] (pri 7) as thirst_alt:
+    "That's rough. Let's look for something to drink."
+  say [subject=FATIGUE] (pri 7) as fatigue:
+    "I hear you. I hope you get a chance to rest soon."
+  say [subject=FATIGUE] (pri 7) as fatigue_alt:
+    "This is wearing. Take a breather when you can."
+
+flow semantic.question.relationship_status.committed
+  say [default] (pri 6) as default:
+    "I thought we were already together."
+
+flow semantic.question.relationship_status.unknown
+  say [actor.social_style=withdrawn] (pri 7) as withdrawn:
+    "I'd rather not get into that. There's too much going on right now."
+  say [default] (pri 5) as uncertain:
+    "I haven't really thought about dating. Right now, I'm focused on surviving."
+  say [default] (pri 5) as uncertain_alt:
+    "Honestly, I haven't had much room to think about relationships lately."
+
+flow semantic.question.relationship_status.committed_after_compliment
+  say [default] (pri 6) as committed:
+    "Thanks for the compliment, but I thought we were already together."
+
+flow semantic.question.relationship_status.unknown_after_compliment
+  say [actor.social_style=withdrawn] (pri 7) as withdrawn:
+    "Thanks, but I'd rather keep that personal."
+  say [default] (pri 5) as unknown:
+    "That's kind of you to ask. I don't have a clear answer right now."
+  say [default] (pri 5) as unknown_alt:
+    "Thanks for saying that. I can't give you a clear answer about relationships right now."
+
+flow semantic.question.relationship_status.acknowledged
+  say [actor.social_style=withdrawn] (pri 7) as withdrawn:
+    "Thanks. I'd rather leave it there for now."
+  say [default] (pri 5) as default:
+    "Thanks for understanding. It's hard to think about relationships with everything going on."
+  say [default] (pri 5) as alternate:
+    "I appreciate you listening. It's hard to make plans while we're trying to survive."
+
+flow semantic.question.event_follow_up.what_happened
+  say [default] (pri 6) as answer:
+    "%1"
+
+flow semantic.question.event_follow_up.location
+  say [default] (pri 6) as answer:
+    "%1"
+
+flow semantic.question.event_follow_up.quantity
+  say [default] (pri 6) as answer:
+    "%1"
+
+flow semantic.question.event_follow_up.attacker
+  say [default] (pri 6) as answer:
+    "%1"
+
+flow semantic.question.event_follow_up.need
+  say [default] (pri 6) as answer:
+    "%1"
+
+flow semantic.question.event_follow_up.deceased
+  say [default] (pri 6) as answer:
+    "%1"
+
+flow semantic.question.event_follow_up.next
+  say [default] (pri 6) as answer:
+    "%1"
+
+flow semantic.question.event_follow_up.health
+  say [default] (pri 6) as answer:
+    "%1"
+
+flow semantic.question.event_follow_up.pursuer
+  say [default] (pri 6) as answer:
+    "%1"
+
+flow semantic.question.event_follow_up.what
+  say [default] (pri 6) as answer:
+    "%1"
