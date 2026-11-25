@@ -20,12 +20,31 @@ function Group:Submit(value, part)
 
     self.submitting = true
     self:BeginTurn(value)
+    local participants = {}
+    for i = 1, #(self.members or {}) do
+        local m = self.members[i]
+        if m and m.id ~= nil then
+            participants[#participants + 1] = {
+                id = m.id,
+                name = m.name,
+                firstName = m.firstName,
+            }
+        end
+    end
+    local prevParticipants = primary.spec and primary.spec.context
+        and primary.spec.context.groupParticipants or nil
+    if primary.spec and type(primary.spec.context) == "table" then
+        primary.spec.context.groupParticipants = participants
+    end
     primary.semanticRequestID = self:RequestID(
         tostring(primary.spec and primary.spec.npcID or "primary")
     )
     local ok, accepted, reason = pcall(
         internal.SubmitSingle, primary, value, part)
     primary.semanticRequestID = nil
+    if primary.spec and type(primary.spec.context) == "table" then
+        primary.spec.context.groupParticipants = prevParticipants
+    end
     if not ok then
         self.submitting = false
         audit(self, "semantic.group.submit_failed", {

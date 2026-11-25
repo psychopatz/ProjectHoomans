@@ -8,6 +8,10 @@ function LiveBodyControl.IsSeated(record)
     local runtime = record and record.runtime or nil
     local activity = runtime and runtime.facilityActivity or nil
     local roamingSeat = runtime and runtime.roamingSeat or nil
+    local companionSit = runtime and runtime.companionMirrorSit or nil
+    if companionSit and companionSit.active == true then
+        return true
+    end
     if activity and activity.seating == true
         and (activity.seatEntered == true
             or activity.phase == "SEAT_ENTRY"

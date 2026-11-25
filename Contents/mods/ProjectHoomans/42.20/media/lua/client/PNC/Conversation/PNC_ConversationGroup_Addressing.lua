@@ -23,6 +23,41 @@ end
 function Group:AddressedIDs(result, rawText)
     local addressed = {}
     local ir = result and result.ir or nil
+    local ext = type(ir) == "table" and type(ir.extensions) == "table" and ir.extensions or nil
+    local scope = ext and type(ext.audienceScope) == "table" and ext.audienceScope or nil
+    if scope then
+        if scope.scope == "GROUP" then
+            -- Explicit group broadcast ("you all", "everyone"): all members respond.
+            return addressed
+        elseif scope.scope == "INDIVIDUAL" and type(scope.targetIDs) == "table" then
+            for i = 1, #scope.targetIDs do
+                local tid = tostring(scope.targetIDs[i] or "")
+                if tid ~= "" and memberFor(self, tid) then
+                    addressed[tid] = true
+                end
+            end
+            for _ in pairs(addressed) do return addressed end
+        elseif scope.scope == "GROUP_EXCEPT" and type(scope.excludeIDs) == "table" then
+            local excluded = {}
+            for i = 1, #scope.excludeIDs do
+                excluded[tostring(scope.excludeIDs[i] or "")] = true
+            end
+            for i = 1, #(self.members or {}) do
+                local m = self.members[i]
+                if m and m.id ~= nil and not excluded[tostring(m.id)] then
+                    addressed[m.id] = true
+                end
+            end
+            for _ in pairs(addressed) do return addressed end
+        end
+    end
+    if ext and ext.vocativeTargetID ~= nil then
+        local vid = tostring(ext.vocativeTargetID)
+        if vid ~= "" and memberFor(self, vid) then
+            addressed[vid] = true
+            return addressed
+        end
+    end
     if type(ir) == "table" then
         collectIDs(self, ir.target, addressed, 0)
         collectIDs(self, ir.recipient, addressed, 0)

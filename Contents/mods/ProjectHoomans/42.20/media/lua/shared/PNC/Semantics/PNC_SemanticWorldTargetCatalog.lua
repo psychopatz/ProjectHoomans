@@ -188,10 +188,12 @@ Catalog.Register("recycle_bin", {
     commandName = "bin",
     aliases = {
         "recycle bin", "recycling bin", "trash bin", "garbage bin",
-        "bin",
+        "garbage can", "trash can", "garbage cans", "trash cans",
+        "garbage", "trash", "dumpster", "waste bin", "bin",
     },
     objectNames = {
         "recycle bin", "recycling bin", "trash bin", "garbage bin",
+        "garbage can", "trash can", "garbage", "trash", "dumpster",
     },
     spriteNames = { "trashcontainers_01_16" },
 })
@@ -234,6 +236,81 @@ Catalog.Register("table", {
     commandName = "table",
     aliases = { "table", "desk", "counter" },
     objectNames = { "table", "desk", "counter" },
+})
+
+Catalog.Register("vehicle", {
+    label = "vehicle",
+    commandName = "car",
+    aliases = {
+        "car", "truck", "van", "vehicle", "ride",
+        "suv", "sedan", "pickup", "trunk", "hood",
+    },
+    objectNames = { "car", "truck", "van", "vehicle" },
+    special = "vehicle",
+})
+
+Catalog.Register("window", {
+    label = "window",
+    commandName = "window",
+    aliases = { "window", "windows", "window sill", "glass" },
+    objectNames = { "window" },
+})
+
+Catalog.Register("fence", {
+    label = "fence",
+    commandName = "fence",
+    aliases = { "fence", "gate", "barricade", "wall", "railing" },
+    objectNames = { "fence", "gate", "barricade", "wall" },
+})
+
+Catalog.Register("stairs", {
+    label = "stairs",
+    commandName = "stairs",
+    aliases = { "stairs", "staircase", "stairway", "steps", "landing" },
+    objectNames = { "stairs", "staircase", "stairway" },
+})
+
+Catalog.Register("fridge", {
+    label = "fridge",
+    commandName = "fridge",
+    aliases = { "fridge", "refrigerator", "freezer", "icebox" },
+    objectNames = { "fridge", "refrigerator", "freezer" },
+})
+
+Catalog.Register("container", {
+    label = "storage",
+    commandName = "crate",
+    aliases = {
+        "crate", "crates", "shelf", "shelves", "locker",
+        "cabinet", "cupboard", "box", "boxes", "drawer", "wardrobe",
+    },
+    objectNames = {
+        "crate", "shelf", "shelves", "locker", "cabinet",
+        "cupboard", "box", "drawer", "wardrobe",
+    },
+})
+
+Catalog.Register("water_source", {
+    label = "water source",
+    commandName = "sink",
+    aliases = {
+        "sink", "faucet", "tap", "well",
+        "rain barrel", "barrel", "water dispenser", "cooler",
+    },
+    objectNames = { "sink", "well", "rain barrel", "water dispenser" },
+})
+
+Catalog.Register("appliance", {
+    label = "appliance",
+    commandName = "stove",
+    aliases = {
+        "stove", "oven", "microwave", "grill",
+        "tv", "television", "radio", "generator",
+    },
+    objectNames = {
+        "stove", "oven", "microwave", "grill",
+        "tv", "television", "radio", "generator",
+    },
 })
 
 return Catalog

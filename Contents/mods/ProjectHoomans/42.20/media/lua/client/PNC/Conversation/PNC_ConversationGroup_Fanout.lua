@@ -48,6 +48,15 @@ function Group:Fanout(value, primaryResult)
         })
         return 1, "llm_fallback"
     end
+    -- Do not fan out an unrecognized/clarification prompt to every NPC in the
+    -- group (prevents 3+ overlapping "I'm not sure what you mean" bubbles).
+    if decision.route == "clarification"
+        or decision.branch == "CLARIFY"
+        or (tonumber(primaryResult.ir.confidence) or 0) <= 0
+    then
+        if self.activeTurn then self.activeTurn.responseCount = 1 end
+        return 1, "clarification_primary_only"
+    end
 
     local primaryMember = self:MemberForHost(primary)
     local queued = primaryMember

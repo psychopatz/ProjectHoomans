@@ -270,4 +270,45 @@ Scenes.Register("ambient.roam.sitFurniture", {
     end,
 })
 
+Scenes.Register("ambient.companion.sitGround", {
+    label = "Companion Ground Sit",
+    description = "Ground sitting pose for followers mirroring a seated leader or taking an approved break.",
+    category = "ambient",
+    priority = 20,
+    repeatMode = "loop",
+    blocking = true,
+    keepManagedUseless = true,
+    retainBump = true,
+    stepGapMs = 0,
+    sequenceMode = "shuffle",
+    steps = {
+        { id = "sit", bump = "Sit", durationMs = 4200, loop = true },
+        { id = "sit_action", bump = "SitAction", durationMs = 3600, loop = true },
+        { id = "sit_making", bump = "SitMaking", durationMs = 3600, loop = true },
+        { id = "sit_rub_hands", bump = "SitRubHands", durationMs = 3600, loop = true },
+    },
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = function(record, zombie, scene, now)
+        local mirrorSit = PNC and PNC.BehaviorCompanion
+            and PNC.BehaviorCompanion.Internal
+            and PNC.BehaviorCompanion.Internal.MirrorSit or nil
+        if mirrorSit and type(mirrorSit.OnSceneTick) == "function" then
+            return mirrorSit.OnSceneTick(record, zombie, scene, now)
+        end
+        return true
+    end,
+    onStop = function(record)
+        local runtime = record and record.runtime or nil
+        if type(runtime) == "table" and type(runtime.companionMirrorSit) == "table" then
+            runtime.companionMirrorSit.active = false
+            runtime.companionMirrorSit.stoppedAt = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+        end
+    end,
+})
+
 return Scenes

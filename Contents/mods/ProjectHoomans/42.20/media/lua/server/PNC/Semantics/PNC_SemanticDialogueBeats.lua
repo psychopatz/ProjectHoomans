@@ -669,6 +669,7 @@ function Beats.ResetRuntime()
     if type(Beats.ResetTelevisionRuntime) == "function" then Beats.ResetTelevisionRuntime() end
     if type(Beats.ResetCombatAssistRuntime) == "function" then Beats.ResetCombatAssistRuntime() end
     if type(Beats.ResetGroupBanterRuntime) == "function" then Beats.ResetGroupBanterRuntime() end
+    if type(Beats.ResetCompanionNeedsRuntime) == "function" then Beats.ResetCompanionNeedsRuntime() end
     if type(Beats.ResetAuditRuntime) == "function" then Beats.ResetAuditRuntime() end
 end
 
@@ -682,6 +683,7 @@ require "PNC/Semantics/Beats/PNC_SemanticBeats_CombatAssist"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_NightCamp"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_MedicalRescue"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_GroupBanter"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_CompanionNeeds"
 require "PNC/Semantics/Beats/PNC_BroadcastRules_StoriesAndOpenBand"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_Audit"
 

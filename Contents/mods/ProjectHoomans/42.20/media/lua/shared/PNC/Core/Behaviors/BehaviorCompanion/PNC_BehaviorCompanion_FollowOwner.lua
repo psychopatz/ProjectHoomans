@@ -25,4 +25,5 @@ if type(Internal.FollowOwnerTick) ~= "table" then
         CompanionVehicle = PNC.CompanionVehicle,
     }
 end
+require "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion_MirrorSit"
 require "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion_FollowOwner_Tick"

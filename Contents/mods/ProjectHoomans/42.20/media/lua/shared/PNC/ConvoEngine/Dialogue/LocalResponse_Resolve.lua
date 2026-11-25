@@ -516,6 +516,21 @@ function Response.Resolve(ir, state, context, branch)
             })
         end
         if ir.intent == "ACCEPT" or ir.intent == "AGREE" then
+            local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+            local pKey = context and (context.playerKey or context.speakerKey or context.player) or nil
+            local npcId = context and (context.npcID or context.npcId or (context.npc and context.npc.id)) or nil
+            if beats and type(beats.TryResolvePlayerNeedReply) == "function" and pKey then
+                local resolved, res = beats.TryResolvePlayerNeedReply(pKey, npcId, "yes")
+                if resolved then
+                    return {
+                        text = res and res.replyText or nil,
+                        poolID = "semantic.companion.need_request",
+                        role = "requester_approved",
+                        topic = "companion_need_request",
+                        resolvedNeedRequest = true,
+                    }
+                end
+            end
             return catalogResponse("semantic.accept", ir, state, context, {
                 action = state and state.pendingRequest
                     and state.pendingRequest.action,
@@ -523,6 +538,21 @@ function Response.Resolve(ir, state, context, branch)
             })
         end
         if ir.intent == "REFUSE" or ir.intent == "DISAGREE" then
+            local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+            local pKey = context and (context.playerKey or context.speakerKey or context.player) or nil
+            local npcId = context and (context.npcID or context.npcId or (context.npc and context.npc.id)) or nil
+            if beats and type(beats.TryResolvePlayerNeedReply) == "function" and pKey then
+                local resolved, res = beats.TryResolvePlayerNeedReply(pKey, npcId, "no")
+                if resolved then
+                    return {
+                        text = res and res.replyText or nil,
+                        poolID = "semantic.companion.need_request",
+                        role = "requester_denied",
+                        topic = "companion_need_request",
+                        resolvedNeedRequest = true,
+                    }
+                end
+            end
             return catalogResponse("semantic.refuse", ir, state, context, {
                 action = state and state.pendingRequest
                     and state.pendingRequest.action,

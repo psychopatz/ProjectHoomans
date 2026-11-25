@@ -119,6 +119,22 @@ function Companion.TickFollowOwner(record, zombie)
     then
         PNC.WorldItemService.TickFollowCompanion(record, zombie, owner, now)
     end
+    local mirrorSit = Internal.MirrorSit
+    if mirrorSit and mirrorSit.TryStart
+        and mirrorSit.TryStart(
+            record,
+            zombie,
+            owner,
+            ownerDist,
+            followState,
+            hazard,
+            ownerEngaged,
+            ownerVehicle,
+            now
+        )
+    then
+        return true
+    end
     local movementHandoff = Internal.FollowOwnerMovementHandoff
     if movementHandoff and movementHandoff.TryHandle
         and movementHandoff.TryHandle(

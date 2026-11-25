@@ -73,6 +73,22 @@ function Internal.CollectSuggestionBuildSources(state)
         candidates, seen, context, revision, predicateTrace
     )
 
+    local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if beats and type(beats.BuildPlayerNeedRequestChoices) == "function" and context then
+        local pKey = context.playerKey or context.speakerKey or context.player
+        local npcId = context.npcID or context.npcId or (context.npc and context.npc.id)
+        local needChoices = pKey and beats.BuildPlayerNeedRequestChoices(pKey, npcId) or nil
+        if type(needChoices) == "table" then
+            for _, choice in ipairs(needChoices) do
+                if addCandidate then
+                    addCandidate(candidates, seen, choice)
+                else
+                    candidates[#candidates + 1] = choice
+                end
+            end
+        end
+    end
+
     local decision = type(result.decision) == "table"
         and result.decision or {}
     local flow = type(decision.flow) == "table" and decision.flow or {}

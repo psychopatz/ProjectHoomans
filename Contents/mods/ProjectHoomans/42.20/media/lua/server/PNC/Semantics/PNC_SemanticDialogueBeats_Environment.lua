@@ -446,6 +446,9 @@ function Beats.CheckEnvironment(now)
     if Beats.LastWeather ~= nil and type(Beats.CheckGroupBanter) == "function" then
         Beats.CheckGroupBanter(now)
     end
+    if type(Beats.CheckCompanionNeeds) == "function" then
+        Beats.CheckCompanionNeeds(now)
+    end
     if type(Beats.MaybeLogPeriodicAuditSnapshot) == "function" then
         Beats.MaybeLogPeriodicAuditSnapshot("env_check", now)
     end
