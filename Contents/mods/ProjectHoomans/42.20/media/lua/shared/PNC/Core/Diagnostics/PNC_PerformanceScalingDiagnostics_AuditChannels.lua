@@ -181,3 +181,22 @@ end
 -- whole flow can be filtered out of console.txt with a single search. Callers
 -- guard on Diagnostics.BuildAuditEnabled before assembling fields; the helper
 -- re-checks so direct callers stay safe.
+
+-- Dialogue beats tracing. Callers guard on Diagnostics.BeatsAuditEnabled before
+-- assembling fields so the disabled path stays a single boolean check.
+function Diagnostics.LogBeatsAudit(eventName, fields)
+    local output
+    local message
+    if Diagnostics.BeatsAuditEnabled ~= true then return false end
+    output = { "beats_audit", "event=" .. tostring(eventName or "unknown") }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end

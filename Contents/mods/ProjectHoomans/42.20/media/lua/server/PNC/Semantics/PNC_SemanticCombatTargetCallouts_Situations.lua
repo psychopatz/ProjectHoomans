@@ -15,6 +15,17 @@ PNC.Semantics.CombatTargetCallouts = S
 local SIT_BARK_OPTS = I.SituationBarkOpts
 
 function I.EmitSituationCallout(speaker, addr, desc, role, now, ref, extraTokens)
+    local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
+    local dirTopic = role == "blindside" and "combat_blindside" or "combat_situation"
+    local dirScope = "sit:" .. tostring(speaker and speaker.id or "nil") .. ":" .. tostring(role or "generic")
+    if Dir and type(Dir.GateEmitter) == "function" then
+        local dirOk = Dir.GateEmitter(dirTopic, speaker, {
+            scopeKey = dirScope,
+            now = now,
+            markOnAdmit = false,
+        })
+        if not dirOk then return false end
+    end
     local tone = S.ResolveAllyWarnTone(speaker, nil)
     local toks = S.BuildRichSpeechTokens
         and S.BuildRichSpeechTokens(speaker, addr, desc, now, tone, { skipLocation = true }) or {}
@@ -40,7 +51,11 @@ function I.EmitSituationCallout(speaker, addr, desc, role, now, ref, extraTokens
         eventRef = ref, text = text, presentationClass = res and res.presentationClass or "BARK",
         context = { eventType = "combat_ally_warn_callout", eventRef = ref, threadID = ref, transient = true },
     })
-    return (tonumber(sent) or 0) > 0
+    local okSent = (tonumber(sent) or 0) > 0
+    if okSent and Dir and type(Dir.MarkSpoken) == "function" then
+        Dir.MarkSpoken(dirScope, dirTopic, role == "blindside" and 3 or 1, now, speaker and speaker.id)
+    end
+    return okSent
 end
 
 local function turnToward(ally, tx, ty, now)

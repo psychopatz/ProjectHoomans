@@ -204,8 +204,18 @@ local function applySingleXP(record, skillID, amount, options)
     if currentLevel >= 10 then xpValue = 0 end
     xpMap[skillID] = math.floor(xpValue * 100 + 0.5) / 100
     local leveledUp = currentLevel > originalLevel
+    local xpSource = type(options) == "table" and (options.source or options.method) or nil
+    if xpSource and type(record.runtime) == "table" then
+        record.runtime.lastXPSource = tostring(xpSource)
+        record.runtime.lastXPSkill = skillID
+    end
     if leveledUp then
-        Events.emit(EventTypes.NPC_SKILL_LEVEL_UP, record, skillID, currentLevel)
+        local levelMeta = {
+            source = xpSource and tostring(xpSource) or nil,
+            showName = type(options) == "table" and options.showName or nil,
+            previousLevel = originalLevel,
+        }
+        Events.emit(EventTypes.NPC_SKILL_LEVEL_UP, record, skillID, currentLevel, levelMeta)
     end
     return true, leveledUp, effectiveAmount
 end

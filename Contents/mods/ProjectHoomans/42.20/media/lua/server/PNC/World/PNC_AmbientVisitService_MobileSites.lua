@@ -58,6 +58,54 @@ local function cachedMobileSite(key, at)
     return primitiveCopy(cache.site)
 end
 
+local function isHazardousOrDoorwaySquare(sq)
+    if not sq then return false end
+    if sq.isOnFire and sq:isOnFire() == true then return true end
+    if sq.HasStairs and sq:HasStairs() == true then return true end
+    if sq.getDeadBody and sq:getDeadBody() ~= nil then return true end
+    if sq.getDoor and (sq:getDoor(true) ~= nil or sq:getDoor(false) ~= nil) then
+        return true
+    end
+    return false
+end
+
+-- O(1) selection-time nudge: if the resolved shelter anchor sits on a doorway,
+-- stairs, fire, or corpse tile, step 1 tile deeper into the same room once.
+local function adjustAnchorAwayFromHazards(site)
+    if type(site) ~= "table" then return site end
+    local cell = type(getCell) == "function" and getCell() or nil
+    if not cell or type(cell.getGridSquare) ~= "function" then return site end
+    local x = math.floor(number(site.movementX or site.x, 0))
+    local y = math.floor(number(site.movementY or site.y, 0))
+    local z = math.floor(number(site.movementZ or site.z, 0))
+    local sq = cell:getGridSquare(x, y, z)
+    if not isHazardousOrDoorwaySquare(sq) then return site end
+    local bounds = type(site.roomBounds) == "table" and site.roomBounds or nil
+    local offsets = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
+    for i = 1, #offsets do
+        local nx = x + offsets[i][1]
+        local ny = y + offsets[i][2]
+        local inBounds = not bounds or (
+            nx >= number(bounds.minX, nx) and nx <= number(bounds.maxX, nx)
+            and ny >= number(bounds.minY, ny) and ny <= number(bounds.maxY, ny)
+        )
+        if inBounds then
+            local cand = cell:getGridSquare(nx, ny, z)
+            if cand and (not cand.isOutside or cand:isOutside() ~= true)
+                and (not cand.isSolidTrans or cand:isSolidTrans() ~= true)
+                and not isHazardousOrDoorwaySquare(cand)
+            then
+                site.movementX = nx
+                site.movementY = ny
+                site.x = nx
+                site.y = ny
+                return site
+            end
+        end
+    end
+    return site
+end
+
 local function resolveMobileShelterSite(record, zombie, order, at)
     local resolver = PNC.Semantics and PNC.Semantics.CampSiteResolver
     local key = mobileShelterKey(order)
@@ -107,10 +155,13 @@ local function resolveMobileShelterSite(record, zombie, order, at)
         rememberMobileFailure(key, reason, at)
         return nil, reason
     end
+    adjustAnchorAwayFromHazards(site)
     rememberMobileSite(key, site, at)
     return primitiveCopy(site), "resolved"
 end
 
+MobileSites.isHazardousOrDoorwaySquare = isHazardousOrDoorwaySquare
+MobileSites.adjustAnchorAwayFromHazards = adjustAnchorAwayFromHazards
 MobileSites.remember = rememberMobileSite
 MobileSites.rememberFailure = rememberMobileFailure
 MobileSites.cached = cachedMobileSite

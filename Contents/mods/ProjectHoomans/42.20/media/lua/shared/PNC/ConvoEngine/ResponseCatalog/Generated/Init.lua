@@ -3,6 +3,7 @@ PNC = PNC or {}
 PNC.ConvoEngine = PNC.ConvoEngine or {}
 
 require "PNC/ConvoEngine/ResponseCatalog/Generated/CoreLexicon"
+require "PNC/ConvoEngine/ResponseCatalog/Generated/AmbientImmersion"
 require "PNC/ConvoEngine/ResponseCatalog/Generated/CombatAllyWarn"
 require "PNC/ConvoEngine/ResponseCatalog/Generated/CombatAssist"
 require "PNC/ConvoEngine/ResponseCatalog/Generated/CombatInjuryAndPain"
@@ -10,6 +11,7 @@ require "PNC/ConvoEngine/ResponseCatalog/Generated/CommandsAndMood"
 require "PNC/ConvoEngine/ResponseCatalog/Generated/CompanionDirectives"
 require "PNC/ConvoEngine/ResponseCatalog/Generated/ConversationLifecycle"
 require "PNC/ConvoEngine/ResponseCatalog/Generated/FlowsGreetingAndEmotes"
+require "PNC/ConvoEngine/ResponseCatalog/Generated/GroupBanter"
 require "PNC/ConvoEngine/ResponseCatalog/Generated/GroupFloorInterjections"
 require "PNC/ConvoEngine/ResponseCatalog/Generated/MedicalAndTriage"
 require "PNC/ConvoEngine/ResponseCatalog/Generated/ModCompatibility"

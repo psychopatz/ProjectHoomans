@@ -7,13 +7,21 @@ PNC.PathService.Internal = PNC.PathService.Internal or {}
 local Internal = PNC.PathService.Internal
 local methodReturnsTrue = Internal.passageMethodReturnsTrue
 
+local function indexField(object, name)
+    return object[name]
+end
+
+local function hasProperty(properties, name)
+    return properties:has(name)
+end
+
 -- Engine members may resolve to nil or raise when a class does not expose them
--- in a given point release, so every lookup goes through here.
+-- in a given point release, so every lookup goes through here with zero closure allocation.
 local function methodOf(object, name)
     local ok
     local method
     if not object then return nil end
-    ok, method = pcall(function() return object[name] end)
+    ok, method = pcall(indexField, object, name)
     if not ok then return nil end
     return method
 end
@@ -77,7 +85,7 @@ local function spriteHasProperty(object, name)
     if not method then return false end
     ok, properties = pcall(method, object)
     if not ok or not properties then return false end
-    ok, value = pcall(function() return properties:has(name) end)
+    ok, value = pcall(hasProperty, properties, name)
     return ok and value == true
 end
 

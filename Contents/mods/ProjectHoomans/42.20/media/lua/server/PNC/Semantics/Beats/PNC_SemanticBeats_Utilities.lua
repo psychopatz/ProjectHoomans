@@ -21,17 +21,17 @@ local function nowMs(at)
     return 0
 end
 
-local function makeUtilityHook(id, eventName, openRole, replyRole, fam, refPrefix)
+local function makeUtilityHook(id, eventName, openRole, replyRole, chimeRole, fam, refPrefix)
     Beats.RegisterHook(id, {
         eventTypes = { eventName },
         priority = 36,
-        cooldownMs = 180000,
+        cooldownMs = 0,
         evaluate = function(_, payload)
             local a = payload.anchor or payload.speaker
             local b = payload.partner or payload.addressee
             if type(Beats.BuildWorldThread) ~= "function" then return nil end
             return Beats.BuildWorldThread(a, b, {
-                refPrefix = refPrefix,
+                refPrefix = refPrefix .. ":" .. tostring(payload.groupIndex or 1),
                 family = fam,
                 poolID = "semantic.world.utility.outage",
                 eventType = "world_event_beat",
@@ -42,8 +42,12 @@ local function makeUtilityHook(id, eventName, openRole, replyRole, fam, refPrefi
                 replyAct = "REACT",
                 openRole = openRole,
                 replyRole = replyRole,
+                chimeRole = chimeRole,
+                third = payload.third,
+                openingDelayMs = payload.openingDelayMs,
                 priority = 36,
-                delayMs = 950,
+                delayMs = 1100,
+                chimeDelayMs = 2400,
             })
         end,
     })
@@ -54,6 +58,7 @@ makeUtilityHook(
     "environment.power_shutoff",
     "power_shutoff_open",
     "power_shutoff_reply",
+    "power_shutoff_chime",
     "world_power_shutoff",
     "world:power_shutoff"
 )
@@ -63,11 +68,19 @@ makeUtilityHook(
     "environment.water_shutoff",
     "water_shutoff_open",
     "water_shutoff_reply",
+    "water_shutoff_chime",
     "world_water_shutoff",
     "world:water_shutoff"
 )
 
 local function tryEmitUtilityEvent(eventName, day, env, now)
+    if type(Beats.EmitForNearbyGroups) == "function" then
+        return Beats.EmitForNearbyGroups(eventName, {
+            currentDay = day,
+            env = env,
+            usePlayerProximity = true,
+        }, now, 18, 2)
+    end
     local a, b = nil, nil
     if type(Beats.FindCalmSpeakerNearPlayer) == "function" then
         a, b = Beats.FindCalmSpeakerNearPlayer(now)
@@ -136,6 +149,15 @@ function Beats.ResetUtilitiesRuntime()
     lastWaterState = nil
     emittedPowerDay = nil
     emittedWaterDay = nil
+end
+
+function Beats.GetUtilitiesAuditState()
+    return {
+        lastPowerState = lastPowerState,
+        lastWaterState = lastWaterState,
+        emittedPowerDay = emittedPowerDay,
+        emittedWaterDay = emittedWaterDay,
+    }
 end
 
 local function onElectricityChanged()

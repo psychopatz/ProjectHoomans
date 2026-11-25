@@ -31,6 +31,10 @@ Router.Register(Const.CMD_DEBUG, function(player, normalizedArgs, rawArgs)
         Handler.Spawn(player, args)
         return
     end
+    if args.action == "spawn_mobile_group" then
+        Handler.SpawnMobileGroup(player, args)
+        return
+    end
     if args.action == "spawn_unique_test" then
         local record, reason = H.HandleUniqueNPCTestSpawn(player, args)
         if Network and Network.SendUniqueNPCTestSpawn then

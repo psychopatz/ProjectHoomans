@@ -316,4 +316,70 @@ function Service.Reset()
     Service.LastDiagnostics = {}
 end
 
+-- Cooldown-gated player-proximity first-sight awareness (zero extra loop).
+-- Neutral/friendly calm NPCs react once when spotting a player (armed vs
+-- unarmed vs known friend/lover reunion) via the compiled ConvoDSL beat.
+Service.PLAYER_SIGHT_COOLDOWN_MS = 90000
+Service.PLAYER_SIGHT_RADIUS = 10.0
+
+function Service.EvaluatePlayerSight(record, player, at, opts)
+    if type(record) ~= "table" or not player then return false, "invalid_args" end
+    if tostring(record.tacticalClass or "") == "hostile" then
+        return false, "hostile_skipped"
+    end
+    at = nowMs(at)
+    if not isParticipantEligible(record, at) then
+        return false, "npc_ineligible"
+    end
+    local nx, ny = tonumber(record.x), tonumber(record.y)
+    local px = player.getX and tonumber(player:getX()) or tonumber(player.x)
+    local py = player.getY and tonumber(player:getY()) or tonumber(player.y)
+    if not nx or not ny or not px or not py then
+        return false, "position_missing"
+    end
+    local radius = tonumber(opts and opts.radius) or Service.PLAYER_SIGHT_RADIUS
+    local dx, dy = px - nx, py - ny
+    if (dx * dx + dy * dy) > (radius * radius) then
+        return false, "out_of_range"
+    end
+    local playerID = tostring(
+        (player.getUsername and player:getUsername())
+        or (player.getDisplayName and player:getDisplayName())
+        or player.id or "player"
+    )
+    local pairKey = "player_sight:" .. tostring(record.id or "") .. ":" .. playerID
+    if at < (tonumber(Service.PairCooldownUntil[pairKey]) or 0) then
+        return false, "cooldown"
+    end
+    Service.PairCooldownUntil[pairKey] = at + Service.PLAYER_SIGHT_COOLDOWN_MS
+
+    local isAiming = player.isAiming and player:isAiming() == true
+    local rels = type(record.social) == "table" and record.social.relationships or nil
+    local rel = type(rels) == "table" and (rels[playerID] or rels["player:" .. playerID]) or nil
+    local bondClass = type(rel) == "table" and type(rel.bond) == "table" and rel.bond.class or nil
+    local familiarity = type(rel) == "table" and (tonumber(rel.familiarity) or 0) or 0
+    local topic
+    if isAiming and bondClass ~= "lover" and bondClass ~= "friend" and bondClass ~= "family" then
+        topic = "armed"
+    elseif bondClass == "lover" or bondClass == "friend" or bondClass == "family" or familiarity >= 45 then
+        topic = "reunion"
+    else
+        topic = "unarmed"
+    end
+
+    local body = record.zombie
+    if body and type(body.faceLocation) == "function" then
+        body:faceLocation(px, py)
+    end
+    local beats = PNC and PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if beats and type(beats.Emit) == "function" then
+        beats.Emit("ambient.player_sight", {
+            speaker = record,
+            topic = topic,
+            playerName = playerID,
+        }, at)
+    end
+    return true, topic
+end
+
 return Service

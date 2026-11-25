@@ -127,6 +127,24 @@ end
 
 function Repository.SerializeOrder(record)
     local order = record and record.orderSpec or nil
+    if type(order) == "table"
+        and tostring(order.kind or "") == "facility_activity"
+    then
+        -- Facility activities (seating, sleeping, campfire warming) temporarily
+        -- own orderSpec while storing the durable player/camp directive on
+        -- runtime.facilityActivity.previousOrder. Unwrap it so saving mid-seat
+        -- or mid-sleep preserves the NPC's durable camp/guard/patrol order.
+        local activity = record and record.runtime
+            and record.runtime.facilityActivity or nil
+        local previous = type(activity) == "table"
+            and type(activity.previousOrder) == "table"
+            and activity.previousOrder or nil
+        if previous and tostring(previous.kind or "") ~= "facility_activity" then
+            order = previous
+        else
+            return nil
+        end
+    end
     if type(order) ~= "table"
         or tostring(order.kind or "") == "facility_activity"
     then

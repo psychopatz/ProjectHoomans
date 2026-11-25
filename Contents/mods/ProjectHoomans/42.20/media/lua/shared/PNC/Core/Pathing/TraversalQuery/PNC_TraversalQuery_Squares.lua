@@ -6,7 +6,6 @@ PNC.TraversalQuery.Internal = PNC.TraversalQuery.Internal or {}
 
 local TraversalQuery = PNC.TraversalQuery
 local Internal = TraversalQuery.Internal
-local VehicleAvoidance = PNC.VehicleAvoidance
 
 function TraversalQuery.GetSquare(x, y, z, cell)
     cell = cell or (getCell and getCell() or nil)
@@ -22,14 +21,13 @@ end
 
 function TraversalQuery.GetOccupancyReason(x, y, z, cell)
     local square = TraversalQuery.GetSquare(x, y, z, cell)
-    local vehicleReason
     if not square then return "unloaded" end
-    if VehicleAvoidance and VehicleAvoidance.GetReason then
-        vehicleReason = VehicleAvoidance.GetReason(x, y, z, cell, false)
-    elseif Internal.ObjectBool(square, { "isVehicleIntersecting" }, false) then
-        vehicleReason = "vehicle"
+    if square.isVehicleIntersecting and square:isVehicleIntersecting() == true then
+        return "vehicle"
     end
-    if vehicleReason then return vehicleReason end
+    if square.isOnFire and square:isOnFire() == true then
+        return "fire"
+    end
     if square:isSolid() then return "solid" end
     if square:isSolidTrans() then return "solid_trans" end
     if not square:isFree(false) then return "occupied" end

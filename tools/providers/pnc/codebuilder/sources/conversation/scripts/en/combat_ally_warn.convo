@@ -24,11 +24,13 @@ flow semantic.combat.ally_warn.callout.zombie
   say [role=stamina_exhausted] (pri 14) as stamina_exhausted:
     "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!"
   say [combat.style=hostile] (pri 11) as hostile:
-    "Drop them! {target.name} prowling {scene.location}!"
+    "Drop {target.pronoun}, {addressee.name}! Got {target.name} prowling {scene.location}!"
   say [combat.style=tactical] (pri 10) as tactical:
-    "Contact, {scene.location}! {target.name}, weapons up!"
+    "Contact {scene.location}, {addressee.name}, got {target.name}, weapons up!"
   say [default] (pri 6) as neutral:
     "Heads up, {addressee.name}, {target.name} moving {scene.location}!"
+  say [default] (pri 6) as neutral_2:
+    "Watch out, {addressee.name}, {target.name} right {scene.location}!"
 
 flow semantic.combat.ally_warn.callout.hostile
   say [role=crawler] (pri 14) as crawler:
@@ -52,11 +54,11 @@ flow semantic.combat.ally_warn.callout.hostile
   say [role=stamina_exhausted] (pri 14) as stamina_exhausted:
     "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!"
   say [combat.style=hostile] (pri 11) as hostile:
-    "Flush them out! Got {target.name} {scene.location}!"
+    "Flush {target.pronoun} out, {addressee.name}! Got {target.name} {scene.location}!"
   say [combat.style=tactical] (pri 10) as tactical:
-    "Hostile contact! {target.name} {scene.location}, weapons ready!"
+    "Hostile contact, {addressee.name}, got {target.name} {scene.location}, weapons ready!"
   say [default] (pri 6) as neutral:
-    "Watch out, {target.name} spotted {scene.location}!"
+    "Watch out, {addressee.name}, {target.name} spotted {scene.location}!"
 
 flow semantic.combat.ally_warn.reply.engaging
   say [role=wingman, combat.style=shaken] (pri 13) as wingman_shaken:

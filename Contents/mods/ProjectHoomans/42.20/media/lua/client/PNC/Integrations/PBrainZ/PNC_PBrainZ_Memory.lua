@@ -125,11 +125,16 @@ local function calendarSnapshot(worldAgeHours)
     end
     hour = math.max(0, math.min(23, math.floor(hour or 0)))
     minutes = math.max(0, math.min(59, math.floor(minutes)))
-    local iso = string.format(
-        "%04d-%02d-%02dT%02d:%02d:00",
-        year, month, day, hour, minutes
-    )
-    local monthName = monthNames[month] or string.format("Month %02d", month)
+    local tf = PsychopatzCore and PsychopatzCore.TimeFormat or nil
+    local iso = (tf and type(tf.FormatISO) == "function" and tf.FormatISO(year, month, day, hour, minutes))
+        or string.format("%04d-%02d-%02dT%02d:%02d:00", year, month, day, hour, minutes)
+    local label = (tf and type(tf.FormatDateTime) == "function"
+        and tf.FormatDateTime(year, month, day, hour, minutes, { gameDay = gameDay }))
+        or string.format(
+            "%s %d, %d (Day %d, %02d:%02d)",
+            monthNames[month] or string.format("Month %02d", month),
+            day, year, gameDay, hour, minutes
+        )
     return {
         kind = "in_world_calendar",
         game_day = gameDay,
@@ -137,10 +142,7 @@ local function calendarSnapshot(worldAgeHours)
         year = year, month = month, day = day,
         hour = hour, minute = minutes,
         iso = iso,
-        label = string.format(
-            "%s %d, %d (Day %d, %02d:%02d)",
-            monthName, day, year, gameDay, hour, minutes
-        ),
+        label = label,
     }
 end
 

@@ -38,10 +38,13 @@ function H.RefreshAmbient(faction, at, context)
     local phase = H.AmbientPhase(at)
     local rainShelter = H.IsRainShelterActive
         and H.IsRainShelterActive(context) == true or false
+    local chopperShelter = H.IsHelicopterShelterActive
+        and H.IsHelicopterShelterActive(context) == true or false
     local ambient = mobile.ambient or {}
     local prevObjective = ambient.objective
     local prevRainShelter = ambient.rainShelter == true
-    local objective = (phase == Constants.MOBILE_AMBIENT_DAY and not rainShelter)
+    local prevChopperShelter = ambient.chopperShelter == true
+    local objective = (phase == Constants.MOBILE_AMBIENT_DAY and not rainShelter and not chopperShelter)
         and Constants.MOBILE_AMBIENT_ROAD
         or Constants.MOBILE_AMBIENT_SHELTER
     local target = ambient.target
@@ -118,6 +121,7 @@ function H.RefreshAmbient(faction, at, context)
                 phase = phase,
                 objective = objective,
                 rainShelter = rainShelter and objective == Constants.MOBILE_AMBIENT_SHELTER or false,
+                chopperShelter = chopperShelter and objective == Constants.MOBILE_AMBIENT_SHELTER or false,
                 target = target,
                 nextCheckAt = at + Constants.MOBILE_AMBIENT_CHECK_HOURS,
                 nextObjectiveAt = at + Constants.MOBILE_AMBIENT_OBJECTIVE_HOURS,
@@ -184,6 +188,7 @@ function H.RefreshAmbient(faction, at, context)
         and PNC.AmbientVisitService
         and PNC.AmbientVisitService.ReleaseMobileShelter
     then
+        local weatherClearedBeatEmitted = false
         for npcID in pairs(faction and faction.memberIDs or {}) do
             local record = PNC.Registry and PNC.Registry.Get
                 and PNC.Registry.Get(npcID) or nil
@@ -193,14 +198,30 @@ function H.RefreshAmbient(faction, at, context)
                     or (PNC.AmbientVisitService.IsActive
                         and PNC.AmbientVisitService.IsActive(record, at)))
             then
-                local releaseReason = prevRainShelter
-                    and "mobile_shelter_weather_cleared"
-                    or "mobile_shelter_day_started"
+                local releaseReason = prevChopperShelter
+                    and "mobile_shelter_chopper_cleared"
+                    or (prevRainShelter
+                        and "mobile_shelter_weather_cleared"
+                        or "mobile_shelter_day_started")
                 PNC.AmbientVisitService.ReleaseMobileShelter(
                     record,
                     releaseReason,
                     at
                 )
+                if (prevChopperShelter or prevRainShelter) and not weatherClearedBeatEmitted then
+                    weatherClearedBeatEmitted = true
+                    local beats = PNC and PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+                    if beats and type(beats.Emit) == "function" then
+                        beats.Emit(
+                            prevChopperShelter and "ambient.chopper_shelter.clear"
+                                or "ambient.rain_shelter.clear",
+                            {
+                                speaker = record,
+                                factionID = faction and faction.id or nil,
+                            }
+                        )
+                    end
+                end
             end
         end
     end

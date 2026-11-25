@@ -85,6 +85,21 @@ Catalog.Register("semantic.question.current_location.unknown", {
     },
 })
 
+Catalog.Register("semantic.question.time.estimated", {
+    variants = {
+        v("semantic.question.time.estimated.time_est_night_guarded", "hoomans.question.time.estimated.time_est_night_guarded", "Do I look like I'm wearing a watch? It's dark out—probably {slot.time_estimate}.", { action = "night", socialStyle = { "hostile", "guarded", "withdrawn" } }, 11, true),
+        v("semantic.question.time.estimated.time_est_night_warm", "hoomans.question.time.estimated.time_est_night_warm", "Sorry {addressee.name}, no watch on me and it's too dark to tell by the sky. Feels like {slot.time_estimate}.", { action = "night", socialStyle = { "warm", "friendly", "protective" } }, 11, true),
+        v("semantic.question.time.estimated.time_est_night_1", "hoomans.question.time.estimated.time_est_night_1", "No watch on me, and it's too dark to check the sun—best guess is {slot.time_estimate}.", { action = "night" }, 9, true),
+        v("semantic.question.time.estimated.time_est_night_2", "hoomans.question.time.estimated.time_est_night_2", "Hard to say in the dark without a watch, probably {slot.time_estimate}.", { action = "night" }, 9, true),
+        v("semantic.question.time.estimated.time_est_sun_guarded", "hoomans.question.time.estimated.time_est_sun_guarded", "Don't have a watch. Going by the sun, I'd say {slot.time_estimate}.", { action = "sun", socialStyle = { "hostile", "guarded", "withdrawn" } }, 11, true),
+        v("semantic.question.time.estimated.time_est_sun_warm", "hoomans.question.time.estimated.time_est_sun_warm", "Not totally sure without a watch, {addressee.name}, but based on where the sun is, looks like {slot.time_estimate}.", { action = "sun", socialStyle = { "warm", "friendly", "protective" } }, 11, true),
+        v("semantic.question.time.estimated.time_est_sun_1", "hoomans.question.time.estimated.time_est_sun_1", "Don't have a watch on me, so I'm guessing by the sun—looks like {slot.time_estimate}.", { action = "sun" }, 9, true),
+        v("semantic.question.time.estimated.time_est_sun_2", "hoomans.question.time.estimated.time_est_sun_2", "No watch, sorry. Judging by the light outside, I'd say it's {slot.time_estimate}.", { action = "sun" }, 9, true),
+        v("semantic.question.time.estimated.time_est_sun_3", "hoomans.question.time.estimated.time_est_sun_3", "Wish I had a watch. Based on the sun's height, probably {slot.time_estimate}.", { action = "sun" }, 9, true),
+        v("semantic.question.time.estimated.default", "hoomans.question.time.estimated.default", "Not sure without a watch, probably {slot.time_estimate}.", nil, 6, true),
+    },
+})
+
 Catalog.Register("semantic.greeting", {
     variants = {
         v("semantic.greeting.fed_up", "hoomans.greeting.fed_up", "What now? You've been talking my ear off.", { npcFedUp = true }, 13, false),

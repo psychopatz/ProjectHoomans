@@ -100,10 +100,20 @@ end
 local function detectWorldTopicFollowUpKind(ir)
     if type(ir) ~= "table" then return nil end
     local act = ir.slots and tostring(ir.slots.dialogueAct or "") or ""
+    local speechAct = string.upper(tostring(ir.speechAct or ir.intent or ""))
     if act == "ASK_WHERE" then return "where" end
     if act == "ASK_WHEN" then return "when" end
     if act == "ASK_WHO" then return "who" end
     if act == "ASK_ELABORATE" then return "more" end
+    if act == "STANCE_POSITIVE" or speechAct == "AGREE" or speechAct == "PRAISE" or speechAct == "REASSURE" then
+        return "stance_positive"
+    end
+    if act == "STANCE_NEGATIVE" or speechAct == "DISAGREE" or speechAct == "CRITICIZE" or speechAct == "ANTAGONIZE" then
+        return "stance_negative"
+    end
+    if act == "STANCE_NEUTRAL" or speechAct == "CLARIFY" then
+        return "stance_neutral"
+    end
     local text = string.lower(tostring(ir.normalizedText or ir.rawText or ""))
     if text == "where" or text == "where was that" or text == "where is that" then
         return "where"
@@ -114,8 +124,21 @@ local function detectWorldTopicFollowUpKind(ir)
     if text == "who" or text == "who was that" or text == "who told you" then
         return "who"
     end
+    if string.find(text, "bullshit", 1, true) or string.find(text, "don't buy", 1, true)
+        or string.find(text, "nonsense", 1, true) or string.find(text, "disagree", 1, true)
+    then
+        return "stance_negative"
+    end
+    if string.find(text, "i agree", 1, true) or string.find(text, "good point", 1, true)
+        or string.find(text, "makes sense", 1, true) or string.find(text, "hope so", 1, true)
+    then
+        return "stance_positive"
+    end
+    if string.find(text, "not sure", 1, true) or string.find(text, "hard to say", 1, true) then
+        return "stance_neutral"
+    end
     if text == "tell me more" or text == "more" or text == "what else"
-        or text == "elaborate"
+        or text == "elaborate" or string.find(text, "what should we do", 1, true)
     then
         return "more"
     end
@@ -130,11 +153,24 @@ local function buildWorldTopicTokens(topic)
     local headline = type(topic.headline) == "string" and topic.headline ~= ""
         and topic.headline or ""
     local raidCount = tonumber(topic.raidCount or (topic.meta and topic.meta.count)) or 3
+    local meta = type(topic.meta) == "table" and topic.meta or {}
+    local channelName = type(meta.channelName) == "string" and meta.channelName ~= ""
+        and meta.channelName or "the broadcast"
+    local showName = type(meta.showName) == "string" and meta.showName ~= ""
+        and meta.showName or (headline ~= "" and headline or channelName)
+    local episode = type(meta.episode) == "string" and meta.episode ~= ""
+        and meta.episode or showName
+    local topicLabel = type(meta.topicLabel) == "string" and meta.topicLabel ~= ""
+        and meta.topicLabel or (headline ~= "" and headline or showName)
     return {
         ["slot.gossip_time"] = timeLabel,
         ["slot.gossip_location"] = locLabel,
         ["slot.gossip_headline"] = headline,
         ["slot.gossip_raid_count"] = tostring(raidCount),
+        ["slot.show.name"] = showName,
+        ["slot.broadcast.channel"] = channelName,
+        ["slot.broadcast.episode"] = episode,
+        ["slot.broadcast.topic"] = topicLabel,
     }
 end
 
@@ -167,7 +203,8 @@ function Response.Resolve(ir, state, context, branch)
                 end
                 local followCtx = copyArgs(context)
                 followCtx.currentTopic = topic.topic
-                followCtx.action = followKind
+                followCtx.action = (followKind == "more" and activeWorldTopic.depth >= 2)
+                    and "plan" or followKind
                 local slotTokens = buildWorldTopicTokens(topic)
                 local resp = catalogResponse(poolID, ir, state, followCtx, slotTokens)
                 if type(resp) == "table" then
@@ -175,6 +212,25 @@ function Response.Resolve(ir, state, context, branch)
                     resp.topic = topic.topic
                     resp.referenceTopic = topic.subjectLabel or topic.topic
                     resp.worldTopicExhausted = activeWorldTopic.exhausted
+                    if (followKind == "stance_positive" or followKind == "stance_neutral" or followKind == "stance_negative")
+                        and PNC.Semantics and PNC.Semantics.ConversationDirector
+                        and type(PNC.Semantics.ConversationDirector.EvaluateStanceImpact) == "function"
+                    then
+                        local addrRec = (type(context) == "table" and (context.npcRecord or context.record))
+                            or (type(context) == "table" and context.npcID and PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(context.npcID))
+                            or nil
+                        local playerSpeaker = (type(context) == "table" and (context.player or context.playerKey))
+                            or { isPlayer = true, username = type(context) == "table" and context.playerUsername or "0" }
+                        local bystanders = nil
+                        if addrRec and addrRec.x and addrRec.y and PNC.SpatialIndex and type(PNC.SpatialIndex.QueryNPCs) == "function" then
+                            bystanders = PNC.SpatialIndex.QueryNPCs(addrRec.x, addrRec.y, 12)
+                        end
+                        local impacts = PNC.Semantics.ConversationDirector.EvaluateStanceImpact(
+                            playerSpeaker, addrRec, bystanders, topic.topic, followKind,
+                            { topicInstanceKey = tostring(topic.id or topic.topic) }
+                        )
+                        resp.stanceImpact = impacts
+                    end
                     return resp
                 end
             end

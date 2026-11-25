@@ -7,6 +7,39 @@ local FACTION_DOGTAG_SCHEMA_VERSION = 1
 local identityCardKey = Internal.IdentityCardKey
 local factionDogtagKey = Internal.FactionDogtagKey
 
+local function resolveWornBodyLocation(value, item)
+    if item and type(item.getBodyLocation) == "function" then
+        local okLoc, nativeLoc = pcall(item.getBodyLocation, item)
+        if okLoc and nativeLoc ~= nil and type(nativeLoc) ~= "string" then
+            return nativeLoc
+        end
+    end
+    if value == nil then return nil end
+    if type(value) ~= "string" then return value end
+    if value == "" then return nil end
+    if ItemBodyLocation and ItemBodyLocation.get
+        and ResourceLocation and ResourceLocation.of
+    then
+        local okRes, resource = pcall(ResourceLocation.of, value)
+        if okRes and resource then
+            local okGet, resolved = pcall(ItemBodyLocation.get, resource)
+            if okGet and resolved then return resolved end
+        end
+        return nil
+    end
+    return value
+end
+
+local function applyWornItemSafe(zombie, slotOrLocation, item)
+    if not zombie or type(zombie.setWornItem) ~= "function" or not item then
+        return false
+    end
+    local resolved = resolveWornBodyLocation(slotOrLocation, item)
+    if resolved == nil then return false end
+    local ok = pcall(zombie.setWornItem, zombie, resolved, item)
+    return ok == true
+end
+
 function Internal.prepareCorpseItems(record, zombie)
     local equipment = PNC.Equipment
     local Identity = PNC.Identity
@@ -182,7 +215,7 @@ function Internal.prepareCorpseItems(record, zombie)
                     if PNC.Core and PNC.Core.ProtectClothingFromFall then
                         PNC.Core.ProtectClothingFromFall(item)
                     end
-                    pcall(zombie.setWornItem, zombie, tostring(descriptor.wornSlot), item)
+                    applyWornItemSafe(zombie, descriptor.wornSlot, item)
                 elseif item and descriptor.equipSlot == "primary" and zombie.setPrimaryHandItem then
                     zombie:setPrimaryHandItem(item)
                 elseif item and descriptor.equipSlot == "secondary" and zombie.setSecondaryHandItem then
@@ -206,7 +239,7 @@ function Internal.prepareCorpseItems(record, zombie)
                         if PNC.Core and PNC.Core.ProtectClothingFromFall then
                             PNC.Core.ProtectClothingFromFall(item)
                         end
-                        pcall(zombie.setWornItem, zombie, tostring(bodyLocation), item)
+                        applyWornItemSafe(zombie, bodyLocation, item)
                     end
                 end
             end
@@ -223,7 +256,7 @@ function Internal.prepareCorpseItems(record, zombie)
                 if PNC.Core and PNC.Core.ProtectClothingFromFall then
                     PNC.Core.ProtectClothingFromFall(item)
                 end
-                pcall(zombie.setWornItem, zombie, tostring(bodyLocation), item)
+                applyWornItemSafe(zombie, bodyLocation, item)
             end
         end
     end

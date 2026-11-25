@@ -48,6 +48,10 @@ local function itemName(value)
 end
 
 local function timeLabel(worldMinute)
+    local tf = PsychopatzCore and PsychopatzCore.TimeFormat or nil
+    if tf and type(tf.FormatDayClock) == "function" then
+        return tf.FormatDayClock(worldMinute)
+    end
     worldMinute = math.max(0, math.floor(tonumber(worldMinute) or 0))
     local day = math.floor(worldMinute / 1440) + 1
     local minuteOfDay = worldMinute % 1440

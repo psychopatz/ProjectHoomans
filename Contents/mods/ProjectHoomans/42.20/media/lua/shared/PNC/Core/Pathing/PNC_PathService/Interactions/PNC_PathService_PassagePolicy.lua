@@ -24,16 +24,19 @@ local function sameSquare(left, right)
         and left:getZ() == right:getZ()
 end
 
+local function indexField(object, key)
+    return object[key]
+end
+
 function Internal.passageMethodReturnsTrue(object, names)
     local method
     local ok
     local value
     if not object then return false end
     for i = 1, #names do
-        -- Probe compatibly: names differ between PZ point releases and an
-        -- unknown member may resolve to nil or raise, so both the lookup and
-        -- the call stay isolated here instead of breaking door passage.
-        ok, method = pcall(function() return object[names[i]] end)
+        -- Probe compatibly with zero closure allocation: names differ between
+        -- PZ point releases and an unknown member may resolve to nil or raise.
+        ok, method = pcall(indexField, object, names[i])
         if ok and type(method) == "function" then
             ok, value = pcall(method, object)
             if ok and value == true then

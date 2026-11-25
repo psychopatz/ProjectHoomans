@@ -201,4 +201,95 @@ function H.TeleportPlayerToRecord(player, npcId)
     return false
 end
 
+function Handler.SpawnMobileGroup(player, args)
+    local Factions = PNC.Factions
+    local Director = PNC.MobileGroupDirector
+    local Archetypes = PNC.FactionArchetypes
+    if not Factions or type(Factions.Create) ~= "function"
+        or not Director or type(Director.GenerateForFaction) ~= "function"
+    then
+        return nil, "mobile_group_pipeline_unavailable"
+    end
+    local archetypeID = tostring(args and args.archetypeID or "refugee")
+    if Archetypes and type(Archetypes.Get) == "function"
+        and not Archetypes.Get(archetypeID)
+    then
+        return nil, "unknown_archetype"
+    end
+    local x = tonumber(args and args.x) or (player and player:getX()) or 0
+    local y = tonumber(args and args.y) or (player and player:getY()) or 0
+    local z = tonumber(args and args.z) or (player and player:getZ()) or 0
+    local controlMode = tostring(args and args.mobileControlMode or "ambient")
+    local pathMode = tostring(args and args.mobilePathMode or "random")
+    local groupSize = math.max(2, math.min(6, math.floor(tonumber(args and args.groupSize) or 3)))
+    local gameTime = getGameTime and getGameTime() or nil
+    local worldAgeHours = gameTime and gameTime.getWorldAgeHours
+        and tonumber(gameTime:getWorldAgeHours()) or 0
+
+    local ok, reason, faction = Factions.Create({
+        name = "Debug " .. archetypeID .. " " .. tostring(math.floor(worldAgeHours * 10)),
+        archetypeID = archetypeID,
+        createdAt = worldAgeHours,
+        tags = {
+            debugCreated = true,
+            mobileGroup = true,
+            mobileControlMode = controlMode,
+            mobilePathMode = pathMode,
+        },
+    })
+    if not ok or type(faction) ~= "table" then
+        return nil, reason or "faction_create_failed"
+    end
+
+    local ix = math.floor(x)
+    local iy = math.floor(y)
+    local iz = math.floor(z)
+    local siteRadius = 6
+    local genOk, genReason, groupResult = Director.GenerateForFaction(faction.id, {
+        x = x,
+        y = y,
+        z = z,
+        groupSize = groupSize,
+        presenceMode = tostring(args and args.presenceMode or "live"),
+        allowLive = true,
+        useExisting = false,
+        mobileControlMode = controlMode,
+        mobilePathMode = pathMode,
+        siteSpec = {
+            id = "debug_mobile:" .. tostring(faction.id),
+            kind = "camp",
+            home = { x = x, y = y, z = z, radius = siteRadius },
+            bounds = {
+                minX = ix - siteRadius,
+                maxX = ix + siteRadius,
+                minY = iy - siteRadius,
+                maxY = iy + siteRadius,
+                minZ = iz,
+                maxZ = iz,
+            },
+            createdAt = worldAgeHours,
+        },
+        debug = true,
+    })
+    if not genOk then
+        return nil, genReason or "mobile_group_generate_failed"
+    end
+
+    if type(Director.RefreshFactionObjective) == "function" then
+        Director.RefreshFactionObjective(faction.id, worldAgeHours)
+    end
+    if args and args.startSettlementTravel == true
+        and type(Director.StartSettlementTravel) == "function"
+    then
+        Director.StartSettlementTravel(faction.id, nil, worldAgeHours)
+    end
+
+    if PNC.Core and type(PNC.Core.LogInfo) == "function" then
+        PNC.Core.LogInfo("PNC debug spawned mobile group faction="
+            .. tostring(faction.id) .. " archetype=" .. archetypeID
+            .. " size=" .. tostring(groupSize) .. " control=" .. controlMode)
+    end
+    return faction, "spawned", groupResult
+end
+
 return Handler

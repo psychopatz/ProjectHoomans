@@ -231,7 +231,7 @@ function LiveBodyControl.SuppressZombieState(
         and ZombieIdleState.instance
     then
         zombie:changeState(ZombieIdleState.instance())
+        LiveBodyControl.TrySilenceEmitter(zombie, lane, now)
     end
-    LiveBodyControl.TrySilenceEmitter(zombie, lane, now)
     return true, actionState
 end

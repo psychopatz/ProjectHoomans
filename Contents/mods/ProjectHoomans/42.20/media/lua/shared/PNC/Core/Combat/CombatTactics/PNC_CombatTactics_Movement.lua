@@ -149,8 +149,9 @@ function Internal.BuildRetreatFromSource(record, target, distance, sourceX, sour
     baseX = dx / len
     baseY = dy / len
     retreatZ = tonumber(sourceZ) or target and target.z or record.z
-    angles = { 0, 0.55, -0.55, 1.05, -1.05 }
+    angles = { 0, 0.55, -0.55, 1.05, -1.05, 1.57, -1.57 }
     if TraversalQuery and TraversalQuery.CanStep and TraversalQuery.CanOccupy then
+        local foundOpen = false
         for i = 1, #angles do
             angle = angles[i]
             cosAngle = math.cos(angle)
@@ -166,14 +167,23 @@ function Internal.BuildRetreatFromSource(record, target, distance, sourceX, sour
             end
             stepX = record.x + ((candidateX - record.x) * 0.8)
             stepY = record.y + ((candidateY - record.y) * 0.8)
+            local nearStepX = record.x + dx
+            local nearStepY = record.y + dy
             if TraversalQuery.CanStep(
+                record.x, record.y, record.z,
+                nearStepX, nearStepY, retreatZ
+            ) and TraversalQuery.CanStep(
                 record.x, record.y, record.z,
                 stepX, stepY, retreatZ
             ) and TraversalQuery.CanOccupy(candidateX, candidateY, retreatZ) then
                 baseX = dx
                 baseY = dy
+                foundOpen = true
                 break
             end
+        end
+        if not foundOpen then
+            return nil
         end
     end
     if state then

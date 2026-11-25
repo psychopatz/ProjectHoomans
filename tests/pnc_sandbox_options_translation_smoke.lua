@@ -86,6 +86,7 @@ local optionAccessors = {
     RadioAmbientEnabled = "RadioAmbientEnabled",
     RadioAmbientIntervalSeconds = "RadioAmbientIntervalSeconds",
     RadioAmbientChance = "RadioAmbientChance",
+    ChatterDensity = "ChatterDensity",
 }
 
 for i = 1, #knownOptions do

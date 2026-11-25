@@ -1,0 +1,319 @@
+# Coherent multi-NPC (2-4 speaker) interactive group banter across camp, road,
+# night watch, weather, and supply check-ins.
+lang EN
+namespace hoomans
+
+beat semantic.banter.group
+  # --- Wellbeing Check (injured / exhausted squadmate or player) ---
+  say [topic=wellbeing_check, role=open] (pri 11) as wellbeing_open_1:
+    "Hey {addressee.name}, you holding up okay? Don't push through an injury out here."
+  say [topic=wellbeing_check, role=open] (pri 11) as wellbeing_open_2:
+    "Let's slow down a second, {addressee.name}—somebody looks worn thin."
+  say [topic=wellbeing_check, role=reply] (pri 11) as wellbeing_reply_1:
+    "Still standing, {addressee.name}, just need a quick breather and fresh bandages."
+  say [topic=wellbeing_check, role=reply] (pri 11) as wellbeing_reply_2:
+    "Appreciate you checking in—better to patch up now than limp into a horde."
+  say [topic=wellbeing_check, role=chime] (pri 11) as wellbeing_chime_1:
+    "I'll keep watch while anyone patches up. Take your time."
+  say [topic=wellbeing_check, role=wrap] (pri 11) as wellbeing_wrap_1:
+    "Good—nobody gets left behind if we stay smart."
+
+  # --- Camp Life ---
+  say [topic=camp_life, role=open] (pri 10) as camp_open_1:
+    "Gotta admit, {addressee.name}, having a spot to catch our breath beats living out of a backpack."
+  say [topic=camp_life, role=open] (pri 10) as camp_open_2:
+    "Think this camp holds if a few wanderers drift by, {addressee.name}?"
+  say [topic=camp_life, role=open] (pri 10) as camp_open_3:
+    "Feels good to sit down for five minutes without checking over my shoulder, {addressee.name}."
+  say [topic=camp_life, role=reply] (pri 10) as camp_reply_1:
+    "Don't get too cozy, {addressee.name}, but yeah—my feet definitely needed the break."
+  say [topic=camp_life, role=reply] (pri 10) as camp_reply_2:
+    "As long as we keep the noise down and watch the exits, we'll be alright."
+  say [topic=camp_life, role=reply] (pri 10) as camp_reply_3:
+    "Same here. A dry spot and people watching your back is worth its weight in gold."
+  say [topic=camp_life, role=chime] (pri 10) as camp_chime_1:
+    "Just wake me if it's my turn on perimeter—I'm not letting anything sneak up on us."
+  say [topic=camp_life, role=chime] (pri 10) as camp_chime_2:
+    "I checked the perimeter a minute ago—quiet so far."
+  say [topic=camp_life, role=chime] (pri 10) as camp_chime_3:
+    "Beats sleeping in a rusted-out sedan, that's for sure."
+  say [topic=camp_life, role=wrap] (pri 10) as camp_wrap_1:
+    "Fair enough. Let's enjoy the quiet while it lasts."
+  say [topic=camp_life, role=wrap] (pri 10) as camp_wrap_2:
+    "Good—stay rested, we'll need the energy later."
+
+  # --- Night Watch ---
+  say [topic=night_watch, role=open] (pri 10) as night_open_1:
+    "Gets dark fast out here, {addressee.name}. Every shadow starts looking like a walker."
+  say [topic=night_watch, role=open] (pri 10) as night_open_2:
+    "Quiet night so far, {addressee.name}... almost too quiet."
+  say [topic=night_watch, role=open] (pri 10) as night_open_3:
+    "Keep your flashlight low if you don't need it, {addressee.name}—light carries in the dark."
+  say [topic=night_watch, role=reply] (pri 10) as night_reply_1:
+    "Yeah, my eyes keep playing tricks on me too. Better safe than sorry."
+  say [topic=night_watch, role=reply] (pri 10) as night_reply_2:
+    "I'll take quiet over a horde any night of the week, {addressee.name}."
+  say [topic=night_watch, role=reply] (pri 10) as night_reply_3:
+    "Good call. Listening is half the job after sundown anyway."
+  say [topic=night_watch, role=chime] (pri 10) as night_chime_1:
+    "I'm wide awake—if anything steps near us, I'll call it out."
+  say [topic=night_watch, role=chime] (pri 10) as night_chime_2:
+    "Just waiting for sunrise. Nights always feel twice as long now."
+  say [topic=night_watch, role=wrap] (pri 10) as night_wrap_1:
+    "Hang in there—morning's not that far off."
+  say [topic=night_watch, role=wrap] (pri 10) as night_wrap_2:
+    "Appreciate it. Stay sharp."
+
+  # --- Weather Talk ---
+  say [topic=weather_talk, role=open] (pri 10) as weather_open_1:
+    "This weather's miserable, {addressee.name}—cuts visibility right down."
+  say [topic=weather_talk, role=open] (pri 10) as weather_open_2:
+    "At least the rain masks our footsteps a little, {addressee.name}."
+  say [topic=weather_talk, role=reply] (pri 10) as weather_reply_1:
+    "Masks theirs too, though. Keep your head on a swivel."
+  say [topic=weather_talk, role=reply] (pri 10) as weather_reply_2:
+    "True—just hope we don't catch a cold out in this."
+  say [topic=weather_talk, role=chime] (pri 10) as weather_chime_1:
+    "My boots are already soaked. Next dry house we pass, I'm warming up."
+  say [topic=weather_talk, role=chime] (pri 10) as weather_chime_2:
+    "Weather never cared about us before, sure doesn't care now."
+  say [topic=weather_talk, role=wrap] (pri 10) as weather_wrap_1:
+    "Keep moving steady and we'll dry off soon enough."
+
+  # --- Supplies Check ---
+  say [topic=supplies_check, role=open] (pri 10) as supplies_open_1:
+    "How are we holding up on food and water, {addressee.name}?"
+  say [topic=supplies_check, role=open] (pri 10) as supplies_open_2:
+    "We should keep an eye out for extra bandages and canned goods next stop, {addressee.name}."
+  say [topic=supplies_check, role=reply] (pri 10) as supplies_reply_1:
+    "Enough to get by for now, but I wouldn't turn down a clean supply run."
+  say [topic=supplies_check, role=reply] (pri 10) as supplies_reply_2:
+    "Agreed—never hurts to top off our packs while we still find untouched shelves."
+  say [topic=supplies_check, role=chime] (pri 10) as supplies_chime_1:
+    "Count me in. Extra water bottles first, then anything with calories."
+  say [topic=supplies_check, role=chime] (pri 10) as supplies_chime_2:
+    "And check tools too—weapons don't last forever."
+  say [topic=supplies_check, role=wrap] (pri 10) as supplies_wrap_1:
+    "Good plan. We'll keep our eyes open."
+
+  # --- Road Morale ---
+  say [topic=road_morale, role=open] (pri 10) as road_open_1:
+    "Still hanging in there, {addressee.name}? Feels like we've walked half of Kentucky."
+  say [topic=road_morale, role=open] (pri 10) as road_open_2:
+    "Hard to believe how empty these streets got, {addressee.name}."
+  say [topic=road_morale, role=open] (pri 10) as road_open_3:
+    "Hey {addressee.name}—glad we're not doing this solo. Too many ways to get blindsided alone."
+  say [topic=road_morale, role=reply] (pri 10) as road_reply_1:
+    "Still standing, {addressee.name}. As long as we stick together, we've got a shot."
+  say [topic=road_morale, role=reply] (pri 10) as road_reply_2:
+    "Yeah, eerie as hell—used to be traffic everywhere, now it's just wind and dead ones."
+  say [topic=road_morale, role=reply] (pri 10) as road_reply_3:
+    "No argument there. Extra pair of eyes saves your skin out here."
+  say [topic=road_morale, role=chime] (pri 10) as road_chime_1:
+    "Speak for yourselves, I'm just here for the great company."
+  say [topic=road_morale, role=chime] (pri 10) as road_chime_2:
+    "One mile at a time. That's all we can do."
+  say [topic=road_morale, role=wrap] (pri 10) as road_wrap_1:
+    "Hah—alright, keep it moving then."
+  say [topic=road_morale, role=wrap] (pri 10) as road_wrap_2:
+    "Damn right. Eyes forward."
+
+  # --- Story Continuity: Post-Alarm ---
+  say [topic=post_alarm, role=open] (pri 12) as post_alarm_open_1:
+    "My ears are still ringing from that house alarm, {addressee.name}. Thought half the block was gonna pour in."
+  say [topic=post_alarm, role=open] (pri 12) as post_alarm_open_2:
+    "We got lucky with that alarm earlier, {addressee.name}. Next door we pry open, let's check our exit first."
+  say [topic=post_alarm, role=reply] (pri 12) as post_alarm_reply_1:
+    "No kidding, {addressee.name}. Alarms are basically dinner bells out here."
+  say [topic=post_alarm, role=reply] (pri 12) as post_alarm_reply_2:
+    "We handled it clean, though. Kept moving instead of freezing up."
+  say [topic=post_alarm, role=chime] (pri 12) as post_alarm_chime_1:
+    "Still makes my heart jump every time one goes off. Glad it finally shut up."
+  say [topic=post_alarm, role=wrap] (pri 12) as post_alarm_wrap_1:
+    "Lesson learned. Stay sharp around locked houses."
+
+  # --- Story Continuity: Post-Chopper ---
+  say [topic=post_chopper, role=open] (pri 12) as post_chopper_open_1:
+    "Whoever was flying that chopper didn't do us any favors, {addressee.name}. Pulled half the county straight through here."
+  say [topic=post_chopper, role=open] (pri 12) as post_chopper_open_2:
+    "Still can't believe that helicopter hovered right over us, {addressee.name}. Glad we had a roof to duck under."
+  say [topic=post_chopper, role=reply] (pri 12) as post_chopper_reply_1:
+    "Yeah, {addressee.name}, they never land to help, they just stir up the dead and leave."
+  say [topic=post_chopper, role=reply] (pri 12) as post_chopper_reply_2:
+    "At least we stayed out of sight until it cleared. Could've been a whole lot worse."
+  say [topic=post_chopper, role=chime] (pri 12) as post_chopper_chime_1:
+    "Watch the side streets for a while. Stragglers always drift in after a chopper pass."
+  say [topic=post_chopper, role=wrap] (pri 12) as post_chopper_wrap_1:
+    "Good call. Let's keep our heads down and move smart."
+
+  # --- Story Continuity: Post-Fight ---
+  say [topic=post_fight, role=open] (pri 12) as post_fight_open_1:
+    "That last scrap got way too close, {addressee.name}. Everybody still in one piece?"
+  say [topic=post_fight, role=open] (pri 12) as post_fight_open_2:
+    "Catch your breath, {addressee.name}. That fight took more out of us than I expected."
+  say [topic=post_fight, role=reply] (pri 12) as post_fight_reply_1:
+    "Still breathing, {addressee.name}. Shaking a little, but we put them down."
+  say [topic=post_fight, role=reply] (pri 12) as post_fight_reply_2:
+    "Could've gone sideways fast if we hadn't covered each other."
+  say [topic=post_fight, role=chime] (pri 12) as post_fight_chime_1:
+    "Check your gear and bandages while it's quiet. Never know when the next pack shows up."
+  say [topic=post_fight, role=wrap] (pri 12) as post_fight_wrap_1:
+    "Yeah. Let's patch up and stay tight."
+
+  # --- Story Continuity: Grounded Broadcast Follow-Up Topics ---
+  say [topic=post_aebs_alert, role=open] (pri 12) as post_aebs_open_1:
+    "Still thinking about {slot.broadcast.topic} we heard on {slot.broadcast.channel}, {addressee.name}. We should plan around it."
+  say [topic=post_aebs_alert, role=reply] (pri 12) as post_aebs_reply_1:
+    "Yeah, {addressee.name}. That {slot.broadcast.episode} warning isn't something we can afford to ignore."
+  say [topic=post_aebs_alert, role=chime] (pri 12) as post_aebs_chime_1:
+    "Good thing we caught it early. Having a heads-up buys us time."
+  say [topic=post_aebs_alert, role=wrap] (pri 12) as post_aebs_wrap_1:
+    "Agreed. Let's stay ahead of it."
+
+  say [topic=post_news, role=open] (pri 12) as post_news_open_1:
+    "Can't shake {slot.broadcast.topic} we caught on {slot.broadcast.channel} earlier, {addressee.name}."
+  say [topic=post_news, role=reply] (pri 12) as post_news_reply_1:
+    "Same here, {addressee.name}. Hearing {slot.broadcast.episode} out loud makes it sink in how wide this really is."
+  say [topic=post_news, role=chime] (pri 12) as post_news_chime_1:
+    "Doesn't change what we have to do, though. Keep moving, keep watching each other's backs."
+  say [topic=post_news, role=wrap] (pri 12) as post_news_wrap_1:
+    "Right. One day at a time."
+
+  say [topic=post_military_radio, role=open] (pri 12) as post_mil_open_1:
+    "What we heard on {slot.broadcast.channel} earlier was grim, {addressee.name}. Sounds like even the army is losing ground."
+  say [topic=post_military_radio, role=reply] (pri 12) as post_mil_reply_1:
+    "Better we heard {slot.broadcast.episode} ourselves, {addressee.name}. No point waiting on rescue."
+  say [topic=post_military_radio, role=chime] (pri 12) as post_mil_chime_1:
+    "We've survived this long on our own. We'll keep doing it."
+  say [topic=post_military_radio, role=wrap] (pri 12) as post_mil_wrap_1:
+    "Damn straight. Stay sharp."
+
+  say [topic=post_survivor_radio, role=open] (pri 12) as post_surv_open_1:
+    "Still wondering about those folks we heard on {slot.broadcast.channel}, {addressee.name}."
+  say [topic=post_survivor_radio, role=reply] (pri 12) as post_surv_reply_1:
+    "Me too, {addressee.name}. Hope whoever sent {slot.broadcast.topic} made it somewhere safe."
+  say [topic=post_survivor_radio, role=chime] (pri 12) as post_surv_chime_1:
+    "Good reminder we're not the last ones left out here."
+  say [topic=post_survivor_radio, role=wrap] (pri 12) as post_surv_wrap_1:
+    "Keep the radio handy, never know who else might call in."
+
+  say [topic=post_skill_show, role=open] (pri 12) as post_skill_open_1:
+    "Honestly, {slot.broadcast.episode} we watched earlier was pretty handy, {addressee.name}."
+  say [topic=post_skill_show, role=reply] (pri 12) as post_skill_reply_1:
+    "Yeah, {addressee.name}, never thought I'd be taking survival lessons from {slot.show.name}."
+  say [topic=post_skill_show, role=chime] (pri 12) as post_skill_chime_1:
+    "If it keeps our gear working and our stomachs full, I'll watch every episode we find."
+  say [topic=post_skill_show, role=wrap] (pri 12) as post_skill_wrap_1:
+    "Fair enough. Keep an eye out for more tapes."
+
+  say [topic=post_home_vhs, role=open] (pri 12) as post_hvhs_open_1:
+    "That {slot.broadcast.episode} tape we watched earlier hit harder than I expected, {addressee.name}."
+  say [topic=post_home_vhs, role=reply] (pri 12) as post_hvhs_reply_1:
+    "Yeah, {addressee.name}. Reminds you what we're fighting to get back to someday."
+  say [topic=post_home_vhs, role=chime] (pri 12) as post_hvhs_chime_1:
+    "Just glad we're still here to remember it."
+  say [topic=post_home_vhs, role=wrap] (pri 12) as post_hvhs_wrap_1:
+    "Same. Let's keep looking out for each other."
+
+  say [topic=post_entertainment, role=open] (pri 12) as post_ent_open_1:
+    "Catching {slot.show.name} earlier almost made me forget about the dead for a minute, {addressee.name}."
+  say [topic=post_entertainment, role=reply] (pri 12) as post_ent_reply_1:
+    "We needed that, {addressee.name}. Even a short break keeps your head straight."
+  say [topic=post_entertainment, role=chime] (pri 12) as post_ent_chime_1:
+    "Here's hoping we find a few more decent tapes or CDs along the way."
+  say [topic=post_entertainment, role=wrap] (pri 12) as post_ent_wrap_1:
+    "Agreed. Morale matters out here."
+
+  # --- Story Continuity: Open World Band & Hidden Radio Arcs ---
+  say [topic=post_looter_trap, role=open] (pri 12) as post_looter_open_1:
+    "Still can't believe those looters tried pulling {slot.broadcast.topic} on {slot.broadcast.channel}, {addressee.name}."
+  say [topic=post_looter_trap, role=reply] (pri 12) as post_looter_reply_1:
+    "Yeah, {addressee.name}. Good thing we spotted it for the ambush it was."
+  say [topic=post_looter_trap, role=chime] (pri 12) as post_looter_chime_1:
+    "Just hope nobody else falls for their free supplies routine."
+  say [topic=post_looter_trap, role=wrap] (pri 12) as post_looter_wrap_1:
+    "Lesson learned. Trust our instincts."
+
+  say [topic=post_trader_radio, role=open] (pri 12) as post_trader_open_1:
+    "Think we should try to catch up with {slot.broadcast.topic} we heard earlier, {addressee.name}?"
+  say [topic=post_trader_radio, role=reply] (pri 12) as post_trader_reply_1:
+    "Could be worth it, {addressee.name}, if we've got spare gear to trade."
+  say [topic=post_trader_radio, role=chime] (pri 12) as post_trader_chime_1:
+    "A fair trade beats kicking down ten locked doors any day."
+  say [topic=post_trader_radio, role=wrap] (pri 12) as post_trader_wrap_1:
+    "Keep it in mind on our next run."
+
+  say [topic=post_refugee_radio, role=open] (pri 12) as post_refugee_open_1:
+    "Still thinking about {slot.broadcast.topic} we heard earlier, {addressee.name}. Hope those folks are holding on."
+  say [topic=post_refugee_radio, role=reply] (pri 12) as post_refugee_reply_1:
+    "Me too, {addressee.name}. It's rough enough out here with a solid crew."
+  say [topic=post_refugee_radio, role=chime] (pri 12) as post_refugee_chime_1:
+    "If we cross paths with them, maybe we can lend a hand."
+  say [topic=post_refugee_radio, role=wrap] (pri 12) as post_refugee_wrap_1:
+    "Yeah. Let's keep our eyes open for them."
+
+  say [topic=post_settlement_radio, role=open] (pri 12) as post_settle_open_1:
+    "Hearing {slot.broadcast.topic} earlier was a good sign, {addressee.name}. People are actually rebuilding."
+  say [topic=post_settlement_radio, role=reply] (pri 12) as post_settle_reply_1:
+    "Gives you a little hope, {addressee.name}. Might be worth visiting them when we're ready."
+  say [topic=post_settlement_radio, role=chime] (pri 12) as post_settle_chime_1:
+    "Just remember to announce ourselves so their guards don't get twitchy."
+  say [topic=post_settlement_radio, role=wrap] (pri 12) as post_settle_wrap_1:
+    "Smart. Respect their perimeter."
+
+  say [topic=post_radio_drama, role=open] (pri 12) as post_drama_open_1:
+    "Still laughing about {slot.broadcast.topic} earlier, {addressee.name}. Glad our crew doesn't air our laundry on an open frequency."
+  say [topic=post_radio_drama, role=reply] (pri 12) as post_drama_reply_1:
+    "No kidding, {addressee.name}. Last thing we need is half the county listening to us argue."
+  say [topic=post_radio_drama, role=chime] (pri 12) as post_drama_chime_1:
+    "At least we know those groups are too busy fighting each other to bother us."
+  say [topic=post_radio_drama, role=wrap] (pri 12) as post_drama_wrap_1:
+    "True enough. Let's keep our own house in order."
+
+  say [topic=post_numbers_station, role=open] (pri 12) as post_num_open_1:
+    "That {slot.broadcast.topic} we caught on {slot.broadcast.channel} still gives me chills, {addressee.name}."
+  say [topic=post_numbers_station, role=reply] (pri 12) as post_num_reply_1:
+    "Same, {addressee.name}. Wonder if anybody's actually left on the other end decoding it."
+  say [topic=post_numbers_station, role=chime] (pri 12) as post_num_chime_1:
+    "Probably just some bunker tape spinning until the generators die."
+  say [topic=post_numbers_station, role=wrap] (pri 12) as post_num_wrap_1:
+    "Either way, I'd rather not find out."
+
+  say [topic=post_cannibal_radio, role=open] (pri 12) as post_cann_open_1:
+    "I still can't get {slot.broadcast.topic} out of my head, {addressee.name}. Sick world we're living in."
+  say [topic=post_cannibal_radio, role=reply] (pri 12) as post_cann_reply_1:
+    "Don't dwell on them, {addressee.name}, just stay sharp so we never end up in their sights."
+  say [topic=post_cannibal_radio, role=chime] (pri 12) as post_cann_chime_1:
+    "We stick together and nobody touches us."
+  say [topic=post_cannibal_radio, role=wrap] (pri 12) as post_cann_wrap_1:
+    "Damn right. Watch each other's backs."
+
+  say [topic=post_pastor_radio, role=open] (pri 12) as post_pastor_open_1:
+    "Wonder if {slot.broadcast.topic} is still out there preaching, {addressee.name}."
+  say [topic=post_pastor_radio, role=reply] (pri 12) as post_pastor_reply_1:
+    "Hard to say, {addressee.name}. Everybody holds onto whatever keeps them going."
+  say [topic=post_pastor_radio, role=chime] (pri 12) as post_pastor_chime_1:
+    "Hope he's got solid walls around his church, though."
+  say [topic=post_pastor_radio, role=wrap] (pri 12) as post_pastor_wrap_1:
+    "Yeah. Prayers and barricades both help."
+
+  # --- Autonomous Social Friction & Mediation (applies across banter topics) ---
+  say [role=reply_friction] (pri 11) as friction_reply_1:
+    "Easy for you to say, {addressee.name}. Maybe try pulling your weight before lecturing the rest of us."
+  say [role=reply_friction] (pri 11) as friction_reply_2:
+    "Cut it out, {addressee.name}. Talking nonstop isn't gonna keep the dead off our backs."
+  say [role=reply_friction] (pri 11) as friction_reply_3:
+    "I don't need a pep talk right now, {addressee.name}. Just focus on watching your own flank."
+  say [role=chime_defuse] (pri 11) as friction_defuse_1:
+    "Hey, both of you, cool it. We're all tired, don't start snapping at each other."
+  say [role=chime_defuse] (pri 11) as friction_defuse_2:
+    "Take a breath. The dead are bad enough without us picking fights with our own people."
+  say [role=chime_defuse] (pri 11) as friction_defuse_3:
+    "Enough, save that energy for the next horde. We need each other sharp."
+  say [role=chime_escalate] (pri 11) as friction_escalate_1:
+    "Honestly? They've got a point. Somebody had to say it."
+  say [role=chime_escalate] (pri 11) as friction_escalate_2:
+    "If you two keep bickering, you're gonna draw every walker on this street."
+
+  say [default] (pri 5) as default:
+    "Stay close and keep your eyes open."

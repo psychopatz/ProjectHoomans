@@ -46,6 +46,7 @@ local MAX_GENERATION_KEYS = 8
 
 local STARTUP_ACTIVE_ORDERS = {
     follow = true,
+    camp = true,
     patrol = true,
     guard = true,
     work = true,

@@ -24,16 +24,141 @@ local function resolveNeeds(ir, state, context)
     )
 end
 
-local function resolveTime(world)
+local function itemLooksLikeWatch(item)
+    if type(item) == "string" then
+        local lo = string.lower(item)
+        return string.find(lo, "watch", 1, true) ~= nil or string.find(lo, "clock", 1, true) ~= nil
+    end
+    if type(item) == "table" then
+        local ft = string.lower(tostring(item.fullType or item.type or item.itemType or item.name or ""))
+        return string.find(ft, "watch", 1, true) ~= nil or string.find(ft, "clock", 1, true) ~= nil
+    end
+    return false
+end
+
+local function inventoryForRecord(rec)
+    if type(rec) ~= "table" then return nil end
+    if type(rec.inventory) == "table" then return rec.inventory end
+    -- Use Project Hoomans' canonical delta-hydrating inventory API so compressed
+    -- NPC inventories are read through one unified path (zero split system).
+    if PNC.Inventory and type(PNC.Inventory.EnsureRecordInventory) == "function" then
+        return PNC.Inventory.EnsureRecordInventory(rec, { reconcileWaterContainer = false })
+    end
+    return nil
+end
+
+local function npcHasWatch(context)
+    if type(context) ~= "table" then return true end
+    if context.hasWatch ~= nil then return context.hasWatch == true end
+    local rec = context.npcRecord or context.record
+        or (context.npcID and PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(context.npcID))
+        or nil
+    if type(rec) ~= "table" then return true end
+    if rec.hasWatch ~= nil then return rec.hasWatch == true end
+
+    local inv = inventoryForRecord(rec)
+    local equip = type(rec.equipment) == "table" and rec.equipment
+        or (PNC.Equipment and type(PNC.Equipment.EnsureRecordEquipment) == "function"
+            and PNC.Equipment.EnsureRecordEquipment(rec))
+        or nil
+    if not inv and not equip then return true end
+
+    -- Revision-keyed O(1) cache on rec.runtime; automatically invalidates on any
+    -- inventory/equipment delta mutation.
+    local rev = tostring(inv and inv.revision or rec.inventoryRevision or 0)
+        .. ":" .. tostring(rec.equipmentRevision or rec.recordRevision or 0)
+    local rt = type(rec.runtime) == "table" and rec.runtime or nil
+    if rt and type(rt._watchCache) == "table" and rt._watchCache.rev == rev then
+        return rt._watchCache.hasWatch == true
+    end
+
+    local found = false
+    if type(equip) == "table" then
+        for _, v in pairs(equip) do
+            if itemLooksLikeWatch(v) then found = true break end
+        end
+    end
+    if not found and type(inv) == "table" then
+        local items = type(inv.items) == "table" and inv.items or inv
+        for _, v in pairs(items) do
+            if itemLooksLikeWatch(v) then found = true break end
+        end
+    end
+    if rt then
+        rt._watchCache = { rev = rev, hasWatch = found }
+    end
+    return found
+end
+
+local function estimateTimePhrase(hour)
+    local tf = PsychopatzCore and PsychopatzCore.TimeFormat or nil
+    if tf and type(tf.EstimateFromHour) == "function" then
+        return tf.EstimateFromHour(hour)
+    end
+    hour = tonumber(hour)
+    if not hour then return "hard to tell without a watch", true end
+    if hour < 5 then return "past midnight, still deep into the night", true
+    elseif hour < 7 then return "around dawn", false
+    elseif hour < 10 then return "early morning", false
+    elseif hour < 12 then return "late morning, getting close to noon", false
+    elseif hour < 14 then return "around noon", false
+    elseif hour < 17 then return "mid-afternoon", false
+    elseif hour < 19 then return "late afternoon, sun's getting low", false
+    elseif hour < 21 then return "around dusk", false
+    else return "late at night", true end
+end
+
+local function resolveTime(world, context)
     local text = clockText(world)
     if not text then return nil end
+    local hasWatch = npcHasWatch(context)
+    local hour = world.time and world.time.hour
+    if not hasWatch then
+        local est, isDark = estimateTimePhrase(hour)
+        local estCtx = type(context) == "table" and copyArgs(context) or {}
+        estCtx.action = isDark and "night" or "sun"
+        local slotTokens = {
+            ["slot.time_estimate"] = est,
+        }
+        local compiled = catalogResponse("semantic.question.time.estimated", nil, nil, estCtx, slotTokens)
+        if type(compiled) == "table" then
+            compiled.args = copyArgs({
+                hour = hour,
+                minute = world.time and world.time.minute,
+                gameDay = world.gameDay,
+                hasWatch = false,
+                estimated = true,
+                estimatePhrase = est,
+                isDark = isDark,
+            })
+            return compiled
+        end
+        local fb = isDark
+            and ("No watch on me and it's too dark to check the sun, but it feels like " .. est .. ".")
+            or ("Not sure without a watch, but based on where the sun is, I'd guess it's " .. est .. ".")
+        return {
+            templateID = "semantic.question.time.estimated",
+            fallback = fb,
+            args = copyArgs({
+                hour = hour,
+                minute = world.time and world.time.minute,
+                gameDay = world.gameDay,
+                hasWatch = false,
+                estimated = true,
+                estimatePhrase = est,
+                isDark = isDark,
+            }),
+        }
+    end
     return {
         templateID = "semantic.question.time",
         fallback = text,
         args = copyArgs({
-            hour = world.time and world.time.hour,
+            hour = hour,
             minute = world.time and world.time.minute,
             gameDay = world.gameDay,
+            hasWatch = true,
+            estimated = false,
         }),
     }
 end

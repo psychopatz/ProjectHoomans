@@ -132,7 +132,24 @@ function S.BuildRichSpeechTokens(speaker, caller, desc, now, tone, opts)
     end
     local loc = ""
     if not (opts and opts.skipLocation == true) then loc = resolveLocationLabel(speaker, desc, now, tone, opts and opts.spatial or nil) end
-    return { ["addressee.name"] = cName, ["target.name"] = tLabel, ["target.count"] = tostring(count), ["target.kind"] = count > 1 and kPl or kSg, ["scene.location"] = loc }
+    local aud = opts and opts.audience or nil
+    local addresseeLabel = (aud and aud.label) or cName
+    local tokens = {
+        ["addressee.name"] = addresseeLabel,
+        ["audience.label"] = addresseeLabel,
+        ["audience.count"] = tostring(aud and aud.count or 1),
+        ["audience.pronoun"] = (aud and aud.isPlural) and "you all" or "you",
+        ["target.name"] = tLabel,
+        ["target.count"] = tostring(count),
+        ["target.kind"] = count > 1 and kPl or kSg,
+        ["target.pronoun"] = count > 1 and "them" or "it",
+        ["target.verb_be"] = count > 1 and "are" or "is",
+        ["scene.location"] = loc,
+    }
+    if aud and aud.playerName then
+        tokens["player.name"] = aud.playerName
+    end
+    return tokens
 end
 
 return S

@@ -35,9 +35,10 @@ Catalog.Register("semantic.combat.ally_warn.callout.zombie", {
         v("semantic.combat.ally_warn.callout.zombie.weather_rain_open", "hoomans.combat.ally_warn.callout.zombie.weather_rain_open", "Great, it's starting to pour, {addressee.name}. We might want some cover soon.", { combatReactionRole = "weather_rain_open" }, 14, true),
         v("semantic.combat.ally_warn.callout.zombie.stamina_winded", "hoomans.combat.ally_warn.callout.zombie.stamina_winded", "Whoa, {addressee.name}, give me a second to catch my breath.", { combatReactionRole = "stamina_winded" }, 14, true),
         v("semantic.combat.ally_warn.callout.zombie.stamina_exhausted", "hoomans.combat.ally_warn.callout.zombie.stamina_exhausted", "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!", { combatReactionRole = "stamina_exhausted" }, 14, true),
-        v("semantic.combat.ally_warn.callout.zombie.hostile", "hoomans.combat.ally_warn.callout.zombie.hostile", "Drop them! {target.name} prowling {scene.location}!", { combatReactionStyle = "hostile" }, 11, true),
-        v("semantic.combat.ally_warn.callout.zombie.tactical", "hoomans.combat.ally_warn.callout.zombie.tactical", "Contact, {scene.location}! {target.name}, weapons up!", { combatReactionStyle = "tactical" }, 10, true),
+        v("semantic.combat.ally_warn.callout.zombie.hostile", "hoomans.combat.ally_warn.callout.zombie.hostile", "Drop {target.pronoun}, {addressee.name}! Got {target.name} prowling {scene.location}!", { combatReactionStyle = "hostile" }, 11, true),
+        v("semantic.combat.ally_warn.callout.zombie.tactical", "hoomans.combat.ally_warn.callout.zombie.tactical", "Contact {scene.location}, {addressee.name}, got {target.name}, weapons up!", { combatReactionStyle = "tactical" }, 10, true),
         v("semantic.combat.ally_warn.callout.zombie.neutral", "hoomans.combat.ally_warn.callout.zombie.neutral", "Heads up, {addressee.name}, {target.name} moving {scene.location}!", nil, 6, true),
+        v("semantic.combat.ally_warn.callout.zombie.neutral_2", "hoomans.combat.ally_warn.callout.zombie.neutral_2", "Watch out, {addressee.name}, {target.name} right {scene.location}!", nil, 6, true),
     },
 })
 
@@ -53,9 +54,9 @@ Catalog.Register("semantic.combat.ally_warn.callout.hostile", {
         v("semantic.combat.ally_warn.callout.hostile.weather_rain_open", "hoomans.combat.ally_warn.callout.hostile.weather_rain_open", "Great, it's starting to pour, {addressee.name}. We might want some cover soon.", { combatReactionRole = "weather_rain_open" }, 14, true),
         v("semantic.combat.ally_warn.callout.hostile.stamina_winded", "hoomans.combat.ally_warn.callout.hostile.stamina_winded", "Whoa, {addressee.name}, give me a second to catch my breath.", { combatReactionRole = "stamina_winded" }, 14, true),
         v("semantic.combat.ally_warn.callout.hostile.stamina_exhausted", "hoomans.combat.ally_warn.callout.hostile.stamina_exhausted", "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!", { combatReactionRole = "stamina_exhausted" }, 14, true),
-        v("semantic.combat.ally_warn.callout.hostile.hostile", "hoomans.combat.ally_warn.callout.hostile.hostile", "Flush them out! Got {target.name} {scene.location}!", { combatReactionStyle = "hostile" }, 11, true),
-        v("semantic.combat.ally_warn.callout.hostile.tactical", "hoomans.combat.ally_warn.callout.hostile.tactical", "Hostile contact! {target.name} {scene.location}, weapons ready!", { combatReactionStyle = "tactical" }, 10, true),
-        v("semantic.combat.ally_warn.callout.hostile.neutral", "hoomans.combat.ally_warn.callout.hostile.neutral", "Watch out, {target.name} spotted {scene.location}!", nil, 6, true),
+        v("semantic.combat.ally_warn.callout.hostile.hostile", "hoomans.combat.ally_warn.callout.hostile.hostile", "Flush {target.pronoun} out, {addressee.name}! Got {target.name} {scene.location}!", { combatReactionStyle = "hostile" }, 11, true),
+        v("semantic.combat.ally_warn.callout.hostile.tactical", "hoomans.combat.ally_warn.callout.hostile.tactical", "Hostile contact, {addressee.name}, got {target.name} {scene.location}, weapons ready!", { combatReactionStyle = "tactical" }, 10, true),
+        v("semantic.combat.ally_warn.callout.hostile.neutral", "hoomans.combat.ally_warn.callout.hostile.neutral", "Watch out, {addressee.name}, {target.name} spotted {scene.location}!", nil, 6, true),
     },
 })
 

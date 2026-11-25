@@ -50,4 +50,20 @@ return {
         local record, reason = handler.Spawn(player, args)
         return record ~= nil, reason, record
     end,
+
+    spawn_mobile_group = function(player, args)
+        if isClient and isClient() == true then
+            if not player or not sendClientCommand then
+                return false, "network_unavailable"
+            end
+            sendClientCommand(player, Const.MODULE, Const.CMD_DEBUG, args)
+            return true, "request_sent"
+        end
+        local handler = PNC.ServerDebugCommandHandler
+        if not handler or not handler.SpawnMobileGroup then
+            return false, "debug_mobile_group_spawn_unavailable"
+        end
+        local faction, reason, details = handler.SpawnMobileGroup(player, args)
+        return faction ~= nil, reason, details or faction
+    end,
 }

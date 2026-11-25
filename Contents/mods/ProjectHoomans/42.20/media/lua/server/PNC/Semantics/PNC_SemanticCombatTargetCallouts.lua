@@ -66,8 +66,28 @@ function S.OnTargetChanged(event, record)
     local pCls, ctx = "TACTICAL_BARK", nil
     if wr and wr.emitted == true then
         local tone, desc = S.ResolveAllyWarnTone(record, nil), wr.descriptor
-        local toks = S.BuildRichSpeechTokens and S.BuildRichSpeechTokens(record, record, desc, now, tone, { spatial = spatial }) or nil
-        local extra = (desc and desc.enemyPosture == "crawler") and { replyRole = "crawler" } or nil
+        local listeners = {}
+        local notified = type(wr.notified) == "table" and wr.notified or {}
+        for i = 1, #notified do
+            local ally = type(notified[i]) == "table" and notified[i].record or nil
+            if type(ally) == "table" and ally.alive ~= false then
+                listeners[#listeners + 1] = ally
+            end
+        end
+        local audSvc = PNC.Semantics and PNC.Semantics.AudienceContext or nil
+        local aud = audSvc and type(audSvc.Resolve) == "function"
+            and audSvc.Resolve(record, listeners, {
+                includeNearbyPlayer = true,
+                playerRadius = S.WITNESS_RADIUS or 12,
+                targetCount = desc and desc.enemyCount or 1,
+            }) or nil
+        local firstAlly = listeners[1] or (aud and aud.includesPlayer and { id = "player", name = aud.playerName, isPlayer = true }) or nil
+        local toks = S.BuildRichSpeechTokens and S.BuildRichSpeechTokens(record, firstAlly, desc, now, tone, { spatial = spatial, audience = aud }) or nil
+        local extra = {}
+        if desc and desc.enemyPosture == "crawler" then extra.replyRole = "crawler" end
+        if aud and type(aud.context) == "table" then
+            extra.context = aud.context
+        end
         local rich, rRes = S.ResolveSemanticLine(record, "combat_ally_warn_callout", "WARN", tCls, ref, nil, toks, extra)
         if rich then
             text, evType = rich, "combat_ally_warn_callout"
@@ -105,6 +125,11 @@ function S.OnTargetChanged(event, record)
         eventRef = ref, text = text, priority = 62, priorityHoldMs = 700, ttlMs = 9000,
         presentationClass = pCls, context = ctx, tacticalSpatial = spatial, tacticalPresentation = pres,
     }) or (tauntEmitted and 1 or 0)
+    if sent > 0 and PNC.Semantics and PNC.Semantics.DialogueBeats
+        and type(PNC.Semantics.DialogueBeats.NotifyExternalSpeech) == "function"
+    then
+        PNC.Semantics.DialogueBeats.NotifyExternalSpeech(now, 1500)
+    end
 
     local sec = PNC and PNC.SecondaryChannel or nil
     if sec and type(sec.RequestBark) == "function" and (sent > 0 or (wr and wr.emitted == true)) then

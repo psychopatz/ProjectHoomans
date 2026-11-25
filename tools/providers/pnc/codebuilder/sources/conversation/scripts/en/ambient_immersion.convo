@@ -1,0 +1,95 @@
+# Ambient immersion overhead beats: rain shelter arrival/departure,
+# live world-event reactions (gunshots, screams, chopper, road stories),
+# and player-proximity first-sight awareness.
+lang EN
+namespace hoomans
+
+beat semantic.ambient.rain_shelter.enter
+  say [role=open] (pri 8) as open_1:
+    "Glad we got under a roof before that downpour soaked us through."
+  say [role=open] (pri 8) as open_2:
+    "Let's wait out this rain inside—no sense catching a chill out there."
+  say [role=reply] (pri 8) as reply_1:
+    "Good call. Better dry in here than trudging through mud."
+  say [role=reply] (pri 8) as reply_2:
+    "Agreed. Let's catch our breath until it lets up."
+  say [default] (pri 5) as default:
+    "Good to be out of the rain for a bit."
+
+beat semantic.ambient.rain_shelter.clear
+  say [role=open] (pri 8) as open_1:
+    "Rain's letting up. Let's get moving again."
+  say [role=open] (pri 8) as open_2:
+    "Looks clear enough out there now—time to hit the road."
+  say [role=reply] (pri 8) as reply_1:
+    "Right behind you. Let's keep our eyes open."
+  say [role=reply] (pri 8) as reply_2:
+    "About time. Let's go."
+  say [default] (pri 5) as default:
+    "Weather's clearing up—time to move."
+
+beat semantic.ambient.chopper_shelter.enter
+  say [role=open] (pri 8) as open_1:
+    "Good—we're under a roof. Stay away from the windows till that chopper passes."
+  say [role=open] (pri 8) as open_2:
+    "Made it inside just in time. Keep quiet and let those rotors pass overhead."
+  say [role=open] (pri 8) as open_3:
+    "Out of sight in here. Let's hold tight until that helicopter moves on."
+  say [role=reply] (pri 8) as reply_1:
+    "Smart call. Better cramped in here than spotted out on the street."
+  say [role=reply] (pri 8) as reply_2:
+    "Listening at the door—if anything bangs on it, we're ready."
+  say [default] (pri 5) as default:
+    "Hunkering down inside until that chopper leaves."
+
+beat semantic.ambient.chopper_shelter.clear
+  say [role=open] (pri 8) as open_1:
+    "Chopper's gone. Let's ease back outside and watch for stragglers."
+  say [role=open] (pri 8) as open_2:
+    "Sounds quiet overhead now—time to move, weapons ready."
+  say [role=reply] (pri 8) as reply_1:
+    "Right behind you. Keep an eye on the corners."
+  say [role=reply] (pri 8) as reply_2:
+    "Let's go—don't want to get trapped in here either."
+  say [default] (pri 5) as default:
+    "Chopper passed—heading back out carefully."
+
+beat semantic.ambient.world_event.react
+  say [topic=meta_gunshot, role=open] (pri 10) as gunshot_open:
+    "Hold up—did you hear those shots?"
+  say [topic=meta_gunshot, role=reply] (pri 10) as gunshot_reply:
+    "Yeah, not far off either. Stay sharp."
+  say [topic=meta_scream, role=open] (pri 10) as scream_open:
+    "That scream… somebody's in real trouble over there."
+  say [topic=meta_scream, role=reply] (pri 10) as scream_reply:
+    "Nothing we can do if they're already surrounded. Keep moving."
+  say [topic=helicopter_event, role=open] (pri 10) as chopper_open:
+    "Chopper overhead! That noise is going to drag every dead one this way."
+  say [topic=helicopter_event, role=reply] (pri 10) as chopper_reply:
+    "Keep low and get near cover—don't get caught in the open."
+  say [topic=medical_wreck, role=open] (pri 9) as med_open:
+    "Crashed ambulance… might still be supplies inside if it's clear."
+  say [topic=police_blockade, role=open] (pri 9) as police_open:
+    "Police blockade ahead. Looks like things fell apart fast here."
+  say [topic=bandit_activity, role=open] (pri 9) as bandit_open:
+    "Looks like an ambush site. Keep your weapon ready."
+  say [role=reply] (pri 6) as reply_default:
+    "I see it. Let's stay alert."
+  say [default] (pri 5) as default:
+    "Something's going on nearby—stay sharp."
+
+beat semantic.ambient.player_sight
+  say [topic=armed, actor.social_style=guarded|withdrawn|hostile] (pri 11) as armed_guarded:
+    "Easy there—keep that weapon pointed somewhere else."
+  say [topic=armed] (pri 10) as armed_default:
+    "Whoa, easy with that weapon. We're not looking for trouble."
+  say [topic=reunion, actor.social_style=friendly|protective] (pri 11) as reunion_warm:
+    "Hey, {addressee.name}! Good to see you're still in one piece."
+  say [topic=reunion] (pri 10) as reunion_default:
+    "Hey, {addressee.name}. Crossing paths again."
+  say [topic=unarmed, actor.social_style=friendly|protective] (pri 9) as unarmed_friendly:
+    "Hey there—roads been quiet your way?"
+  say [topic=unarmed, actor.social_style=guarded|withdrawn] (pri 9) as unarmed_guarded:
+    "Keep your distance and we'll get along fine."
+  say [default] (pri 5) as default:
+    "Stay safe out there."

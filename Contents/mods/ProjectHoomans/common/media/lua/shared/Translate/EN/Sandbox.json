@@ -151,5 +151,10 @@
     "Sandbox_ProjectHoomans.RadioAmbientIntervalSeconds": "Ambient Chatter Interval (Seconds)",
     "Sandbox_ProjectHoomans.RadioAmbientIntervalSeconds_tooltip": "Minimum real-time interval before a tuned radio may request another ambient transmission.",
     "Sandbox_ProjectHoomans.RadioAmbientChance": "Ambient Chatter Chance (%%)",
-    "Sandbox_ProjectHoomans.RadioAmbientChance_tooltip": "Chance that an eligible ambient-radio trigger produces background chatter. It is not guaranteed every interval."
+    "Sandbox_ProjectHoomans.RadioAmbientChance_tooltip": "Chance that an eligible ambient-radio trigger produces background chatter. It is not guaranteed every interval.",
+    "Sandbox_ProjectHoomans.ChatterDensity": "NPC Conversation Density",
+    "Sandbox_ProjectHoomans.ChatterDensity_tooltip": "Controls how frequently the Conversation Director initiates ambient banter and non-urgent reactions. Urgent combat and world warnings remain active.",
+    "Sandbox_ProjectHoomans.ChatterDensity_option1": "Quiet",
+    "Sandbox_ProjectHoomans.ChatterDensity_option2": "Cinematic",
+    "Sandbox_ProjectHoomans.ChatterDensity_option3": "Lively"
 }

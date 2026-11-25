@@ -138,6 +138,21 @@ function Settings.RadioAmbientChance()
     return Settings.GetNumber("RadioAmbientChance", 65, 0, 100)
 end
 
+-- Ambient NPC chatter pacing: 1 = Quiet, 2 = Cinematic (default), 3 = Lively.
+function Settings.ChatterDensity()
+    local vars = projectVars()
+    local mode = math.floor(tonumber(vars and vars.ChatterDensity) or 2)
+    if mode < 1 or mode > 3 then mode = 2 end
+    return mode
+end
+
+function Settings.ChatterDensityProfile()
+    local mode = Settings.ChatterDensity()
+    if mode == 1 then return "quiet" end
+    if mode == 3 then return "lively" end
+    return "cinematic"
+end
+
 function Settings.PlayerOwnedNPCNeedMortalityEnabled()
     return Settings.GetBoolean("PlayerOwnedNPCNeedMortality", true)
 end

@@ -151,5 +151,10 @@
     "Sandbox_ProjectHoomans.RadioAmbientIntervalSeconds": "Ambient Chatter Interval (Segundo)",
     "Sandbox_ProjectHoomans.RadioAmbientIntervalSeconds_tooltip": "Ang pinakamababang agwat ng real-time bago ang isang nakatutok na radyo ay maaaring humiling ng isa pang ambient transmission.",
     "Sandbox_ProjectHoomans.RadioAmbientChance": "Tsansa ng usapan sa paligid (%%)",
-    "Sandbox_ProjectHoomans.RadioAmbientChance_tooltip": "Malamang na ang isang karapat-dapat na trigger ng ambient-radio ay gumagawa ng background chatter. Hindi ito ginagarantiyahan sa bawat pagitan."
+    "Sandbox_ProjectHoomans.RadioAmbientChance_tooltip": "Malamang na ang isang karapat-dapat na trigger ng ambient-radio ay gumagawa ng background chatter. Hindi ito ginagarantiyahan sa bawat pagitan.",
+    "Sandbox_ProjectHoomans.ChatterDensity": "Dalas ng Usapan ng NPC",
+    "Sandbox_ProjectHoomans.ChatterDensity_tooltip": "Kinokontrol kung gaano kadalas nagsisimula ang Conversation Director ng ambient banter at hindi apurahang reaksyon. Nananatiling aktibo ang mga babala sa labanan.",
+    "Sandbox_ProjectHoomans.ChatterDensity_option1": "Tahimik",
+    "Sandbox_ProjectHoomans.ChatterDensity_option2": "Sinematiko",
+    "Sandbox_ProjectHoomans.ChatterDensity_option3": "Masigla"
 }

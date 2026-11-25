@@ -69,6 +69,36 @@ function Service.TryStartMobileShelter(record, zombie, order, at)
         return false, state.reason
     end
     runtime.ambientMobileShelter = nil
+    local beats = PNC and PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if beats and type(beats.Emit) == "function" then
+        local chopperActive = false
+        local obs = PsychopatzCore and PsychopatzCore.VanillaEventObserver or nil
+        if obs and type(obs.GetHelicopterState) == "function" then
+            local st = obs.GetHelicopterState()
+            chopperActive = type(st) == "table" and st.active == true
+        end
+        if not chopperActive and type(getWorld) == "function" then
+            local w = getWorld()
+            local heli = w and type(w.getHelicopter) == "function" and w:getHelicopter() or nil
+            chopperActive = heli ~= nil and type(heli.isActive) == "function" and heli:isActive() == true
+        end
+        if chopperActive then
+            beats.Emit("ambient.chopper_shelter.enter", {
+                speaker = record,
+                shelterKey = key,
+            })
+        else
+            local weatherSvc = PNC and PNC.WeatherDressingService or nil
+            if weatherSvc and type(weatherSvc.IsRaining) == "function"
+                and weatherSvc.IsRaining() == true
+            then
+                beats.Emit("ambient.rain_shelter.enter", {
+                    speaker = record,
+                    shelterKey = key,
+                })
+            end
+        end
+    end
     return true, reason or "mobile_shelter_started"
 end
 

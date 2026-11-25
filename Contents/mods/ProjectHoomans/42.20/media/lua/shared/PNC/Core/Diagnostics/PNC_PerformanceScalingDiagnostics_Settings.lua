@@ -27,6 +27,8 @@ local PRESENCE_TRAVERSAL_AUDIT_SETTING_ID =
     "ProjectHoomans.PresenceTraversalAudit"
 local BODY_IDENTITY_AUDIT_SETTING_ID =
     "ProjectHoomans.BodyIdentityAudit"
+local BEATS_AUDIT_SETTING_ID =
+    "ProjectHoomans.BeatsAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -219,6 +221,24 @@ local function initializeCentralDebugSettings()
             Diagnostics.BodyIdentityAuditEnabled = enabled == true
         end,
     })
+    settings.Register({
+        id = BEATS_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 170,
+        title = "Dialogue beats audit",
+        description = "Logs registered beat hooks, trigger/environment/alarm variables, speaker filtering, and beat delivery outcomes.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.BeatsAuditEnabled = enabled == true
+            if Diagnostics.BeatsAuditEnabled == true then
+                local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+                if beats and type(beats.LogAuditSnapshot) == "function" then
+                    beats.LogAuditSnapshot("debug_settings_apply")
+                end
+            end
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
@@ -255,6 +275,8 @@ local function initializeCentralDebugSettings()
         PRESENCE_TRAVERSAL_AUDIT_SETTING_ID) == true
     Diagnostics.BodyIdentityAuditEnabled = settings.IsEnabled(
         BODY_IDENTITY_AUDIT_SETTING_ID) == true
+    Diagnostics.BeatsAuditEnabled = settings.IsEnabled(
+        BEATS_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()

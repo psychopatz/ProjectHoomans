@@ -10,6 +10,7 @@ local EventTypes = PNC.EventTypes
 local H = Needs.Internal
 local NutritionModel = PNC.NPCNutrition
 local PASSIVE_NEED_TYPES = { "thirst", "fatigue" }
+local CARAVAN_LITE_PASSIVE_TYPES = { "thirst" }
 
 local function setPassiveValue(record, state, needType, value, reason)
     if H and H.SetStateValue then
@@ -64,7 +65,9 @@ function Needs.Update(record, elapsedHours, reason, stateOverride,
         if nextHunger ~= prevHunger then anyChanged = true end
     end
 
-    for _, needType in ipairs(PASSIVE_NEED_TYPES) do
+    local passiveTypes = (type(record) == "table" and record.needsProfile == "caravan_lite")
+        and CARAVAN_LITE_PASSIVE_TYPES or PASSIVE_NEED_TYPES
+    for _, needType in ipairs(passiveTypes) do
         local amount = (tonumber(rates[needType]) or 0) * elapsedHours
         if amount ~= 0 then
             local prevValue = state[needType]

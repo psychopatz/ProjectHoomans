@@ -152,6 +152,63 @@ local function sortRecords(records, profiles)
 end
 
 Internal.evaluateNeed = evaluateNeed
+local ACTIVITY_TO_PROFILE_KIND = {
+    eat = "food",
+    food = "food",
+    sleep = "sleep",
+    rest = "sleep",
+    drink = "water",
+    water = "water",
+    chitchat = "social",
+    relax = "social",
+    social = "social",
+}
+
+-- Unified building-local room-intent resolver shared by both camping colonists
+-- and sheltering/neutral NPCs. Preserves the one-by-one camp entry loop (no-op
+-- while queued/moving) and stays strictly inside the current building with
+-- zero extra ModData.
+function Service.ResolveActivityRoom(record, activityKind, options)
+    if type(record) ~= "table" then return nil, "record_required" end
+    options = type(options) == "table" and options or {}
+    local order = type(record.orderSpec) == "table" and record.orderSpec or nil
+    if order then
+        local placement = string.lower(tostring(order.placementState or "arrived"))
+        if placement == "queued" or placement == "moving" then
+            return nil, "camp_entry_in_progress"
+        end
+    end
+    local profileKind = ACTIVITY_TO_PROFILE_KIND[string.lower(tostring(activityKind or ""))]
+        or "social"
+    local directory = options.directory
+    if not directory and type(Service.GetDirectory) == "function" then
+        directory = Service.GetDirectory(record, options)
+    end
+    if type(directory) ~= "table" or type(directory.zones) ~= "table"
+        or #directory.zones == 0
+    then
+        return nil, "no_building_zones"
+    end
+    local rootSite = directory.rootSite or directory.zones[1]
+    local profile = { kind = profileKind, critical = false }
+    local chosen, score, hasMatch = bestZone(
+        profile,
+        directory,
+        options.occupancy or {},
+        rootSite
+    )
+    -- For drinking, require a room that actually has a clean water source.
+    if profileKind == "water" and not hasMatch then
+        return nil, "no_water_in_building"
+    end
+    if not chosen then return nil, "no_matching_room" end
+    local maxDist = tonumber(options.maxDistance) or 24
+    if math.sqrt(siteDistanceSq(chosen, rootSite)) > maxDist then
+        return nil, "room_too_far"
+    end
+    return chosen, score, hasMatch
+end
+
 Internal.needProfile = needProfile
 Internal.matches = matches
 Internal.preferredRoomBonus = preferredRoomBonus

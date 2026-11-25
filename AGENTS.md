@@ -21,6 +21,12 @@
 - Do not use `pcall` or `xpcall` for normal control flow, input validation, or engine-bug workarounds. Prefer explicit guards and direct fixes.
 - Use a protected call only when an external or addon-owned callback is an unavoidable failure boundary after ordinary validation, and document that reason beside the call.
 
+## PZ Build 42 engine gotchas
+
+- `instanceof(obj, "ClassName")` only checks `LuaManager.exposer.typeMap` and returns `false` for unexposed Java classes (e.g., `zombie.iso.Alarm` in SP). Verify exposure in `pz-java-baseline` or also check `typeof(obj)` / `getClassSimpleName(obj)` (which read `Object.getClass().getSimpleName()` directly).
+- SP (`AmbientStreamManager`) and MP dedicated server (`AmbientSoundManager`) can emit different Lua events for the same world occurrence (e.g., SP house alarms fire `OnWorldSound` with `zombie.iso.Alarm`, not `OnAmbientSound("burglar2")`). Verify both paths in `pz-java-baseline`.
+- For silent dialogue beats, enable `ProjectHoomans.BeatsAudit` (`beats_audit`) in the Debug Hub to inspect registered hooks, cooldowns, state variables, and `Transport.CanHear` (12-tile, same-Z, LOS) drops.
+
 ## Never stage a temporary directory under watched `media/`
 
 Project Zomboid recursively watches every loaded mod's `media/` tree with `DebugFileWatcher`. A short-lived staging directory can break the watcher for the rest of the running session.

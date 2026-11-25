@@ -15,11 +15,26 @@ local function clockText(world)
     local hour = tonumber(time and (time.hour or time.hour24))
     local minute = tonumber(time and (time.minute or time.minutes)) or 0
     if hour == nil then return nil end
+    local tf = PsychopatzCore and PsychopatzCore.TimeFormat or nil
+    if tf and type(tf.FormatClockSentence) == "function" then
+        return tf.FormatClockSentence(hour, minute)
+    end
     hour = math.floor(hour) % 24
+    local use24 = false
+    if type(getCore) == "function" then
+        local okCore, core = pcall(getCore)
+        if okCore and core and type(core.getOptionClock24Hour) == "function" then
+            local okOpt, v = pcall(core.getOptionClock24Hour, core)
+            if okOpt and v == true then use24 = true end
+        end
+    end
+    if use24 then
+        return string.format("It's %02d:%02d.", hour, math.floor(minute) % 60)
+    end
     local suffix = hour >= 12 and "PM" or "AM"
     local displayHour = hour % 12
     if displayHour == 0 then displayHour = 12 end
-    return string.format("It's %d:%02d %s.", displayHour, minute, suffix)
+    return string.format("It's %d:%02d %s.", displayHour, math.floor(minute) % 60, suffix)
 end
 
 local MONTH_NAMES = {
@@ -30,6 +45,10 @@ local MONTH_NAMES = {
 local function dayText(world)
     world = type(world) == "table" and world or {}
     local calendar = type(world.calendar) == "table" and world.calendar or {}
+    local tf = PsychopatzCore and PsychopatzCore.TimeFormat or nil
+    if tf and type(tf.FormatDateSentence) == "function" then
+        return tf.FormatDateSentence(calendar.year, calendar.month, calendar.day, world.gameDay)
+    end
     local year = tonumber(calendar.year)
     local month = tonumber(calendar.month)
     local day = tonumber(calendar.day)

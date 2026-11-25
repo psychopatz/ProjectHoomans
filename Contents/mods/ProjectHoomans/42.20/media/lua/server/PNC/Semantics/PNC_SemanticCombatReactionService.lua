@@ -544,6 +544,25 @@ function Service.OnNPCKill(record, zombie, spec)
         spec,
         now
     )
+    local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
+    if Dir and type(Dir.EvaluateCandidate) == "function" and spec.ignoreDirector ~= true then
+        local dirOk, dirInfo = Dir.EvaluateCandidate({
+            speaker = record,
+            scopeKey = "npc_kill:" .. tostring(record.id or ""),
+            topic = "combat_kill_self",
+            tier = 1,
+            urgency = 45,
+            salience = 54,
+            saturationWindowMs = 22000,
+            silenceThreshold = 46,
+            markOnAdmit = false,
+            now = now,
+        })
+        if not dirOk then
+            return 0, tostring(dirInfo and dirInfo.reason or "director_suppressed")
+        end
+    end
+
     local gate, gateReason, burst = Arbiter.Begin({
         streamKey = "npc_kill:" .. tostring(record.id or ""),
         now = now,
@@ -594,7 +613,26 @@ function Service.OnNPCKill(record, zombie, spec)
                     { actorKind = "npc", x = x, y = y, z = z },
                     now, moment.burstCount, nil, moment
                 )
-                if sent then listeners = listeners + 1 end
+                if sent then
+                    listeners = listeners + 1
+                    if Dir then
+                        if type(Dir.MarkSpoken) == "function" then
+                            Dir.MarkSpoken("npc_kill:" .. tostring(record.id or ""), "combat_kill_self", 1, now, record.id)
+                        end
+                        if type(Dir.RecordStoryMoment) == "function" then
+                            local perc = PNC.Perception
+                            local gKey = tostring(perc and perc.GetTeamKey and perc.GetTeamKey(record) or "__default__")
+                            Dir.RecordStoryMoment(gKey, {
+                                kind = "finished_skirmish",
+                                topic = "post_fight",
+                                actorId = record.id,
+                                salience = 58,
+                                valence = 0,
+                                ttlMs = 180000,
+                            }, now)
+                        end
+                    end
+                end
             end
         end
     end
@@ -641,6 +679,25 @@ function Service.OnNPCHumanKill(record, targetRecord, targetBody, spec)
         spec,
         now
     )
+    local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
+    if Dir and type(Dir.EvaluateCandidate) == "function" and spec.ignoreDirector ~= true then
+        local dirOk, dirInfo = Dir.EvaluateCandidate({
+            speaker = record,
+            scopeKey = "npc_human_kill:" .. tostring(record.id or ""),
+            topic = "combat_human_kill_self",
+            tier = 2,
+            urgency = 80,
+            salience = 74,
+            saturationWindowMs = 15000,
+            silenceThreshold = 40,
+            markOnAdmit = false,
+            now = now,
+        })
+        if not dirOk then
+            return 0, tostring(dirInfo and dirInfo.reason or "director_suppressed")
+        end
+    end
+
     local gate, gateReason, burst = Arbiter.Begin({
         streamKey = "npc_kill:" .. tostring(record.id or ""),
         now = now,

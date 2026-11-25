@@ -122,6 +122,7 @@ function Transport.ResolveLine(rec, opts)
     local act = tostring(opts.act or "REACT")
     local topic = cleanText(opts.topic or opts.domain) or evType
     local context = copyShallow(opts.context)
+    if context.topic == nil then context.topic = topic end
     local role = opts.role or opts.replyRole
     if role ~= nil then
         if context.beatRole == nil then context.beatRole = role end

@@ -52,18 +52,84 @@ function Transport.Deliver(rec, now, opts)
     local tts = opts.tts ~= false
     local act = opts.act or "REACT"
     local sent = 0
+    local diag = PNC.PerformanceScalingDiagnostics
+    local beatAudit = lane == "beat" and diag ~= nil and diag.BeatsAuditEnabled == true
+    local playerCount = 0
 
     core.ForEachPlayer(function(p)
+        playerCount = playerCount + 1
         if type(opts.audienceFilter) == "function" then
-            if opts.audienceFilter(p, rec) ~= true then return end
+            if opts.audienceFilter(p, rec) ~= true then
+                if beatAudit then
+                    diag.LogBeatsAudit("transport_drop", {
+                        "npc=" .. npcId,
+                        "eventType=" .. tostring(ev),
+                        "poolID=" .. tostring(opts.poolID or "nil"),
+                        "reason=audience_filter",
+                    })
+                end
+                return
+            end
         elseif not canHear(p, rec, witnessRadius) then
+            if beatAudit then
+                local px = p and p.getX and finite(p:getX())
+                local py = p and p.getY and finite(p:getY())
+                local pz = p and p.getZ and finite(p:getZ())
+                local nx, ny, nz = finite(rec.x), finite(rec.y), finite(rec.z)
+                local dist = (px and py and nx and ny)
+                    and math.floor(math.sqrt((px - nx) * (px - nx) + (py - ny) * (py - ny)) * 10 + 0.5) / 10
+                    or -1
+                local zDiff = (pz and nz) and math.abs(pz - nz) or -1
+                local perc = PNC.Perception
+                local canSee = perc and type(perc.CanSeeWorldObject) == "function"
+                    and perc.CanSeeWorldObject(rec, p) == true or false
+                diag.LogBeatsAudit("transport_drop", {
+                    "npc=" .. npcId,
+                    "eventType=" .. tostring(ev),
+                    "poolID=" .. tostring(opts.poolID or "nil"),
+                    "reason=can_hear_false",
+                    "dist=" .. tostring(dist),
+                    "witnessRadius=" .. tostring(witnessRadius),
+                    "zDiff=" .. tostring(zDiff),
+                    "canSee=" .. tostring(canSee),
+                })
+            end
             return
         end
         local aud = playerKey(p)
-        if not aud then return end
+        if not aud then
+            if beatAudit then
+                diag.LogBeatsAudit("transport_drop", {
+                    "npc=" .. npcId,
+                    "eventType=" .. tostring(ev),
+                    "reason=no_player_key",
+                })
+            end
+            return
+        end
         if type(opts.preDeliver) == "function" then
-            if opts.preDeliver(rec, aud, now, opts) ~= true then return end
+            if opts.preDeliver(rec, aud, now, opts) ~= true then
+                if beatAudit then
+                    diag.LogBeatsAudit("transport_drop", {
+                        "npc=" .. npcId,
+                        "eventType=" .. tostring(ev),
+                        "aud=" .. tostring(aud),
+                        "reason=pre_deliver_false",
+                    })
+                end
+                return
+            end
         elseif not reserveNeutralCooldown(streamKey, fam, npcId, aud, now, cd, famCd) then
+            if beatAudit then
+                diag.LogBeatsAudit("transport_drop", {
+                    "npc=" .. npcId,
+                    "eventType=" .. tostring(ev),
+                    "aud=" .. tostring(aud),
+                    "streamKey=" .. tostring(streamKey),
+                    "family=" .. tostring(fam),
+                    "reason=transport_cooldown",
+                })
+            end
             return
         end
 
@@ -160,8 +226,25 @@ function Transport.Deliver(rec, now, opts)
         if type(opts.postDeliver) == "function" then
             opts.postDeliver(ok, rec, aud, now, opts)
         end
-        if ok then sent = sent + 1 end
+        if ok then
+            sent = sent + 1
+        elseif beatAudit then
+            diag.LogBeatsAudit("transport_drop", {
+                "npc=" .. npcId,
+                "eventType=" .. tostring(ev),
+                "aud=" .. tostring(aud),
+                "reason=network_send_false",
+            })
+        end
     end)
+
+    if beatAudit and playerCount == 0 then
+        diag.LogBeatsAudit("transport_drop", {
+            "npc=" .. npcId,
+            "eventType=" .. tostring(ev),
+            "reason=no_players",
+        })
+    end
 
     return sent
 end

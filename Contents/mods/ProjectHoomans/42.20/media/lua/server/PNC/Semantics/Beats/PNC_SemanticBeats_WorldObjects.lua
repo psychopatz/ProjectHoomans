@@ -134,6 +134,47 @@ function Beats.ListDeviceTextHooks()
     return out
 end
 
+function Beats.GetObjectHookAuditEntries(at)
+    local now = nowMs(at)
+    local out = {}
+    for i = 1, #objectHookList do
+        local h = objectHookList[i]
+        local untilAt = tonumber(objectHookCooldowns[h.id]) or 0
+        out[i] = {
+            id = h.id,
+            priority = h.priority,
+            cooldownMs = h.cooldownMs,
+            cooldownRemainingMs = math.max(0, untilAt - now),
+        }
+    end
+    return out
+end
+
+function Beats.GetDeviceHookAuditEntries(at)
+    local now = nowMs(at)
+    local out = {}
+    for i = 1, #deviceHookList do
+        local h = deviceHookList[i]
+        local untilAt = tonumber(deviceHookCooldowns[h.id]) or 0
+        out[i] = {
+            id = h.id,
+            priority = h.priority,
+            cooldownMs = h.cooldownMs,
+            cooldownRemainingMs = math.max(0, untilAt - now),
+        }
+    end
+    return out
+end
+
+function Beats.GetWorldObjectAuditState(at)
+    local now = nowMs(at)
+    return {
+        nextObjectScanRemainingMs = math.max(0, nextObjectScanAt - now),
+        globalCooldownRemainingMs = math.max(0, globalObjectBeatCooldownUntil - now),
+        deviceTextBucketCount = deviceTextBucketCount,
+    }
+end
+
 local function buildContext(anchor, partner, now)
     local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
     if BC and type(BC.Build) == "function" then
@@ -260,12 +301,15 @@ function Beats.CheckNearbyWorldObjects(now)
     return false
 end
 
+local function isDeviceBucketDebounced(x, y, now)
+    local key = tostring(math.floor(x / 6)) .. ":" .. tostring(math.floor(y / 6))
+    local last = deviceTextBuckets[key]
+    return last ~= nil and now >= last and (now - last) < DEVICE_TEXT_DEBOUNCE_MS
+end
+
 local function markDeviceBucket(x, y, now)
     local key = tostring(math.floor(x / 6)) .. ":" .. tostring(math.floor(y / 6))
     local last = deviceTextBuckets[key]
-    if last ~= nil and now >= last and (now - last) < DEVICE_TEXT_DEBOUNCE_MS then
-        return false
-    end
     if last == nil then
         deviceTextBucketCount = deviceTextBucketCount + 1
         if deviceTextBucketCount > MAX_DEVICE_BUCKETS then
@@ -277,7 +321,46 @@ local function markDeviceBucket(x, y, now)
     return true
 end
 
+local function resolveDevicePosition(x, y, z, device)
+    local nx, ny, nz = tonumber(x), tonumber(y), tonumber(z) or 0
+    -- WaveSignalDevice.AddDeviceText passes (-1, -1, -1) for handheld and car radios.
+    if (not nx or not ny) or (nx == -1 and ny == -1) then
+        local vx, vy, vz = nil, nil, nil
+        if device then
+            local veh = safeCall(device, "getVehicle")
+            if veh then
+                vx = tonumber(safeCall(veh, "getX"))
+                vy = tonumber(safeCall(veh, "getY"))
+                vz = tonumber(safeCall(veh, "getZ")) or 0
+            else
+                local dx = tonumber(safeCall(device, "getX"))
+                local dy = tonumber(safeCall(device, "getY"))
+                if dx and dy and not (dx == -1 and dy == -1) then
+                    vx, vy, vz = dx, dy, tonumber(safeCall(device, "getZ")) or 0
+                end
+            end
+        end
+        if not vx or not vy then
+            local core = PNC.Core
+            if core and type(core.ForEachPlayer) == "function" then
+                core.ForEachPlayer(function(p)
+                    if vx or not p then return end
+                    local px = p.getX and tonumber(p:getX())
+                    local py = p.getY and tonumber(p:getY())
+                    if px and py then
+                        vx, vy = px, py
+                        vz = p.getZ and tonumber(p:getZ()) or 0
+                    end
+                end)
+            end
+        end
+        nx, ny, nz = vx, vy, vz or 0
+    end
+    return nx, ny, nz
+end
+
 function Beats.OnDeviceTextEvent(guid, codes, x, y, z, line, device, now)
+    local audit = type(Beats.IsAuditEnabled) == "function" and Beats.IsAuditEnabled() == true
     if #deviceHookList == 0 or device == nil then
         return false, "device_text_unhandled"
     end
@@ -285,26 +368,93 @@ function Beats.OnDeviceTextEvent(guid, codes, x, y, z, line, device, now)
     if text == "" then
         return false, "device_text_empty"
     end
-    local nx = tonumber(x) or tonumber(safeCall(device, "getX"))
-    local ny = tonumber(y) or tonumber(safeCall(device, "getY"))
+    local nx, ny, nz = resolveDevicePosition(x, y, z, device)
     if not nx or not ny then
+        if audit then
+            Beats.AuditLog("device_text", { "ok=false", "reason=device_text_position_missing" })
+        end
         return false, "device_text_position_missing"
     end
-    local nz = tonumber(z) or tonumber(safeCall(device, "getZ")) or 0
     now = nowMs(now)
-    if not markDeviceBucket(nx, ny, now) then
+    -- Award player-parity media XP on every unique skill-code line before
+    -- dialogue debouncing so companions learn from TV/VHS just like the player.
+    if type(codes) == "string" and codes ~= ""
+        and type(Beats.AwardNearbyCompanionMediaXP) == "function"
+    then
+        Beats.AwardNearbyCompanionMediaXP(guid, codes, nx, ny, nz, device, text)
+    end
+    if isDeviceBucketDebounced(nx, ny, now) then
         return false, "device_text_debounced"
     end
 
-    local anchor, partner = nil, nil
-    if type(Beats.FindCalmSpeakerNearPoint) == "function" then
+    local anchor, partner, third, fourth, teamKey = nil, nil, nil, nil, nil
+    local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
+    if type(Beats.FindCalmGroupsNearPoint) == "function" then
+        local groups = Beats.FindCalmGroupsNearPoint(nx, ny, DEVICE_TEXT_RADIUS, now, 1)
+        if type(groups) == "table" and groups[1] and type(groups[1].members) == "table" then
+            local m = groups[1].members
+            if Dir and type(Dir.ResolveVoiceProfile) == "function" and #m > 1 then
+                local sorted = {}
+                for mi = 1, #m do sorted[mi] = m[mi] end
+                table.sort(sorted, function(m1, m2)
+                    local c1 = Dir.ResolveVoiceProfile(m1, now).chattiness or 1.0
+                    local c2 = Dir.ResolveVoiceProfile(m2, now).chattiness or 1.0
+                    if c1 ~= c2 then return c1 > c2 end
+                    return tostring(m1.id or "") < tostring(m2.id or "")
+                end)
+                m = sorted
+            end
+            teamKey = groups[1].teamKey
+            anchor, partner, third, fourth = m[1], m[2], m[3], m[4]
+        end
+    end
+    if not anchor and type(Beats.FindCalmSpeakerNearPoint) == "function" then
         anchor, partner = Beats.FindCalmSpeakerNearPoint(nx, ny, DEVICE_TEXT_RADIUS, now)
     end
+    -- Fallback: if squad has an active skirmish flag from a teammate outside,
+    -- still allow a nearby non-fighting NPC standing by the TV/radio to react.
+    if not anchor and PNC.SpatialIndex and type(PNC.SpatialIndex.QueryNPCs) == "function" then
+        local nearList = PNC.SpatialIndex.QueryNPCs(nx, ny, DEVICE_TEXT_RADIUS) or {}
+        local idle = {}
+        for i = 1, #nearList do
+            local r = nearList[i]
+            local rt = type(r) == "table" and type(r.runtime) == "table" and r.runtime or nil
+            if type(r) == "table" and r.alive ~= false and r.id ~= nil
+                and (not rt or (rt.target == nil and rt.attackAction == nil))
+            then
+                idle[#idle + 1] = r
+            end
+        end
+        if #idle > 0 then
+            if Dir and type(Dir.ResolveVoiceProfile) == "function" and #idle > 1 then
+                table.sort(idle, function(m1, m2)
+                    local c1 = Dir.ResolveVoiceProfile(m1, now).chattiness or 1.0
+                    local c2 = Dir.ResolveVoiceProfile(m2, now).chattiness or 1.0
+                    if c1 ~= c2 then return c1 > c2 end
+                    return tostring(m1.id or "") < tostring(m2.id or "")
+                end)
+            end
+            anchor, partner, third, fourth = idle[1], idle[2], idle[3], idle[4]
+            local perc = PNC.Perception
+            teamKey = tostring((perc and perc.GetTeamKey and perc.GetTeamKey(anchor)) or anchor.id)
+        end
+    end
     if not anchor then
+        if audit then
+            Beats.AuditLog("device_text", {
+                "x=" .. tostring(math.floor(nx)),
+                "y=" .. tostring(math.floor(ny)),
+                "ok=false",
+                "reason=no_calm_speaker",
+            })
+        end
         return false, "no_calm_speaker"
     end
 
     local ctx = buildContext(anchor, partner, now)
+    ctx.third = third
+    ctx.fourth = fourth
+    ctx.teamKey = teamKey
     for i = 1, #deviceHookList do
         local h = deviceHookList[i]
         if now >= (tonumber(deviceHookCooldowns[h.id]) or 0) then
@@ -312,12 +462,31 @@ function Beats.OnDeviceTextEvent(guid, codes, x, y, z, line, device, now)
             if okM and matched == true then
                 local okE, plan = pcall(h.evaluate, device, text, nx, ny, nz, anchor, partner, ctx, codes, guid)
                 if okE and type(plan) == "table" and (plan.opening or plan.replies) then
+                    markDeviceBucket(nx, ny, now)
                     deviceHookCooldowns[h.id] = now + h.cooldownMs
-                    Beats.StartThread(plan, now, ctx)
+                    local tid, openOk = Beats.StartThread(plan, now, ctx)
+                    if audit then
+                        Beats.AuditLog("device_text", {
+                            "hook=" .. tostring(h.id),
+                            "anchor=" .. tostring(anchor.id or ""),
+                            "threadID=" .. tostring(tid or "nil"),
+                            "openingDelivered=" .. tostring(openOk == true),
+                            "ok=true",
+                        })
+                    end
                     return true, h.id
                 end
             end
         end
+    end
+    if audit then
+        Beats.AuditLog("device_text", {
+            "x=" .. tostring(math.floor(nx)),
+            "y=" .. tostring(math.floor(ny)),
+            "anchor=" .. tostring(anchor.id or ""),
+            "ok=false",
+            "reason=no_matching_device_hook",
+        })
     end
     return false, "no_matching_device_hook"
 end

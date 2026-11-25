@@ -615,17 +615,33 @@ local function emitZombieAwareness(
         })
         local awarenessFamily = tacticalPrompt == true
             and "horde_tactical_prompt" or tostring(eventType)
+        local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
+        local awarenessCooldownMs = ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS
+        if Dir then
+            if type(Dir.GetDensityProfile) == "function" then
+                local dProf = Dir.GetDensityProfile()
+                awarenessCooldownMs = math.floor(awarenessCooldownMs * (tonumber(dProf and dProf.cooldownScale) or 1.0))
+            end
+            if type(Dir.GateEmitter) == "function" then
+                local dirTopic = tacticalPrompt == true and "combat_tactical_prompt" or "combat_awareness"
+                local dirOk = Dir.GateEmitter(dirTopic, record, {
+                    scopeKey = "awareness:" .. tostring(playerKey) .. ":" .. awarenessFamily,
+                    now = now,
+                })
+                if not dirOk then return end
+            end
+        end
         local allowed = BanterArbiter.Reserve({
             streamKey = "awareness:" .. tostring(playerKey)
                 .. ":" .. awarenessFamily,
             now = now,
-            cooldownMs = ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS,
+            cooldownMs = awarenessCooldownMs,
             maxSpeakers = 1,
             speakerID = npcID,
             audienceKey = tostring(playerKey),
             family = awarenessFamily,
             speakerCooldownMs = 0,
-            familyCooldownMs = ZOMBIE_AWARENESS_PRESENTATION_COOLDOWN_MS,
+            familyCooldownMs = awarenessCooldownMs,
             priorityHoldMs = tacticalPrompt == true and 4000 or 900,
             priority = combatMoment.priority,
             moment = combatMoment,

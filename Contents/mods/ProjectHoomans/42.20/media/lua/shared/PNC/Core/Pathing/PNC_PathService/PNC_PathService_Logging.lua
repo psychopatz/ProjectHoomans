@@ -134,6 +134,7 @@ function Internal.logMoveWarning(record, zombie, lane, event, reason, extra)
             :find("CombatGuard", 1, true)
     then
         local target = record.runtime and record.runtime.target or nil
+        local actionState = Internal.getActionStateName and Internal.getActionStateName(zombie) or ""
         Diagnostics.LogNPCThreatAudit("combat_path_warning", {
             "npc=" .. tostring(record.id or ""),
             "event=" .. tostring(event or ""),

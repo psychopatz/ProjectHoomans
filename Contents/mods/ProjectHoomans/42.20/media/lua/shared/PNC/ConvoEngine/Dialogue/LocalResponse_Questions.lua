@@ -27,7 +27,7 @@ return function(ir, state, context)
     then
         return Internal.ResolveConversationContinuation(ir, state, context)
     end
-    if ir.subject == "TIME" then return Internal.ResolveTime(world) end
+    if ir.subject == "TIME" then return Internal.ResolveTime(world, context) end
     if ir.subject == "DATE" then return Internal.ResolveDate(world) end
     if ir.subject == "WEATHER" then return Internal.ResolveWeather(world) end
     if ir.subject == "IDENTITY" then

@@ -67,6 +67,33 @@ function H.IsRainShelterActive(context)
     return raining
 end
 
+-- Cached helicopter-shelter check matching IsRainShelterActive so mobile groups
+-- seek nearby buildings during chopper flyovers without per-group world queries.
+function H.IsHelicopterShelterActive(context)
+    if type(context) == "table" and context.chopperShelterActive ~= nil then
+        return context.chopperShelterActive == true
+    end
+    local active = false
+    local obs = PsychopatzCore and PsychopatzCore.VanillaEventObserver or nil
+    if obs and type(obs.GetHelicopterState) == "function" then
+        local st = obs.GetHelicopterState()
+        if type(st) == "table" and st.active == true then
+            active = true
+        end
+    end
+    if not active and type(getWorld) == "function" then
+        local w = getWorld()
+        local heli = w and type(w.getHelicopter) == "function" and w:getHelicopter() or nil
+        if heli and type(heli.isActive) == "function" and heli:isActive() == true then
+            active = true
+        end
+    end
+    if type(context) == "table" then
+        context.chopperShelterActive = active
+    end
+    return active
+end
+
 function H.FindPlayerBaseTarget(faction)
     local mobile = faction and faction.mobile or nil
     local current = mobile and mobile.strategicTarget or nil

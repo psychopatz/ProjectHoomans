@@ -62,9 +62,6 @@ function Internal.recoverScriptedBodyState(zombie, record, lane, now)
             suppressedState or lane.lastActionState,
             "postAction=" .. tostring(lane.lastActionState)
         )
-    else
-        lane.lastSuppressedWarnState = nil
-        lane.lastSuppressedWarnAt = nil
     end
 
     if not suppressed and Internal.tryRecoverNonLocomotionState then

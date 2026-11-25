@@ -79,6 +79,10 @@ Diagnostics.PresenceTraversalAuditEnabled = false
 -- restore/registration boundaries so the normal zombie update path remains
 -- a single boolean read when the probe is disabled.
 Diagnostics.BodyIdentityAuditEnabled = false
+-- Dialogue beats tracing is opt-in. When enabled it logs registered beat hooks,
+-- trigger inputs, cooldown/environment/alarm state variables, speaker filtering,
+-- and delivery outcomes so silent beat drops can be pinpointed in console.txt.
+Diagnostics.BeatsAuditEnabled = false
 Diagnostics.BuildTraceSequence = tonumber(Diagnostics.BuildTraceSequence) or 0
 Diagnostics.BuildTraceSentAt = Diagnostics.BuildTraceSentAt or {}
 Diagnostics.BuildTraceReceivedAt = Diagnostics.BuildTraceReceivedAt or {}
@@ -356,6 +360,26 @@ end
 
 function Diagnostics.IsSleepAuditEnabled()
     return Diagnostics.SleepAuditEnabled == true
+end
+
+function Diagnostics.SetBeatsAuditEnabled(enabled)
+    Diagnostics.BeatsAuditEnabled = enabled == true
+    if Diagnostics.BeatsAuditEnabled == true then
+        if PNC.Core and PNC.Core.LogInfo then
+            PNC.Core.LogInfo("beats_audit event=enabled")
+        else
+            print("[PNC][INFO] beats_audit event=enabled")
+        end
+        local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+        if beats and type(beats.LogAuditSnapshot) == "function" then
+            beats.LogAuditSnapshot("enabled")
+        end
+    end
+    return Diagnostics.BeatsAuditEnabled
+end
+
+function Diagnostics.IsBeatsAuditEnabled()
+    return Diagnostics.BeatsAuditEnabled == true
 end
 
 function Diagnostics.SetInventoryAuditEnabled(enabled)

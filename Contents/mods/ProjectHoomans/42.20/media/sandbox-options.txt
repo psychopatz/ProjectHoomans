@@ -511,3 +511,12 @@ option ProjectHoomans.RadioAmbientChance
     page = ProjectHoomans,
     translation = ProjectHoomans.RadioAmbientChance,
 }
+
+option ProjectHoomans.ChatterDensity
+{
+    type = enum,
+    numValues = 3,
+    default = 2,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.ChatterDensity,
+}

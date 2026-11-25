@@ -22,7 +22,6 @@ PNC = {
 }
 
 T.load(ROOT .. "PNC_LiveBodyControl.lua")
-T.load(ROOT .. "PNC_VehicleAvoidance.lua")
 T.load(ROOT .. "PNC_TraversalQuery.lua")
 
 local position = {}
@@ -126,7 +125,6 @@ local windowCell = {
         return x == 4 and windowVehicleSquare or windowFromSquare
     end,
 }
-PNC.VehicleAvoidance.Invalidate()
 canStep, stepReason = PNC.TraversalQuery.CanStep(
     3.5,
     0.5,

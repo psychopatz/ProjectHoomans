@@ -228,8 +228,11 @@ function Mod.InspectTargetLootHighlight(player, salt)
     end
     local candidates = {}
 
+    local backSlot = (ItemBodyLocation and ItemBodyLocation.BACK)
+        or (not ItemBodyLocation and "Back")
+        or nil
     local backpack = safeCall(player, "getClothingItem_Back")
-        or safeCall(player, "getWornItem", "Back")
+        or (backSlot and safeCall(player, "getWornItem", backSlot))
     if backpack then
         candidates[#candidates + 1] = {
             category = "backpack",
