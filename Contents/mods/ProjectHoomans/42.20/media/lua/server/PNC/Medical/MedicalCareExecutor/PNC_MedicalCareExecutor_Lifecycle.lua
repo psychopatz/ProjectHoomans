@@ -17,43 +17,45 @@ local Common = Internal.Common
 function Executor.GetCandidates(npcId)
     local actor = Registry and Registry.Get and Registry.Get(npcId) or nil
     local candidates = {}
-    local at = PNC.Core.Now()
     if not actor or not WorkPolicy.IsEnabled(actor, "MedicalCare") then return candidates end
-    for _, task in ipairs(Service.List(false)) do
+    local tasks = Service.List(false)
+    if #tasks == 0 then return candidates end
+    local at = PNC.Core.Now()
+    for i = 1, #tasks do
+        local task = tasks[i]
         local supplyTask = preflightMissingSupply(task, at)
         if supplyTask then
             Executor.RequestBandageSupport(supplyTask.id)
         elseif task.status == Status.WAITING_FOR_SUPPLY then
             Executor.RequestBandageSupport(task.id)
         end
-    end
-    for _, task in ipairs(Service.List(false)) do
-        local ready = (tonumber(task.retryAt) or 0) <= at
-        local supplyReady = task.status == Status.WAITING_FOR_SUPPLY
-            and hasTaskBandage(actor, task)
-        if (ready and task.status ~= Status.WAITING_FOR_SUPPLY)
-            or supplyReady
-        then
-            local valid = Internal.CanTreat(actor, task)
-            if valid then
-                candidates[#candidates + 1] = {
-                    taskId = "medical_care:" .. tostring(task.id)
-                        .. ":" .. tostring(npcId),
-                    npcId = tostring(npcId),
-                    kind = "MEDICAL_CARE",
-                    sourceDomain = "medical",
-                    sourceRef = task.id,
-                    precedence = (tonumber(task.priority) or 0) >= 100
-                        and "CRITICAL_NEED" or "NORMAL_NEED",
-                    urgency = math.max(0, math.min(1,
-                        (tonumber(task.priority) or 0) / 100)),
-                    workPriority = WorkPolicy.GetPriority(actor, "MedicalCare"),
-                    capability = "MEDICAL_CARE",
-                    interruptPolicy = "NORMAL",
-                    revision = task.revision,
-                    createdAt = task.createdAt,
-                }
-                break
+        if #candidates == 0 then
+            local ready = (tonumber(task.retryAt) or 0) <= at
+            local supplyReady = task.status == Status.WAITING_FOR_SUPPLY
+                and hasTaskBandage(actor, task)
+            if (ready and task.status ~= Status.WAITING_FOR_SUPPLY)
+                or supplyReady
+            then
+                local valid = Internal.CanTreat(actor, task)
+                if valid then
+                    candidates[1] = {
+                        taskId = "medical_care:" .. tostring(task.id)
+                            .. ":" .. tostring(npcId),
+                        npcId = tostring(npcId),
+                        kind = "MEDICAL_CARE",
+                        sourceDomain = "medical",
+                        sourceRef = task.id,
+                        precedence = (tonumber(task.priority) or 0) >= 100
+                            and "CRITICAL_NEED" or "NORMAL_NEED",
+                        urgency = math.max(0, math.min(1,
+                            (tonumber(task.priority) or 0) / 100)),
+                        workPriority = WorkPolicy.GetPriority(actor, "MedicalCare"),
+                        capability = "MEDICAL_CARE",
+                        interruptPolicy = "NORMAL",
+                        revision = task.revision,
+                        createdAt = task.createdAt,
+                    }
+                end
             end
         end
     end

@@ -11,6 +11,10 @@ local Animation = PNC.Animation
 local Treatment = PNC.Treatment
 
 local PATIENT_DRIFT_CANCEL_SQ = 1.8 * 1.8
+local REQUEUE_BACKOFF_MS = {
+    patient_moved_away = 4000,
+    combat_active = 3000,
+}
 
 local function releasePatientHold(state)
     if type(state) ~= "table" or state.patientKind ~= "npc" or state.patientId == nil then return end
@@ -50,47 +54,10 @@ local function holdPatientForTreatment(record, body, task, patient, patientBody,
 end
 
 local function speakTreatmentInterrupted(record, patient, patientKind, partId, role, now)
-    local transport = PNC.Semantics and PNC.Semantics.SpeechTransport or nil
-    if not transport or type(transport.ResolveLine) ~= "function" or type(transport.Deliver) ~= "function" then
-        return false
+    if Internal.SpeakTreatmentInterrupted then
+        return Internal.SpeakTreatmentInterrupted(record, patient, patientKind, partId, role, now)
     end
-    local addrName = "friend"
-    if patientKind == "player" and patient then
-        local desc = patient.getDescriptor and patient:getDescriptor() or nil
-        addrName = (desc and desc.getForename and desc:getForename())
-            or (patient.getDisplayName and patient:getDisplayName())
-            or (patient.getUsername and patient:getUsername())
-            or "friend"
-    elseif type(patient) == "table" then
-        addrName = tostring(patient.name or patient.fullName or "friend")
-    end
-    local partLabel = string.gsub(tostring(partId or "wound"), "_", " ")
-    local tokens = {
-        ["addressee.name"] = addrName,
-        ["slot.wound.part"] = partLabel,
-    }
-    local text, res = transport.ResolveLine(record, {
-        poolID = "semantic.medical.care.assisted",
-        role = role,
-        act = role == "hostile_interrupted" and "WARN" or "REACT",
-        topic = "medical_care",
-        tokens = tokens,
-    })
-    if not text then
-        text = role == "hostile_interrupted"
-            and ("Watch out, " .. addrName .. "! Hostiles!")
-            or ("Stop moving, " .. addrName .. "! I can't bandage you while you walk away.")
-    end
-    transport.Deliver(record, now, {
-        text = text,
-        eventType = "medical_care_interrupted",
-        family = "medical_care_" .. tostring(role),
-        topic = "medical_care",
-        priority = role == "hostile_interrupted" and 75 or 55,
-        poolID = res and res.poolID or "semantic.medical.care.assisted",
-        interrupt = role == "hostile_interrupted",
-    })
-    return true
+    return false
 end
 
 local function clearRuntime(record, body, reason)
@@ -298,9 +265,6 @@ local function finishLiveTreatment(lease, task, record, body)
         applied, reason = Treatment.TryNPCMedicalTreatment(
             record, patient, state.partId, treatmentOptions(task, state))
     end
-    if body and Animation and Animation.FinishBump then
-        Animation.FinishBump(body, true)
-    end
     if not applied then
         if reason == "missing_bandage" then
             return failForSupply(lease, task, record, body)
@@ -348,7 +312,19 @@ function Executor.Tick(lease)
             "MEDICAL_PATIENT_UNAVAILABLE")
         return false, "medical_patient_unavailable"
     end
-    if not Internal.CurrentPart(patient, task) then
+    local curState = record.runtime and record.runtime.medicalCare or nil
+    local hasTreatable = false
+    if task.patientKind == "player"
+        and curState and curState.phase == "treating"
+        and curState.playerPartInfo
+        and Internal.IsPlayerPartStillTreatable
+        and Internal.IsPlayerPartStillTreatable(curState.playerPartInfo)
+    then
+        hasTreatable = true
+    else
+        hasTreatable = Internal.CurrentPart(patient, task) ~= nil
+    end
+    if not hasTreatable then
         clearRuntime(record, body, "patient_wound_resolved")
         Service.Complete(task.id, "patient_wound_resolved")
         PNC.Tasking.Commands.Complete(lease.leaseId, "patient_wound_resolved")
@@ -357,7 +333,6 @@ function Executor.Tick(lease)
     local medicInCombat = Internal.combatActive and Internal.combatActive(record)
     local patientInCombat = task.patientKind == "npc" and Internal.combatActive and Internal.combatActive(patient)
     if medicInCombat or patientInCombat then
-        local curState = record.runtime and record.runtime.medicalCare or nil
         if curState and curState.phase == "treating" then
             speakTreatmentInterrupted(record, patient, task.patientKind, curState.partId, "hostile_interrupted", now)
         end
@@ -400,8 +375,10 @@ function Executor.Tick(lease)
             speakTreatmentInterrupted(record, patient, task.patientKind, partId, "patient_moved_away", now)
             return false, "patient_moved_away"
         end
-        if task.patientKind == "npc" and Common and Common.HaltMovement then
-            Common.HaltMovement(patient, patientBody, "receiving_medical_care")
+        if task.patientKind == "npc" then
+            if patient.runtime and patient.runtime.moveIntent ~= nil and Common and Common.HaltMovement then
+                Common.HaltMovement(patient, patientBody, "receiving_medical_care")
+            end
             Internal.Face(patientBody, body)
         end
         Internal.Face(body, patientBody)
@@ -455,7 +432,8 @@ function Executor.Cancel(lease, reason)
     if task and not Service.TERMINAL[task.status]
         and task.status ~= Status.WAITING_FOR_SUPPLY
     then
-        Service.Requeue(task.id, reason or "medical_care_cancelled")
+        Service.Requeue(task.id, reason or "medical_care_cancelled",
+            REQUEUE_BACKOFF_MS[tostring(reason or "")])
     end
     return true
 end

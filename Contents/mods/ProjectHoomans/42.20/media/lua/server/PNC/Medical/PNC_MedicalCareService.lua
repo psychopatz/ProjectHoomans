@@ -416,13 +416,16 @@ function Service.Cancel(id, reason)
     return true, copy(task)
 end
 
-function Service.Requeue(id, reason)
+function Service.Requeue(id, reason, retryDelayMs)
     local task = Repository.Get(id)
     local supplyRequest
     if not task or Service.TERMINAL[task.status] then
         return false, "MEDICAL_TASK_NOT_REQUEUEABLE"
     end
     supplyRequest = pendingSupplyRequest(task)
+    local nowAt = now()
+    local delay = tonumber(retryDelayMs) or 0
+    if delay < 0 then delay = 0 end
     task.status = Status.WAITING_FOR_DOCTOR
     task.phase = Status.WAITING_FOR_DOCTOR
     task.actorId = nil
@@ -431,9 +434,9 @@ function Service.Requeue(id, reason)
     task.reservationId = nil
     task.blockedReason = reason and tostring(reason) or nil
     task.retryCount = task.retryCount + 1
-    task.retryAt = now()
-    task.updatedAt = task.retryAt
-    task.lastProgressAt = task.retryAt
+    task.retryAt = nowAt + delay
+    task.updatedAt = nowAt
+    task.lastProgressAt = nowAt
     task.revision = task.revision + 1
     Repository.Put(task)
     emit("MEDICAL_CARE_REQUEST_CHANGED", task, "requeued")

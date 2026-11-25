@@ -79,6 +79,22 @@ local function findTreatablePlayerPart(player)
 end
 Internal.FindTreatablePlayerPart = findTreatablePlayerPart
 
+function Internal.IsPlayerPartStillTreatable(partInfo)
+    local part = type(partInfo) == "table" and partInfo.part or nil
+    if not part then return false end
+    local isB = call(part, "bandaged") == true
+    if isB then
+        return call(part, "isBandageDirty") == true
+    end
+    return call(part, "bleeding") == true
+        or (tonumber(call(part, "getBleedingTime")) or 0) > 0
+        or call(part, "bitten") == true
+        or call(part, "isCut") == true
+        or call(part, "scratched") == true
+        or call(part, "isDeepWounded") == true
+        or (tonumber(call(part, "getBurnTime")) or 0) > 0
+end
+
 function Internal.ApplyNPCTreatmentToPlayer(actor, player, partInfo, options)
     options = type(options) == "table" and options or {}
     if not (Core and Core.IsAuthority and Core.IsAuthority() == true) then return false, "not_authority" end

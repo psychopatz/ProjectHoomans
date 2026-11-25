@@ -156,4 +156,10 @@ function Internal.SpeakTreatmentComplete(medic, patient, patientKind, partId, is
     return ok, text, v
 end
 
+function Internal.SpeakTreatmentInterrupted(medic, patient, patientKind, partId, role, now)
+    local variant = role == "hostile_interrupted" and "hostile_interrupted" or "patient_moved_away"
+    local act = variant == "hostile_interrupted" and "WARN" or "REACT"
+    return speakCareLine(medic, patient, patientKind, variant, partId, now, variant, act)
+end
+
 return Executor

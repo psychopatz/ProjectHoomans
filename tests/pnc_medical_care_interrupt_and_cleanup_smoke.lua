@@ -55,7 +55,7 @@ _G.PNC = {
         SetPhase = function() return true end,
         Complete = function() if activeTask then activeTask.status = "COMPLETED" end return true end,
         Cancel = function() if activeTask then activeTask.status = "CANCELLED" end return true end,
-        Requeue = function(_, reason) cancelledTasks[#cancelledTasks + 1] = reason return true end,
+        Requeue = function(_, reason, delayMs) cancelledTasks[#cancelledTasks + 1] = { reason = reason, delayMs = delayMs } return true end,
         MarkProgress = function() end,
     },
     Registry = {
@@ -116,7 +116,9 @@ PNC.MedicalCareExecutor = {
     },
 }
 
+require "PNC/Medical/MedicalCareExecutor/PNC_MedicalCareExecutor_Speech"
 require "PNC/Medical/MedicalCareExecutor/PNC_MedicalCareExecutor_Actions"
+require "PNC/Core/Health/PNC_Treatment/PNC_Treatment_Snapshot"
 local Exec = PNC.MedicalCareExecutor
 local lease = { leaseId = "lease_1", npcId = medic.id, sourceRef = "task_1" }
 
@@ -150,7 +152,7 @@ T.equal(okHostile, false, "hostile threat on patient interrupts treatment")
 T.equal(reasonHostile, "combat_active", "interrupt reason is combat_active")
 T.truthy(finishedBumps >= 1, "Animation.FinishBump called on hostile interruption")
 T.equal(medicBody.vars.LootPosition, "", "LootPosition cleared on hostile interruption")
-T.truthy(#spoken >= 1 and string.find(spoken[1], "hostile_interrupted", 1, true) ~= nil, "medic calls out hostile_interrupted")
+T.truthy(#spoken >= 1 and string.find(spoken[#spoken], "hostile_interrupted", 1, true) ~= nil, "medic calls out hostile_interrupted")
 combatFlags[npcPatient.id] = false
 
 -- 3) Player target: stops player's timed action on start, and if player moves away -> cancels + says stop moving!
@@ -169,7 +171,60 @@ T.equal(okMoved, false, "treatment cancels when player moves away")
 T.equal(reasonMoved, "patient_moved_away", "cancel reason is patient_moved_away")
 T.truthy(finishedBumps >= 1, "Animation.FinishBump called when patient moves away")
 T.equal(medicBody.vars.LootPosition, "", "LootPosition cleared when patient moves away")
-T.truthy(#spoken >= 1 and string.find(spoken[1], "patient_moved_away|Rick", 1, true) ~= nil,
+T.truthy(#spoken >= 1 and string.find(spoken[#spoken], "patient_moved_away|Rick", 1, true) ~= nil,
     "medic tells player to stop moving via ConvoDSL")
+
+-- Verify requeue retry backoff on combat_active and patient_moved_away
+local sawCombatBackoff, sawMoveBackoff = false, false
+for _, entry in ipairs(cancelledTasks) do
+    if type(entry) == "table" then
+        if entry.reason == "combat_active" and (tonumber(entry.delayMs) or 0) >= 3000 then sawCombatBackoff = true end
+        if entry.reason == "patient_moved_away" and (tonumber(entry.delayMs) or 0) >= 4000 then sawMoveBackoff = true end
+    end
+end
+T.equal(sawCombatBackoff, true, "combat_active requeue applies retry backoff")
+T.equal(sawMoveBackoff, true, "patient_moved_away requeue applies retry backoff")
+
+-- 4) Snapshot preserves patientKind and TickOwnership holds patient still (while still yielding to ThreatGuard)
+activeTask = { id = "task_1", patientId = "player:Rick", patientKind = "player", status = "CLAIMED" }
+playerPatient.x, playerPatient.y = 10.5, 10
+Exec.Tick(lease)
+local snap = PNC.Treatment.BuildMedicalCareSnapshot(medic)
+T.truthy(snap ~= nil and snap.patientKind == "player", "BuildMedicalCareSnapshot includes patientKind")
+Exec.Cancel(lease, "test_cleanup")
+
+local selfTreatCalled = false
+local threatActive = false
+PNC.BehaviorSystem = {
+    Internal = {
+        TickOwnership = {
+            ThreatGuard = { Tick = function() return threatActive end },
+            Treatment = { Tick = function() selfTreatCalled = true return true end },
+            puppetOperaOwnsBehavior = function() return false end,
+        },
+    },
+}
+require "PNC/Core/Behaviors/PNC_BehaviorSystem_Tick_Ownership"
+local Ownership = PNC.BehaviorSystem.Internal.TickOwnership
+
+activeTask = { id = "task_1", patientId = npcPatient.id, patientKind = "npc", status = "CLAIMED" }
+treatablePart = "ForeArm_L"
+Exec.Tick(lease) -- medic begins treating npcPatient
+
+-- Patient ownership tick must hold patient still and block self-treatment
+selfTreatCalled = false
+threatActive = false
+T.equal(Ownership.Run(npcPatient, npcPatientBody, simNow), true, "TickOwnership holds NPC patient still while receiving medical care")
+T.equal(selfTreatCalled, false, "patient hold prevents concurrent self-treatment")
+
+-- Hostile threat preempts patient hold immediately
+threatActive = true
+T.equal(Ownership.Run(npcPatient, npcPatientBody, simNow), true, "ThreatGuard preempts patient hold")
+threatActive = false
+
+-- Expired hold auto-clears and falls through
+T.equal(Ownership.Run(npcPatient, npcPatientBody, simNow + 60000), true, "expired hold clears and allows normal Treatment.Tick")
+T.equal(npcPatient.runtime.receivingMedicalCareBy, nil, "expired patient hold self-clears")
+T.equal(selfTreatCalled, true, "normal behavior resumes after hold expires")
 
 print("pnc_medical_care_interrupt_and_cleanup_smoke: OK")

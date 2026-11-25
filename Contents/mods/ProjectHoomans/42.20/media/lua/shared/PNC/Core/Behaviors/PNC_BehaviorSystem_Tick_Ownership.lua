@@ -17,6 +17,32 @@ local AnimationScenes = H.AnimationScenes
 local Treatment = H.Treatment
 local puppetOperaOwnsBehavior = H.puppetOperaOwnsBehavior
 
+local function holdForIncomingMedicalCare(record, now)
+    local runtime = record and record.runtime or nil
+    local medicId = runtime and runtime.receivingMedicalCareBy or nil
+    if medicId == nil then return false end
+    local untilAt = tonumber(runtime.receivingMedicalCareUntil) or 0
+    local active = false
+    if untilAt == 0 or now <= untilAt then
+        local registry = PNC.Registry
+        local medic = registry and registry.Get and registry.Get(medicId) or nil
+        local mState = medic and medic.alive ~= false
+            and medic.runtime and medic.runtime.medicalCare or nil
+        if mState and mState.phase == "treating"
+            and tostring(mState.patientId or "") == tostring(record.id or "")
+        then
+            active = true
+        end
+    end
+    if not active then
+        runtime.receivingMedicalCareBy = nil
+        runtime.receivingMedicalCareTaskId = nil
+        runtime.receivingMedicalCareUntil = nil
+        return false
+    end
+    return true
+end
+
 function H.Run(record, zombie, now)
     if LiveBodyControl and LiveBodyControl.TickGroundedRecovery
         and LiveBodyControl.TickGroundedRecovery(record, zombie, now)
@@ -51,6 +77,10 @@ function H.Run(record, zombie, now)
     end
 
     if puppetOperaOwnsBehavior(record) then
+        return true
+    end
+
+    if holdForIncomingMedicalCare(record, now) then
         return true
     end
 

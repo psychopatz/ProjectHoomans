@@ -17,6 +17,7 @@ function Treatment.BuildMedicalCareSnapshot(record)
         phase = tostring(state.phase),
         taskId = state.taskId,
         patientId = state.patientId,
+        patientKind = state.patientKind,
         partId = state.partId,
         bump = state.bump,
         lootPosition = state.lootPosition,

@@ -184,10 +184,6 @@ local function syncTreatmentAnimation(
         modData.PNC_ClientMedicalCareAnimKey = nil
     end
     if presentation.source == "medical" then
-        if zombie and zombie.setVariable then
-            zombie:setVariable(
-                "LootPosition", presentation.lootPosition or "Mid")
-        end
         if zombie and zombie.faceThisObject then
             local patient = patientBody(presentation.targetId, presentation.targetKind)
             if patient then zombie:faceThisObject(patient) end
@@ -197,6 +193,10 @@ local function syncTreatmentAnimation(
         and modData.PNC_ClientMedicalCareAnimKey
         or modData.PNC_ClientTreatmentAnimKey
     if currentKey ~= presentation.key then
+        if presentation.source == "medical" and zombie and zombie.setVariable then
+            zombie:setVariable(
+                "LootPosition", presentation.lootPosition or "Mid")
+        end
         if Animation and Animation.PlayBump then
             Animation.PlayBump(
                 zombie,
