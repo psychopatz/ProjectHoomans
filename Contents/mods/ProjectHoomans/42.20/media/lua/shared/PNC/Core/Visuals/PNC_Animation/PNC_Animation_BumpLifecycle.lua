@@ -111,6 +111,11 @@ function Animation.FinishBump(zombie, forceIdle, owner)
             "forceIdle=" .. tostring(forceIdle == true),
         })
     end
+    if zombie.setBumpType then
+        -- Clear BumpType immediately so idle/to_bumped.xml cannot bounce the
+        -- body back into bumped on the very next frame after to_idle.xml fires.
+        zombie:setBumpType("")
+    end
     if zombie.setBumpDone then
         zombie:setBumpDone(true)
     end
@@ -127,6 +132,7 @@ function Animation.FinishBump(zombie, forceIdle, owner)
         modData.PNC_BumpReleaseAt = now
         modData.PNC_BumpReleaseHardRetries = nil
         modData.PNC_BumpActionLease = true
+        modData.PNC_BumpKeepUseless = false
         modData.PNC_BumpActionLeaseUntil = math.max(
             tonumber(modData.PNC_BumpActionLeaseUntil) or 0,
             now + Internal.BUMP_RELEASE_HARD_TIMEOUT_MS + 250

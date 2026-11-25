@@ -281,12 +281,13 @@ Catalog.Register("container", {
     label = "storage",
     commandName = "crate",
     aliases = {
-        "crate", "crates", "shelf", "shelves", "locker",
-        "cabinet", "cupboard", "box", "boxes", "drawer", "wardrobe",
+        "pantry", "crate", "crates", "shelf", "shelves", "locker",
+        "cabinet", "cupboard", "kitchen counter", "box", "boxes",
+        "drawer", "wardrobe",
     },
     objectNames = {
-        "crate", "shelf", "shelves", "locker", "cabinet",
-        "cupboard", "box", "drawer", "wardrobe",
+        "pantry", "crate", "shelf", "shelves", "locker", "cabinet",
+        "cupboard", "counter", "box", "drawer", "wardrobe",
     },
 })
 
@@ -306,11 +307,20 @@ Catalog.Register("appliance", {
     aliases = {
         "stove", "oven", "microwave", "grill",
         "tv", "television", "radio", "generator",
+        "light", "lights", "lamp", "switch", "light switch",
     },
     objectNames = {
         "stove", "oven", "microwave", "grill",
         "tv", "television", "radio", "generator",
+        "light", "lamp", "lightswitch",
     },
+})
+
+Catalog.Register("curtain", {
+    label = "curtain",
+    commandName = "curtain",
+    aliases = { "curtain", "curtains", "sheet", "blinds", "drapes" },
+    objectNames = { "curtain", "sheet", "blinds" },
 })
 
 return Catalog

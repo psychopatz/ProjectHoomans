@@ -7,8 +7,8 @@ local Client = PNC.Client
 local Const = PNC.Const
 local Core = PNC.Core
 local Internal = Client.Internal
-local CommandIRBridge = PNC.Semantics and PNC.Semantics.CommandIRBridge
-    or require "PNC/Semantics/PNC_SemanticCommandIRBridge"
+local CommandIRBridge = PNC.ConvoEngine and PNC.ConvoEngine.CommandIRBridge
+    or require "PNC/ConvoEngine/CommandIRBridge"
 
 function Client.SendCompanionCommand(commandID, npcId, scope, context)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil

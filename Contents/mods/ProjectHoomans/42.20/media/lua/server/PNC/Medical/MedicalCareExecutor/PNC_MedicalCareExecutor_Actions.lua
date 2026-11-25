@@ -43,6 +43,26 @@ local function holdPatientForTreatment(record, body, task, patient, patientBody,
     end
     if type(patient) == "table" then
         patient.runtime = type(patient.runtime) == "table" and patient.runtime or {}
+        -- If the patient was mid-self-bandage when a medic took ownership,
+        -- cleanly end their self-treatment bump so holdForIncomingMedicalCare
+        -- cannot freeze them in an orphaned bumped pose.
+        local selfTreat = patient.runtime.selfTreatment
+        if type(selfTreat) == "table" and selfTreat.phase == "bandaging" then
+            if patientBody and Animation and Animation.FinishBump then
+                Animation.FinishBump(patientBody, true)
+            end
+            selfTreat.phase = "idle"
+            selfTreat.partId = nil
+            selfTreat.bandageType = nil
+            selfTreat.useSplint = nil
+            selfTreat.bandageName = nil
+            selfTreat.startedAt = 0
+            selfTreat.finishAt = 0
+            selfTreat.interruptedReason = "receiving_medical_care"
+            if patient.runtime.tacticalState == "self_bandage" then
+                patient.runtime.tacticalState = nil
+            end
+        end
         patient.runtime.receivingMedicalCareBy = record and record.id or nil
         patient.runtime.receivingMedicalCareTaskId = task and task.id or nil
         patient.runtime.receivingMedicalCareUntil = finishAt
@@ -392,6 +412,20 @@ function Executor.Tick(lease)
         return finishLiveTreatment(lease, task, record, body)
     end
     if Internal.InTreatmentRange(record, body, patient, patientBody) then
+        if Internal.IsPatientAlreadyBeingTreated then
+            local busy, busyReason = Internal.IsPatientAlreadyBeingTreated(
+                record, patient, task.patientKind)
+            if busy then
+                Executor.Cancel(lease, busyReason or "patient_already_treating")
+                if PNC.Tasking and PNC.Tasking.Commands
+                    and PNC.Tasking.Commands.CancelForNPC
+                then
+                    PNC.Tasking.Commands.CancelForNPC(
+                        lease.npcId, "PATIENT_ALREADY_TREATING")
+                end
+                return false, busyReason or "patient_already_treating"
+            end
+        end
         Service.SetPhase(task.id, Status.AT_PATIENT, { actorId = lease.npcId })
         started, startReason = beginTreatment(
             lease, task, record, body, patient, patientBody, now)

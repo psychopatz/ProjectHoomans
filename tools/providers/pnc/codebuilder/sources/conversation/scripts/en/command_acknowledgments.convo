@@ -110,6 +110,26 @@ flow semantic.command.ack
   say [role=ack_task] (pri 7) as ack_task_default:
     "Understood, {addressee.name}. Getting on it now."
 
+  # --- Behavior Script Plan Affirmation, Cancellation, and Completion ---
+  say [role=ack_script_plan, actor.social_style=warm|friendly|protective] (pri 8) as ack_script_plan_warm:
+    "Got it, {addressee.name} - I'll {slot.plan.summary}."
+  say [role=ack_script_plan, actor.social_style=hostile|guarded|withdrawn] (pri 8) as ack_script_plan_guarded:
+    "Alright, {addressee.name}. Going to {slot.plan.summary}."
+  say [role=ack_script_plan] (pri 7) as ack_script_plan_default:
+    "Copy that, {addressee.name}. I'll {slot.plan.summary}."
+
+  say [role=ack_script_cancelled, actor.social_style=warm|friendly|protective] (pri 8) as ack_script_cancel_warm:
+    "Alright, stopping now, {addressee.name}. What's next?"
+  say [role=ack_script_cancelled, actor.social_style=hostile|guarded|withdrawn] (pri 8) as ack_script_cancel_guarded:
+    "Fine, dropping it."
+  say [role=ack_script_cancelled] (pri 7) as ack_script_cancel_default:
+    "Got it, {addressee.name}. Stopping what I was doing."
+
+  say [role=ack_script_done, actor.social_style=warm|friendly|protective] (pri 8) as ack_script_done_warm:
+    "All done, {addressee.name}!"
+  say [role=ack_script_done] (pri 7) as ack_script_done_default:
+    "Finished up, {addressee.name}."
+
   # --- Emote Reactions ---
   say [role=emote_wavehi, actor.social_style=warm|friendly|protective] (pri 8) as emote_wavehi_warm:
     "Hey there, {addressee.name}! Good to see you."

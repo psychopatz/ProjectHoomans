@@ -61,8 +61,29 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
     local navigation = runtime and runtime.localNavigation or nil
     local attackAction = runtime and runtime.attackAction or nil
     local treatment = runtime and runtime.selfTreatment or nil
+    local medicalCare = runtime and runtime.medicalCare or nil
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
     local now = Core and Core.Now and Core.Now() or 0
+    -- A pending bump release (or an expired bump lease still sitting in
+    -- bumped) MUST keep ActionContext useful until the engine evaluates
+    -- zombie/bumped/to_idle.xml, even if a stationary presentation (e.g.
+    -- LivingRoom/seat) has already claimed the record.
+    if modData and modData.PNC_BumpReleasePending == true then
+        return true
+    end
+    if modData and modData.PNC_BumpActionLease == true
+        and now > (tonumber(modData.PNC_BumpActionLeaseUntil) or now)
+    then
+        local actionState = LiveBodyControl.GetActionStateName(zombie)
+        local bumpType = zombie and zombie.getBumpType
+            and tostring(zombie:getBumpType() or "") or ""
+        if (actionState == "bumped" or bumpType ~= "")
+            and PNC.Animation and PNC.Animation.FinishBump
+        then
+            PNC.Animation.FinishBump(zombie, true)
+            return true
+        end
+    end
     -- A stationary presentation is stronger than a stale native movement
     -- lease. Combat is an explicit override; otherwise the resolved owner
     -- keeps the managed carrier useless to the vanilla brain.
@@ -86,6 +107,15 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
         if now <= (tonumber(modData.PNC_BumpActionLeaseUntil) or now) then
             return modData.PNC_BumpKeepUseless ~= true
         end
+        local actionState = LiveBodyControl.GetActionStateName(zombie)
+        local bumpType = zombie and zombie.getBumpType
+            and tostring(zombie:getBumpType() or "") or ""
+        if (actionState == "bumped" or bumpType ~= "")
+            and PNC.Animation and PNC.Animation.FinishBump
+        then
+            PNC.Animation.FinishBump(zombie, true)
+            return true
+        end
         modData.PNC_BumpActionLease = nil
         modData.PNC_BumpActionLeaseUntil = nil
         modData.PNC_BumpActionLeaseStartedAt = nil
@@ -98,6 +128,7 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
         return true
     end
     if treatment and treatment.phase == "bandaging" then return true end
+    if medicalCare and medicalCare.phase == "treating" then return true end
     if not navigation
         or navigation.provider ~= "engine_path"
         or navigation.nativeActive ~= true

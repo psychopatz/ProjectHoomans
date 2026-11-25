@@ -352,7 +352,7 @@ function ISEmoteRadialMenu:emote(emote)
                 )
             end
         else
-            local bridge = PNC.Semantics and PNC.Semantics.CommandIRBridge or nil
+            local bridge = PNC.ConvoEngine and PNC.ConvoEngine.CommandIRBridge or nil
             local p = self.character or (getSpecificPlayer and getSpecificPlayer(self.playerNum or 0)) or nil
             if bridge and type(bridge.EmitEmoteFeedback) == "function" and p then
                 local emoteTargets = targets or (target and { target }) or nil

@@ -72,6 +72,17 @@ function Behavior.Tick(record, zombie, now)
     partId = Wounds.FindTreatableWound(record)
     state = ensureState(record)
     now = tonumber(now) or Core.Now()
+    -- Yield cleanly if another medic is already actively treating this NPC so
+    -- self-treatment and MedicalCare never compete for the same bump pose.
+    if record.runtime and record.runtime.receivingMedicalCareBy ~= nil then
+        local untilAt = tonumber(record.runtime.receivingMedicalCareUntil) or 0
+        if untilAt == 0 or now <= untilAt then
+            if state.phase == "bandaging" then
+                clearAction(record, zombie, "receiving_medical_care")
+            end
+            return false
+        end
+    end
     if not partId then
         if Wounds.FindRemovableHealedDressing then
             healedPart, _, healedKind = Wounds.FindRemovableHealedDressing(record)

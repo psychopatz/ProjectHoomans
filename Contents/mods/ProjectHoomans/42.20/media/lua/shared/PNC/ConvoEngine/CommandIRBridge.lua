@@ -4,13 +4,13 @@
 -- and emits context-aware ConvoDSL acknowledgments through SpeechTransport.
 
 PNC = PNC or {}
-PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
-local GrammarJoin = PNC.Semantics.GrammarJoin
-    or require "PNC/Semantics/PNC_SemanticGrammarJoin"
+local GrammarJoin = PNC.ConvoEngine.GrammarJoin
+    or require "PNC/ConvoEngine/GrammarJoin"
 
-local Bridge = PNC.Semantics.CommandIRBridge or {}
-PNC.Semantics.CommandIRBridge = Bridge
+local Bridge = PNC.ConvoEngine.CommandIRBridge or {}
+PNC.ConvoEngine.CommandIRBridge = Bridge
 
 Bridge.VERSION = 1
 Bridge.Commands = Bridge.Commands or {}

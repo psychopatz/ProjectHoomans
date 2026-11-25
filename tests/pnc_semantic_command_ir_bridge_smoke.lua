@@ -36,8 +36,8 @@ _G.PNC = {
     },
 }
 
-local Grammar = require "PNC/Semantics/PNC_SemanticGrammarJoin"
-local Bridge = require "PNC/Semantics/PNC_SemanticCommandIRBridge"
+local Grammar = require "PNC/ConvoEngine/GrammarJoin"
+local Bridge = require "PNC/ConvoEngine/CommandIRBridge"
 
 -- 1) GrammarJoin fixes missing-glyph em-dashes ("Good—nobody" -> "Good - nobody")
 T.equal(Grammar.CleanSurface("Good\226\128\148nobody gets left behind."), "Good - nobody gets left behind.",

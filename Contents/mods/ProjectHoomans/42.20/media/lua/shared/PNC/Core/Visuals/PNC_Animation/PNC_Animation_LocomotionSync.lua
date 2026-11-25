@@ -55,6 +55,13 @@ function Animation.SyncLocomotion(zombie, record)
         Internal.setManagedUseless(zombie, false, true)
         return
     end
+    local medicalCare = runtime and runtime.medicalCare or nil
+    if medicalCare and medicalCare.phase == "treating"
+        and now < (tonumber(medicalCare.finishAt) or 0)
+    then
+        Internal.setManagedUseless(zombie, false, true)
+        return
+    end
     if Animation.PumpBumpRelease(zombie, now) then
         Internal.applyBumpLeaseBodyMode(zombie)
         return

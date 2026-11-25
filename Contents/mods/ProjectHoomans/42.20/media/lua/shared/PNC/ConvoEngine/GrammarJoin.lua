@@ -3,10 +3,10 @@
 -- normalizes smart quotes/ellipses, articles, and safe clause stitching.
 
 PNC = PNC or {}
-PNC.Semantics = PNC.Semantics or {}
+PNC.ConvoEngine = PNC.ConvoEngine or {}
 
-local Grammar = PNC.Semantics.GrammarJoin or {}
-PNC.Semantics.GrammarJoin = Grammar
+local Grammar = PNC.ConvoEngine.GrammarJoin or {}
+PNC.ConvoEngine.GrammarJoin = Grammar
 
 Grammar.VERSION = 1
 

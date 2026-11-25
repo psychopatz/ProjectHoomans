@@ -9,7 +9,7 @@ local Classifier = require "PsychopatzCore/Semantics/PsychopatzSemanticIntentCla
 
 Registry.Reset()
 Classifier.ResetDatasets()
-local ds = require "PNC/Semantics/Generated/PNC_SemanticIntentDataset_EN"
+local ds = require "PNC/ConvoEngine/Intents/IntentDataset_EN"
 Classifier.RegisterDataset("project_hoomans_en", ds)
 
 local participants = {

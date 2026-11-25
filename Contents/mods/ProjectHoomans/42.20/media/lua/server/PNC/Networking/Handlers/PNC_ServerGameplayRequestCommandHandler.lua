@@ -7,8 +7,8 @@ local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
 local CompanionCommands = PNC.CompanionCommands
 local MapCommandService = PNC.MapCommandService
-local CommandIRBridge = PNC.Semantics and PNC.Semantics.CommandIRBridge
-    or require "PNC/Semantics/PNC_SemanticCommandIRBridge"
+local CommandIRBridge = PNC.ConvoEngine and PNC.ConvoEngine.CommandIRBridge
+    or require "PNC/ConvoEngine/CommandIRBridge"
 
 local function isColonistActivityCommand(args)
     return tostring(args and args.commandSource or "")

@@ -84,6 +84,13 @@ function H.Run(record, zombie, now)
         return true
     end
 
+    local scriptRunner = PNC.ConvoEngine and PNC.ConvoEngine.BehaviorScriptRunner or nil
+    if scriptRunner and type(scriptRunner.Reconcile) == "function"
+        and scriptRunner.Reconcile(record, zombie, now)
+    then
+        return true
+    end
+
     local leases = PNC.TaskLeaseService
     local runtime = record and record.runtime or nil
     local executors = PNC.AutonomyExecutors or {}

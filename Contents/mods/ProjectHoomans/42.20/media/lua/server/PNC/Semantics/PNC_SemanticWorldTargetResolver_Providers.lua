@@ -253,7 +253,8 @@ function Resolver.Resolve(target, context)
     end
 
     local kind = Resolver.ResolveKind(target)
-        or lower(target.type or target.resourceKind or target.kind)
+        or lower(target.type or target.resourceKind or target.kind
+            or target.value or target.text or target.label or target.concept)
     if kind == "resource" or kind == "facility_resource"
         or kind == "interaction_resource"
     then
@@ -262,6 +263,11 @@ function Resolver.Resolve(target, context)
     end
 
     local provider = Resolver.Providers[kind]
+    if not provider and kind ~= "" and type(Resolver.ResolveDynamicObject) == "function" then
+        provider = function(t, ctx)
+            return Resolver.ResolveDynamicObject(t, ctx, kind)
+        end
+    end
     if not provider then
         return traceResolution(target, context, kind, nil,
             "world_target_kind_unsupported")

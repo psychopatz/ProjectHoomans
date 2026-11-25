@@ -8,7 +8,7 @@ PNC.Semantics = PNC.Semantics or {}
 local Pack = {}
 PNC.Semantics.CoreSemanticPack = Pack
 
-pcall(require, "PNC/Semantics/Generated/PNC_SemanticIntentDataset_EN")
+pcall(require, "PNC/ConvoEngine/Intents/IntentDataset_EN")
 
 Pack.PACK_ID = "pack.projecthoomans.social_core"
 Pack.VERSION = 1

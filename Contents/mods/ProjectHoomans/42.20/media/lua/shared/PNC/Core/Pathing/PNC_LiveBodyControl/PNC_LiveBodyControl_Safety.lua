@@ -61,6 +61,11 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source, verifiedManaged)
     end
     modData = zombie.getModData and zombie:getModData() or nil
     now = Core.Now and Core.Now() or 0
+    if modData and modData.PNC_BumpReleasePending == true
+        and PNC.Animation and PNC.Animation.PumpBumpRelease
+    then
+        PNC.Animation.PumpBumpRelease(zombie, now)
+    end
     puppetOwned = ActorControl and ActorControl.IsPuppetOwned
         and ActorControl.IsPuppetOwned(record) or false
     if puppetOwned then

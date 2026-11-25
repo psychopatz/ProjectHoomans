@@ -13,8 +13,8 @@ local TokenFormatter = PNC.ConvoEngine.TokenFormatter
     or require "PNC/ConvoEngine/TokenFormatter"
 local Lexicon = PNC.ConvoEngine.Lexicon
     or require "PNC/ConvoEngine/Lexicon"
-local GrammarJoin = PNC.Semantics.GrammarJoin
-    or require "PNC/Semantics/PNC_SemanticGrammarJoin"
+local GrammarJoin = PNC.ConvoEngine.GrammarJoin
+    or require "PNC/ConvoEngine/GrammarJoin"
 
 local MAX_COOLDOWN_KEYS = 256
 local sr = nil

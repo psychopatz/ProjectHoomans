@@ -219,6 +219,30 @@ function Executor.CurrentPart(patient, task)
 end
 Internal.CurrentPart = Executor.CurrentPart
 
+local function isPatientAlreadyBeingTreated(actor, patient, pKind)
+    if pKind ~= "npc" or type(patient) ~= "table" then return false, nil end
+    local runtime = patient.runtime
+    if type(runtime) ~= "table" then return false, nil end
+    if type(runtime.selfTreatment) == "table"
+        and runtime.selfTreatment.phase == "bandaging"
+    then
+        return true, "patient_self_bandaging"
+    end
+    local medicId = runtime.receivingMedicalCareBy
+    if medicId ~= nil and tostring(medicId) ~= tostring(actor and actor.id or "") then
+        local medic = Registry and Registry.Get and Registry.Get(medicId) or nil
+        local mState = medic and medic.alive ~= false
+            and medic.runtime and medic.runtime.medicalCare or nil
+        if mState and mState.phase == "treating"
+            and tostring(mState.patientId or "") == tostring(patient.id or "")
+        then
+            return true, "patient_treated_by_other_medic"
+        end
+    end
+    return false, nil
+end
+Internal.IsPatientAlreadyBeingTreated = isPatientAlreadyBeingTreated
+
 function Internal.CanTreat(actor, task)
     local patient = Internal.Patient(task)
     local pKind = task and tostring(task.patientKind or "npc") or "npc"
@@ -230,6 +254,8 @@ function Internal.CanTreat(actor, task)
     if task and task.actorId and tostring(task.actorId) ~= tostring(actor.id) then
         return false, "claimed_by_other_doctor"
     end
+    local busy, busyReason = isPatientAlreadyBeingTreated(actor, patient, pKind)
+    if busy then return false, busyReason end
     if not Internal.CurrentPart(patient, task) then
         return false, "patient_has_no_treatable_wound"
     end

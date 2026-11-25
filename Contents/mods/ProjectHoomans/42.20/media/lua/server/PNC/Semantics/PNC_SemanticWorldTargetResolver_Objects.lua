@@ -60,6 +60,13 @@ local function objectMetadata(object)
     addSprite(call(sprite, "getName"))
     addSprite(call(sprite, "getSpriteName"))
     addLabel(call(container, "getType"))
+    -- Include ground world-inventory items (e.g. dropped tire, backpack, generator).
+    local invItem = call(object, "getItem")
+    if invItem then
+        addLabel(call(invItem, "getDisplayName"))
+        addLabel(call(invItem, "getName"))
+        addLabel(call(invItem, "getType"))
+    end
     if SquareRules and type(SquareRules.GetObjectProperty) == "function" then
         addLabel(SquareRules.GetObjectProperty(object, "CustomName"))
         addLabel(SquareRules.GetObjectProperty(object, "GroupName"))
@@ -228,6 +235,146 @@ end
 
 for _, profile in ipairs(Catalog and Catalog.List and Catalog.List() or {}) do
     registerCatalogProfile(profile)
+end
+
+-- Dynamic fallback reusing the exact same Locator.FindObject cache and
+-- objectMetadata/objectText extractor for any nearby IsoObject or ground item
+-- not explicitly listed in WorldTargetCatalog (e.g. "tire", "stump", "mailbox").
+function Resolver.ResolveDynamicObject(target, context, rawKind)
+    local phrase = Catalog and type(Catalog.Normalize) == "function"
+        and Catalog.Normalize(rawKind)
+        or lower(rawKind)
+    phrase = string.gsub(tostring(phrase or ""), "_", " ")
+    phrase = string.gsub(phrase, "^%s+", "")
+    phrase = string.gsub(phrase, "%s+$", "")
+    if phrase == "" or #phrase < 2 then
+        return nil, "world_target_kind_unsupported"
+    end
+    local words = {}
+    for w in string.gmatch(phrase, "%S+") do
+        words[#words + 1] = w
+    end
+    if #words == 0 then return nil, "world_target_kind_unsupported" end
+
+    local kindKey = "dynamic:" .. string.gsub(phrase, "%s+", "_")
+    return resolveObject(
+        target,
+        context,
+        kindKey,
+        function(entry)
+            local obj = entry and entry.object
+            if not obj then return false end
+            local full = objectText(obj)
+            if full == "" then return false end
+            if contains(full, phrase) then return true end
+            if #words > 1 then
+                for i = 1, #words do
+                    if not contains(full, words[i]) then return false end
+                end
+                return true
+            end
+            return false
+        end,
+        "world_object_not_found"
+    )
+end
+
+local SEAT_TYPE_PATTERNS = {
+    { needle = "armchair", label = "armchair" },
+    { needle = "recliner", label = "recliner" },
+    { needle = "bar stool", label = "bar stool" },
+    { needle = "barstool", label = "bar stool" },
+    { needle = "couch", label = "couch" },
+    { needle = "sofa", label = "sofa" },
+    { needle = "loveseat", label = "loveseat" },
+    { needle = "bench", label = "bench" },
+    { needle = "stool", label = "stool" },
+    { needle = "pew", label = "pew" },
+    { needle = "booth", label = "booth" },
+    { needle = "ottoman", label = "ottoman" },
+    { needle = "chair", label = "chair" },
+    { needle = "seat", label = "seat" },
+}
+
+local function cleanSeatName(raw)
+    if type(raw) ~= "string" then return nil end
+    local s = string.lower(raw)
+    s = (s:gsub("^%s+", ""):gsub("%s+$", ""))
+    if s == "" or #s > 28 then return nil end
+    if string.find(s, "[_%d]") then return nil end
+    return s
+end
+
+function Resolver.DescribeSeatType(object)
+    if not object then return "seat" end
+    local custom = SquareRules and type(SquareRules.GetObjectProperty) == "function"
+        and cleanSeatName(SquareRules.GetObjectProperty(object, "CustomName")) or nil
+    if custom then
+        for i = 1, #SEAT_TYPE_PATTERNS do
+            if contains(custom, SEAT_TYPE_PATTERNS[i].needle) then
+                return custom
+            end
+        end
+    end
+    local full = objectText(object)
+    for i = 1, #SEAT_TYPE_PATTERNS do
+        if contains(full, SEAT_TYPE_PATTERNS[i].needle) then
+            return SEAT_TYPE_PATTERNS[i].label
+        end
+    end
+    if custom then return custom end
+    return "seat"
+end
+
+local function isSittableObject(entry)
+    local obj = entry and entry.object
+    if not obj then return false end
+    if SeatingManager and type(SeatingManager.getInstance) == "function" then
+        local okMgr, mgr = pcall(SeatingManager.getInstance)
+        if okMgr and mgr and type(mgr.getTilePositionCount) == "function" then
+            local okCnt, count = pcall(mgr.getTilePositionCount, mgr, obj)
+            if okCnt and tonumber(count) and tonumber(count) > 0 then
+                return true
+            end
+            return false
+        end
+    end
+    local full = objectText(obj)
+    if full == "" then return false end
+    for i = 1, #SEAT_TYPE_PATTERNS do
+        if contains(full, SEAT_TYPE_PATTERNS[i].needle) then
+            return true
+        end
+    end
+    return false
+end
+
+-- Finds the nearest sittable object relative to `origin` (e.g. the player)
+-- reusing the shared NearbyResourceLocator cache. Returns pure primitives only.
+function Resolver.FindNearbySeat(origin, options)
+    options = type(options) == "table" and options or {}
+    if not origin or not Locator or type(Locator.FindObject) ~= "function" then
+        return nil
+    end
+    local radius = math.max(1, math.min(12, math.floor(tonumber(options.radius) or 5)))
+    local entry = Locator.FindObject(origin, {
+        radius = radius,
+        cell = options.cell,
+        cacheMs = tonumber(options.cacheMs) or (Resolver.OBJECT_CACHE_MS or 2500),
+        cacheKey = "semantic_nearby_seat:" .. tostring(radius),
+        accept = isSittableObject,
+    })
+    if not entry or not entry.object then return nil end
+    local seatType = Resolver.DescribeSeatType(entry.object)
+    return {
+        kind = "seat",
+        seatType = seatType,
+        label = seatType,
+        resourceKey = entry.key,
+        x = tonumber(entry.x) or 0,
+        y = tonumber(entry.y) or 0,
+        z = tonumber(entry.z) or 0,
+    }
 end
 
 return Resolver
