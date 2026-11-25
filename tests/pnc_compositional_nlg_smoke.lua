@@ -5,7 +5,7 @@ T.addPackagePaths()
 local Formatter = require "PNC/ConvoEngine/TokenFormatter"
 local Lexicon = require "PNC/ConvoEngine/Lexicon"
 local Catalog = require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
-require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
+require("PNC/ConvoEngine/ConvoDSL/ConvoDSL").EnsureActiveLanguage()
 
 -- 1. Grammar filters: |a, |s, |s:count, |cap, |verb, {?optional}
 T.equal(Formatter.Format("{adj|a} fight", { adj = "ugly" }), "an ugly fight", "an before vowel")

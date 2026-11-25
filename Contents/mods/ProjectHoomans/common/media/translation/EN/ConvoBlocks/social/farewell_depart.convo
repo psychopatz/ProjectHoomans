@@ -1,0 +1,35 @@
+# Subject: FAREWELL DEPARTURE.
+language EN
+namespace hoomans
+
+flow semantic.social.farewell.depart
+  say [social.farewell_speaker=player, social.role=hostile] (priority 21) as player_hostile:
+    "We're done talking."
+  say [social.farewell_speaker=player, social.role=wary] (priority 20) as player_wary:
+    "I'm heading out. Stay sharp."
+  say [social.farewell_speaker=player, social.role=lover] (priority 21) as player_lover:
+    "Stay safe for me. I'll come right back to you."
+  say [social.farewell_speaker=player, social.role=family] (priority 21) as player_family:
+    "Be safe while I'm out, {addressee.name}. I'll be right back."
+  say [social.farewell_speaker=player, social.role=friend] (priority 20) as player_friend:
+    "Take care of yourself, {addressee.name}. Talk soon."
+  say [social.farewell_speaker=player, social.role=colonist] (priority 19) as player_colonist:
+    "Keep holding the line, {addressee.name}. I'll check back soon."
+  say [social.farewell_speaker=player] (priority 15) as player_default:
+    "Stay safe out there."
+  say [social.role=hostile] (priority 11) as hostile:
+    "Get out of my sight."
+  say [social.role=wary] (priority 10) as wary:
+    "Keep your distance out there."
+  say [social.role=lover] (priority 11) as lover:
+    "Come back to me safely, {addressee.name}. Please don't stay gone long."
+  say [social.role=family] (priority 11) as family:
+    "Be careful out there. You know how much you mean to me."
+  say [social.role=friend] (priority 10) as friend:
+    "Stay safe out there, {addressee.name}. Come back in one piece."
+  say [social.role=colonist] (priority 9) as colonist:
+    "Watch your perimeter out there, {addressee.name}."
+  say [actor.social_style=friendly|protective] (priority 7) as friendly:
+    "Take care, {addressee.name}. I will see you soon."
+  say [default] (priority 5) as default:
+    "Take care."

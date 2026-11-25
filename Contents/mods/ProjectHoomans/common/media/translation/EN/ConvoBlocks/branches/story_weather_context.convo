@@ -1,0 +1,19 @@
+# Branching story: weather context gate (declarative `.convo` mirror of Flow_Weather).
+language EN
+namespace hoomans
+
+story convo.weather_context
+  trigger intent=QUESTION, subject=WEATHER
+  initial weather_gate
+
+  node weather_gate
+    gate [environment.raining] -> raining | clear | unknown
+
+  node raining terminal
+    pool semantic.flow.weather.raining
+
+  node clear terminal
+    pool semantic.flow.weather.clear
+
+  node unknown terminal
+    pool semantic.flow.weather.unknown

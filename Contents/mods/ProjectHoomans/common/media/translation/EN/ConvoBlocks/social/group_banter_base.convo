@@ -1,0 +1,18 @@
+# Subject: GROUP BANTER BASE (defaults; individual topics live in group_banter_<topic>.convo).
+language EN
+namespace hoomans
+
+beat semantic.banter.group
+  say [role=reply_friction] (priority 11) as friction_reply:
+    "Easy for you to say, {addressee.name}. Maybe try pulling your weight before lecturing the rest of us."
+    "Cut it out, {addressee.name}. Talking nonstop isn't gonna keep the dead off our backs."
+    "I don't need a pep talk right now, {addressee.name}. Just focus on watching your own flank."
+  say [role=chime_defuse] (priority 11) as friction_defuse:
+    "Hey, both of you, cool it. We're all tired, don't start snapping at each other."
+    "Take a breath. The dead are bad enough without us picking fights with our own people."
+    "Enough, save that energy for the next horde. We need each other sharp."
+  say [role=chime_escalate] (priority 11) as friction_escalate:
+    "Honestly? They've got a point. Somebody had to say it."
+    "If you two keep bickering, you're gonna draw every walker on this street."
+  say [default] (priority 5) as default:
+    "Stay close and keep your eyes open."

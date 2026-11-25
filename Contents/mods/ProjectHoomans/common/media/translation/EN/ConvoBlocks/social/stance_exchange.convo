@@ -1,0 +1,46 @@
+# Universal Compositional Stance Exchange (Layer 1): scales to any topic registered
+# with an axis (compassion, caution, pragmatism, social) with zero boilerplate.
+language EN
+namespace hoomans
+
+flow semantic.stance.exchange
+  say [action=aligned_compassion, actor.social_style=warm|friendly|protective] (priority 11) as sc_al_comp_warm:
+    "Glad you feel the same way about {slot.broadcast.topic}, {addressee.name}. Means we haven't lost our humanity."
+  say [action=aligned_compassion, actor.social_style=hostile|guarded|withdrawn] (priority 11) as sc_al_comp_cold:
+    "Finally somebody talking sense about {slot.broadcast.topic}, {addressee.name}. Soft hearts get people killed."
+  say [action=aligned_compassion] (priority 10) as sc_al_comp_neu:
+    "Makes sense, {addressee.name}. Good to know we see {slot.broadcast.topic} the same way."
+
+  say [action=clashed_compassion, actor.social_style=warm|friendly|protective] (priority 11) as sc_cl_comp_warm:
+    "That's pretty cold, {addressee.name}. I still think {slot.broadcast.topic} matters."
+  say [action=clashed_compassion, actor.social_style=hostile|guarded|withdrawn] (priority 11) as sc_cl_comp_cold:
+    "Spare me the naive talk about {slot.broadcast.topic}, {addressee.name}. The world doesn't work like that anymore."
+  say [action=clashed_compassion] (priority 10) as sc_cl_comp_neu:
+    "We clearly don't see eye to eye on {slot.broadcast.topic}, {addressee.name}."
+
+  say [action=aligned_caution, actor.social_style=warm|friendly|protective] (priority 11) as sc_al_caut_warm:
+    "Smart call on {slot.broadcast.topic}, {addressee.name}. Staying careful keeps everyone alive."
+  say [action=aligned_caution, actor.social_style=hostile|guarded|withdrawn] (priority 11) as sc_al_caut_cold:
+    "Yeah, you've got the right idea about {slot.broadcast.topic}, {addressee.name}. No point playing scared."
+  say [action=aligned_caution] (priority 10) as sc_al_caut_neu:
+    "Agreed on {slot.broadcast.topic}, {addressee.name}. Good to be on the same page."
+
+  say [action=clashed_caution, actor.social_style=warm|friendly|protective] (priority 11) as sc_cl_caut_warm:
+    "You're being reckless about {slot.broadcast.topic}, {addressee.name}. We can't afford sloppy mistakes."
+  say [action=clashed_caution, actor.social_style=hostile|guarded|withdrawn] (priority 11) as sc_cl_caut_cold:
+    "Stop jumping at shadows over {slot.broadcast.topic}, {addressee.name}. Caution turns into paralysis real fast."
+  say [action=clashed_caution] (priority 10) as sc_cl_caut_neu:
+    "I think you're reading {slot.broadcast.topic} wrong, {addressee.name}."
+
+  say [action=aligned_pragmatism] (priority 10) as sc_al_prag:
+    "Practical thinking on {slot.broadcast.topic}, {addressee.name}. That's how we stay ahead."
+  say [action=clashed_pragmatism] (priority 10) as sc_cl_prag:
+    "That's not realistic about {slot.broadcast.topic}, {addressee.name}. We need plans that actually hold up."
+  say [action=respected_clash] (priority 11) as sc_resp_clash:
+    "I don't agree with you on {slot.broadcast.topic}, {addressee.name}, but I respect that you stand your ground."
+  say [action=diplomatic] (priority 9) as sc_diplomatic:
+    "Fair enough, {addressee.name}. Guess we'll see how {slot.broadcast.topic} plays out."
+  say [action=measured_match] (priority 9) as sc_measured:
+    "Yeah, hard to say for sure on {slot.broadcast.topic}, {addressee.name}. Best to keep an open mind."
+  say [default] (priority 5) as default:
+    "Noted, {addressee.name}. Let's keep moving."

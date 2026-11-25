@@ -1,0 +1,21 @@
+# Subject: PLAYER EMOTE SPEECH LINES.
+language EN
+namespace hoomans
+
+flow semantic.emote.player
+  say [action=insult] (priority 8) as insult:
+    "Back off, {addressee.name}!"
+  say [action=thumbsdown] (priority 8) as thumbsdown:
+    "No. That's not good enough, {addressee.name}."
+  say [action=wavehi] (priority 8) as wavehi:
+    "Hey, {addressee.name}!"
+  say [action=wavebye] (priority 8) as wavebye:
+    "Take care, {addressee.name}."
+  say [action=thankyou] (priority 8) as thankyou:
+    "Thanks, {addressee.name}."
+  say [action=thumbsup] (priority 8) as thumbsup:
+    "Good work, {addressee.name}."
+  say [action=clap] (priority 8) as clap:
+    "Well done, {addressee.name}!"
+  say [action=salute] (priority 8) as salute:
+    "Respect, {addressee.name}."

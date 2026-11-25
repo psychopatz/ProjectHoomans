@@ -11,7 +11,7 @@ from .emitter import emit_lua
 from .parser import ConvoScript, parse_convo_file, validate_language_pack
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
-SCRIPTS_DIR = REPO_ROOT / "tools/providers/pnc/codebuilder/sources/conversation/scripts"
+SCRIPTS_DIR = REPO_ROOT / "Contents/mods/ProjectHoomans/common/media/translation"
 LUA_OUT_DIR = (
     REPO_ROOT
     / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/ConvoEngine/ResponseCatalog/Generated"
@@ -23,8 +23,8 @@ def _module_name(stem: str) -> str:
 
 
 def _discover_scripts(scripts_dir: Path) -> list[Path]:
-    # Support both scripts/<lang>/*.convo (preferred modular packs) and scripts/*.convo
-    found = list(scripts_dir.glob("*/*.convo")) + list(scripts_dir.glob("*.convo"))
+    # Discover <LANG>/ConvoBlocks/**/*.convo as well as direct *.convo packs.
+    found = list(scripts_dir.glob("*/ConvoBlocks/**/*.convo")) + list(scripts_dir.glob("*.convo"))
     return sorted(set(found))
 
 

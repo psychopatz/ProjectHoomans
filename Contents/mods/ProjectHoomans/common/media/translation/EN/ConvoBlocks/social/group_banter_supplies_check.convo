@@ -1,0 +1,16 @@
+# Subject: GROUP BANTER — SUPPLIES_CHECK.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=supplies_check, role=open] (priority 10) as supplies_open:
+    "How are we holding up on food and water, {addressee.name}?"
+    "We should keep an eye out for extra bandages and canned goods next stop, {addressee.name}."
+  say [topic=supplies_check, role=reply] (priority 10) as supplies_reply:
+    "Enough to get by for now, but I wouldn't turn down a clean supply run."
+    "Agreed—never hurts to top off our packs while we still find untouched shelves."
+  say [topic=supplies_check, role=chime] (priority 10) as supplies_chime:
+    "Count me in. Extra water bottles first, then anything with calories."
+    "And check tools too—weapons don't last forever."
+  say [topic=supplies_check, role=wrap] (priority 10) as supplies_wrap:
+    "Good plan. We'll keep our eyes open."

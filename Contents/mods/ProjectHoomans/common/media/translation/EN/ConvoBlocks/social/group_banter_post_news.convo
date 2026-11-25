@@ -1,0 +1,13 @@
+# Subject: GROUP BANTER — POST_NEWS.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=post_news, role=open] (priority 12) as post_news_open:
+    "Can't shake {slot.broadcast.topic} we caught on {slot.broadcast.channel} earlier, {addressee.name}."
+  say [topic=post_news, role=reply] (priority 12) as post_news_reply:
+    "Same here, {addressee.name}. Hearing {slot.broadcast.episode} out loud makes it sink in how wide this really is."
+  say [topic=post_news, role=chime] (priority 12) as post_news_chime:
+    "Doesn't change what we have to do, though. Keep moving, keep watching each other's backs."
+  say [topic=post_news, role=wrap] (priority 12) as post_news_wrap:
+    "Right. One day at a time."

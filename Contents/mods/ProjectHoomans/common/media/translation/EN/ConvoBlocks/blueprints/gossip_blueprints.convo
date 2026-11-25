@@ -1,0 +1,55 @@
+# Reusable stance & follow-up offer blueprints for world gossip pools.
+language EN
+namespace hoomans
+
+blueprint offer.gossip_opening_stances
+  offer world_gossip.stance_positive:
+    label: "Agree / take it seriously"
+    say: "I agree, that makes sense."
+    utility: warmth
+    intent: AGREE
+    subject: CONVERSATION_TOPIC
+  offer world_gossip.stance_neutral:
+    label: "Not sure / ask more"
+    say: "Hard to say. Tell me more about that."
+    utility: curiosity
+    intent: CLARIFY
+    subject: CONVERSATION_TOPIC
+  offer world_gossip.stance_negative:
+    label: "Skeptical / call bullshit"
+    say: "I don't buy it, sounds like bullshit."
+    utility: conflict
+    intent: DISAGREE
+    subject: CONVERSATION_TOPIC
+  offer world_gossip.ask_where:
+    label: "Where was that?"
+    say: "Where was that?"
+    utility: curiosity
+    intent: QUESTION
+    subject: LOCATION
+  offer world_gossip.ask_when:
+    label: "When did that happen?"
+    say: "When did that happen?"
+    utility: curiosity
+    intent: QUESTION
+    subject: TIME
+
+blueprint offer.gossip_followup_stances
+  offer world_gossip.stance_positive:
+    label: "Agree / support"
+    say: "I agree with you on that."
+    utility: warmth
+    intent: AGREE
+    subject: CONVERSATION_TOPIC
+  offer world_gossip.stance_neutral:
+    label: "Not sure / weigh it"
+    say: "Hard to say. What should we do?"
+    utility: practical
+    intent: CLARIFY
+    subject: CONVERSATION_TOPIC
+  offer world_gossip.stance_negative:
+    label: "Disagree / push back"
+    say: "I don't buy it, that's bullshit."
+    utility: conflict
+    intent: DISAGREE
+    subject: CONVERSATION_TOPIC

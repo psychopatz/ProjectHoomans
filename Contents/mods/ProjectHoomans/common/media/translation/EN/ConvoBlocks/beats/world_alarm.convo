@@ -1,0 +1,38 @@
+# Subject: HOUSE & CAR ALARM REACTIONS.
+language EN
+namespace hoomans
+
+flow semantic.world.alarm.react
+  say [role=house_alarm_open] (priority 8) as house_alarm_open:
+    "Damn—house alarm! Every {noun.zombie} on this {noun.road} is going to hear that!"
+    "Shit, a burglar alarm! {addressee.name}, we need to move before the whole block swarms in!"
+    "There goes a house alarm—great, like we needed a dinner bell ringing!"
+    "Hear that siren? Somebody tripped a security system nearby—weapons ready!"
+    "Loud alarm going off! Don't linger around here, {addressee.name}!"
+  say [role=house_alarm_reply] (priority 8) as house_alarm_reply:
+    "Yeah, let's get clear before {noun.pack|a} shows up!"
+    "Copy that, {addressee.name}—eyes on the corners, they'll be pouring in any second."
+    "Way too loud. Keep tight and let's put some distance between us and that house."
+    "I hear it—stay sharp and don't let them box us in!"
+    "No point fighting a whole neighborhood over an alarm. Let's stay mobile."
+  say [role=house_alarm_chime] (priority 8) as house_alarm_chime:
+    "Got your back—watching the rear in case stragglers come through."
+    "Just my luck. Keep moving, I'm right behind you."
+    "Stay off the main street if we can—that noise carries for blocks."
+    "Ready if anything jumps out. Let's not hang around."
+  say [role=house_alarm_ended_open] (priority 8) as house_alarm_ended_open:
+    "Finally—that alarm cut out. My ears are still ringing."
+    "Alarm's dead, {addressee.name}, but the damage is done—stay alert for stragglers."
+    "Thank god that siren shut off. Watch the treeline—anything nearby is still headed this way."
+    "Quiet again... don't let your guard down yet, the dead take a minute to arrive."
+  say [role=house_alarm_ended_reply] (priority 8) as house_alarm_ended_reply:
+    "Yeah, silence after an alarm is never really safe. Keeping my eyes peeled."
+    "Agreed, {addressee.name}. Let's check our sightlines before we relax."
+    "At least I can hear myself think again. Still watching the perimeter."
+    "Stay ready—half the neighborhood probably started shambling over here."
+  say [role=house_alarm_ended_chime] (priority 8) as house_alarm_ended_chime:
+    "Looks clear on my side for now, let's keep it that way."
+    "If we're lucky they went straight for that house instead of us."
+    "Good—now let's breathe and keep moving smart."
+  say [default] (priority 5) as default:
+    "That alarm is going to draw trouble—stay sharp!"

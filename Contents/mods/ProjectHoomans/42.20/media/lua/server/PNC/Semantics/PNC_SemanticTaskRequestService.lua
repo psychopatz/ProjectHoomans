@@ -145,6 +145,61 @@ function Service.Authorize(request, context)
     return false, "conversation_token_required"
 end
 
+local function yieldConversationHoldForOrder(npcID, reason)
+    if not npcID or npcID == "" then return end
+    local convScene = PNC.ConversationScene
+    if not convScene or type(convScene.YieldForOrder) ~= "function" then return end
+    local record = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(npcID) or nil
+    if not record then return end
+    local body = PNC.Registry and PNC.Registry.GetLiveZombie and PNC.Registry.GetLiveZombie(npcID) or nil
+    convScene.YieldForOrder(record, body, reason or "semantic_order_dispatched")
+end
+
+local function tryBehaviorScriptFallback(normalizedRequest, context)
+    local rawText = tostring(normalizedRequest.rawText or normalizedRequest.normalizedText or "")
+    if rawText == "" then return nil end
+    local engine = PNC.ConvoEngine
+    local compiler = engine and engine.BehaviorScriptCompiler or nil
+    local runner = engine and engine.BehaviorScriptRunner or nil
+    if not compiler or type(compiler.CompileFromText) ~= "function"
+        or not runner or type(runner.Start) ~= "function"
+    then
+        return nil
+    end
+    local npcID = requestNPCID(normalizedRequest, context)
+    local record = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(npcID) or nil
+    if not record then return nil end
+    local body = PNC.Registry and PNC.Registry.GetLiveZombie and PNC.Registry.GetLiveZombie(npcID) or nil
+
+    local plan = compiler.CompileFromText(rawText, record, context.player, {
+        cell = context.cell,
+    })
+    if not plan then return nil end
+    local started, startReason, info = runner.Start(record, body, plan, context.player, nil, {
+        resolveOnly = true,
+    })
+    if not started then return nil end
+    yieldConversationHoldForOrder(npcID, "behavior_script_started")
+    local spoken = info and info.spokenText or nil
+    return {
+        accepted = true,
+        status = "accepted",
+        action = normalizedRequest.action,
+        npcID = npcID,
+        planID = info and info.planId or ("bscript:" .. tostring(npcID)),
+        reason = startReason,
+        summary = info and info.summary or nil,
+        spokenText = spoken,
+        response = spoken and {
+            text = spoken,
+            fallback = spoken,
+            templateID = "semantic.command.ack.ack_script_plan",
+        } or nil,
+        handledByBehaviorScript = true,
+        request = normalizedRequest,
+    }
+end
+
 function Service.Submit(request, context)
     context = type(context) == "table" and context or {}
     audit("semantic.task.request", request, context, {
@@ -186,8 +241,30 @@ function Service.Submit(request, context)
         return result
     end
 
+    -- Route cancel phrases ("okay that's enough", "stop") and open-ended
+    -- area/room scavenge/loot requests (FETCH without a specific inventory
+    -- item) directly through the Behavior Script compiler/runner.
+    local compiler = PNC.ConvoEngine and PNC.ConvoEngine.BehaviorScriptCompiler or nil
+    local rawText = tostring(normalizedRequest.rawText or normalizedRequest.normalizedText or "")
+    local isCancel = compiler and type(compiler.IsCancelPhrase) == "function"
+        and compiler.IsCancelPhrase(rawText) == true
+    local isOpenFetch = normalizedRequest.action == "FETCH"
+        and type(normalizedRequest.object) ~= "table"
+    if isCancel or isOpenFetch then
+        local scriptResult = tryBehaviorScriptFallback(normalizedRequest, context)
+        if scriptResult then
+            audit("semantic.task.admission", normalizedRequest, context, scriptResult)
+            return scriptResult
+        end
+    end
+
     local handler = Service.GetHandler(normalizedRequest.action)
     if not handler then
+        local scriptResult = tryBehaviorScriptFallback(normalizedRequest, context)
+        if scriptResult then
+            audit("semantic.task.admission", normalizedRequest, context, scriptResult)
+            return scriptResult
+        end
         local result = {
             accepted = false,
             status = "unhandled",
@@ -203,6 +280,11 @@ function Service.Submit(request, context)
         local valid, validationReason = handler.Validate(
             normalizedRequest, context)
         if valid ~= true then
+            local scriptResult = tryBehaviorScriptFallback(normalizedRequest, context)
+            if scriptResult then
+                audit("semantic.task.admission", normalizedRequest, context, scriptResult)
+                return scriptResult
+            end
             local result = {
                 accepted = false,
                 status = "rejected",
@@ -231,6 +313,9 @@ function Service.Submit(request, context)
     end
     if type(accepted) == "table" then
         accepted.request = accepted.request or normalizedRequest
+        if accepted.accepted == true then
+            yieldConversationHoldForOrder(requestNPCID(normalizedRequest, context), "semantic_task_accepted")
+        end
         audit("semantic.task.admission", normalizedRequest, context, accepted)
         return accepted
     end
@@ -242,6 +327,9 @@ function Service.Submit(request, context)
         action = normalizedRequest.action,
         request = normalizedRequest,
     }
+    if result.accepted == true then
+        yieldConversationHoldForOrder(requestNPCID(normalizedRequest, context), "semantic_task_accepted")
+    end
     audit("semantic.task.admission", normalizedRequest, context, result)
     return result
 end

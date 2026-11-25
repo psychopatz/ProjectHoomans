@@ -325,4 +325,177 @@ end
 
 Adapter.Enrich = Adapter.EnrichClassification
 
+-- Bounded O(1) per-fullType MarketSense taxonomy cache for high-frequency
+-- looting filters and compressed loot-summary categorization.
+-- Item taxonomy by fullType is immutable at runtime, so each fullType is
+-- queried from MarketSense at most once per session (capped at MAX_CACHE_ENTRIES).
+Adapter.MAX_CACHE_ENTRIES = 1024
+Adapter._profileCache = Adapter._profileCache or {}
+Adapter._profileCacheCount = Adapter._profileCacheCount or 0
+
+local FILTER_ALIASES = {
+    med = { "medical", "firstaid", "pharmaceutical", "medicine", "bandage" },
+    meds = { "medical", "firstaid", "pharmaceutical", "medicine", "bandage" },
+    medicine = { "medical", "firstaid", "pharmaceutical", "medicine" },
+    medical = { "medical", "firstaid", "pharmaceutical", "medicine" },
+    firstaid = { "firstaid", "medical", "pharmaceutical" },
+    food = { "food", "cannedfood", "canned", "snack", "perishable", "edible", "produce" },
+    canned = { "cannedfood", "canned", "sealedfood" },
+    drink = { "beverage", "water", "liquidwater", "liquidsoda", "liquidjuice", "drink" },
+    drinks = { "beverage", "water", "liquidwater", "liquidsoda", "liquidjuice", "drink" },
+    water = { "water", "liquidwater", "beverage", "containerliquid" },
+    gun = { "firearm", "gun", "weaponranged", "ranged" },
+    guns = { "firearm", "gun", "weaponranged", "ranged" },
+    firearm = { "firearm", "gun", "weaponranged" },
+    firearms = { "firearm", "gun", "weaponranged" },
+    weapon = { "weapon", "firearm", "melee", "weaponmelee", "weaponranged" },
+    weapons = { "weapon", "firearm", "melee", "weaponmelee", "weaponranged" },
+    ammo = { "ammo", "ammunition", "bullet", "cartridge", "magazine" },
+    tool = { "tool", "tools", "carpentry", "metalworking", "hardware" },
+    tools = { "tool", "tools", "carpentry", "metalworking", "hardware" },
+    electronics = { "electronics", "electronic", "electrical", "battery", "radio" },
+    electronic = { "electronics", "electronic", "electrical" },
+    clothes = { "clothing", "apparel", "wearable", "armor", "protective" },
+    clothing = { "clothing", "apparel", "wearable" },
+    book = { "literature", "book", "skillbook", "magazine", "recipe" },
+    books = { "literature", "book", "skillbook", "magazine", "recipe" },
+    camping = { "camping", "survival", "outdoor", "outdoors" },
+    mechanics = { "mechanics", "automotive", "vehicle", "carpart" },
+    auto = { "mechanics", "automotive", "vehicle", "carpart" },
+    cooking = { "cooking", "kitchen", "cookware" },
+    fishing = { "fishing", "tackle" },
+    farming = { "farming", "agriculture", "gardening", "seed" },
+    fuel = { "fuel", "liquidfuel", "gasoline", "propane" },
+    bag = { "container", "backpack", "bag" },
+    bags = { "container", "backpack", "bag" },
+}
+
+local SUMMARY_CATEGORY_RULES = {
+    { key = "canned_food", tags = { "cannedfood", "sealedfood", "sealedfoodreserve" } },
+    { key = "medical",     tags = { "medical", "firstaid", "pharmaceutical", "medicine" } },
+    { key = "ammo",        tags = { "ammo", "ammunition" } },
+    { key = "firearm",     tags = { "firearm", "weaponranged", "gun" } },
+    { key = "weapon",      tags = { "weapon", "melee", "weaponmelee" } },
+    { key = "water",       tags = { "beverage", "water", "liquidwater", "liquidsoda", "liquidjuice" } },
+    { key = "food",        tags = { "food", "edible", "snack", "candy", "produce", "perishable" } },
+    { key = "electronics", tags = { "electronics", "electronic", "electrical", "radio" } },
+    { key = "mechanics",   tags = { "mechanics", "automotive", "vehicle", "carpart" } },
+    { key = "camping",     tags = { "camping", "survival", "outdoor" } },
+    { key = "fishing",     tags = { "fishing", "tackle" } },
+    { key = "farming",     tags = { "farming", "agriculture", "gardening", "foodseed" } },
+    { key = "fuel",        tags = { "fuel", "liquidfuel", "gasoline" } },
+    { key = "tool",        tags = { "tool", "tools", "carpentry", "metalworking", "hardware" } },
+    { key = "cooking",     tags = { "cooking", "cookware", "kitchen" } },
+    { key = "literature",  tags = { "literature", "book", "skillbook", "magazine" } },
+    { key = "clothing",    tags = { "clothing", "apparel", "wearable", "armor" } },
+    { key = "container",   tags = { "backpack", "bag", "container" } },
+    { key = "material",    tags = { "material", "crafting", "scrap", "lumber" } },
+}
+
+local function fullTypeFrom(itemOrFullType)
+    if type(itemOrFullType) == "string" then
+        return boundedText(itemOrFullType, 160)
+    end
+    if itemOrFullType ~= nil then
+        local fn = itemOrFullType.getFullType or itemOrFullType.getType
+        if type(fn) == "function" then
+            local ok, v = pcall(fn, itemOrFullType)
+            if ok and type(v) == "string" and v ~= "" then
+                return boundedText(v, 160)
+            end
+        end
+    end
+    return ""
+end
+
+local function deriveSummaryCategory(tagSet)
+    for i = 1, #SUMMARY_CATEGORY_RULES do
+        local rule = SUMMARY_CATEGORY_RULES[i]
+        local rTags = rule.tags
+        for j = 1, #rTags do
+            if tagSet[rTags[j]] then
+                return rule.key
+            end
+        end
+    end
+    return nil
+end
+
+function Adapter.ResetProfileCache()
+    Adapter._profileCache = {}
+    Adapter._profileCacheCount = 0
+end
+
+-- O(1) cached lookup of an item's MarketSense tagSet and summaryCategory.
+function Adapter.GetItemProfile(itemOrFullType, options)
+    local fullType = fullTypeFrom(itemOrFullType)
+    if fullType == "" then return nil end
+    local useCache = type(options) ~= "table" or (options.api == nil and options.marketSenseDetails == nil)
+    if useCache then
+        local cached = Adapter._profileCache[fullType]
+        if cached ~= nil then
+            return cached ~= false and cached or nil
+        end
+    end
+
+    local details = marketSenseDetails(fullType, options)
+    if type(details) ~= "table" then
+        if useCache then
+            if Adapter._profileCacheCount >= Adapter.MAX_CACHE_ENTRIES then
+                Adapter.ResetProfileCache()
+            end
+            Adapter._profileCache[fullType] = false
+            Adapter._profileCacheCount = Adapter._profileCacheCount + 1
+        end
+        return nil
+    end
+
+    local tagSet = collectClassificationTags(nil, details)
+    local heuristic = details.priceHeuristic
+    local role = normalized(heuristic and heuristic.role or details.role)
+    if role ~= "" then tagSet[role] = true end
+
+    local profile = {
+        fullType = fullType,
+        tagSet = tagSet,
+        summaryCategory = deriveSummaryCategory(tagSet),
+        primary = normalized(details.primary or details.category),
+    }
+    if useCache then
+        if Adapter._profileCacheCount >= Adapter.MAX_CACHE_ENTRIES then
+            Adapter.ResetProfileCache()
+        end
+        Adapter._profileCache[fullType] = profile
+        Adapter._profileCacheCount = Adapter._profileCacheCount + 1
+    end
+    return profile
+end
+
+-- O(1) MarketSense category/tag match for Behavior Script PICKUP/STORE filters.
+function Adapter.MatchesCategory(itemOrFullType, filter, options)
+    local normFilter = normalized(filter)
+    if normFilter == "" then return false end
+    local profile = Adapter.GetItemProfile(itemOrFullType, options)
+    if not profile then return false end
+    local tagSet = profile.tagSet
+    if tagSet[normFilter] then return true end
+    local aliases = FILTER_ALIASES[normFilter]
+    if aliases then
+        for i = 1, #aliases do
+            if tagSet[aliases[i]] then return true end
+        end
+    end
+    if profile.summaryCategory and normalized(profile.summaryCategory) == normFilter then
+        return true
+    end
+    return false
+end
+
+-- O(1) MarketSense summary category key for GrammarJoin.FormatLootSummary.
+function Adapter.GetSummaryCategory(itemOrFullType, options)
+    local profile = Adapter.GetItemProfile(itemOrFullType, options)
+    if not profile then return nil end
+    return profile.summaryCategory or (profile.primary ~= "" and profile.primary or nil)
+end
+
 return Adapter

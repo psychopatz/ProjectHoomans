@@ -1,0 +1,53 @@
+# Branching story: supply-run / travel excursion planning exchange.
+# Demonstrates multi-line `say` variants, `choice -> target` routing, `guard`, and `recommend`.
+language EN
+namespace hoomans
+
+story convo.travel_excursion
+  trigger intent=SUGGEST, subject=EXCURSION
+  trigger intent=QUESTION, subject=ROUTE
+  guard safe_to_talk
+  initial propose_route
+
+  node propose_route
+    say [default]:
+      "We're running low on canned goods and spare batteries, {term.address}. Think we can make a quick run {scene.location}?"
+      "Supplies are getting thin, {term.address}. Up for a quick run {scene.location}?"
+
+    choice set_destination -> assess_risk:
+      label: "Confirm supply run destination"
+      say: "Need canned goods and batteries from down the road before sunset."
+      intent: SUGGEST
+      subject: EXCURSION
+
+    choice ask_threat -> assess_hazard_intel:
+      label: "Check corridor threats"
+      say: "Heard anything about hordes or alarms along that street lately?"
+      intent: QUESTION
+      subject: ROUTE
+
+    choice call_off -> called_off:
+      label: "Call off the trip"
+      say: "Not worth sticking our necks out right now."
+      intent: REFUSE
+      subject: EXCURSION
+
+    on_unrelated: suspend
+
+  node assess_risk terminal
+    say [default]:
+      "Alright, {term.address}. Pack light, keep the crowbar handy, and we stick to the side streets."
+      "Deal, {term.address}. Let's travel light and keep our eyes on the corners."
+    recommend combat.aftermath.debrief_exchange
+
+  node assess_hazard_intel terminal
+    say [default]:
+      "Roads looked quiet earlier {scene.location}, {term.address}, though there's always a few {noun.zombie|s} near the gas station."
+      "Saw a couple {noun.zombie|s} drifting down the {noun.road} earlier, {term.address}—nothing we can't slip past."
+    recommend knowledge.gossip.exchange
+
+  node called_off terminal
+    say [default]:
+      "Fair enough, {term.address}. Better safe than cornered out there."
+      "Good call, {term.address}. We can wait for a cleaner window."
+    recommend wellbeing.needs.checkin

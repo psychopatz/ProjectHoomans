@@ -1,0 +1,49 @@
+# Subject: HORDE & COMBAT REACTIONS.
+language EN
+namespace hoomans
+
+flow semantic.combat.horde.prompt
+  offer semantic.combat.horde.choice.engage:
+    label: "Take them."
+    say: "Take them."
+    utility: directness
+    intent: REQUEST
+    action: COMBAT_ENGAGE
+  offer semantic.combat.horde.choice.avoid:
+    label: "Go around."
+    say: "Go around."
+    utility: caution
+    intent: REQUEST
+    action: COMBAT_AVOID
+  offer semantic.combat.horde.choice.hold:
+    label: "Hold for now."
+    say: "Hold for now."
+    utility: caution
+    intent: REQUEST
+    action: COMBAT_HOLD
+  say [combat.style=aggressive|brave] (priority 9) as eager:
+    "That's a hell of a crowd. We taking them?"
+  say [combat.style=shaken] (priority 9) as shaken:
+    "God... that's a lot. Are we really fighting all of them?"
+  say [combat.style=reserved|cold] (priority 8) as reserved:
+    "Horde ahead. Engage or go around?"
+  say [default] (priority 5) as default:
+    "That's a lot of them. We fighting or going around?"
+
+flow semantic.combat.horde
+  say [event.horde_phase=escalated] (priority 9) as escalated:
+    "More are piling in. This is getting bad."
+  say [event.horde_phase=deescalated] (priority 8) as deescalated:
+    "They're thinning out. Don't relax yet."
+  say [event.horde_phase=started] (priority 7) as started:
+    "That's a lot of them. Stay sharp."
+  say [default] (priority 5) as default:
+    "Horde nearby. Keep your eyes up."
+
+flow semantic.combat.reaction
+  say [event.type=zombie_stamina_retreat] (priority 9) as retreat:
+    "I need a moment before I can swing again."
+  say [event.type=combat_awareness|zombie_horde_detected] (priority 8) as threat:
+    "That threat is down. Stay alert."
+  say [default] (priority 5) as default:
+    "Good work. Keep watching the area."

@@ -1,0 +1,20 @@
+# Subject: GROUP BANTER — CAMP_LIFE.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=camp_life, role=open] (priority 10) as camp_open:
+    "Gotta admit, {addressee.name}, having a spot to catch our breath beats living out of a backpack."
+    "Think this camp holds if a few wanderers drift by, {addressee.name}?"
+    "Feels good to sit down for five minutes without checking over my shoulder, {addressee.name}."
+  say [topic=camp_life, role=reply] (priority 10) as camp_reply:
+    "Don't get too cozy, {addressee.name}, but yeah—my feet definitely needed the break."
+    "As long as we keep the noise down and watch the exits, we'll be alright."
+    "Same here. A dry spot and people watching your back is worth its weight in gold."
+  say [topic=camp_life, role=chime] (priority 10) as camp_chime:
+    "Just wake me if it's my turn on perimeter—I'm not letting anything sneak up on us."
+    "I checked the perimeter a minute ago—quiet so far."
+    "Beats sleeping in a rusted-out sedan, that's for sure."
+  say [topic=camp_life, role=wrap] (priority 10) as camp_wrap:
+    "Fair enough. Let's enjoy the quiet while it lasts."
+    "Good—stay rested, we'll need the energy later."

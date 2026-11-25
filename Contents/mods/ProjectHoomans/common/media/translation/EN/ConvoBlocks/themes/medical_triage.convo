@@ -1,0 +1,67 @@
+# Subject: COMBAT INJURY TRIAGE FLOWS.
+language EN
+namespace hoomans
+
+flow semantic.flow.combat.injury.triage.open
+  say [medical.is_bitten] (priority 11) as bitten:
+    "Teeth caught me in the scramble! Help me clear a lane so we can check the bite!"
+  say [medical.open_wounds] (priority 10) as open_wounds:
+    "Still bleeding through my clothes—cover my front while I tie this wound off!"
+  say [default] (priority 6) as default:
+    "Still holding my ground, caught a hit and keeping eyes forward."
+
+flow semantic.flow.combat.injury.triage.assess
+  say [state.value=covered_for_treatment] (priority 11) as covered:
+    "Thanks! Keep them off my back while I tie off this open bleed."
+  say [state.value=reassured_bond] (priority 10) as reassured:
+    "Heard you loud and clear. Still breathing, still swinging beside you."
+  say [medical.open_wounds] (priority 9) as open_wounds:
+    "The hit tore deep and it's still bleeding—give me two seconds of cover to wrap it!"
+  say [default] (priority 6) as default:
+    "Dressings are tight. Stay on my side and we'll sweep the rest of them."
+
+flow semantic.flow.combat.injury.triage.bite_check
+  say [!medical.saliva_transmissible] (priority 11) as non_transmissible:
+    "Thank god saliva doesn't carry it here. Still stings awful, wrapping it tight now."
+  say [default] (priority 6) as default:
+    "Teeth broke the skin. Let's clear the stragglers first and I'll keep my distance."
+
+flow semantic.flow.combat.injury.triage.squad_interject
+  say [state.value=bite_psychopath_threatened] (priority 11) as threatened:
+    "Keep that barrel down! We finish clearing the dead before anyone talks about executions."
+  say [default] (priority 6) as default:
+    "Eyes on the perimeter! Hold the line together while we sort this wound out."
+
+flow semantic.flow.combat.injury.triage.tactical_order
+  say [state.value=ordered_fallback] (priority 11) as fallback:
+    "Alright, backing up two steps behind you. Cover me while I catch my breath!"
+  say [state.value=covered_for_treatment] (priority 10) as covered:
+    "Wrapping it right behind you—keep those {noun.zombie|s} off my shoulder!"
+  say [default] (priority 6) as default:
+    "Dressings are holding. Stay on my flank and we push through."
+
+flow semantic.flow.combat.injury.triage.bite_standoff
+  say [state.value=bite_non_lethal_stabilized] (priority 11) as non_lethal:
+    "Saliva doesn't turn people here—just let me wrap the tear and keep fighting!"
+  say [state.value=bite_psychopath_threatened] (priority 10) as threatened:
+    "Keep that barrel down! We finish clearing the dead before anyone talks about executions."
+  say [default] (priority 6) as default:
+    "I know the rules. Help me clear the stragglers and I'll stay apart from the group."
+
+flow semantic.flow.combat.injury.triage.resolved
+  say [state.value=ordered_fallback] (priority 11) as fallback:
+    "Pulling back to rear guard now—watch the front!"
+  say [state.value=covered_for_treatment] (priority 10) as covered:
+    "Tying off the dressing under your cover right now!"
+  say [state.value=bite_non_lethal_stabilized] (priority 10) as non_lethal:
+    "Bite's wrapped tight and saliva isn't lethal here. Back in formation!"
+  say [state.value=bite_quarantined] (priority 10) as quarantined:
+    "Understood. I'll keep my distance from the squad and watch for fever."
+  say [state.value=bite_psychopath_threatened] (priority 10) as threatened:
+    "Nobody's firing on our own while I'm standing here. Eyes back on the dead!"
+  say [state.value=reassured_bond] (priority 9) as reassured:
+    "Heard you loud and clear. Still breathing, still swinging beside you."
+  say [intent=REFUSE] (priority 9) as refused:
+    "Save the talk for when there aren't teeth snapping in our faces!"
+  say [default] (priority 6) as default:
+    "Dressings are tight. Stay on my side and we'll sweep the rest of them."

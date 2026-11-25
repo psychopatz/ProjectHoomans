@@ -1,0 +1,53 @@
+# Shared base defaults and leader approve/deny/requester replies for companion needs.
+# Individual need subjects (hunger, thirst, sleep, fatigue, encumbrance, pain_rest)
+# live in their own self-contained per-subject files in this folder.
+language EN
+namespace hoomans
+
+flow semantic.companion.moodle_suggest
+  say [default] (priority 5) as default:
+    "Take care of yourself out here, {term.address}."
+
+flow semantic.companion.need_request
+  say [role=leader_approve, actor.social_style=warm|friendly|protective] (priority 8) as leader_approve_warm:
+    "Of course, {term.address}. Take a minute — we'll hold here."
+  say [role=leader_approve, actor.social_style=hostile|guarded|withdrawn] (priority 8) as leader_approve_guarded:
+    "Fine, {term.address}. Make it quick."
+  say [role=leader_approve] (priority 7) as leader_approve_default:
+    "Sure, {term.address}. Take a quick break."
+
+  say [role=leader_deny, actor.social_style=warm|friendly|protective] (priority 8) as leader_deny_warm:
+    "Not right here, {term.address}. Hang in there a little longer until we're somewhere safer."
+  say [role=leader_deny, actor.social_style=hostile|guarded|withdrawn] (priority 8) as leader_deny_guarded:
+    "No. Keep moving, {term.address} — we don't have time for breaks."
+  say [role=leader_deny] (priority 7) as leader_deny_default:
+    "Not right now, {term.address}. Let's push a bit further first."
+
+  say [role=requester_approved, actor.social_style=warm|friendly|protective] (priority 8) as req_approved_warm:
+    "Thanks, {term.address}. I really needed that."
+  say [role=requester_approved, actor.social_style=hostile|guarded|withdrawn] (priority 8) as req_approved_guarded:
+    "Good. Won't take long."
+  say [role=requester_approved] (priority 7) as req_approved_default:
+    "Thanks, {term.address}. Just need a moment."
+
+  say [role=requester_denied, actor.social_style=warm|friendly|protective] (priority 8) as req_denied_warm:
+    "Alright, {term.address}... I'll try to keep up."
+  say [role=requester_denied, actor.social_style=hostile|guarded|withdrawn] (priority 8) as req_denied_guarded:
+    "Unbelievable... fine, {term.address}. Don't blame me if I slow us down."
+  say [role=requester_denied] (priority 7) as req_denied_default:
+    "Okay, {term.address}. I'll hang on a bit longer."
+
+  say [default] (priority 5) as default:
+    "Could use a quick break when we get a chance, {term.address}."
+
+flow semantic.question.needs.offer
+  say [default] (priority 5) as unknown:
+    "I don't know what I need right now."
+
+flow semantic.question.needs.quantity
+  say [default] (priority 5) as unknown:
+    "I can't confirm an exact amount yet. Which item do you mean?"
+
+flow semantic.question.needs.proposal
+  say [default] (priority 5) as unknown:
+    "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment."

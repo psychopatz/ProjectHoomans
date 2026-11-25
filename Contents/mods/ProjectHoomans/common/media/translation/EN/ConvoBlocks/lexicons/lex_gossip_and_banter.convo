@@ -1,0 +1,9 @@
+# Closure clauses for world gossip and mundane banter.
+language EN
+namespace hoomans
+
+lexicon clause.gossip_closure
+  [default] (priority 6): "That's all I know about it, honestly." | "Honestly, that's everything I saw—couldn't tell you much more." | "That's about all I caught."
+
+lexicon clause.banter_closure
+  [default] (priority 6): "Anyway, no use dwelling on it—gotta keep moving." | "That's about it. Just thinking out loud." | "Anyway, back to reality."

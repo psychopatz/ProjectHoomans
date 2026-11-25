@@ -9,7 +9,7 @@ require "PNC/ConvoEngine/PatienceTracker"
 require "PNC/ConvoEngine/TokenFormatter"
 require "PNC/ConvoEngine/Lexicon"
 require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
-require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
+require("PNC/ConvoEngine/ConvoDSL/ConvoDSL").EnsureActiveLanguage()
 local GroupFloor = require "PNC/ConvoEngine/GroupFloor"
 
 local Catalog = PNC.ConvoEngine.ResponseCatalog

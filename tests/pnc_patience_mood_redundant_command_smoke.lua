@@ -35,7 +35,7 @@ require "PNC/ConvoEngine/TokenFormatter"
 require "PNC/ConvoEngine/Lexicon"
 require "PNC/ConvoEngine/OfferRealizer"
 require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
-require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
+require("PNC/ConvoEngine/ConvoDSL/ConvoDSL").EnsureActiveLanguage()
 require "PNC/Semantics/PNC_SemanticBeatContext"
 
 local Patience = PNC.ConvoEngine.PatienceTracker

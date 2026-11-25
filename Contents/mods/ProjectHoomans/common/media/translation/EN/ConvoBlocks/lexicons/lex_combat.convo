@@ -1,0 +1,25 @@
+# Combat, survival, and caution clause lexicons.
+language EN
+namespace hoomans
+
+lexicon clause.thanks_backup
+  [actor.style=supportive] (priority 8): "Thank you for stepping in—I really appreciate the backup." | "You really came through for me back there."
+  [actor.style=brave] (priority 8):      "Appreciate the backup—always easier with another pair of hands." | "Good stand. Glad you jumped in."
+  [actor.style=cold] (priority 8):       "Good timing. Saved me some trouble." | "Appreciate the assist."
+  [actor.style=shaken] (priority 8):     "I didn't think I'd make it out of that—thank you." | "You saved my skin back there."
+  [default]:                        "Appreciate you jumping in like that." | "Thanks for watching my back."
+
+lexicon clause.night_warning
+  [environment.night_or_dusk] (priority 8): "Hard enough spotting {noun.zombie|s} in {noun.dark}." | "They get nastier once the sun drops." | "Stick to cover with the light gone."
+
+lexicon clause.rain_note
+  [environment.raining] (priority 8): "This rain makes it even harder to hear them coming." | "Wet ground didn't help any either."
+
+lexicon clause.stay_sharp
+  [default]: "Stay sharp out here." | "Keep your head on a swivel." | "Watch your corners." | "Don't let your guard down."
+
+lexicon clause.breath_check
+  [default]: "Take a second to catch your breath." | "Give it a second—looks clear for now." | "Catch your breath while we can."
+
+lexicon clause.wary_tail
+  [default]: "That's all you need to know for now." | "No need to get any friendlier than that." | "Let's leave it at that."

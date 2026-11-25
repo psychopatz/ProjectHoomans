@@ -29,6 +29,8 @@ local BODY_IDENTITY_AUDIT_SETTING_ID =
     "ProjectHoomans.BodyIdentityAudit"
 local BEATS_AUDIT_SETTING_ID =
     "ProjectHoomans.BeatsAudit"
+local BEHAVIOR_SCRIPT_AUDIT_SETTING_ID =
+    "ProjectHoomans.BehaviorScriptAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -239,6 +241,18 @@ local function initializeCentralDebugSettings()
             end
         end,
     })
+    settings.Register({
+        id = BEHAVIOR_SCRIPT_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 152,
+        title = "Behavior script audit",
+        description = "Logs behavior script start, step dispatch, loot spot search, pickup results, and cancellation.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.BehaviorScriptAuditEnabled = enabled == true
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
@@ -277,6 +291,8 @@ local function initializeCentralDebugSettings()
         BODY_IDENTITY_AUDIT_SETTING_ID) == true
     Diagnostics.BeatsAuditEnabled = settings.IsEnabled(
         BEATS_AUDIT_SETTING_ID) == true
+    Diagnostics.BehaviorScriptAuditEnabled = settings.IsEnabled(
+        BEHAVIOR_SCRIPT_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()

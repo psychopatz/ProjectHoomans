@@ -74,6 +74,46 @@ local function hostileParleyRequested(record, options)
         and record.hostility.attackPlayers == true
 end
 
+local function hasActiveDirectedWork(record)
+    local rt = type(record) == "table" and record.runtime or nil
+    if type(rt) == "table" and type(rt.behaviorScript) == "table"
+        and rt.behaviorScript.active == true
+    then
+        return true
+    end
+    local plans = PNC.Semantics and PNC.Semantics.ActionPlanService or nil
+    if plans and type(plans.Get) == "function" and record and record.id ~= nil then
+        local plan = plans.Get(record.id)
+        if type(plan) == "table" then
+            local st = string.upper(tostring(plan.state or ""))
+            if st == "PENDING" or st == "ACTIVE" or st == "RUNNING" then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- Smart, non-invasive conversation hold release: stops the blocking
+-- `social.conversation` animation scene so the NPC can immediately carry out
+-- a player order/script while keeping the chat lease alive for follow-ups.
+function Scene.YieldForOrder(record, zombie, reason)
+    if type(record) ~= "table" then return false end
+    local rt = record.runtime
+    if type(rt) ~= "table" then return false end
+    local activeScene = rt.animationScene
+    if type(activeScene) == "table" and tostring(activeScene.id or "") == Scene.ID then
+        local scenes = PNC.AnimationScenes
+        if scenes and type(scenes.Stop) == "function" then
+            scenes.Stop(record, zombie, tostring(reason or "order_dispatched"))
+        else
+            rt.animationScene = nil
+        end
+        return true
+    end
+    return false
+end
+
 local function renewLease(record, token, currentTime)
     local current = record.runtime.conversationLease
     if not current
@@ -82,6 +122,7 @@ local function renewLease(record, token, currentTime)
         return nil
     end
     if not isAbstractRecord(record)
+        and not hasActiveDirectedWork(record)
         and (not record.runtime.animationScene
             or record.runtime.animationScene.id ~= Scene.ID)
     then
@@ -112,6 +153,10 @@ end
 local function requestScene(record, zombie, currentTime)
     if isAbstractRecord(record) then
         return true, "abstract_no_body_scene"
+    end
+    if hasActiveDirectedWork(record) then
+        Scene.YieldForOrder(record, zombie, "directed_work_active")
+        return true, "directed_work_non_blocking"
     end
     return PNC.AnimationScenes.Request(record, zombie, Scene.ID, {
         reason = "conversation",

@@ -1,0 +1,13 @@
+# Mod Compatibility: Bandits.
+language EN
+namespace hoomans
+
+flow semantic.compat.bandits.hooman_hurt
+  say [social.role=colonist] (priority 9) as colonist:
+    "Bandit fire! Pull back and cover the wounded colonist."
+  say [social.role=lover] (priority 9) as lover:
+    "Bandit fire. Stay close; I have got you."
+  say [social.role=family] (priority 9) as family:
+    "Bandit fire! Stay together and cover the wounded family member."
+  say [default] (priority 5) as default:
+    "Bandit fire! Stay with the wounded survivor and watch the flank."

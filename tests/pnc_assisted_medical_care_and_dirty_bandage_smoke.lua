@@ -174,7 +174,7 @@ require "PsychopatzCore/Semantics/PsychopatzSemantic"
 require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
 require "PNC/ConvoEngine/SpeechRealization"
 require "PNC/ConvoEngine/Social/Reaction"
-require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
+require("PNC/ConvoEngine/ConvoDSL/ConvoDSL").EnsureActiveLanguage()
 require "PNC/Semantics/PNC_SemanticSpeechTransport"
 
 local Wounds = require "PNC/Core/Health/PNC_NPCWounds"

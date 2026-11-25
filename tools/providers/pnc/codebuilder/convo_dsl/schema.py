@@ -207,6 +207,31 @@ CONTEXT_SCHEMA: dict[str, FieldSpec] = {
     "command.id": FieldSpec("commandID", "string"),
     "command.reason": FieldSpec("commandReason", "string"),
     "command.outcome": FieldSpec("commandOutcome", "string"),
+
+    # Descriptive full-name predicate aliases
+    "relationship.bond": FieldSpec("relBond", "string", ("lover", "spouse", "parent", "child", "sibling", "family", "friend", "rival", "stranger")),
+    "relationship.tier": FieldSpec("relationshipTier", "string", ("hostile", "wary", "stranger", "acquaintance", "friendly", "trusted", "ally")),
+    "relationship.state": FieldSpec("relationshipState", "string"),
+    "relationship.identity_trust": FieldSpec("identityTrust", "string", ("unknown", "claimed", "trusted", "distrusted", "untrustworthy")),
+    "relationship.cross_group": FieldSpec("isCrossGroup", "bool"),
+    "environment.night_or_dusk": FieldSpec("isNightOrDusk", "bool"),
+    "environment.time_band": FieldSpec("timeBand", "string"),
+    "environment.raining": FieldSpec("raining", "bool"),
+    "environment.foggy": FieldSpec("foggy", "bool"),
+    "environment.snowing": FieldSpec("snowing", "bool"),
+    "environment.indoors": FieldSpec("indoors", "bool"),
+    "memory.has_any": FieldSpec("memHasAny", "bool"),
+    "memory.saved_me": FieldSpec("memSavedMe", "bool"),
+    "memory.fought_together": FieldSpec("memFoughtTogether", "bool"),
+    "memory.treated_me": FieldSpec("memTreatedMe", "bool"),
+    "memory.betrayed": FieldSpec("memBetrayed", "bool"),
+    "knowledge.has_gossip": FieldSpec("knowHasGossip", "bool"),
+    "conversation.repeat_count": FieldSpec("convoRepeatCount", "number"),
+    "conversation.pending_request": FieldSpec("hasPendingRequest", "bool"),
+    "conversation.previous_topic": FieldSpec("previousTopic", "string"),
+    "conversation.previous_action": FieldSpec("previousAction", "string"),
+    "conversation.last_intent": FieldSpec("lastIntent", "string"),
+    "conversation.last_speech_act": FieldSpec("lastSpeechAct", "string"),
 }
 
 

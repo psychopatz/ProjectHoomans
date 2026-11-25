@@ -1,0 +1,50 @@
+# Subject: SLEEP (self-contained lexicons, suggestions, acknowledgments, requests).
+language EN
+namespace hoomans
+
+lexicon sleep.observe
+  [actor.social_style=warm|friendly|protective] (priority 8): "You're barely keeping your eyes open" | "You look like you're about to drop" | "You're swaying on your feet"
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "You're nodding off" | "You're half-asleep out here" | "You're dragging"
+  [default]: "You look dead tired" | "You're running on empty" | "You look beat"
+
+lexicon sleep.suggest
+  [environment.night_or_dusk] (priority 9): "Let's hole up and get some shut-eye before it gets any darker." | "We need to barricade somewhere and sleep."
+  [place.in_settlement] (priority 9): "Go hit a bunk—I'll hold things down here." | "Head to a bed and get some rest."
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Find a bed before you walk into a bite." | "Crash somewhere safe before you get us killed."
+  [default]: "We should find a safe spot to sleep." | "Let's find somewhere to get some sleep." | "You need to get some shut-eye."
+
+lexicon sleep.risk
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "I'm not carrying you if you pass out." | "One slip and we're both dead."
+  [environment.night_or_dusk] (priority 8): "Not safe being half-asleep in {noun.dark}." | "Hard enough spotting {noun.zombie|s} when you're wide awake."
+
+lexicon sleep.ack
+  [actor.social_style=warm|friendly|protective] (priority 8): "Rest easy—I'll keep watch while you sleep." | "Get some shut-eye. I've got the door covered."
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Get your sleep. I'll wake you if anything moves." | "Fine. Sleep quick—I'm watching the perimeter."
+  [default]: "I'll stand guard while you get some rest." | "Go ahead and sleep. I'll keep an eye out."
+
+lexicon sleep.request_need
+  [actor.social_style=warm|friendly|protective] (priority 8): "I'm barely keeping my eyes open" | "I'm completely worn out" | "My eyes are burning"
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "I'm running on fumes" | "I'm about to drop" | "I need rack time"
+  [default]: "I'm dead tired" | "I'm wiped out" | "I can barely stay upright"
+
+lexicon sleep.request_ask
+  [environment.night_or_dusk] (priority 8): "Can we hole up and get some sleep before morning?" | "Think we can find a safe spot to crash for the night?"
+  [default]: "Mind if I get some sleep for a bit?" | "Can we stop somewhere safe so I can crash?"
+
+extend semantic.companion.moodle_suggest
+  say [role=suggest_sleep, environment.night_or_dusk] (priority 9) as suggest_sleep_night:
+    "{opener.casual}, {term.address}—{sleep.observe}. {sleep.suggest} {?sleep.risk}"
+  say [role=suggest_sleep, place.in_settlement] (priority 9) as suggest_sleep_settlement:
+    "{sleep.observe}, {term.address}. {sleep.suggest}"
+  say [role=suggest_sleep] (priority 8) as suggest_sleep_composed_a:
+    "{sleep.observe}, {term.address}. {sleep.suggest} {?sleep.risk}"
+    "{opener.casual} {term.address}, {sleep.observe}. {sleep.suggest}"
+  say [role=ack_sleep] (priority 8) as ack_sleep_composed:
+    "{sleep.ack}"
+
+extend semantic.companion.need_request
+  say [role=request_sleep, environment.night_or_dusk] (priority 9) as req_sleep_night:
+    "{term.address}, {sleep.request_need}. {sleep.request_ask}"
+  say [role=request_sleep] (priority 8) as req_sleep_composed_a:
+    "{opener.casual} {term.address}, {sleep.request_need}. {sleep.request_ask}"
+    "{sleep.request_need}, {term.address}. {sleep.request_ask}"

@@ -76,11 +76,17 @@ function Service.CaptureInventoryOutput(effect, items, opts)
         end
     end
     if #descriptors < 1 then return false, "OUTPUT_ITEMS_EMPTY" end
-    if opts.addToInventory == true and opts.record
-        and PNC.Inventory and type(PNC.Inventory.AddItems) == "function"
-    then
-        local added, reason = PNC.Inventory.AddItems(opts.record, specs, "root",
-            opts.reason or "work_inventory_output")
+    if opts.addToInventory == true and opts.record and PNC.Inventory then
+        local added, reason
+        if type(PNC.Inventory.AddItemsAndSync) == "function" then
+            added, reason = PNC.Inventory.AddItemsAndSync(
+                opts.record, opts.body, specs, "root", opts.reason or "work_inventory_output"
+            )
+        elseif type(PNC.Inventory.AddItems) == "function" then
+            added, reason = PNC.Inventory.AddItems(
+                opts.record, specs, "root", opts.reason or "work_inventory_output"
+            )
+        end
         if not added then return false, reason or "NPC_INVENTORY_FULL" end
     end
     effect.items = effect.items or {}

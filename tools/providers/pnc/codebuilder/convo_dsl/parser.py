@@ -9,15 +9,15 @@ from typing import Any
 
 from .schema import resolve_predicate
 
-HEADER_RE = re.compile(r"^(pool|beat|flow)\s+([a-zA-Z0-9_.-]+)\s*$")
-BLUEPRINT_HEADER_RE = re.compile(r"^blueprint\s+([a-zA-Z0-9_.-]+)\s*$")
+HEADER_RE = re.compile(r"^(pool|beat|flow|extend)(?:\s+pool)?\s+([a-zA-Z0-9_.-]+)\s*$")
+BLUEPRINT_HEADER_RE = re.compile(r"^(?:extend\s+)?blueprint\s+([a-zA-Z0-9_.-]+)\s*$")
 USE_RE = re.compile(r"^use\s+([a-zA-Z0-9_.-]+)\s*$")
-LEX_HEADER_RE = re.compile(r"^lex\s+([a-zA-Z0-9_.-]+)\s*$")
+LEX_HEADER_RE = re.compile(r"^(?:extend\s+)?(?:lexicon|lex)\s+([a-zA-Z0-9_.-]+)\s*$")
 LEX_ENTRY_RE = re.compile(
-    r"^(?:\[([^\]]*)\])?(?:\s*\(pri\s+(\d+)\))?\s*:\s*(.+?)\s*$"
+    r"^(?:\[([^\]]*)\])?(?:\s*\((?:priority|pri)\s+(\d+)\))?\s*:\s*(.+?)\s*$"
 )
 SAY_RE = re.compile(
-    r'^say(?:\s+\[([^\]]*)\])?(?:\s+\(pri\s+(\d+)\))?(?:\s+as\s+([a-zA-Z0-9_.-]+))?\s*:\s*(?:"(.*)")?\s*$'
+    r'^say(?:\s+\[([^\]]*)\])?(?:\s+\((?:priority|pri)\s+(\d+)\))?(?:\s+as\s+([a-zA-Z0-9_.-]+))?\s*:\s*(?:"(.*)")?\s*$'
 )
 OFFER_RE = re.compile(r"^offer\s+([a-zA-Z0-9_.-]+)\s*:\s*$")
 KV_RE = re.compile(r"^([a-zA-Z0-9_]+)\s*:\s*(.+?)\s*$")
@@ -45,7 +45,7 @@ RUNTIME_TOKEN_PREFIXES = (
     "group.",
     "rel.",
 )
-RUNTIME_EXACT_TOKENS = {"end"}
+RUNTIME_EXACT_TOKENS = {"end", "content", "role", "destination", "direction", "eta"}
 
 
 @dataclass
@@ -186,7 +186,9 @@ def parse_convo_text(text: str, source_path: str = "<memory>") -> ConvoScript:
     current_blueprint: BlueprintNode | None = None
     current_pool: PoolNode | None = None
     current_offer: OfferNode | None = None
+    in_story = False
     pending_say: tuple[dict[str, Any], int, str | None, int] | None = None
+    pending_say_count = 0
 
     lines = text.splitlines()
     for idx, raw_line in enumerate(lines, start=1):
@@ -195,22 +197,48 @@ def parse_convo_text(text: str, source_path: str = "<memory>") -> ConvoScript:
             continue
 
         if pending_say is not None:
-            if not (stripped.startswith('"') and stripped.endswith('"')):
+            if stripped.startswith('"') and stripped.endswith('"'):
+                when, pri, explicit_id, say_line = pending_say
+                pending_say_count += 1
+                if current_pool is not None:
+                    if explicit_id:
+                        vid = explicit_id if pending_say_count == 1 else f"{explicit_id}_{pending_say_count}"
+                    else:
+                        vid = f"v{len(current_pool.variants) + 1}"
+                    current_pool.variants.append(
+                        VariantNode(
+                            variant_id=vid,
+                            fallback=_strip_quotes(stripped),
+                            when=when,
+                            priority=pri,
+                            line_no=say_line,
+                        )
+                    )
+                continue
+            if pending_say_count == 0:
                 raise ValueError(f"{source_path}:{idx}: expected quoted dialogue line after 'say:'")
-            when, pri, explicit_id, say_line = pending_say
             pending_say = None
-            assert current_pool is not None
-            vid = explicit_id or f"v{len(current_pool.variants) + 1}"
-            current_pool.variants.append(
-                VariantNode(
-                    variant_id=vid,
-                    fallback=_strip_quotes(stripped),
-                    when=when,
-                    priority=pri,
-                    line_no=say_line,
-                )
-            )
+            pending_say_count = 0
+
+        if stripped.startswith("story ") or stripped.startswith("extend story "):
+            current_lex = None
+            current_blueprint = None
+            current_pool = None
+            current_offer = None
+            in_story = True
             continue
+
+        if in_story:
+            # Story blocks are validated & compiled directly by Lua ConvoDSL_StoryCompiler.
+            is_top_level = not raw_line.startswith((" ", "\t"))
+            if is_top_level and (
+                LEX_HEADER_RE.match(stripped)
+                or BLUEPRINT_HEADER_RE.match(stripped)
+                or HEADER_RE.match(stripped)
+            ):
+                in_story = False
+            else:
+                continue
 
         if stripped.startswith("namespace "):
             namespace = stripped.split(None, 1)[1].strip()
@@ -218,10 +246,17 @@ def parse_convo_text(text: str, source_path: str = "<memory>") -> ConvoScript:
                 raise ValueError(f"{source_path}:{idx}: invalid namespace '{namespace}'")
             continue
 
-        if stripped.startswith("lang "):
+        if stripped.startswith("language ") or stripped.startswith("lang "):
             language = stripped.split(None, 1)[1].strip().upper()
             if not re.match(r"^[A-Z]{2,8}$", language):
-                raise ValueError(f"{source_path}:{idx}: invalid lang '{language}'")
+                raise ValueError(f"{source_path}:{idx}: invalid language '{language}'")
+            continue
+
+        if stripped.startswith("theme ") or stripped.startswith("pack "):
+            directive, val = stripped.split(None, 1)
+            val = val.strip()
+            if not re.match(r"^[a-zA-Z0-9_.-]+$", val):
+                raise ValueError(f"{source_path}:{idx}: invalid {directive} '{val}'")
             continue
 
         m_lex = LEX_HEADER_RE.match(stripped)
@@ -330,11 +365,12 @@ def parse_convo_text(text: str, source_path: str = "<memory>") -> ConvoScript:
                 )
             else:
                 pending_say = (when, pri, explicit_id, idx)
+                pending_say_count = 0
             continue
 
         raise ValueError(f"{source_path}:{idx}: unrecognized statement '{stripped}'")
 
-    if pending_say is not None:
+    if pending_say is not None and pending_say_count == 0:
         raise ValueError(f"{source_path}:{pending_say[3]}: dangling 'say:' without text line")
 
     seen_lex: set[str] = set()
@@ -392,6 +428,8 @@ def validate_language_pack(scripts: list[ConvoScript]) -> None:
                 )
             bp_owners[bp.blueprint_id] = script.source_path
         for pool in script.pools:
+            if pool.kind == "extend":
+                continue
             if pool.pool_id in pool_owners:
                 raise ValueError(
                     f"duplicate pool '{pool.pool_id}' across {pool_owners[pool.pool_id]} and {script.source_path}"

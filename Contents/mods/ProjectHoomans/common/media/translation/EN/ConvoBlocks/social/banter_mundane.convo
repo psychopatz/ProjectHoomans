@@ -1,0 +1,37 @@
+# Mundane, reminiscent, and personal-belief idle banter.
+language EN
+namespace hoomans
+
+flow semantic.banter.mundane
+  offer banter.ask_more:
+    label: "Tell me more"
+    say: "Tell me more about that."
+    utility: warmth
+    intent: QUESTION
+    subject: CONVERSATION_TOPIC
+  say [topic=reminisce_sunset] (priority 9) as reminisce_sunset:
+    "I miss just sitting on the porch watching the sunset without worrying about walkers."
+  say [topic=reminisce_comforts] (priority 8) as reminisce_comforts:
+    "Funny what you miss—I'd trade half my pack for a hot shower and a cold soda."
+  say [topic=reminisce_music] (priority 8) as reminisce_music:
+    "Every time I pass an old car, I half expect the radio to kick on with some late-night rock station."
+  say [topic=personal_belief, actor.social_style=friendly] (priority 9) as belief_compassionate:
+    "I still think people are worth saving, even after everything we've seen."
+  say [topic=personal_belief] (priority 8) as belief_pragmatic:
+    "Out here, you only make it if you watch your own back first and trust slow."
+  say [topic=mundane_food] (priority 7) as mundane_food:
+    "If I have to eat one more cold can of beans straight out of the tin, I might lose my mind."
+  say [default] (priority 5) as mundane_default:
+    "My feet are killing me—feels like we've walked half of Knox County this week."
+
+flow semantic.banter.mundane.followup
+  say [topic=reminisce_sunset] (priority 9) as followup_sunset:
+    "Used to be my favorite part of the day—just quiet air, orange sky, and nowhere else to be. {clause.banter_closure}"
+  say [topic=reminisce_comforts] (priority 8) as followup_comforts:
+    "You don't realize how much the little stuff kept you sane until it's all gone. {clause.banter_closure}"
+  say [topic=personal_belief, actor.social_style=friendly] (priority 9) as followup_belief_warm:
+    "If we stop looking out for each other, then what's the point of surviving at all? {clause.banter_closure}"
+  say [topic=personal_belief] (priority 8) as followup_belief_pragmatic:
+    "Seen too many good folks get burned because they assumed a stranger meant well. {clause.banter_closure}"
+  say [default] (priority 5) as default:
+    "Dry socks and a warm meal are worth more than gold out here. {clause.banter_closure}"

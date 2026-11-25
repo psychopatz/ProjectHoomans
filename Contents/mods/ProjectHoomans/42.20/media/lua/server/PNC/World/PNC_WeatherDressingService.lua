@@ -253,9 +253,16 @@ local function tryBorrowFromFactionStorage(record, band)
     local removedOk = storage.inventory.remove
         and storage.inventory:remove(bestTypeKey, 1)
     if not removedOk then return nil end
-    local addedOk, addedItems = invSvc.AddItems(record, {
-        { type = bestProfile.fullType, count = 1 },
-    }, "weather_storage_borrow")
+    local addedOk, _, addedIds
+    if type(invSvc.AddItemsAndSync) == "function" then
+        addedOk, _, addedIds = invSvc.AddItemsAndSync(record, nil, {
+            { type = bestProfile.fullType, stack = 1 },
+        }, "root", "weather_storage_borrow")
+    else
+        addedOk, _, addedIds = invSvc.AddItems(record, {
+            { type = bestProfile.fullType, stack = 1 },
+        }, "root", "weather_storage_borrow")
+    end
     if not addedOk then
         if storage.inventory.add then
             storage.inventory:add(bestRecord)
@@ -263,8 +270,9 @@ local function tryBorrowFromFactionStorage(record, band)
         return nil
     end
     if repo.MarkDirty then repo.MarkDirty() end
-    local added = type(addedItems) == "table" and addedItems[1] or nil
-    return added and added.id or nil, bestProfile.slot, storage.id, bestTypeKey
+    local added = type(addedIds) == "table" and addedIds[1] or nil
+    local addedId = type(added) == "table" and added.id or added
+    return addedId, bestProfile.slot, storage.id, bestTypeKey
 end
 
 local function revertOwnedWeatherItems(record, zombie)

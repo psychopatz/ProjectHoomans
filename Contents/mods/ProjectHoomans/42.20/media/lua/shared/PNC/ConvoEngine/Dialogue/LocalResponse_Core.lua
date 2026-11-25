@@ -119,8 +119,18 @@ local function catalogResponse(poolID, ir, state, context, args)
         .. tostring(ir and ir.rawText or "")
     local selected = Catalog.Select(poolID, selCtx, salt)
     if type(selected) ~= "table" then return nil end
+    local rawFallback = selected.fallback
+    local tid = selected.templateID or selected.id
+    if type(tid) == "string" and tid ~= ""
+        and PNC and PNC.Translation and type(PNC.Translation.GetKey) == "function"
+    then
+        local translated = PNC.Translation.GetKey(tid, rawFallback)
+        if type(translated) == "string" and translated ~= "" and translated ~= tid then
+            rawFallback = translated
+        end
+    end
     local fallback = renderFallback(
-        selected.fallback, args, selected.translationArgs
+        rawFallback, args, selected.translationArgs
     )
     if type(fallback) == "string" and string.find(fallback, "{", 1, true)
         and Lexicon and type(Lexicon.Expand) == "function"

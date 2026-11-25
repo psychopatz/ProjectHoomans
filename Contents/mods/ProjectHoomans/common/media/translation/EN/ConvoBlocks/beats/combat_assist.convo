@@ -1,0 +1,55 @@
+# Compositional post-combat assist gratitude & companion-to-survivor exchange beats.
+language EN
+namespace hoomans
+
+beat semantic.combat.assist.gratitude
+  use offer.post_assist_nudges
+  use offer.social_repair
+  # Horde cleared (compositional: opener + fight adj + pack + zombie noun + backup thanks + optional night/rain)
+  say [role=assist_gratitude_horde] (priority 8) as horde_composed:
+    "{opener.relief|cap}, that was {adj.fight|a} {noun.pack} of {noun.zombie|s}. {clause.thanks_backup} {?clause.night_warning}"
+
+  # Night / dusk assist
+  say [role=assist_gratitude_night] (priority 8) as night_composed:
+    "{opener.relief|cap}, cutting it close on this {noun.road} in {noun.dark}. {clause.thanks_backup} {?clause.rain_note}"
+
+  # Shaken / injured / exhausted
+  say [role=assist_gratitude_shaken, actor.injured] (priority 9) as shaken_injured:
+    "Ugh... I {adv.barely} kept standing. {clause.thanks_backup}"
+  say [role=assist_gratitude_shaken] (priority 7) as shaken_general:
+    "{opener.relief|cap}, that got {adj.fight} {adv.fast}. {clause.thanks_backup}"
+
+  # Wary / warm relationships
+  say [role=assist_gratitude_wary] (priority 8) as wary_general:
+    "{opener.wary|cap}, didn't expect you to help with those {noun.zombie|s}... alright, I owe you one."
+  say [role=assist_gratitude_warm] (priority 8) as warm_general:
+    "Knew I could count on you, {addressee.name}. {clause.thanks_backup}"
+
+  # General assist
+  say [role=assist_gratitude_general] (priority 6) as general_composed:
+    "{opener.relief|cap}, those {noun.zombie|s} closed in {adv.fast}. {clause.thanks_backup} {?clause.night_warning}"
+
+  # State-driven aftermath check-in
+  say [role=aftermath_checkin, any.injured] (priority 8) as checkin_injured:
+    "That looked like {adj.hit|a} hit—keep pressure on it while we make sure the {noun.road} is clear."
+  say [role=aftermath_checkin] (priority 6) as checkin_general:
+    "{clause.breath_check} {?clause.night_warning}"
+
+beat semantic.combat.assist.companion_exchange
+  say [role=companion_exchange_horde_open] (priority 8) as horde_open:
+    "Your {noun.group} really held the line against that {noun.pack} of {noun.zombie|s}. Didn't think folks out here still had people's backs."
+  say [role=companion_exchange_open, environment.night_or_dusk] (priority 8) as open_night:
+    "Glad your {noun.group} came down this {noun.road} in {noun.dark}. {clause.thanks_backup}"
+  say [role=companion_exchange_open, relationship.tier=wary] (priority 8) as open_wary:
+    "Your {noun.group} fights tight... thanks for pulling those {noun.zombie|s} off me, even if we're strangers."
+  say [role=companion_exchange_open] (priority 6) as open_general:
+    "Appreciate your {noun.group} stepping in on those {noun.zombie|s}. Nice to see people still looking out for each other."
+
+  say [role=companion_exchange_checkin] (priority 8) as reply_checkin:
+    "Don't mention it—you patched up alright? Looked like you took {adj.hit|a} hit back there."
+  say [role=companion_exchange_night] (priority 8) as reply_night:
+    "No problem. {clause.night_warning} {clause.stay_sharp}"
+  say [role=companion_exchange_reply, actor.style=supportive] (priority 7) as reply_supportive:
+    "Anytime. Nobody's making it through these {noun.zombie|s} alone anyway. {clause.stay_sharp}"
+  say [role=companion_exchange_reply] (priority 6) as reply_general:
+    "Just doing what needed doing. {clause.stay_sharp}"

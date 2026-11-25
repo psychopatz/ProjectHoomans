@@ -178,7 +178,18 @@ return function(Catalog, Core)
     end
 
     function Catalog.Get(id)
-        return Catalog.POOLS[tostring(id or "")]
+        local key = tostring(id or "")
+        local pool = Catalog.POOLS[key]
+        if pool == nil and key ~= "" then
+            local dsl = PNC and PNC.ConvoEngine and PNC.ConvoEngine.ConvoDSL
+            if type(dsl) == "table" and type(dsl.PendingCount) == "function"
+                and dsl.PendingCount() > 0 and type(dsl.EnsurePoolLoaded) == "function"
+            then
+                dsl.EnsurePoolLoaded(key)
+                pool = Catalog.POOLS[key]
+            end
+        end
+        return pool
     end
 
     -- Read the already selected variant without selecting again.  Lifecycle

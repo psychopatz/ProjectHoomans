@@ -1,0 +1,68 @@
+# Subject: TOOL REPLIES — SOCIAL ACCEPTED.
+language EN
+namespace hoomans
+
+flow semantic.tool_reply.social.accepted.admire
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.accepted.apologize
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.accepted.comfort
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.accepted.compliment
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.accepted.flirt
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.accepted.generic
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.accepted.hostile_abuse
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.accepted.insult
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.accepted.praise
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.accepted.romantic_interest
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.accepted.sexual_advance
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+    "Understood."

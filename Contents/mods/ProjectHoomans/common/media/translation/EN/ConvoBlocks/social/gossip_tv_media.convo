@@ -1,0 +1,38 @@
+# TV, VHS, skill show, and music media gossip extensions.
+language EN
+namespace hoomans
+
+extend semantic.gossip.world.opening
+  use offer.gossip_opening_stances
+  say [topic=skill_show, actor.social_style=warm|friendly|protective] (priority 10) as skill_show_pos:
+    "Watched {slot.show.name} on {slot.broadcast.channel} {slot.gossip_time}! Actually picked up some really useful tricks."
+  say [topic=skill_show, actor.social_style=hostile|guarded|withdrawn] (priority 10) as skill_show_neg:
+    "Caught {slot.show.name} {slot.gossip_time}. Half of TV advice is too clean for the real world, though a couple tips might help."
+  say [topic=skill_show] (priority 8) as skill_show_neu:
+    "Watched {slot.show.name} on {slot.broadcast.channel} {slot.gossip_time}. Might come in handy next time we need to build or fix something."
+
+  say [topic=home_vhs, actor.social_style=warm|friendly|protective] (priority 10) as home_vhs_pos:
+    "Watched {slot.show.name} {slot.gossip_time}. Kind of comforting remembering how ordinary life used to feel."
+  say [topic=home_vhs, actor.social_style=hostile|guarded|withdrawn] (priority 10) as home_vhs_neg:
+    "Watched {slot.show.name} {slot.gossip_time}. Honestly just depressing staring at ghosts of the old world."
+  say [topic=home_vhs] (priority 8) as home_vhs_neu:
+    "Watched {slot.show.name} {slot.gossip_time}. Strange peeking into somebody else's home tape."
+
+  say [topic=music_radio, actor.social_style=warm|friendly|protective] (priority 9) as music_pos:
+    "Caught {slot.show.name} playing {slot.gossip_time}. Really lifted my mood hearing real music again."
+  say [topic=music_radio, actor.social_style=hostile|guarded|withdrawn] (priority 9) as music_neg:
+    "Caught {slot.show.name} {slot.gossip_time}. Just hope the noise doesn't draw walkers to the door."
+  say [topic=music_radio] (priority 7) as music_neu:
+    "Caught {slot.show.name} playing {slot.gossip_time}. Nice change of pace from all the static."
+
+  say [topic=entertainment_tv, actor.social_style=warm|friendly|protective] (priority 9) as ent_pos:
+    "Caught {slot.show.name} {slot.gossip_time}. Nice to laugh and forget about the dead for five minutes."
+  say [topic=entertainment_tv, actor.social_style=hostile|guarded|withdrawn] (priority 9) as ent_neg:
+    "Caught {slot.show.name} {slot.gossip_time}. Feels like a waste of power watching reruns while the world burns."
+  say [topic=entertainment_tv] (priority 7) as ent_neu:
+    "Caught {slot.show.name} {slot.gossip_time}. Surreal watching regular TV like nothing happened."
+
+extend semantic.gossip.world.followup
+  use offer.gossip_followup_stances
+  say [topic=skill_show, action=more] (priority 10) as more_skill:
+    "They walked through {slot.show.name} step by step. Way clearer than guessing from scratch."

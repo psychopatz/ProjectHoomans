@@ -1,0 +1,19 @@
+# Reusable redundant-command offer blueprints.
+language EN
+namespace hoomans
+
+blueprint offer.redundant_follow_nudges
+  offer follow.switch_stay:
+    when: [state.already_following]
+    label: "Actually, stay here"
+    say: "Actually, hold up and stay here instead."
+    utility: directness
+    intent: REQUEST
+    subject: STAY
+  offer follow.sorry_nag:
+    when: [npc.annoyed]
+    label: "Sorry, my bad"
+    say: "Sorry—didn't mean to keep repeating myself."
+    utility: openness
+    intent: APOLOGY
+    subject: SOCIAL

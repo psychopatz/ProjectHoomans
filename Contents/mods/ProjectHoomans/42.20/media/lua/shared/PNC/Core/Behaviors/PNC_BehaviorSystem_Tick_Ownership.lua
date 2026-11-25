@@ -85,10 +85,11 @@ function H.Run(record, zombie, now)
     end
 
     local scriptRunner = PNC.ConvoEngine and PNC.ConvoEngine.BehaviorScriptRunner or nil
-    if scriptRunner and type(scriptRunner.Reconcile) == "function"
-        and scriptRunner.Reconcile(record, zombie, now)
-    then
-        return true
+    if scriptRunner then
+        local tickFn = scriptRunner.Tick or scriptRunner.Reconcile
+        if type(tickFn) == "function" and tickFn(record, zombie, now) then
+            return true
+        end
     end
 
     local leases = PNC.TaskLeaseService

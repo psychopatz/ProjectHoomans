@@ -69,25 +69,14 @@ local function removeFromWorldSource(cand)
 end
 
 local function encodeSpecFromWorldItem(cand)
+    local inv = PNC.Inventory
+    if inv and type(inv.EncodeLiveItemSpec) == "function" and cand and cand.item then
+        local spec = inv.EncodeLiveItemSpec(cand.item)
+        if type(spec) == "table" then return spec end
+    end
     local fullType = cand.itemCtx and cand.itemCtx.fullType
         or tostring(safeCall(cand.item, "getFullType") or "")
-    local fallback = { type = fullType, stack = 1 }
-    if not CoreInventory or type(CoreInventory.encodeItem) ~= "function" then
-        return fallback
-    end
-    local ok, encoded = pcall(CoreInventory.encodeItem, cand.item, 1)
-    if not ok or type(encoded) ~= "table" then return fallback end
-    local bridge = PNC.Inventory and PNC.Inventory.CoreBridge or nil
-    local stateCodec = bridge and bridge.StateCodec or nil
-    if stateCodec and type(stateCodec.readValidatedState) == "function" then
-        local decoded = stateCodec.readValidatedState(encoded)
-        if type(decoded) == "table" then
-            decoded.type = fullType
-            decoded.stack = 1
-            return decoded
-        end
-    end
-    return fallback
+    return { type = fullType, stack = 1 }
 end
 
 function Internal.CommitAction(intent, record, body)
@@ -117,17 +106,22 @@ function Internal.CommitAction(intent, record, body)
     local removed, remReason = removeFromWorldSource(cand)
     if not removed then return false, remReason or "remove_failed" end
 
-    local addedOK, addReason, addedIds = inv.AddItems(record, specs, "root", reasonTag)
-    if not addedOK then
-        return false, addReason or "inventory_add_failed"
-    end
-    if body and addedIds and type(inv.MaterializeItem) == "function" then
-        for index = 1, #addedIds do
-            inv.MaterializeItem(record, body, addedIds[index])
+    local addedOK, addReason, addedIds
+    if type(inv.AddItemsAndSync) == "function" then
+        addedOK, addReason, addedIds = inv.AddItemsAndSync(record, body, specs, "root", reasonTag)
+    else
+        addedOK, addReason, addedIds = inv.AddItems(record, specs, "root", reasonTag)
+        if addedOK and body and addedIds and type(inv.MaterializeItem) == "function" then
+            for index = 1, #addedIds do
+                inv.MaterializeItem(record, body, addedIds[index])
+            end
+        end
+        if addedOK and PNC.Registry and PNC.Registry.MarkDirty then
+            PNC.Registry.MarkDirty(record, "inventory")
         end
     end
-    if PNC.Registry and PNC.Registry.MarkDirty then
-        PNC.Registry.MarkDirty(record, "inventory")
+    if not addedOK then
+        return false, addReason or "inventory_add_failed"
     end
     if intent.action == "rip_bandage" then
         local rip = cand.itemCtx.rippable

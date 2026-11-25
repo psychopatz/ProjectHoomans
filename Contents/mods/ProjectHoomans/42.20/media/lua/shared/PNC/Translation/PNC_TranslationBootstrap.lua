@@ -52,6 +52,7 @@ local function systemForKey(key)
     if string.match(key, "^convo%.")
         or string.match(key, "^conversation%.content%.")
         or string.match(key, "^semantic%.")
+        or string.match(key, "^hoomans%.")
         or string.match(key, "^UI_DT_Conversation_")
     then
         return "Conversation"

@@ -1,0 +1,13 @@
+# Subject: GROUP BANTER — POST_SKILL_SHOW.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=post_skill_show, role=open] (priority 12) as post_skill_open:
+    "Honestly, {slot.broadcast.episode} we watched earlier was pretty handy, {addressee.name}."
+  say [topic=post_skill_show, role=reply] (priority 12) as post_skill_reply:
+    "Yeah, {addressee.name}, never thought I'd be taking survival lessons from {slot.show.name}."
+  say [topic=post_skill_show, role=chime] (priority 12) as post_skill_chime:
+    "If it keeps our gear working and our stomachs full, I'll watch every episode we find."
+  say [topic=post_skill_show, role=wrap] (priority 12) as post_skill_wrap:
+    "Fair enough. Keep an eye out for more tapes."

@@ -100,6 +100,18 @@ local function normalizeNode(nodeID, node, nodes)
         output.accepts = {}
     end
 
+    if node.choiceTargets ~= nil then
+        if type(node.choiceTargets) ~= "table" then
+            return nil, "node_choice_targets_must_be_object:" .. tostring(nodeID)
+        end
+        output.choiceTargets = {}
+        for choiceID, rawTarget in pairs(node.choiceTargets) do
+            local t, tReason = normalizeTransition(rawTarget, nodes, "node_choice_target")
+            if not t then return nil, tReason .. ":" .. tostring(choiceID) end
+            output.choiceTargets[tostring(choiceID)] = t
+        end
+    end
+
     local fields = {
         "next", "onMatch", "onUnrelated", "onRefuse",
         "onClarify", "onPass", "onFail", "onUnknown",

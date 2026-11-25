@@ -1,0 +1,15 @@
+# Subject: WEATHER FLOW RESPONSES.
+language EN
+namespace hoomans
+
+flow semantic.flow.weather.raining
+  say [default] (priority 6) as default:
+    "It is raining right now. I would wait for a break. {?clause.rain_note}"
+
+flow semantic.flow.weather.clear
+  say [default] (priority 6) as default:
+    "The weather looks clear right now{end} {?clause.night_warning}"
+
+flow semantic.flow.weather.unknown
+  say [default] (priority 6) as default:
+    "I cannot confirm the weather from here."

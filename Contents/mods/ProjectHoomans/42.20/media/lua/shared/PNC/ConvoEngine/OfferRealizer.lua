@@ -28,7 +28,7 @@ local function matchesWhen(when, ctx)
 end
 
 local function expandOffer(offer, context, tokens, opts)
-    local lang = type(opts) == "table" and opts.language or "EN"
+    local lang = type(opts) == "table" and opts.language or nil
     local salt = (type(opts) == "table" and opts.salt or "") .. ":" .. tostring(offer.id or "")
     local label = Lexicon.Expand(offer.label or "", context, tokens, { language = lang, salt = salt })
     local say = Lexicon.Expand(offer.say or "", context, tokens, { language = lang, salt = salt })

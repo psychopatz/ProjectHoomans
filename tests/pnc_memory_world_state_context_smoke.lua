@@ -67,7 +67,7 @@ PNC = {
 local BC = require "PNC/Semantics/PNC_SemanticBeatContext"
 local Catalog = require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
 local Lexicon = require "PNC/ConvoEngine/Lexicon"
-require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
+require("PNC/ConvoEngine/ConvoDSL/ConvoDSL").EnsureActiveLanguage()
 
 -- 1. Working farmer NPC in a settlement with food crisis, power out, and rescue memory
 local farmer = {

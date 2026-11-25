@@ -23,8 +23,10 @@ Core.install(Catalog)
 registerCatalog(Catalog, Core)
 installSelection(Catalog, Core)
 
--- Unified .convo generated packs are the single authored response authority.
-require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
+-- Runtime .convo language packs in media/translation/ConvoBlocks/<LANG>/
+-- are the single authored response authority (no offline codebuilder needed).
+local ConvoDSL = require "PNC/ConvoEngine/ConvoDSL/ConvoDSL"
+ConvoDSL.EnsureActiveLanguage()
 
 registerConversationPools(
     Catalog,

@@ -1,0 +1,59 @@
+# Subject: HUNGER (self-contained lexicons, suggestions, acks, requests, and Q&A).
+language EN
+namespace hoomans
+
+lexicon hunger.observe
+  [actor.social_style=warm|friendly|protective] (priority 8): "Your stomach's growling" | "You haven't eaten in a while" | "You look like you could use a meal"
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "You're running on an empty stomach" | "You're going to pass out if you don't eat"
+  [default]: "You look hungry" | "Sounds like you're starving" | "You could probably use some food"
+
+lexicon hunger.suggest
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Eat something—starving won't help us survive." | "Grab a ration before you slow us down."
+  [default]: "Grab a bite when you get a second." | "Might want to eat something soon." | "Take a minute to eat something."
+
+lexicon hunger.ack
+  [actor.social_style=warm|friendly|protective] (priority 8): "Good—glad you grabbed something to eat, {term.address}." | "Nice, that should keep your strength up."
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Good. Better full than fainting mid-run." | "Good—eat quick so we can move."
+  [default]: "Nice, that'll keep you going, {term.address}." | "Good call grabbing a bite."
+
+lexicon hunger.request_need
+  [actor.social_style=warm|friendly|protective] (priority 8): "I'm starving" | "My stomach's been growling nonstop" | "I really need a bite to eat"
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "I need food" | "My gut's empty" | "I'm running on fumes without food"
+  [default]: "I'm getting pretty hungry" | "Could really use something to eat"
+
+lexicon hunger.request_ask
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Can I eat before I pass out?" | "Give me a minute to eat."
+  [default]: "Mind if I stop for a second to grab a bite?" | "Mind if I eat something?"
+
+extend semantic.companion.moodle_suggest
+  say [role=suggest_eat] (priority 8) as suggest_eat_composed_a:
+    "{hunger.observe}, {term.address}. {hunger.suggest}"
+    "{opener.casual} {term.address}, {hunger.observe}. {hunger.suggest}"
+  say [role=ack_eat] (priority 8) as ack_eat_composed:
+    "{hunger.ack}"
+
+extend semantic.companion.need_request
+  say [role=request_eat] (priority 8) as req_eat_composed_a:
+    "{term.address}, {hunger.request_need}. {hunger.request_ask}"
+    "{opener.casual} {term.address}, {hunger.request_need}. {hunger.request_ask}"
+
+extend semantic.question.needs.offer
+  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] (priority 8) as hunger:
+    "Food would help, but I don't have an exact amount yet. {?clause.world_pressure}"
+
+extend semantic.question.needs.quantity
+  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] (priority 8) as hunger:
+    "I know food is what I need, but I can't give you an exact amount yet."
+
+extend semantic.question.needs.proposal
+  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] (priority 8) as hunger:
+    "I can keep that as a proposal, but I still need the item and amount before I record a commitment."
+
+extend semantic.question.wellbeing.follow_up
+  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] (priority 7) as hunger:
+    "I'm still hungry."
+
+extend semantic.self_state
+  say [subject=HUNGER] (priority 7) as hunger:
+    "Sorry to hear that. I hope we find something to eat soon."
+    "That sounds rough. Let's keep an eye out for food."

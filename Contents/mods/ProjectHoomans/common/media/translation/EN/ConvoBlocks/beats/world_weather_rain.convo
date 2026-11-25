@@ -1,0 +1,13 @@
+# Subject: RAIN ONSET & CLEARING BEATS.
+language EN
+namespace hoomans
+
+flow semantic.world.weather.rain
+  say [role=weather_rain_open] (priority 8) as weather_rain_open:
+    "Rain's picking up, {addressee.name}. {?clause.rain_note}"
+  say [role=weather_rain_reply] (priority 8) as weather_rain_reply:
+    "Yeah, {addressee.name}, let's keep dry and watch our footing."
+  say [role=weather_rain_chime] (priority 8) as weather_rain_chime:
+    "At least it keeps the dust down—just stay close so we don't lose sight of each other."
+  say [default] (priority 5) as default:
+    "Wet weather out here—stay alert."

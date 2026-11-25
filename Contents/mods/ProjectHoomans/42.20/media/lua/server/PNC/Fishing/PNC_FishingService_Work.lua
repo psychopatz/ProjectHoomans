@@ -24,11 +24,16 @@ local function canAccept(record, spec)
 end
 
 local function addCatch(record, spec)
-    if not PNC.Inventory or type(PNC.Inventory.AddItems) ~= "function" then
+    local inv = PNC.Inventory
+    if not inv then return false, "fishing_inventory_unavailable" end
+    if type(inv.AddItemsAndSync) == "function" then
+        local added, reason = inv.AddItemsAndSync(record, nil, { spec }, "root", "fishing_catch")
+        return added == true, reason or "fishing_inventory_full"
+    end
+    if type(inv.AddItems) ~= "function" then
         return false, "fishing_inventory_unavailable"
     end
-    local added, reason = PNC.Inventory.AddItems(record, { spec },
-        "root", "fishing_catch")
+    local added, reason = inv.AddItems(record, { spec }, "root", "fishing_catch")
     return added == true, reason or "fishing_inventory_full"
 end
 

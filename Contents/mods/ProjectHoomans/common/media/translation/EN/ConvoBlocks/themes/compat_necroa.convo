@@ -1,0 +1,19 @@
+# Mod Compatibility: Necroa.
+language EN
+namespace hoomans
+
+flow semantic.compat.necroa.mask_warning
+  say [social.role=family] (priority 9) as family:
+    "Put your mask on, family. I am not losing you to the air."
+  say [social.role=colonist] (priority 9) as colonist:
+    "Mask up. We keep the camp safe together."
+  say [default] (priority 5) as default:
+    "Put your mask back on. Knox is airborne."
+
+flow semantic.compat.necroa.player_mask_removed
+  say [social.role=hostile] (priority 9) as hostile:
+    "Put your mask back on before you become a problem."
+  say [social.role=lover] (priority 9) as lover:
+    "Please put your mask back on, love. This air is not safe."
+  say [default] (priority 5) as default:
+    "Put your mask back on. The air is not safe."

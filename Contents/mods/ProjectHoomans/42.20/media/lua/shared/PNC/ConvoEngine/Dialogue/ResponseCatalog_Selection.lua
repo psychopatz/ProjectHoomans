@@ -2,6 +2,15 @@
 -- matching, scoring, hash and anti-repeat code path.
 return function(Catalog, Core)
     local function evaluate(id, context, salt, explain)
+        local dsl = PNC and PNC.ConvoEngine and PNC.ConvoEngine.ConvoDSL
+        if type(dsl) == "table" then
+            if type(dsl.EnsureActiveLanguage) == "function" then
+                dsl.EnsureActiveLanguage()
+            end
+            if type(dsl.EnsurePoolLoaded) == "function" then
+                dsl.EnsurePoolLoaded(id)
+            end
+        end
         local pool = Catalog.Get(id)
         if not pool then return nil, "response_pool_unavailable" end
 

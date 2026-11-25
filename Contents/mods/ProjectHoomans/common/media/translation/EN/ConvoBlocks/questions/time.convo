@@ -1,0 +1,22 @@
+# Subject: ESTIMATED TIME Q&A.
+language EN
+namespace hoomans
+
+flow semantic.question.time.estimated
+  say [action=night, actor.social_style=hostile|guarded|withdrawn] (priority 11) as time_est_night_guarded:
+    "Do I look like I'm wearing a watch? It's dark out—probably {slot.time_estimate}."
+  say [action=night, actor.social_style=warm|friendly|protective] (priority 11) as time_est_night_warm:
+    "Sorry {addressee.name}, no watch on me and it's too dark to tell by the sky. Feels like {slot.time_estimate}."
+  say [action=night] (priority 9) as time_est_night:
+    "No watch on me, and it's too dark to check the sun—best guess is {slot.time_estimate}."
+    "Hard to say in the dark without a watch, probably {slot.time_estimate}."
+  say [action=sun, actor.social_style=hostile|guarded|withdrawn] (priority 11) as time_est_sun_guarded:
+    "Don't have a watch. Going by the sun, I'd say {slot.time_estimate}."
+  say [action=sun, actor.social_style=warm|friendly|protective] (priority 11) as time_est_sun_warm:
+    "Not totally sure without a watch, {addressee.name}, but based on where the sun is, looks like {slot.time_estimate}."
+  say [action=sun] (priority 9) as time_est_sun:
+    "Don't have a watch on me, so I'm guessing by the sun—looks like {slot.time_estimate}."
+    "No watch, sorry. Judging by the light outside, I'd say it's {slot.time_estimate}."
+    "Wish I had a watch. Based on the sun's height, probably {slot.time_estimate}."
+  say [default] (priority 6) as default:
+    "Not sure without a watch, probably {slot.time_estimate}."

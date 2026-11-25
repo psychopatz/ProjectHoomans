@@ -9,7 +9,6 @@ local SPECIAL_TARGETS = Normalization.SpecialTargets
 local function validateReachability(nodes, initial)
     local seen = {}
     local pending = { initial }
-    local index
     local nodeID
     local node
     local target
@@ -19,10 +18,10 @@ local function validateReachability(nodes, initial)
             seen[nodeID] = true
             node = nodes[nodeID]
             if node then
-        for _, field in ipairs({
-            "next", "onMatch", "onClarify", "onRefuse",
-            "onPass", "onFail", "onUnknown",
-        }) do
+                for _, field in ipairs({
+                    "next", "onMatch", "onClarify", "onRefuse",
+                    "onPass", "onFail", "onUnknown",
+                }) do
                     target = node[field]
                     if target and not SPECIAL_TARGETS[target]
                         and not seen[target]
@@ -34,6 +33,15 @@ local function validateReachability(nodes, initial)
                     and type(node.action.resultTransitions) == "table"
                 then
                     for _, target in pairs(node.action.resultTransitions) do
+                        if target and not SPECIAL_TARGETS[target]
+                            and not seen[target]
+                        then
+                            pending[#pending + 1] = target
+                        end
+                    end
+                end
+                if type(node.choiceTargets) == "table" then
+                    for _, target in pairs(node.choiceTargets) do
                         if target and not SPECIAL_TARGETS[target]
                             and not seen[target]
                         then
@@ -55,4 +63,3 @@ end
 return {
     Validate = validateReachability,
 }
-

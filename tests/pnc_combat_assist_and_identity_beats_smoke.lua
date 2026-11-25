@@ -189,7 +189,9 @@ PNC = {
     },
 }
 
-require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
+local ConvoDSL = require "PNC/ConvoEngine/ConvoDSL/ConvoDSL"
+ConvoDSL.EnsureActiveLanguage()
+ConvoDSL.FlushStream()
 local Beats = require "PNC/Semantics/PNC_SemanticDialogueBeats"
 local BC = PNC.Semantics.BeatContext
 local IdentityBeat = PNC.Semantics.CombatAssistIdentity

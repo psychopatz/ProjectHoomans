@@ -1,0 +1,61 @@
+# Actor-agnostic identity exchange flow & proactive ask-name beat.
+language EN
+namespace hoomans
+
+flow semantic.question.identity
+  say [default] (priority 6) as ask_first:
+    "Who's asking? Tell me your name first, and maybe I'll tell you mine."
+  say [relationship.tier=wary] (priority 7) as ask_first_guarded:
+    "Names don't come free out here. Tell me yours first—who am I talking to?"
+  say [actor.social_style=friendly] (priority 7) as ask_first_warm:
+    "Fair question—how about you go first? What's your name?"
+  say [relationship.identity_trust=untrustworthy] (priority 9) as untrustworthy_ask_first:
+    "I don't share my name with liars. What's yours, truthfully?"
+
+  offer identity.choice.real_name:
+    label: "Say your real name"
+    say: "I'm {speaker.name}."
+    utility: openness
+    intent: INFORM
+    subject: IDENTITY
+    claim: canonical
+
+  offer identity.choice.refuse_name:
+    label: "Don't tell your name"
+    say: "Better if we keep names out of it for now."
+    utility: caution
+    intent: REFUSE
+    subject: IDENTITY
+    style: rude
+
+  offer identity.choice.lie_name:
+    label: "Lie about your name"
+    say: "You can call me {speaker.alias}. {clause.wary_tail}"
+    utility: deception
+    intent: INFORM
+    subject: IDENTITY
+    claim: generated
+
+beat semantic.social.identity.ask_name_proactive
+  say [role=ask_name_after_assist, actor.style=supportive] (priority 8) as after_assist_warm:
+    "Wait—I didn't even catch your name. Who do I owe a favor to?"
+  say [role=ask_name_after_assist, relationship.tier=wary] (priority 8) as after_assist_wary:
+    "Before we split up... what do people call you?"
+  say [role=ask_name_after_assist] (priority 6) as after_assist_general:
+    "{opener.casual|cap}, I never caught your name. Who am I thanking here?"
+
+  # Autonomous colonist responses (actor-agnostic compositional lines)
+  say [role=colonist_answer_real_name] (priority 7) as colonist_real_name:
+    "Name's {claimed.name}. Good fighting beside you."
+  say [role=colonist_answer_lie_name] (priority 7) as colonist_lie_name:
+    "You can call me {claimed.name}. {clause.wary_tail}"
+  say [role=colonist_answer_refuse_name] (priority 7) as colonist_refuse_name:
+    "Better if we keep names out of it for now. {clause.stay_sharp}"
+
+  # Asker reactions to colonist response
+  say [role=ask_name_react_real_name] (priority 7) as react_real_name:
+    "Good to know, {claimed.name}. I'm {speaker.name}."
+  say [role=ask_name_react_lie_name] (priority 7) as react_lie_name:
+    "Alright, {claimed.name}. Fair enough—I'm {speaker.name}."
+  say [role=ask_name_react_refuse_name] (priority 7) as react_refuse_name:
+    "Fair enough, can't blame you for being careful these days."

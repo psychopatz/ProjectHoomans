@@ -1,0 +1,56 @@
+# Core world-sighting gossip openings, generic follow-ups, and closures.
+# Radio and TV/VHS topics extend these pools in gossip_radio.convo and gossip_tv_media.convo.
+language EN
+namespace hoomans
+
+flow semantic.gossip.world.opening
+  use offer.gossip_opening_stances
+  say [topic=threat_pattern_7d, world.raider_surge] (priority 11) as threat_chopper_linked:
+    "Ever since that chopper passed over, the raids and the dead haven't stopped pushing in."
+  say [topic=threat_pattern_7d] (priority 10) as threat_constant:
+    "We've been hit {slot.gossip_raid_count} times in the past week—someone or something is definitely testing our perimeter."
+  say [topic=helicopter_event] (priority 10) as chopper:
+    "That chopper came over {slot.gossip_time} and drew half the dead in the county right through here."
+  say [topic=medical_wreck] (priority 8) as medical_wreck:
+    "I saw a crashed ambulance {slot.gossip_time}, {slot.gossip_location}—might still have medical supplies."
+  say [topic=police_blockade] (priority 8) as police_blockade:
+    "Ran into a police blockade {slot.gossip_time}, {slot.gossip_location}. Looked like things went sideways."
+  say [topic=bandit_activity] (priority 8) as bandit_activity:
+    "People spotted bandits on the road {slot.gossip_time}, {slot.gossip_location}. Best to stay sharp."
+  say [topic=horde_sighting] (priority 8) as horde_sighting:
+    "Saw a big horde {slot.gossip_time}, {slot.gossip_location}. Wouldn't wander over there alone."
+  say [topic=meta_gunshot] (priority 8) as meta_gunshot:
+    "Heard gunfire {slot.gossip_time}, {slot.gossip_location}. Somebody's still fighting out there."
+  say [topic=meta_scream] (priority 8) as meta_scream:
+    "Heard someone screaming {slot.gossip_time}, {slot.gossip_location}. Doesn't sound like they made it."
+  say [default] (priority 5) as default:
+    "I spotted something strange {slot.gossip_time}, {slot.gossip_location}."
+
+flow semantic.gossip.world.followup
+  use offer.gossip_followup_stances
+  say [action=stance_positive] (priority 10) as generic_stance_pos:
+    "Glad we're on the same page about {slot.broadcast.topic}. Makes it easier to move as a team."
+  say [action=stance_neutral] (priority 10) as generic_stance_neu:
+    "Yeah, hard to be sure either way about {slot.broadcast.topic}. We'll just have to see how it plays out."
+  say [action=stance_negative] (priority 10) as generic_stance_neg:
+    "Fair enough—maybe it really is bullshit. Better skeptical than dead out here."
+  say [action=where] (priority 9) as detail_where:
+    "It was {slot.gossip_location}. {clause.gossip_closure}"
+  say [action=when] (priority 9) as detail_when:
+    "Happened {slot.gossip_time}, right before things quieted down. {clause.gossip_closure}"
+  say [action=who] (priority 9) as detail_who:
+    "Couldn't make out any faces—I kept my distance. {clause.gossip_closure}"
+  say [action=plan] (priority 8) as plan_generic:
+    "Best we can do is stay sharp, use what we learned from {slot.broadcast.channel}, and watch each other's backs. {clause.gossip_closure}"
+  say [topic=medical_wreck, action=more] (priority 9) as more_medical:
+    "Looked like somebody already checked the cab, though the back doors were still jammed shut. {clause.gossip_closure}"
+  say [topic=police_blockade, action=more] (priority 9) as more_police:
+    "Saw shell casings and overturned barricades—didn't stick around long enough to check the trunks. {clause.gossip_closure}"
+  say [topic=bandit_activity, action=more] (priority 9) as more_bandit:
+    "They were armed and moving fast. I kept my head down until they cleared out. {clause.gossip_closure}"
+  say [default] (priority 5) as default:
+    "Didn't stay long enough to search everything—too many stragglers wandering around. {clause.gossip_closure}"
+
+flow semantic.gossip.world.closure
+  say [default] (priority 5) as default:
+    "{clause.gossip_closure}"

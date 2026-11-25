@@ -176,8 +176,77 @@ function Test.path(mod, layer, relative)
     error("unknown test mod: " .. tostring(mod))
 end
 
+local function installModFileShims()
+    if type(rawget(_G, "getModFileReader")) ~= "function" then
+        rawset(_G, "getModFileReader", function(modID, relPath, _createIfNull)
+            if type(relPath) ~= "string" or relPath == "" or string.find(relPath, "..", 1, true) then
+                return nil
+            end
+            local bases = nil
+            if modID == "ProjectHoomans" then
+                bases = { roots.ProjectHoomansMod, roots.ProjectHoomansCommonMod }
+            elseif modID == "PsychopatzCore" then
+                bases = {
+                    roots.PsychopatzCore .. coreRuntime .. "/",
+                    roots.PsychopatzCore .. "common/",
+                }
+            end
+            if not bases then return nil end
+            for i = 1, #bases do
+                local handle = io.open(bases[i] .. relPath, "r")
+                if handle then
+                    return {
+                        readLine = function()
+                            return handle:read("*l")
+                        end,
+                        close = function()
+                            pcall(function() handle:close() end)
+                        end,
+                    }
+                end
+            end
+            return nil
+        end)
+    end
+    if type(rawget(_G, "listFilesInModDirectory")) ~= "function" then
+        rawset(_G, "listFilesInModDirectory", function(modID, relDir)
+            if type(relDir) ~= "string" or relDir == "" or string.find(relDir, "..", 1, true) then
+                return nil
+            end
+            local bases = nil
+            if modID == "ProjectHoomans" then
+                bases = { roots.ProjectHoomansCommonMod, roots.ProjectHoomansMod }
+            elseif modID == "PsychopatzCore" then
+                bases = {
+                    roots.PsychopatzCore .. "common/",
+                    roots.PsychopatzCore .. coreRuntime .. "/",
+                }
+            end
+            if not bases then return nil end
+            local out = {}
+            local seen = {}
+            for i = 1, #bases do
+                local dirPath = bases[i] .. relDir
+                local cmd = 'ls -1 "' .. string.gsub(dirPath, '"', '\\"') .. '" 2>/dev/null'
+                local pipe = io.popen(cmd)
+                if pipe then
+                    for name in pipe:lines() do
+                        if name ~= "" and not seen[name] then
+                            seen[name] = true
+                            out[#out + 1] = name
+                        end
+                    end
+                    pipe:close()
+                end
+            end
+            return out
+        end)
+    end
+end
+
 function Test.addPackagePaths(specifications)
     installTranslationFallback()
+    installModFileShims()
     local usingDefaults = specifications == nil
     specifications = specifications or {
         { "ProjectHoomans", "shared" },

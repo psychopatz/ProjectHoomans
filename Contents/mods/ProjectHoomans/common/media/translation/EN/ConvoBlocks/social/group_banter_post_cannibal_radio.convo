@@ -1,0 +1,13 @@
+# Subject: GROUP BANTER — POST_CANNIBAL_RADIO.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=post_cannibal_radio, role=open] (priority 12) as post_cann_open:
+    "I still can't get {slot.broadcast.topic} out of my head, {addressee.name}. Sick world we're living in."
+  say [topic=post_cannibal_radio, role=reply] (priority 12) as post_cann_reply:
+    "Don't dwell on them, {addressee.name}, just stay sharp so we never end up in their sights."
+  say [topic=post_cannibal_radio, role=chime] (priority 12) as post_cann_chime:
+    "We stick together and nobody touches us."
+  say [topic=post_cannibal_radio, role=wrap] (priority 12) as post_cann_wrap:
+    "Damn right. Watch each other's backs."

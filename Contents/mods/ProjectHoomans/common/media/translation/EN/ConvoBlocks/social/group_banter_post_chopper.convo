@@ -1,0 +1,15 @@
+# Subject: GROUP BANTER — POST_CHOPPER.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=post_chopper, role=open] (priority 12) as post_chopper_open:
+    "Whoever was flying that chopper didn't do us any favors, {addressee.name}. Pulled half the county straight through here."
+    "Still can't believe that helicopter hovered right over us, {addressee.name}. Glad we had a roof to duck under."
+  say [topic=post_chopper, role=reply] (priority 12) as post_chopper_reply:
+    "Yeah, {addressee.name}, they never land to help, they just stir up the dead and leave."
+    "At least we stayed out of sight until it cleared. Could've been a whole lot worse."
+  say [topic=post_chopper, role=chime] (priority 12) as post_chopper_chime:
+    "Watch the side streets for a while. Stragglers always drift in after a chopper pass."
+  say [topic=post_chopper, role=wrap] (priority 12) as post_chopper_wrap:
+    "Good call. Let's keep our heads down and move smart."

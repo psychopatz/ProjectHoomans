@@ -1,0 +1,15 @@
+# Subject: GROUP BANTER — WELLBEING_CHECK.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=wellbeing_check, role=open] (priority 11) as wellbeing_open:
+    "Hey {addressee.name}, you holding up okay? Don't push through an injury out here."
+    "Let's slow down a second, {addressee.name}—somebody looks worn thin."
+  say [topic=wellbeing_check, role=reply] (priority 11) as wellbeing_reply:
+    "Still standing, {addressee.name}, just need a quick breather and fresh bandages."
+    "Appreciate you checking in—better to patch up now than limp into a horde."
+  say [topic=wellbeing_check, role=chime] (priority 11) as wellbeing_chime:
+    "I'll keep watch while anyone patches up. Take your time."
+  say [topic=wellbeing_check, role=wrap] (priority 11) as wellbeing_wrap:
+    "Good—nobody gets left behind if we stay smart."

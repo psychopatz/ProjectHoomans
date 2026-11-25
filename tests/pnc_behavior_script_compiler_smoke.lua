@@ -400,4 +400,259 @@ T.equal(pWaitSpot.steps[1].anchor.x, 10, "anchored to player X")
 T.equal(pWaitSpot.steps[1].anchor.y, 10, "anchored to player Y")
 T.equal(pWaitSpot.summary, "wait right here", "fallback summary says wait right here")
 
+-- 10) "lets loot this place" + Smart non-invasive conversation hold yield
+local stoppedScenes = {}
+_G.PNC.AnimationScenes = {
+    Stop = function(rec, _, reason)
+        stoppedScenes[#stoppedScenes + 1] = reason
+        if rec and rec.runtime then rec.runtime.animationScene = nil end
+    end,
+}
+local ConvScene = require "PNC/Conversation/PNC_ConversationScene/PNC_ConversationScene_Lease_Core"
+_G.PNC.ConversationScene.ID = "social.conversation"
+
+local pLootPlace, eLootPlace = Compiler.CompileFromText("lets loot this place", colonist, playerInKitchen, { groupParticipants = participants })
+T.truthy(pLootPlace ~= nil, "lets loot this place compiles: " .. tostring(eLootPlace))
+T.equal(pLootPlace.steps[1].kind, "PICKUP", "lets loot this place compiles to PICKUP")
+T.equal(pLootPlace.steps[1].areaScope.kind, "building", "this place grounds to whole building when indoors")
+T.equal(pLootPlace.steps[1].includeContainers, true, "includes room containers")
+T.equal(pLootPlace.summary, "search this place for supplies", "grounded plan summary for lets loot this place")
+
+colonist.orderSpec = { kind = "follow" }
+colonist.runtime.animationScene = { id = "social.conversation", blocking = true }
+colonist.runtime.conversationLease = { token = "tok_live", expiresAt = 99999 }
+stoppedScenes = {}
+local okLootStart = Runner.Start(colonist, npcBody, pLootPlace, playerInKitchen, 17000)
+T.equal(okLootStart, true, "Runner.Start succeeds for lets loot this place")
+T.equal(colonist.orderSpec.kind, "behavior_script", "switched into dedicated behavior_script orderSpec (out of follow)")
+T.equal(colonist.runtime.animationScene, nil, "blocking social.conversation scene yielded immediately")
+T.truthy(colonist.runtime.conversationLease ~= nil and colonist.runtime.conversationLease.token == "tok_live", "conversationLease preserved so player can still send stop/follow")
+T.equal(#stoppedScenes, 1, "AnimationScenes.Stop called once to yield conversation hold")
+
+-- Update mock SpeechTransport ResolveLine to expose slot.item.name as well
+_G.PNC.Semantics.SpeechTransport.ResolveLine = function(rec, opts)
+    local tok = (opts.tokens and (opts.tokens["slot.plan.summary"] or opts.tokens["slot.item.name"])) or ""
+    return tostring(opts.role) .. ":" .. tostring(tok), {
+        poolID = opts.poolID,
+        realizationID = "test." .. tostring(opts.role),
+        presentationClass = "BARK",
+    }
+end
+
+-- Put a fresh CannedSoup in kitchen pantry and verify "lets loot here" walks/grabs & emits loot_grab_item beat
+local freshSoup = makeItem("CannedSoup", "Food", true)
+pantryItems[#pantryItems + 1] = freshSoup
+local pLootHere = Compiler.CompileFromText("lets loot here", colonist, playerInKitchen, { groupParticipants = participants })
+T.truthy(pLootHere ~= nil, "lets loot here compiles")
+T.equal(pLootHere.steps[1].areaScope.kind, "building", "lets loot here resolves to whole building when indoors")
+T.equal(pLootHere.steps[1].includeContainers, true, "lets loot here includes containers")
+
+spokenLog = {}
+Runner.Start(colonist, npcBody, pLootHere, playerInKitchen, 17000)
+colonist.runtime.behaviorScript.cell = mockCell
+local tick1 = Runner.Tick(colonist, npcBody, 17100)
+T.equal(tick1, true, "Tick 1 grabs loot and stays active to check for more spots")
+T.equal(#pantryItems, 0, "pantry CannedSoup was actually looted on Tick 1")
+local sawLootBeat = false
+for idx = 1, #spokenLog do
+    if spokenLog[idx].eventType == "behavior_script_loot_grab"
+        and spokenLog[idx].familyCooldownMs == 4500
+    then
+        sawLootBeat = true
+    end
+end
+T.equal(sawLootBeat, true, "emitted throttled behavior_script_loot_grab beat naming grabbed item")
+
+-- Next tick sees no more matching spots and completes cleanly
+local tick2 = Runner.Tick(colonist, npcBody, 18000)
+T.equal(tick2, false, "Tick 2 completes cleanly when room is cleared")
+T.equal(Runner.IsActive(colonist, 18000), false, "behaviorScript cleared after completion")
+
+-- 11) Direct-object container looting ("loot the fridge") -> MOVE_TO(fridge) + PICKUP(target=fridge, filter=all)
+local pFridge, eFridge = Compiler.CompileFromText("loot the fridge", colonist, playerInKitchen, { groupParticipants = participants })
+T.truthy(pFridge ~= nil, "loot the fridge compiles: " .. tostring(eFridge))
+T.equal(pFridge.stepCount, 2, "loot the fridge compiles to MOVE_TO + PICKUP")
+T.equal(pFridge.steps[1].kind, "MOVE_TO", "step 1 MOVE_TO fridge")
+T.equal(pFridge.steps[1].target.text, "fridge", "step 1 target is fridge")
+T.equal(pFridge.steps[2].kind, "PICKUP", "step 2 PICKUP from fridge")
+T.equal(pFridge.steps[2].target.text, "fridge", "step 2 target is fridge")
+T.equal(pFridge.steps[2].filter, "all", "step 2 filter is all supplies (not an item named fridge)")
+T.equal(pFridge.summary, "grab supplies from the fridge", "grounded summary says grab supplies from the fridge")
+
+-- 12) Semantic loot-summary formatting (counting, 'and', and category compression for >6 items)
+local GrammarJoin = require "PNC/ConvoEngine/GrammarJoin"
+T.equal(
+    GrammarJoin.FormatLootSummary({
+        { name = "Bandage", category = "medical" },
+        { name = "Bandage", category = "medical" },
+        { name = "Canned Beans", category = "food" },
+        { name = "Hammer", category = "tool" },
+    }),
+    "2 Bandage, Canned Beans, and Hammer",
+    "small haul formats with counts and Oxford 'and'"
+)
+T.equal(
+    GrammarJoin.FormatLootSummary({
+        { name = "Apple", category = "food" },
+        { name = "Bandage", category = "medical" },
+        { name = "Beans", category = "food" },
+        { name = "Hammer", category = "tool" },
+        { name = "Soap", category = "junk" },
+    }),
+    "Apple, Bandage, Beans, and 2 more items",
+    "medium haul caps named items and appends 'and N more items'"
+)
+local bigHaul = {}
+for idx = 1, 5 do bigHaul[#bigHaul + 1] = { name = "Food" .. idx, category = "food" } end
+for idx = 1, 3 do bigHaul[#bigHaul + 1] = { name = "Med" .. idx, category = "medical" } end
+for idx = 1, 2 do bigHaul[#bigHaul + 1] = { name = "Tool" .. idx, category = "tool" } end
+T.equal(
+    GrammarJoin.FormatLootSummary(bigHaul),
+    "5 food items, 3 medical supplies, and 2 tools",
+    "large haul (>6 items, >3 distinct) compresses by category with natural 'and'"
+)
+
+-- 13) Scavenge loot animation plays BEFORE item transfer, then ack_script_done_loot reports items
+local animRequests = {}
+_G.PNC.AnimationScenes.Request = function(rec, body, sceneId)
+    animRequests[#animRequests + 1] = sceneId
+    return true
+end
+_G.PNC.Semantics.SpeechTransport.ResolveLine = function(rec, opts)
+    local tok = (opts.tokens and (opts.tokens["slot.loot.summary"] or opts.tokens["slot.plan.summary"] or opts.tokens["slot.item.name"])) or ""
+    return tostring(opts.role) .. ":" .. tostring(tok), {
+        poolID = opts.poolID,
+        realizationID = "test." .. tostring(opts.role),
+        presentationClass = "BARK",
+    }
+end
+
+local animBeans = makeItem("CannedBeans", "Food", true)
+pantryItems[#pantryItems + 1] = animBeans
+spokenLog = {}
+animRequests = {}
+Runner.Start(colonist, npcBody, pLootHere, playerInKitchen, 20000)
+colonist.runtime.behaviorScript.cell = mockCell
+
+-- Tick 1 plays scavenge.loot_high animation first (does NOT magically grab yet)
+local aTick1 = Runner.Tick(colonist, npcBody, 20100)
+T.equal(aTick1, true, "Tick 1 waits for loot animation")
+T.equal(colonist.activeBehavior, "BehaviorScript:PICKUP_GRAB:CannedBeans", "nametag phase carries item name for Looting CannedBeans")
+T.equal(#animRequests, 1, "requested 1 scavenge animation")
+T.equal(animRequests[1], "scavenge.loot_high", "container uses scavenge.loot_high animation")
+T.equal(#pantryItems, 1, "item not magically transferred before animation completes")
+
+-- Tick 2 transfers the item after 650ms animation
+local aTick2 = Runner.Tick(colonist, npcBody, 20800)
+T.equal(aTick2, true, "Tick 2 transfers item after animation")
+T.equal(#pantryItems, 0, "item transferred after animation finished")
+
+-- Tick 3 completes and emits ack_script_done_loot with formatted summary
+local aTick3 = Runner.Tick(colonist, npcBody, 21700)
+T.equal(aTick3, false, "Tick 3 completes cleanly")
+local sawDoneLoot = false
+for idx = 1, #spokenLog do
+    if spokenLog[idx].text == "ack_script_done_loot:CannedBeans" then
+        sawDoneLoot = true
+    end
+end
+T.equal(sawDoneLoot, true, "emitted ack_script_done_loot reporting collected items")
+T.equal(colonist.orderSpec.kind, "follow", "restored previous orderSpec cleanly on completion")
+
+-- 14) Restart safety for orphaned persisted orderSpec.kind == "behavior_script"
+colonist.orderSpec = { kind = "behavior_script", planId = "orphaned" }
+colonist.runtime.behaviorScript = nil
+Runner.Reconcile(colonist, npcBody, 22000)
+T.equal(colonist.orderSpec, nil, "orphaned behavior_script orderSpec cleared on restart reconcile")
+
+-- 15) Multi-NPC agnostic tile claiming (2 colonists pick distinct loot spots without colliding)
+PickupProvider.ReleaseClaimsFor("npc_meghan")
+PickupProvider.ReleaseClaimsFor("npc_rory")
+PickupProvider.ClaimTile(10, 10, 0, "npc_meghan", 23000)
+T.equal(PickupProvider.IsTileClaimedByOther(10, 10, 0, "npc_rory", 23100), true, "Rory sees tile claimed by Meghan")
+T.equal(PickupProvider.IsTileClaimedByOther(10, 10, 0, "npc_meghan", 23100), false, "Meghan can still use her own claimed tile")
+PickupProvider.ReleaseClaimsFor("npc_meghan")
+T.equal(PickupProvider.IsTileClaimedByOther(10, 10, 0, "npc_rory", 23100), false, "tile claim released cleanly")
+
+-- 16) MarketSense catalog matching + O(1) memoization + rich category summaries
+local MSAdapter = require "PNC/Semantics/PNC_SemanticMarketSenseAdapter"
+MSAdapter.ResetProfileCache()
+local msCallCount = 0
+local mockMSCatalog = {
+    ["Base.TinnedBeans"] = { primary = "Food", tags = { "CannedFood", "Food" }, priceHeuristic = { role = "sealed_food" } },
+    ["Base.WalkieTalkie2"] = { primary = "Electronics", tags = { "Electronics", "Radio" } },
+    ["Base.CarBattery1"] = { primary = "Mechanics", tags = { "Mechanics", "Automotive" } },
+    ["Base.TentKit"] = { primary = "Camping", tags = { "Camping", "Survival" } },
+}
+_G.MarketSense = {
+    GetPriceDetails = function(fullType)
+        msCallCount = msCallCount + 1
+        return mockMSCatalog[fullType]
+    end,
+}
+
+local radioItem = makeItem("Walkie Talkie", "Item", false)
+radioItem.getFullType = function() return "Base.WalkieTalkie2" end
+local carBat = makeItem("Car Battery", "Item", false)
+carBat.getFullType = function() return "Base.CarBattery1" end
+local cannedItem = makeItem("Tinned Beans", "Food", true)
+cannedItem.getFullType = function() return "Base.TinnedBeans" end
+
+T.equal(PickupProvider.ItemMatchesFilter(radioItem, "electronics"), true, "MarketSense matches WalkieTalkie as electronics")
+T.equal(PickupProvider.ItemMatchesFilter(carBat, "auto"), true, "MarketSense alias matches CarBattery as auto/mechanics")
+T.equal(PickupProvider.ItemMatchesFilter(cannedItem, "canned"), true, "MarketSense matches TinnedBeans as canned")
+T.equal(MSAdapter.GetSummaryCategory(cannedItem), "canned_food", "summary category is canned_food")
+T.equal(MSAdapter.GetSummaryCategory(carBat), "mechanics", "summary category is mechanics")
+T.equal(MSAdapter.GetSummaryCategory(radioItem), "electronics", "summary category is electronics")
+-- Repeated queries hit O(1) cache without re-calling MarketSense.GetPriceDetails
+local callsAfterFirstPass = msCallCount
+T.equal(callsAfterFirstPass, 3, "only 3 MarketSense.GetPriceDetails calls for 3 distinct fullTypes")
+for _ = 1, 20 do
+    MSAdapter.MatchesCategory(radioItem, "electronics")
+    MSAdapter.GetSummaryCategory(cannedItem)
+end
+T.equal(msCallCount, 3, "20 repeated lookups caused 0 additional MarketSense calls (O(1) cache)")
+
+local richHaul = {}
+for idx = 1, 4 do richHaul[#richHaul + 1] = { name = "Can" .. idx, category = "canned_food" } end
+for idx = 1, 3 do richHaul[#richHaul + 1] = { name = "Part" .. idx, category = "mechanics" } end
+for idx = 1, 2 do richHaul[#richHaul + 1] = { name = "Elec" .. idx, category = "electronics" } end
+T.equal(
+    GrammarJoin.FormatLootSummary(richHaul),
+    "4 canned foods, 3 auto parts, and 2 electronics",
+    "rich MarketSense categories format naturally in compressed loot summary"
+)
+_G.MarketSense = nil
+
+-- 17) Persistence contract: PickupProvider calls AddItems, MaterializeItem, and Registry.MarkDirty(record, "inventory")
+local persistedSpecs, materializedIds, dirtyCalls = {}, {}, {}
+_G.PNC.Inventory = {
+    CanAccept = function() return true end,
+    AddItems = function(rec, specs)
+        persistedSpecs[#persistedSpecs + 1] = specs[1]
+        return true, "added", { "inv_item_" .. tostring(#persistedSpecs) }
+    end,
+    MaterializeItem = function(rec, body, id)
+        materializedIds[#materializedIds + 1] = id
+    end,
+}
+_G.PNC.Registry = {
+    MarkDirty = function(rec, field)
+        dirtyCalls[#dirtyCalls + 1] = tostring(rec.id) .. ":" .. tostring(field)
+    end,
+}
+local persistItem = makeItem("Hammer", "Tool", false)
+pantryItems[#pantryItems + 1] = persistItem
+local okPersist, _, cntPersist = PickupProvider.ExecutePickup(
+    colonist, npcBody, { kind = "PICKUP", filter = "all", includeContainers = true }, { player = player, container = pantryContainer }
+)
+T.equal(okPersist, true, "persisted pickup succeeds")
+T.equal(cntPersist, 1, "picked up 1 item via PNC.Inventory")
+T.equal(#persistedSpecs, 1, "PNC.Inventory.AddItems called")
+T.equal(persistedSpecs[1].type, "Base.Hammer", "persisted fullType is Base.Hammer")
+T.equal(#materializedIds, 1, "PNC.Inventory.MaterializeItem called for live body sync")
+T.equal(dirtyCalls[1], "npc_meghan:inventory", "PNC.Registry.MarkDirty(record, 'inventory') called so items survive restart")
+_G.PNC.Inventory = nil
+_G.PNC.Registry = nil
+
 print("pnc_behavior_script_compiler_smoke: OK")

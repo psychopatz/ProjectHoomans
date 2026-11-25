@@ -8,7 +8,7 @@ local OfferRealizer = require "PNC/ConvoEngine/OfferRealizer"
 local Normalizer = require "PsychopatzCore/Semantics/PsychopatzSemanticNormalizer"
 local FollowUp = require "PsychopatzCore/Semantics/PsychopatzSemanticFollowUp"
 require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
-require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
+require("PNC/ConvoEngine/ConvoDSL/ConvoDSL").EnsureActiveLanguage()
 
 -- 1. Dynamic list conjunctions (1, 2, 3+ items, "and" / "or", with & without articles)
 T.equal(Formatter.Format("I have {items|list_a}.", { items = { "bandage" } }),

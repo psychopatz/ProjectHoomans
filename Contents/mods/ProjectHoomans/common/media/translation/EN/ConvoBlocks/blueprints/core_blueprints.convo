@@ -1,0 +1,35 @@
+# Core reusable dynamic suggestion-button blueprints.
+language EN
+namespace hoomans
+
+blueprint offer.social_repair
+  offer repair.apologize:
+    when: [player.rude]
+    label: "Apologize for snapping"
+    say: "Sorry, {addressee.name}—didn't mean to snap like that."
+    utility: openness
+    intent: APOLOGIZE
+    subject: SOCIAL
+
+blueprint offer.post_assist_nudges
+  offer assist.check_wound:
+    when: [any.injured]
+    label: "Check on {addressee.pos} wound"
+    say: "Hold still—let me check {addressee.pos} wound{end}"
+    utility: compassion
+    intent: OFFER
+    subject: MEDICAL
+
+  offer assist.ask_supplies:
+    label: "Ask about {mention.items|list_a}"
+    say: "You got any spare {mention.items|list}?"
+    utility: openness
+    intent: QUESTION
+    subject: INVENTORY
+
+  offer assist.stay_safe:
+    label: "Tell {addressee.obj} to stay safe"
+    say: "{clause.stay_sharp}"
+    utility: caution
+    intent: FAREWELL
+    subject: SOCIAL

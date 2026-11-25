@@ -1,0 +1,19 @@
+# Subject: GROUP BANTER — NIGHT_WATCH.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=night_watch, role=open] (priority 10) as night_open:
+    "Gets dark fast out here, {addressee.name}. Every shadow starts looking like a walker."
+    "Quiet night so far, {addressee.name}... almost too quiet."
+    "Keep your flashlight low if you don't need it, {addressee.name}—light carries in the dark."
+  say [topic=night_watch, role=reply] (priority 10) as night_reply:
+    "Yeah, my eyes keep playing tricks on me too. Better safe than sorry."
+    "I'll take quiet over a horde any night of the week, {addressee.name}."
+    "Good call. Listening is half the job after sundown anyway."
+  say [topic=night_watch, role=chime] (priority 10) as night_chime:
+    "I'm wide awake—if anything steps near us, I'll call it out."
+    "Just waiting for sunrise. Nights always feel twice as long now."
+  say [topic=night_watch, role=wrap] (priority 10) as night_wrap:
+    "Hang in there—morning's not that far off."
+    "Appreciate it. Stay sharp."

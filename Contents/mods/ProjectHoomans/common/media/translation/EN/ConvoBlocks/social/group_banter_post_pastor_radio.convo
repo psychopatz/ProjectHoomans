@@ -1,0 +1,13 @@
+# Subject: GROUP BANTER — POST_PASTOR_RADIO.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=post_pastor_radio, role=open] (priority 12) as post_pastor_open:
+    "Wonder if {slot.broadcast.topic} is still out there preaching, {addressee.name}."
+  say [topic=post_pastor_radio, role=reply] (priority 12) as post_pastor_reply:
+    "Hard to say, {addressee.name}. Everybody holds onto whatever keeps them going."
+  say [topic=post_pastor_radio, role=chime] (priority 12) as post_pastor_chime:
+    "Hope he's got solid walls around his church, though."
+  say [topic=post_pastor_radio, role=wrap] (priority 12) as post_pastor_wrap:
+    "Yeah. Prayers and barricades both help."

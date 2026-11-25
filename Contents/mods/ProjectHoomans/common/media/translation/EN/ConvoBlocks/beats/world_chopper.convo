@@ -1,0 +1,36 @@
+# Subject: HELICOPTER EVENT REACTIONS.
+language EN
+namespace hoomans
+
+flow semantic.world.chopper.react
+  say [role=chopper_start_open] (priority 8) as chopper_start_open:
+    "Chopper! Hear those blades, {addressee.name}? Get under a roof right now!"
+    "Damn—helicopter overhead! It's going to drag every dead one in the county right onto us!"
+    "Wait—rotor blades! Everybody get indoors and stay away from the windows!"
+    "Chopper inbound! Don't let it spot us in the open, {addressee.name}!"
+    "That's a helicopter—and it sure isn't here to rescue us. Find cover!"
+  say [role=chopper_start_reply] (priority 8) as chopper_start_reply:
+    "On it, {addressee.name}! Inside a building—now, before it hovers over us!"
+    "I hear it! Keep low and get behind solid walls!"
+    "Last thing we need is a horde following those rotors—move!"
+    "Yeah, no waving at it—get out of sight and hunker down!"
+  say [role=chopper_start_chime] (priority 8) as chopper_start_chime:
+    "Right behind you—close the doors once we're inside!"
+    "Keep quiet once we're under cover and wait it out."
+    "Watch the streets—dead ones are already shifting toward the noise!"
+  say [role=chopper_ended_open] (priority 8) as chopper_ended_open:
+    "Rotors are fading out... sounds like the chopper finally left."
+    "It's gone, {addressee.name}. Give it a second before we step outside—the streets will be messy."
+    "Chopper's finally moving off. Let's check the windows before we head back out."
+    "Thank god that noise is gone. Stay sharp—it probably stirred up half the town."
+  say [role=chopper_ended_reply] (priority 8) as chopper_ended_reply:
+    "Good call waiting a beat, {addressee.name}. Let's peek outside carefully."
+    "Glad we kept our heads down. Weapons ready when we step out."
+    "Yeah, that thing always leaves a mess of walkers behind. Stay tight."
+    "Looks like we rode it out. Let's see what's still shambling around."
+  say [role=chopper_ended_chime] (priority 8) as chopper_ended_chime:
+    "My heart's still pounding. Good thing we got under cover."
+    "Next time I hear blades, I'm not even looking up—straight indoors."
+    "Alright, back to business—watch the corners."
+  say [default] (priority 5) as default:
+    "Helicopter noise—keep low and stay under cover!"

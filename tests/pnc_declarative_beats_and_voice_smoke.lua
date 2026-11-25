@@ -99,16 +99,16 @@ if handle then handle:close() end
 T.truthy(string.find(pyOut, "PY_VOICE_GUARD_OK", 1, true) ~= nil,
     "declarative JSON + static voice guard failed: " .. tostring(pyOut))
 
--- 2. Verify WorldEventsAndEmotes.lua contains semantic.world.alarm.react
+-- 2. Verify world_alarm.convo contains semantic.world.alarm.react
 local scFile = io.open(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/ConvoEngine/ResponseCatalog/Generated/WorldEventsAndEmotes.lua",
+    "Contents/mods/ProjectHoomans/common/media/translation/EN/ConvoBlocks/beats/world_alarm.convo",
     "r"
 )
-T.truthy(scFile ~= nil, "WorldEventsAndEmotes.lua must exist")
+T.truthy(scFile ~= nil, "world_alarm.convo must exist")
 local scText = scFile:read("*a")
 scFile:close()
 local worldSectionStart = string.find(scText, "semantic.world.alarm.react", 1, true)
-T.truthy(worldSectionStart ~= nil, "semantic.world.alarm.react must be in WorldEventsAndEmotes.lua")
+T.truthy(worldSectionStart ~= nil, "semantic.world.alarm.react must be in world_alarm.convo")
 
 -- 3. Load ConvoEngine Registry and seed our 4 new families if reconcile.py --apply hasn't run yet
 PNC = PNC or {}
@@ -207,7 +207,7 @@ seedPlan("world.event.surplus", {
 
 require "PNC/ConvoEngine/Foundation"
 require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
-require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
+require("PNC/ConvoEngine/ConvoDSL/ConvoDSL").EnsureActiveLanguage()
 local Reactions = require "PNC/ConvoEngine/Social/Reaction"
 
 -- 4. Verify Social/Reaction.lua resolves chronology & scoped world events cleanly

@@ -148,6 +148,17 @@ function Compiler.RegisterActionCompiler(actionID, fn)
     return true
 end
 
+local CONTAINER_WORDS = {
+    fridge = true, refrigerator = true, freezer = true,
+    pantry = true, cupboard = true, cabinet = true, cabinets = true,
+    counter = true, counters = true, shelf = true, shelves = true,
+    crate = true, crates = true, box = true, boxes = true,
+    locker = true, lockers = true, desk = true, dresser = true,
+    wardrobe = true, closet = true, trunk = true, glovebox = true,
+    corpse = true, body = true, bag = true, backpack = true,
+    stove = true, oven = true, microwave = true, bin = true, dumpster = true,
+}
+
 local function compilePickup(ir)
     local ext = type(ir.extensions) == "table" and ir.extensions or {}
     local filter = normalizeItemFilter(ir.object)
@@ -156,6 +167,11 @@ local function compilePickup(ir)
     if type(container) == "string" then
         container = trim(string.gsub(string.lower(container), "^nearby%s+", ""))
         if container == "" then container = nil end
+    end
+    -- Direct-object container looting: "loot the fridge", "search the cabinet", "loot that corpse"
+    if not container and CONTAINER_WORDS[filter] then
+        container = filter
+        filter = "all"
     end
     if container then
         return {
@@ -177,7 +193,8 @@ local function compilePickup(ir)
             quantity = qty,
             areaScope = ext.areaScope,
             includeGround = true,
-            includeContainers = ext.areaScope ~= nil and ext.areaScope.kind == "room",
+            includeContainers = (ext.areaScope ~= nil and ext.areaScope.kind == "room")
+                or filter == "all",
         },
     }
 end
@@ -399,8 +416,15 @@ local function describeStep(st)
         if st.target and st.target.text then
             return "grab " .. what .. " from " .. GrammarJoin.FormatTargetWithArticle(st.target.text)
         end
+        if st.areaScope and st.areaScope.kind == "building" then
+            return "search this place for " .. what
+        end
         if st.areaScope and st.areaScope.room then
-            local rLabel = st.areaScope.room == "room" and "this room" or ("the " .. tostring(st.areaScope.room))
+            local r = tostring(st.areaScope.room)
+            local rLabel = (r == "room" and "this room")
+                or (r == "place" and "this place")
+                or (r == "area" and "this area")
+                or ("the " .. r)
             return "search " .. rLabel .. " for " .. what
         end
         return "pick up " .. what .. " around here"
@@ -624,20 +648,53 @@ function Compiler.CompileFromText(rawText, record, player, options)
     local parsed = splitter.ParseScript(rawText, parser, options)
     local plan, err = Compiler.CompileIRList(parsed.steps, record, player)
     if not plan then return nil, err end
-    -- Ground any "this room" / currentOnly areaScope to the player's current room.
+    -- Ground any "this room" / "this place" / "here" areaScope to the player's current room/building.
     local playerRoom = Compiler.ResolvePlayerRoomContext(player)
     if playerRoom then
         for i = 1, #plan.steps do
-            local scope = plan.steps[i].areaScope
-            if type(scope) == "table" and scope.kind == "room"
-                and (scope.currentOnly == true or scope.room == "room")
+            local st = plan.steps[i]
+            local scope = st.areaScope
+            if type(scope) == "table"
+                and (scope.kind == "room" or scope.kind == "area" or scope.kind == "building")
+                and (scope.currentOnly == true
+                    or scope.room == "room"
+                    or scope.room == "place"
+                    or scope.room == "area"
+                    or scope.room == "house"
+                    or scope.room == "building"
+                    or scope.label == "here"
+                    or scope.label == "right here"
+                    or scope.label == "around here")
             then
-                if playerRoom.roomName and scope.room == "room" then
+                local isBroadPlace = (scope.room == "place" or scope.room == "house" or scope.room == "building"
+                    or scope.label == "here" or scope.label == "right here" or scope.label == "around here")
+                if isBroadPlace then
+                    -- "lets loot here" / "lets loot this place" -> whole building when indoors,
+                    -- or area around player when outdoors (never trapped in an empty sub-room!)
+                    scope.kind = playerRoom.roomName and "building" or "area"
+                    scope.room = playerRoom.roomName and "building" or "area"
+                    scope.currentOnly = true
+                elseif playerRoom.roomName and (scope.room == "room" or scope.room == "area" or scope.room == nil) then
+                    scope.kind = "room"
                     scope.room = playerRoom.roomName
+                    scope.currentOnly = true
                 end
                 scope.roomX = playerRoom.roomX
                 scope.roomY = playerRoom.roomY
                 scope.roomZ = playerRoom.roomZ
+                if st.kind == "PICKUP" then
+                    st.includeContainers = true
+                end
+            elseif st.kind == "PICKUP" and scope == nil and not st.target then
+                st.areaScope = {
+                    kind = playerRoom.roomName and "building" or "area",
+                    room = playerRoom.roomName and "building" or "area",
+                    currentOnly = true,
+                    roomX = playerRoom.roomX,
+                    roomY = playerRoom.roomY,
+                    roomZ = playerRoom.roomZ,
+                }
+                st.includeContainers = true
             end
         end
     end

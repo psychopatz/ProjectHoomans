@@ -1,0 +1,25 @@
+# Subject: ABOUT YOU / PERSONAL BACKGROUND Q&A.
+language EN
+namespace hoomans
+
+flow semantic.question.about_you
+  say [actor.social_style=friendly|protective] (priority 9) as warm:
+    "Sure thing — what do you want to know about me?"
+  say [actor.social_style=withdrawn|guarded|hostile] (priority 9) as guarded:
+    "Depends on what you're asking. What about me?"
+  say [default] (priority 5) as neutral:
+    "What do you want to know about me?"
+
+flow semantic.question.about_you.gated
+  say [topic=faction, actor.social_style=withdrawn|guarded|hostile] (priority 10) as faction_guarded:
+    "I don't hand out who I run with to someone I barely know."
+  say [topic=faction] (priority 9) as faction_neutral:
+    "We haven't known each other long enough for me to get into who I'm with."
+  say [topic=surname, actor.social_style=withdrawn|guarded|hostile] (priority 10) as surname_guarded:
+    "First name's enough for now. We're not that close."
+  say [topic=surname] (priority 9) as surname_neutral:
+    "Let's stick to first names until we know each other a bit better."
+  say [actor.social_style=withdrawn|guarded|hostile] (priority 8) as personal_guarded:
+    "That's personal. We're not there yet."
+  say [default] (priority 5) as personal_neutral:
+    "I'm not ready to get into that yet — maybe once we know each other better."

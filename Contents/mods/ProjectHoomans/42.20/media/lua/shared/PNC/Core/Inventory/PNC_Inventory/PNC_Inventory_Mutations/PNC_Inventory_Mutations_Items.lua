@@ -137,4 +137,86 @@ function Inventory.RemoveItems(record, itemIDs, reason)
     return true, "removed"
 end
 
+-- Canonical item-spec encoder for live PZ InventoryItem instances.
+-- Preserves durability, uses, fluid, and custom state when CoreInventory +
+-- StateCodec are available; falls back safely to { type = fullType, stack = 1 }.
+function Inventory.EncodeLiveItemSpec(item)
+    if not item then return nil end
+    local fullType = nil
+    if type(item.getFullType) == "function" then
+        local ok, v = pcall(item.getFullType, item)
+        if ok and type(v) == "string" and v ~= "" then fullType = v end
+    end
+    if not fullType and type(item.getType) == "function" then
+        local ok, v = pcall(item.getType, item)
+        if ok and type(v) == "string" and v ~= "" then fullType = v end
+    end
+    if not fullType then return nil end
+    local fallback = { type = fullType, stack = 1 }
+    local coreInv = PsychopatzCore and PsychopatzCore.Inventory or nil
+    if not coreInv or type(coreInv.encodeItem) ~= "function" then
+        return fallback
+    end
+    local ok, encoded = pcall(coreInv.encodeItem, item, 1)
+    if not ok or type(encoded) ~= "table" then return fallback end
+    local bridge = Inventory.CoreBridge
+    local stateCodec = bridge and bridge.StateCodec or nil
+    if stateCodec and type(stateCodec.readValidatedState) == "function" then
+        local decoded = stateCodec.readValidatedState(encoded)
+        if type(decoded) == "table" then
+            decoded.type = fullType
+            decoded.stack = 1
+            return decoded
+        end
+    end
+    return fallback
+end
+
+-- Unified persistence + live-body sync entry point for adding item specs to
+-- an NPC: validates capacity, commits to record.inventory (marking ModData
+-- dirty), and materializes onto the live body so items never vanish on reload.
+function Inventory.AddItemsAndSync(record, body, specs, containerID, reason, options)
+    local ok, addReason, itemIDs = Inventory.AddItems(
+        record,
+        specs,
+        containerID or "root",
+        reason,
+        options
+    )
+    if not ok then
+        return false, addReason, {}
+    end
+    local liveBody = body
+    if not liveBody and record and record.id ~= nil
+        and PNC.Registry and type(PNC.Registry.GetLiveZombie) == "function"
+    then
+        liveBody = PNC.Registry.GetLiveZombie(record.id)
+    end
+    if liveBody and type(itemIDs) == "table" and type(Inventory.MaterializeItem) == "function" then
+        for i = 1, #itemIDs do
+            pcall(Inventory.MaterializeItem, record, liveBody, itemIDs[i])
+        end
+    end
+    if PNC.Registry and type(PNC.Registry.MarkDirty) == "function" then
+        pcall(PNC.Registry.MarkDirty, record, "inventory")
+    end
+    return true, addReason or "added", itemIDs
+end
+
+-- Unified single-call helper for committing a live world InventoryItem onto an
+-- NPC with full state encoding, capacity check, persistence, and body sync.
+function Inventory.CommitLiveItem(record, body, item, reason, options)
+    local spec = Inventory.EncodeLiveItemSpec(item)
+    if not spec then return false, "invalid_item", {} end
+    local containerID = type(options) == "table" and options.containerID or "root"
+    return Inventory.AddItemsAndSync(
+        record,
+        body,
+        { spec },
+        containerID,
+        reason or "commit_live_item",
+        options
+    )
+end
+
 return Inventory

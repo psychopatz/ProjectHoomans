@@ -1,0 +1,43 @@
+# Subject: EVENT FOLLOW-UP FACT ANSWERS.
+language EN
+namespace hoomans
+
+flow semantic.question.event_follow_up.what_happened
+  say [default] (priority 6) as answer:
+    "{content}"
+
+flow semantic.question.event_follow_up.location
+  say [default] (priority 6) as answer:
+    "{content}"
+
+flow semantic.question.event_follow_up.quantity
+  say [default] (priority 6) as answer:
+    "{content}"
+
+flow semantic.question.event_follow_up.attacker
+  say [default] (priority 6) as answer:
+    "{content}"
+
+flow semantic.question.event_follow_up.need
+  say [default] (priority 6) as answer:
+    "{content}"
+
+flow semantic.question.event_follow_up.deceased
+  say [default] (priority 6) as answer:
+    "{content}"
+
+flow semantic.question.event_follow_up.next
+  say [default] (priority 6) as answer:
+    "{content}"
+
+flow semantic.question.event_follow_up.health
+  say [default] (priority 6) as answer:
+    "{content}"
+
+flow semantic.question.event_follow_up.pursuer
+  say [default] (priority 6) as answer:
+    "{content}"
+
+flow semantic.question.event_follow_up.what
+  say [default] (priority 6) as answer:
+    "{content}"

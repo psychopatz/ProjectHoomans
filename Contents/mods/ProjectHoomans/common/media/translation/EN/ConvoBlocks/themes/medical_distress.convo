@@ -1,0 +1,99 @@
+# Subject: MEDICAL DISTRESS & ASSISTED CARE.
+language EN
+namespace hoomans
+
+flow semantic.medical.distress.call
+  use offer.medical_distress_nudges
+  say [downed.need=mercy] (priority 10) as mercy:
+    "Please... I'm not going to make it. Don't let me turn."
+  say [downed.need=bleedout] (priority 9) as bleedout:
+    "I'm bleeding out over here! Help me, please!"
+  say [downed.need=bandage] (priority 8) as bandage:
+    "I'm hurt and down! Need a bandage over here!"
+  say [downed.need=rescue] (priority 8) as rescue:
+    "I can't get up—somebody pull me out of here!"
+  say [downed.need=dehydration] (priority 8) as dehydration:
+    "Need water... I can barely move..."
+  say [downed.need=starvation] (priority 8) as starvation:
+    "Starving... I don't have the strength to stand..."
+  say [downed.need=exhaustion] (priority 8) as exhaustion:
+    "I'm completely spent... give me a hand up..."
+  say [default] (priority 5) as default:
+    "I'm down! Somebody help me!"
+
+flow semantic.medical.distress.update
+  use offer.medical_distress_nudges
+  say [downed.need=mercy] (priority 10) as mercy:
+    "It's getting worse... please don't leave me like this."
+  say [downed.need=bleedout] (priority 9) as bleedout:
+    "Still losing blood—hurry!"
+  say [downed.need=bandage] (priority 8) as bandage:
+    "I'm still down and waiting for a patch."
+  say [downed.need=rescue] (priority 8) as rescue:
+    "Still pinned down here—need a hand!"
+  say [downed.need=dehydration] (priority 8) as dehydration:
+    "Still need water before I pass out..."
+  say [downed.need=starvation] (priority 8) as starvation:
+    "Still weak—need food soon..."
+  say [downed.need=exhaustion] (priority 8) as exhaustion:
+    "Still trying to catch my breath down here..."
+  say [default] (priority 5) as default:
+    "Still down here—don't forget about me!"
+
+flow semantic.medical.distress.repeat
+  use offer.medical_distress_nudges
+  say [downed.need=mercy] (priority 10) as mercy:
+    "Please... end it before it's too late."
+  say [downed.need=bleedout] (priority 9) as bleedout:
+    "I'm running out of time—stop the bleeding!"
+  say [downed.need=bandage] (priority 8) as bandage:
+    "I still need these wounds patched! Hurry!"
+  say [downed.need=rescue] (priority 8) as rescue:
+    "Over here! I still can't get clear!"
+  say [downed.need=dehydration] (priority 8) as dehydration:
+    "Water... please, anything to drink..."
+  say [downed.need=starvation] (priority 8) as starvation:
+    "Please, I need something to eat..."
+  say [downed.need=exhaustion] (priority 8) as exhaustion:
+    "I still can't stand on my own..."
+  say [default] (priority 5) as default:
+    "Hey! Still need help over here!"
+
+flow semantic.medical.distress.teammate
+  use offer.medical_distress_nudges
+  say [medical.bandage_status=missing] (priority 9) as missing:
+    "They're hurt and I'm out of bandages—anyone have medical supplies?!"
+  say [medical.bandage_status=found] (priority 9) as found:
+    "Found bandages—cover me while I patch them up!"
+  say [default] (priority 5) as default:
+    "They're hurt! Stay with them while I cover you."
+
+flow semantic.medical.distress.treatment
+  say [downed.need=bandage] (priority 8) as bandage:
+    "Bandage is on—thanks, that stopped the worst of it."
+  say [default] (priority 5) as default:
+    "The wound is treated. I can move when you are ready."
+
+flow semantic.medical.care.assisted
+  say [role=start_patch_npc] (priority 10) as start_patch_npc:
+    "Hold still, {addressee.name}, let me wrap your {slot.wound.part}."
+  say [role=start_patch_player] (priority 10) as start_patch_player:
+    "Hold still—let me get a clean wrap on your {slot.wound.part}."
+  say [role=start_change_dirty] (priority 10) as start_change_dirty:
+    "That bandage on your {slot.wound.part} is soaked—let me swap it out."
+  say [role=complete_patch] (priority 10) as complete_patch:
+    "There—your {slot.wound.part} is wrapped tight."
+  say [role=complete_change_dirty] (priority 10) as complete_change_dirty:
+    "Fresh dressing is on your {slot.wound.part}. Keep it clean."
+  say [role=patient_thanks] (priority 10) as patient_thanks:
+    "Thanks for patching up my {slot.wound.part}, {addressee.name}—owe you one."
+  say [role=patient_moved_away, actor.social_style=hostile|guarded|withdrawn] (priority 11) as moved_away_guarded:
+    "Hey, stop moving! I can't bandage you if you keep walking off, {addressee.name}."
+  say [role=patient_moved_away, actor.social_style=warm|friendly|protective] (priority 11) as moved_away_warm:
+    "Whoa, hold still {addressee.name}! Stand put for a second so I can finish wrapping your {slot.wound.part}."
+  say [role=patient_moved_away] (priority 10) as moved_away_default:
+    "Stop moving, {addressee.name}! Can't wrap your {slot.wound.part} while you're walking away."
+  say [role=hostile_interrupted] (priority 10) as hostile_interrupted:
+    "Forget the bandage for a second—hostiles! Watch out, {addressee.name}!"
+  say [default] (priority 5) as default:
+    "Hold still, let me patch up that {slot.wound.part}."

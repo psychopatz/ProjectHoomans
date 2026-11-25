@@ -1,0 +1,51 @@
+# Subject: FATIGUE / EXHAUSTION (self-contained lexicons, sit suggestions, acks, requests, Q&A).
+language EN
+namespace hoomans
+
+lexicon fatigue.observe
+  [actor.social_style=warm|friendly|protective] (priority 8): "You're breathing hard" | "You look completely winded"
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "You're dragging" | "You're slowing down"
+  [default]: "You look exhausted" | "You look wiped out"
+
+lexicon fatigue.suggest
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Sit down before you get us both killed." | "Take thirty seconds and catch your wind."
+  [default]: "Let's sit down for a minute and catch our breath." | "Maybe we should sit down for a bit."
+
+lexicon fatigue.ack
+  [actor.social_style=warm|friendly|protective] (priority 8): "Good call, {term.address}. Take a breather—I'll sit with you and watch the perimeter."
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Finally. Good—catch your breath so we can move."
+  [default]: "Good idea, {term.address}. A quick sit-down does wonders."
+
+lexicon fatigue.request_need
+  [actor.social_style=warm|friendly|protective] (priority 8): "I'm pretty beat" | "My legs are burning"
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "My legs are shot" | "I'm winded"
+  [default]: "I'm getting exhausted" | "I'm out of breath"
+
+lexicon fatigue.request_ask
+  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "I need to sit for a minute—yes or no?" | "Give me a minute to sit."
+  [default]: "Mind if I sit down for a minute?" | "Can we sit down for a bit?"
+
+extend semantic.companion.moodle_suggest
+  say [role=suggest_sit] (priority 8) as suggest_sit_composed_a:
+    "{fatigue.observe}, {term.address}. {fatigue.suggest}"
+    "{opener.casual} {term.address}, {fatigue.observe}. {fatigue.suggest}"
+  say [role=ack_sit] (priority 8) as ack_sit_composed:
+    "{fatigue.ack}"
+
+extend semantic.companion.need_request
+  say [role=request_sit] (priority 8) as req_sit_composed_a:
+    "{opener.casual} {term.address}, {fatigue.request_need}. {fatigue.request_ask}"
+    "{term.address}, {fatigue.request_need}. {fatigue.request_ask}"
+
+extend semantic.question.needs.offer
+  say [need.type=fatigue, need.urgency=moderate|severe|emergency|critical] (priority 7) as fatigue:
+    "A little rest would help, but this isn't something I can count."
+
+extend semantic.question.wellbeing.follow_up
+  say [need.type=fatigue, need.urgency=moderate|severe|emergency|critical] (priority 7) as fatigue:
+    "I'm still worn out."
+
+extend semantic.self_state
+  say [subject=FATIGUE] (priority 7) as fatigue:
+    "I hear you. I hope you get a chance to rest soon."
+    "This is wearing. Take a breather when you can."

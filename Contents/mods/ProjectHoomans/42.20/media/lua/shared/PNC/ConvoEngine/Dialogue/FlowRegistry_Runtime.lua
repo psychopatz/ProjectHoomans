@@ -41,6 +41,22 @@ function Registry.ReplaceGenerated(definition)
     return true, normalized
 end
 
+-- Runtime `.convo` stories may be registered, extended across packs, or
+-- reloaded on language switch while preserving FlowRegistry validation.
+function Registry.UpsertStory(definition)
+    local valid, normalized = Registry.Validate(definition)
+    if not valid then return false, normalized end
+    if not Registry.Flows[normalized.id] then
+        if #Registry.FlowOrder >= Registry.DEFAULT_MAX_FLOWS then
+            return false, "flow_limit"
+        end
+        Registry.FlowOrder[#Registry.FlowOrder + 1] = normalized.id
+    end
+    Registry.Flows[normalized.id] = normalized
+    Registry.Revision = Registry.Revision + 1
+    return true, normalized
+end
+
 function Registry.Get(flowID)
     return Registry.Flows[flowID]
 end

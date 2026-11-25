@@ -154,7 +154,7 @@ require "PNC/ConvoEngine/Dialogue/Situation"
 require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
 require "PNC/ConvoEngine/SpeechRealization"
 require "PNC/ConvoEngine/Social/Reaction"
-require "PNC/ConvoEngine/ResponseCatalog/Generated/Init"
+require("PNC/ConvoEngine/ConvoDSL/ConvoDSL").EnsureActiveLanguage()
 local Suggestions = require "PNC/ConvoEngine/Dialogue/Suggestions"
 require "PNC/ConvoEngine/Dialogue/FlowKernel"
 require "PNC/ConvoEngine/Dialogue/LocalResponse"

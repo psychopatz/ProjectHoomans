@@ -1,0 +1,44 @@
+# Subject: TOOL REPLIES — SOCIAL REJECTED.
+language EN
+namespace hoomans
+
+flow semantic.tool_reply.social.rejected.generic
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.rejected.hostile_abuse
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.rejected.orientation_gate
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.rejected.personality_gate
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.rejected.positive_cooldown_active
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.rejected.rejected_by_game
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.rejected.relationship_gate
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+
+flow semantic.tool_reply.social.rejected.sexual_advance
+  say [default] (priority 6) as 1:
+    "Understood."
+    "Understood."
+    "Understood."

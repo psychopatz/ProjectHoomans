@@ -81,9 +81,72 @@ function Lexicon.Register(lang, key, entries)
     return true
 end
 
+function Lexicon.Extend(lang, key, entries)
+    lang = string.upper(tostring(lang or "EN"))
+    key = tostring(key or "")
+    if key == "" or type(entries) ~= "table" or #entries == 0 then return false end
+    local pack = Lexicon.Packs[lang]
+    local existing = type(pack) == "table" and pack[key] or nil
+    if type(existing) ~= "table" or #existing == 0 then
+        return Lexicon.Register(lang, key, entries)
+    end
+    local merged = {}
+    for i = 1, #existing do
+        merged[i] = existing[i]
+    end
+    local baseCount = #merged
+    local added = 0
+    for i = 1, #entries do
+        local e = entries[i]
+        if type(e) == "table" and type(e.words) == "table" and #e.words > 0 then
+            local pri = tonumber(e.priority) or 6
+            local kc = countKeys(e.when)
+            added = added + 1
+            merged[#merged + 1] = {
+                when = e.when,
+                priority = pri,
+                words = e.words,
+                _maxScore = pri * 100 + kc,
+                _idx = baseCount + added,
+            }
+        end
+    end
+    if added == 0 then return false end
+    table.sort(merged, function(a, b)
+        if a._maxScore ~= b._maxScore then return a._maxScore > b._maxScore end
+        return a._idx < b._idx
+    end)
+    Lexicon.Packs[lang][key] = merged
+    return true
+end
+
+local function resolveActiveLanguage(explicit)
+    if explicit ~= nil and tostring(explicit) ~= "" then
+        return string.upper(tostring(explicit))
+    end
+    local dsl = PNC and PNC.ConvoEngine and PNC.ConvoEngine.ConvoDSL
+    if type(dsl) == "table" and type(dsl.ActiveLanguage) == "function" then
+        return dsl.ActiveLanguage()
+    end
+    local manager = rawget(_G, "CustomTranslationManager")
+        or (PsychopatzCore and PsychopatzCore.CustomTranslationManager)
+    if type(manager) == "table" and type(manager.getLanguage) == "function" then
+        local ok, value = pcall(manager.getLanguage)
+        if ok and value and tostring(value) ~= "" then
+            return string.upper(tostring(value))
+        end
+    end
+    return "EN"
+end
+
 function Lexicon.Has(key, lang)
-    local pack = Lexicon.Packs[string.upper(tostring(lang or "EN"))] or Lexicon.Packs.EN
-    return type(pack) == "table" and pack[tostring(key or "")] ~= nil
+    local k = tostring(key or "")
+    local reqLang = resolveActiveLanguage(lang)
+    local pack = Lexicon.Packs[reqLang]
+    if type(pack) == "table" and pack[k] ~= nil then
+        return true
+    end
+    return type(Lexicon.Packs.EN) == "table" and Lexicon.Packs.EN[k] ~= nil
 end
 
 local function recordHistory(hKey, wordIndex)
@@ -108,9 +171,12 @@ local function recordHistory(hKey, wordIndex)
 end
 
 function Lexicon.Pick(key, context, salt, lang)
-    local pack = Lexicon.Packs[string.upper(tostring(lang or "EN"))] or Lexicon.Packs.EN
-    if type(pack) ~= "table" then return nil end
-    local entries = pack[tostring(key or "")]
+    local k = tostring(key or "")
+    local reqLang = resolveActiveLanguage(lang)
+    local pack = Lexicon.Packs[reqLang]
+    local entries = (type(pack) == "table" and pack[k])
+        or (type(Lexicon.Packs.EN) == "table" and Lexicon.Packs.EN[k])
+        or nil
     if type(entries) ~= "table" then return nil end
 
     local bestScore = nil
@@ -191,7 +257,7 @@ function Lexicon.Expand(text, context, tokens, opts)
         return out
     end
     opts = type(opts) == "table" and opts or {}
-    local lang = string.upper(tostring(opts.language or "EN"))
+    local lang = resolveActiveLanguage(opts.language)
     local salt = opts.salt or (type(context) == "table" and context.eventRef) or ""
     out = expandPass(out, context, tokens, lang, salt, 1)
     out = Formatter.Format(out, tokens, { language = lang, context = context })

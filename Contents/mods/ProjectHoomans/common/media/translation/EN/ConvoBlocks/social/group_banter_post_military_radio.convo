@@ -1,0 +1,13 @@
+# Subject: GROUP BANTER — POST_MILITARY_RADIO.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=post_military_radio, role=open] (priority 12) as post_mil_open:
+    "What we heard on {slot.broadcast.channel} earlier was grim, {addressee.name}. Sounds like even the army is losing ground."
+  say [topic=post_military_radio, role=reply] (priority 12) as post_mil_reply:
+    "Better we heard {slot.broadcast.episode} ourselves, {addressee.name}. No point waiting on rescue."
+  say [topic=post_military_radio, role=chime] (priority 12) as post_mil_chime:
+    "We've survived this long on our own. We'll keep doing it."
+  say [topic=post_military_radio, role=wrap] (priority 12) as post_mil_wrap:
+    "Damn straight. Stay sharp."

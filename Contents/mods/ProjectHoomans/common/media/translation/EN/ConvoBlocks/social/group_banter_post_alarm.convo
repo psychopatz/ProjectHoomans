@@ -1,0 +1,15 @@
+# Subject: GROUP BANTER — POST_ALARM.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=post_alarm, role=open] (priority 12) as post_alarm_open:
+    "My ears are still ringing from that house alarm, {addressee.name}. Thought half the block was gonna pour in."
+    "We got lucky with that alarm earlier, {addressee.name}. Next door we pry open, let's check our exit first."
+  say [topic=post_alarm, role=reply] (priority 12) as post_alarm_reply:
+    "No kidding, {addressee.name}. Alarms are basically dinner bells out here."
+    "We handled it clean, though. Kept moving instead of freezing up."
+  say [topic=post_alarm, role=chime] (priority 12) as post_alarm_chime:
+    "Still makes my heart jump every time one goes off. Glad it finally shut up."
+  say [topic=post_alarm, role=wrap] (priority 12) as post_alarm_wrap:
+    "Lesson learned. Stay sharp around locked houses."

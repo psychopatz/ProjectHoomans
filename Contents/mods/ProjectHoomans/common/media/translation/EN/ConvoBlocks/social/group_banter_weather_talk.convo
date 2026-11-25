@@ -1,0 +1,16 @@
+# Subject: GROUP BANTER — WEATHER_TALK.
+language EN
+namespace hoomans
+
+extend semantic.banter.group
+  say [topic=weather_talk, role=open] (priority 10) as weather_open:
+    "This weather's miserable, {addressee.name}—cuts visibility right down."
+    "At least the rain masks our footsteps a little, {addressee.name}."
+  say [topic=weather_talk, role=reply] (priority 10) as weather_reply:
+    "Masks theirs too, though. Keep your head on a swivel."
+    "True—just hope we don't catch a cold out in this."
+  say [topic=weather_talk, role=chime] (priority 10) as weather_chime:
+    "My boots are already soaked. Next dry house we pass, I'm warming up."
+    "Weather never cared about us before, sure doesn't care now."
+  say [topic=weather_talk, role=wrap] (priority 10) as weather_wrap:
+    "Keep moving steady and we'll dry off soon enough."

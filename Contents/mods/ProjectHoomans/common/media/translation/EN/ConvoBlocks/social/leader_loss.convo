@@ -1,0 +1,17 @@
+# Subject: LEADER LOSS REACTIONS.
+language EN
+namespace hoomans
+
+flow semantic.leader_loss.reaction
+  say [leader.grief=devoted] (priority 9) as devoted:
+    "We lost someone important. We need to stay together."
+  say [leader.grief=dissent] (priority 8) as dissent:
+    "The old order is gone. What happens next is up to us."
+  say [leader.grief=close] (priority 7) as close:
+    "We lost someone close to us. We need to stay together."
+  say [leader.grief=colonist] (priority 7) as colonist:
+    "Our leader is gone. We keep the group together."
+  say [leader.grief=distant] (priority 7) as distant:
+    "The leader is gone. Someone needs to decide what comes next."
+  say [default] (priority 5) as default:
+    "We lost our leader. We need to decide what comes next."

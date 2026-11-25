@@ -309,10 +309,55 @@ function Presentation.ActivityActionStatus(snapshot)
     return text, ACTION_COLOR, text ~= ""
 end
 
+local BEHAVIOR_SCRIPT_PHASE_LABELS = {
+    PICKUP_MOVE = { key = "UI_PNC_BScript_PickupMove", fallback = "Scavenging (Moving)" },
+    PICKUP_GRAB = { key = "UI_PNC_BScript_PickupGrab", fallback = "Scavenging (Looting)" },
+    PICKUP      = { key = "UI_PNC_BScript_Pickup", fallback = "Scavenging" },
+    STORE       = { key = "UI_PNC_BScript_Store", fallback = "Storing Items" },
+    MOVE_TO     = { key = "UI_PNC_BScript_MoveTo", fallback = "Moving to Target" },
+    WAIT_SEAT   = { key = "UI_PNC_BScript_WaitSeat", fallback = "Waiting (Seated)" },
+    WAIT        = { key = "UI_PNC_BScript_Wait", fallback = "Holding Position" },
+    INTERACT    = { key = "UI_PNC_BScript_Interact", fallback = "Interacting" },
+    EQUIP       = { key = "UI_PNC_BScript_Equip", fallback = "Equipping Gear" },
+    POSTURE     = { key = "UI_PNC_BScript_Posture", fallback = "Resting" },
+    EMOTE       = { key = "UI_PNC_BScript_Emote", fallback = "Emoting" },
+    GUARD       = { key = "UI_PNC_BScript_Guard", fallback = "Guarding" },
+    ENGAGE      = { key = "UI_PNC_BScript_Engage", fallback = "Engaging" },
+    USE_ITEM    = { key = "UI_PNC_BScript_UseItem", fallback = "Using Item" },
+    DROP        = { key = "UI_PNC_BScript_Drop", fallback = "Dropping Items" },
+    GIVE        = { key = "UI_PNC_BScript_Give", fallback = "Handing Over" },
+}
+
+function Presentation.BehaviorScriptStatus(snapshot)
+    if type(snapshot) ~= "table" then return "", ACTION_COLOR, false end
+    local ab = tostring(snapshot.activeBehavior or "")
+    local job = tostring(snapshot.activeJob or "")
+    if job ~= "BehaviorScript" and string.sub(ab, 1, 14) ~= "BehaviorScript" then
+        return "", ACTION_COLOR, false
+    end
+    local phase, detail = string.match(ab, "^BehaviorScript:([%w_]+):?(.*)$")
+    phase = phase or ""
+    if detail and detail ~= "" then
+        if phase == "PICKUP_GRAB" then
+            return tr("UI_PNC_BScript_LootingPrefix", "Looting") .. " " .. detail, ACTION_COLOR, true
+        elseif phase == "PICKUP_MOVE" then
+            return tr("UI_PNC_BScript_LootingPrefix", "Looting") .. " " .. detail, ACTION_COLOR, true
+        end
+    end
+    local spec = BEHAVIOR_SCRIPT_PHASE_LABELS[phase]
+    local label = spec and tr(spec.key, spec.fallback)
+        or tr("UI_PNC_BScript_Default", "Following Order")
+    return label, ACTION_COLOR, true
+end
+
 function Presentation.ActionStatus(snapshot)
     local info = snapshot and snapshot.actionInformation or nil
     if info and info.kind == "treatment" then
         return Presentation.TreatmentStatus(snapshot)
+    end
+    local bsText, bsColor, bsActive = Presentation.BehaviorScriptStatus(snapshot)
+    if bsText ~= "" then
+        return bsText, bsColor, bsActive
     end
     local fishingText, fishingColor, fishingActive =
         Presentation.FishingActionStatus(snapshot)
