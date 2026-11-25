@@ -107,6 +107,14 @@ flow semantic.medical.care.assisted
     "Fresh dressing is on your {slot.wound.part}. Keep it clean."
   say [role=patient_thanks] (pri 10) as patient_thanks:
     "Thanks for patching up my {slot.wound.part}, {addressee.name}—owe you one."
+  say [role=patient_moved_away, actor.social_style=hostile|guarded|withdrawn] (pri 11) as moved_away_guarded:
+    "Hey, stop moving! I can't bandage you if you keep walking off, {addressee.name}."
+  say [role=patient_moved_away, actor.social_style=warm|friendly|protective] (pri 11) as moved_away_warm:
+    "Whoa, hold still {addressee.name}! Stand put for a second so I can finish wrapping your {slot.wound.part}."
+  say [role=patient_moved_away] (pri 10) as moved_away_default:
+    "Stop moving, {addressee.name}! Can't wrap your {slot.wound.part} while you're walking away."
+  say [role=hostile_interrupted] (pri 10) as hostile_interrupted:
+    "Forget the bandage for a second—hostiles! Watch out, {addressee.name}!"
   say [default] (pri 5) as default:
     "Hold still, let me patch up that {slot.wound.part}."
 

@@ -171,6 +171,9 @@ local function syncTreatmentAnimation(
         if Animation and Animation.FinishBump then
             Animation.FinishBump(zombie, true)
         end
+        if zombie and zombie.setVariable then
+            zombie:setVariable("LootPosition", "")
+        end
         modData.PNC_ClientTreatmentAnimKey = nil
         modData.PNC_ClientMedicalCareAnimKey = nil
         return false, true

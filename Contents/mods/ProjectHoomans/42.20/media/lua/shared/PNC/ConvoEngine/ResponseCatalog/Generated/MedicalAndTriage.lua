@@ -142,6 +142,10 @@ Catalog.Register("semantic.medical.care.assisted", {
         v("semantic.medical.care.assisted.complete_patch", "hoomans.medical.care.assisted.complete_patch", "There—your {slot.wound.part} is wrapped tight.", { combatReactionRole = "complete_patch" }, 10, true),
         v("semantic.medical.care.assisted.complete_change_dirty", "hoomans.medical.care.assisted.complete_change_dirty", "Fresh dressing is on your {slot.wound.part}. Keep it clean.", { combatReactionRole = "complete_change_dirty" }, 10, true),
         v("semantic.medical.care.assisted.patient_thanks", "hoomans.medical.care.assisted.patient_thanks", "Thanks for patching up my {slot.wound.part}, {addressee.name}—owe you one.", { combatReactionRole = "patient_thanks" }, 10, true),
+        v("semantic.medical.care.assisted.moved_away_guarded", "hoomans.medical.care.assisted.moved_away_guarded", "Hey, stop moving! I can't bandage you if you keep walking off, {addressee.name}.", { combatReactionRole = "patient_moved_away", socialStyle = { "hostile", "guarded", "withdrawn" } }, 11, true),
+        v("semantic.medical.care.assisted.moved_away_warm", "hoomans.medical.care.assisted.moved_away_warm", "Whoa, hold still {addressee.name}! Stand put for a second so I can finish wrapping your {slot.wound.part}.", { combatReactionRole = "patient_moved_away", socialStyle = { "warm", "friendly", "protective" } }, 11, true),
+        v("semantic.medical.care.assisted.moved_away_default", "hoomans.medical.care.assisted.moved_away_default", "Stop moving, {addressee.name}! Can't wrap your {slot.wound.part} while you're walking away.", { combatReactionRole = "patient_moved_away" }, 10, true),
+        v("semantic.medical.care.assisted.hostile_interrupted", "hoomans.medical.care.assisted.hostile_interrupted", "Forget the bandage for a second—hostiles! Watch out, {addressee.name}!", { combatReactionRole = "hostile_interrupted" }, 10, true),
         v("semantic.medical.care.assisted.default", "hoomans.medical.care.assisted.default", "Hold still, let me patch up that {slot.wound.part}.", nil, 5, true),
     },
 })
