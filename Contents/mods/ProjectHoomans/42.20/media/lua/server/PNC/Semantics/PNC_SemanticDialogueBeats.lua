@@ -646,6 +646,9 @@ function Beats.Pump(now)
     elseif #threadOrder > 0 then
         pruneCompletedThreads(now)
     end
+    if Beats.TickFinalKillResolutions then
+        Beats.TickFinalKillResolutions(now)
+    end
     if Beats.CheckEnvironment and now >= (tonumber(Beats.NextEnvCheckAt) or 0) then
         Beats.CheckEnvironment(now)
     end
@@ -670,6 +673,7 @@ function Beats.ResetRuntime()
     if type(Beats.ResetCombatAssistRuntime) == "function" then Beats.ResetCombatAssistRuntime() end
     if type(Beats.ResetGroupBanterRuntime) == "function" then Beats.ResetGroupBanterRuntime() end
     if type(Beats.ResetCompanionNeedsRuntime) == "function" then Beats.ResetCompanionNeedsRuntime() end
+    if type(Beats.ResetFinalKillRuntime) == "function" then Beats.ResetFinalKillRuntime() end
     if type(Beats.ResetAuditRuntime) == "function" then Beats.ResetAuditRuntime() end
 end
 
@@ -684,6 +688,7 @@ require "PNC/Semantics/Beats/PNC_SemanticBeats_NightCamp"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_MedicalRescue"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_GroupBanter"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_CompanionNeeds"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_FinalKill"
 require "PNC/Semantics/Beats/PNC_BroadcastRules_StoriesAndOpenBand"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_Audit"
 

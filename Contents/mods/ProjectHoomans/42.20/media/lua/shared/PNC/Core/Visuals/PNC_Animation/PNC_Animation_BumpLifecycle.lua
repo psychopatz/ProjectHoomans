@@ -121,10 +121,16 @@ function Animation.FinishBump(zombie, forceIdle, owner)
         zombie:setVariable("BumpDone", true)
         zombie:setVariable("BumpAnimFinished", true)
     end
+    local now = Core and Core.Now and Core.Now() or 0
     if modData then
         modData.PNC_BumpReleasePending = true
-        modData.PNC_BumpReleaseAt = Core and Core.Now and Core.Now() or 0
+        modData.PNC_BumpReleaseAt = now
+        modData.PNC_BumpReleaseHardRetries = nil
         modData.PNC_BumpActionLease = true
+        modData.PNC_BumpActionLeaseUntil = math.max(
+            tonumber(modData.PNC_BumpActionLeaseUntil) or 0,
+            now + Internal.BUMP_RELEASE_HARD_TIMEOUT_MS + 250
+        )
     end
     if AnimationTrace and AnimationTrace.Sample then
         AnimationTrace.Sample(
@@ -134,6 +140,31 @@ function Animation.FinishBump(zombie, forceIdle, owner)
             true
         )
     end
+end
+
+function Animation.ForceRecoverBumped(zombie)
+    if not zombie then return false end
+    if zombie.setBumpType then
+        zombie:setBumpType("")
+    end
+    if zombie.setBumpDone then
+        zombie:setBumpDone(true)
+    end
+    if zombie.setVariable then
+        zombie:setVariable("BumpDone", true)
+        zombie:setVariable("BumpAnimFinished", true)
+    end
+    if zombie.reportEvent then
+        zombie:reportEvent("ActiveAnimFinishing")
+    end
+    Internal.setManagedUseless(zombie, false, true)
+    if zombie.changeState
+        and ZombieIdleState
+        and ZombieIdleState.instance
+    then
+        zombie:changeState(ZombieIdleState.instance())
+    end
+    return Internal.getActionStateName(zombie) ~= "bumped"
 end
 
 function Animation.PumpBumpRelease(zombie, now)
@@ -213,6 +244,8 @@ function Animation.PumpBumpRelease(zombie, now)
     if actionState == "bumped"
         and (now - releaseAt) >= Internal.BUMP_RELEASE_HARD_TIMEOUT_MS
     then
+        local retries = (tonumber(modData.PNC_BumpReleaseHardRetries) or 0) + 1
+        modData.PNC_BumpReleaseHardRetries = retries
         if Diagnostics and Diagnostics.SeatingAuditEnabled == true
             and Diagnostics.LogSeatingAudit
         then
@@ -224,25 +257,21 @@ function Animation.PumpBumpRelease(zombie, now)
                     modData.PNC_BumpRequestedType or ""
                 ),
                 "ageMs=" .. tostring(now - releaseAt),
+                "retry=" .. tostring(retries),
             })
         end
-        if zombie.reportEvent then
-            zombie:reportEvent("ActiveAnimFinishing")
-        end
-        if zombie.setBumpType then
-            zombie:setBumpType("")
-        end
-        if zombie.changeState
-            and ZombieIdleState
-            and ZombieIdleState.instance
-        then
-            zombie:changeState(ZombieIdleState.instance())
-        end
-        if Core and Core.LogWarn then
+        local exited = Animation.ForceRecoverBumped(zombie)
+        if retries == 1 and Core and Core.LogWarn then
             Core.LogWarn(
                 "bump_release_recovered action=bumped requested="
                     .. tostring(modData.PNC_BumpRequestedType or "")
             )
+        end
+        actionState = Internal.getActionStateName(zombie)
+        if not exited and actionState == "bumped" and retries < 4 then
+            modData.PNC_BumpKeepUseless = false
+            modData.PNC_BumpActionLeaseUntil = now + 250
+            return true
         end
     end
     -- BumpedState.exit owns clearing BumpAnimFinished and BumpType. This
@@ -252,6 +281,7 @@ function Animation.PumpBumpRelease(zombie, now)
     end
     modData.PNC_BumpReleasePending = nil
     modData.PNC_BumpReleaseAt = nil
+    modData.PNC_BumpReleaseHardRetries = nil
     modData.PNC_BumpActionLease = nil
     modData.PNC_BumpActionLeaseUntil = nil
     modData.PNC_BumpActionLeaseStartedAt = nil

@@ -560,12 +560,22 @@ function Provider.GetRecoveryState(lease)
             runtime.roamAmbient.phase == "SLEEPING"
             or runtime.roamAmbient.phase == "ACTIVE"
         ))
-    local progressAt = activePose and nowMs()
-        or tonumber(lease.lastProgressAt) or nowMs()
+    if activePose then
+        -- Poses (seated, sleeping, ambient scenes) do not advance a work
+        -- output clock, but still require a bounded ceiling so a wedged pose
+        -- cannot hold the autonomy lease indefinitely.
+        return {
+            lastProgressAt = tonumber(lease.startedAt) or nowMs(),
+            phase = tostring(lease.phase or "WORKING"),
+            watchable = true,
+            timeoutMs = 180000,
+            recoveryReason = "autonomy_pose_timeout",
+        }
+    end
     return {
-        lastProgressAt = progressAt,
+        lastProgressAt = tonumber(lease.lastProgressAt) or nowMs(),
         phase = tostring(lease.phase or "WORKING"),
-        watchable = not activePose,
+        watchable = true,
     }
 end
 

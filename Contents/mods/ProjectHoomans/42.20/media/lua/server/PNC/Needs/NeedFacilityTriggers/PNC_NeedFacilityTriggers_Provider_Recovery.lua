@@ -25,23 +25,23 @@ function Triggers.GetRecoveryState(lease)
     then
         return {
             invalid = true,
+            watchable = true,
+            forceRecovery = true,
+            recoveryReason = "need_facility_activity_missing",
             phase = lease and lease.phase or "WAITING",
             lastProgressAt = progressAt,
         }
     end
     local definition = definitionFor(lease)
     -- Activities without a logical effect (for example a plain living-room
-    -- pose) have no truthful progress signal yet. Keep them out of the
-    -- effect watchdog until their owner exposes one.
+    -- pose) have no effect-progress clock during WORKING, but TRAVEL and
+    -- scene startup still need bounded watchdog recovery.
     local activityDefinition = PNC.FacilityJobDefinitions
         and PNC.FacilityJobDefinitions.Get
         and PNC.FacilityJobDefinitions.Get(
             activity.capability or lease and lease.capability)
-    if not definition or not activityDefinition
-        or not activityDefinition.needEffect
-    then
-        return { phase = "WAITING", lastProgressAt = progressAt }
-    end
+    local hasNeedEffect = definition ~= nil and activityDefinition ~= nil
+        and activityDefinition.needEffect ~= nil
     local phase = taskPhaseFor(activity, lease)
     local snapshot = {
         phase = phase,
@@ -85,7 +85,7 @@ function Triggers.GetRecoveryState(lease)
             end
         end
     elseif phase == "WORKING" then
-        snapshot.watchable = true
+        snapshot.watchable = hasNeedEffect == true
     elseif activity.phase == "QUEUED"
         or activity.phase == "STARTING"
         or activity.phase == "INTERRUPTED"

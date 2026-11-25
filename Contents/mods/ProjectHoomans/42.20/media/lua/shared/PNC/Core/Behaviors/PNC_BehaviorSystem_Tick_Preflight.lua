@@ -49,7 +49,11 @@ function H.Run(record, zombie, now)
         return true
     end
 
-    if OrderSystem and OrderSystem.RecoverStalled
+    if PNC.Watchdog and PNC.Watchdog.AuditActor then
+        if PNC.Watchdog.AuditActor(record, zombie, now) then
+            return true
+        end
+    elseif OrderSystem and OrderSystem.RecoverStalled
         and OrderSystem.RecoverStalled(record, zombie, now)
     then
         return true

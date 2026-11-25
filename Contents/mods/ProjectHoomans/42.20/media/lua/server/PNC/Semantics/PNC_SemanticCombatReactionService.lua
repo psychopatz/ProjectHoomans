@@ -451,6 +451,10 @@ function Service.OnPlayerKill(player, zombie, spec)
 
     local key = playerKey(player)
     local now = tonumber(spec.now) or (Core and Core.Now and Core.Now()) or 0
+    local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if beats and type(beats.ObserveCombatKill) == "function" then
+        beats.ObserveCombatKill(player, "zombie", now, { isPlayer = true })
+    end
     local baseMoment = baseKillMoment(
         "zombie_kill_witnessed", "player", key, zombie, spec, now
     )
@@ -544,6 +548,10 @@ function Service.OnNPCKill(record, zombie, spec)
         spec,
         now
     )
+    local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if beats and type(beats.ObserveCombatKill) == "function" then
+        beats.ObserveCombatKill(record, "zombie", now)
+    end
     local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
     if Dir and type(Dir.EvaluateCandidate) == "function" and spec.ignoreDirector ~= true then
         local dirOk, dirInfo = Dir.EvaluateCandidate({
@@ -652,6 +660,10 @@ function Service.OnNPCHumanKill(record, targetRecord, targetBody, spec)
     local y = tonumber(spec.y or targetRecord.y or record.y)
     local z = tonumber(spec.z or targetRecord.z or record.z)
     if not x or not y or not z then return 0, "kill_position_unavailable" end
+    local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if beats and type(beats.ObserveCombatKill) == "function" then
+        beats.ObserveCombatKill(record, "hostile_human", now)
+    end
 
     local weapon = WeaponContext.Build(record, spec)
     spec.attackType = weapon.attackType

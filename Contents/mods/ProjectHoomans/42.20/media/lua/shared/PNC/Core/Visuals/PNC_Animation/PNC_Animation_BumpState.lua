@@ -121,6 +121,16 @@ function Animation.IsBumpActionActive(zombie, now)
     ) then
         return true
     end
+    if modData.PNC_BumpReleasePending ~= true
+        and (actionState == "bumped" or bumpType ~= "")
+        and Animation.FinishBump
+    then
+        -- Never silently drop an expired lease while the body is still in
+        -- bumped or still carries a non-empty BumpType selector; hand off to
+        -- the release pump so ActionContext can exit cleanly to idle.
+        Animation.FinishBump(zombie, true)
+        return false
+    end
     modData.PNC_BumpActionLease = nil
     modData.PNC_BumpActionLeaseUntil = nil
     modData.PNC_BumpActionLeaseStartedAt = nil

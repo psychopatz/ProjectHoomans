@@ -7,6 +7,8 @@ local Client = PNC.Client
 local Const = PNC.Const
 local Core = PNC.Core
 local Internal = Client.Internal
+local CommandIRBridge = PNC.Semantics and PNC.Semantics.CommandIRBridge
+    or require "PNC/Semantics/PNC_SemanticCommandIRBridge"
 
 function Client.SendCompanionCommand(commandID, npcId, scope, context)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
@@ -85,6 +87,26 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
     local affected, reason, affectedTargets, details =
         PNC.CompanionCommands.Execute(player, args)
     local succeeded = (tonumber(affected) or 0) > 0
+    local src = tostring(args.commandSource or "")
+    if CommandIRBridge and type(CommandIRBridge.EmitCommandFeedback) == "function"
+        and src ~= "semantic_chat" and src ~= "llm_tool" and src ~= "companion_emote"
+    then
+        local feedbackTargets = (type(affectedTargets) == "table" and #affectedTargets > 0)
+            and affectedTargets or npcId
+        if feedbackTargets ~= nil then
+            CommandIRBridge.EmitCommandFeedback(
+                player,
+                commandID,
+                feedbackTargets,
+                succeeded and "accepted" or "rejected",
+                {
+                    source = src ~= "" and src or "ui_command",
+                    isGroup = tostring(scope or "") == "group",
+                    target = type(context) == "table" and context.targetLabel or nil,
+                }
+            )
+        end
+    end
     Internal.RecordCampServer(commandID, npcId, scope, context, succeeded, reason,
         campSiteHint, details)
     Internal.PublishLLMCommandResult(

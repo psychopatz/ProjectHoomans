@@ -7,6 +7,8 @@ local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
 local CompanionCommands = PNC.CompanionCommands
 local MapCommandService = PNC.MapCommandService
+local CommandIRBridge = PNC.Semantics and PNC.Semantics.CommandIRBridge
+    or require "PNC/Semantics/PNC_SemanticCommandIRBridge"
 
 local function isColonistActivityCommand(args)
     return tostring(args and args.commandSource or "")
@@ -20,6 +22,25 @@ Router.Register(Const.CMD_COMPANION_COMMAND, function(player, args)
     if CompanionCommands and CompanionCommands.Execute then
         local affected, reason, affectedTargets, details =
             CompanionCommands.Execute(player, args)
+        local src = tostring(args.commandSource or "")
+        if CommandIRBridge and type(CommandIRBridge.EmitCommandFeedback) == "function"
+            and src ~= "semantic_chat" and src ~= "llm_tool" and src ~= "companion_emote"
+        then
+            local feedbackTargets = (type(affectedTargets) == "table" and #affectedTargets > 0)
+                and affectedTargets or args.id
+            if feedbackTargets ~= nil then
+                CommandIRBridge.EmitCommandFeedback(
+                    player,
+                    args.commandID,
+                    feedbackTargets,
+                    (tonumber(affected) or 0) > 0 and "accepted" or "rejected",
+                    {
+                        source = src ~= "" and src or "network_command",
+                        isGroup = tostring(args.scope or "") == "group",
+                    }
+                )
+            end
+        end
         if sendServerCommand
             and (tostring(args.commandID) == "camp"
                 or tostring(args.commandSource or "") == "companion_emote"

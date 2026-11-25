@@ -418,7 +418,21 @@ end
 
 function Provider.GetRecoveryState(lease)
     if not Provider.CanContinue(lease) then return { terminal = true } end
-    return { lastProgressAt = tonumber(lease.lastProgressAt) or nowMs(), phase = tostring(lease.phase or "WORKING") }
+    local phase = tostring(lease.phase or "WORKING")
+    local snapshot = {
+        lastProgressAt = tonumber(lease.lastProgressAt) or nowMs(),
+        phase = phase,
+        watchable = true,
+        timeoutMs = 15000,
+        recoveryReason = "reaction_timeout",
+    }
+    local recovery = PNC.Tasking and PNC.Tasking.Commands
+    if phase == "TRAVEL" and recovery and recovery.ApplyMovementRecovery then
+        local record = PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(lease.npcId) or nil
+        snapshot = recovery.ApplyMovementRecovery(snapshot, lease, record)
+    end
+    return snapshot
 end
 
 function Provider.GetDiagnostics(npcId)

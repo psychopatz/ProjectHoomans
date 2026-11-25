@@ -13,6 +13,8 @@ local TokenFormatter = PNC.ConvoEngine.TokenFormatter
     or require "PNC/ConvoEngine/TokenFormatter"
 local Lexicon = PNC.ConvoEngine.Lexicon
     or require "PNC/ConvoEngine/Lexicon"
+local GrammarJoin = PNC.Semantics.GrammarJoin
+    or require "PNC/Semantics/PNC_SemanticGrammarJoin"
 
 local MAX_COOLDOWN_KEYS = 256
 local sr = nil
@@ -28,6 +30,9 @@ Transport.Finite = finite
 
 local function cleanText(v)
     if v == nil then return nil end
+    if GrammarJoin and type(GrammarJoin.CleanSurface) == "function" then
+        return GrammarJoin.CleanSurface(v)
+    end
     local s = tostring(v)
     s = string.gsub(s, "^%s+", "")
     s = string.gsub(s, "%s+$", "")

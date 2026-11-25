@@ -191,6 +191,13 @@ function Activities.OnControl(window, button)
         local inventory = PNC.InventoryWindow
         if inventory and type(inventory.Open) == "function" then
             inventory.Open(person.id)
+            local bridge = PNC.Semantics and PNC.Semantics.CommandIRBridge or nil
+            local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+            if bridge and type(bridge.EmitCommandFeedback) == "function" then
+                bridge.EmitCommandFeedback(player, "access_inventory", person.id, "accepted", {
+                    source = "colonist_activities",
+                })
+            end
             return true
         end
         return false

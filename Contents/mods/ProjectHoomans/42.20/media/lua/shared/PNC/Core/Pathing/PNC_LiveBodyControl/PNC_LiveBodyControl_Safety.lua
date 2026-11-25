@@ -223,8 +223,28 @@ function LiveBodyControl.SuppressZombieState(
         zombie:setVariable("ClimbWindowStarted", false)
         zombie:setVariable("ClimbWindowFinished", true)
         zombie:setVariable("ClimbWindowOutcome", "")
+    elseif actionState == "bumped" then
+        -- ActionContext exits bumped via zombie/bumped/to_idle.xml
+        -- (<isTrue>BumpAnimFinished</isTrue>) and immediately re-enters bumped
+        -- from idle/walktoward whenever getBumpType() is non-empty. Clear the
+        -- selector and assert both completion latches so the graph exits.
+        if zombie.setBumpType then zombie:setBumpType("") end
+        if zombie.setBumpDone then zombie:setBumpDone(true) end
+        if zombie.setVariable then
+            zombie:setVariable("BumpDone", true)
+            zombie:setVariable("BumpAnimFinished", true)
+        end
+        if zombie.reportEvent then
+            zombie:reportEvent("ActiveAnimFinishing")
+        end
     end
-    LiveBodyControl.SetManagedBodyUseless(zombie, true)
+    if actionState == "bumped" then
+        -- Keep the body useful for this settle tick so ActionContext evaluates
+        -- to_idle.xml before humanized useless mode is reapplied.
+        LiveBodyControl.SetManagedBodyUseless(zombie, false, true)
+    else
+        LiveBodyControl.SetManagedBodyUseless(zombie, true)
+    end
     if needsIdleReset
         and zombie.changeState
         and ZombieIdleState

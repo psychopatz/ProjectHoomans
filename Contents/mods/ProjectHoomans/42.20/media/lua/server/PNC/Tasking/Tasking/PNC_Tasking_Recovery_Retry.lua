@@ -45,6 +45,14 @@ local function retryOrQuarantine(lease, at, reason, failureEvent,
         emit(recoveredEvent, lease, {
             reason = reason, attempt = state.attempts,
         })
+        if PNC.Watchdog and PNC.Watchdog.Record then
+            PNC.Watchdog.Record(
+                "task:" .. tostring(lease and lease.sourceDomain or "unknown"),
+                lease and lease.npcId,
+                reason,
+                "recovered"
+            )
+        end
         return true, "RECOVERED"
     end
 
@@ -59,6 +67,14 @@ local function retryOrQuarantine(lease, at, reason, failureEvent,
             reason = reason, attempt = state.attempts,
             error = releaseReason or "TASK_CLEANUP_FAILED",
         })
+        if PNC.Watchdog and PNC.Watchdog.Record then
+            PNC.Watchdog.Record(
+                "task:" .. tostring(lease and lease.sourceDomain or "unknown"),
+                lease and lease.npcId,
+                reason,
+                "quarantined"
+            )
+        end
         return false, "QUARANTINED"
     end
     emit(failureEvent, lease, {

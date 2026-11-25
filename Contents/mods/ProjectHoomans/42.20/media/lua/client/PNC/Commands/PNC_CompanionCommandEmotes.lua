@@ -351,6 +351,15 @@ function ISEmoteRadialMenu:emote(emote)
                     socialContext
                 )
             end
+        else
+            local bridge = PNC.Semantics and PNC.Semantics.CommandIRBridge or nil
+            local p = self.character or (getSpecificPlayer and getSpecificPlayer(self.playerNum or 0)) or nil
+            if bridge and type(bridge.EmitEmoteFeedback) == "function" and p then
+                local emoteTargets = targets or (target and { target }) or nil
+                if emoteTargets then
+                    bridge.EmitEmoteFeedback(p, emote, emoteTargets, { source = "player_emote" })
+                end
+            end
         end
         return originalEmote(self, emote)
     end

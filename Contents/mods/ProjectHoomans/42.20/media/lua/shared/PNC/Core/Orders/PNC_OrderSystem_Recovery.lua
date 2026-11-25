@@ -82,8 +82,10 @@ local function attackRecoveryState(record, now)
     -- finishAt is the action owner's explicit deadline (reloads can be
     -- longer than ordinary melee clips). Use the generic cap only for a
     -- malformed action that never published a deadline.
-    stale = finishAt > 0 and now >= finishAt + 1000
-        or finishAt <= 0 and now - startedAt >= 10000
+    stale = PNC.Watchdog and PNC.Watchdog.IsDeadlineStale
+        and PNC.Watchdog.IsDeadlineStale(startedAt, finishAt, now, 1000, 10000)
+        or (finishAt > 0 and now >= finishAt + 1000
+            or finishAt <= 0 and now - startedAt >= 10000)
     return {
         action = true,
         watchable = stale,

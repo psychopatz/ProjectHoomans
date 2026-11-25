@@ -119,6 +119,14 @@ local function refreshProviderState(lease)
         )
         return nil
     end
+    if PNC.Watchdog and PNC.Watchdog.NormalizeTaskSnapshot then
+        snapshot = PNC.Watchdog.NormalizeTaskSnapshot(snapshot, lease)
+    elseif snapshot.invalid == true then
+        snapshot.watchable = true
+        snapshot.forceRecovery = true
+        snapshot.recoveryReason = snapshot.recoveryReason
+            or (tostring(lease and lease.sourceDomain or "task") .. "_state_invalid")
+    end
     if snapshot.lastProgressAt ~= nil then
         lease.lastProgressAt = snapshot.lastProgressAt
     end

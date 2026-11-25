@@ -1,0 +1,160 @@
+# Post-combat final-kill relief, worry, and applause beats.
+# Covers solo & group slayers (actor-agnostic: NPC or Player), threat type &
+# intensity (straggler, couple, horde, hostile_human, wounded_close_call),
+# and archetype flavor (companion, guard, trader, neutral, hostile).
+lang EN
+namespace hoomans
+
+flow semantic.combat.final_kill
+  # --- Solo NPC Slayer (Companion / Default) ---
+  say [role=solo_straggler, actor.social_style=warm|friendly|protective] (pri 8) as solo_straggler_warm:
+    "Alright, that's one less to worry about."
+  say [role=solo_straggler, actor.social_style=hostile|guarded|withdrawn] (pri 8) as solo_straggler_guarded:
+    "Down. Stay down."
+  say [role=solo_straggler] (pri 7) as solo_straggler_default:
+    "Just a straggler. Clear."
+
+  say [role=solo_couple, actor.social_style=warm|friendly|protective] (pri 8) as solo_couple_warm:
+    "Phew... couple of them, but they're all down now."
+  say [role=solo_couple, actor.social_style=hostile|guarded|withdrawn] (pri 8) as solo_couple_guarded:
+    "Two, three, doesn't matter. All dead."
+  say [role=solo_couple] (pri 7) as solo_couple_default:
+    "That's the last of the couple. Catching my breath."
+
+  say [role=solo_horde, actor.social_style=warm|friendly|protective] (pri 8) as solo_horde_warm:
+    "God... that whole pack almost had me. I'm still breathing."
+  say [role=solo_horde, actor.social_style=hostile|guarded|withdrawn] (pri 8) as solo_horde_guarded:
+    "Whole damn horde and I'm still standing. Come get some."
+  say [role=solo_horde] (pri 7) as solo_horde_default:
+    "Phew... that was a whole pack. Glad that's over."
+
+  say [role=solo_hostile_human, actor.social_style=warm|friendly|protective] (pri 8) as solo_human_warm:
+    "Damn it... I hate fighting the living. At least I'm still here."
+  say [role=solo_hostile_human, actor.social_style=hostile|guarded|withdrawn] (pri 8) as solo_human_guarded:
+    "Picked the wrong fight. Shouldn't have crossed me."
+  say [role=solo_hostile_human] (pri 7) as solo_human_default:
+    "Living ones are always worse than the dead. It's over."
+
+  say [role=solo_wounded_close_call, actor.social_style=warm|friendly|protective] (pri 8) as solo_wounded_warm:
+    "Phew... I'm hurt, that was way too close. Need to patch myself up."
+  say [role=solo_wounded_close_call, actor.social_style=hostile|guarded|withdrawn] (pri 8) as solo_wounded_guarded:
+    "Ugh, got clipped. At least they're all dead."
+  say [role=solo_wounded_close_call] (pri 7) as solo_wounded_default:
+    "Too close... I took a hit, but that's the last of them."
+
+  # --- Solo Archetype Variants (Guard, Trader, Hostile, Neutral) ---
+  say [role=solo_guard_wounded] (pri 8) as solo_guard_wounded:
+    "Perimeter's clear, though I took a hit. Need to dress this."
+  say [role=solo_guard_heavy] (pri 8) as solo_guard_heavy:
+    "Heavy contact neutralized. Area's clear - checking my gear."
+  say [role=solo_guard] (pri 7) as solo_guard_default:
+    "Hostile down. Sector's clear."
+
+  say [role=solo_trader_wounded] (pri 8) as solo_trader_wounded:
+    "Damn, that cost me some blood. At least I'm alive to trade another day."
+  say [role=solo_trader_heavy] (pri 8) as solo_trader_heavy:
+    "Way too much action for a merchant... glad the stock is still intact."
+  say [role=solo_trader] (pri 7) as solo_trader_default:
+    "Phew, bad for business, but I handled it."
+
+  say [role=solo_hostile_wounded] (pri 8) as solo_hostile_wounded:
+    "Tch, lucky bastards drew blood. Didn't save 'em."
+  say [role=solo_hostile_heavy] (pri 8) as solo_hostile_heavy:
+    "Hah! Dropped the whole lot of 'em. Still standing!"
+  say [role=solo_hostile] (pri 7) as solo_hostile_default:
+    "Easy pickings. Who's next?"
+
+  say [role=solo_neutral_wounded] (pri 8) as solo_neutral_wounded:
+    "God, I'm bleeding... my hands are shaking. At least it's over."
+  say [role=solo_neutral_heavy] (pri 8) as solo_neutral_heavy:
+    "How the hell did I survive that... I need a minute."
+  say [role=solo_neutral] (pri 7) as solo_neutral_default:
+    "Phew... thought I was done for there."
+
+  # --- Group / Ally Reactions Addressing the Slayer ({addressee.name}) ---
+  say [role=ally_applaud_straggler, actor.social_style=warm|friendly|protective] (pri 8) as ally_strag_warm:
+    "Clean work, {addressee.name}. All clear."
+  say [role=ally_applaud_straggler, actor.social_style=hostile|guarded|withdrawn] (pri 8) as ally_strag_guarded:
+    "Good. One less problem, {addressee.name}."
+  say [role=ally_applaud_straggler] (pri 7) as ally_strag_default:
+    "Nice finish, {addressee.name}. We're clear."
+
+  say [role=ally_applaud_couple, actor.social_style=warm|friendly|protective] (pri 8) as ally_couple_warm:
+    "Nice work wrapping those up, {addressee.name}! Glad we've got you."
+  say [role=ally_applaud_couple, actor.social_style=hostile|guarded|withdrawn] (pri 8) as ally_couple_guarded:
+    "Couple of them down. Solid finish, {addressee.name}."
+  say [role=ally_applaud_couple] (pri 7) as ally_couple_default:
+    "Good job dropping the last one, {addressee.name}. That's all of them."
+
+  say [role=ally_applaud_horde, actor.social_style=warm|friendly|protective] (pri 8) as ally_horde_warm:
+    "Phew! What a pack - you really came through on that last one, {addressee.name}!"
+  say [role=ally_applaud_horde, actor.social_style=hostile|guarded|withdrawn] (pri 8) as ally_horde_guarded:
+    "Hell of a horde. Good finish, {addressee.name} - thought we were buried."
+  say [role=ally_applaud_horde] (pri 7) as ally_horde_default:
+    "Whoa, that was a whole horde! Way to finish them off, {addressee.name}!"
+
+  say [role=ally_applaud_human, actor.social_style=warm|friendly|protective] (pri 8) as ally_human_warm:
+    "Thank god you dropped them, {addressee.name}... fighting people is terrifying."
+  say [role=ally_applaud_human, actor.social_style=hostile|guarded|withdrawn] (pri 8) as ally_human_guarded:
+    "Good riddance. Clean takedown, {addressee.name}."
+  say [role=ally_applaud_human] (pri 7) as ally_human_default:
+    "That was tense... nice work putting them down, {addressee.name}."
+
+  say [role=ally_wounded_relief, actor.social_style=warm|friendly|protective] (pri 8) as ally_wounded_warm:
+    "Phew, thank god that's the last of them, {addressee.name}! Someone check on {slot.injured.name}!"
+  say [role=ally_wounded_relief, actor.social_style=hostile|guarded|withdrawn] (pri 8) as ally_wounded_guarded:
+    "Too damn close, {addressee.name}. {slot.injured.name} took a hit - patch it up before more show."
+  say [role=ally_wounded_relief] (pri 7) as ally_wounded_default:
+    "Phew, that was way too close! Good finish, {addressee.name} - let's check {slot.injured.name}'s wounds."
+
+  # --- Group Archetype Flavors (Guard, Trader, Hostile, Neutral) ---
+  say [role=ally_guard_wounded] (pri 8) as ally_guard_wounded:
+    "Area's clear, good finish {addressee.name}. {slot.injured.name}'s hit - get a bandage on it!"
+  say [role=ally_guard_clear] (pri 8) as ally_guard_clear:
+    "Last hostile down. Solid work, {addressee.name} - perimeter's secure."
+
+  say [role=ally_trader_wounded] (pri 8) as ally_trader_wounded:
+    "Too close for comfort! Good job finishing it, {addressee.name} - let's tend to {slot.injured.name}."
+  say [role=ally_trader_relief] (pri 8) as ally_trader_relief:
+    "Phew! You earned your keep today, {addressee.name}. Glad the stock survived."
+
+  say [role=ally_hostile_bravado] (pri 8) as ally_hostile_bravado:
+    "Hah! Dropped the last one, {addressee.name}! That's how we do it!"
+
+  say [role=ally_neutral_wounded] (pri 8) as ally_neutral_wounded:
+    "Oh god... thanks for ending that, {addressee.name}. {slot.injured.name} is hurt!"
+  say [role=ally_neutral_relief] (pri 8) as ally_neutral_relief:
+    "Phew... my heart's pounding. Good thing you got that last one, {addressee.name}."
+
+  # --- Slayer Replies & Relief Chimes ---
+  say [role=slayer_reply_wounded, actor.social_style=warm|friendly|protective] (pri 8) as slayer_wounded_warm:
+    "Just glad we all made it out, {addressee.name}. Let's patch up and breathe."
+  say [role=slayer_reply_wounded] (pri 7) as slayer_wounded_default:
+    "Too close for my liking, {addressee.name}. Let's tend those wounds."
+
+  say [role=slayer_reply_heavy, actor.social_style=warm|friendly|protective] (pri 8) as slayer_heavy_warm:
+    "Couldn't have done it without you watching my back, {addressee.name}."
+  say [role=slayer_reply_heavy] (pri 7) as slayer_heavy_default:
+    "Phew... yeah, that took everything we had, {addressee.name}."
+
+  say [role=slayer_reply_guard] (pri 8) as slayer_reply_guard:
+    "Just doing my job, {addressee.name}. Stay sharp."
+  say [role=slayer_reply_hostile] (pri 8) as slayer_reply_hostile:
+    "Damn right. Nobody messes with us."
+
+  say [role=slayer_reply, actor.social_style=warm|friendly|protective] (pri 8) as slayer_reply_warm:
+    "Thanks, {addressee.name}. Just glad everyone's alright."
+  say [role=slayer_reply, actor.social_style=hostile|guarded|withdrawn] (pri 8) as slayer_reply_guarded:
+    "Yeah, yeah. Keep moving."
+  say [role=slayer_reply] (pri 7) as slayer_reply_default:
+    "Appreciate it, {addressee.name}. All clear now."
+
+  say [role=ally_relief_wounded_chime] (pri 8) as chime_wounded:
+    "Phew... thought we were goners. Let's get everyone patched up."
+  say [role=ally_relief_chime, actor.social_style=warm|friendly|protective] (pri 8) as chime_warm:
+    "Phew... that was a close one. Glad we've got each other."
+  say [role=ally_relief_chime] (pri 7) as chime_default:
+    "Phew, that was too close. Catching my breath."
+
+  say [default] (pri 5) as default:
+    "Phew... looks like that's the last of them."

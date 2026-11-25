@@ -97,7 +97,16 @@ function OrderSystem.RecoverStalled(record, zombie, now)
     if snapshot.forceRecovery ~= true and now - progressAt < timeoutMs then
         return false
     end
-    return recoverDirectOrder(record, zombie, now, snapshot)
+    local recovered = recoverDirectOrder(record, zombie, now, snapshot)
+    if recovered and PNC.Watchdog and PNC.Watchdog.Record then
+        PNC.Watchdog.Record(
+            "order",
+            record and record.id,
+            snapshot.recoveryReason or "order_progress_timeout",
+            "recovered"
+        )
+    end
+    return recovered
 end
 
 function OrderSystem.SetHostility(record, modeSpec)

@@ -222,15 +222,16 @@ local function beginTreatment(lease, task, record, body, patient, patientBody, n
         })
     end
     local modData = body and body.getModData and body:getModData() or nil
-    local animationKey = tostring(task.id) .. ":" .. tostring(partId)
+    local soundKey = tostring(task.id) .. ":" .. tostring(partId)
         .. ":" .. tostring(state.startedAt)
+    local animationKey = "medical:" .. soundKey
     if modData then
         modData.PNC_ClientMedicalCareAnimKey = animationKey
     end
     local emitter = body and body.getEmitter and body:getEmitter() or nil
     if emitter and emitter.playSound then
         emitter:playSound("FirstAidApplyBandage")
-        if modData then modData.PNC_ClientMedicalCareSoundKey = animationKey end
+        if modData then modData.PNC_ClientMedicalCareSoundKey = soundKey end
     end
     record.runtime.forceSyncEvent = "medical_care_treating"
     Service.SetPhase(task.id, Status.TREATING, { actorId = lease.npcId })
