@@ -1041,30 +1041,30 @@ do
             {
                 id = "j-shaken",
                 opts = { attackType = "auto", social = { personality = { bravery = 0.15 } }, conditionStats = { panic = 75 } },
-                style = "shaken", engTpl = "combat.callout.reply_engage.engaging_shaken",
-                altTpl = "combat.callout.reply_engage.engaging_shaken", wingTpl = "combat.callout.reply_wingman.shaken",
+                style = "shaken", engTpl = "hoomans.combat.ally_warn.reply.engaging.engaging_shaken",
+                altTpl = "hoomans.combat.ally_warn.reply.alerted.engaging_shaken", wingTpl = "hoomans.combat.ally_warn.reply.engaging.wingman_shaken",
             },
             {
                 id = "j-brave",
                 opts = { attackType = "auto", social = { personality = { bravery = 0.90 } } },
-                style = "brave", engTpl = "combat.callout.reply_engage.engaging_brave",
-                wingTpl = "combat.callout.reply_wingman.brave",
+                style = "brave", engTpl = "hoomans.combat.ally_warn.reply.engaging.engaging_brave",
+                wingTpl = "hoomans.combat.ally_warn.reply.engaging.wingman_brave",
             },
             {
                 id = "j-agg",
                 opts = { attackType = "auto", social = { personality = { aggression = 0.85 } } },
-                style = "aggressive", engTpl = "combat.callout.reply_engage.engaging_aggressive",
-                wingTpl = "combat.callout.reply_wingman.aggressive",
+                style = "aggressive", engTpl = "hoomans.combat.ally_warn.reply.engaging.engaging_aggressive",
+                wingTpl = "hoomans.combat.ally_warn.reply.engaging.wingman_aggressive",
             },
             {
                 id = "j-exh",
                 opts = { attackType = "auto", conditionStats = { fatigue = 0.85, bleeding = true } },
-                style = "exhausted", engTpl = "combat.callout.reply_engage.engaging_exhausted",
+                style = "exhausted", engTpl = "hoomans.combat.ally_warn.reply.engaging.engaging_exhausted",
             },
             {
                 id = "j-sup",
                 opts = { attackType = "auto", social = { personality = { compassion = 0.88 } } },
-                style = "supportive", engTpl = "combat.callout.reply_engage.engaging_supportive",
+                style = "supportive", engTpl = "hoomans.combat.ally_warn.reply.engaging.engaging_supportive",
             },
         }
         local callerStub = { id = "j-caller", name = "Sammie" }

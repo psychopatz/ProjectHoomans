@@ -147,6 +147,13 @@ end
 function Skills.GetLevel(record, skillID)
     skillID = Curves.NormalizeSkillID(skillID)
     if type(record) ~= "table" or not skillID then return 0 end
+    if record.progression ~= nil and (
+        type(record.progression) ~= "table"
+        or (record.progression.skillXP ~= nil and type(record.progression.skillXP) ~= "table")
+        or (record.progression.skillLevelDeltas ~= nil and type(record.progression.skillLevelDeltas) ~= "table")
+    ) then
+        ensureProgress(record)
+    end
     local progression = type(record.progression) == "table"
         and record.progression or nil
     local deltas = progression and type(progression.skillLevelDeltas) == "table"

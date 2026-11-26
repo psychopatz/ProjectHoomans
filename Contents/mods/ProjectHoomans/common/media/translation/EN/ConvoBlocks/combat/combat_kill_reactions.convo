@@ -1,0 +1,175 @@
+# Subject: ZOMBIE & HOSTILE HUMAN KILL REACTIONS.
+# Authoritative ConvoDSL pools for Reaction_Pools.PoolFor kill events.
+language EN
+namespace hoomans
+
+blueprint offer.combat_kill_nudges
+  choice combat.kill.what_happened:
+    label: "What happened?"
+    say: "What happened?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_WHAT_HAPPENED
+  choice combat.kill.how_many:
+    label: "How many left?"
+    say: "How many left?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_QUANTITY
+  choice combat.kill.are_you_ok:
+    label: "You okay?"
+    say: "Are you okay?"
+    utility: openness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_HEALTH
+  choice combat.kill.whats_next:
+    label: "What's next?"
+    say: "What's the plan?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_NEXT
+
+# --- Zombie kill (witness) ---
+
+dialogue semantic.combat.kill.witness.aggressive
+  use offer.combat_kill_nudges
+  say [default] as default:
+    "Nice hit! Drop the next one!"
+    "That's how you put 'em down!"
+
+dialogue semantic.combat.kill.witness.supportive
+  use offer.combat_kill_nudges
+  say [default] as default:
+    "Good shot! I've still got your back."
+    "Nice work—stay steady, I'm right with you."
+
+dialogue semantic.combat.kill.witness.shaken
+  use offer.combat_kill_nudges
+  say [default] as default:
+    "God, that was too close... is it down?"
+    "Whew... thank god you got it in time."
+
+dialogue semantic.combat.kill.witness.brave
+  use offer.combat_kill_nudges
+  say [default] as default:
+    "Clean takedown! Keep pushing!"
+    "One less to worry about—keep moving!"
+
+dialogue semantic.combat.kill.witness.reserved
+  use offer.combat_kill_nudges
+  say [default] as default:
+    "Target down. Watch the flank."
+    "Got it. Keep scanning."
+
+dialogue semantic.combat.kill.witness.cold
+  use offer.combat_kill_nudges
+  say [default] as default:
+    "Dead. Next."
+    "Down. Don't waste time."
+
+dialogue semantic.combat.kill.witness.practical
+  use offer.combat_kill_nudges
+  say [default] as default:
+    "That's one down. Check your corners."
+    "Clear on that one. Stay sharp."
+
+# --- Zombie kill (killer) ---
+
+dialogue semantic.combat.kill.killer.aggressive
+  use offer.combat_kill_nudges
+  say [combat.weapon_family=long_blunt|short_blunt] as blunt:
+    "Cracked its skull right open!"
+  say [combat.weapon_family=long_blade|short_blade|axe] as blade:
+    "Sliced clean through it!"
+  say [combat.weapon_family=firearm] as firearm:
+    "Dropped it right where it stood!"
+  say [default] as default:
+    "Stay down, you rotter!"
+    "Yeah! Who's next?!"
+
+dialogue semantic.combat.kill.killer.supportive
+  use offer.combat_kill_nudges
+  say [combat.weapon_family=long_blunt|short_blunt] as blunt:
+    "Got it with the swing—you alright?"
+  say [default] as default:
+    "Got that one off you—stay close!"
+    "It's down, we're okay."
+
+dialogue semantic.combat.kill.killer.shaken
+  use offer.combat_kill_nudges
+  say [default] as default:
+    "I got it... god, my hands are shaking."
+    "It's down... please tell me that's all of them."
+
+dialogue semantic.combat.kill.killer.brave
+  use offer.combat_kill_nudges
+  say [combat.weapon_family=long_blunt|short_blunt] as blunt:
+    "Solid swing—that one's not getting back up!"
+  say [default] as default:
+    "Took it down! Keep the line!"
+    "One more down—we've got this!"
+
+dialogue semantic.combat.kill.killer.reserved
+  use offer.combat_kill_nudges
+  say [default] as default:
+    "Down. Moving on."
+    "Handled. Keep watching."
+
+dialogue semantic.combat.kill.killer.cold
+  use offer.combat_kill_nudges
+  say [default] as default:
+    "Done. Next target."
+    "Finished it."
+
+dialogue semantic.combat.kill.killer.practical
+  use offer.combat_kill_nudges
+  say [combat.weapon_family=long_blunt|short_blunt] as blunt:
+    "Good solid hit. That one's down."
+  say [combat.weapon_family=long_blade|short_blade|axe] as blade:
+    "Clean cut. One less."
+  say [combat.weapon_family=firearm] as firearm:
+    "Shot landed. Watch your ammo."
+  say [default] as default:
+    "Got it. Keep checking the perimeter."
+    "Down. Let's keep moving."
+
+# --- Hostile human kill (self) ---
+
+dialogue semantic.combat.human_kill.aggressive
+  use offer.combat_kill_nudges
+  say [default] as line_01:
+    "They picked the wrong fight!"
+
+dialogue semantic.combat.human_kill.supportive
+  use offer.combat_kill_nudges
+  say [default] as line_01:
+    "Had to protect us... are you hurt?"
+
+dialogue semantic.combat.human_kill.shaken
+  use offer.combat_kill_nudges
+  say [default] as line_01:
+    "I didn't have a choice... they were going to kill us."
+
+dialogue semantic.combat.human_kill.brave
+  use offer.combat_kill_nudges
+  say [default] as line_01:
+    "Hostile down! Stay ready for the rest of them!"
+
+dialogue semantic.combat.human_kill.reserved
+  use offer.combat_kill_nudges
+  say [default] as line_01:
+    "Threat neutralized."
+
+dialogue semantic.combat.human_kill.cold
+  use offer.combat_kill_nudges
+  say [default] as line_01:
+    "One less raider breathing."
+
+dialogue semantic.combat.human_kill.practical
+  use offer.combat_kill_nudges
+  say [default] as line_01:
+    "Hostile's down. Check for any more."

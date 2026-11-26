@@ -78,8 +78,10 @@ function Internal.SleepDirection(order)
         directionName = tostring(order and order.interactionFacing or "")
     end
     if directionName == "" then
-        local axis = tostring(order and (order.sleepAxis or order.interactionAxis)
-            or "")
+        local axis = tostring(order and order.sleepAxis or "")
+        if axis == "" then
+            axis = tostring(order and order.interactionAxis or "")
+        end
         if axis == "x" then directionName = "E"
         elseif axis == "y" then directionName = "S" end
     end

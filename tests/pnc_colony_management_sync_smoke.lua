@@ -56,6 +56,12 @@ PNC = {
 Events = { OnTick = {
     Add = function(callback) tickCallback = callback end,
 } }
+PNC.Server = PNC.Server or {}
+PNC.Server.TickRegistry = {
+    Register = function(_, spec)
+        tickCallback = type(spec) == "table" and spec.pump or nil
+    end,
+}
 isServer = function() return false end
 getSpecificPlayer = function() return player end
 

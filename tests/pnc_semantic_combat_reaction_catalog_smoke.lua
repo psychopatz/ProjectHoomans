@@ -71,9 +71,9 @@ for _, role in ipairs({ "witness", "killer" }) do
         local repeated = resolve(role, style, eventID)
         T.truthy(
             string.find(first.realizationID,
-                "kill_" .. role .. "_" .. style .. "_", 1, true)
+                "semantic.combat.kill." .. role .. "." .. style, 1, true)
             and string.find(repeated.realizationID,
-                "kill_" .. role .. "_" .. style .. "_", 1, true),
+                "semantic.combat.kill." .. role .. "." .. style, 1, true),
             role .. "/" .. style .. " stays in one semantic family"
         )
         firstTextByStyle[role .. ":" .. style] = first.fallback

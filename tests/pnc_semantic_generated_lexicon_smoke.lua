@@ -249,7 +249,7 @@ T.equal(routed.ir.target.id, "npc:sarah",
 T.equal(routed.ir.target.unresolved, false,
     "known target remains resolved")
 
-local unsupportedFrom = Parser.Parse("Take the rifle from the locker.")
+local unsupportedFrom = Parser.Parse("Take the rifle from the locker.", { enableVerbFrames = false })
 T.equal(unsupportedFrom.source, nil,
     "lexical expansion does not invent a general FROM relation")
 T.truthy(Catalog.registered, "generated and authored concepts register together")

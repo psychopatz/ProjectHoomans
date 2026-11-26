@@ -22,6 +22,13 @@ Events = { OnInitGlobalModData = event(), OnGameStart = event(),
 package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
     return {}
 end
+package.preload["PNC/Server/Server/PNC_Server_TickRegistry"] = function()
+    return {
+        Register = function(_, spec)
+            tickCallback = type(spec) == "table" and spec.pump or nil
+        end,
+    }
+end
 
 local function list(items)
     return {

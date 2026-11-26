@@ -106,7 +106,7 @@ local recipientContraction = Parser.Parse("you're an idiot")
 T.equal(recipientContraction.intent, "INSULT",
     "contracted second-person insult is recognized")
 T.equal(recipientContraction.diagnostics.matchedPattern,
-    "pnc.social.insult_youre",
+    "pnc.social.insult_you_are",
     "contracted insult uses its explicit grammar")
 
 local malformedSelfPrefix = Parser.Parse("I idiot")
@@ -249,7 +249,7 @@ local withdrawn = Policy.Decide(insult, state, {
         social = { style = "withdrawn" },
     },
 })
-T.equal(withdrawn.response.templateID, "social.hostile_withdrawn",
+T.equal(withdrawn.response.templateID, "hoomans.hostile_remark.withdrawn",
     "hostile response can use NPC social style")
 
 local selfReflection = Policy.Decide(selfMockery, state, {
@@ -261,7 +261,7 @@ local selfReflection = Policy.Decide(selfMockery, state, {
 T.equal(selfReflection.branch, "SELF_REFLECTION_RECEIVED",
     "self-mockery selects a dedicated reflection response branch")
 T.equal(selfReflection.response.templateID,
-    "semantic.social.self_reflection.friendly",
+    "hoomans.self_reflection.friendly",
     "friendly standing produces a supportive self-reflection response")
 
 local withdrawnReflection = Policy.Decide(selfMockery, state, {
@@ -271,7 +271,7 @@ local withdrawnReflection = Policy.Decide(selfMockery, state, {
     socialStyle = "withdrawn",
 })
 T.equal(withdrawnReflection.response.templateID,
-    "semantic.social.self_reflection.withdrawn",
+    "hoomans.self_reflection.withdrawn",
     "withdrawn social style produces a distinct self-reflection response")
 
 local identityDecision = Policy.Decide(identityClaim, state, {
@@ -299,7 +299,7 @@ T.equal(identityQuestionDecision.branch, "QUESTION_RECEIVED",
     "identity question remains a question while starting the exchange")
 local identityQuestionText = identityQuestionDecision.response.fallback or ""
 T.equal(identityQuestionDecision.response.templateID,
-    "question.identity.known",
+    "hoomans.question.repeat_known.repeat_identity",
     "known identity uses the production known-identity response")
 T.truthy(string.find(identityQuestionText, "Mara", 1, true),
     "known identity response names the NPC")

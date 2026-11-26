@@ -89,7 +89,7 @@ PNC = {
     MapCommands = {
         HandleResult = function(args) mapResult = args end,
     },
-    FactionTollUI = {
+    FactionTollConversation = {
         HandleServerMessage = function(args)
             tollMessage = args
         end,

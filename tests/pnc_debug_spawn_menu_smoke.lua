@@ -48,18 +48,22 @@ T.equal(PNC.DebugSpawnMenu.Add(context, square), nil,
 debugAuthorized = true
 local root = PNC.DebugSpawnMenu.Add(context, square)
 T.equal(context.options[1].name, "[Debug] Spawn Hoomans", "spawn root")
-T.equal(#root.options, 3, "faction submenu count")
-T.equal(root.options[1].name, "Companion", "companion submenu")
-T.equal(root.options[2].name, "Neutral", "neutral submenu")
-T.equal(root.options[3].name, "Hostile", "hostile submenu")
+T.equal(#root.options, 2, "spawn mode submenu count (Single/Group)")
+T.equal(root.options[1].name, "Single", "single submenu")
+T.equal(root.options[2].name, "Group", "group submenu")
+local singleMenu = root.options[1].submenu
+T.equal(#singleMenu.options, 3, "faction submenu count")
+T.equal(singleMenu.options[1].name, "Companion", "companion submenu")
+T.equal(singleMenu.options[2].name, "Neutral", "neutral submenu")
+T.equal(singleMenu.options[3].name, "Hostile", "hostile submenu")
 
 local function choose(factionIndex, equipmentIndex)
-    local option = root.options[factionIndex].submenu.options[equipmentIndex]
+    local option = singleMenu.options[factionIndex].submenu.options[equipmentIndex]
     option.callback(option.target, table.unpack(option.params))
 end
 
 for factionIndex = 1, 3 do
-    T.equal(#root.options[factionIndex].submenu.options, 4,
+    T.equal(#singleMenu.options[factionIndex].submenu.options, 4,
         "equipment choices for faction " .. tostring(factionIndex))
 end
 

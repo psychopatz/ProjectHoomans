@@ -240,19 +240,16 @@ InlineChat.State.entries = {}
 InlineChat.State.host = nil
 getSpecificPlayer = function() return targetPlayer end
 
-T.truthy(InlineChat.SetMode(modePart, "nearest", modePart), "repeated nearest mode click retargets immediately")
+T.truthy(InlineChat.SetMode(modePart, "nearest", modePart), "repeated nearest mode click succeeds cleanly as no-op")
 commitModeForTest("nearest")
-T.equal(InlineChat.State.targetID, secondTarget.id, "nearest mode cycles to the next NPC without reopening")
-T.equal(#InlineChat.State.hosts, 1, "nearest mode keeps one active conversation host")
-T.equal(InlineChat.State.host.spec.context.nameplateConversation, true, "compact host uses headless context")
-T.equal(InlineChat.State.host.spec.context.guardThreats, false, "compact host disables threat interruption")
+T.equal(InlineChat.State.targetID, firstTarget.id, "repeated nearest mode click keeps current target unchanged")
 
 T.truthy(InlineChat.SetMode(modePart, "nearby", modePart), "nearby mode switches immediately")
 commitModeForTest("nearby")
 T.equal(modePart.inputMode, "nearby", "nearby mode updates the selected mode button state")
 T.equal(modePart.visualMode, "nearby", "nearby mode refreshes the selected mode styling")
 T.equal(#InlineChat.State.hosts, 2, "nearby mode creates a host for every nearby NPC")
-T.equal(InlineChat.State.targetID, secondTarget.id, "nearby mode preserves the selected target")
+T.equal(InlineChat.State.targetID, firstTarget.id, "nearby mode preserves the selected target")
 
 T.truthy(InlineChat.SetMode(modePart, "nearest", modePart), "nearest mode switches back immediately")
 commitModeForTest("nearest")

@@ -151,15 +151,15 @@ PNC.Inventory = {
         return true
     end,
     AddItems = function(rec, specs)
-        local added = {}
+        local ids = {}
         for i = 1, #specs do
             nextItemSeq = nextItemSeq + 1
             local id = "borrowed_" .. tostring(nextItemSeq)
             local item = { id = id, type = specs[i].type, wornSlot = nil }
             rec._inv.items[id] = item
-            added[#added + 1] = item
+            ids[#ids + 1] = id
         end
-        return true, added
+        return true, nil, ids
     end,
     RemoveItems = function(rec, ids)
         for i = 1, #ids do rec._inv.items[ids[i]] = nil end

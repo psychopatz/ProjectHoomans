@@ -112,7 +112,7 @@ local witness = resolve(
 )
 T.truthy(string.find(
     witness.realizationID,
-    "semantic.combat.reaction.kill_witness_practical_",
+    "semantic.combat.kill.witness.practical",
     1,
     true
 ), "witnessed kill selects the practical witness reaction family")

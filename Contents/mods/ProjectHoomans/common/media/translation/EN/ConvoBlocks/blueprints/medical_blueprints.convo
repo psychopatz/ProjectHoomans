@@ -15,6 +15,7 @@ blueprint offer.medical_distress_nudges
     utility: directness
     intent: QUESTION
     subject: CONTEXT_REFERENCE
+    reference: EVENT_ATTACKER
   choice medical.what_need:
     label: "What do you need?"
     say: "What do you need?"

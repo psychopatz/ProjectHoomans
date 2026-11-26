@@ -42,6 +42,13 @@ function Pack.Register(core)
         },
         patterns = {
             {
+                id = "hoomans.pattern.follow",
+                intent = "COMMAND",
+                priority = 15,
+                match = { { literal = "follow" }, { literal = "me" } },
+                emit = { intent = "COMMAND", speechAct = "COMMAND", action = "FOLLOW" },
+            },
+            {
                 id = "hoomans.pattern.recruit",
                 intent = "RECRUIT",
                 priority = 10,

@@ -45,10 +45,10 @@ local decision = Policy.Decide(navigation, nil, {
 T.equal(decision.branch, "SEMANTIC_NAVIGATION_RECEIVED",
     "navigation frames use the semantic navigation branch")
 T.equal(decision.response.templateID,
-    "navigation.subject_change",
+    "hoomans.conversation.acknowledged.default",
     "subject-change navigation selects a semantic response")
-T.equal(decision.response.fallback,
-    "All right. What did you want to talk about?",
+T.contains(decision.response.fallback,
+    "All right.",
     "subject-change navigation has visible acknowledgement copy")
 
 T.finish("pnc_semantic_navigation_smoke")

@@ -154,7 +154,8 @@ function Internal.RegisterLocationQuestions()
     registerPattern(
         "pnc.question.community_role_whereabouts.the_trader",
         {
-            { kind = "literal", value = "where's" },
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "is" },
             { kind = "literal", value = "the" },
             { kind = "literal", value = "trader" },
         },

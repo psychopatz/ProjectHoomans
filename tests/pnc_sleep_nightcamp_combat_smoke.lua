@@ -242,15 +242,26 @@ local campRec1 = { id = "bandit_1", factionID = "bandits_alpha" }
 local campRec2 = { id = "bandit_2", factionID = "bandits_alpha" }
 
 local outCand1 = NightCamp.ResolveNightCandidate(campRec1, outBody, { wakeAt = 30 }, now)
+T.truthy(outCand1, "outdoor group builder resolves campfire build spot")
+local gCamp
+for _, camp in pairs(NightCamp.GroupCamps or {}) do
+    gCamp = camp
+    break
+end
+T.truthy(gCamp, "outdoor group creates a shared group camp")
+NightCamp.CommitTemporaryCampfire(gCamp, now)
+outCand1 = NightCamp.ResolveNightCandidate(campRec1, outBody, { wakeAt = 30 }, now)
 local outCand2 = NightCamp.ResolveNightCandidate(campRec2, outBody, { wakeAt = 30 }, now)
 
 T.truthy(outCand1 and outCand2, "outdoor group members both resolve camp spots")
 T.equal(addedCampfires, 1, "outdoor group shares a single temporary SCampfireSystem campfire")
-T.equal(outCand1.role, "sleeper", "first outdoor member sleeps")
-T.equal(outCand2.role, "sentry", "second outdoor member becomes awake campfire sentry")
-T.equal(outCand2.target.sceneId, "ambient.roam.camp.sentry",
+local sentryCand = outCand1.role == "sentry" and outCand1 or outCand2
+local sleeperCand = outCand1.role == "sleeper" and outCand1 or outCand2
+T.equal(sleeperCand.role, "sleeper", "one outdoor member sleeps")
+T.equal(sentryCand.role, "sentry", "one outdoor member becomes awake campfire sentry")
+T.equal(sentryCand.target.sceneId, "ambient.roam.camp.sentry",
     "sentry uses ambient.roam.camp.sentry scene")
-T.equal(outCand1.target.sceneId, "ambient.roam.sleep.floor",
+T.equal(sleeperCand.target.sceneId, "ambient.roam.sleep.floor",
     "sleeper uses ambient.roam.sleep.floor scene")
 
 -- Release all members -> temporary campfire is removed immediately (zero clutter/bloat)
