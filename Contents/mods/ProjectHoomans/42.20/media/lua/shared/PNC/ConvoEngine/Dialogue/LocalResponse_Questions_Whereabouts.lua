@@ -122,7 +122,15 @@ local function resolveCommunityRoleWhereabouts(ir, state, context)
         state = phase,
         factStatus = fact and fact.status or "unknown",
     })
-    return response or fallbackResponse(role, fact, value, context)
+    if response then
+        response.dialogueAct = response.dialogueAct or "FACT_ANSWER"
+        response.topic = response.topic or "COMMUNITY_ROLE_WHEREABOUTS"
+        response.groundedFactRefs = response.groundedFactRefs
+            or { "community.excursion.role_whereabouts" }
+        response.selectionSource = response.selectionSource or "fact_provider"
+        return response
+    end
+    return fallbackResponse(role, fact, value, context)
 end
 
 local function resolveCurrentLocation(ir, state, context)

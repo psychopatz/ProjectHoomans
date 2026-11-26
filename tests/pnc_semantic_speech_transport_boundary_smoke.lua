@@ -307,7 +307,7 @@ local tvObj = {
 }
 deviceTextHandlers[1]("guid-tv-1", "show", 11, 10, 0, "Welcome to Woodcraft!", tvObj)
 T.equal(#deliveredBarks, 5, "1d. television beat delivered")
-assertNonCombatBark(deliveredBarks[5], "television", "world", "television")
+assertNonCombatBark(deliveredBarks[5], "skill_show", "world", "television")
 
 -- Direct domain-neutral social delivery with tts=false
 nowMs = nowMs + 5000

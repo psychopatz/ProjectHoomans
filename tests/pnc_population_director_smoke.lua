@@ -193,6 +193,84 @@ function PNC.CommunityDirector.GenerateForFaction(factionID, spec)
         createdCount = spec.groupSize }
 end
 
+PNC.CoreSurvivorWorldAdapter = {
+    CanCommitGeneratedPlans = function() return true end,
+    CommitGeneratedCommunityPlan = function(plan)
+        local okF, _, fac = PNC.Factions.Create({
+            id = plan.factionID,
+            name = plan.factionName or plan.communityName or "Settlers",
+            archetypeID = plan.factionArchetypeID or "settler",
+            tags = { settlement = true, populationGenerated = true },
+        })
+        if not okF or not fac then return nil, "faction_failed" end
+        local gen = {
+            source = plan.source,
+            generationID = plan.generationID,
+            sectorID = plan.sectorID,
+            seed = plan.seed,
+        }
+        local loc = PNC.AbstractLocations.Get(plan.locationID)
+        local siteID = plan.siteID
+            or (loc and (loc.siteID or loc.sourceSiteID or (loc.site and loc.site.id)))
+            or string.gsub(tostring(plan.locationID or ""), "^aloc_", "")
+        local okC, reason, res = PNC.CommunityDirector.GenerateForFaction(fac.id, {
+            communityID = plan.communityID,
+            groupSize = #(plan.memberActorIDs or {}) > 0 and #plan.memberActorIDs
+                or (tonumber(plan.initialPopulation) or 4),
+            actorIDs = plan.memberActorIDs,
+            siteSpec = plan.siteSpec or plan.site or {
+                id = siteID,
+                home = plan.home or (loc and { x = loc.x, y = loc.y, z = loc.z or 0 })
+                    or { x = 0, y = 0, z = 0 },
+            },
+            generation = gen,
+            presenceMode = "auto",
+            allowLive = true,
+        })
+        if not okC then return nil, reason or "community_failed" end
+        if communities[res.communityID] then
+            communities[res.communityID].generation = PNC.Core.DeepCopy(gen)
+        end
+        return PNC.Communities.Get(res.communityID), "committed"
+    end,
+    CommitGeneratedGroupPlan = function(plan)
+        local okF, _, fac = PNC.Factions.Create({
+            id = plan.factionID,
+            name = plan.factionName or "Roamers",
+            archetypeID = plan.factionArchetypeID or "refugee",
+            tags = { mobileGroup = true, populationGenerated = true },
+        })
+        if not okF or not fac then return nil, "faction_failed" end
+        local loc = PNC.AbstractLocations.Get(plan.locationID)
+        local home = plan.home or (loc and { x = loc.x, y = loc.y, z = loc.z or 0 })
+            or { x = 0, y = 0, z = 0 }
+        local groupSize = #(plan.memberActorIDs or {}) > 0 and #plan.memberActorIDs
+            or (tonumber(plan.memberCount) or 3)
+        local gen = {
+            source = plan.source,
+            generationID = plan.generationID,
+            sectorID = plan.sectorID,
+            seed = plan.seed,
+        }
+        local okM, reason = PNC.MobileGroupDirector.GenerateForFaction(fac.id, {
+            groupSize = groupSize,
+            actorIDs = plan.memberActorIDs,
+            siteSpec = { id = plan.locationID, home = home },
+            generation = gen,
+            presenceMode = "auto",
+            allowLive = true,
+        })
+        if not okM then return nil, reason or "group_failed" end
+        local grp = PNC.AbstractGroups.ImportMobileFaction(fac.id, {
+            groupID = plan.groupID,
+            groupType = plan.groupType,
+            locationID = plan.locationID,
+        })
+        if not grp then return nil, "group_import_failed" end
+        grp.generation = PNC.Core.DeepCopy(gen)
+        return grp, "committed"
+    end,
+}
 PNC.API = { Despawn = function(id) PNC.Registry.Data[id] = nil return true end }
 T.load(POP .. "PNC_GroupGenerator.lua")
 T.load(POP .. "PNC_SettlementGenerator.lua")

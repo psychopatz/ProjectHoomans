@@ -81,10 +81,15 @@ dialogue semantic.combat.kill.witness.practical
 
 dialogue semantic.combat.kill.killer.aggressive
   use offer.combat_kill_nudges
+  say [combat.weapon_family=long_blade|short_blade|axe, combat.hit_zone=head_neck] as blade_head_01:
+    "Right through the skull! That's one way to shut it up!"
   say [combat.weapon_family=long_blunt|short_blunt] as blunt:
     "Cracked its skull right open!"
   say [combat.weapon_family=long_blade|short_blade|axe] as blade:
     "Sliced clean through it!"
+  say [combat.weapon_family=firearm, combat.skill_band=high, combat.weapon_named=true] as firearm_high_named_01:
+    "Dropped it cold—this piece doesn't miss!"
+    "Right on the mark—still got the touch!"
   say [combat.weapon_family=firearm] as firearm:
     "Dropped it right where it stood!"
   say [default] as default:
@@ -101,12 +106,16 @@ dialogue semantic.combat.kill.killer.supportive
 
 dialogue semantic.combat.kill.killer.shaken
   use offer.combat_kill_nudges
+  say [combat.weapon_family=firearm, combat.skill_band=low] as firearm_low_01:
+    "I—I actually hit it! Thank god that landed!"
   say [default] as default:
     "I got it... god, my hands are shaking."
     "It's down... please tell me that's all of them."
 
 dialogue semantic.combat.kill.killer.brave
   use offer.combat_kill_nudges
+  say [combat.weapon_family=firearm, combat.skill_band=high] as firearm_high_01:
+    "Clean shot—right where I aimed!"
   say [combat.weapon_family=long_blunt|short_blunt] as blunt:
     "Solid swing—that one's not getting back up!"
   say [default] as default:
@@ -127,10 +136,15 @@ dialogue semantic.combat.kill.killer.cold
 
 dialogue semantic.combat.kill.killer.practical
   use offer.combat_kill_nudges
+  say [combat.weapon_family=unarmed] as unarmed_01:
+    "Bare hands got it done. Keep moving."
   say [combat.weapon_family=long_blunt|short_blunt] as blunt:
     "Good solid hit. That one's down."
   say [combat.weapon_family=long_blade|short_blade|axe] as blade:
     "Clean cut. One less."
+  say [combat.weapon_family=firearm, combat.skill_band=high, combat.weapon_named=true] as firearm_high_named_01:
+    "Dropped it cold—this piece doesn't miss!"
+    "Right on the mark—still got the touch!"
   say [combat.weapon_family=firearm] as firearm:
     "Shot landed. Watch your ammo."
   say [default] as default:

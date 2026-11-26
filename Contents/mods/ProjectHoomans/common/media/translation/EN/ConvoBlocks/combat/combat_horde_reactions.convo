@@ -30,7 +30,31 @@ dialogue semantic.combat.horde.prompt
   say [default] as default:
     "That's a lot of them. We fighting or going around?"
 
+blueprint offer.combat_horde_nudges
+  choice combat.horde.what_happened:
+    label: "What's out there?"
+    say: "What's out there?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_WHAT_HAPPENED
+  choice combat.horde.how_many:
+    label: "How many?"
+    say: "How many are there?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_QUANTITY
+  choice semantic.followup.event.location:
+    label: "Where are they?"
+    say: "Where are they coming from?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_LOCATION
+
 dialogue semantic.combat.horde
+  use offer.combat_horde_nudges
   say [event.horde_phase=escalated] as escalated:
     "More are piling in. This is getting bad."
   say [event.horde_phase=deescalated] as deescalated:
@@ -41,6 +65,7 @@ dialogue semantic.combat.horde
     "Horde nearby. Keep your eyes up."
 
 dialogue semantic.combat.reaction
+  use offer.combat_horde_nudges
   say [event.type=zombie_stamina_retreat] as retreat:
     "I need a moment before I can swing again."
   say [event.type=combat_awareness|zombie_horde_detected] as threat:

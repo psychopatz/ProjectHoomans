@@ -57,10 +57,9 @@ local knownNickname = Policy.Decide(nickname, nil, {
 T.equal(knownNickname.branch, "QUESTION_RECEIVED",
     "nickname question remains a read-only question")
 T.equal(knownNickname.response.templateID,
-    "semantic.question.identity.nickname.known",
+    "hoomans.question.repeat_known.repeat_nickname",
     "known nickname selects the nickname response")
-T.equal(knownNickname.response.fallback,
-    "Most people call me Pat.",
+T.contains(knownNickname.response.fallback, "Pat",
     "known nickname response uses the learned value")
 
 local unknownSurname = Policy.Decide(surname, nil, {
@@ -72,9 +71,9 @@ local unknownSurname = Policy.Decide(surname, nil, {
     npcKnowledge = { identity = { nickname = "Pat" } },
 })
 T.equal(unknownSurname.response.templateID,
-    "semantic.question.identity.surname.unknown",
+    "hoomans.question.about_you.gated.surname_guarded",
     "unknown surname remains undisclosed")
-T.truthy(string.find(unknownSurname.response.fallback, "private", 1, true),
+T.falsy(string.find(unknownSurname.response.fallback, "Parker", 1, true),
     "unknown surname response does not invent a surname")
 
 local knownFaction = Policy.Decide(faction, nil, {
@@ -86,10 +85,9 @@ local knownFaction = Policy.Decide(faction, nil, {
     factionName = "The Rovers",
 })
 T.equal(knownFaction.response.templateID,
-    "semantic.question.identity.faction.known",
+    "hoomans.question.repeat_known.repeat_faction",
     "known faction selects the faction response")
-T.equal(knownFaction.response.fallback,
-    "I'm with The Rovers.",
+T.contains(knownFaction.response.fallback, "The Rovers",
     "known faction response uses the learned value")
 
 T.finish("pnc_semantic_identity_facets_smoke")

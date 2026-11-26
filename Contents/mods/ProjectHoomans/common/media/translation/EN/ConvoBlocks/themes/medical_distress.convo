@@ -69,6 +69,7 @@ dialogue semantic.medical.distress.teammate
     "They're hurt! Stay with them while I cover you."
 
 dialogue semantic.medical.distress.treatment
+  use offer.medical_distress_nudges
   say [downed.need=bandage] as bandage:
     "Bandage is on—thanks, that stopped the worst of it."
   say [default] as default:

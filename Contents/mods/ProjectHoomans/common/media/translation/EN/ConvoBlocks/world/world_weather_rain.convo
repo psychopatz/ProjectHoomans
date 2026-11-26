@@ -8,7 +8,7 @@ dialogue semantic.world.weather.rain
     "Great, it's coming down now, {addressee.name}. Let's not linger out in the open."
   say [role=weather_rain_reply] as weather_rain_reply:
     "Yeah, {addressee.name}, let's keep dry and watch our footing."
-    "Agreed—visibility drops fast in this rain, stay sharp."
+    "Agreed, {addressee.name}—visibility drops fast in this rain, stay sharp."
   say [role=weather_rain_chime] as weather_rain_chime:
     "At least it masks our footsteps—just stay close so we don't lose sight of each other."
     "Keep your pack sealed if you can, wet gear weighs a ton."

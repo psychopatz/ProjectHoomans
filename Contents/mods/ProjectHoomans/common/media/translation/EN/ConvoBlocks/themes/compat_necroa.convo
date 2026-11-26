@@ -3,6 +3,13 @@ language EN
 namespace hoomans
 
 dialogue semantic.compat.necroa.mask_warning
+  choice necroa.what_happened:
+    label: "What's wrong with the air?"
+    say: "What's wrong with the air?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_WHAT_HAPPENED
   say [social.role=family] as family:
     "Put your mask on, family. I am not losing you to the air."
   say [social.role=colonist] as colonist:

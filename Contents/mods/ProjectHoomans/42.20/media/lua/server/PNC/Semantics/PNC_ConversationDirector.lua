@@ -45,6 +45,7 @@ local topicPolicies = {
     combat_kill_self      = { tier = 1, urgency = 45, salience = 54, saturationWindowMs = 22000, silenceThreshold = 46 },
     combat_human_kill_self= { tier = 2, urgency = 80, salience = 74, saturationWindowMs = 15000, silenceThreshold = 40 },
     combat_blindside      = { tier = 3, urgency = 90, salience = 88, saturationWindowMs =  6000, silenceThreshold = 25 },
+    combat_exhausted      = { tier = 2, urgency = 72, salience = 70, saturationWindowMs =  6000, silenceThreshold = 34 },
     combat_situation      = { tier = 1, urgency = 48, salience = 54, saturationWindowMs = 24000, silenceThreshold = 44 },
     combat_awareness      = { tier = 1, urgency = 52, salience = 56, saturationWindowMs = 20000, silenceThreshold = 44 },
     combat_tactical_prompt= { tier = 3, urgency = 88, salience = 86, saturationWindowMs =  8000, silenceThreshold = 25 },

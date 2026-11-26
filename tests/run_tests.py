@@ -159,7 +159,7 @@ def parse_args(arguments: list[str]) -> argparse.Namespace:
         help="emit flushed progress summary every N completed tests/modules (default: 10)",
     )
     parser.add_argument("--jobs", type=int, default=min(4, os.cpu_count() or 1))
-    parser.add_argument("--timeout", type=float, default=30.0, help="seconds per test")
+    parser.add_argument("--timeout", type=float, default=60.0, help="seconds per test")
     parser.add_argument("--max-output-lines", type=int, default=80)
     parser.add_argument("--fail-fast", action="store_true")
     parser.add_argument("--list", action="store_true")

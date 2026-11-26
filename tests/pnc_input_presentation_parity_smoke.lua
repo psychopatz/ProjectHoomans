@@ -357,7 +357,7 @@ do
             singleSubmitCount = singleSubmitCount + 1
             primary.lastSemanticDialogueResult = {
                 accepted = true,
-                ir = { intent = "SOCIAL", subject = "greeting", normalizedText = value },
+                ir = { intent = "SOCIAL", subject = "greeting", normalizedText = value, confidence = 0.9 },
                 decision = decisionOverride or { route = "deterministic", branch = "GREETING" },
             }
             return true, "committed"

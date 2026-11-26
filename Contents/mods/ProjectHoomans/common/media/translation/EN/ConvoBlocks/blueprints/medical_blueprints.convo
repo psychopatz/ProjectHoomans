@@ -9,6 +9,7 @@ blueprint offer.medical_distress_nudges
     utility: directness
     intent: QUESTION
     subject: CONTEXT_REFERENCE
+    reference: EVENT_WHAT_HAPPENED
   choice medical.who_hurt_you:
     label: "Who hurt you?"
     say: "Who hurt you?"
@@ -22,3 +23,4 @@ blueprint offer.medical_distress_nudges
     utility: openness
     intent: QUESTION
     subject: CONTEXT_REFERENCE
+    reference: EVENT_NEED

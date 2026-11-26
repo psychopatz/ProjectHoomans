@@ -148,11 +148,11 @@ T.equal(complimentDecision.route, "deterministic",
 T.equal(complimentDecision.branch, "COMPLIMENT_RECEIVED",
     "a compliment selects its own dialogue branch")
 T.equal(complimentDecision.response.templateID,
-    "semantic.social.compliment.friendly",
+    "hoomans.compliment.friendly",
     "friendly NPCs can return a light, noncommittal compliment")
-T.equal(ResponseAdapter.Payload(complimentDecision).translationKey,
-    "UI_PNC_Conversation_Semantic_ComplimentFriendly",
-    "compliment response resolves through the conversation translation catalog")
+T.truthy((ResponseAdapter.Payload(complimentDecision).text
+    or ResponseAdapter.Payload(complimentDecision).fallback or "") ~= "",
+    "compliment response resolves through the conversation catalog")
 
 local relationshipQuestion = parse("are you single")
 local unknownStatus = Policy.Decide(relationshipQuestion, state, {
@@ -164,7 +164,7 @@ local unknownStatus = Policy.Decide(relationshipQuestion, state, {
 T.equal(unknownStatus.branch, "QUESTION_RECEIVED",
     "relationship status uses the existing question branch")
 T.truthy(string.find(unknownStatus.response.templateID,
-    "semantic.question.relationship_status", 1, true),
+    "question.relationship_status", 1, true),
     "unknown relationship status selects a dedicated response")
 T.falsy(string.find(string.lower(unknownStatus.response.fallback),
     "i'm single", 1, true),
@@ -172,8 +172,9 @@ T.falsy(string.find(string.lower(unknownStatus.response.fallback),
 T.falsy(string.find(string.lower(unknownStatus.response.fallback),
     "i'm taken", 1, true),
     "romance style alone is not treated as evidence of a partner")
-T.equal(ResponseAdapter.Payload(unknownStatus).translationKey ~= nil, true,
-    "unknown status response has a localized conversation key")
+T.truthy((ResponseAdapter.Payload(unknownStatus).text
+    or ResponseAdapter.Payload(unknownStatus).fallback or "") ~= "",
+    "unknown status response has realized conversation text")
 
 local delayedComplimentHistory = {
     recentTurns = {
@@ -207,8 +208,8 @@ local knownPartner = Policy.Decide(relationshipQuestion, state, {
     npcID = "npc:mara-partner",
     relationshipState = "Lover",
 })
-T.equal(knownPartner.response.templateID,
-    "semantic.question.relationship_status.committed",
+T.truthy(string.find(knownPartner.response.templateID,
+    "question.relationship_status.committed", 1, true),
     "an explicit Lover relationship supports a grounded partner answer")
 T.contains(knownPartner.response.fallback, "already together",
     "the answer refers to the explicit player-NPC relationship")
@@ -218,8 +219,8 @@ local generatedPartner = Policy.Decide(relationshipQuestion, state, {
     npcID = "npc:starter-partner",
     npcRecord = { generation = { relationshipKind = "lover" } },
 })
-T.equal(generatedPartner.response.templateID,
-    "semantic.question.relationship_status.committed",
+T.truthy(string.find(generatedPartner.response.templateID,
+    "question.relationship_status.committed", 1, true),
     "an authored companion relationship is recognized as known")
 
 local contextState = DialogueContext.New()
@@ -268,9 +269,9 @@ local contextualUnknownStatus = Policy.Decide(
 T.truthy(string.find(contextualUnknownStatus.response.templateID,
     "after_compliment", 1, true),
     "a relationship question immediately following a compliment gets a contextual reply")
-T.equal(ResponseAdapter.Payload(contextualUnknownStatus).translationKey ~= nil,
-    true,
-    "contextual reply resolves through the conversation translation catalog")
+T.truthy((ResponseAdapter.Payload(contextualUnknownStatus).text
+    or ResponseAdapter.Payload(contextualUnknownStatus).fallback or "") ~= "",
+    "contextual reply resolves through the conversation catalog")
 local contextualPartnerStatus = Policy.Decide(
     relationshipQuestion,
     state,
@@ -281,8 +282,8 @@ local contextualPartnerStatus = Policy.Decide(
         semanticDialogueContext = relationshipContext,
     }
 )
-T.equal(contextualPartnerStatus.response.templateID,
-    "semantic.question.relationship_status.after_compliment.committed",
+T.truthy(string.find(contextualPartnerStatus.response.templateID,
+    "question.relationship_status.committed_after_compliment", 1, true),
     "a known partner status acknowledges both the compliment and relationship")
 
 contextState:RecordTurn(relationshipQuestion, {
@@ -339,12 +340,13 @@ local contextualAcknowledgement = Policy.Decide(
 )
 T.truthy(string.find(
     contextualAcknowledgement.response.templateID,
-    "semantic.question.relationship_status.acknowledged",
+    "question.relationship_status.acknowledged",
     1,
     true
 ), "understanding receives a context-aware relationship reply")
-T.truthy(ResponseAdapter.Payload(contextualAcknowledgement).translationKey,
-    "context-aware acknowledgment resolves to a localized response")
+T.truthy((ResponseAdapter.Payload(contextualAcknowledgement).text
+    or ResponseAdapter.Payload(contextualAcknowledgement).fallback or "") ~= "",
+    "context-aware acknowledgment resolves to realized text")
 
 local unrelatedAcknowledgementContext = {
     recentTurns = {

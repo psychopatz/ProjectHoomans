@@ -338,12 +338,19 @@ T.equal(#presentations, 5,
 T.equal(presentations[5].context.ambientFlavor.context.attackerKind, "npc",
     "NPC battle teammate flavor preserves attacker kind")
 
-T.equal(#tickHandlers, 1, "vanilla damage poll registers once")
-tickHandlers[1]()
+local damagePollPump = PNC.Server
+    and PNC.Server.TickRegistry
+    and PNC.Server.TickRegistry.Pumps
+    and PNC.Server.TickRegistry.Pumps["social_damage_poll"]
+    and PNC.Server.TickRegistry.Pumps["social_damage_poll"].pump
+    or tickHandlers[1]
+T.truthy(type(damagePollPump) == "function",
+    "vanilla damage poll registers once")
+damagePollPump()
 bodyPart.health = 92
 bodyPart.scratchTime = 8
 clock = 10500
-tickHandlers[1]()
+damagePollPump()
 T.equal(events[3].type, "witnessed_player_hurt",
     "vanilla zombie wound is converted to a hurt event")
 T.equal(events[3].context.woundType, "scratch",

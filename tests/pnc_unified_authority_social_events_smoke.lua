@@ -190,7 +190,7 @@ local leader = resolve(
         }),
     }
 )
-T.equal(leader.realizationID, "semantic.leader_loss.devoted",
+T.equal(leader.realizationID, "semantic.leader_loss.reaction.devoted",
     "leader loss uses the semantic grief realization")
 T.equal(#leader.offerIDs, 3,
     "leader loss exposes its bounded grounded follow-up set")

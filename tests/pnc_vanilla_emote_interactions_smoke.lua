@@ -163,7 +163,7 @@ PNC.Conversation = {
 local Interactions = PNC.VanillaEmoteInteractions
 local CompanionSpeech = PNC.ConvoEngine.CompanionSpeech
 local all = Interactions.List()
-T.equal(#all, 8, "first vanilla emote slice has eight interactions")
+T.equal(#all, 9, "first vanilla emote slice has nine interactions")
 for _, id in ipairs(all) do
     local definition = Interactions.Get(id)
     T.truthy(definition.eventType, id .. " event type")

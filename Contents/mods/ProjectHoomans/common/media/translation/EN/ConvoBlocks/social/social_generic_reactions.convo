@@ -3,6 +3,13 @@ language EN
 namespace hoomans
 
 dialogue semantic.companion.reaction
+  choice companion.who_chased:
+    label: "Who was chasing you?"
+    say: "Who was chasing you?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_PURSUER
   say [command.id=camp, event.type=companion_command_rejection] as camp_rejected:
     "I can't find a safe room or campfire nearby."
   say [event.type=follower_abandoned_zombie|follower_abandoned_hostile_npc] as abandonment:

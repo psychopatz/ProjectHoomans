@@ -5,6 +5,8 @@ namespace hoomans
 dialogue semantic.command.player
   say [command.id=follow] as follow:
     "{addressee.name}, on me."
+    "Stay with me, {addressee.name}."
+    "Follow my lead, {addressee.name}."
   say [command.id=stay] as stay:
     "{addressee.name}, wait here."
   say [command.id=camp] as camp:

@@ -19,3 +19,5 @@ dialogue semantic.emote.player
     "Well done, {addressee.name}!"
   say [action=salute] as salute:
     "Respect, {addressee.name}."
+  say [action=surrender] as surrender:
+    "Hands up, {addressee.name}! Don't shoot!"

@@ -35,15 +35,28 @@ local initial = ids({
 })
 T.truthy(initial["question.identity"],
     "generic identity suggestion remains available before identity is known")
-T.truthy(initial["question.identity_nickname"],
-    "nickname suggestion is available before nickname is known")
-T.truthy(initial["question.identity_surname"],
-    "surname suggestion is available before surname is known")
-T.truthy(initial["question.identity_faction"],
-    "faction suggestion is available before faction is known")
+T.falsy(initial["question.about_you"],
+    "about-you hub stays hidden before identity is known")
+
+local aboutYouInitial = ids({
+    activeHubID = "about_you",
+    identityState = "known",
+    familiarity = 25,
+    npcKnowledge = {
+        identity = {},
+    },
+})
+T.truthy(aboutYouInitial["question.identity_nickname"],
+    "nickname suggestion is available in about_you hub before nickname is known")
+T.truthy(aboutYouInitial["question.identity_surname"],
+    "surname suggestion is available in about_you hub before surname is known")
+T.truthy(aboutYouInitial["question.identity_faction"],
+    "faction suggestion is available in about_you hub before faction is known")
 
 local nicknameKnown = ids({
-    activeHubID = nil,
+    activeHubID = "about_you",
+    identityState = "known",
+    familiarity = 25,
     npcKnowledge = {
         identity = {
             nickname = "Pat",
@@ -58,8 +71,9 @@ T.truthy(nicknameKnown["question.identity_faction"],
     "unknown faction suggestion remains available")
 
 local allKnown = ids({
-    activeHubID = nil,
+    activeHubID = "about_you",
     identityState = "known",
+    familiarity = 25,
     npcKnowledge = {
         factionKnown = true,
         factionName = "The Rovers",
@@ -69,7 +83,20 @@ local allKnown = ids({
         },
     },
 })
-T.falsy(allKnown["question.identity"],
+local allKnownRoot = ids({
+    activeHubID = nil,
+    identityState = "known",
+    familiarity = 25,
+    npcKnowledge = {
+        factionKnown = true,
+        factionName = "The Rovers",
+        identity = {
+            nickname = "Pat",
+            surname = "Parker",
+        },
+    },
+})
+T.falsy(allKnownRoot["question.identity"],
     "generic identity suggestion is removed after identity exchange")
 T.falsy(allKnown["question.identity_nickname"],
     "nickname suggestion is removed after disclosure")

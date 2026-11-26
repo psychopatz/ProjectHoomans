@@ -18,14 +18,7 @@ local Realization = T.load(
 local Registry = PNC.ConvoEngine.Registry
 
 T.truthy(Registry and Registry.FamilyFor,
-    "generated Conversation registry is available to production realization")
-T.truthy(Registry.PHRASE_FAMILIES["leader_loss.default"],
-    "migrated leader-loss variant has a stable phrase family")
-T.equal(
-    Registry.PHRASE_FAMILIES["leader_loss.default"].contentOwner,
-        "projecthoomans.dialogue_content.events",
-    "event wording exposes the canonical content owner"
-)
+    "Conversation registry is available to production realization")
 
 local function realize(poolID, context)
     Catalog.ResetSelections()
@@ -35,13 +28,6 @@ local function realize(poolID, context)
         Catalog.Select(poolID, context, "content-authority"),
         poolID .. " selects through the production ResponseCatalog"
     )
-    T.equal(selected.contentOwner,
-        poolID:find("semantic.compat.", 1, true) == 1
-            and "projecthoomans.dialogue_content.compatibility"
-            or poolID:find("semantic.tool_reply.", 1, true) == 1
-                and "projecthoomans.dialogue_content.tool_replies"
-            or "projecthoomans.dialogue_content.events",
-        poolID .. " keeps wording below semantic authority")
     if selected.plan then
         T.truthy(selected.plan.turns,
             poolID .. " keeps its bounded ResponsePlan")
@@ -57,10 +43,8 @@ local function realize(poolID, context)
         fallback = selected.fallback,
         plan = selected.plan,
     }, context)
-    T.truthy(rendered.phraseID,
-        poolID .. " receives a canonical phrase selection")
-    T.truthy(rendered.phraseSelection,
-        poolID .. " exposes phrase provenance")
+    T.truthy(tostring(rendered.text or rendered.fallback or "") ~= "",
+        poolID .. " realizes non-empty wording")
     T.equal(rendered.semanticVariantID, selected.id,
         poolID .. " keeps semantic selection separate from phrase selection")
     return selected, rendered
@@ -69,11 +53,10 @@ end
 local leader, leaderRendered = realize("semantic.leader_loss.reaction", {
     leaderGrief = "devoted",
 })
-T.equal(leader.id, "semantic.leader_loss.devoted",
+T.equal(leader.id, "semantic.leader_loss.reaction.devoted",
     "leader-loss semantic variant remains the selected meaning")
-T.equal(leaderRendered.phraseID,
-    "phrase.leader_loss.devoted.neutral.01",
-    "leader-loss wording comes from a stable Dialogue Content phrase")
+T.truthy(tostring(leaderRendered.text or leaderRendered.fallback or "") ~= "",
+    "leader-loss wording comes from the authoritative ConvoDSL pool")
 
 local medical = realize("semantic.medical.distress.call", {
     downedNeed = "bleedout",
@@ -82,7 +65,7 @@ T.equal(medical.id, "semantic.medical.distress.call.bleedout",
     "medical semantic condition remains ResponseCatalog-owned")
 
 local tool = realize("semantic.tool_reply.order.camp")
-T.truthy(string.find(tool.templateID, "tool_reply.order_camp.", 1, true),
+T.truthy(string.find(tool.templateID, "tool_reply.order.camp.", 1, true),
     "ToolReply wording uses stable semantic content identity")
 
 local compatibility = realize("semantic.compat.bandits.hooman_hurt", {

@@ -16,7 +16,9 @@ local SIT_BARK_OPTS = I.SituationBarkOpts
 
 function I.EmitSituationCallout(speaker, addr, desc, role, now, ref, extraTokens)
     local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
-    local dirTopic = role == "blindside" and "combat_blindside" or "combat_situation"
+    local dirTopic = role == "blindside" and "combat_blindside"
+        or role == "stamina_exhausted" and "combat_exhausted"
+        or "combat_situation"
     local dirScope = "sit:" .. tostring(speaker and speaker.id or "nil") .. ":" .. tostring(role or "generic")
     if Dir and type(Dir.GateEmitter) == "function" then
         local dirOk = Dir.GateEmitter(dirTopic, speaker, {

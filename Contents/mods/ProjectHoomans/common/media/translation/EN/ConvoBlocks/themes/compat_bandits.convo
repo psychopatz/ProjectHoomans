@@ -3,6 +3,20 @@ language EN
 namespace hoomans
 
 dialogue semantic.compat.bandits.hooman_hurt
+  choice bandits.what_happened:
+    label: "What happened?"
+    say: "What happened?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_WHAT_HAPPENED
+  choice bandits.who_attacked:
+    label: "Who attacked?"
+    say: "Who attacked us?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_ATTACKER
   say [social.role=colonist] as colonist:
     "Bandit fire! Pull back and cover the wounded colonist."
   say [social.role=lover] as lover:

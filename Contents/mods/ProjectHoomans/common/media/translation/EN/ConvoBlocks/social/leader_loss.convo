@@ -3,6 +3,27 @@ language EN
 namespace hoomans
 
 dialogue semantic.leader_loss.reaction
+  choice semantic.followup.event.what_happened:
+    label: "What happened?"
+    say: "What happened?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_WHAT_HAPPENED
+  choice semantic.followup.event.person:
+    label: "Who was it?"
+    say: "Who did we lose?"
+    utility: openness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_PERSON
+  choice semantic.followup.event.next:
+    label: "What's next?"
+    say: "What do we do now?"
+    utility: directness
+    intent: QUESTION
+    subject: CONTEXT_REFERENCE
+    reference: EVENT_NEXT
   say [leader.grief=devoted] as devoted:
     "We lost someone important. We need to stay together."
   say [leader.grief=dissent] as dissent:

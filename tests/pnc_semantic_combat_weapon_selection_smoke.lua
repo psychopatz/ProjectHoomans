@@ -77,7 +77,7 @@ local unknown = explain("semantic.combat.kill.killer.practical", {
     combatSkillBand = "low",
     combatWeaponNamed = false,
 }, "unknown")
-T.contains(unknown.selectedID, "semantic.combat.reaction.kill_killer_practical_",
+T.contains(unknown.selectedID, "semantic.combat.kill.killer.practical.default",
     "unknown/modded melee degrades to existing generic safe fallback")
 
 T.finish("pnc_semantic_combat_weapon_selection_smoke")

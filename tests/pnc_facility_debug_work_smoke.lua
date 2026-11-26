@@ -175,7 +175,7 @@ PNC.FacilityJobs.OnSceneStopped(
     bedRecord,
     bedZombie,
     { id = "facility.sleep.bed" },
-    "interrupted:combat"
+    "interrupted:command"
 )
 bedRecord.runtime.animationScene = nil
 T.equal(bedRecord.runtime.facilityActivity.sleepWakePending, true,
