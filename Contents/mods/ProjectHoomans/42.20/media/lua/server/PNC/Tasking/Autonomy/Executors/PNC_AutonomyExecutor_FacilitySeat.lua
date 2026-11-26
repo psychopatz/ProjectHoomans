@@ -78,6 +78,13 @@ function Service.IsEligible(record)
     if sleepActionable(record) then return false end
     if record.runtime and record.runtime.target then return false end
     local camp = isCamp(record)
+    if camp then
+        local placement = string.lower(tostring(
+            record.orderSpec and record.orderSpec.placementState or "arrived"))
+        if placement == "queued" or placement == "moving" then
+            return false
+        end
+    end
     local base = not camp and homeBase(record) or nil
     if not camp and not isHome(record, base) then return false end
     return true, camp, base

@@ -23,17 +23,20 @@ local function snapshotMatches(state, order, radius, campRadius)
         and CampSite.NormalizeBounds(state.roomBounds)
     local orderBounds = Internal.RoomBounds(order)
     local scope = Internal.CampScope(order)
+    local isRoom = scope == CampSite.SCOPES.ROOM
     return type(state) == "table"
         and tonumber(state.schemaVersion) == tonumber(Service.SCHEMA_VERSION)
         and tostring(state.campId or "") == tostring(order.campId or "")
-        and tonumber(state.anchorX) == tonumber(order.x)
-        and tonumber(state.anchorY) == tonumber(order.y)
-        and tonumber(state.anchorZ) == tonumber(order.z)
+        -- Room snapshots are shared across all per-member interior slots in
+        -- the same room; only non-room camps are keyed to a single anchor tile.
+        and (isRoom or (tonumber(state.anchorX) == tonumber(order.x)
+            and tonumber(state.anchorY) == tonumber(order.y)
+            and tonumber(state.anchorZ) == tonumber(order.z)))
         and tonumber(state.campRadius) == tonumber(campRadius)
         and tonumber(state.resourceRadius) == tonumber(radius)
         and tostring(state.scope or state.siteScope or "") == tostring(scope)
         and tostring(state.zoneID or "") == tostring(order.zoneID or "")
-        and (scope ~= CampSite.SCOPES.ROOM
+        and (not isRoom
             or (tostring(state.siteID or "") == tostring(order.siteID or "")
                 and tostring(state.roomID or "") == tostring(order.roomID or "")
                 and tostring(state.buildingID or "")
@@ -114,13 +117,48 @@ local function newCapture(entry, record, order, radius, campRadius)
             truncated = true
         end
     end
+    local cell = type(getCell) == "function" and getCell() or nil
+    local roomObj
+    local roomSquareList
+    local roomSquareCount = 0
+    if scope == CampSite.SCOPES.ROOM and cell
+        and type(cell.getGridSquare) == "function"
+    then
+        local anchorSq = cell:getGridSquare(
+            originX, originY, math.floor(state.anchorZ))
+        if anchorSq and type(anchorSq.getRoom) == "function" then
+            local okRoom, r = pcall(anchorSq.getRoom, anchorSq)
+            if okRoom and r then
+                roomObj = r
+                if type(r.getSquares) == "function" then
+                    local okSq, sqList = pcall(r.getSquares, r)
+                    if okSq and sqList then
+                        local count = type(sqList.size) == "function"
+                            and tonumber(sqList:size())
+                            or (type(sqList) == "table" and #sqList or 0)
+                        if count and count > 0 then
+                            roomSquareList = sqList
+                            roomSquareCount = math.min(
+                                math.floor(count),
+                                Service.MAX_ROOM_SCAN_SQUARES
+                            )
+                        end
+                    end
+                end
+            end
+        end
+    end
     state.scanTruncated = truncated
     return {
         entry = entry,
         record = record,
         state = state,
         seen = {},
-        cell = type(getCell) == "function" and getCell() or nil,
+        cell = cell,
+        room = roomObj,
+        roomSquares = roomSquareList,
+        roomSquareIndex = 0,
+        roomSquareCount = roomSquareCount,
         live = PNC.Registry and PNC.Registry.GetLiveZombie
             and PNC.Registry.GetLiveZombie(record.id) or nil,
         order = order,
@@ -192,8 +230,27 @@ local function pumpCapture(capture, budget)
         end
         return capture.cell:getGridSquare(cx, cy, capture.originZ)
     end
+    local useRoomList = capture.scope == CampSite.SCOPES.ROOM
+        and capture.roomSquares ~= nil and capture.roomSquareCount > 0
+    local roomSquares = capture.roomSquares
+    local roomListIsJava = useRoomList and type(roomSquares.get) == "function"
+    local addFn = function(resource)
+        addResource(capture.state.resources, capture.seen, resource)
+    end
+    local providerCtx = {
+        record = capture.record,
+        character = capture.live,
+    }
     while processed < limit do
-        if capture.scope == CampSite.SCOPES.ROOM then
+        if useRoomList then
+            if capture.roomSquareIndex >= capture.roomSquareCount then break end
+            local idx = capture.roomSquareIndex
+            capture.roomSquareIndex = idx + 1
+            Internal._cachedSquareRef = nil
+            Internal._cachedSquareObjects = nil
+            square = roomListIsJava and roomSquares:get(idx)
+                or roomSquares[idx + 1]
+        elseif capture.scope == CampSite.SCOPES.ROOM then
             if capture.scanX > capture.maxX then break end
             x, y = capture.scanX, capture.scanY
             capture.scanY = capture.scanY + 1
@@ -202,10 +259,14 @@ local function pumpCapture(capture, budget)
                 capture.scanY = capture.minY
             end
             square = getCachedSquare(x, y)
-            if square and Geometry.MatchesRoom
-                and not Geometry.MatchesRoom(square, capture.order)
-            then
-                square = nil
+            if square then
+                if capture.room and type(square.getRoom) == "function" then
+                    if square:getRoom() ~= capture.room then square = nil end
+                elseif Geometry.MatchesRoom
+                    and not Geometry.MatchesRoom(square, capture.order)
+                then
+                    square = nil
+                end
             end
         else
             if capture.dx > capture.span then break end
@@ -224,27 +285,15 @@ local function pumpCapture(capture, budget)
         processed = processed + 1
         if square then
             for _, provider in pairs(Service.Providers) do
-                provider.CaptureSquare(
-                    square,
-                    function(resource)
-                        addResource(
-                            capture.state.resources,
-                            capture.seen,
-                            resource
-                        )
-                    end,
-                    {
-                        record = capture.record,
-                        character = capture.live,
-                    }
-                )
+                provider.CaptureSquare(square, addFn, providerCtx)
             end
         end
         Internal._cachedSquareRef = nil
         Internal._cachedSquareObjects = nil
     end
-    if (capture.scope == CampSite.SCOPES.ROOM
-        and capture.scanX > capture.maxX)
+    if (useRoomList and capture.roomSquareIndex >= capture.roomSquareCount)
+        or (not useRoomList and capture.scope == CampSite.SCOPES.ROOM
+            and capture.scanX > capture.maxX)
         or (capture.scope ~= CampSite.SCOPES.ROOM
             and capture.dx > capture.span)
     then

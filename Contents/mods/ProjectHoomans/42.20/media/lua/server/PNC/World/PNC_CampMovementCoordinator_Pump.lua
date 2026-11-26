@@ -47,6 +47,12 @@ local function markEntry(session, entry, state, at, reason)
             entityId = entry.npcID,
             cause = "CAMP_PLACEMENT_ARRIVED",
         })
+        PNC.Tasking.Events.Emit("AMBIENT_OPPORTUNITY", {
+            npcId = entry.npcID,
+            source = "CampMovementCoordinator",
+            entityId = entry.npcID,
+            cause = "CAMP_PLACEMENT_ARRIVED",
+        })
     end
     return applied == true
 end

@@ -67,6 +67,7 @@ function Coordinator.StartGroupCamp(campSite, records, directory, options)
     Coordinator.PendingCount = (tonumber(Coordinator.PendingCount) or 0) + 1
     at = session.startedAt
 
+    local firstAcceptedRecord
     local slots = type(campSite.slots) == "table" and campSite.slots or nil
     for index = 1, math.min(#records, Coordinator.MAX_QUEUE) do
         record = records[index]
@@ -110,6 +111,7 @@ function Coordinator.StartGroupCamp(campSite, records, directory, options)
                 entry.state = state
                 session.queue[#session.queue + 1] = entry
                 accepted = accepted + 1
+                if not firstAcceptedRecord then firstAcceptedRecord = record end
                 affectedTargets[#affectedTargets + 1] = tostring(record.id)
                 if state == "moving" then
                     entry.startedAt = at
@@ -126,6 +128,13 @@ function Coordinator.StartGroupCamp(campSite, records, directory, options)
     if accepted <= 0 then
         finishSession(session, "failed", "no_live_targets")
         return 0, "no_targets", affectedTargets
+    end
+    -- Schedule one non-blocking shared room/camp resource scan while the group
+    -- walks in so chairs, beds, sofas, and faucets are ready upon arrival.
+    if firstAcceptedRecord and PNC.CampResourceService
+        and type(PNC.CampResourceService.GetSnapshot) == "function"
+    then
+        pcall(PNC.CampResourceService.GetSnapshot, firstAcceptedRecord, false)
     end
     if activeAssigned then Coordinator.ActiveSessionID = sessionID end
     Coordinator.NextPumpAt = 0

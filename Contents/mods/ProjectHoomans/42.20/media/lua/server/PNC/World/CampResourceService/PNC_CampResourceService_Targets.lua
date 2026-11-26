@@ -192,9 +192,22 @@ local function resolveWaterTarget(record, resource, abstract)
     return nil, nil, source
 end
 
+local function isPendingRoomSnapshot(record, state, snapReason)
+    if state or snapReason ~= "CAMP_RESOURCE_CAPTURE_PENDING" then
+        return false
+    end
+    local order = Internal.CampContext(record)
+    return order ~= nil and Internal.CampScope(order) == CampSite.SCOPES.ROOM
+end
+
 function Service.FindSleep(record, options)
     options = type(options) == "table" and options or {}
-    local state = Service.GetSnapshot(record, options.force == true)
+    local state, snapReason = Service.GetSnapshot(record, options.force == true)
+    if isPendingRoomSnapshot(record, state, snapReason)
+        and options.allowPendingFloor ~= true
+    then
+        return nil, nil, nil, "CAMP_RESOURCE_CAPTURE_PENDING"
+    end
     local resources = state and state.resources or {}
     local selected
     local live = options.character
@@ -242,11 +255,21 @@ end
 
 function Service.FindSeat(record, options)
     options = type(options) == "table" and options or {}
-    local state = Service.GetSnapshot(record, options.force == true)
+    local state, snapReason = Service.GetSnapshot(record, options.force == true)
+    if isPendingRoomSnapshot(record, state, snapReason)
+        and options.allowPendingFloor ~= true
+    then
+        return nil, nil, nil, "CAMP_RESOURCE_CAPTURE_PENDING"
+    end
     local resources = state and state.resources or {}
     local live = options.character
         or PNC.Registry and PNC.Registry.GetLiveZombie
             and PNC.Registry.GetLiveZombie(record.id) or nil
+    local refX = live and live.getX and tonumber(live:getX())
+        or tonumber(record and record.x)
+    local refY = live and live.getY and tonumber(live:getY())
+        or tonumber(record and record.y)
+    local best
     for index = 1, #resources do
         local resource = resources[index]
         if tostring(resource.resourceKind or "") == "seating_surface"
@@ -255,9 +278,30 @@ function Service.FindSeat(record, options)
             local target, targets = resolveSeat(
                 resource, options.abstract, live)
             if target and Internal.TargetWithinCamp(record, target) then
-                return resource, target, targets
+                local distSq = 0
+                if refX and refY and tonumber(target.x) and tonumber(target.y) then
+                    local dx = tonumber(target.x) - refX
+                    local dy = tonumber(target.y) - refY
+                    distSq = dx * dx + dy * dy
+                end
+                if not best
+                    or distSq < best.distSq
+                    or (distSq == best.distSq
+                        and tostring(resource.resourceKey or "")
+                            < tostring(best.resource.resourceKey or ""))
+                then
+                    best = {
+                        resource = resource,
+                        target = target,
+                        targets = targets,
+                        distSq = distSq,
+                    }
+                end
             end
         end
+    end
+    if best then
+        return best.resource, best.target, best.targets
     end
     if options.allowFloor ~= false then
         local resource = floorSeatSlot(record, Internal.CampContext(record) or {})
