@@ -251,19 +251,36 @@ elseif not Hooks.VanillaDamageCallbackRegistered then
     })
 end
 
-if Events and Events.OnTick and Events.OnTick.Add
-    and not Hooks.VanillaDamagePollRegistered
-then
-    Events.OnTick.Add(onTick)
-    Hooks.VanillaDamagePollRegistered = true
-    audit({
-        "luaSide=server",
-        "event=VanillaZombieDamage",
-        "phase=registration",
-        "result=true",
-        "pollIntervalMs=" .. tostring(POLL_INTERVAL_MS),
-    })
-elseif not Hooks.VanillaDamagePollRegistered then
+if not Hooks.VanillaDamagePollRegistered then
+    local TickRegistry = PNC.Server and PNC.Server.TickRegistry
+        or require "PNC/Server/Server/PNC_Server_TickRegistry"
+    if TickRegistry and type(TickRegistry.Register) == "function" then
+        TickRegistry.Register("social_damage_poll", {
+            phase = "prepare",
+            priority = 30,
+            pump = onTick,
+        })
+        Hooks.VanillaDamagePollRegistered = true
+        audit({
+            "luaSide=server",
+            "event=VanillaZombieDamage",
+            "phase=registration",
+            "result=true",
+            "pollIntervalMs=" .. tostring(POLL_INTERVAL_MS),
+        })
+    elseif Events and Events.OnTick and Events.OnTick.Add then
+        Events.OnTick.Add(onTick)
+        Hooks.VanillaDamagePollRegistered = true
+        audit({
+            "luaSide=server",
+            "event=VanillaZombieDamage",
+            "phase=registration",
+            "result=true",
+            "pollIntervalMs=" .. tostring(POLL_INTERVAL_MS),
+        })
+    end
+end
+if not Hooks.VanillaDamagePollRegistered then
     audit({
         "luaSide=server",
         "event=VanillaZombieDamage",

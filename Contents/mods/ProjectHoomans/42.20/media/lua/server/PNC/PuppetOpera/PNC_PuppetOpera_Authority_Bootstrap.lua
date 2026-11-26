@@ -15,7 +15,15 @@ local Authority = Opera.Authority or {}
 Opera.Authority = Authority
 local Const = PNC.Const or {}
 
-if Events and Events.OnTick then
+local TickRegistry = PNC.Server and PNC.Server.TickRegistry
+    or require "PNC/Server/Server/PNC_Server_TickRegistry"
+if TickRegistry and type(TickRegistry.Register) == "function" then
+    TickRegistry.Register("puppet_opera", {
+        phase = "prepare",
+        priority = 10,
+        pump = Authority.Pump,
+    })
+elseif Events and Events.OnTick then
     Events.OnTick.Add(Authority.Pump)
 end
 

@@ -469,13 +469,22 @@ function Service.Update(explicitNowMs, explicitWorldAge)
     return triggered, triggeredStage
 end
 
-if Events and Events.OnTick and type(Events.OnTick.Add) == "function"
-    and not Service.State.tickHookInstalled
-then
-    Service.State.tickHookInstalled = true
-    Events.OnTick.Add(function()
-        Service.Update()
-    end)
+if not Service.State.tickHookInstalled then
+    local TickRegistry = PNC.Server and PNC.Server.TickRegistry
+        or require "PNC/Server/Server/PNC_Server_TickRegistry"
+    if TickRegistry and type(TickRegistry.Register) == "function" then
+        Service.State.tickHookInstalled = true
+        TickRegistry.Register("social_exchange", {
+            phase = "finish",
+            priority = 80,
+            pump = function() Service.Update() end,
+        })
+    elseif Events and Events.OnTick and type(Events.OnTick.Add) == "function" then
+        Service.State.tickHookInstalled = true
+        Events.OnTick.Add(function()
+            Service.Update()
+        end)
+    end
 end
 
 return Service

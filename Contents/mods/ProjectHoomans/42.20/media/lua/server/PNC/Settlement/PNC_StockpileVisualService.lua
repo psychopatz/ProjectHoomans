@@ -400,9 +400,20 @@ then
     Events.OnObjectAboutToBeRemoved.Add(markVisualRemoved)
     Service.ObjectRemoveHookRegistered = true
 end
-if Events and Events.OnTick and not Service.TickHookRegistered then
-    Events.OnTick.Add(retryPending)
-    Service.TickHookRegistered = true
+if not Service.TickHookRegistered then
+    local TickRegistry = PNC.Server and PNC.Server.TickRegistry
+        or require "PNC/Server/Server/PNC_Server_TickRegistry"
+    if TickRegistry and type(TickRegistry.Register) == "function" then
+        TickRegistry.Register("stockpile_visuals", {
+            phase = "finish",
+            priority = 100,
+            pump = retryPending,
+        })
+        Service.TickHookRegistered = true
+    elseif Events and Events.OnTick then
+        Events.OnTick.Add(retryPending)
+        Service.TickHookRegistered = true
+    end
 end
 
 return Service

@@ -192,7 +192,15 @@ function Discovery.UpdateProximity()
     end
 end
 
-if Events and Events.OnTick then
+local TickRegistry = PNC.Server and PNC.Server.TickRegistry
+    or require "PNC/Server/Server/PNC_Server_TickRegistry"
+if TickRegistry and type(TickRegistry.Register) == "function" then
+    TickRegistry.Register("world_discovery_proximity", {
+        phase = "finish",
+        priority = 90,
+        pump = Discovery.UpdateProximity,
+    })
+elseif Events and Events.OnTick then
     Events.OnTick.Add(Discovery.UpdateProximity)
 end
 

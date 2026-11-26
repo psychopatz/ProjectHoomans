@@ -62,11 +62,19 @@ end
 EventBus.subscribe(EventTypes.NPC_INVENTORY_CHANGED,
     Replication.OnInventoryChanged, Replication)
 
-if Events and Events.OnTick and Events.OnTick.Add
-    and not Replication.TickHookRegistered
-then
-    Events.OnTick.Add(function() Replication.Flush() end)
-    Replication.TickHookRegistered = true
+if not Replication.TickHookRegistered then
+    local TickRegistry = PNC.Server and PNC.Server.TickRegistry or nil
+    if TickRegistry and type(TickRegistry.Register) == "function" then
+        TickRegistry.Register("inventory_replication", {
+            phase = "finish",
+            priority = 120,
+            pump = function() Replication.Flush() end,
+        })
+        Replication.TickHookRegistered = true
+    elseif Events and Events.OnTick and Events.OnTick.Add then
+        Events.OnTick.Add(function() Replication.Flush() end)
+        Replication.TickHookRegistered = true
+    end
 end
 
 return Replication

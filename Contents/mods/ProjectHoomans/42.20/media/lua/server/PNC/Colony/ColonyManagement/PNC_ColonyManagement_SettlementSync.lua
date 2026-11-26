@@ -100,11 +100,20 @@ if EventsBus and EventsBus.subscribe then
     end
 end
 
-if Events and Events.OnTick and Events.OnTick.Add
-    and not Management.Internal.SettlementSyncTickInstalled
-then
-    Events.OnTick.Add(flushPending)
-    Management.Internal.SettlementSyncTickInstalled = true
+if not Management.Internal.SettlementSyncTickInstalled then
+    local TickRegistry = PNC.Server and PNC.Server.TickRegistry
+        or require "PNC/Server/Server/PNC_Server_TickRegistry"
+    if TickRegistry and type(TickRegistry.Register) == "function" then
+        TickRegistry.Register("colony_settlement_sync", {
+            phase = "finish",
+            priority = 110,
+            pump = flushPending,
+        })
+        Management.Internal.SettlementSyncTickInstalled = true
+    elseif Events and Events.OnTick and Events.OnTick.Add then
+        Events.OnTick.Add(flushPending)
+        Management.Internal.SettlementSyncTickInstalled = true
+    end
 end
 
 return Management
