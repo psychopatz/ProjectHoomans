@@ -1,6 +1,7 @@
+local T = require "tests/support/test"
 -- Offline contract test for the Core Radio OS Hoomans adapter.
 
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/client/"
+local ROOT = T.path("ProjectHoomans", "client", "")
 package.path = ROOT .. "?.lua;" .. package.path
 
 local provider

@@ -352,27 +352,20 @@ function Social.Register()
         0.90,
         90
     )
-    local manifest = require "PNC/ConvoEngine/Manifest"
-    if type(manifest) == "table" and type(manifest.shards) == "table" then
-        for _, shard in ipairs(manifest.shards) do
-            if type(shard) == "table" and shard.kind == "Packs" and type(shard.module) == "string" then
-                local packShard = require(shard.module)
-                local packList = type(packShard) == "table" and (packShard.packs or packShard) or {}
-                for _, pack in ipairs(packList) do
-                    if type(pack) == "table" and type(pack.patterns) == "table" then
-                        for _, pat in ipairs(pack.patterns) do
-                            if type(pat) == "table" and type(pat.id) == "string" and type(pat.emit) == "table" and pat.emit.speechAct then
-                                registerDirectedPattern(
-                                    pat.id,
-                                    pat.match or {},
-                                    pat.emit.speechAct,
-                                    pat.emit.severity or "moderate",
-                                    pat.confidence or 0.9,
-                                    pat.priority or 50
-                                )
-                            end
-                        end
-                    end
+    local registry = require "PNC/ConvoEngine/Registry"
+    local packList = type(registry) == "table" and type(registry.PACKS) == "table" and registry.PACKS or {}
+    for _, pack in ipairs(packList) do
+        if type(pack) == "table" and type(pack.patterns) == "table" then
+            for _, pat in ipairs(pack.patterns) do
+                if type(pat) == "table" and type(pat.id) == "string" and type(pat.emit) == "table" and pat.emit.speechAct then
+                    registerDirectedPattern(
+                        pat.id,
+                        pat.match or {},
+                        pat.emit.speechAct,
+                        pat.emit.severity or "moderate",
+                        pat.confidence or 0.9,
+                        pat.priority or 50
+                    )
                 end
             end
         end

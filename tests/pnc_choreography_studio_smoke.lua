@@ -1,10 +1,11 @@
+local T = require "tests/support/test"
 -- Smoke test for Puppet Opera v3: dynamic capabilities, triggers, sub-tile
 -- anchors, locomotive tethering, stair clamping, abstract co-movement,
 -- anim_vars cleanup, and Lua/XML export round-trip.
 
 local T = require("tests/support/test")
 
-local ROOT = "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Choreography/"
+local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/Choreography/")
 T.load(ROOT .. "PNC_Choreography_AnimationCapabilities.lua")
 T.load(ROOT .. "PNC_Choreography_TriggerRegistry.lua")
 T.load(ROOT .. "PNC_Choreography_Blueprints.lua")

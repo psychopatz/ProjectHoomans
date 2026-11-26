@@ -1,5 +1,6 @@
+local T = require "tests/support/test"
 local source = assert(io.open(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Equipment/PNC_Equipment.lua",
+    T.path("ProjectHoomans", "shared", "PNC/Core/Equipment/PNC_Equipment.lua"),
     "r"
 )):read("*a")
 

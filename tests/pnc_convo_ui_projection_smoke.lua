@@ -1,5 +1,6 @@
+local T = require "tests/support/test"
 local suggestions = dofile(
-    "Contents/mods/ProjectHoomans/common/media/lua/shared/PNC/"
+    T.path("ProjectHoomans", "common_lua", "PNC/")
         .. "ConvoEngine/UI/Dialogue/"
         .. "CompanionCheckIn.lua"
 )

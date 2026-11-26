@@ -2,12 +2,12 @@
 -- Verifies single context-menu entry, 3-tab shell loading, Kahlua-safe
 -- structure, and lazy catalog loading.
 
-local T = dofile("tests/support/test.lua")
+local T = require "tests/support/test"
 
 -- Verify Debug Context Provider exposes ONE Animation Studio entry instead of
 -- the 4 legacy fragmented animation entries.
 local ctxSource = assert(io.open(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/Context/Providers/PNC_ContextProvider_Debug.lua",
+    T.path("ProjectHoomans", "client", "PNC/UI/Context/Providers/PNC_ContextProvider_Debug.lua"),
     "r"
 )):read("*a")
 T.truthy(ctxSource:find("UI_PNC_Debug_AnimationStudio", 1, true),
@@ -23,7 +23,7 @@ T.falsy(ctxSource:find("UI_PNC_Debug_Choreography", 1, true),
 
 -- Verify PsychopatzCore Debug Hub exposes ONE Animation Studio tool.
 local hubSource = assert(io.open(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Integrations/PNC_PsychopatzCoreDebug.lua",
+    T.path("ProjectHoomans", "client", "PNC/Integrations/PNC_PsychopatzCoreDebug.lua"),
     "r"
 )):read("*a")
 T.truthy(hubSource:find("pnc.animationStudio", 1, true),
@@ -35,10 +35,10 @@ T.falsy(hubSource:find("pnc.choreography", 1, true),
 
 -- Verify all 4 Animation Studio files exist and parse cleanly under Lua 5.1.
 for _, path in ipairs({
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/AnimationStudio/PNC_AnimationStudio.lua",
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/AnimationStudio/PNC_AnimationStudio_ClipsTab.lua",
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/AnimationStudio/PNC_AnimationStudio_ScenesTab.lua",
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/AnimationStudio/PNC_AnimationStudio_PropsTab.lua",
+    T.path("ProjectHoomans", "client", "PNC/UI/AnimationStudio/PNC_AnimationStudio.lua"),
+    T.path("ProjectHoomans", "client", "PNC/UI/AnimationStudio/PNC_AnimationStudio_ClipsTab.lua"),
+    T.path("ProjectHoomans", "client", "PNC/UI/AnimationStudio/PNC_AnimationStudio_ScenesTab.lua"),
+    T.path("ProjectHoomans", "client", "PNC/UI/AnimationStudio/PNC_AnimationStudio_PropsTab.lua"),
 }) do
     local fn, err = loadfile(path)
     assert(fn ~= nil, "Failed to parse " .. path .. ": " .. tostring(err))
@@ -46,7 +46,7 @@ end
 
 -- Verify ScenesTab includes Base.Cigarettes preset for testing smoke scenes.
 local scenesSource = assert(io.open(
-    "Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/UI/AnimationStudio/PNC_AnimationStudio_ScenesTab.lua",
+    T.path("ProjectHoomans", "client", "PNC/UI/AnimationStudio/PNC_AnimationStudio_ScenesTab.lua"),
     "r"
 )):read("*a")
 T.truthy(scenesSource:find("Base.Cigarettes", 1, true),

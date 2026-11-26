@@ -87,7 +87,10 @@ end
 local function clockMs()
     if getTimeInMillis then return tonumber(getTimeInMillis()) or 0 end
     if getTimestampMs then return tonumber(getTimestampMs()) or 0 end
-    if os and os.clock then return os.clock() * 1000 end
+    local hostOs = type(_G) == "table" and _G["os"] or nil
+    if type(hostOs) == "table" and type(hostOs.clock) == "function" then
+        return hostOs.clock() * 1000
+    end
     return 0
 end
 
