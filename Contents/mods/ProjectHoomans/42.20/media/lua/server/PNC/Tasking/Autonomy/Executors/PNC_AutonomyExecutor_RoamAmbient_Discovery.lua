@@ -47,6 +47,21 @@ local function reserved(resource, target)
 end
 
 function Service.FindSleepSurface(zombie)
+    if not zombie then return nil end
+    -- Prefer the unified single-pass spatial-bucket scanner when available so
+    -- roaming sleep/seat/water discovery shares one cached scan per area.
+    local scanner = PNC.WorldObjects and PNC.WorldObjects.Scanner or nil
+    if scanner and type(scanner.FindBestInRadius) == "function"
+        and PNC.FacilityResources
+        and type(PNC.FacilityResources.InspectSquare) == "function"
+    then
+        return scanner.FindBestInRadius(nil, zombie, "sleep", {
+            radius = Service.SEARCH_RADIUS,
+            maxObjects = Service.MAX_OBJECTS,
+            character = zombie,
+            detectorIDs = { "bed", "sofa" },
+        })
+    end
     local cell = type(getCell) == "function" and getCell() or nil
     local resources = PNC.FacilityResources
     local targetsSvc = PNC.FacilityInteractionTargets

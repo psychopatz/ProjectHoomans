@@ -3,4 +3,5 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeR
 require "PNC/World/PNC_NearbyResourceLocator"
 require "PNC/World/PNC_NearbyWaterService"
 require "PNC/World/PNC_WaterContainerService"
+require "PNC/World/WorldObjects/PNC_WorldObjects"
 require "PNC/World/PNC_CampResourceService"

@@ -93,9 +93,25 @@ local function floorSeatCandidate(record, zombie, cell)
 end
 
 local function findSeat(record, zombie)
+    local cell = type(getCell) == "function" and getCell() or nil
+    if not cell or not cell.getGridSquare then return nil end
+    -- Prefer the unified single-pass spatial-bucket scanner when available so
+    -- roaming seating shares one cached scan with sleep and water discovery.
+    local scanner = PNC.WorldObjects and PNC.WorldObjects.Scanner or nil
+    if scanner and type(scanner.FindBestInRadius) == "function"
+        and PNC.FacilityResources
+        and type(PNC.FacilityResources.InspectSquare) == "function"
+    then
+        local best = scanner.FindBestInRadius(record, zombie, "living", {
+            radius = Service.SEARCH_RADIUS,
+            maxObjects = Service.MAX_OBJECTS,
+            character = zombie,
+            detectorIDs = { "seat" },
+        })
+        return best or floorSeatCandidate(record, zombie, cell)
+    end
     local resourcesService = facilityResources()
     local targetsService = interactionTargets()
-    local cell = type(getCell) == "function" and getCell() or nil
     local detector = resourcesService and resourcesService.GetDetector
         and resourcesService.GetDetector("seat") or nil
     local originX = math.floor(zombie:getX())
@@ -104,7 +120,6 @@ local function findSeat(record, zombie)
     local best
     local bestDistance
     local examined = 0
-    if not cell or not cell.getGridSquare then return nil end
     if detector and type(detector.matches) == "function"
         and type(detector.describe) == "function"
         and targetsService and targetsService.ResolveResource
