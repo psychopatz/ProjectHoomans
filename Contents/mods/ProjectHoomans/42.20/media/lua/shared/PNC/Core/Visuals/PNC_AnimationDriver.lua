@@ -15,6 +15,15 @@ local OWNER_KEY = "PNC_AnimDriverOwner"
 local ROUTE_KEY = "PNC_AnimDriverRoute"
 local BUMP_KEY = "PNC_AnimDriverBump"
 
+local MANAGED_ANIM_VARS = {
+    "PNC_AnimActive",
+    "PNC_AnimStyle",
+    "PNC_AnimRole",
+    "PNC_AnimPhase",
+    "PNC_AnimMoving",
+    "PNC_AnimProgress",
+}
+
 local function modDataOf(body)
     return body and type(body.getModData) == "function"
         and body:getModData() or nil
@@ -24,8 +33,83 @@ local function animService()
     return PNC.Animation
 end
 
-local function animVarAdapter()
-    return PNC.Choreography and PNC.Choreography.AnimVarAdapter or nil
+local function setAnimVar(body, name, value)
+    if not body or not body.setVariable then return false end
+    body:setVariable(tostring(name), value)
+    return true
+end
+
+local function clearAnimVar(body, name)
+    if not body then return false end
+    if body.clearVariable then
+        body:clearVariable(tostring(name))
+        return true
+    end
+    if body.setVariable then
+        body:setVariable(tostring(name), "")
+        return true
+    end
+    return false
+end
+
+function Driver.GetManagedAnimVars()
+    local copy = {}
+    for i = 1, #MANAGED_ANIM_VARS do
+        copy[i] = MANAGED_ANIM_VARS[i]
+    end
+    return copy
+end
+
+function Driver.ApplyAnimVars(body, track, options)
+    if not body or type(track) ~= "table" then
+        return false, "anim_vars_arguments_invalid"
+    end
+    options = type(options) == "table" and options or {}
+    local style = tostring(track.style or track.anim or "custom")
+    local role = tostring(track.role or "Actor")
+    local phase = tostring(track.phase or options.phase or "play")
+    local moving = options.moving == true
+    local progress = tonumber(options.progress) or 0
+    setAnimVar(body, "PNC_AnimActive", true)
+    setAnimVar(body, "PNC_AnimStyle", style)
+    setAnimVar(body, "PNC_AnimRole", role)
+    setAnimVar(body, "PNC_AnimPhase", phase)
+    setAnimVar(body, "PNC_AnimMoving", moving)
+    setAnimVar(body, "PNC_AnimProgress", progress)
+    if type(track.variables) == "table" then
+        for _, entry in ipairs(track.variables) do
+            if type(entry) == "table" and entry.name then
+                setAnimVar(body, entry.name, entry.value)
+            end
+        end
+    end
+    return true, "anim_vars_applied"
+end
+
+function Driver.UpdateAnimVars(body, progress, moving)
+    if not body then return false end
+    if progress ~= nil then
+        setAnimVar(body, "PNC_AnimProgress", tonumber(progress) or 0)
+    end
+    if moving ~= nil then
+        setAnimVar(body, "PNC_AnimMoving", moving == true)
+    end
+    return true
+end
+
+function Driver.ClearAnimVars(body, track)
+    if not body then return false end
+    for _, name in ipairs(MANAGED_ANIM_VARS) do
+        clearAnimVar(body, name)
+    end
+    if type(track) == "table" and type(track.variables) == "table" then
+        for _, entry in ipairs(track.variables) do
+            if type(entry) == "table" and entry.name then
+                clearAnimVar(body, entry.name)
+            end
+        end
+    end
+    return true
 end
 
 local function nowMs()
@@ -104,11 +188,7 @@ function Driver.Start(body, record, request)
 
     local route = tostring(request.route or "bump")
     if route == "anim_vars" then
-        local vars = animVarAdapter()
-        if not vars or type(vars.Apply) ~= "function" then
-            return false, "anim_vars_adapter_unavailable"
-        end
-        local ok, reason = vars.Apply(body, request.track or request, {
+        local ok, reason = Driver.ApplyAnimVars(body, request.track or request, {
             phase = request.phase or "play",
             moving = request.moving == true,
             progress = tonumber(request.progress) or 0,
@@ -186,12 +266,9 @@ function Driver.Observe(body, ownerToken, spec)
     local current = tonumber(spec.now) or nowMs()
     local duration = tonumber(spec.durationMs) or 900
     if modData and modData[ROUTE_KEY] == "anim_vars" then
-        local vars = animVarAdapter()
-        if vars and type(vars.UpdateProgress) == "function" then
-            local progress = duration > 0
-                and ((current - startedAt) / duration) % 1 or 0
-            vars.UpdateProgress(body, progress, spec.isMoving == true)
-        end
+        local progress = duration > 0
+            and ((current - startedAt) / duration) % 1 or 0
+        Driver.UpdateAnimVars(body, progress, spec.isMoving == true)
         if current - startedAt >= duration then
             return true, "finished"
         end
@@ -217,10 +294,7 @@ function Driver.Stop(body, record, ownerToken, options)
     end
     local route = modData and modData[ROUTE_KEY] or options.route
     if route == "anim_vars" then
-        local vars = animVarAdapter()
-        if vars and type(vars.Clear) == "function" then
-            pcall(vars.Clear, body)
-        end
+        Driver.ClearAnimVars(body)
     else
         local anim = animService()
         if anim and type(anim.FinishBump) == "function" then

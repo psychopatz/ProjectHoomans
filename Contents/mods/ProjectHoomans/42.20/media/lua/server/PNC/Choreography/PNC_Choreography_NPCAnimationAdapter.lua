@@ -10,8 +10,8 @@ PNC.Choreography.NPCAnimation = PNC.Choreography.NPCAnimation or {}
 
 local Adapter = PNC.Choreography.NPCAnimation
 local Animation = PNC.Animation
-local AnimVars = PNC.Choreography.AnimVarAdapter
-    or require "PNC/Core/Choreography/PNC_Choreography_AnimVarAdapter"
+local AnimDriver = PNC.AnimationDriver
+    or require "PNC/Core/Visuals/PNC_AnimationDriver"
 local Telemetry = PNC.Choreography.Telemetry
     or require "PNC/Core/Choreography/PNC_Choreography_Telemetry"
 
@@ -214,7 +214,7 @@ function Adapter.Start(session, actor, beat, track)
             -- behavior2_move) vs MP (useless=false for client_goto).
             actor._savedUseless = nil
         end
-        local ok, reason = AnimVars.Apply(body, track, {
+        local ok, reason = AnimDriver.ApplyAnimVars(body, track, {
             phase = track.phase or beat.id or "play",
             moving = false,
             progress = 0,
@@ -335,7 +335,7 @@ function Adapter.Observe(session, actor, beat)
         local refActor = leader or actor
         local refBody = refActor and refActor.body or body
         local moving = isNPCMoving(refBody, refActor, current)
-        AnimVars.UpdateProgress(body, progress, moving)
+        AnimDriver.UpdateAnimVars(body, progress, moving)
         if not isLocomotiveCarrier(session, actor, beat) then
             holdAnimVarNPC(body)
         end
@@ -414,7 +414,7 @@ function Adapter.Release(session, actor)
         return false, "npc_animation_ownership_lost"
     end
     if modData[ROUTE_KEY] == "anim_vars" then
-        AnimVars.Clear(body, actor.animationTrack)
+        AnimDriver.ClearAnimVars(body, actor.animationTrack)
         if actor._savedUseless ~= nil and body and body.setUseless then
             body:setUseless(actor._savedUseless == true)
         end

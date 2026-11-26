@@ -9,8 +9,8 @@ PNC = PNC or {}
 PNC.Choreography = PNC.Choreography or {}
 
 local Opera = PNC.Choreography
-local AnimVars = Opera.AnimVarAdapter
-    or require "PNC/Core/Choreography/PNC_Choreography_AnimVarAdapter"
+local AnimDriver = PNC.AnimationDriver
+    or require "PNC/Core/Visuals/PNC_AnimationDriver"
 local Tether = Opera.Tether
     or require "PNC/Core/Choreography/PNC_Choreography_Tether"
 local Const = PNC.Const or {}
@@ -165,8 +165,8 @@ local function cleanupScene(scene)
     for _, entry in pairs(scene.actors or {}) do
         local body = entry._body or resolveBody(entry)
         if body and not isLocallyOwnedPlayer(body, scene.sessionId) then
-            if AnimVars and AnimVars.Clear then
-                AnimVars.Clear(body)
+            if AnimDriver and AnimDriver.ClearAnimVars then
+                AnimDriver.ClearAnimVars(body)
             end
             if entry._collisionDisabled and body.setCollidable then
                 body:setCollidable(true)
@@ -244,7 +244,7 @@ function VisualSync.Receive(payload)
         if not actors[id] and old._body
             and not isLocallyOwnedPlayer(old._body, sessionId)
         then
-            if AnimVars and AnimVars.Clear then AnimVars.Clear(old._body) end
+            if AnimDriver and AnimDriver.ClearAnimVars then AnimDriver.ClearAnimVars(old._body) end
             if old._collisionDisabled and old._body.setCollidable then
                 old._body:setCollidable(true)
             end
@@ -289,7 +289,7 @@ function VisualSync.Pump()
                     moving = entry._moving == true
                 end
                 if not entry._applied then
-                    AnimVars.Apply(body, {
+                    AnimDriver.ApplyAnimVars(body, {
                         style = entry.st,
                         role = entry.r,
                         phase = entry.ph,
@@ -300,7 +300,7 @@ function VisualSync.Pump()
                     })
                     entry._applied = true
                 else
-                    AnimVars.UpdateProgress(body, nil, moving)
+                    AnimDriver.UpdateAnimVars(body, nil, moving)
                 end
                 if scene.disableCollision and body.setCollidable
                     and not entry._collisionDisabled

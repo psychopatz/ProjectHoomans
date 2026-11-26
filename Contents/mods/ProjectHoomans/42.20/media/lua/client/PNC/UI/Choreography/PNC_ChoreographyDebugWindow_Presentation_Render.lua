@@ -8,7 +8,11 @@ local Class = ISPNCChoreographyDebugWindow
 local tr = Internal.tr
 
 function Class:render()
-    PsychopatzWindow.render(self)
+    if self._embedded then
+        ISPanel.render(self)
+    else
+        PsychopatzWindow.render(self)
+    end
     local Client = Internal.Client
     local status, runtimeError = Client.GetStatus()
     local editorMessage = self.editorStatus

@@ -5,7 +5,7 @@
 --   1. Preflight (verifies no crashes and ready == true)
 --   2. Start -> MOVING -> tick-1 activeSafety/puppetMovementIsSafe
 --   3. Arrival -> FACING -> READY -> PLAYING (beat 1 + beat 2 transition)
---   4. AnimVarAdapter verification on anim_vars tracks + locomotive sustained check
+--   4. AnimationDriver verification on anim_vars tracks + locomotive sustained check
 --   5. Mid-session preflight snapshot + Client.Stop() cleanup verification
 
 local T = require "tests/support/test"
@@ -255,7 +255,7 @@ PNC = {
 local Opera = T.load("ProjectHoomans", "shared", "PNC/Core/Choreography/PNC_Choreography.lua")
 local Blueprints = T.load("ProjectHoomans", "shared", "PNC/Core/Choreography/PNC_Choreography_Blueprints.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Choreography/PNC_Choreography_Anchors.lua")
-T.load("ProjectHoomans", "shared", "PNC/Core/Choreography/PNC_Choreography_AnimVarAdapter.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Visuals/PNC_AnimationDriver.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Choreography/PNC_Choreography_Tether.lua")
 local Telemetry = T.load("ProjectHoomans", "shared", "PNC/Core/Choreography/PNC_Choreography_Telemetry.lua")
 Telemetry.Enabled = false

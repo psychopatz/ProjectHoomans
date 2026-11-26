@@ -6,8 +6,10 @@
 --   3. Props & Anchors (Hold Item + Firearm Anchor)
 
 require "ISUI/ISTabPanel"
+require "ISUI/ISComboBox"
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PNC/Debug/PNC_AnimationDebugPlayer"
+require "PNC/Choreography/PNC_Choreography_Client"
 require "PNC/UI/Nameplates/PNC_NameplateFirearmAnchor"
 require "PNC/UI/AnimationStudio/PNC_AnimationStudio_ClipsTab"
 require "PNC/UI/AnimationStudio/PNC_AnimationStudio_ScenesTab"
@@ -30,6 +32,14 @@ local function tr(key, fallback)
     return value
 end
 
+local function getNearbyLiveNPCs()
+    local client = PNC.Choreography and PNC.Choreography.Client or nil
+    if client and type(client.GetNearbyNPCs) == "function" then
+        return client.GetNearbyNPCs(32) or {}
+    end
+    return {}
+end
+
 ISPNCAnimationStudioWindow = PsychopatzWindow:derive("ISPNCAnimationStudioWindow")
 
 function ISPNCAnimationStudioWindow:initialise()
@@ -39,9 +49,22 @@ end
 function ISPNCAnimationStudioWindow:createChildren()
     PsychopatzWindow.createChildren(self)
 
-    self.tabPanel = ISTabPanel:new(10, self:titleBarHeight() + 26,
+    self.targetCombo = ISComboBox:new(0, 0, 260, 24, self,
+        ISPNCAnimationStudioWindow.onTargetComboChanged)
+    self.targetCombo:initialise()
+    self.targetCombo:instantiate()
+    self:addChild(self.targetCombo)
+
+    self.refreshTargetBtn = UI.CreateButton(self, {
+        title = tr("UI_PNC_AnimationStudio_RefreshTargets", "Refresh NPCs"),
+        target = self,
+        onclick = UI.ButtonCallback(function() self:refreshNearbyTargets(false) end),
+        variant = "quiet",
+    })
+
+    self.tabPanel = ISTabPanel:new(10, self:titleBarHeight() + 34,
         self.width - 20,
-        self.height - self:titleBarHeight() - self:resizeWidgetHeight() - 34)
+        self.height - self:titleBarHeight() - self:resizeWidgetHeight() - 42)
     self.tabPanel:initialise()
     self.tabPanel:instantiate()
     self.tabPanel.tabPadX = Layout.Pixels(12, self.uiScale)
@@ -68,9 +91,65 @@ function ISPNCAnimationStudioWindow:createChildren()
     self:onResponsiveLayout()
 end
 
+function ISPNCAnimationStudioWindow:refreshNearbyTargets(autoSelectFirst)
+    if not self.targetCombo then return end
+    local currentId = tostring(self.npcId or "")
+    local nearby = getNearbyLiveNPCs()
+    self.targetCombo:clear()
+    if #nearby == 0 then
+        self.targetCombo:addOptionWithData("No nearby live NPCs", { id = "", name = "No NPC" })
+        self.targetCombo.selected = 1
+        if currentId ~= "" then
+            self:setTarget({})
+        end
+        return
+    end
+    local selectedIdx = nil
+    for i, entry in ipairs(nearby) do
+        local dist = entry.distSq and math.sqrt(tonumber(entry.distSq) or 0) or nil
+        local distText = dist and string.format(" (%.1f tiles)", dist) or ""
+        self.targetCombo:addOptionWithData(
+            tostring(entry.name or entry.id) .. distText,
+            entry
+        )
+        if currentId ~= "" and tostring(entry.id) == currentId then
+            selectedIdx = i
+        end
+    end
+    if selectedIdx then
+        self.targetCombo.selected = selectedIdx
+    elseif autoSelectFirst or currentId == "" then
+        self.targetCombo.selected = 1
+        self:setTarget(nearby[1])
+    else
+        self.targetCombo.selected = 1
+        self:setTarget(nearby[1])
+    end
+end
+
+function ISPNCAnimationStudioWindow:onTargetComboChanged()
+    if not self.targetCombo or not self.targetCombo.getOptionData then return end
+    local entry = self.targetCombo:getOptionData(self.targetCombo.selected)
+    if type(entry) == "table" then
+        self:setTarget(entry)
+    end
+end
+
 function ISPNCAnimationStudioWindow:onResponsiveLayout()
     if not self.tabPanel then return end
-    local top = self:titleBarHeight() + 26
+    local titleH = self:titleBarHeight()
+    local headerY = titleH + 5
+    local headerH = 24
+    local refreshW = 104
+    local comboX = 96
+    local comboW = math.min(340, math.max(160, self.width - comboX - refreshW - 22))
+    if self.targetCombo then
+        Layout.SetBounds(self.targetCombo, comboX, headerY, comboW, headerH)
+    end
+    if self.refreshTargetBtn then
+        Layout.SetBounds(self.refreshTargetBtn, comboX + comboW + 6, headerY, refreshW, headerH)
+    end
+    local top = headerY + headerH + 6
     local resizeH = self:resizeWidgetHeight()
     local panelW = math.max(1, self.width - 20)
     local panelH = math.max(1, self.height - top - resizeH - 8)
@@ -91,10 +170,37 @@ function ISPNCAnimationStudioWindow:resolveBody()
     return self.body
 end
 
--- Called by embedded NPC AnimationTab's "SCENE LAB" button to jump straight
--- to the Single-NPC Scenes view inside this same window.
-function ISPNCAnimationStudioWindow:onSceneLabClicked()
+function ISPNCAnimationStudioWindow:resolveRecord()
+    if self.npcId and self.npcId ~= "" and PNC.Registry and PNC.Registry.Get then
+        return PNC.Registry.Get(self.npcId)
+    end
+    return nil
+end
+
+function ISPNCAnimationStudioWindow:playXML(entry)
+    local body = self:resolveBody()
+    if not entry or not body or not DebugPlayer or not DebugPlayer.PlayXML then return end
+    DebugPlayer.PlayXML(entry, self.npcId, body, self:resolveRecord())
+end
+
+function ISPNCAnimationStudioWindow:playPipeline(entry)
+    local body = self:resolveBody()
+    if not entry or not body or not DebugPlayer or not DebugPlayer.PlayPipeline then return end
+    DebugPlayer.PlayPipeline(entry, self.npcId, body, self:resolveRecord())
+end
+
+function ISPNCAnimationStudioWindow:playRaw(entry)
+    local body = self:resolveBody()
+    if not entry or not body or not DebugPlayer or not DebugPlayer.PlayRaw then return end
+    DebugPlayer.PlayRaw(entry, self.npcId, body, self:resolveRecord())
+end
+
+function ISPNCAnimationStudioWindow:openScenes()
     self:selectTab("scenes", "single")
+end
+
+function ISPNCAnimationStudioWindow:onSceneLabClicked()
+    self:openScenes()
 end
 
 function ISPNCAnimationStudioWindow:selectTab(tabKey, subMode)
@@ -124,13 +230,17 @@ function ISPNCAnimationStudioWindow:setTarget(contextEntry)
     local nextBody = DebugPlayer and DebugPlayer.ResolveBody
         and DebugPlayer.ResolveBody(nextID, contextEntry.zombie)
         or contextEntry.zombie
-    if (self.body ~= nextBody or tostring(self.npcId or "") ~= nextID)
-        and DebugPlayer and DebugPlayer.active
-    then
-        DebugPlayer.Stop("animation_studio_target_changed")
+    if (self.body ~= nextBody or tostring(self.npcId or "") ~= nextID) then
+        if DebugPlayer and DebugPlayer.active then
+            DebugPlayer.Stop("animation_studio_target_changed")
+        end
+        if Anchor and Anchor.ClearTarget then
+            Anchor.ClearTarget()
+        end
     end
     self.npcId = nextID
     self.body = nextBody
+    self.playerIndex = tonumber(contextEntry.playerNum or contextEntry.playerIndex) or 0
     self.npcName = tostring(
         contextEntry.name
             or (contextEntry.snapshot and contextEntry.snapshot.name)
@@ -146,10 +256,8 @@ end
 
 function ISPNCAnimationStudioWindow:prerender()
     PsychopatzWindow.prerender(self)
-    local y = self:titleBarHeight() + 6
-    local status = "Target: " .. tostring(self.npcName or "Local Player")
-        .. (self.npcId ~= "" and (" [" .. tostring(self.npcId) .. "]") or "")
-    self:drawText(status, 14, y, 0.78, 0.86, 0.94, 1, UIFont.Small)
+    local y = self:titleBarHeight() + 9
+    self:drawText("Target NPC:", 14, y, 0.78, 0.86, 0.94, 1, UIFont.Small)
 end
 
 function ISPNCAnimationStudioWindow:close()
@@ -182,15 +290,28 @@ function Studio.Open(contextEntry, initialTab, subMode)
     if not window then
         window = UI.NewWindow(ISPNCAnimationStudioWindow, {
             title = tr("UI_PNC_AnimationStudio_Title", "Animation Studio"),
-            width = 1040,
-            height = 680,
-            minWidth = 760,
-            minHeight = 520,
             resizable = true,
+            responsiveSpec = {
+                width = 1120,
+                height = 740,
+                minWidth = 760,
+                minHeight = 520,
+                maxWidth = 1600,
+                maxHeight = 1080,
+            },
         })
+        window:initialise()
+        window:instantiate()
         Studio.instance = window
     end
-    window:setTarget(contextEntry)
+    window:addToUIManager()
+    if type(contextEntry) == "table" and tostring(contextEntry.id or "") ~= "" then
+        window:setTarget(contextEntry)
+        window:refreshNearbyTargets(false)
+    else
+        window:setTarget(contextEntry)
+        window:refreshNearbyTargets(true)
+    end
     if initialTab then
         window:selectTab(initialTab, subMode)
     end

@@ -12,8 +12,8 @@ end
 
 local Adapter = PNC.Choreography.PlayerAnimation
 local Player = PsychopatzCore.Animation.Player
-local AnimVars = PNC.Choreography.AnimVarAdapter
-    or require "PNC/Core/Choreography/PNC_Choreography_AnimVarAdapter"
+local AnimDriver = PNC.AnimationDriver
+    or require "PNC/Core/Visuals/PNC_AnimationDriver"
 local OWNER_PREFIX = "ProjectHoomans.Choreography:"
 
 local function ownerFor(sessionID)
@@ -72,7 +72,7 @@ function Adapter.Start(sessionID, beat, track)
             return false, "player_is_dead"
         end
         local moving = isBodyMoving(body)
-        local ok, reason = AnimVars.Apply(body, entry, {
+        local ok, reason = AnimDriver.ApplyAnimVars(body, entry, {
             phase = entry.phase or beat.id or "play",
             moving = moving,
             progress = 0,
@@ -155,7 +155,7 @@ function Adapter.Observe(sessionID)
     end
     if active.route == "anim_vars" then
         if not body or (body.isDead and body:isDead()) then
-            AnimVars.Clear(active.body, active.entry)
+            AnimDriver.ClearAnimVars(active.body, active.entry)
             return false, "player_is_dead"
         end
         local elapsed = math.max(0, nowMs() - (tonumber(active.startedAt) or 0))
@@ -179,7 +179,7 @@ function Adapter.Observe(sessionID)
             end
             movingNow = isBodyMoving(body)
         end
-        AnimVars.UpdateProgress(body, progress, movingNow)
+        AnimDriver.UpdateAnimVars(body, progress, movingNow)
         if not sustained and elapsed >= duration then
             return true, "finished"
         end
@@ -212,7 +212,7 @@ function Adapter.Stop(sessionID)
         return false, "player_animation_not_owned"
     end
     if active.route == "anim_vars" then
-        AnimVars.Clear(active.body, active.entry)
+        AnimDriver.ClearAnimVars(active.body, active.entry)
         if active.mode == "locomotive" and active.body then
             if active.body.setBlockMovement then
                 active.body:setBlockMovement(active.savedBlock == true)
@@ -237,7 +237,7 @@ function Adapter.Clear(sessionID)
         and tostring(Adapter.Active.sessionId or "") == tostring(sessionID or "")
     then
         if Adapter.Active.route == "anim_vars" then
-            AnimVars.Clear(Adapter.Active.body, Adapter.Active.entry)
+            AnimDriver.ClearAnimVars(Adapter.Active.body, Adapter.Active.entry)
             if Adapter.Active.mode == "locomotive" and Adapter.Active.body then
                 if Adapter.Active.body.setBlockMovement then
                     Adapter.Active.body:setBlockMovement(Adapter.Active.savedBlock == true)

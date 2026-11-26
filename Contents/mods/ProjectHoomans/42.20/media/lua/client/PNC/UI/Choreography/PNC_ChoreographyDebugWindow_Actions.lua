@@ -244,7 +244,11 @@ function Class:onControl(button)
 end
 
 function Class:prerender()
-    PsychopatzWindow.prerender(self)
+    if self._embedded then
+        ISPanel.prerender(self)
+    else
+        PsychopatzWindow.prerender(self)
+    end
     self.refreshCounter = self.refreshCounter + 1
     if self.refreshCounter % 10 == 0
         and not (self.layoutTab and self.layoutTab.liveDragPending)

@@ -11,7 +11,7 @@ T.load(ROOT .. "PNC_Choreography_Blueprints.lua")
 T.load(ROOT .. "PNC_Choreography_Blueprints_Builtins.lua")
 T.load(ROOT .. "PNC_Choreography_Anchors.lua")
 T.load(ROOT .. "PNC_Choreography_Tether.lua")
-T.load(ROOT .. "PNC_Choreography_AnimVarAdapter.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Visuals/PNC_AnimationDriver.lua")
 T.load(ROOT .. "PNC_Choreography_Exporter.lua")
 
 local Capabilities = PNC.Choreography.AnimationCapabilities
@@ -19,7 +19,7 @@ local Triggers = PNC.Choreography.TriggerRegistry
 local Blueprints = PNC.Choreography.Blueprints
 local Anchors = PNC.Choreography.Anchors
 local Tether = PNC.Choreography.Tether
-local AnimVars = PNC.Choreography.AnimVarAdapter
+local AnimDriver = PNC.AnimationDriver
 local Exporter = PNC.Choreography.Exporter
 
 -- 1. Dynamic capabilities: safe non-combat bumps & anim_vars approved; combat blocked
@@ -130,12 +130,12 @@ T.equal(recB.x, 50)
 T.equal(recB.y, 60)
 T.equal(recB.z, 1)
 
--- 5. AnimVarAdapter apply & clear
-AnimVars.Apply(passengerBody, carry.beats[2].tracks.actor_2, { moving = true, progress = 0.5 })
+-- 5. AnimationDriver anim_vars apply & clear
+AnimDriver.ApplyAnimVars(passengerBody, carry.beats[2].tracks.actor_2, { moving = true, progress = 0.5 })
 T.equal(passengerBody.vars.PNC_AnimActive, true)
 T.equal(passengerBody.vars.PNC_AnimStyle, "carry_shoulder")
 T.equal(passengerBody.vars.PNC_AnimProgress, 0.5)
-AnimVars.Clear(passengerBody, carry.beats[2].tracks.actor_2)
+AnimDriver.ClearAnimVars(passengerBody, carry.beats[2].tracks.actor_2)
 T.equal(passengerBody.vars.PNC_AnimActive, nil)
 
 -- 6. Exporter Lua + AnimSet XML round-trip

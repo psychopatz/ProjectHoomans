@@ -125,12 +125,26 @@ function ISPNCAnimationStudioClipsTab:ensurePlayerPanel()
     panel.categoryCombo:instantiate()
     panel:addChild(panel.categoryCombo)
 
-    panel.list = UI.CreateScrollingList(panel, {
-        itemheight = 54,
-        drawitem = drawPlayerClipRow,
-        onmousedown = function() self:refreshPlayerDetails() end,
+    panel.list = UI.CreateList(panel, {
+        itemHeight = 54,
+        doDrawItem = drawPlayerClipRow,
+        onMouseDown = function() self:refreshPlayerDetails() end,
     })
-    panel.detail = UI.CreateDetailPanel(panel, {})
+    panel.detail = UI.CreateKeyValueList(panel, {
+        itemHeight = 26,
+        valueXMax = 150,
+        valueXRatio = 0.34,
+        ellipsize = false,
+        labelX = 8,
+        labelY = 6,
+        valueY = 6,
+        labelColor = { r = 0.62, g = 0.72, b = 0.80, a = 1 },
+        valueColor = { r = 0.92, g = 0.92, b = 0.92, a = 1 },
+        warningColor = { r = 1.0, g = 0.56, b = 0.30, a = 1 },
+        alternateColor = { r = 0.16, g = 0.18, b = 0.20, a = 1 },
+        alternateAlpha = 0.12,
+        drawSelection = false,
+    })
 
     panel.buttons = {}
     for _, def in ipairs({
@@ -187,13 +201,25 @@ function ISPNCAnimationStudioClipsTab:onPlayerCategoryChanged()
     self:refreshPlayerCatalog()
 end
 
+local function playerCatalogEntries(source)
+    local Catalog = PNC.PlayerAnimationDebugCatalog
+    local all = Catalog and Catalog.entries or {}
+    local out = {}
+    local wantZombie = source == "zombie"
+    for _, entry in ipairs(all) do
+        local isZombie = entry and entry.source == "zombie"
+        if isZombie == wantZombie then
+            out[#out + 1] = entry
+        end
+    end
+    return out
+end
+
 function ISPNCAnimationStudioClipsTab:rebuildPlayerCategories()
     local p = self.playerPanel
-    local Catalog = PNC.PlayerAnimationDebugCatalog
-    if not p or not p.categoryCombo or not Catalog then return end
+    if not p or not p.categoryCombo then return end
     p.categoryCombo:clear()
-    local all = Catalog.GetEntries and Catalog.GetEntries(self.playerSource)
-        or Catalog.entries or {}
+    local all = playerCatalogEntries(self.playerSource)
     local seen = {}
     local states = {}
     for _, entry in ipairs(all) do
@@ -214,10 +240,8 @@ end
 
 function ISPNCAnimationStudioClipsTab:refreshPlayerCatalog()
     local p = self.playerPanel
-    local Catalog = PNC.PlayerAnimationDebugCatalog
-    if not p or not p.list or not Catalog then return end
-    local all = Catalog.GetEntries and Catalog.GetEntries(self.playerSource)
-        or Catalog.entries or {}
+    if not p or not p.list then return end
+    local all = playerCatalogEntries(self.playerSource)
     local query = string.lower(tostring(p.search and p.search:getText() or ""))
     local cat = p.categoryCombo and p.categoryCombo:getOptionData(p.categoryCombo.selected) or "__all__"
     p.list:clear()
@@ -247,19 +271,18 @@ function ISPNCAnimationStudioClipsTab:refreshPlayerDetails()
     local p = self.playerPanel
     if not p or not p.detail then return end
     local entry = self:selectedPlayerEntry()
-    local lines = {}
+    p.detail:clear()
     if not entry then
-        addDetail(lines, "Selection", "No animation selected")
+        addDetail(p.detail, "Selection", "No animation selected", true)
     else
-        addDetail(lines, "State", tostring(entry.state or "-"))
-        addDetail(lines, "Node", tostring(entry.node or "-"))
-        addDetail(lines, "Clip", tostring(entry.anim or "(none)"))
-        addDetail(lines, "Route", tostring(entry.route or "-"))
-        addDetail(lines, "Action / Emote", tostring(entry.action or entry.emote or "-"))
-        addDetail(lines, "File", tostring(entry.file or "-"))
-        addDetail(lines, "Loop", self.playerLoop and "ON" or "OFF")
+        addDetail(p.detail, "State", tostring(entry.state or "-"))
+        addDetail(p.detail, "Node", tostring(entry.node or "-"))
+        addDetail(p.detail, "Clip", tostring(entry.anim or "(none)"))
+        addDetail(p.detail, "Route", tostring(entry.route or "-"))
+        addDetail(p.detail, "Action / Emote", tostring(entry.action or entry.emote or "-"))
+        addDetail(p.detail, "File", tostring(entry.file or "-"))
+        addDetail(p.detail, "Loop", self.playerLoop and "ON" or "OFF")
     end
-    UI.SetDetailLines(p.detail, lines)
 end
 
 function ISPNCAnimationStudioClipsTab:onPlayerAction(button)
@@ -268,6 +291,9 @@ function ISPNCAnimationStudioClipsTab:onPlayerAction(button)
     local entry = self:selectedPlayerEntry()
     if id == "loop" then
         self.playerLoop = not self.playerLoop
+        if Debug and Debug.SetLoopEnabled then
+            Debug.SetLoopEnabled(self.playerLoop)
+        end
         setButtonState(self.playerPanel and self.playerPanel.buttons.loop,
             self.playerLoop and "LOOP: ON" or "LOOP: OFF",
             self.playerLoop and "selected" or "quiet")
@@ -276,13 +302,15 @@ function ISPNCAnimationStudioClipsTab:onPlayerAction(button)
     end
     if not Debug then return end
     if id == "play" and entry and Debug.Play then
-        Debug.Play(entry, { loop = self.playerLoop })
-    elseif id == "replay" and entry and Debug.Replay then
-        Debug.Replay(entry, { loop = self.playerLoop })
+        if Debug.SetLoopEnabled then Debug.SetLoopEnabled(self.playerLoop) end
+        Debug.Play(entry)
+    elseif id == "replay" and Debug.Replay then
+        if Debug.SetLoopEnabled then Debug.SetLoopEnabled(self.playerLoop) end
+        Debug.Replay()
     elseif id == "stop" and Debug.Stop then
         Debug.Stop("animation_studio_stop")
-    elseif id == "dump" and Debug.DumpTrace then
-        Debug.DumpTrace()
+    elseif id == "dump" and Debug.Dump then
+        Debug.Dump()
     end
     self:refreshPlayerDetails()
 end

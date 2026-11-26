@@ -25,11 +25,6 @@ PNC = {
         FinishBump = function() finishedCount = finishedCount + 1 end,
     },
     Choreography = {
-        AnimVarAdapter = {
-            Apply = function() return true end,
-            UpdateProgress = function() end,
-            Clear = function() end,
-        },
         Telemetry = {},
     },
 }

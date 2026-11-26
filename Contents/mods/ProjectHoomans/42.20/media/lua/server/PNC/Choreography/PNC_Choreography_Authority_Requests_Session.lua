@@ -105,9 +105,9 @@ local function handleSessionAction(player, session, args, action)
     end
     if action == "stop" then
         if not session then
-            local animVars = Opera.AnimVarAdapter
-            if player and animVars and animVars.Clear then
-                animVars.Clear(player)
+            local animDriver = PNC.AnimationDriver
+            if player and animDriver and animDriver.ClearAnimVars then
+                animDriver.ClearAnimVars(player)
             end
             Internal.sendError(player, "session_missing")
             return true, false, "session_missing", true

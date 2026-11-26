@@ -22,8 +22,8 @@ local NPCAnimation = Opera.NPCAnimation
     or require "PNC/Choreography/PNC_Choreography_NPCAnimationAdapter"
 local Tether = Opera.Tether
     or require "PNC/Core/Choreography/PNC_Choreography_Tether"
-local AnimVars = Opera.AnimVarAdapter
-    or require "PNC/Core/Choreography/PNC_Choreography_AnimVarAdapter"
+local AnimDriver = PNC.AnimationDriver
+    or require "PNC/Core/Visuals/PNC_AnimationDriver"
 local Telemetry = Opera.Telemetry
     or require "PNC/Core/Choreography/PNC_Choreography_Telemetry"
 local NPCOverride = Opera.Override
@@ -133,8 +133,8 @@ local function releaseActors(session)
             actor.tetherLeaderID = nil
             actor._tetherNavCleared = nil
         end
-        if actor.body and AnimVars and AnimVars.Clear then
-            AnimVars.Clear(actor.body, actor.animationTrack)
+        if actor.body and AnimDriver and AnimDriver.ClearAnimVars then
+            AnimDriver.ClearAnimVars(actor.body, actor.animationTrack)
         end
         if actor.kind == "nearby_live_npc" then
             if actor.animationOwned

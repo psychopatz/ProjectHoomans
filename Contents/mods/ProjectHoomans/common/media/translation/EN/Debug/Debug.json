@@ -236,6 +236,7 @@
   "UI_PNC_AnimationStudio_ModePlayer": "Local Player",
   "UI_PNC_AnimationStudio_MultiScenes": "Multi-Actor Scenes",
   "UI_PNC_AnimationStudio_PlayScene": "Play Scene",
+  "UI_PNC_AnimationStudio_RefreshTargets": "Refresh NPCs",
   "UI_PNC_AnimationStudio_RollPool": "Roll Pool Once",
   "UI_PNC_AnimationStudio_SingleScenes": "Single-NPC Scenes",
   "UI_PNC_AnimationStudio_StopScene": "Stop Scene / Clear",

@@ -142,12 +142,26 @@ function ISPNCAnimationStudioScenesTab:buildSinglePanel()
     p.propHand.selected = 1
     p:addChild(p.propHand)
 
-    p.list = UI.CreateScrollingList(p, {
-        itemheight = 54,
-        drawitem = drawSingleSceneRow,
-        onmousedown = function() self:refreshSingleDetails() end,
+    p.list = UI.CreateList(p, {
+        itemHeight = 54,
+        doDrawItem = drawSingleSceneRow,
+        onMouseDown = function() self:refreshSingleDetails() end,
     })
-    p.detail = UI.CreateDetailPanel(p, {})
+    p.detail = UI.CreateKeyValueList(p, {
+        itemHeight = 26,
+        valueXMax = 150,
+        valueXRatio = 0.34,
+        ellipsize = false,
+        labelX = 8,
+        labelY = 6,
+        valueY = 6,
+        labelColor = { r = 0.62, g = 0.72, b = 0.80, a = 1 },
+        valueColor = { r = 0.92, g = 0.92, b = 0.92, a = 1 },
+        warningColor = { r = 1.0, g = 0.56, b = 0.30, a = 1 },
+        alternateColor = { r = 0.16, g = 0.18, b = 0.20, a = 1 },
+        alternateAlpha = 0.12,
+        drawSelection = false,
+    })
 
     p.buttons = {}
     for _, def in ipairs({
@@ -182,6 +196,7 @@ function ISPNCAnimationStudioScenesTab:ensureMultiPanel()
     host:initialise()
     host:noBackground()
     host:instantiate()
+    host._embedded = true
     host.uiScale = self.host and self.host.uiScale or 1
     host.titleBarHeight = function() return 0 end
     host.resizeWidgetHeight = function() return 0 end
@@ -191,7 +206,9 @@ function ISPNCAnimationStudioScenesTab:ensureMultiPanel()
         end
     end
     for k, fn in pairs(ISPNCChoreographyDebugWindow) do
-        if type(fn) == "function" and host[k] == nil then
+        if type(fn) == "function"
+            and k ~= "new" and k ~= "initialise" and k ~= "close"
+        then
             host[k] = fn
         end
     end
@@ -207,9 +224,16 @@ function ISPNCAnimationStudioScenesTab:ensureMultiPanel()
             host.tabPanel:removeView(host.npcAnimationTab)
         end
     end
+    if Internal.Model and Internal.Model.ResetEditorSelection then
+        Internal.Model.ResetEditorSelection()
+    end
+    if Internal.Model and Internal.Model.ClearActorBindings then
+        Internal.Model.ClearActorBindings()
+    end
     self.multiPanel = host
-    if self.host and host.setTarget then
-        host:setTarget(self.host.contextEntry)
+    if host.refreshViews then host:refreshViews() end
+    if Internal.Client and Internal.Client.Refresh then
+        Internal.Client.Refresh()
     end
     return host
 end
@@ -234,10 +258,10 @@ function ISPNCAnimationStudioScenesTab:rebuildSingleGroups()
     p.groupFilter:clear()
     local groups = SceneModel.GetGroups and SceneModel.GetGroups() or {}
     if #groups == 0 then
-        p.groupFilter:addOptionWithData("All scenes", "all")
+        p.groupFilter:addOptionWithData("All scenes", { kind = "all", label = "All scenes" })
     else
         for _, g in ipairs(groups) do
-            p.groupFilter:addOptionWithData(tostring(g.label or g.id), tostring(g.id or "all"))
+            p.groupFilter:addOptionWithData(tostring(g.label or g.key or "All scenes"), g)
         end
     end
     p.groupFilter.selected = 1
@@ -250,9 +274,10 @@ end
 function ISPNCAnimationStudioScenesTab:refreshSingleCatalog()
     local p = self.singlePanel
     if not p or not p.list or not SceneModel then return end
-    local group = p.groupFilter and p.groupFilter:getOptionData(p.groupFilter.selected) or "all"
+    local group = p.groupFilter and p.groupFilter:getOptionData(p.groupFilter.selected)
+        or { kind = "all" }
     local query = tostring(p.search and p.search:getText() or "")
-    local scenes = SceneModel.FilterScenes and SceneModel.FilterScenes(group, query) or {}
+    local scenes = SceneModel.GetScenes and SceneModel.GetScenes(query, group) or {}
     self.singleScenes = scenes
     p.list:clear()
     for _, scene in ipairs(scenes) do
@@ -328,30 +353,37 @@ function ISPNCAnimationStudioScenesTab:refreshSingleDetails()
     local p = self.singlePanel
     if not p or not p.detail then return end
     local scene = self:selectedSingleScene()
-    local lines = {}
-    addDetail(lines, "Target NPC", tostring(self.host and self.host.npcName or "None"))
+    p.detail:clear()
+    addDetail(p.detail, "Target NPC", tostring(self.host and self.host.npcName or "None"))
     if not scene then
-        addDetail(lines, "Scene", "No scene selected")
+        addDetail(p.detail, "Scene", "No scene selected", true)
     else
-        addDetail(lines, "Scene ID", tostring(scene.id))
-        addDetail(lines, "Label", tostring(scene.label or "-"))
-        addDetail(lines, "Description", tostring(scene.description or "-"))
-        addDetail(lines, "Category", tostring(scene.category or "-"))
-        addDetail(lines, "Pool", tostring(scene.pool or "-"))
-        addDetail(lines, "Bump", tostring(scene.bump or "-"))
+        addDetail(p.detail, "Scene ID", tostring(scene.id))
+        addDetail(p.detail, "Label", tostring(scene.label or "-"))
+        addDetail(p.detail, "Description", tostring(scene.description or "-"))
+        addDetail(p.detail, "Category", tostring(scene.category or "-"))
+        addDetail(p.detail, "Pool", tostring(scene.pool or "-"))
+        addDetail(p.detail, "Bump", tostring(scene.bump or "-"))
         if scene.propPrimary or scene.propSecondary then
-            addDetail(lines, "Default Props", tostring(scene.propPrimary or "-")
+            addDetail(p.detail, "Default Props", tostring(scene.propPrimary or "-")
                 .. " / " .. tostring(scene.propSecondary or "-"))
         end
     end
-    UI.SetDetailLines(p.detail, lines)
+    local hasNpc = self.host and tostring(self.host.npcId or "") ~= ""
+    local hasPool = scene and scene.pool and tostring(scene.pool) ~= ""
+    if p.buttons then
+        if p.buttons.play then p.buttons.play:setEnable(hasNpc and scene ~= nil) end
+        if p.buttons.roll then p.buttons.roll:setEnable(hasNpc and hasPool == true) end
+        if p.buttons.cycle then p.buttons.cycle:setEnable(hasNpc and hasPool == true) end
+        if p.buttons.stop then p.buttons.stop:setEnable(hasNpc) end
+    end
 end
 
 function ISPNCAnimationStudioScenesTab:setContext(host)
     self.host = host
     self:refreshSingleDetails()
-    if self.multiPanel and self.multiPanel.setTarget then
-        self.multiPanel:setTarget(host and host.contextEntry or nil)
+    if self.multiPanel and self.multiPanel.refreshViews then
+        self.multiPanel:refreshViews()
     end
 end
 

@@ -259,9 +259,9 @@ function Client.Stop()
             Movement.Clear(Movement.Active.sessionId)
         end
         local body = localPlayer()
-        local animVars = Opera.AnimVarAdapter
-        if body and animVars and animVars.Clear then
-            animVars.Clear(body)
+        local animDriver = PNC.AnimationDriver
+        if body and animDriver and animDriver.ClearAnimVars then
+            animDriver.ClearAnimVars(body)
         end
     end
     Client.StopPreview()

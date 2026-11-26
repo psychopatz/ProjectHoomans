@@ -15,7 +15,9 @@ function Class:initialise()
 end
 
 function Class:createChildren()
-    PsychopatzWindow.createChildren(self)
+    if not self._embedded then
+        PsychopatzWindow.createChildren(self)
+    end
     self.model = Model
     self.loopEnabled = false
     self.editorStatus = nil

@@ -50,7 +50,7 @@ PNC.Core = {
     IsClientOnly = function() return clientMode and not serverMode end,
 }
 
-T.load("ProjectHoomans", "shared", "PNC/Core/Choreography/PNC_Choreography_AnimVarAdapter.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Visuals/PNC_AnimationDriver.lua")
 T.load("ProjectHoomans", "shared", "PNC/Core/Choreography/PNC_Choreography_Tether.lua")
 local ServerSync = T.load("ProjectHoomans", "server", "PNC/Choreography/PNC_Choreography_Authority_VisualSync.lua")
 local ClientSync = T.load("ProjectHoomans", "client", "PNC/Choreography/PNC_Choreography_Client_VisualSync.lua")

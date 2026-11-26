@@ -6,8 +6,8 @@ T.addPackagePaths({
 
 local Blueprints = T.load("ProjectHoomans", "shared",
     "PNC/Core/Choreography/PNC_Choreography_Blueprints.lua")
-local AnimVars = T.load("ProjectHoomans", "shared",
-    "PNC/Core/Choreography/PNC_Choreography_AnimVarAdapter.lua")
+local AnimDriver = T.load("ProjectHoomans", "shared",
+    "PNC/Core/Visuals/PNC_AnimationDriver.lua")
 
 local expectedStyles = {
     { id = "carry.princess", style = "carry_princess", grounded = false },
@@ -49,7 +49,7 @@ for _, spec in ipairs(expectedStyles) do
     T.equal(npcBp.anchorFrame.originActor, "actor_2", npcID .. " anchors on target actor_2")
 end
 
--- Verify AnimVarAdapter drives canonical PNC_Anim* variables cleanly.
+-- Verify AnimationDriver drives canonical PNC_Anim* variables cleanly.
 local vars = {}
 local body = {
     setVariable = function(_, name, val) vars[name] = val end,
@@ -59,18 +59,18 @@ local body = {
 
 local handhold = Blueprints.Get("carry.handhold")
 local carrierTrack = Blueprints.GetTrack(handhold.beats[2], "actor_1", "local_player")
-local okApply = AnimVars.Apply(body, carrierTrack, { phase = "carry", moving = false, progress = 0 })
-T.equal(okApply, true, "AnimVarAdapter applies handhold carrier track")
+local okApply = AnimDriver.ApplyAnimVars(body, carrierTrack, { phase = "carry", moving = false, progress = 0 })
+T.equal(okApply, true, "AnimationDriver applies handhold carrier track")
 T.equal(vars.PNC_AnimActive, true, "PNC_AnimActive set to true")
 T.equal(vars.PNC_AnimRole, "Carrier", "PNC_AnimRole set to Carrier")
 T.equal(vars.PNC_AnimStyle, "carry_handhold", "PNC_AnimStyle set to carry_handhold")
 T.equal(vars.PNC_AnimPhase, "carry", "PNC_AnimPhase set to carry")
 
-AnimVars.UpdateProgress(body, 0.5, true)
+AnimDriver.UpdateAnimVars(body, 0.5, true)
 T.equal(vars.PNC_AnimProgress, 0.5, "PNC_AnimProgress updated")
 T.equal(vars.PNC_AnimMoving, true, "PNC_AnimMoving updated")
 
-AnimVars.Clear(body, carrierTrack)
+AnimDriver.ClearAnimVars(body, carrierTrack)
 T.equal(vars.PNC_AnimActive, nil, "PNC_AnimActive cleared on stop")
 T.equal(vars.PNC_AnimRole, nil, "PNC_AnimRole cleared on stop")
 T.equal(vars.PNC_AnimStyle, nil, "PNC_AnimStyle cleared on stop")
