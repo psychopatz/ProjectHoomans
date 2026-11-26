@@ -87,6 +87,7 @@ local optionAccessors = {
     RadioAmbientIntervalSeconds = "RadioAmbientIntervalSeconds",
     RadioAmbientChance = "RadioAmbientChance",
     ChatterDensity = "ChatterDensity",
+    NPCCarryCapacityMultiplier = "NPCCarryCapacityMultiplier",
 }
 
 for i = 1, #knownOptions do

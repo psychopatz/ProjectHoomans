@@ -98,7 +98,7 @@ T.equal(Translation.Get("Character", "UI_PNC_Trait_Friendly"), "Palakaibigan",
     "localized catalog overrides the English value")
 T.equal(Translation.GetKey("UI_PNC_Trait_Brawler"), "Palaban",
     "localized catalog resolves the Tagalog value")
-T.equal(Translation.GetKey("UI_PNC_DebugHub_NPCMonitor_Title"), "Monitor ng NPC",
+T.equal(Translation.GetKey("UI_PNC_DebugHub_NPCMonitor_Title"), "Runtime Monitor ng NPC",
     "Debug Hub title resolves through the localized catalog")
 T.equal(Translation.GetKey("UI_PNC_DebugHub_NPCMonitor_Description"),
     "Siyasatin ang lifecycle, awtoridad, presensya, labanan, at runtime body ng mga NPC.",

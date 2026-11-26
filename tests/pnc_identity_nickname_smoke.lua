@@ -35,11 +35,11 @@ T.equal(Names.ResolveNickname("Faustino", 17, { isFemale = false }), "Tino",
 T.equal(Names.ResolveNickname("Faustino", 17, { isFemale = true }), "Faustino",
     "male-only registered nickname does not leak to female actors")
 
-local maleAlex = Names.ResolveNickname("Alex", 42, { isFemale = false })
-local femaleAlex = Names.ResolveNickname("Alex", 42, { isFemale = true })
-T.truthy(maleAlex == "Al" or maleAlex == "Lex",
-    "male Alex resolves to male nickname pool")
-T.truthy(femaleAlex == "Lexi" or femaleAlex == "Lexy",
-    "female Alex resolves to female nickname pool")
+local maleFrancis = Names.ResolveNickname("Francis", 42, { isFemale = false })
+local femaleFrancis = Names.ResolveNickname("Francis", 42, { isFemale = true })
+T.truthy(maleFrancis == "Frank" or maleFrancis == "Frankie",
+    "male Francis resolves to male nickname pool")
+T.truthy(femaleFrancis == "Fran",
+    "female Francis resolves to female nickname pool")
 
 T.finish("pnc_identity_nickname_smoke")

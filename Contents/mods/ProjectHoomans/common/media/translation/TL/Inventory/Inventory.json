@@ -11,6 +11,7 @@
     "UI_PNC_Inventory_DragHint": "Ang mga icon ng bag ay pumipili ng mga lalagyan. I-drag sa pagitan ng mga gilid; i-right-click ang mga item sa NPC.",
     "UI_PNC_Inventory_Drop": "Ihulog",
     "UI_PNC_Inventory_Equip": "Kasangkapan ang Primary",
+    "UI_PNC_Inventory_EquipSecondary": "Kasangkapan ang Secondary",
     "UI_PNC_Inventory_EquipContainer": "Isuot",
     "UI_PNC_Inventory_EquipWaterContainer": "Maglagay ng Lalagyan ng Tubig",
     "UI_PNC_Inventory_Failed": "Nabigo ang pagkilos ng imbentaryo",
