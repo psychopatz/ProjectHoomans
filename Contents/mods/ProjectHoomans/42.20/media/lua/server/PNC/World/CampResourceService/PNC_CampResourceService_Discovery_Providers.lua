@@ -24,6 +24,13 @@ function Service.RegisterProvider(id, provider)
     return true, provider
 end
 
+function Service.UnregisterProvider(id)
+    id = tostring(id or "")
+    if id == "" or not Service.Providers[id] then return false end
+    Service.Providers[id] = nil
+    return true
+end
+
 Service.RegisterProvider("bed", {
     resourceKind = "sleep_surface",
     CaptureSquare = function(square, add)

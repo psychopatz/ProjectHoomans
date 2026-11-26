@@ -192,6 +192,59 @@ function Service.AcquireWater(record, options)
     }
 end
 
+function Service.AcquireByCapability(record, capability, options)
+    capability = tostring(capability or "")
+    if capability == "sleep" then
+        return Service.AcquireSleep(record, options)
+    end
+    if capability == "living" then
+        return Service.AcquireSeat(record, options)
+    end
+    if capability == "survival.drink.world" then
+        return Service.AcquireWater(record, options)
+    end
+    options = type(options) == "table" and options or {}
+    local order = campOrder(record)
+    if not order then return nil, "NOT_CAMPED" end
+    local resource, target, targets, reason = Service.FindByCapability(
+        record, capability, options)
+    if not resource then return nil, reason or "CAMP_RESOURCE_UNAVAILABLE" end
+    local campId = tostring(order.campId or "camp:" .. tostring(record.id))
+    local reservations = PNC.FacilityReservations
+    if not reservations or not reservations.ReserveResource then
+        return nil, "CAMP_RESERVATIONS_UNAVAILABLE"
+    end
+    local ok, reservation = reservations.ReserveResource(
+        Internal.CampFacilityId(campId), resource, record.id, capability,
+        tonumber(options.ttlMs) or 30000,
+        { campId = campId, campResource = true })
+    if not ok then
+        return nil, reservation or "CAMP_RESOURCE_RESERVATION_FAILED"
+    end
+    return {
+        ok = true,
+        facilityId = Internal.CampFacilityId(campId),
+        componentId = "",
+        reservationId = reservation.id,
+        capability = capability,
+        role = resource.role or capability,
+        resource = resource,
+        resourceKey = resource.resourceKey,
+        resourceKind = resource.resourceKind or capability,
+        target = target,
+        approachCandidates = targets,
+        campId = campId,
+        campActivity = true,
+        campX = order.x,
+        campY = order.y,
+        campZ = order.z,
+        campRadius = number(order.radius, Const.CAMP_RADIUS or 3),
+        resourceRadius = number(order.resourceRadius,
+            Const.CAMP_RESOURCE_RADIUS or 12),
+        executionMode = options.abstract == true and "ABSTRACT" or "LIVE",
+    }
+end
+
 Internal.ApplyTarget = applyTarget
 
 return Service

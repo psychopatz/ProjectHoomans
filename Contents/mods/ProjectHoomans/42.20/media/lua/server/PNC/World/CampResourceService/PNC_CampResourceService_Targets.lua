@@ -369,6 +369,130 @@ local function reserveWater(record, resource, campId)
         { campId = campId, campResource = true })
 end
 
+Service.Capabilities = Service.Capabilities or {}
+
+function Service.RegisterCapability(capability, handler)
+    capability = tostring(capability or "")
+    if capability == "" or type(handler) ~= "table" then
+        return false, "INVALID_CAMP_CAPABILITY"
+    end
+    handler.capability = capability
+    Service.Capabilities[capability] = handler
+    return true, handler
+end
+
+function Service.UnregisterCapability(capability)
+    capability = tostring(capability or "")
+    if capability == "" or not Service.Capabilities[capability] then
+        return false
+    end
+    Service.Capabilities[capability] = nil
+    return true
+end
+
+local function genericFindByCapability(record, capability, options)
+    options = type(options) == "table" and options or {}
+    local state, snapReason = Service.GetSnapshot(record, options.force == true)
+    if isPendingRoomSnapshot(record, state, snapReason)
+        and options.allowPendingFloor ~= true
+    then
+        return nil, nil, nil, "CAMP_RESOURCE_CAPTURE_PENDING"
+    end
+    local resources = state and state.resources or {}
+    local live = options.character
+        or PNC.Registry and PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(record.id) or nil
+    local refX = live and live.getX and tonumber(live:getX())
+        or tonumber(record and record.x)
+    local refY = live and live.getY and tonumber(live:getY())
+        or tonumber(record and record.y)
+    local excludeKey = tostring(options.excludeKey or "")
+    local registry = PNC.FacilityResources
+    local best
+    for index = 1, #resources do
+        local resource = resources[index]
+        local resCap = resource.capability
+        if not resCap and registry and registry.GetDetector
+            and resource.detectorId
+        then
+            local det = registry.GetDetector(resource.detectorId)
+            resCap = det and det.capability or nil
+        end
+        local key = tostring(resource.resourceKey or "")
+        if tostring(resCap or "") == capability
+            and key ~= excludeKey
+            and (resource.exclusive == false
+                or not reserved(resource, options.excludeKey))
+        then
+            local targets = Targets and Targets.ResolveResource
+                and Targets.ResolveResource(resource, {
+                    abstract = options.abstract == true,
+                    character = live,
+                }) or nil
+            local target = type(targets) == "table" and targets[1] or nil
+            if not target and tonumber(resource.x) and tonumber(resource.y) then
+                target = {
+                    x = tonumber(resource.x),
+                    y = tonumber(resource.y),
+                    z = tonumber(resource.z) or 0,
+                    resourceKey = key,
+                    resourceKind = resource.resourceKind,
+                }
+            end
+            if target and Internal.TargetWithinCamp(record, target) then
+                local priority = tonumber(resource.priority) or 0
+                local distSq = 0
+                if refX and refY and tonumber(target.x) and tonumber(target.y) then
+                    local dx = tonumber(target.x) - refX
+                    local dy = tonumber(target.y) - refY
+                    distSq = dx * dx + dy * dy
+                end
+                if not best
+                    or priority > best.priority
+                    or (priority == best.priority and distSq < best.distSq)
+                    or (priority == best.priority and distSq == best.distSq
+                        and key < tostring(best.resource.resourceKey or ""))
+                then
+                    best = {
+                        resource = resource,
+                        target = target,
+                        targets = targets,
+                        priority = priority,
+                        distSq = distSq,
+                    }
+                end
+            end
+        end
+    end
+    if best then
+        return best.resource, best.target, best.targets
+    end
+    return nil, nil, nil, "CAMP_RESOURCE_UNAVAILABLE"
+end
+
+function Service.FindByCapability(record, capability, options)
+    capability = tostring(capability or "")
+    if capability == "" then return nil, nil, nil, "CAPABILITY_REQUIRED" end
+    local handler = Service.Capabilities[capability]
+    if handler and type(handler.find) == "function" then
+        return handler.find(record, options)
+    end
+    return genericFindByCapability(record, capability, options)
+end
+
+Service.RegisterCapability("sleep", {
+    find = Service.FindSleep,
+    reserve = reserve,
+})
+Service.RegisterCapability("living", {
+    find = Service.FindSeat,
+    reserve = reserveSeat,
+})
+Service.RegisterCapability("survival.drink.world", {
+    find = Service.FindWater,
+    reserve = reserveWater,
+})
+
 Internal.FloorSlot = floorSlot
 Internal.FloorSeatSlot = floorSeatSlot
 Internal.FloorSeatTarget = floorSeatTarget

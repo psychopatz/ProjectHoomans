@@ -241,6 +241,18 @@ local function pumpCapture(capture, budget)
         record = capture.record,
         character = capture.live,
     }
+    local resourcesRegistry = PNC and PNC.FacilityResources or nil
+    local useUnifiedInspect = resourcesRegistry ~= nil
+        and type(resourcesRegistry.InspectSquare) == "function"
+    local extraProviders = {}
+    for id, provider in pairs(Service.Providers) do
+        if not useUnifiedInspect
+            or not (resourcesRegistry.Detectors
+                and resourcesRegistry.Detectors[id])
+        then
+            extraProviders[#extraProviders + 1] = provider
+        end
+    end
     while processed < limit do
         if useRoomList then
             if capture.roomSquareIndex >= capture.roomSquareCount then break end
@@ -284,8 +296,15 @@ local function pumpCapture(capture, budget)
         end
         processed = processed + 1
         if square then
-            for _, provider in pairs(Service.Providers) do
-                provider.CaptureSquare(square, addFn, providerCtx)
+            if useUnifiedInspect then
+                providerCtx.cachedSquareObjects =
+                    Internal._cachedSquareRef == square
+                    and Internal._cachedSquareObjects or nil
+                resourcesRegistry.InspectSquare(square, addFn, providerCtx)
+                providerCtx.cachedSquareObjects = nil
+            end
+            for pIdx = 1, #extraProviders do
+                extraProviders[pIdx].CaptureSquare(square, addFn, providerCtx)
             end
         end
         Internal._cachedSquareRef = nil

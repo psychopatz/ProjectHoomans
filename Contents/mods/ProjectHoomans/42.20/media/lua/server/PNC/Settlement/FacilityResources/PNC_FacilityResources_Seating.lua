@@ -346,6 +346,7 @@ end
 
 Resources.Register("seat", {
     resourceKind = "seating_surface",
+    capability = "living",
     role = "living.chair",
     matches = function(_, object)
         if not object or not SeatingManager

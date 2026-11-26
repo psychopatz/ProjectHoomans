@@ -13,6 +13,7 @@ local SquareRules = require "PsychopatzCore/World/PsychopatzSquareRules"
 
 Resources.Register("bed", {
     resourceKind = "sleep_surface",
+    capability = "sleep",
     role = "sleep.bed",
     sleepSurface = "bed",
     sleepPriority = 100,
@@ -43,6 +44,7 @@ Resources.Register("bed", {
 
 Resources.Register("sofa", {
     resourceKind = "sleep_surface",
+    capability = "sleep",
     role = "sleep.sofa",
     sleepSurface = "sofa",
     sleepPriority = 50,

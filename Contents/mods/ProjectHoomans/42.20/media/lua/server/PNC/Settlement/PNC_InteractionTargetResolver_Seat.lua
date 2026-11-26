@@ -161,11 +161,6 @@ local function resourceSeatTargets(resource, context)
     return targets
 end
 
-Targets.Register("sleepSpot", sleepSpotTargets)
--- Compatibility for components saved before sleep spots became furniture-optional.
-Targets.Register("bed", sleepSpotTargets)
-Targets.RegisterResource("bed", resourceSleepTargets)
-Targets.RegisterResource("sofa", resourceSleepTargets)
 Targets.RegisterResource("seat", resourceSeatTargets)
 
 return Targets
