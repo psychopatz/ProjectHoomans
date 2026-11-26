@@ -42,7 +42,45 @@ local function sleepActionable(record)
 end
 
 function Service.IsEligible(record)
-    if not record or record.alive == false
+    if not record then return false end
+    local npcContextSvc = PNC.Tasking and PNC.Tasking.NPCContext or nil
+    local ctx = npcContextSvc and type(npcContextSvc.For) == "function"
+        and npcContextSvc.For(record) or nil
+    if ctx then
+        if not ctx.alive or not ctx.isCompanion or ctx.puppetOwned then
+            return false
+        end
+        if ctx.currentLease
+            and tostring(ctx.currentLease.sourceDomain or "") ~= "autonomy"
+        then
+            return false
+        end
+        local hasAutonomyActivity = record.runtime
+            and record.runtime.autonomyAdId ~= nil
+            and record.runtime.facilityActivity ~= nil
+        if ctx.hasWorkOrder
+            or (ctx.hasFacilityActivity and not hasAutonomyActivity)
+        then
+            if ctx.sleepActionable
+                and record.runtime and record.runtime.facilityActivity
+                and record.runtime.facilityActivity.automatic == true
+                and tostring(record.runtime.facilityActivity.capability or "")
+                    == "living"
+                and PNC.FacilityJobs and PNC.FacilityJobs.Stop
+            then
+                PNC.FacilityJobs.Stop(record, "sleep_need_priority")
+            end
+            return false
+        end
+        if ctx.sleepActionable or ctx.combatActive then return false end
+        if ctx.isCamp then
+            if ctx.campPlacementLocked then return false end
+            return true, true, nil
+        end
+        if not ctx.isHome then return false end
+        return true, false, ctx.homeBase
+    end
+    if record.alive == false
         or not PNC.CompanionCommands
         or not PNC.CompanionCommands.IsCompanion(record)
     then return false end

@@ -61,11 +61,21 @@ function Triggers.WakeActionable(record)
     return false
 end
 
-function Triggers.GetCandidates(npcId)
-    local record = recordFor(npcId)
+function Triggers.GetCandidates(npcId, npcContext)
+    local record = (type(npcContext) == "table" and npcContext.record)
+        or recordFor(npcId)
     local candidates = {}
     if not record then return candidates end
-    if campPlacementLocked(record) then return candidates end
+    local ctx = type(npcContext) == "table" and npcContext
+        or (PNC.Tasking and PNC.Tasking.NPCContext
+            and PNC.Tasking.NPCContext.GetActive
+            and PNC.Tasking.NPCContext.GetActive(record))
+        or nil
+    if (ctx and ctx.campPlacementLocked == true)
+        or (not ctx and campPlacementLocked(record))
+    then
+        return candidates
+    end
     for _, definition in ipairs(Definitions.List()) do
         local actionable, metadata = Definitions.Evaluate(
             definition, record, false)

@@ -13,6 +13,10 @@ function H.Collect(record)
     local failures = {}
     local maximum = math.max(1, math.floor(tonumber(
         Tasking.MAX_CANDIDATES_PER_PROVIDER) or 64))
+    local npcContextSvc = Tasking.NPCContext
+    local npcContext = npcContextSvc
+        and type(npcContextSvc.BeginEvaluation) == "function"
+        and npcContextSvc.BeginEvaluation(record) or nil
     if ScalingDiagnostics then
         ScalingDiagnostics.Increment("NPCDecisions.CandidateBuilds")
     end
@@ -20,7 +24,7 @@ function H.Collect(record)
         local context = { npcId = record.id, domain = domain }
         local ok, values, callbackError = H.SafeCall(
             "provider_get_candidates", provider.GetCandidates, context,
-            record.id)
+            record.id, npcContext)
         if not ok then
             failures[#failures + 1] = { domain = domain,
                 error = callbackError }
@@ -46,6 +50,9 @@ function H.Collect(record)
                 end
             end
         end
+    end
+    if npcContextSvc and type(npcContextSvc.EndEvaluation) == "function" then
+        npcContextSvc.EndEvaluation(record)
     end
     table.sort(candidates, function(a, b) return Priority.Compare(a, b) > 0 end)
     return candidates, failures

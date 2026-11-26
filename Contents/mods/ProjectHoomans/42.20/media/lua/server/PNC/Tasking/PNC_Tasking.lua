@@ -6,6 +6,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 require "PNC/Tasking/PNC_TaskPriority"
 require "PNC/Tasking/PNC_TaskIntent"
 require "PNC/Tasking/PNC_TaskLeaseService"
+require "PNC/Tasking/PNC_NPCContext"
 
 PNC = PNC or {}
 PNC.Tasking = PNC.Tasking or {}
