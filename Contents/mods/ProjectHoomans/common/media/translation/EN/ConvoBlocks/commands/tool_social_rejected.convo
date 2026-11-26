@@ -4,41 +4,41 @@ namespace hoomans
 
 dialogue semantic.tool_reply.social.rejected.generic
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Not right now."
+    "I'm not up for that."
 
 dialogue semantic.tool_reply.social.rejected.hostile_abuse
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Back off. I'm not putting up with that."
+    "Watch your mouth—we're done talking."
 
 dialogue semantic.tool_reply.social.rejected.orientation_gate
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Sorry, I don't feel that way about you."
+    "That's not really who I'm into—let's keep it friendly."
 
 dialogue semantic.tool_reply.social.rejected.personality_gate
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "That's just not my style."
+    "I'm not the right person for that."
 
 dialogue semantic.tool_reply.social.rejected.positive_cooldown_active
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Easy, we already went through that today—ask me again tomorrow."
+    "Slow down, we've had enough of that for today."
 
 dialogue semantic.tool_reply.social.rejected.rejected_by_game
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "I can't do that right now."
+    "Now's not the time for that."
 
 dialogue semantic.tool_reply.social.rejected.relationship_gate
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "We don't know each other well enough for that yet."
+    "Slow down—we're not that close yet."
 
 dialogue semantic.tool_reply.social.rejected.sexual_advance
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Not happening. Don't talk to me like that."
+    "Whoa—way too fast. That's not happening."
+    "Don't talk to me like that. Back off."

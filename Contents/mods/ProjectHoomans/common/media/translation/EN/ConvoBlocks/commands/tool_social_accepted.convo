@@ -4,65 +4,65 @@ namespace hoomans
 
 dialogue semantic.tool_reply.social.accepted.admire
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Appreciate hearing that."
+    "Means a lot coming from you."
+    "Thank you—that keeps us going."
 
 dialogue semantic.tool_reply.social.accepted.apologize
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "It's alright—we're good."
+    "Don't sweat it, we can move past it."
+    "Fair enough. Let's focus on staying alive."
 
 dialogue semantic.tool_reply.social.accepted.comfort
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Thanks... I needed to hear that."
+    "Appreciate you checking in on me."
+    "That actually helps a lot."
 
 dialogue semantic.tool_reply.social.accepted.compliment
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Hah, thanks—glad you noticed."
+    "Appreciate that."
+    "Thanks, needed a boost today."
 
 dialogue semantic.tool_reply.social.accepted.flirt
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Heh... smooth, aren't you?"
+    "Careful, you'll make me blush out here."
+    "Not a bad line for the end of the world."
 
 dialogue semantic.tool_reply.social.accepted.generic
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Alright, I hear you."
+    "Fair enough."
 
 dialogue semantic.tool_reply.social.accepted.hostile_abuse
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Watch your mouth. Keep talking like that and see what happens."
+    "Don't make a habit of talking to me like that."
+    "Watch your mouth before something bad happens."
 
 dialogue semantic.tool_reply.social.accepted.insult
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Real mature. Save it for the dead."
+    "Yeah, well, look who's talking."
+    "Keep pushing and see what happens."
 
 dialogue semantic.tool_reply.social.accepted.praise
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Thanks—just doing my part."
+    "Glad to pull my weight."
+    "Appreciate the kind words."
 
 dialogue semantic.tool_reply.social.accepted.romantic_interest
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "You really mean that? Glad it's not just me."
+    "Honestly... I've been feeling the same way."
+    "Didn't expect to find someone like you out here."
 
 dialogue semantic.tool_reply.social.accepted.sexual_advance
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Easy there—we've got time later."
+    "Heh, maybe once we're somewhere safe."
+    "Keep that energy for after we clear the block."

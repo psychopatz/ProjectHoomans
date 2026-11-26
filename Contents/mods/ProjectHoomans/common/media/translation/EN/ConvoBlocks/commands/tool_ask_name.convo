@@ -1,12 +1,12 @@
-# Subject: TOOL REPLIES — ASK NAME.
+# Subject: TOOL ASK NAME REPLIES.
 language EN
 namespace hoomans
 
 dialogue semantic.tool_reply.ask_name.named
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "I'm %1."
+    "The name's %1."
+    "You can call me %1."
 
 dialogue semantic.tool_reply.ask_name.prompt
   say [default] as prompt:
@@ -14,10 +14,10 @@ dialogue semantic.tool_reply.ask_name.prompt
 
 dialogue semantic.tool_reply.ask_name.rejected
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "I'm not giving you my name right now."
+    "Let's keep names out of this for now."
 
 dialogue semantic.tool_reply.ask_name.unnamed
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "I'd rather not say my name right now."
+    "Just call me whatever works."

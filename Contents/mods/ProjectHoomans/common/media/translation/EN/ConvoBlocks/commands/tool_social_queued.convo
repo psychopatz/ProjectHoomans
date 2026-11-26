@@ -4,55 +4,55 @@ namespace hoomans
 
 dialogue semantic.tool_reply.social.queued.admire
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Give me a second to take that in."
+    "Hold on—let me think about that."
 
 dialogue semantic.tool_reply.social.queued.apologize
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Let me think about it for a moment."
+    "Give me a second on that."
 
 dialogue semantic.tool_reply.social.queued.comfort
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Give me a moment to catch my breath."
+    "Thanks... just give me a second."
 
 dialogue semantic.tool_reply.social.queued.compliment
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Hold on—give me a second."
+    "Wait a moment, I heard you."
 
 dialogue semantic.tool_reply.social.queued.flirt
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Hold on... let me think about that."
+    "Give me a second here."
 
 dialogue semantic.tool_reply.social.queued.generic
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "One second—I heard you."
+    "Hold on a moment."
 
 dialogue semantic.tool_reply.social.queued.hostile_abuse
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Watch yourself—give me a second."
+    "Hold on—don't push it."
 
 dialogue semantic.tool_reply.social.queued.insult
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Hold on—you really want to start that?"
+    "Give me a second before I answer that."
 
 dialogue semantic.tool_reply.social.queued.praise
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Give me a moment—appreciate it."
+    "Hold on, thanks."
 
 dialogue semantic.tool_reply.social.queued.romantic_interest
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Whoa—give me a second to process that."
+    "Hold on... let me think."
 
 dialogue semantic.tool_reply.social.queued.sexual_advance
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Hold on—slow way down."
+    "Whoa, give me a second."

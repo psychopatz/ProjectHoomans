@@ -327,7 +327,7 @@ local identityEvasion = Policy.Decide(Parser.Parse("no"), state, {
 T.equal(identityEvasion.branch, "IDENTITY_NAME_EVASION",
     "an explicit refusal while a name answer is pending is identity evasion")
 T.equal(identityEvasion.response.templateID,
-    "semantic.identity.evasion.friendly",
+    "hoomans.identity.evasion.friendly",
     "identity evasion uses the relationship-aware disappointment response")
 
 state:Record(insult, { timestamp = 100 })
@@ -335,14 +335,14 @@ local firstHostile = Policy.Decide(insult, state, {
     llmEnabled = false,
     npcID = "mara-escalation",
 })
-T.falsy(firstHostile.response.templateID == "semantic.social.hostile_escalated",
+T.falsy(firstHostile.response.templateID == "hoomans.hostile_remark.escalated",
     "the first hostile remark does not start at the escalation branch")
 state:Record(insult, { timestamp = 200 })
 local escalated = Policy.Decide(insult, state, {
     llmEnabled = false,
     npcID = "mara-escalation",
 })
-T.equal(escalated.response.templateID, "semantic.social.hostile_escalated",
+T.equal(escalated.response.templateID, "hoomans.hostile_remark.escalated",
     "recent hostile remarks produce a bounded escalation response")
 
 local first = ResponseCatalog.Select(

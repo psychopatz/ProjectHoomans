@@ -4,28 +4,29 @@ namespace hoomans
 
 dialogue semantic.tool_reply.order.accepted.generic
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Got it, on it now."
+    "Copy that—I'll handle it."
+    "Right away."
 
 dialogue semantic.tool_reply.order.camp
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Heading back to camp now."
+    "Got it—I'll make my way back to camp."
+    "Understood, returning to camp."
 
 dialogue semantic.tool_reply.order.follow
   say [default] as 1:
-    "Understood."
-    "Understood."
-    "Understood."
+    "Right behind you."
+    "Lead the way, I'm following."
+    "On your six."
 
 dialogue semantic.tool_reply.order.rejected
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "I can't do that right now."
+    "No can do—not possible from here."
 
 dialogue semantic.tool_reply.order.stay
   say [default] as 1:
-    "Understood."
-    "Understood."
+    "Holding right here."
+    "I'll stay put until you call."
+    "Staying here—keep an eye out."

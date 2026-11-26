@@ -65,8 +65,7 @@ T.equal(repeatedAccept.decision.response.fallback, "All right.",
 
 local thanks = router:Process("Thanks", nil, { timestamp = 300 })
 T.truthy(thanks.decision.response.templateID
-    and (string.find(thanks.decision.response.templateID, "semantic.thanks", 1, true)
-        or thanks.decision.response.templateID == "semantic.social.thanks_response"),
+    and (string.find(thanks.decision.response.templateID, "thanks", 1, true) ~= nil),
     "thanks receives a generated local social response")
 T.truthy(thanks.decision.response.fallback ~= nil
     and thanks.decision.response.fallback ~= "",
