@@ -261,6 +261,10 @@ local function puppetMovementIsSafe(session, actor)
         return true
     end
     if intent and intent.kind == "move" then
+        local lease = runtime and runtime.puppetOperaLease or nil
+        if lease and lease.carrying == true then
+            return true
+        end
         return false, "npc_movement_started_during_scene"
     end
     return true

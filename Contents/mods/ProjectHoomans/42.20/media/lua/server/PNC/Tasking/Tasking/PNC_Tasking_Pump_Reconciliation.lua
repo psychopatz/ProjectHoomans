@@ -24,6 +24,8 @@ local function reconcileOrphanedActivities(at)
     PNC.Registry.ForEach(function(record)
         if ActorControl and ActorControl.IsPuppetOwned
             and ActorControl.IsPuppetOwned(record)
+            and not (ActorControl.IsLocomotiveCarrier
+                and ActorControl.IsLocomotiveCarrier(record))
         then
             -- A Puppet lease is a temporary presentation override. Do not
             -- let orphan cleanup erase the facility runtime that the scene

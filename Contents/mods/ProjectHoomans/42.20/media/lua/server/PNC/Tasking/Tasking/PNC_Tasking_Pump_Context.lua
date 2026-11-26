@@ -28,7 +28,13 @@ local function puppetOperaSuspends(lease)
         return false
     end
     record = PNC.Registry.Get(lease.npcId)
-    return record ~= nil and ActorControl.IsPuppetOwned(record)
+    if record == nil then return false end
+    if ActorControl.IsLocomotiveCarrier
+        and ActorControl.IsLocomotiveCarrier(record)
+    then
+        return false
+    end
+    return ActorControl.IsPuppetOwned(record)
 end
 
 local function promoteMaterializedLease(lease)

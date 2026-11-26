@@ -131,6 +131,7 @@ local function releaseActors(session)
             actor.tethered = false
             actor.collisionDisabled = false
             actor.tetherLeaderID = nil
+            actor._tetherNavCleared = nil
         end
         if actor.body and AnimVars and AnimVars.Clear then
             AnimVars.Clear(actor.body, actor.animationTrack)
@@ -176,6 +177,9 @@ local function closeSession(session, finalPhase, reason, errorText)
     })
     rememberSnapshot(session, true)
     unindexSession(session)
+    if Internal.VisualSync and Internal.VisualSync.ClearSession then
+        Internal.VisualSync.ClearSession(session)
+    end
     sendState(session, true)
     return true
 end

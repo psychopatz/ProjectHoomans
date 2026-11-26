@@ -19,6 +19,7 @@ local Animation = PNC.Animation
 local ConversationScene = PNC.ConversationScene
 local ZombieObservation = PNC.ZombieObservation
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
 
 function H.GetSyncInterval(record)
     local runtime = record and record.runtime or nil
@@ -61,6 +62,11 @@ local function shouldReconcileAbstractFollowHandoff(record)
 end
 
 local function nextRecordDueAt(record, now, preResolvedTier)
+    if ActorControl and ActorControl.IsAutonomySuspended
+        and ActorControl.IsAutonomySuspended(record) == true
+    then
+        return (tonumber(now) or 0) + 500
+    end
     local runtime = record and record.runtime or nil
     local retryAt = runtime and tonumber(runtime.materializeRetryAt) or nil
     if retryAt and retryAt > (tonumber(now) or 0) then
@@ -165,7 +171,11 @@ function H.ProcessRecord(record, now)
         return
     end
 
-    if now >= (tonumber(record.nextThinkAt) or 0) then
+    local autonomySuspended = ActorControl
+        and ActorControl.IsAutonomySuspended
+        and ActorControl.IsAutonomySuspended(record) == true
+
+    if not autonomySuspended and now >= (tonumber(record.nextThinkAt) or 0) then
         record.runtime = record.runtime or {}
         record.runtime.abstractStepElapsedMs = math.max(
             0,
@@ -213,7 +223,7 @@ function H.ProcessRecord(record, now)
     local pathInterval = (lodTier and SimulationLOD.GetPathIntervalForTier)
         and SimulationLOD.GetPathIntervalForTier(lodTier)
         or (SimulationLOD and SimulationLOD.GetPathInterval(record) or 100)
-    pathDue = zombie and record.alive ~= false and (
+    pathDue = not autonomySuspended and zombie and record.alive ~= false and (
         not SimulationClock
         or SimulationClock.IsDue(
             record,

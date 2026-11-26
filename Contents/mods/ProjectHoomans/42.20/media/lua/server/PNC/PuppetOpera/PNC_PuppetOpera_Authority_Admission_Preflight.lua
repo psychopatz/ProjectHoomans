@@ -267,7 +267,7 @@ local function buildPreflight(player, args)
     }
     local playerReason = invalidPlayer(player)
     local ownerSession = Authority.ByOwner[ownerID(player)]
-    local allowedSession = ownerSession and ownerSession.previewOnly
+    local allowedSession = ownerSession and not ownerSession.closed
         and ownerSession or nil
     local npcCount = 0
     for actorID, definition in pairs(blueprint.actors or {}) do

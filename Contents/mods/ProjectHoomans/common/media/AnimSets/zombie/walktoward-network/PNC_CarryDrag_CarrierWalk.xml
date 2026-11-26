@@ -9,7 +9,8 @@
   <m_SpeedScale>1.0</m_SpeedScale>
   <m_SyncTrackingEnabled>false</m_SyncTrackingEnabled>
   <m_maxTorsoTwist>0.0</m_maxTorsoTwist>
-  <m_useDeferredMovement>false</m_useDeferredMovement>
+  <m_deferredBoneAxis>Y</m_deferredBoneAxis>
+  <m_useDeferredMovement>true</m_useDeferredMovement>
   <m_Conditions><m_Name>PNC_AnimActive</m_Name><m_Type>BOOL</m_Type><m_BoolValue>true</m_BoolValue></m_Conditions>
   <m_Conditions><m_Name>PNC_AnimStyle</m_Name><m_Type>STRING</m_Type><m_Value>carry_drag</m_Value></m_Conditions>
   <m_Conditions><m_Name>PNC_AnimRole</m_Name><m_Type>STRING</m_Type><m_Value>Carrier</m_Value></m_Conditions>

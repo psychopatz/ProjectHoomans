@@ -56,6 +56,7 @@ Internal.Core = Core
 Internal.Const = Const
 
 require "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Guards"
+require "PNC/PuppetOpera/PNC_PuppetOpera_Authority_VisualSync"
 require "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Lifecycle"
 require "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Admission"
 require "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Runtime"

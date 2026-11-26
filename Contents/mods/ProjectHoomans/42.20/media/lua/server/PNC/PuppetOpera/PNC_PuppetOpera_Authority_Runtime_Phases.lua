@@ -297,6 +297,8 @@ local function pumpPlaying(session, timestamp)
         for actorID, actor in pairs(session.actors or {}) do
             local def = bpActors[actorID]
             local coupling = def and def.coupling or nil
+            local lease = actor.record and actor.record.runtime
+                and actor.record.runtime.puppetOperaLease or nil
             if coupling and coupling.attachTo then
                 local leader = session.actors[coupling.attachTo]
                 if leader and leader.body and actor.body then
@@ -311,10 +313,49 @@ local function pumpPlaying(session, timestamp)
                     end
                     actor.tethered = true
                     actor.tetherLeaderID = coupling.attachTo
+                    if lease then
+                        lease.tethered = true
+                        lease.carrying = false
+                    end
+                    if not actor._tetherNavCleared and actor.record then
+                        actor._tetherNavCleared = true
+                        local rt = actor.record.runtime
+                        if rt then
+                            rt.moveIntent = nil
+                            rt.localNavigation = nil
+                        end
+                        if PNC.EnginePathPlanner
+                            and PNC.EnginePathPlanner.Invalidate
+                        then
+                            PNC.EnginePathPlanner.Invalidate(
+                                actor.record,
+                                "puppet_opera_tether",
+                                actor.body
+                            )
+                        end
+                        if PNC.PathService and PNC.PathService.Commands
+                            and PNC.PathService.Commands.Reset
+                        then
+                            PNC.PathService.Commands.Reset(
+                                actor.record,
+                                actor.body,
+                                "puppet_opera_tether"
+                            )
+                        end
+                    end
                 elseif leader and leader.record and actor.record
                     and coupling.abstractCoMove ~= false
                 then
                     Tether.SyncAbstractPair(leader.record, actor.record)
+                end
+            elseif beat.mode == "locomotive" and actor.kind == "nearby_live_npc" then
+                -- Mark untethered locomotive initiator as carrying so its own
+                -- AI/behavior (colonist follow, neutral/hostile flee, squad
+                -- rescue, etc.) drives locomotion agnostically while tethered
+                -- passengers remain suspended and follow in lockstep.
+                if lease then
+                    lease.carrying = true
+                    lease.tethered = false
                 end
             end
         end
@@ -338,6 +379,9 @@ local function pumpPlaying(session, timestamp)
     end
     if stateChanged then
         Internal.sendState(session, false)
+    end
+    if Internal.VisualSync and Internal.VisualSync.SyncBeat then
+        Internal.VisualSync.SyncBeat(session, beat, false)
     end
     if beat.mode == "sustained" or beat.mode == "locomotive" then
         session.phaseDeadline = timestamp + tonumber(beat.durationMs or 900)

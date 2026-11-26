@@ -80,6 +80,8 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
     -- valid movement owner for a leased scene actor.
     if ActorControl and ActorControl.IsPuppetOwned
         and ActorControl.IsPuppetOwned(record)
+        and not (ActorControl.IsLocomotiveCarrier
+            and ActorControl.IsLocomotiveCarrier(record))
     then
         if ActorControl.NoteBlocked then
             ActorControl.NoteBlocked(

@@ -84,6 +84,104 @@ function Adapter.IsOwned(body, sessionID)
     return owns(body, sessionID)
 end
 
+local function isLocomotiveCarrier(session, actor, beat)
+    if type(beat) ~= "table" or beat.mode ~= "locomotive" then return false end
+    if actor and actor.tethered == true then return false end
+    local def = session and session.blueprint and session.blueprint.actors
+        and actor and session.blueprint.actors[actor.id] or nil
+    if def and type(def.coupling) == "table" and def.coupling.attachTo then
+        return false
+    end
+    return true
+end
+
+local function isPlayerBody(body, refActor)
+    if refActor and refActor.kind == "local_player" then return true end
+    if type(instanceof) == "function" and body and instanceof(body, "IsoPlayer") then
+        return true
+    end
+    return body ~= nil and body.isLocalPlayer ~= nil
+end
+
+local function isNPCMoving(body, refActor, now)
+    if not body then return false end
+    -- Only use player action-state checks for true IsoPlayer leaders.
+    -- Note: IsoZombie inherits isPlayerMoving() from IsoGameCharacter, so
+    -- checking `body.isPlayerMoving` would misclassify every zombie as a player!
+    if isPlayerBody(body, refActor) then
+        if body.getActionStateName then
+            local st = tostring(body:getActionStateName() or "")
+            if st == "movement" or st == "run" or st == "sprint"
+                or st == "turningMovement180"
+            then
+                return true
+            end
+            if st == "strafe" then
+                return body:isPlayerMoving() == true
+            end
+            if st ~= "" then
+                return false
+            end
+        end
+        return body:isPlayerMoving() == true
+    end
+    -- For IsoZombie NPC leaders, detect engine locomotion states, active
+    -- path2/moveIntent/pathing lane, OR actual world displacement (covers
+    -- fake_locomotion too). Keep hysteresis bounded to active intent/pathing
+    -- so deferred-movement walk nodes stop cleanly on arrival with zero drift.
+    local movingNow = false
+    local hasActiveRoute = false
+    if body.getPath2 and body:getPath2() ~= nil then
+        movingNow = true
+        hasActiveRoute = true
+    end
+    if not movingNow and body.getActionStateName then
+        local st = tostring(body:getActionStateName() or "")
+        if st == "walktoward" or st == "walktoward-network" or st == "pathfind"
+            or st == "movement" or st == "run" or st == "sprint"
+        then
+            movingNow = true
+        end
+    end
+    if not movingNow and body.isMoving and body:isMoving() == true then
+        movingNow = true
+    end
+    local runtime = refActor and refActor.record
+        and refActor.record.runtime or nil
+    if runtime then
+        if runtime.moveIntent and runtime.moveIntent.kind == "move" then
+            movingNow = true
+            hasActiveRoute = true
+        elseif runtime.pathing and runtime.pathing.phase == "active" then
+            movingNow = true
+            hasActiveRoute = true
+        end
+    end
+    local bx = body.getX and tonumber(body:getX()) or nil
+    local by = body.getY and tonumber(body:getY()) or nil
+    if refActor and bx and by then
+        if refActor._lastCarryX and refActor._lastCarryY then
+            local dx = bx - refActor._lastCarryX
+            local dy = by - refActor._lastCarryY
+            if (dx * dx + dy * dy) > 0.0001 then
+                movingNow = true
+            end
+        end
+        refActor._lastCarryX = bx
+        refActor._lastCarryY = by
+        local ts = tonumber(now) or 0
+        if movingNow then
+            refActor._lastCarryMovedAt = ts
+        elseif hasActiveRoute
+            and refActor._lastCarryMovedAt
+            and ts - refActor._lastCarryMovedAt < 250
+        then
+            movingNow = true
+        end
+    end
+    return movingNow
+end
+
 function Adapter.Start(session, actor, beat, track)
     track = track or beat and beat.npc
     if type(session) ~= "table" or type(actor) ~= "table"
@@ -105,10 +203,17 @@ function Adapter.Start(session, actor, beat, track)
         then
             return false, "npc_animation_owned_by_other"
         end
-        if body.isUseless then
-            actor._savedUseless = body:isUseless() == true
+        if not isLocomotiveCarrier(session, actor, beat) then
+            if body.isUseless then
+                actor._savedUseless = body:isUseless() == true
+            end
+            holdAnimVarNPC(body)
+        else
+            -- Do not override setUseless for locomotive carriers:
+            -- PNC_Animation_NativeLocomotion owns SP (useless=true for
+            -- behavior2_move) vs MP (useless=false for client_goto).
+            actor._savedUseless = nil
         end
-        holdAnimVarNPC(body)
         local ok, reason = AnimVars.Apply(body, track, {
             phase = track.phase or beat.id or "play",
             moving = false,
@@ -225,19 +330,15 @@ function Adapter.Observe(session, actor, beat)
                 progress = math.min(1, elapsed / duration)
             end
         end
-        local moving = actor.isMoving == true
         local leaderID = actor.tetherLeaderID
         local leader = leaderID and session.actors and session.actors[leaderID] or nil
-        local refBody = (leader and leader.body) or body
-        if refBody then
-            if refBody.isPlayerMoving then
-                moving = refBody:isPlayerMoving() == true
-            elseif refBody.isMoving then
-                moving = refBody:isMoving() == true
-            end
-        end
+        local refActor = leader or actor
+        local refBody = refActor and refActor.body or body
+        local moving = isNPCMoving(refBody, refActor, current)
         AnimVars.UpdateProgress(body, progress, moving)
-        holdAnimVarNPC(body)
+        if not isLocomotiveCarrier(session, actor, beat) then
+            holdAnimVarNPC(body)
+        end
         if not sustained and elapsed >= duration then
             actor.lastReason = "npc_animation_duration_complete"
             return true, "finished"
@@ -314,7 +415,7 @@ function Adapter.Release(session, actor)
     end
     if modData[ROUTE_KEY] == "anim_vars" then
         AnimVars.Clear(body, actor.animationTrack)
-        if body and body.setUseless then
+        if actor._savedUseless ~= nil and body and body.setUseless then
             body:setUseless(actor._savedUseless == true)
         end
         actor._savedUseless = nil

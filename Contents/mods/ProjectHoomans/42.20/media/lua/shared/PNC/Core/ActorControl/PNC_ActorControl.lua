@@ -52,6 +52,30 @@ function Control.IsPuppetOwned(record)
         and Control.GetSessionID(record) ~= ""
 end
 
+function Control.IsLocomotiveCarrier(record)
+    local runtime = runtimeOf(record)
+    local lease = runtime and runtime[LEASE_KEY] or nil
+    return type(lease) == "table"
+        and text(lease.sessionId) ~= ""
+        and lease.carrying == true
+        and lease.tethered ~= true
+end
+
+function Control.IsTetheredPassenger(record)
+    local runtime = runtimeOf(record)
+    local lease = runtime and runtime[LEASE_KEY] or nil
+    return type(lease) == "table"
+        and text(lease.sessionId) ~= ""
+        and lease.tethered == true
+end
+
+---True when an external initiator (carrier/driver) owns this actor's movement
+---and presentation, so autonomous AI/perception/pathing computation should be
+---temporarily suspended while vitals and spatial tracking continue.
+function Control.IsAutonomySuspended(record)
+    return Control.IsTetheredPassenger(record)
+end
+
 function Control.IsOwned(record, sessionID)
     local expected = text(sessionID)
     return expected ~= ""
@@ -146,6 +170,7 @@ function Control.CanPump(record)
         intent.puppetOperaSessionId or intent.ownerSessionId
     ) or ""
     if not lease or sessionID == "" then return true end
+    if Control.IsLocomotiveCarrier(record) then return true end
     if not claim or text(claim.sessionId) ~= sessionID then return false end
     if not intent or intent.kind ~= "move" then return false end
     if intentSessionID ~= sessionID then return false end
@@ -184,6 +209,16 @@ function Control.CanWrite(record, owner, lane, options)
     end
     if options.allowPuppetMovement == true and Control.CanPump(record) then
         return true
+    end
+    if Control.IsLocomotiveCarrier(record) then
+        local laneText = string.lower(text(lane))
+        if string.find(laneText, "move", 1, true)
+            or string.find(laneText, "path", 1, true)
+            or string.find(laneText, "locomotion", 1, true)
+            or string.find(laneText, "intent", 1, true)
+        then
+            return true
+        end
     end
     reason = "puppet_opera_writer_blocked:" .. text(lane)
     Control.NoteBlocked(record, lane, reason)

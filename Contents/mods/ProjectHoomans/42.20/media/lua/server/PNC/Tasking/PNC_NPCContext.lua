@@ -68,7 +68,10 @@ function Context.Build(record, now)
         and PNC.CompanionCommands.IsCompanion(record) == true or false
     local puppetOwned = ActorControl
         and type(ActorControl.IsPuppetOwned) == "function"
-        and ActorControl.IsPuppetOwned(record) == true or false
+        and ActorControl.IsPuppetOwned(record) == true
+        and not (type(ActorControl.IsLocomotiveCarrier) == "function"
+            and ActorControl.IsLocomotiveCarrier(record) == true)
+        or false
     local currentLease = PNC.TaskLeaseService
         and type(PNC.TaskLeaseService.ForNPC) == "function"
         and PNC.TaskLeaseService.ForNPC(record.id) or nil

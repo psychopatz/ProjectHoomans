@@ -34,6 +34,8 @@ function LiveBodyControl.SetAuthoritativePosition(zombie, x, y, z)
     -- movement-owned and must never be replaced by a raw coordinate write.
     if ActorControl and ActorControl.IsPuppetOwned
         and ActorControl.IsPuppetOwned(record)
+        and not (ActorControl.IsLocomotiveCarrier
+            and ActorControl.IsLocomotiveCarrier(record))
     then
         if ActorControl.NoteBlocked then
             ActorControl.NoteBlocked(

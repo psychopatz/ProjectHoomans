@@ -387,6 +387,7 @@ require "PNC/PuppetOpera/PNC_PuppetOpera_Client_Discovery"
 require "PNC/PuppetOpera/PNC_PuppetOpera_Client_Preview"
 require "PNC/PuppetOpera/PNC_PuppetOpera_Client_Runtime"
 require "PNC/PuppetOpera/PNC_PuppetOpera_Client_Transport"
+require "PNC/PuppetOpera/PNC_PuppetOpera_Client_VisualSync"
 
 function Client.GetStatus()
     return State.status, State.error

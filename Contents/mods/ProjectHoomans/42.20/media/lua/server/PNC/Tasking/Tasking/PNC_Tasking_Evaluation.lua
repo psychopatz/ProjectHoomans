@@ -152,6 +152,8 @@ function Tasking.Commands.Reevaluate(npcId, cause, event)
     end
     if ActorControl and ActorControl.IsPuppetOwned
         and ActorControl.IsPuppetOwned(record)
+        and not (ActorControl.IsLocomotiveCarrier
+            and ActorControl.IsLocomotiveCarrier(record))
     then
         diagnostics.lastReason = "DEFERRED_PUPPET_OPERA"
         return true, Leases.ForNPC(npcId)

@@ -99,6 +99,11 @@ local function puppetOperaOwnsBehavior(record)
     if not override or tostring(override.sessionId or "") == "" then
         return false
     end
+    if ActorControl and ActorControl.IsLocomotiveCarrier
+        and ActorControl.IsLocomotiveCarrier(record)
+    then
+        return false
+    end
     record.activeJob = "PuppetOpera"
     record.activeBehavior = "PuppetOpera:"
         .. tostring(override.sessionId)
