@@ -118,6 +118,12 @@ function H.CreateDemand(
     at
 )
     if Tolls.PendingByPlayerKey[key] then return false end
+    local baseAmount = H.DemandAmount(community)
+    local tribute = type(H.InspectTargetTribute) == "function"
+        and H.InspectTargetTribute(player, baseAmount) or {
+            mode = "cash_only",
+            cashAmount = baseAmount,
+        }
     local demand = {
         id = table.concat({
             faction.id,
@@ -129,7 +135,12 @@ function H.CreateDemand(
         factionName = faction.name,
         communityID = community.id,
         communityName = community.name,
-        amount = H.DemandAmount(community),
+        amount = tribute.cashAmount or baseAmount,
+        tributeMode = tribute.mode or "cash_only",
+        itemFullType = tribute.itemFullType,
+        itemName = tribute.itemName,
+        itemValue = tribute.itemValue or 0,
+        storyID = "convo.faction.looter_toll",
         createdAt = at,
         expiresAt = at + DEMAND_LIFETIME_HOURS,
     }
@@ -142,6 +153,15 @@ function H.CreateDemand(
         communityID = demand.communityID,
         communityName = demand.communityName,
         amount = demand.amount,
+        tributeMode = demand.tributeMode,
+        itemFullType = demand.itemFullType,
+        itemName = demand.itemName,
+        itemValue = demand.itemValue,
+        storyID = demand.storyID,
+        tokens = {
+            ["slot.toll.amount"] = tostring(demand.amount or 0),
+            ["slot.item.name"] = tostring(demand.itemName or "gear"),
+        },
     })
     return true
 end

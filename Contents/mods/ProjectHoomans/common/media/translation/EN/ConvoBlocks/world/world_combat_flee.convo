@@ -1,0 +1,19 @@
+# Subject: TACTICAL FLEE & FAR-MIGRATION CALLOUTS.
+language EN
+namespace hoomans
+
+dialogue semantic.combat.flee
+  say [role=flee_last_standing_open] as flee_last_standing_open:
+    "Everyone's dead—screw this, I'm getting out of here!"
+    "I'm the last one left—fall back! I'm not dying for this turf!"
+  say [role=flee_spared_open] as flee_spared_open:
+    "I'm running—don't shoot! Heading far away from here!"
+    "Moving out, hands clear—I'm gone for good!"
+  say [role=flee_morale_break_open] as flee_morale_break_open:
+    "Too hot—bail out! Scatter and regroup miles from here!"
+    "Not worth dying over—I'm out!"
+  say [role=flee_witness_reply] as flee_witness_reply:
+    "Look at 'em run! Good riddance—let 'em go."
+    "They're bolting—stay sharp in case they've got friends around the corner."
+  say [default] as default:
+    "Fall back—get out of here!"

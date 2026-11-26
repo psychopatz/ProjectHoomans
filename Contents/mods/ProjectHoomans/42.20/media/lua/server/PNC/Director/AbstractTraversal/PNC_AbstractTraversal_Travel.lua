@@ -53,6 +53,39 @@ function Traversal.Begin(groupOrID, targetOrID, at)
     return true, "travel_started"
 end
 
+-- Strengthened far-migration entrypoint for fleeing looters and displaced squads.
+function Traversal.BeginFarMigration(groupOrID, opts, at)
+    local group = type(groupOrID) == "table" and groupOrID
+        or Groups.Get(groupOrID)
+    opts = type(opts) == "table" and opts or {}
+    at = tonumber(at) or Store.WorldAgeHours()
+    if not group or not group.location then return false, "invalid_group" end
+
+    if group.state == "TRAVELING" and group.journey and CoreGroupTravel and CoreGroupTravel.Cancel then
+        CoreGroupTravel.Cancel(group, "rerouted_far_migration")
+        group.targetLocation = nil
+        Groups.SetState(group, "IDLE", at, at)
+    end
+
+    group.recentAvoidedLocations = group.recentAvoidedLocations or {}
+    if group.location.id then
+        group.recentAvoidedLocations[group.location.id] = at + (tonumber(opts.avoidHours) or 24)
+    end
+    group.mission = "FLEE_MIGRATE"
+
+    local target, pickReason = Traversal.ChooseFarMigrationDestination(
+        group,
+        opts.threatX or group.location.x,
+        opts.threatY or group.location.y,
+        opts
+    )
+    if not target then
+        return false, pickReason or "no_far_destination"
+    end
+    local ok, reason = Traversal.Begin(group, target, at)
+    return ok, ok and (pickReason or reason) or reason
+end
+
 function Traversal.Arrive(groupOrID, at)
     local group = type(groupOrID) == "table" and groupOrID
         or Groups.Get(groupOrID)
@@ -76,6 +109,16 @@ function Traversal.Arrive(groupOrID, at)
         end
         group.targetLocation = nil
         Groups.SetState(group, "IDLE", at, at)
+        -- Resilient reroute: if migrating away from threat, pick a replacement
+        -- far waypoint once instead of stranding the group IDLE.
+        if group.mission == "FLEE_MIGRATE" and group._rerouteAttempted ~= true
+            and type(Traversal.BeginFarMigration) == "function"
+        then
+            group._rerouteAttempted = true
+            local rerouted = Traversal.BeginFarMigration(group, {}, at)
+            if rerouted then return true, "target_missing_rerouted" end
+        end
+        group._rerouteAttempted = nil
         if settlementTraveling and PNC.Factions.SetMobileGroup then
             local failedMobile = PNC.Core and PNC.Core.DeepCopy
                 and PNC.Core.DeepCopy(faction.mobile) or faction.mobile

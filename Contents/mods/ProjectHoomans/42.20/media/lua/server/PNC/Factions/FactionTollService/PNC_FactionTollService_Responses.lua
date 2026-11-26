@@ -56,15 +56,21 @@ function Tolls.HandleResponse(player, args)
     end
     local response = tostring(args.response or "")
     if response == "pay" then
-        local paid, remaining = H.RemoveMoney(
-            player,
-            demand.amount
-        )
-        if not paid then
+        local needCash = tonumber(demand.amount) or 0
+        local needItem = demand.itemFullType
+        local paidCash, remaining = true, 0
+        if needCash > 0 then
+            paidCash, remaining = H.RemoveMoney(player, needCash)
+        end
+        local paidItem = true
+        if paidCash and needItem and needItem ~= "" then
+            paidItem = H.RemoveDemandedItem(player, needItem)
+        end
+        if not paidCash or not paidItem then
             return H.Result(
                 player,
                 false,
-                "insufficient_money",
+                not paidItem and "missing_demanded_item" or "insufficient_money",
                 demand,
                 { reopen = true, available = remaining }
             )
@@ -101,12 +107,16 @@ function Tolls.HandleResponse(player, args)
             demand,
             {
                 remaining = remaining,
+                itemTaken = demand.itemName,
                 pacifiedUntil =
                     at + PAID_PACIFICATION_HOURS,
             }
         )
     end
     if response == "refuse" then
+        if PNC.CeasefireService and type(PNC.CeasefireService.RevokeCeasefire) == "function" then
+            PNC.CeasefireService.RevokeCeasefire(key, demand.factionID, "toll_refused")
+        end
         local playerFaction =
             Factions.GetDiplomacyFactionForPlayerKey(key)
         if not playerFaction then

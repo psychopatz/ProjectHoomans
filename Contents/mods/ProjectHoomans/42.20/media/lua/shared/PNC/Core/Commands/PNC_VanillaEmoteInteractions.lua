@@ -82,6 +82,13 @@ local DEFINITIONS = {
         radius = 14,
         maxTargets = 8,
     },
+    surrender = {
+        id = "surrender",
+        eventType = "player_emote_surrender",
+        radius = 16,
+        maxTargets = 8,
+        ceasefire = true,
+    },
 }
 
 local ALIASES = {
@@ -91,6 +98,7 @@ local ALIASES = {
     clap02 = "clap",
     saluteformal = "salute",
     salutecasual = "salute",
+    surrender02 = "surrender",
 }
 
 function Interactions.Get(emote)

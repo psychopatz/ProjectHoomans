@@ -96,3 +96,98 @@ function Traversal.ChooseFallback(group, threatLocationID)
     end
     return best, best and "fallback_selected" or "no_fallback"
 end
+
+local MAP_MIN_X, MAP_MAX_X = 3000, 15000
+local MAP_MIN_Y, MAP_MAX_Y = 1000, 13500
+
+local function clampCoord(v, lo, hi)
+    if v < lo then return lo end
+    if v > hi then return hi end
+    return v
+end
+
+local function seededIndex(seedText, count)
+    if count <= 1 then return 1 end
+    local h = 17
+    local s = tostring(seedText or "")
+    for i = 1, #s do
+        h = (h * 31 + string.byte(s, i)) % 100003
+    end
+    return (h % count) + 1
+end
+
+-- Far-migration destination selector for fleeing looters & displaced squads.
+-- Prefers distant safe locations (>= minDistance away from threat) with seeded
+-- randomization among top candidates, and synthesizes a valid bounded far
+-- waypoint if no pre-discovered AbstractLocation exists far enough away.
+function Traversal.ChooseFarMigrationDestination(group, threatX, threatY, opts)
+    if not group or not group.location then return nil, "invalid_group" end
+    opts = type(opts) == "table" and opts or {}
+    local tx = tonumber(threatX) or tonumber(group.location.x) or 8000
+    local ty = tonumber(threatY) or tonumber(group.location.y) or 8000
+    local minDist = tonumber(opts.minDistance) or 350
+    local maxDist = tonumber(opts.maxDistance) or 1400
+    local nowHours = Store and type(Store.WorldAgeHours) == "function" and Store.WorldAgeHours() or 0
+
+    local pool = {}
+    if Locations and type(Locations.GetNearby) == "function" then
+        local wide = Locations.GetNearby(tx, ty, maxDist, 48) or {}
+        for i = 1, #wide do
+            local entry = wide[i]
+            local loc = entry and entry.location
+            local dist = tonumber(entry and entry.distance) or 0
+            if loc and loc.id ~= group.location.id and dist >= minDist then
+                local avoidedUntil = group.recentAvoidedLocations and group.recentAvoidedLocations[loc.id] or 0
+                if avoidedUntil <= nowHours then
+                    local occupied = Locations.GetGroupOccupants and #Locations.GetGroupOccupants(loc, group.id) or 0
+                    local score = dist * 0.08
+                        - (tonumber(loc.danger) or 0) * 1.5
+                        - occupied * 40
+                        + ((loc.tags and loc.tags.SAFE) and 50 or 0)
+                    pool[#pool + 1] = { location = loc, score = score, distance = dist }
+                end
+            end
+        end
+    end
+
+    if #pool > 0 then
+        table.sort(pool, function(a, b)
+            if a.score ~= b.score then return a.score > b.score end
+            return tostring(a.location.id) < tostring(b.location.id)
+        end)
+        local topCount = math.min(#pool, 5)
+        local pick = seededIndex(tostring(group.id or "") .. ":" .. tostring(math.floor(nowHours * 10)), topCount)
+        return pool[pick].location, "far_location_selected"
+    end
+
+    -- Synthetic bounded far waypoint along the away-bearing so migration never stalls.
+    local gx = tonumber(group.location.x) or tx
+    local gy = tonumber(group.location.y) or ty
+    local dx, dy = gx - tx, gy - ty
+    local len = math.sqrt(dx * dx + dy * dy)
+    local angle
+    if len < 1 then
+        local idx = seededIndex(tostring(group.id or "") .. ":bearing", 360)
+        angle = math.rad(idx)
+    else
+        local jitter = (seededIndex(tostring(group.id or "") .. ":jit", 61) - 31)
+        angle = math.atan2(dy, dx) + math.rad(jitter)
+    end
+    local hop = minDist + seededIndex(tostring(group.id or "") .. ":hop", math.max(50, maxDist - minDist))
+    local destX = math.floor(clampCoord(tx + math.cos(angle) * hop, MAP_MIN_X, MAP_MAX_X))
+    local destY = math.floor(clampCoord(ty + math.sin(angle) * hop, MAP_MIN_Y, MAP_MAX_Y))
+    local synthID = "far_migrate:" .. tostring(destX) .. ":" .. tostring(destY)
+    local synth = {
+        id = synthID,
+        type = "MIGRATION_WAYPOINT",
+        x = destX,
+        y = destY,
+        z = 0,
+        danger = 0,
+        tags = { SAFE = true, MIGRATION = true },
+    }
+    if Locations and type(Locations.Register) == "function" then
+        pcall(Locations.Register, synth)
+    end
+    return synth, "far_waypoint_synthesized"
+end

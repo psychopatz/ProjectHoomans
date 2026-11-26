@@ -1,0 +1,26 @@
+# Subject: AI HOSTILE SURRENDERING TO PLAYER — MERCY OR NO MERCY STORY.
+language EN
+namespace hoomans
+
+story convo.combat.surrender_mercy
+  trigger intent=SURRENDER, subject=CEASEFIRE
+  guard safe_to_talk
+
+  say [default]:
+    "Hold fire! My crew's gone—hands are up, {term.address}! Let me walk away and you'll never see me again!"
+
+    choice spare (intent=ACCEPT, subject=CEASEFIRE, utility=compassion, ai_bias=compassion+|forgiveness+|aggression-):
+      label: "Spare them — let them run"
+      say: "Get out of my sight and don't ever come back. Run!"
+
+      reply [default]:
+        "Thank you—I'm gone! You won't see my face around here again!"
+        end
+
+    choice no_mercy (intent=REFUSE, subject=CEASEFIRE, utility=assertive, ai_bias=aggression+|hostile+|compassion-):
+      label: "No mercy — finish the fight"
+      say: "Too late for begging. You started this—now you finish it."
+
+      reply [default]:
+        "No mercy?! Fine—if I'm going down, I'm fighting to the last breath!"
+        end

@@ -86,6 +86,9 @@ function Tolls.Pump(now)
             then
                 Tolls.DepartureByPlayerKey[key] = nil
             elseif departure.expiresAt <= at then
+                if PNC.CeasefireService and type(PNC.CeasefireService.RevokeCeasefire) == "function" then
+                    PNC.CeasefireService.RevokeCeasefire(key, demand.factionID, "toll_departure_ignored")
+                end
                 local diplomacyFaction =
                     Factions.GetDiplomacyFactionForPlayerKey(
                         key

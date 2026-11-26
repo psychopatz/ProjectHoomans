@@ -1,0 +1,44 @@
+# Subject: LOOTER TOLL OVERHEAD BEATS (Dynamic MarketSense Item + Cash + Trait Replies).
+language EN
+namespace hoomans
+
+dialogue semantic.world.toll.demand
+  say [role=toll_demand_item_cash_open] as toll_demand_item_cash_open:
+    "Whoa—nice {slot.item.name}, {addressee.name}! Hand it over with ${slot.toll.amount} and we leave you in one piece!"
+    "Hold up, {addressee.name}! That {slot.item.name} and ${slot.toll.amount} buys you safe passage—pay up or bleed!"
+  say [role=toll_demand_item_open] as toll_demand_item_open:
+    "Nice {slot.item.name}, {addressee.name}! Short on cash? Hand over that {slot.item.name} and we'll call it even!"
+    "Stop right there, {addressee.name}! Drop that {slot.item.name} as our toll and you walk away breathing!"
+  say [role=toll_demand_cash_open] as toll_demand_cash_open:
+    "Freeze, {addressee.name}! This is our turf—${slot.toll.amount} buys you safe passage. Pay up or get out!"
+    "Hold it, {addressee.name}! Toll's ${slot.toll.amount} if you want to cross our block in one piece."
+
+  say [role=toll_paid_open] as toll_paid_open:
+    "Okay, we're chill—for now! Move along, {addressee.name}, and don't cause trouble."
+    "Pleasure doing business, {addressee.name}. You're clear on our turf for the day."
+  say [role=toll_paid_reply, actor.style=brave] as toll_paid_reply_brave:
+    "Enjoy it while you can. Next time we meet, things won't be this easy."
+  say [role=toll_paid_reply, actor.style=shaken] as toll_paid_reply_shaken:
+    "T-take it, just let us walk away, okay?"
+  say [role=toll_paid_reply] as toll_paid_reply_default:
+    "Fine. Keep your word and let us pass."
+
+  say [role=toll_leave_open] as toll_leave_open:
+    "Smart choice—get off our block before we change our minds, {addressee.name}!"
+  say [role=toll_leave_reply, actor.style=brave] as toll_leave_reply_brave:
+    "We're leaving on our own terms—don't follow us."
+  say [role=toll_leave_reply] as toll_leave_reply_default:
+    "Relax, we're backing out now."
+
+  say [role=toll_refused_open] as toll_refused_open:
+    "Wrong answer, {addressee.name}! Boys, take everything off 'em!"
+    "You asked for this—light 'em up!"
+  say [role=toll_refused_reply, actor.style=brave] as toll_refused_reply_brave:
+    "Come and try it! You're not taking a single thing from us!"
+  say [role=toll_refused_reply, actor.style=aggressive] as toll_refused_reply_aggressive:
+    "Over my dead body—you're gonna regret stepping in front of me!"
+  say [role=toll_refused_reply] as toll_refused_reply_default:
+    "No deal! Back off or we fight!"
+
+  say [default] as default:
+    "This is our turf—pay the toll or turn around!"

@@ -1,0 +1,37 @@
+# Subject: ACTOR-AGNOSTIC SURRENDER & CEASEFIRE BEATS (Human NPCs Only).
+language EN
+namespace hoomans
+
+dialogue semantic.combat.surrender
+  say [role=surrender_plea_open, actor.style=brave] as surrender_plea_brave:
+    "Hold fire, {addressee.name}! Hands are up—you won this round, let's call a truce!"
+  say [role=surrender_plea_open, actor.style=shaken] as surrender_plea_shaken:
+    "Please, stop! Hands up—don't shoot! I give up, I'm done fighting!"
+  say [role=surrender_plea_open] as surrender_plea_default:
+    "Ceasefire! Hands up, {addressee.name}—I surrender, don't shoot!"
+    "Hold your fire! I'm putting my hands up—we don't have to die here!"
+
+  say [role=surrender_accept_reply, actor.style=aggressive] as surrender_accept_aggressive:
+    "Tch—lucky for you I'm feeling generous. Drop your stance and get out of my sight—you get ONE pass!"
+  say [role=surrender_accept_reply, actor.style=tactical] as surrender_accept_tactical:
+    "Hold fire! Keep those hands where I can see them and back out slowly—ceasefire holds only if you walk."
+  say [role=surrender_accept_reply] as surrender_accept_default:
+    "Alright, ceasefire! Keep your hands up and clear out—don't make me regret sparing you."
+  say [role=surrender_accept_chime] as surrender_accept_chime:
+    "Keep an eye on them until they're clear of the block."
+
+  say [role=surrender_reject_reply, actor.style=aggressive] as surrender_reject_aggressive:
+    "Too late for hands up—you don't get to walk away from this!"
+  say [role=surrender_reject_reply] as surrender_reject_default:
+    "No deal! Not trusting a word you say—keep fighting!"
+
+  say [role=surrender_revoked_reply] as surrender_revoked_reply:
+    "Save it! You already burned your chance when you provoked us—no ceasefire!"
+    "Hands up won't save you now—you broke our terms! Finish it!"
+
+  say [role=surrender_no_mercy_reply] as surrender_no_mercy_reply:
+    "No mercy?! Fine—if I'm dying today, I'm taking you with me!"
+    "Screw you then—I'm not going down on my knees!"
+
+  say [default] as default:
+    "Hands up—ceasefire!"

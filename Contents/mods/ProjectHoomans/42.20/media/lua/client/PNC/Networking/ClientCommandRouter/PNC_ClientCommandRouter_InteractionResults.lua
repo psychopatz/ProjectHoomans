@@ -39,11 +39,11 @@ Internal.RegisterServerCommand(Const.CMD_MAP_COMMAND_RESULT, function(args)
 end)
 
 Internal.RegisterServerCommand(Const.CMD_FACTION_TOLL, function(args)
-    if not PNC.FactionTollUI then
-        require "PNC/UI/Factions/PNC_FactionTollWindow"
+    if not PNC.FactionTollConversation then
+        require "PNC/Conversation/PNC_FactionTollConversation"
     end
-    if PNC.FactionTollUI and PNC.FactionTollUI.HandleServerMessage then
-        PNC.FactionTollUI.HandleServerMessage(args or {})
+    if PNC.FactionTollConversation and PNC.FactionTollConversation.HandleServerMessage then
+        PNC.FactionTollConversation.HandleServerMessage(args or {})
     end
 end)
 

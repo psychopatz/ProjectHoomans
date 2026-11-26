@@ -1,0 +1,50 @@
+# Subject: LOOTER TERRITORIAL TOLL BRANCHING STORY (Cash + MarketSense Item).
+language EN
+namespace hoomans
+
+story convo.faction.looter_toll
+  trigger intent=DEMAND, subject=TOLL
+  guard safe_to_talk
+
+  say [default]:
+    "Hold it right there, {term.address}! Nice {slot.item.name}—how about you hand that over with ${slot.toll.amount} and we leave you in one piece?"
+
+    choice pay (intent=ACCEPT, subject=TOLL, utility=caution, ai_bias=caution+|compassion+|bravery-|shaken+):
+      label: "Pay the toll (${slot.toll.amount} / {slot.item.name})"
+      say: "Fine, take it—just keep your weapons lowered and let us pass."
+
+      reply [actor.style=aggressive|hostile]:
+        "Smart move, {term.address}. Okay, we're chill—for now! Move along before I change my mind."
+        end
+
+      reply [actor.style=tactical|cold]:
+        "Pleasure doing business, {term.address}. You've bought yourself safe passage—don't push your luck."
+        end
+
+      reply [default]:
+        "Okay, we're chill—for now! Keep walking and don't cause trouble on our turf."
+        end
+
+    choice leave (intent=WITHDRAW, subject=TOLL, utility=caution, ai_bias=caution+|loyalty+|aggression-):
+      label: "Back out of their territory"
+      say: "Relax—we're turning around and heading out. Keep your turf."
+
+      reply [actor.style=aggressive|hostile]:
+        "Yeah, you better walk! You've got thirty seconds to clear our perimeter or we open fire!"
+        end
+
+      reply [default]:
+        "Smart choice. Turn around and keep walking until you're past our borders."
+        end
+
+    choice refuse (intent=REFUSE, subject=TOLL, utility=assertive, ai_bias=bravery+|aggression+|caution-):
+      label: "Refuse — stand your ground"
+      say: "You want my gear and my cash? Come try and take it yourself!"
+
+      reply [actor.style=aggressive|hostile]:
+        "Big mistake, {term.address}! Light 'em up—take everything off their bodies!"
+        end
+
+      reply [default]:
+        "Have it your way! You just started a fight you're not walking away from!"
+        end
