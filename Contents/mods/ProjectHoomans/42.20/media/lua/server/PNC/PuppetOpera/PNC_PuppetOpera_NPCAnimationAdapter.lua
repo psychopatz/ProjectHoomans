@@ -99,7 +99,19 @@ function Adapter.Start(session, actor, beat, track)
         end
         return true, "npc_anim_vars_started"
     end
-    local bump = tostring(track.bump or "")
+    local bump = tostring(track.bump or track.bumpType or "")
+    local driver = PNC.AnimationDriver
+    -- Support referencing any registered AnimationScenes / AnimationPacks
+    -- sceneId directly from a PuppetOpera beat (inheriting modder overrides
+    -- and hand props automatically).
+    if bump == "" and track.sceneId and driver
+        and type(driver.ResolveSceneTrack) == "function"
+    then
+        local resolvedTrack = driver.ResolveSceneTrack(track.sceneId)
+        if resolvedTrack then
+            bump = tostring(resolvedTrack.bump or "")
+        end
+    end
     if not body or not record or bump == "" then
         return false, "npc_animation_actor_unavailable"
     end
@@ -111,25 +123,41 @@ function Adapter.Start(session, actor, beat, track)
     then
         return false, "npc_animation_owned_by_other"
     end
-    if not Animation or not Animation.PlayBump then
-        return false, "npc_animation_service_unavailable"
-    end
     local accepted
     local reason = nil
-    accepted, reason = Animation.PlayBump(
-        body,
-        record,
-        bump,
-        {
-            sceneId = "PuppetOpera:" .. tostring(session.sessionId),
+    local leaseUntil = tonumber(session.beatStartedAt or 0)
+        + tonumber(beat.durationMs or 900)
+        + 1500
+    if driver and type(driver.Start) == "function" then
+        accepted, reason = driver.Start(body, record, {
+            ownerToken = "opera:" .. tostring(session.sessionId),
+            forceTakeover = true,
+            route = "bump",
+            bump = bump,
+            sceneId = track.sceneId
+                or ("PuppetOpera:" .. tostring(session.sessionId)),
             sceneRevision = tonumber(session.revision) or 0,
-            leaseUntil = tonumber(session.beatStartedAt or 0)
-                + tonumber(beat.durationMs or 900)
-                + 1500,
+            leaseUntil = leaseUntil,
             keepManagedUseless = false,
             nonCombat = track.nonCombat == true,
-        }
-    )
+        })
+    else
+        if not Animation or not Animation.PlayBump then
+            return false, "npc_animation_service_unavailable"
+        end
+        accepted, reason = Animation.PlayBump(
+            body,
+            record,
+            bump,
+            {
+                sceneId = "PuppetOpera:" .. tostring(session.sessionId),
+                sceneRevision = tonumber(session.revision) or 0,
+                leaseUntil = leaseUntil,
+                keepManagedUseless = false,
+                nonCombat = track.nonCombat == true,
+            }
+        )
+    end
     if accepted ~= true then return false, reason or "npc_animation_rejected" end
     modData[SESSION_KEY] = tostring(session.sessionId)
     modData[BUMP_KEY] = Animation.ResolveBumpType

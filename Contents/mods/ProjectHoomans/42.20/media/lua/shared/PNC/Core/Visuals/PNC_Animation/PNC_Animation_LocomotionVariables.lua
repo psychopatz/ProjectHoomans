@@ -26,27 +26,54 @@ function Internal.resolveProfile(record, profileOverride, animState)
             return LocomotionProfiles.GetBaseProfile("limp")
         end
     end
+    local baseProfile
     if LocomotionProfiles and LocomotionProfiles.GetBaseProfile then
         if animState == "Run" then
-            return LocomotionProfiles.GetBaseProfile("run")
+            baseProfile = LocomotionProfiles.GetBaseProfile("run")
+        elseif animState == "SneakWalk" then
+            baseProfile = LocomotionProfiles.GetBaseProfile("sneak")
+        elseif animState == "Crawl" then
+            baseProfile = LocomotionProfiles.GetBaseProfile("crawl")
+        else
+            baseProfile = LocomotionProfiles.GetBaseProfile("walk")
         end
-        if animState == "SneakWalk" then
-            return LocomotionProfiles.GetBaseProfile("sneak")
-        end
-        if animState == "Crawl" then
-            return LocomotionProfiles.GetBaseProfile("crawl")
-        end
-        return LocomotionProfiles.GetBaseProfile("walk")
+    else
+        baseProfile = {
+            moveAnim = animState == "Run" and "Run" or animState == "SneakWalk" and "SneakWalk" or animState == "Crawl" and "Crawl" or "Walk",
+            walkType = animState == "SneakWalk" and "SneakWalk" or animState == "Crawl" and "Crawl" or animState == "Run" and "Run" or "Walk",
+            engineWalkType = animState == "Crawl" and "" or animState == "Run" and "Run" or animState == "SneakWalk" and "SneakWalk" or "Walk",
+            animSpeed = 1.0,
+            isRunning = animState == "Run",
+            isCrawling = animState == "Crawl",
+            profileKey = string.lower(tostring(animState or "walk")),
+        }
     end
-    return {
-        moveAnim = animState == "Run" and "Run" or animState == "SneakWalk" and "SneakWalk" or animState == "Crawl" and "Crawl" or "Walk",
-        walkType = animState == "SneakWalk" and "SneakWalk" or animState == "Crawl" and "Crawl" or animState == "Run" and "Run" or "Walk",
-        engineWalkType = animState == "Crawl" and "" or animState == "Run" and "Run" or animState == "SneakWalk" and "SneakWalk" or "Walk",
-        animSpeed = 1.0,
-        isRunning = animState == "Run",
-        isCrawling = animState == "Crawl",
-        profileKey = string.lower(tostring(animState or "walk")),
-    }
+    local packs = PNC.AnimationPacks
+    if packs and type(packs.ResolveLocomotion) == "function" then
+        local stateKey = baseProfile and baseProfile.profileKey
+            or string.lower(tostring(animState or "walk"))
+        local override = packs.ResolveLocomotion(stateKey, {
+            record = record,
+            weaponClass = record and record.weaponClass or nil,
+            injured = mobility ~= nil and mobility.profileKey == "limp",
+        })
+        if type(override) == "table" then
+            return {
+                moveAnim = override.moveAnim or baseProfile.moveAnim,
+                walkType = override.walkType or baseProfile.walkType,
+                engineWalkType = override.engineWalkType ~= nil
+                    and override.engineWalkType or baseProfile.engineWalkType,
+                animSpeed = override.animSpeed or baseProfile.animSpeed,
+                isRunning = override.isRunning ~= nil
+                    and override.isRunning or baseProfile.isRunning,
+                isCrawling = override.isCrawling ~= nil
+                    and override.isCrawling or baseProfile.isCrawling,
+                profileKey = override.profileKey or baseProfile.profileKey,
+                customVars = override.customVars,
+            }
+        end
+    end
+    return baseProfile
 end
 
 function Internal.setLocomotionVars(zombie, profile, moving, animSpeed)

@@ -70,6 +70,82 @@ local function sceneIs(visual, expected)
     return text(visual, "sceneId") == expected
 end
 
+local function resolveScenePropSpec(visual)
+    if type(visual) ~= "table" then return nil end
+    if visual.propPrimary or visual.propSecondary then
+        return {
+            primary = visual.propPrimary,
+            secondary = visual.propSecondary,
+            equipmentMode = visual.propEquipmentMode,
+        }, "visual_override"
+    end
+    local sceneId = text(visual, "sceneId")
+    if sceneId == "" then return nil end
+    local scenes = PNC.AnimationScenes
+    local def = scenes and type(scenes.Get) == "function"
+        and scenes.Get(sceneId) or nil
+    if type(def) ~= "table" then return nil end
+    local stepId = text(visual, "sceneStepId")
+    if stepId ~= "" and type(def.steps) == "table" then
+        for i = 1, #def.steps do
+            local step = def.steps[i]
+            if step and tostring(step.id or "") == stepId and step.props then
+                return step.props, "scene_step"
+            end
+        end
+    end
+    if def.props then return def.props, "scene_default" end
+    return nil
+end
+
+local function buildDeclaredDescriptor(source, spec, action, visual)
+    local actionItem = text(action, "activityItemFullType")
+    local actionItemID = value(action, "activityItemID")
+    local primaryType = spec.primary
+    local primaryItemID
+    if not primaryType and spec.primaryFrom == "action_item" then
+        primaryType = actionItem ~= "" and actionItem or spec.fallbackPrimary
+        if actionItem ~= "" then primaryItemID = actionItemID end
+    elseif not primaryType then
+        primaryType = spec.fallbackPrimary
+    end
+    local secondaryType = spec.secondary
+    local secondaryItemID
+    if not secondaryType and spec.secondaryFrom == "action_item" then
+        secondaryType = actionItem ~= "" and actionItem or spec.fallbackSecondary
+        if actionItem ~= "" then secondaryItemID = actionItemID end
+    elseif not secondaryType then
+        secondaryType = spec.fallbackSecondary
+    end
+    if (not primaryType or primaryType == "")
+        and (not secondaryType or secondaryType == "")
+    then
+        return nil
+    end
+    local hand = (primaryType and secondaryType) and "both"
+        or (secondaryType and "secondary" or "primary")
+    return {
+        source = source,
+        primaryFullType = primaryType,
+        secondaryFullType = secondaryType,
+        primaryItemID = primaryItemID,
+        secondaryItemID = secondaryItemID,
+        primaryVisual = primaryItemID ~= nil
+            and value(action, "activityItemVisual") or nil,
+        secondaryVisual = secondaryItemID ~= nil
+            and value(action, "activityItemVisual") or nil,
+        primaryState = primaryItemID ~= nil
+            and value(action, "activityItemState") or nil,
+        secondaryState = secondaryItemID ~= nil
+            and value(action, "activityItemState") or nil,
+        hand = hand,
+        equipmentMode = spec.equipmentMode,
+        sceneId = value(visual, "sceneId"),
+        sceneStepId = value(visual, "sceneStepId"),
+        revision = sceneRevision(visual),
+    }
+end
+
 function ActionProps.Resolve(snapshot)
     local action = snapshot and snapshot.actionInformation or nil
     local visual = snapshot and snapshot.visualState or nil
@@ -87,6 +163,15 @@ function ActionProps.Resolve(snapshot)
         or visual and visual.attackActive == true
     then
         return nil
+    end
+
+    -- First-class data-driven hand props declared on the active scene step,
+    -- AnimationPack override, or PuppetOpera visual override.
+    local propSpec, propSource = resolveScenePropSpec(visual)
+    if propSpec then
+        local declared = buildDeclaredDescriptor(
+            propSource, propSpec, action, visual)
+        if declared then return declared end
     end
 
     -- Vanilla eating and drinking actions put the consumed item in the

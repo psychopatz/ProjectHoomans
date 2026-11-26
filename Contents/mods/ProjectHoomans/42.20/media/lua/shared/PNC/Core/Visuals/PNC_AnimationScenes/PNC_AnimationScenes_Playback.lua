@@ -130,7 +130,26 @@ function Internal.ActivateStep(record, zombie, scene, definition, now)
         definition, record, zombie, scene, step, now
     )
     if not started then return false, startReason end
-    if PNC.Animation and PNC.Animation.PlayBump then
+    local driver = PNC.AnimationDriver
+    local stepRoute = tostring(step.route or "bump")
+    if driver and type(driver.Start) == "function" then
+        local played, playReason = driver.Start(zombie, record, {
+            ownerToken = "scene:" .. tostring(definition.id),
+            forceTakeover = true,
+            route = stepRoute,
+            bump = step.bump,
+            track = step.animVars,
+            sceneId = definition.id,
+            sceneRevision = scene.revision,
+            playbackRevision = scene.playbackRevision,
+            leaseUntil = Internal.SceneLeaseUntil(scene, now),
+            keepManagedUseless = definition.keepManagedUseless == true
+                and true or nil,
+        })
+        if played == false then
+            return false, playReason or "scene_bump_rejected"
+        end
+    elseif stepRoute == "bump" and PNC.Animation and PNC.Animation.PlayBump then
         local played
         local playReason
         played, playReason = PNC.Animation.PlayBump(

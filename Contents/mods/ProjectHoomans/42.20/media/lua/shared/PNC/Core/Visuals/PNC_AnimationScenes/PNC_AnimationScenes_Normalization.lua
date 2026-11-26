@@ -11,6 +11,37 @@ function Internal.CopyInterrupts(source)
     }
 end
 
+function Internal.NormalizeProps(raw)
+    if type(raw) ~= "table" then return nil end
+    local function optText(value)
+        if value == nil then return nil end
+        local s = tostring(value)
+        return s ~= "" and s or nil
+    end
+    local primary = optText(raw.primary or raw.primaryFullType)
+    local secondary = optText(raw.secondary or raw.secondaryFullType)
+    local primaryFrom = optText(raw.primaryFrom)
+    local secondaryFrom = optText(raw.secondaryFrom)
+    local fallbackPrimary = optText(raw.fallbackPrimary)
+    local fallbackSecondary = optText(raw.fallbackSecondary)
+    local equipmentMode = optText(raw.equipmentMode)
+    if not primary and not secondary and not primaryFrom
+        and not secondaryFrom and not fallbackPrimary
+        and not fallbackSecondary and not equipmentMode
+    then
+        return nil
+    end
+    return {
+        primary = primary,
+        secondary = secondary,
+        primaryFrom = primaryFrom,
+        secondaryFrom = secondaryFrom,
+        fallbackPrimary = fallbackPrimary,
+        fallbackSecondary = fallbackSecondary,
+        equipmentMode = equipmentMode,
+    }
+end
+
 function Internal.NormalizeSteps(definition)
     local source = type(definition.steps) == "table"
         and definition.steps or nil
@@ -21,21 +52,36 @@ function Internal.NormalizeSteps(definition)
     if not source or #source <= 0 then
         source = {{
             id = definition.stepId,
-            bump = definition.bump,
+            route = definition.route,
+            bump = definition.bump or definition.bumpType,
+            animVars = definition.animVars or definition.vars,
             durationMs = definition.durationMs,
             loop = definition.loop,
+            props = definition.props,
         }}
     end
     for i = 1, #source do
         raw = type(source[i]) == "table"
             and source[i] or { bump = source[i] }
-        bump = tostring(raw.bump or "")
-        if bump == "" then
+        local route = tostring(raw.route or definition.route or "")
+        local animVars = type(raw.animVars) == "table" and raw.animVars
+            or (type(raw.vars) == "table" and raw.vars or nil)
+        if route == "" then
+            route = animVars and not raw.bump and not raw.bumpType
+                and "anim_vars" or "bump"
+        end
+        bump = tostring(raw.bump or raw.bumpType or "")
+        if route ~= "anim_vars" and bump == "" then
             return nil, "missing_step_bump"
+        end
+        if route == "anim_vars" and type(animVars) ~= "table" then
+            return nil, "missing_step_anim_vars"
         end
         steps[#steps + 1] = {
             id = tostring(raw.id or raw.key or ("step_" .. tostring(i))),
-            bump = bump,
+            route = route,
+            bump = bump ~= "" and bump or nil,
+            animVars = animVars,
             durationMs = math.max(
                 0,
                 tonumber(raw.durationMs)
@@ -43,6 +89,7 @@ function Internal.NormalizeSteps(definition)
                     or 0
             ),
             loop = raw.loop == true,
+            props = Internal.NormalizeProps(raw.props),
         }
     end
     return steps
@@ -100,6 +147,7 @@ function Internal.NormalizeDefinition(sceneId, definition, steps)
             0,
             tonumber(definition.stepGapJitterMs) or 0
         ),
+        props = Internal.NormalizeProps(definition.props),
         interrupts = Internal.CopyInterrupts(definition.interrupts),
         onTick = type(definition.onTick) == "function"
             and definition.onTick or nil,
