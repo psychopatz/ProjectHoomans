@@ -60,17 +60,32 @@ local function isWithinCamp(record, zombie, anchorX, anchorY, anchorZ, radius,
     if order and (normalizeScope(order.scope) == ROOM_SCOPE
         or normalizeScope(order.siteScope) == ROOM_SCOPE)
     then
+        local inRoom = false
         bodySquare = zombie and zombie.getCurrentSquare
             and zombie:getCurrentSquare() or nil
         if bodySquare and Geometry
             and type(Geometry.MatchesRoom) == "function"
         then
-            return Geometry.MatchesRoom(bodySquare, order) == true
+            inRoom = Geometry.MatchesRoom(bodySquare, order) == true
+        else
+            -- Abstract records do not have an IsoGridSquare. Bounds are a safe
+            -- primitive fallback until the live body is materialized.
+            inRoom = boundsContain(order.roomBounds,
+                record and record.x, record and record.y, record and record.z)
         end
-        -- Abstract records do not have an IsoGridSquare. Bounds are a safe
-        -- primitive fallback until the live body is materialized.
-        return boundsContain(order.roomBounds,
-            record and record.x, record and record.y, record and record.z)
+        if not inRoom then return false end
+        -- While moving into an analyzed room slot, keep walking to the open
+        -- interior slot so NPCs do not halt in the doorway on the first room tile.
+        if order.hasSlot == true
+            and string.lower(tostring(order.placementState or "arrived"))
+                == "moving"
+        then
+            local slotStop = math.max(tonumber(order.stopDistance) or 0.7, 1.25)
+            local px = zombie and zombie.getX and zombie:getX() or record.x
+            local py = zombie and zombie.getY and zombie:getY() or record.y
+            return Core.Distance(px, py, anchorX, anchorY) <= slotStop
+        end
+        return true
     end
     local distance = Core.Distance(record.x, record.y, anchorX, anchorY)
     if distance > radius then return false end
@@ -143,6 +158,7 @@ local function normalize(record, spec)
         stopDistance = math.max(0.25, tonumber(spec.stopDistance)
             or (scope == ROOM_SCOPE and 0.7
                 or tonumber(Const.CAMP_STOP_DISTANCE) or 0.45)),
+        hasSlot = spec.hasSlot == true and true or nil,
         -- Group camp keeps the assigned zone as the durable movement boundary
         -- and the validated player-selected site as a separate primitive root
         -- for diagnostics/reallocation. Do not retain Java objects here.

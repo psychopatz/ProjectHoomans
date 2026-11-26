@@ -236,6 +236,7 @@ Commands.Register({
             label = zone and zone.label or nil,
             risk = zone and zone.risk or nil,
             stopDistance = zone and zone.stopDistance or nil,
+            hasSlot = zone and zone.hasSlot == true and true or nil,
             -- The assigned zone is the movement/safety boundary. Keep the
             -- validated player-selected site separately for diagnostics and
             -- future group reallocation without serializing the full zone

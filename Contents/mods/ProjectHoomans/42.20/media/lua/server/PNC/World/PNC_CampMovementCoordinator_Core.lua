@@ -98,6 +98,7 @@ local function compactSite(site)
     output.radius = number(site.radius, 3)
     output.resourceRadius = number(site.resourceRadius, 12)
     output.stopDistance = number(site.stopDistance, 0.7)
+    if site.hasSlot == true then output.hasSlot = true end
     bounds = primitiveCopy(site.roomBounds)
     if bounds then output.roomBounds = bounds end
     return output
@@ -220,13 +221,23 @@ local function reached(zone, body, record)
         local square = call(body, "getCurrentSquare")
         local geometry = PNC.Semantics
             and PNC.Semantics.CampSiteGeometry or nil
+        local inRoom = false
         if square and geometry and type(geometry.MatchesRoom) == "function" then
-            local matched = geometry.MatchesRoom(square, zone)
-            if matched == true then return true end
+            inRoom = geometry.MatchesRoom(square, zone) == true
         end
-        if boundsContain(zone and zone.roomBounds, x, y, z) then
-            return true
+        if not inRoom and boundsContain(zone and zone.roomBounds, x, y, z) then
+            inRoom = true
         end
+        -- When the room has an analyzed interior slot, walk the member all
+        -- the way into the room toward its slot instead of halting on the
+        -- first doorway tile.
+        if zone and zone.hasSlot == true and distance ~= nil then
+            if math.abs(z - number(zone and zone.z, z)) > 0.75 then
+                return false
+            end
+            return inRoom and distance <= math.max(stopDistance, 1.25)
+        end
+        if inRoom then return true end
         if math.abs(z - number(zone and zone.z, z)) > 0.75 then
             return false
         end

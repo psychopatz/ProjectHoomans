@@ -67,19 +67,35 @@ function Coordinator.StartGroupCamp(campSite, records, directory, options)
     Coordinator.PendingCount = (tonumber(Coordinator.PendingCount) or 0) + 1
     at = session.startedAt
 
+    local slots = type(campSite.slots) == "table" and campSite.slots or nil
     for index = 1, math.min(#records, Coordinator.MAX_QUEUE) do
         record = records[index]
         if record and record.id ~= nil and isLiveRecord(record) then
             assignment = directory and directory.assignments
                 and directory.assignments[tostring(record.id)] or nil
             -- First iteration deliberately uses the validated root for every
-            -- member. Adjacent-room/need placement is a later coordinator
-            -- policy; it must not reintroduce a second broad scan here.
-            zone = root
+            -- member, spreading members across the room's pre-analyzed open
+            -- interior slots so they do not pile up at the doorway.
+            zone = compactSite(root)
+            if slots and #slots > 0 then
+                local slotIndex = #session.queue + 1
+                local slot = slots[((slotIndex - 1) % #slots) + 1]
+                if type(slot) == "table"
+                    and slot.x ~= nil and slot.y ~= nil
+                then
+                    zone.x = slot.x
+                    zone.y = slot.y
+                    zone.z = slot.z or zone.z
+                    zone.movementX = slot.x
+                    zone.movementY = slot.y
+                    zone.movementZ = slot.z or zone.movementZ
+                    zone.hasSlot = true
+                end
+            end
             entry = {
                 npcID = tostring(record.id),
                 index = #session.queue + 1,
-                zone = compactSite(zone),
+                zone = zone,
                 assignment = compactAssignment(assignment, zone),
                 state = "queued",
             }

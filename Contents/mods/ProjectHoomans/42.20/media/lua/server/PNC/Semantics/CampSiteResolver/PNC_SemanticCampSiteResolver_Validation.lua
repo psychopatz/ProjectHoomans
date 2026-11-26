@@ -106,6 +106,11 @@ local function validateRoomHint(hint, context)
         movementY = number(anchor.movementY) or number(anchor.y),
         movementZ = number(anchor.movementZ) or number(anchor.z)
             or number(identity.z) or number(hint.z) or 0,
+        slots = anchor.slots,
+        capacity = anchor.capacity,
+        campCapacity = anchor.campCapacity,
+        narrow = anchor.narrow,
+        exitCount = anchor.exitCount,
         label = CampSite.DisplayLabel({
             scope = CampSite.SCOPES.ROOM,
             roomType = identity.roomType,

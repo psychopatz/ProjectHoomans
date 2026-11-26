@@ -151,6 +151,7 @@ end
 local function deriveBounds(room, definition, squares)
     local bounds = boundsFor(definition)
     if bounds then return bounds end
+    squares = squares or roomSquares(room)
     local minX
     local minY
     local maxX

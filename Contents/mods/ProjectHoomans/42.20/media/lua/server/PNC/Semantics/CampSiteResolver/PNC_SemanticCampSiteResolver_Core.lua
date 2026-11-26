@@ -156,6 +156,22 @@ local function campfireTarget(target, hint, origin)
     return output
 end
 
+local function normalizeSlots(slots)
+    if type(slots) ~= "table" then return nil end
+    local output = {}
+    local limit = math.min(#slots, 12)
+    for index = 1, limit do
+        local slot = slots[index]
+        local sx = type(slot) == "table" and number(slot.x) or nil
+        local sy = type(slot) == "table" and number(slot.y) or nil
+        local sz = type(slot) == "table" and number(slot.z) or 0
+        if sx ~= nil and sy ~= nil then
+            output[#output + 1] = { x = sx, y = sy, z = sz }
+        end
+    end
+    return #output > 0 and output or nil
+end
+
 local function normalizeRoomSite(site)
     local movementX
     local movementY
@@ -182,6 +198,11 @@ local function normalizeRoomSite(site)
         movementX = movementX,
         movementY = movementY,
         movementZ = movementZ,
+        slots = normalizeSlots(site.slots),
+        capacity = number(site.capacity),
+        campCapacity = number(site.campCapacity),
+        narrow = site.narrow == true and true or nil,
+        exitCount = number(site.exitCount),
         label = text(site.label, CampSite.MAX_LABEL) or "room",
         labelKey = text(site.labelKey, 96) or "semantic.camp.room",
         risk = text(site.risk, 32) or "sheltered",

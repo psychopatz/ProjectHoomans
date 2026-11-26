@@ -1,77 +1,33 @@
 -- Projects one engine room into the stable primitive camp-site contract.
 local Geometry = PNC and PNC.Semantics and PNC.Semantics.CampSiteGeometry
 local Internal = Geometry and Geometry.Internal
-if type(Internal) ~= "table" or type(Internal.BuildRoomIdentity) ~= "function" then
-    error("camp-site room projection requires room records")
+if type(Internal) ~= "table" or type(Internal.BuildRoomIdentity) ~= "function"
+    or type(Internal.AnalyzeRoom) ~= "function"
+then
+    error("camp-site room projection requires room records and analysis")
 end
 
 local CampSite = Internal.CampSite
 local call = Internal.Call
-local number = Internal.Number
-local listSize = Internal.ListSize
-local listItem = Internal.ListItem
-local position = Internal.Position
 local roomFor = Internal.RoomFor
 local roomDefFor = Internal.RoomDefFor
 local buildingFor = Internal.BuildingFor
 local roomName = Internal.RoomName
 local roomSquares = Internal.RoomSquares
-local isUsable = Internal.IsUsable
 local deriveBounds = Internal.DeriveBounds
 local roomIdentity = Internal.BuildRoomIdentity
+local analyzeRoom = Internal.AnalyzeRoom
 
-local function anchorFor(room, bounds, cell, origin)
-    local originX, originY, originZ = position(origin)
-    local best
-    local bestDistance
-    local squares = roomSquares(room)
-    local size = math.min(listSize(squares), Geometry.MAX_ROOM_SQUARES)
-    local function consider(square)
-        local x, y, z
-        local dx
-        local dy
-        local distance
-        if not isUsable(square, cell) then return end
-        x, y, z = position(square)
-        if not x or not y then return end
-        dx = originX and x - originX or 0
-        dy = originY and y - originY or 0
-        distance = dx * dx + dy * dy
-        if not best or distance < bestDistance then
-            best = { x = x + 0.5, y = y + 0.5, z = z }
-            bestDistance = distance
-        end
-    end
-
-    -- getFreeTile is cheap and handles room-specific engine constraints. It
-    -- is only accepted after the same indoor/free checks as list scanning.
-    consider(call(room, "getFreeTile"))
-    for index = 0, size - 1 do consider(listItem(squares, index)) end
-
-    if best or not bounds or not cell then return best end
-    local minX = math.floor(bounds.minX)
-    local minY = math.floor(bounds.minY)
-    local maxX = math.floor(bounds.maxX)
-    local maxY = math.floor(bounds.maxY)
-    local inspected = 0
-    for x = minX, maxX do
-        for y = minY, maxY do
-            if inspected >= Geometry.MAX_FALLBACK_SCAN then return best end
-            inspected = inspected + 1
-            consider(Geometry.GetSquare(cell, x, y, bounds.z or originZ))
-        end
-    end
-    return best
-end
-
-function Geometry.DescribeRoom(roomLike, building, cell, origin, options)
+-- Cheap identity/filter projection: RoomDef bounds and names only, no square
+-- iteration. Room selection ranks many rooms with this before paying for the
+-- full floor analysis on a handful of finalists.
+function Geometry.SummarizeRoom(roomLike, building, options)
     options = type(options) == "table" and options or {}
     local room = roomFor(roomLike)
     local definition = roomDefFor(room)
     local actualBuilding = building or buildingFor(room, definition)
     local name = roomName(room, definition)
     local bounds
-    local anchor
     local roomID
     local buildingID
     local roomType
@@ -83,7 +39,7 @@ function Geometry.DescribeRoom(roomLike, building, cell, origin, options)
     if actualBuilding and call(actualBuilding, "isToxic") == true then
         return nil, "room_toxic"
     end
-    bounds = deriveBounds(room, definition, roomSquares(room))
+    bounds = deriveBounds(room, definition)
     if not bounds then return nil, "room_bounds_unavailable" end
     roomID, buildingID, roomType = roomIdentity(
         room, definition, actualBuilding, bounds, name)
@@ -98,32 +54,62 @@ function Geometry.DescribeRoom(roomLike, building, cell, origin, options)
             return nil, "room_query_mismatch"
         end
     end
-    anchor = anchorFor(room, bounds, cell, origin)
+    return {
+        room = room,
+        building = actualBuilding,
+        name = name,
+        bounds = bounds,
+        roomID = roomID,
+        buildingID = buildingID,
+        roomType = roomType,
+    }
+end
+
+local function copySlots(slots)
+    local output = {}
+    for index = 1, #(slots or {}) do
+        local slot = slots[index]
+        output[index] = { x = slot.x, y = slot.y, z = slot.z }
+    end
+    return output
+end
+
+function Geometry.DescribeRoom(roomLike, building, cell, origin, options)
+    local summary, reason = Geometry.SummarizeRoom(roomLike, building, options)
+    if not summary then return nil, reason end
+    local bounds = summary.bounds
+    local analysis = analyzeRoom(summary.room, bounds, cell)
+    local anchor = analysis and analysis.anchor
     if not anchor then return nil, "room_no_free_anchor" end
     return {
         kind = CampSite.KIND,
         scope = CampSite.SCOPES.ROOM,
         siteScope = CampSite.SCOPES.ROOM,
-        siteID = "room:" .. tostring(buildingID or "unknown") .. ":"
-            .. tostring(roomID or (bounds.minX .. ":" .. bounds.minY)),
-        roomID = roomID,
-        buildingID = buildingID,
-        roomType = roomType,
-        roomName = name,
+        siteID = "room:" .. tostring(summary.buildingID or "unknown") .. ":"
+            .. tostring(summary.roomID or (bounds.minX .. ":" .. bounds.minY)),
+        roomID = summary.roomID,
+        buildingID = summary.buildingID,
+        roomType = summary.roomType,
+        roomName = summary.name,
         roomBounds = bounds,
         x = anchor.x,
         y = anchor.y,
         z = anchor.z,
-        -- Keep the movement point explicit. The room identity/label is the
-        -- semantic contract; this is only the bounded server/client walking
-        -- anchor chosen from the room's usable tiles.
+        -- The anchor is the most open, door-distant reachable floor tile.
+        -- `slots` are spaced per-member standing tiles (slot 1 == anchor) so
+        -- a group spreads through the room instead of piling at one point.
         movementX = anchor.x,
         movementY = anchor.y,
         movementZ = anchor.z,
+        slots = copySlots(analysis.slots),
+        capacity = analysis.capacity,
+        campCapacity = analysis.campCapacity,
+        narrow = analysis.narrow == true,
+        exitCount = analysis.exitCount,
         label = CampSite.DisplayLabel({
             scope = CampSite.SCOPES.ROOM,
-            roomType = roomType,
-            roomName = name,
+            roomType = summary.roomType,
+            roomName = summary.name,
         }),
         labelKey = "semantic.camp.room",
         risk = "sheltered",

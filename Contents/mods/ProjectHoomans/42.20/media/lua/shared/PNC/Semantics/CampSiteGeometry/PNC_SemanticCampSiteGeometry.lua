@@ -19,6 +19,7 @@ Geometry.MAX_FALLBACK_SCAN = 4096
 
 require "PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RuntimeAccess"
 require "PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomRecords"
+require "PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomAnalysis"
 require "PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomProjection"
 require "PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomEnumeration"
 require "PNC/Semantics/CampSiteGeometry/PNC_SemanticCampSiteGeometry_RoomSelection"
