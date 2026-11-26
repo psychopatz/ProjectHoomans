@@ -79,6 +79,17 @@ end
 
 local function runAnimationCommand(record, zombie, command, args)
     if command == "animation_scene_play" then
+        record.runtime = record.runtime or {}
+        local p1 = args and args.propPrimary and tostring(args.propPrimary) or nil
+        local p2 = args and args.propSecondary and tostring(args.propSecondary) or nil
+        if (p1 and p1 ~= "") or (p2 and p2 ~= "") then
+            record.runtime.debugActionProps = {
+                primary = (p1 and p1 ~= "") and p1 or nil,
+                secondary = (p2 and p2 ~= "") and p2 or nil,
+            }
+        else
+            record.runtime.debugActionProps = nil
+        end
         return PNC.AnimationSceneDebug.Play(record, zombie, args and args.sceneId, {
             durationMs = args and args.durationMs,
             reason = "debug_scene_command",
@@ -99,6 +110,9 @@ local function runAnimationCommand(record, zombie, command, args)
             args and args.pool,
             { gapMs = args and args.gapMs }
         )
+    end
+    if record and record.runtime then
+        record.runtime.debugActionProps = nil
     end
     return PNC.AnimationSceneDebug.Stop(
         record,

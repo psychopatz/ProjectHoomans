@@ -104,6 +104,14 @@ local function handleSessionAction(player, session, args, action)
         return true, true, reason, true
     end
     if action == "stop" then
+        if not session then
+            local animVars = Opera.AnimVarAdapter
+            if player and animVars and animVars.Clear then
+                animVars.Clear(player)
+            end
+            Internal.sendError(player, "session_missing")
+            return true, false, "session_missing", true
+        end
         accepted, reason = Internal.ownsRequest(session, player, args)
         if not accepted then
             Internal.sendError(player, reason, session)

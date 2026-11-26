@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode>
+  <m_Name>PNC_CarryShoulder_PassengerWalk</m_Name>
+  <m_AnimName>PNC_CarriedShoulderWalk</m_AnimName>
+  <m_Priority>110</m_Priority>
+  <m_ConditionPriority>1000</m_ConditionPriority>
+  <m_Looped>true</m_Looped>
+  <m_BlendTime>0.12</m_BlendTime>
+  <m_SpeedScale>1.0</m_SpeedScale>
+  <m_SyncTrackingEnabled>false</m_SyncTrackingEnabled>
+  <m_maxTorsoTwist>0.0</m_maxTorsoTwist>
+  <m_useDeferredMovement>false</m_useDeferredMovement>
+  <m_Conditions><m_Name>PNC_AnimActive</m_Name><m_Type>BOOL</m_Type><m_BoolValue>true</m_BoolValue></m_Conditions>
+  <m_Conditions><m_Name>PNC_AnimStyle</m_Name><m_Type>STRING</m_Type><m_Value>carry_shoulder</m_Value></m_Conditions>
+  <m_Conditions><m_Name>PNC_AnimRole</m_Name><m_Type>STRING</m_Type><m_Value>Passenger</m_Value></m_Conditions>
+  <m_Conditions><m_Name>PNC_AnimPhase</m_Name><m_Type>STRING</m_Type><m_Value>carry</m_Value></m_Conditions>
+  <m_Conditions><m_Name>PNC_AnimMoving</m_Name><m_Type>BOOL</m_Type><m_BoolValue>true</m_BoolValue></m_Conditions>
+</animNode>

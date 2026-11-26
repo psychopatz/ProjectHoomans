@@ -320,7 +320,20 @@ local function buildPreflight(player, args)
     end
 
     if playerReason == nil then
-        local plan, planReason = Anchors.BuildPlan(blueprint, player)
+        local planOptions = nil
+        local originActorID = blueprint.anchorFrame
+            and blueprint.anchorFrame.originActor or nil
+        if originActorID and result.actors and result.actors[originActorID] then
+            local originEntry = result.actors[originActorID]
+            local originBody = originEntry.kind == "local_player" and player
+                or (originEntry.npcID and Registry and Registry.GetLiveZombie
+                    and Registry.GetLiveZombie(originEntry.npcID))
+                or nil
+            if originBody then
+                planOptions = { leadActor = originBody }
+            end
+        end
+        local plan, planReason = Anchors.BuildPlan(blueprint, player, planOptions)
         if not plan then
             result.ready = false
             result.reason = planReason

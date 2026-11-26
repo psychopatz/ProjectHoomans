@@ -86,6 +86,42 @@ function ISPNCAnimationSceneDebugWindow:createChildren()
         onlyNumbers = true,
     })
 
+    self.propItemCombo = ISComboBox:new(0, 0, 180, 26, self)
+    self.propItemCombo:initialise()
+    self.propItemCombo:instantiate()
+    local propPresets = {
+        { label = "Prop: None", data = "" },
+        { label = "Prop: Base.Apple", data = "Base.Apple" },
+        { label = "Prop: Base.WaterBottleFull", data = "Base.WaterBottleFull" },
+        { label = "Prop: Base.Bandage", data = "Base.Bandage" },
+        { label = "Prop: Base.Hammer", data = "Base.Hammer" },
+        { label = "Prop: Base.Axe", data = "Base.Axe" },
+        { label = "Prop: Base.Book", data = "Base.Book" },
+        { label = "Prop: Base.KitchenKnife", data = "Base.KitchenKnife" },
+        { label = "Prop: Base.Bowl", data = "Base.Bowl" },
+        { label = "Prop: Base.Flashlight", data = "Base.Flashlight" },
+    }
+    for _, preset in ipairs(propPresets) do
+        self.propItemCombo:addOptionWithData(preset.label, preset.data)
+    end
+    self.propItemCombo.selected = 1
+    self:addChild(self.propItemCombo)
+
+    self.propCustomEntry = UI.CreateTextEntry(self, {
+        text = "",
+        width = 160,
+        height = 26,
+    })
+
+    self.propHandCombo = ISComboBox:new(0, 0, 130, 26, self)
+    self.propHandCombo:initialise()
+    self.propHandCombo:instantiate()
+    self.propHandCombo:addOptionWithData("Hand: Primary", "primary")
+    self.propHandCombo:addOptionWithData("Hand: Secondary", "secondary")
+    self.propHandCombo:addOptionWithData("Hand: Both", "both")
+    self.propHandCombo.selected = 1
+    self:addChild(self.propHandCombo)
+
     self.list = UI.CreateList(self, {
         itemHeight = 59,
         doDrawItem = drawSceneItem,
@@ -156,8 +192,16 @@ function ISPNCAnimationSceneDebugWindow:onResponsiveLayout()
     Layout.SetBounds(self.gapEntry, groupX + groupWidth + 8, top,
         gapWidth, 26)
 
+    local propTop = top + 32
+    local handWidth = 132
+    local presetWidth = math.max(180, math.floor((width - margin * 2 - handWidth - 16) * 0.5))
+    local customWidth = math.max(120, width - margin * 2 - presetWidth - handWidth - 16)
+    Layout.SetBounds(self.propItemCombo, margin, propTop, presetWidth, 26)
+    Layout.SetBounds(self.propCustomEntry, margin + presetWidth + 8, propTop, customWidth, 26)
+    Layout.SetBounds(self.propHandCombo, margin + presetWidth + customWidth + 16, propTop, handWidth, 26)
+
     local buttonsTop = height - 43
-    local mainTop = top + 36
+    local mainTop = propTop + 34
     local mainHeight = math.max(
         130,
         buttonsTop - mainTop - 10

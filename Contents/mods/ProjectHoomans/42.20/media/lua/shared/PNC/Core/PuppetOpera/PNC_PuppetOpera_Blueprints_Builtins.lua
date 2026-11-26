@@ -51,6 +51,7 @@ local defaultBlueprint = {
         {
             id = "kiss",
             durationMs = 900,
+            disableCollision = true,
             synchronization = "arrival_and_start_barrier",
             tracks = {
                 actor_1 = {
@@ -163,6 +164,8 @@ local function dedicatedKissBlueprint(id, label, sceneType, actorKinds)
             origin = "server_player_relative",
             orientation = "player_facing",
             tolerance = 0.75,
+            allowOverlap = true,
+            searchRadius = 3,
             interactionDistance = 0.55,
             movementStopDistance = 0.20,
             arrivalTolerance = 0.20,
@@ -252,6 +255,9 @@ Registry.Register("rescue.carry_incapacitated_npc", {
         orientation = "lead_facing",
         tolerance = 0.75,
         allowOverlap = true,
+        searchRadius = 3,
+        movementStopDistance = 0.35,
+        arrivalTolerance = 0.55,
         anchors = {
             carrier = { right = 0, forward = -0.45, z = 0, faceTarget = "actor_2" },
             passenger = { right = 0, forward = 0, z = 0, faceTarget = "actor_1" },
@@ -400,17 +406,17 @@ Registry.Register("social.hold_hands", {
                     byKind = {
                         local_player = {
                             route = "anim_vars",
-                            style = "handhold",
+                            style = "carry_handhold",
                             role = "Carrier",
                             phase = "carry",
-                            clip = "PNC_HandholdLeft",
+                            clip = "PNC_CarryHandholdWalk",
                         },
                         nearby_live_npc = {
                             route = "anim_vars",
-                            style = "handhold",
+                            style = "carry_handhold",
                             role = "Carrier",
                             phase = "carry",
-                            clip = "PNC_HandholdLeft",
+                            clip = "PNC_CarryHandholdWalk",
                         },
                     },
                 },
@@ -418,17 +424,17 @@ Registry.Register("social.hold_hands", {
                     byKind = {
                         local_player = {
                             route = "anim_vars",
-                            style = "handhold",
+                            style = "carry_handhold",
                             role = "Passenger",
                             phase = "carry",
-                            clip = "PNC_HandholdRight",
+                            clip = "PNC_CarriedHandholdWalk",
                         },
                         nearby_live_npc = {
                             route = "anim_vars",
-                            style = "handhold",
+                            style = "carry_handhold",
                             role = "Passenger",
                             phase = "carry",
-                            clip = "PNC_HandholdRight",
+                            clip = "PNC_CarriedHandholdWalk",
                         },
                     },
                 },

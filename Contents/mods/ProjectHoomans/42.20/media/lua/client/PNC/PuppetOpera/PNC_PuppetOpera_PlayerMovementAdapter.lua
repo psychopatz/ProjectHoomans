@@ -37,6 +37,30 @@ local function queueIsIdle(queue)
     return not queue or not queue.queue or #queue.queue == 0
 end
 
+local function clearStaleOperaWalkActions(queue)
+    if not queue or type(queue.queue) ~= "table" then return end
+    local onlyOpera = true
+    for _, act in ipairs(queue.queue) do
+        if not (type(act) == "table" and act.puppetOperaSessionId ~= nil) then
+            onlyOpera = false
+            break
+        end
+    end
+    if not onlyOpera or #queue.queue == 0 then return end
+    if queue.current and queue.current.puppetOperaSessionId ~= nil
+        and queue.current.forceStop
+    then
+        queue.current:forceStop()
+    end
+    if type(queue.clearQueue) == "function" then
+        queue:clearQueue()
+    else
+        for i = #queue.queue, 1, -1 do
+            table.remove(queue.queue, i)
+        end
+    end
+end
+
 local function targetSquare(target)
     if type(getCell) ~= "function" or type(target) ~= "table" then
         return nil
@@ -67,6 +91,7 @@ function Adapter.Start(sessionID, target, callbacks)
     local valid, reason = validPlayer(body)
     if not valid then return false, reason end
     local queue = queueOf(body)
+    clearStaleOperaWalkActions(queue)
     if not queueIsIdle(queue) then return false, "player_movement_busy" end
     if type(ISWalkToTimedAction) ~= "table"
         or type(ISWalkToTimedAction.new) ~= "function"
@@ -112,7 +137,7 @@ function Adapter.IsOwned(sessionID)
         and tostring(Adapter.Active.sessionId or "") == tostring(sessionID or "")
 end
 
-function Adapter.Observe(sessionID)
+function Adapter.Observe(sessionID, tolerance)
     local active = Adapter.Active
     if not active or tostring(active.sessionId or "") ~= tostring(sessionID or "") then
         return false, "player_movement_not_owned"
@@ -121,19 +146,35 @@ function Adapter.Observe(sessionID)
     if body ~= active.body then return false, "local_player_changed" end
     local valid, reason = validPlayer(body)
     if not valid then return false, reason end
+    local tol = tonumber(tolerance) or 0.45
     local queue = queueOf(body)
     if queue and queue.current == active.action then
-        if Anchors.IsAt(body, active.target, 0.75) then
+        if Anchors.IsAt(body, active.target, tol) then
             active.completed = true
             return true, "arrived"
         end
         return true, "moving"
     end
-    if active.completed or Anchors.IsAt(body, active.target, 0.75) then
+    if active.completed or Anchors.IsAt(body, active.target, tol) then
         active.completed = true
         return true, "arrived"
     end
     return false, "player_movement_cancelled"
+end
+
+local function stopBodyWalk(body)
+    if not body then return end
+    if ISTimedActionQueue and type(ISTimedActionQueue.clear) == "function" then
+        ISTimedActionQueue.clear(body)
+    end
+    if body.StopAllActionQueue then body:StopAllActionQueue() end
+    if body.setMoving then body:setMoving(false) end
+    if body.setPath2 then body:setPath2(nil) end
+    if body.getPathFindBehavior2 then
+        local pfb = body:getPathFindBehavior2()
+        if pfb and pfb.cancel then pfb:cancel() end
+        if pfb and pfb.reset then pfb:reset() end
+    end
 end
 
 function Adapter.Stop(sessionID)
@@ -148,10 +189,12 @@ function Adapter.Stop(sessionID)
         end
         if active.action.forceStop then
             active.action:forceStop()
+            stopBodyWalk(active.body)
             return true, "player_movement_stop_requested"
         end
         return false, "player_movement_stop_api_unavailable"
     end
+    stopBodyWalk(active.body)
     return false, "player_movement_already_released"
 end
 

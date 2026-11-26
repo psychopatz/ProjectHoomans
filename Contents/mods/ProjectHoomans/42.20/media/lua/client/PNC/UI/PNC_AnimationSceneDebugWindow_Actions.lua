@@ -25,11 +25,35 @@ function ISPNCAnimationSceneDebugWindow:send(action, payload)
     self:refreshDetails(true)
 end
 
+function ISPNCAnimationSceneDebugWindow:selectedPropPayload()
+    local custom = self.propCustomEntry and self.propCustomEntry.getText
+        and tostring(self.propCustomEntry:getText() or "") or ""
+    custom = custom:match("^%s*(.-)%s*$") or ""
+    local itemType = custom
+    if itemType == "" and self.propItemCombo
+        and self.propItemCombo.getOptionData
+    then
+        itemType = tostring(self.propItemCombo:getOptionData(
+            self.propItemCombo.selected) or "")
+    end
+    if itemType == "" then return nil, nil end
+    local hand = self.propHandCombo and self.propHandCombo.getOptionData
+        and tostring(self.propHandCombo:getOptionData(
+            self.propHandCombo.selected) or "primary")
+        or "primary"
+    local primary = (hand == "primary" or hand == "both") and itemType or nil
+    local secondary = (hand == "secondary" or hand == "both") and itemType or nil
+    return primary, secondary
+end
+
 function ISPNCAnimationSceneDebugWindow:onPlay()
     local scene = self:getSelectedScene()
     if scene then
+        local propPrimary, propSecondary = self:selectedPropPayload()
         self:send("animation_scene_play", {
             sceneId = scene.id,
+            propPrimary = propPrimary,
+            propSecondary = propSecondary,
         })
     end
 end

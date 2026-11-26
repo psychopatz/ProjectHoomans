@@ -45,15 +45,35 @@ function Override.GetReadiness(record, body, options)
     if body.isSeatedInVehicle and body:isSeatedInVehicle() then
         return false, "npc_seated"
     end
+    local sessions = PNC.PuppetOpera and PNC.PuppetOpera.Authority
+        and PNC.PuppetOpera.Authority.Sessions or nil
     if current and tostring(current.sessionId or "")
         ~= tostring(options.sessionId or "")
     then
-        return false, "npc_owned_by_other_puppet_override"
+        local staleID = tostring(current.sessionId or "")
+        if sessions and staleID ~= "" and sessions[staleID] == nil then
+            -- Previous session already ended without clearing the override;
+            -- reclaim the orphan marker so the NPC is not permanently wedged.
+            if type(Override.Release) == "function" then
+                Override.Release(record, body, staleID,
+                    "stale_override_reclaimed")
+            end
+            runtime[OVERRIDE_KEY] = nil
+            current = nil
+        else
+            return false, "npc_owned_by_other_puppet_override"
+        end
     end
     if lease and tostring(lease.sessionId or "")
         ~= tostring(options.sessionId or "")
     then
-        return false, "npc_owned_by_other_puppet_session"
+        local staleLeaseID = tostring(lease.sessionId or "")
+        if sessions and staleLeaseID ~= "" and sessions[staleLeaseID] == nil then
+            runtime.puppetOperaLease = nil
+            lease = nil
+        else
+            return false, "npc_owned_by_other_puppet_session"
+        end
     end
     actionState = Internal.ActionStateOf(body)
     if actionState == "bumped" then

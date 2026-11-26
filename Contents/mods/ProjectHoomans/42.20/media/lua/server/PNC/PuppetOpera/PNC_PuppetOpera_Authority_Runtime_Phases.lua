@@ -16,6 +16,7 @@ Opera.Authority = Authority
 local Internal = Authority.Internal or {}
 Authority.Internal = Internal
 local Anchors = Internal.Anchors or Opera.Anchors
+local Blueprints = Internal.Blueprints or Opera.Blueprints
 local Tether = Opera.Tether
     or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Tether"
 local Telemetry = Opera.Telemetry
@@ -129,8 +130,14 @@ end
 
 local function pumpMoving(session, timestamp)
     local stateChanged = false
+    local arrivalTol = session.plan
+        and (session.plan.arrivalTolerance or session.plan.tolerance)
+        or 0.75
     for actorID, actor in pairs(session.actors or {}) do
-        if actor.kind == "nearby_live_npc" and actor.stationary ~= true then
+        if actor.kind == "nearby_live_npc"
+            and actor.stationary ~= true
+            and actor.arrived ~= true
+        then
             local previousState = actor.state
             local ok, reason = NPCMovement.Observe(session, actor)
             if not ok then
@@ -138,7 +145,20 @@ local function pumpMoving(session, timestamp)
                     .. ":" .. tostring(actorID)
             end
             if actor.state ~= previousState then stateChanged = true end
+        elseif actor.kind == "local_player"
+            and actor.arrived ~= true
+            and actor.body
+            and actor.target
+            and Anchors.IsAt(actor.body, actor.target, arrivalTol)
+        then
+            actor.arrived = true
+            actor.state = "arrived"
+            actor.lastReason = "player_arrived_server_verified"
+            stateChanged = true
         end
+    end
+    if Telemetry and Telemetry.LogActorSnapshot then
+        Telemetry.LogActorSnapshot(session, "MOVE_PROGRESS", timestamp, false)
     end
     if stateChanged then Internal.sendState(session, false) end
     local allArrived = true
@@ -181,6 +201,9 @@ local function pumpFacing(session, timestamp)
     for _, actor in pairs(session.actors or {}) do
         if not actor.facing then allFacing = false break end
     end
+    if not allFacing and Telemetry and Telemetry.LogActorSnapshot then
+        Telemetry.LogActorSnapshot(session, "FACE_PROGRESS", timestamp, false)
+    end
     if allFacing then
         if session.previewOnly then
             for _, actor in pairs(session.actors or {}) do
@@ -203,6 +226,21 @@ local function pumpFacing(session, timestamp)
 end
 
 local function pumpReady(session, timestamp)
+    local beat = session.blueprint and session.blueprint.beats
+        and session.blueprint.beats[session.beatIndex] or nil
+    if beat and (beat.tetherActive == true or beat.mode == "locomotive") then
+        local bpActors = session.blueprint and session.blueprint.actors or {}
+        for actorID, actor in pairs(session.actors or {}) do
+            local def = bpActors[actorID]
+            local coupling = def and def.coupling or nil
+            if coupling and coupling.attachTo then
+                local leader = session.actors[coupling.attachTo]
+                if leader and leader.body and actor.body then
+                    Tether.ApplyBody(actor.body, leader.body, coupling)
+                end
+            end
+        end
+    end
     if timestamp < tonumber(session.beatStartAt or 0) then return true end
     local accepted, reason = prepareBeat(session, timestamp)
     if not accepted then return false, reason end
@@ -223,7 +261,7 @@ local function pumpPlaying(session, timestamp)
                 actor.timelineStartedAt = timestamp
                 session.beatStartedBy[actorID] = true
             elseif actor.kind == "local_player" then
-                session.beatStartedBy[actorID] = false
+                session.beatStartedBy[actorID] = session.beatStartedBy[actorID] == true
             end
         end
         Internal.trace(session, "beat_started", {
@@ -306,6 +344,24 @@ local function pumpPlaying(session, timestamp)
             + Opera.Config.beatGraceMs
         return true
     end
+    local beatDuration = tonumber(beat.durationMs) or 900
+    if session.beatStartedAt and timestamp >= session.beatStartedAt + beatDuration then
+        for actorID, actor in pairs(session.actors or {}) do
+            if actor.kind == "local_player"
+                and session.beatStartedBy[actorID] == true
+                and not session.beatFinishedBy[actorID]
+            then
+                local track = Blueprints and Blueprints.GetTrack
+                    and Blueprints.GetTrack(beat, actorID, actor.kind) or nil
+                if type(track) == "table" and track.route == "anim_vars" then
+                    session.beatFinishedBy[actorID] = true
+                    actor.animationOwned = false
+                    actor.state = "animation_finished"
+                    actor.lastReason = "player_anim_vars_duration_complete"
+                end
+            end
+        end
+    end
     local allFinished = true
     for actorID in pairs(session.actors or {}) do
         if not session.beatFinishedBy[actorID] then
@@ -317,6 +373,9 @@ local function pumpPlaying(session, timestamp)
         return beatFinished(session, timestamp)
     end
     if timestamp >= session.phaseDeadline then
+        if Telemetry and Telemetry.LogActorSnapshot then
+            Telemetry.LogActorSnapshot(session, "BEAT_TIMEOUT", timestamp, true)
+        end
         return false, "beat_timeout"
     end
     return true

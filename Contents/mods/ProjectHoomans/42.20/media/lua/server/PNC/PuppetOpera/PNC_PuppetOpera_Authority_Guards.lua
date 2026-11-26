@@ -238,6 +238,9 @@ local function puppetMovementIsSafe(session, actor)
     local runtime = record and record.runtime or nil
     local intent = runtime and runtime.moveIntent or nil
     if session.phase == Opera.Phases.MOVING then
+        if actor.stationary == true or actor.arrived == true then
+            return true
+        end
         local claim = runtime and runtime.puppetOperaMovement or nil
         local expectedReason = "puppet_opera:"
             .. tostring(session.sessionId or "")

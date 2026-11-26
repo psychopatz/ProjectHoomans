@@ -51,7 +51,7 @@ local function nodeIdentity(node, index)
     return tostring(node and node.id or ("node_" .. tostring(index)))
 end
 
-local function pendingTimelineNode(nodes, elapsed)
+local function pendingTimelineNode(nodes, elapsed, sustained)
     for index, node in ipairs(nodes or {}) do
         local startMs = tonumber(node.startMs or node.offsetMs) or 0
         local durationMs = tonumber(node.durationMs) or 0
@@ -60,7 +60,7 @@ local function pendingTimelineNode(nodes, elapsed)
             State.timelineNodeFinished == true
             and tostring(State.timelineNodeID or "") == nodeID
         ) and elapsed >= startMs
-            and elapsed < startMs + durationMs
+            and (sustained == true or elapsed < startMs + durationMs)
         then
             return node, index
         end
@@ -68,7 +68,7 @@ local function pendingTimelineNode(nodes, elapsed)
     return nil
 end
 
-local function hasPendingTimelineNode(nodes, elapsed)
+local function hasPendingTimelineNode(nodes, elapsed, sustained)
     for index, node in ipairs(nodes or {}) do
         local startMs = tonumber(node.startMs or node.offsetMs) or 0
         local durationMs = tonumber(node.durationMs) or 0
@@ -76,7 +76,7 @@ local function hasPendingTimelineNode(nodes, elapsed)
         if not (
             State.timelineNodeFinished == true
             and tostring(State.timelineNodeID or "") == nodeID
-        ) and startMs + durationMs > elapsed
+        ) and (sustained == true or startMs + durationMs > elapsed)
         then
             return true
         end
@@ -132,7 +132,11 @@ function Client.Pump()
         and activeLocalActorID ~= nil
         and State.movementSessionId == sessionID
     then
-        local ok, status = Movement.Observe(sessionID)
+        local arrivalTol = snapshot.plan
+            and (tonumber(snapshot.plan.arrivalTolerance)
+                or tonumber(snapshot.plan.tolerance))
+            or 0.45
+        local ok, status = Movement.Observe(sessionID, arrivalTol)
         if not ok then
             setError(status)
             request("player_cancelled", {
@@ -163,6 +167,8 @@ function Client.Pump()
                     revision = snapshot.revision,
                 })
             end
+        else
+            Movement.Face(target)
         end
     elseif snapshot.phase == Opera.Phases.PLAYING then
         local localActorID, localActorState = localActor(snapshot)
@@ -180,12 +186,13 @@ function Client.Pump()
             return
         end
         local nodes = timelineFor(beat, localActorID, localActorState.kind)
+        local sustained = beat.mode == "sustained" or beat.mode == "locomotive"
         local elapsed = math.max(
             0,
             timestamp() - tonumber(snapshot.beatStartAt or timestamp())
         )
         State.timelineElapsedMs = math.floor(elapsed)
-        local node, nodeIndex = pendingTimelineNode(nodes, elapsed)
+        local node, nodeIndex = pendingTimelineNode(nodes, elapsed, sustained)
         if node and node.type == "animation" then
             local nodeID = nodeIdentity(node, nodeIndex)
             local track = node.track or node
@@ -193,6 +200,7 @@ function Client.Pump()
                 or tonumber(beat.durationMs) or 900
             local nodeBeat = {
                 id = beat.id,
+                mode = beat.mode or "timed",
                 durationMs = durationMs,
             }
             if tostring(State.timelineNodeID or "") ~= nodeID
@@ -245,7 +253,7 @@ function Client.Pump()
             State.timelineNodeID = nodeIdentity(node, nodeIndex)
             State.timelineNodeType = node.type or "delay"
             State.timelineNodeFinished = false
-        elseif hasPendingTimelineNode(nodes, elapsed) then
+        elseif hasPendingTimelineNode(nodes, elapsed, sustained) then
             local released, releaseReason = releasePlayerAnimation(sessionID)
             if not released then
                 cancelPlayerSession(sessionID, releaseReason)

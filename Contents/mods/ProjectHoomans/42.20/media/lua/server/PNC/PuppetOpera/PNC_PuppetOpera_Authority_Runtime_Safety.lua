@@ -87,10 +87,18 @@ local function activeSafety(session, timestamp)
                 and NPCMovement.IsOwned
                 and NPCMovement.IsOwned(actor.record, session.sessionId)
                 or false
+            local movingBumped = session.phase == Opera.Phases.MOVING
+                and NPCMovement
+                and NPCMovement.IsOwned
+                and NPCMovement.IsOwned(actor.record, session.sessionId)
+                and actor.body
+                and actor.body.getActionStateName
+                and tostring(actor.body:getActionStateName() or "") == "bumped"
             if unsafeNPCActionState(actor.body)
                 and not npcAnimation.IsOwned(actor.body, session.sessionId)
                 and not managedBumpCanBeReleased(actor.body)
                 and not traversalOwned
+                and not movingBumped
             then
                 return false, actorFailureReason(
                     "npc_action_state_interrupted",

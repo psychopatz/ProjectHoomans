@@ -2,7 +2,7 @@
 --
 -- Emits clean, diff-friendly Lua modules that register directly into
 -- `PNC.PuppetOpera.Blueprints`, plus optional starter AnimSet XML templates
--- for `anim_vars` tracks using `<m_TrackTimeToVariable>PNC_OperaProgress`.
+-- for `anim_vars` tracks using `<m_TrackTimeToVariable>PNC_AnimProgress`.
 
 PNC = PNC or {}
 PNC.PuppetOpera = PNC.PuppetOpera or {}
@@ -187,7 +187,7 @@ function Exporter.FormatAnimSetXML(definition)
     }
     for _, spec in ipairs(specs) do
         local targetSet = spec.kind == "local_player" and "player" or "zombie"
-        local nodeName = "PNC_Opera_" .. spec.style .. "_" .. spec.role .. "_" .. spec.phase
+        local nodeName = "PNC_Anim_" .. spec.style .. "_" .. spec.role .. "_" .. spec.phase
         local lines = {
             "",
             "<!-- Target: media/AnimSets/" .. targetSet .. "/ -->",
@@ -205,12 +205,12 @@ function Exporter.FormatAnimSetXML(definition)
             "  <m_useDeferredMovement>false</m_useDeferredMovement>",
         }
         if spec.phaseLocked then
-            lines[#lines + 1] = "  <m_TrackTimeToVariable>PNC_OperaProgress</m_TrackTimeToVariable>"
+            lines[#lines + 1] = "  <m_TrackTimeToVariable>PNC_AnimProgress</m_TrackTimeToVariable>"
         end
-        lines[#lines + 1] = "  <m_Conditions><m_Name>PNC_OperaActive</m_Name><m_Type>BOOL</m_Type><m_BoolValue>true</m_BoolValue></m_Conditions>"
-        lines[#lines + 1] = "  <m_Conditions><m_Name>PNC_OperaStyle</m_Name><m_Type>STRING</m_Type><m_Value>" .. spec.style .. "</m_Value></m_Conditions>"
-        lines[#lines + 1] = "  <m_Conditions><m_Name>PNC_OperaRole</m_Name><m_Type>STRING</m_Type><m_Value>" .. spec.role .. "</m_Value></m_Conditions>"
-        lines[#lines + 1] = "  <m_Conditions><m_Name>PNC_OperaPhase</m_Name><m_Type>STRING</m_Type><m_Value>" .. spec.phase .. "</m_Value></m_Conditions>"
+        lines[#lines + 1] = "  <m_Conditions><m_Name>PNC_AnimActive</m_Name><m_Type>BOOL</m_Type><m_BoolValue>true</m_BoolValue></m_Conditions>"
+        lines[#lines + 1] = "  <m_Conditions><m_Name>PNC_AnimStyle</m_Name><m_Type>STRING</m_Type><m_Value>" .. spec.style .. "</m_Value></m_Conditions>"
+        lines[#lines + 1] = "  <m_Conditions><m_Name>PNC_AnimRole</m_Name><m_Type>STRING</m_Type><m_Value>" .. spec.role .. "</m_Value></m_Conditions>"
+        lines[#lines + 1] = "  <m_Conditions><m_Name>PNC_AnimPhase</m_Name><m_Type>STRING</m_Type><m_Value>" .. spec.phase .. "</m_Value></m_Conditions>"
         lines[#lines + 1] = "</animNode>"
         blocks[#blocks + 1] = table.concat(lines, "\n")
     end

@@ -242,23 +242,39 @@ end
 
 function Client.Stop()
     local snapshot = State.snapshot
-    if not snapshot or not snapshot.sessionId then
-        local pendingPreviewAccepted, pendingPreviewResult =
-            Client.StopPlacementPreview()
-        if pendingPreviewAccepted
-            or pendingPreviewResult ~= "placement_preview_missing"
-        then
-            return pendingPreviewAccepted, pendingPreviewResult
-        end
-        local previewStopped = Client.StopPreview()
-        return previewStopped, previewStopped
-            and "preview_stopped" or "puppet_opera_session_missing"
-    end
-    if snapshot.preview == true then
+    if snapshot and snapshot.preview == true then
         return Client.StopPlacementPreview()
     end
-    local accepted, result = request("stop", { sessionId = snapshot.sessionId })
+    local sessionID = snapshot and snapshot.sessionId or nil
+    local accepted, result = request("stop", { sessionId = sessionID })
+    if sessionID then
+        stopOwnedLocals(sessionID)
+    else
+        if Animation and Animation.Active and Animation.Active.sessionId then
+            Animation.Stop(Animation.Active.sessionId)
+            Animation.Clear(Animation.Active.sessionId)
+        end
+        if Movement and Movement.Active and Movement.Active.sessionId then
+            Movement.Stop(Movement.Active.sessionId)
+            Movement.Clear(Movement.Active.sessionId)
+        end
+        local body = localPlayer()
+        local animVars = Opera.AnimVarAdapter
+        if body and animVars and animVars.Clear then
+            animVars.Clear(body)
+        end
+    end
     Client.StopPreview()
+    if accepted then
+        return accepted, result
+    end
+    local pendingPreviewAccepted, pendingPreviewResult =
+        Client.StopPlacementPreview()
+    if pendingPreviewAccepted
+        or pendingPreviewResult ~= "placement_preview_missing"
+    then
+        return pendingPreviewAccepted, pendingPreviewResult
+    end
     return accepted, result
 end
 

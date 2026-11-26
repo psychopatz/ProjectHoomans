@@ -55,6 +55,31 @@ local function bumpFinished(body)
     return false
 end
 
+local function holdAnimVarNPC(body)
+    if not body then return end
+    if body.setUseless then body:setUseless(true) end
+    if body.setMoving then body:setMoving(false) end
+    if body.getPathFindBehavior2 then
+        local pfb = body:getPathFindBehavior2()
+        if pfb and pfb.reset then pfb:reset() end
+    end
+    if body.setPath2 then body:setPath2(nil) end
+    if body.setTarget then body:setTarget(nil) end
+    local stateName = body.getActionStateName
+        and tostring(body:getActionStateName() or "") or ""
+    if stateName == "bumped" then
+        if body.setBumpType then body:setBumpType("") end
+        if body.setVariable then body:setVariable("BumpAnimFinished", true) end
+    end
+    if stateName ~= "idle"
+        and ZombieIdleState
+        and ZombieIdleState.instance
+        and body.changeState
+    then
+        body:changeState(ZombieIdleState.instance())
+    end
+end
+
 function Adapter.IsOwned(body, sessionID)
     return owns(body, sessionID)
 end
@@ -80,8 +105,12 @@ function Adapter.Start(session, actor, beat, track)
         then
             return false, "npc_animation_owned_by_other"
         end
+        if body.isUseless then
+            actor._savedUseless = body:isUseless() == true
+        end
+        holdAnimVarNPC(body)
         local ok, reason = AnimVars.Apply(body, track, {
-            phase = track.phase or "play",
+            phase = track.phase or beat.id or "play",
             moving = false,
             progress = 0,
         })
@@ -185,10 +214,31 @@ function Adapter.Observe(session, actor, beat)
         local startedAt = tonumber(actor.animationStartedAt) or 0
         local current = PNC.Core and PNC.Core.Now and PNC.Core.Now() or startedAt
         local duration = tonumber(beat and beat.durationMs) or 900
-        local progress = duration > 0
-            and ((current - startedAt) / duration) % 1 or 0
-        AnimVars.UpdateProgress(body, progress, actor.isMoving == true)
-        if current - startedAt >= duration then
+        local mode = type(beat) == "table" and tostring(beat.mode or "") or ""
+        local sustained = mode == "sustained" or mode == "locomotive"
+        local elapsed = math.max(0, current - startedAt)
+        local progress = 0
+        if duration > 0 then
+            if sustained then
+                progress = (elapsed / duration) % 1
+            else
+                progress = math.min(1, elapsed / duration)
+            end
+        end
+        local moving = actor.isMoving == true
+        local leaderID = actor.tetherLeaderID
+        local leader = leaderID and session.actors and session.actors[leaderID] or nil
+        local refBody = (leader and leader.body) or body
+        if refBody then
+            if refBody.isPlayerMoving then
+                moving = refBody:isPlayerMoving() == true
+            elseif refBody.isMoving then
+                moving = refBody:isMoving() == true
+            end
+        end
+        AnimVars.UpdateProgress(body, progress, moving)
+        holdAnimVarNPC(body)
+        if not sustained and elapsed >= duration then
             actor.lastReason = "npc_animation_duration_complete"
             return true, "finished"
         end
@@ -264,6 +314,10 @@ function Adapter.Release(session, actor)
     end
     if modData[ROUTE_KEY] == "anim_vars" then
         AnimVars.Clear(body, actor.animationTrack)
+        if body and body.setUseless then
+            body:setUseless(actor._savedUseless == true)
+        end
+        actor._savedUseless = nil
         modData[SESSION_KEY] = nil
         modData[ROUTE_KEY] = nil
         modData[BUMP_KEY] = nil

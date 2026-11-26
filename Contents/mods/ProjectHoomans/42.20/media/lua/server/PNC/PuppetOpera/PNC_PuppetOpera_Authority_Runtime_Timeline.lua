@@ -61,7 +61,7 @@ local function releaseTimelineAnimation(session, actor)
     return true
 end
 
-local function pendingTimelineNode(nodes, elapsed, actor)
+local function pendingTimelineNode(nodes, elapsed, actor, sustained)
     for index, node in ipairs(nodes or {}) do
         local startMs = tonumber(node.startMs or node.offsetMs) or 0
         local durationMs = tonumber(node.durationMs) or 0
@@ -70,7 +70,7 @@ local function pendingTimelineNode(nodes, elapsed, actor)
             and tostring(actor.timelineNodeID or "") == nodeID
         if not finished
             and elapsed >= startMs
-            and elapsed < startMs + durationMs
+            and (sustained == true or elapsed < startMs + durationMs)
         then
             return node, index
         end
@@ -78,14 +78,14 @@ local function pendingTimelineNode(nodes, elapsed, actor)
     return nil
 end
 
-local function hasPendingTimelineNode(nodes, elapsed, actor)
+local function hasPendingTimelineNode(nodes, elapsed, actor, sustained)
     for index, node in ipairs(nodes or {}) do
         local startMs = tonumber(node.startMs or node.offsetMs) or 0
         local durationMs = tonumber(node.durationMs) or 0
         local nodeID = tostring(node.id or ("node_" .. tostring(index)))
         local finished = actor.timelineNodeFinished == true
             and tostring(actor.timelineNodeID or "") == nodeID
-        if not finished and startMs + durationMs > elapsed then
+        if not finished and (sustained == true or startMs + durationMs > elapsed) then
             return true
         end
     end
@@ -140,15 +140,20 @@ end
 
 local function pumpNPCAnimationTimeline(session, actor, beat, timestamp)
     local nodes = timelineFor(beat, actor.id, actor.kind)
+    local sustained = beat.mode == "sustained" or beat.mode == "locomotive"
     local elapsed = timestamp - (tonumber(actor.timelineStartedAt) or timestamp)
-    local node, nodeIndex = pendingTimelineNode(nodes, elapsed, actor)
+    local node, nodeIndex = pendingTimelineNode(nodes, elapsed, actor, sustained)
     local previousState = actor.state
     if node and node.type == "animation" then
         local nodeID = tostring(node.id or ("node_" .. tostring(nodeIndex)))
         local track = node.track or node
         local durationMs = tonumber(node.durationMs)
             or tonumber(beat.durationMs) or 900
-        local nodeBeat = { durationMs = durationMs }
+        local nodeBeat = {
+            id = beat.id,
+            mode = beat.mode or "timed",
+            durationMs = durationMs,
+        }
         if tostring(actor.timelineNodeID or "") ~= nodeID
             or actor.timelineNodeType ~= "animation"
         then
@@ -209,7 +214,7 @@ local function pumpNPCAnimationTimeline(session, actor, beat, timestamp)
         actor.state = node.type == "delay"
             and "animation_delay" or "animation_queued"
         actor.lastReason = "timeline_" .. tostring(node.type or "wait")
-    elseif not hasPendingTimelineNode(nodes, elapsed, actor) then
+    elseif not hasPendingTimelineNode(nodes, elapsed, actor, sustained) then
         local released, releaseReason = releaseTimelineAnimation(
             session,
             actor

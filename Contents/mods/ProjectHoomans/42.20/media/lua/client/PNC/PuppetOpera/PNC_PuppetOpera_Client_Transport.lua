@@ -81,6 +81,15 @@ function Client.ReceiveState(snapshot)
     then
         return false
     end
+    if previous
+        and previous.sessionId
+        and not finalPhase(previous.phase)
+        and snapshot.preflight
+        and not snapshot.sessionId
+    then
+        Client.ReceivePreflight(snapshot.preflight)
+        return true
+    end
     State.snapshot = snapshot
     if snapshot.trace then State.trace = snapshot.trace end
     if snapshot.preflight then Client.ReceivePreflight(snapshot.preflight) end
@@ -192,7 +201,9 @@ end
 local function receiveTrace(snapshot)
     if type(snapshot) == "table" then
         State.trace = snapshot.trace or {}
-        State.snapshot = snapshot
+        if snapshot.sessionId or not (State.snapshot and State.snapshot.sessionId and not finalPhase(State.snapshot.phase)) then
+            State.snapshot = snapshot
+        end
     end
 end
 

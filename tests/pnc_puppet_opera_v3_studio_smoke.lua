@@ -132,11 +132,11 @@ T.equal(recB.z, 1)
 
 -- 5. AnimVarAdapter apply & clear
 AnimVars.Apply(passengerBody, carry.beats[2].tracks.actor_2, { moving = true, progress = 0.5 })
-T.equal(passengerBody.vars.PNC_OperaActive, true)
-T.equal(passengerBody.vars.PNC_OperaStyle, "carry_shoulder")
-T.equal(passengerBody.vars.PNC_OperaProgress, 0.5)
+T.equal(passengerBody.vars.PNC_AnimActive, true)
+T.equal(passengerBody.vars.PNC_AnimStyle, "carry_shoulder")
+T.equal(passengerBody.vars.PNC_AnimProgress, 0.5)
 AnimVars.Clear(passengerBody, carry.beats[2].tracks.actor_2)
-T.equal(passengerBody.vars.PNC_OperaActive, nil)
+T.equal(passengerBody.vars.PNC_AnimActive, nil)
 
 -- 6. Exporter Lua + AnimSet XML round-trip
 local luaText, norm = Exporter.FormatLua(carry)
@@ -150,7 +150,7 @@ T.truthy(exportedBp and exportedBp.id == "rescue.carry_incapacitated_npc",
 
 local xmlText, specs = Exporter.FormatAnimSetXML(carry)
 T.truthy(xmlText and #specs >= 2, "Exporter.FormatAnimSetXML should emit zombie/player templates")
-T.truthy(string.find(xmlText, "PNC_OperaProgress", 1, true) ~= nil,
-    "Exported XML should include TrackTimeToVariable PNC_OperaProgress")
+T.truthy(string.find(xmlText, "PNC_AnimProgress", 1, true) ~= nil,
+    "Exported XML should include TrackTimeToVariable PNC_AnimProgress")
 
 print("PASS pnc_puppet_opera_v3_studio_smoke")

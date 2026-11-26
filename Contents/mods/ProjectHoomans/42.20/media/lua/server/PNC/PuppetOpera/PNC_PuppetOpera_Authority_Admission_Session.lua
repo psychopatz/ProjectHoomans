@@ -279,8 +279,23 @@ local function startSession(player, args, previewOnly)
                 reason = actor.lastReason,
             })
             if actor.stationary == true then
-                -- Anchored/incapacitated target does not walk or turn; only
-                -- the executor (e.g. carrier) walks to the target.
+                -- Anchored/target actor stays put; halt any in-progress walk
+                -- so only the initiating actor (e.g. carrier) walks to them.
+                if actor.body and actor.body.setPath2 then
+                    actor.body:setPath2(nil)
+                end
+                if actor.body and actor.body.setMoving then
+                    actor.body:setMoving(false)
+                end
+                if PNC.BehaviorMoveIntent and PNC.BehaviorMoveIntent.Hold then
+                    PNC.BehaviorMoveIntent.Hold(
+                        actor.record,
+                        "puppet_opera_stationary",
+                        PNC.ActorControl and PNC.ActorControl.MakeOwner
+                            and PNC.ActorControl.MakeOwner(session.sessionId)
+                            or { kind = "puppet_opera", sessionId = tostring(session.sessionId) }
+                    )
+                end
                 actor.arrived = true
                 actor.facing = true
                 actor.state = "arrived"

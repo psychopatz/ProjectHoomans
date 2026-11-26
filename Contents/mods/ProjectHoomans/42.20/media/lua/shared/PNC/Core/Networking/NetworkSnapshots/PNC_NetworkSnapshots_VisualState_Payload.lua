@@ -110,6 +110,12 @@ function Parts.BuildVisualStatePayload(context)
             and scene and scene.blocking == true or false,
         scenePriority = sceneActive
             and scene and scene.priority or 0,
+        propPrimary = sceneActive
+            and runtime and runtime.debugActionProps
+            and runtime.debugActionProps.primary or nil,
+        propSecondary = sceneActive
+            and runtime and runtime.debugActionProps
+            and runtime.debugActionProps.secondary or nil,
         sceneDebug = sceneDebug and {
             active = sceneDebug.active == true,
             mode = sceneDebug.mode,

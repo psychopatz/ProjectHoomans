@@ -268,5 +268,6 @@ end
 -- Built-in scenes are declarative data loaded after normalization and
 -- runtime validation APIs are available.
 require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Blueprints_Builtins"
+require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Blueprints_PlayerCarry"
 
 return Registry

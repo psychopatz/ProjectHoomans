@@ -53,6 +53,61 @@ function Adapter.IsOwned(record, sessionID)
         and tostring(claim.sessionId or "") == tostring(sessionID or "")
 end
 
+local function needsCloseApproach(session)
+    local plan = session and session.plan or nil
+    local frame = session and session.blueprint
+        and session.blueprint.anchorFrame or nil
+    local interactionDist = plan and tonumber(plan.interactionDistance) or nil
+    if interactionDist and interactionDist <= 0.85 then return true end
+    if frame and frame.allowOverlap == true then return true end
+    local actors = session and session.blueprint and session.blueprint.actors
+    if type(actors) == "table" then
+        for _, def in pairs(actors) do
+            if def and type(def.coupling) == "table"
+                and def.coupling.disableCollision ~= false
+            then
+                return true
+            end
+        end
+    end
+    local beats = session and session.blueprint and session.blueprint.beats
+    if type(beats) == "table" then
+        for i = 1, #beats do
+            if beats[i] and beats[i].disableCollision == true then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function snapBodyToTarget(record, body, target)
+    if not body or not target then return end
+    if body.setX then body:setX(target.x) end
+    if body.setY then body:setY(target.y) end
+    if body.setLx then body:setLx(target.x) end
+    if body.setLy then body:setLy(target.y) end
+    if record then
+        record.x = target.x
+        record.y = target.y
+    end
+end
+
+local function holdArrivedBody(session, record, body)
+    if MoveIntent and MoveIntent.Hold then
+        local owner = ActorControl and ActorControl.MakeOwner
+            and ActorControl.MakeOwner(session.sessionId)
+            or {
+                kind = "puppet_opera",
+                sessionId = tostring(session.sessionId),
+            }
+        MoveIntent.Hold(record, "puppet_opera_arrived", owner)
+    end
+    if body and body.setPath2 then
+        body:setPath2(nil)
+    end
+end
+
 function Adapter.Start(session, actor)
     if type(session) ~= "table" or type(actor) ~= "table" then
         return false, "npc_movement_arguments_invalid"
@@ -171,6 +226,21 @@ function Adapter.Start(session, actor)
         return false, movementState or "npc_movement_request_rejected"
     end
 
+    local closeApproach = needsCloseApproach(session)
+    if closeApproach then
+        -- Close-range & tethered scenes (kiss, hold-hands, drag, carry) sit
+        -- inside PZ's default character collision cylinder (~0.60+ tiles).
+        -- Disable collision on all session actors during approach so NPC-to-NPC
+        -- and Player-to-NPC partners never push each other back.
+        for _, participant in pairs(session.actors or {}) do
+            if participant and participant.body
+                and participant.body.setCollidable
+            then
+                participant.body:setCollidable(false)
+                participant.collisionDisabled = true
+            end
+        end
+    end
     local intent = runtime.moveIntent
     if intent then
         intent.puppetOperaSessionId = tostring(session.sessionId)
@@ -185,6 +255,7 @@ function Adapter.Start(session, actor)
         requestedY = ty,
         requestedZ = tz,
         reason = ownershipReason,
+        closeApproach = closeApproach,
         startedAt = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
     }
     actor.movementOwned = true
@@ -195,6 +266,9 @@ end
 function Adapter.Observe(session, actor)
     if type(session) ~= "table" or type(actor) ~= "table" then
         return false, "npc_movement_arguments_invalid"
+    end
+    if actor.arrived == true then
+        return true, "arrived"
     end
     local record = actor.record
     local body = actor.body
@@ -213,15 +287,31 @@ function Adapter.Observe(session, actor)
     if not intentMatchesClaim(intent, claim, session.sessionId) then
         return false, "npc_movement_intent_replaced"
     end
-    if Anchors.IsAt(
-        body,
-        actor.target,
-        session.plan.arrivalTolerance or session.plan.tolerance
-    ) then
+    local arrivalTol = session.plan.arrivalTolerance or session.plan.tolerance
+    if Anchors.IsAt(body, actor.target, arrivalTol) then
+        holdArrivedBody(session, record, body)
         actor.arrived = true
         actor.state = "arrived"
         actor.lastReason = "npc_arrived"
         return true, "arrived"
+    end
+    if claim.closeApproach == true then
+        local snapTol = math.max(tonumber(arrivalTol) or 0.20, 0.70)
+        if Anchors.IsAt(body, actor.target, snapTol) then
+            local target = targetPoint(actor.target)
+            snapBodyToTarget(record, body, target)
+            holdArrivedBody(session, record, body)
+            actor.arrived = true
+            actor.state = "arrived"
+            actor.lastReason = "npc_arrived_close_snap"
+            return true, "arrived"
+        end
+    end
+    if body and body.getActionStateName
+        and tostring(body:getActionStateName() or "") == "bumped"
+    then
+        if body.setBumpType then body:setBumpType("") end
+        if body.setVariable then body:setVariable("BumpAnimFinished", true) end
     end
     actor.lastReason = "npc_moving"
     return true, "moving"

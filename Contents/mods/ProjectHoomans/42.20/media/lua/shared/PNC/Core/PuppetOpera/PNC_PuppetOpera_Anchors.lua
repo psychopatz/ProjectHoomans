@@ -95,42 +95,51 @@ local function applyInteractionDistance(plan, actorIDs, distance)
     second.worldY = midpointY + offsetY
 end
 
-function Anchors.BuildPlan(blueprint, player, options)
-    if type(blueprint) ~= "table" then
-        return nil, "blueprint_missing"
-    end
-    options = type(options) == "table" and options or {}
-    local originX
-    local originY
-    local originZ
-    local originActor = options.leadActor or player
-    if options.origin then
-        originX = integer(options.origin.x)
-        originY = integer(options.origin.y)
-        originZ = integer(options.origin.z)
-    else
-        originX, originY, originZ = actorPosition(originActor)
-    end
-    if not originX or not originY or not originZ then
-        return nil, "anchor_origin_unavailable"
-    end
+local function callSafe(object, method, ...)
+    local fn = object and object[method]
+    if type(fn) ~= "function" then return nil end
+    return fn(object, ...)
+end
 
-    local orientation = options.orientation
-    local orientationError
-    if type(orientation) ~= "table" then
-        orientation, orientationError = Anchors.ReadForward(originActor)
-        if not orientation then
-            orientation = { x = 0, y = 1, rightX = -1, rightY = 0 }
+local function squareUsable(square)
+    if not square then return false end
+    if callSafe(square, "isSolid") == true
+        or callSafe(square, "isSolidTrans") == true
+    then
+        return false
+    end
+    local free = callSafe(square, "isFree", false)
+    return free ~= false
+end
+
+local function isPlanWalkable(plan, cell, originSq)
+    if not cell or type(cell.getGridSquare) ~= "function" then return true end
+    local originIndoor = originSq and callSafe(originSq, "isInARoom") or nil
+    local planOriginSq = cell:getGridSquare(
+        plan.origin.x, plan.origin.y, plan.origin.z)
+    if not squareUsable(planOriginSq) then return false end
+    if originIndoor == true and callSafe(planOriginSq, "isInARoom") == false then
+        return false
+    end
+    for _, target in pairs(plan.actors) do
+        local sq = cell:getGridSquare(target.x, target.y, target.z)
+        if not squareUsable(sq) then return false end
+        if originIndoor == true and callSafe(sq, "isInARoom") == false then
+            return false
+        end
+        local manhattan = math.abs(target.x - plan.origin.x)
+            + math.abs(target.y - plan.origin.y)
+        if manhattan == 1 and planOriginSq
+            and callSafe(planOriginSq, "isBlockedTo", sq) == true
+        then
+            return false
         end
     end
-    local forwardX = integer(orientation.x)
-    local forwardY = integer(orientation.y)
-    local rightX = integer(orientation.rightX)
-    local rightY = integer(orientation.rightY)
-    if not forwardX or not forwardY or not rightX or not rightY then
-        return nil, "anchor_orientation_invalid"
-    end
+    return true
+end
 
+local function projectPlan(blueprint, originX, originY, originZ,
+    forwardX, forwardY, rightX, rightY)
     local frame = blueprint.anchorFrame or {}
     local anchors = frame.anchors or {}
     local actors = blueprint.actors or {}
@@ -152,19 +161,11 @@ function Anchors.BuildPlan(blueprint, player, options)
         actors = {},
         occupied = {},
     }
-
-    local actorID
-    local actorDefinition
-    local anchor
-    local x
-    local y
-    local z
-    local key
     local allowOverlap = frame.allowOverlap == true
     local originWorldX = originX + 0.5
     local originWorldY = originY + 0.5
     for actorID, actorDefinition in pairs(actors) do
-        anchor = anchors[actorDefinition.anchor]
+        local anchor = anchors[actorDefinition.anchor]
         if not anchor then
             return nil, "anchor_missing:" .. tostring(actorID)
         end
@@ -175,8 +176,8 @@ function Anchors.BuildPlan(blueprint, player, options)
         local worldY = originWorldY + rightY * anchorRight
             + forwardY * anchorForward
         local worldZ = originZ + (tonumber(anchor.z) or 0)
-        x, y, z = integer(worldX), integer(worldY), integer(worldZ)
-        key = targetKey(x, y, z)
+        local x, y, z = integer(worldX), integer(worldY), integer(worldZ)
+        local key = targetKey(x, y, z)
         if not allowOverlap and plan.occupied[key] then
             return nil, "anchors_overlap:" .. tostring(actorID)
         end
@@ -198,6 +199,113 @@ function Anchors.BuildPlan(blueprint, player, options)
     table.sort(actorIDs)
     applyInteractionDistance(plan, actorIDs, plan.interactionDistance)
     return plan
+end
+
+local function buildCandidateOrientations(fx, fy, rx, ry)
+    -- Preferred forward, right, left, back (all orthonormal cardinal bases).
+    return {
+        { x = fx, y = fy, rightX = rx, rightY = ry },
+        { x = rx, y = ry, rightX = -fx, rightY = -fy },
+        { x = -rx, y = -ry, rightX = fx, rightY = fy },
+        { x = -fx, y = -fy, rightX = -rx, rightY = -ry },
+    }
+end
+
+function Anchors.BuildPlan(blueprint, player, options)
+    if type(blueprint) ~= "table" then
+        return nil, "blueprint_missing"
+    end
+    options = type(options) == "table" and options or {}
+    local originX
+    local originY
+    local originZ
+    local originActor = options.leadActor or player
+    if options.origin then
+        originX = integer(options.origin.x)
+        originY = integer(options.origin.y)
+        originZ = integer(options.origin.z)
+    else
+        originX, originY, originZ = actorPosition(originActor)
+    end
+    if not originX or not originY or not originZ then
+        return nil, "anchor_origin_unavailable"
+    end
+
+    local explicitOrientation = type(options.orientation) == "table"
+    local orientation = options.orientation
+    if not explicitOrientation then
+        orientation = Anchors.ReadForward(originActor)
+        if not orientation then
+            orientation = { x = 0, y = 1, rightX = -1, rightY = 0 }
+        end
+    end
+    local forwardX = integer(orientation.x)
+    local forwardY = integer(orientation.y)
+    local rightX = integer(orientation.rightX)
+    local rightY = integer(orientation.rightY)
+    if not forwardX or not forwardY or not rightX or not rightY then
+        return nil, "anchor_orientation_invalid"
+    end
+
+    local primaryPlan, primaryErr = projectPlan(
+        blueprint, originX, originY, originZ,
+        forwardX, forwardY, rightX, rightY
+    )
+    if not primaryPlan then return nil, primaryErr end
+
+    -- When world squares are loaded and orientation was not explicitly locked,
+    -- auto-rotate or shift up to 3 tiles to find an open, unblocked rendezvous
+    -- so actors never try to pathfind through walls or counters.
+    local cell = options.cell or (type(getCell) == "function" and getCell() or nil)
+    if explicitOrientation or options.disableAutoRendezvous == true
+        or not cell or type(cell.getGridSquare) ~= "function"
+    then
+        return primaryPlan
+    end
+    local originSq = cell:getGridSquare(originX, originY, originZ)
+    if isPlanWalkable(primaryPlan, cell, originSq) then
+        return primaryPlan
+    end
+
+    local orientations = buildCandidateOrientations(
+        forwardX, forwardY, rightX, rightY)
+    for oIdx = 2, #orientations do
+        local o = orientations[oIdx]
+        local alt = projectPlan(
+            blueprint, originX, originY, originZ,
+            o.x, o.y, o.rightX, o.rightY
+        )
+        if alt and isPlanWalkable(alt, cell, originSq) then
+            alt.rendezvousAdjusted = "rotated"
+            return alt
+        end
+    end
+
+    local searchRadius = math.max(1, math.min(4,
+        math.floor(tonumber(options.searchRadius)
+            or tonumber(blueprint.anchorFrame
+                and blueprint.anchorFrame.searchRadius)
+            or 3)))
+    for ring = 1, searchRadius do
+        for dx = -ring, ring do
+            for dy = -ring, ring do
+                if math.max(math.abs(dx), math.abs(dy)) == ring then
+                    for oIdx = 1, #orientations do
+                        local o = orientations[oIdx]
+                        local shifted = projectPlan(
+                            blueprint, originX + dx, originY + dy, originZ,
+                            o.x, o.y, o.rightX, o.rightY
+                        )
+                        if shifted and isPlanWalkable(shifted, cell, originSq) then
+                            shifted.rendezvousAdjusted = "shifted"
+                            return shifted
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return primaryPlan
 end
 
 function Anchors.WorldPoint(target)
@@ -241,7 +349,7 @@ function Anchors.IsFacing(actor, target, tolerance)
     local dx = targetPoint.x - tonumber(actor:getX())
     local dy = targetPoint.y - tonumber(actor:getY())
     local length = math.sqrt(dx * dx + dy * dy)
-    if length < 0.0001 then return false, "facing_target_too_close" end
+    if length < 0.15 then return true, 1.0 end
     local forwardX = tonumber(actor:getForwardDirectionX())
     local forwardY = tonumber(actor:getForwardDirectionY())
     if not forwardX or not forwardY then

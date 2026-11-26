@@ -1,8 +1,8 @@
--- Shared AnimSet variable adapter for Puppet Opera `anim_vars` tracks.
+-- Shared AnimSet variable adapter for `anim_vars` tracks.
 --
 -- Drives continuous, phase-locked animations on both `IsoZombie` NPCs and
--- `IsoPlayer` characters using `PNC_Opera*` AnimSet variables, mirroring the
--- proven non-grapple pattern from SilesCarryB42 with guaranteed cleanup.
+-- `IsoPlayer` characters using canonical `PNC_Anim*` AnimSet variables with
+-- guaranteed cleanup.
 
 PNC = PNC or {}
 PNC.PuppetOpera = PNC.PuppetOpera or {}
@@ -11,12 +11,12 @@ PNC.PuppetOpera.AnimVarAdapter = PNC.PuppetOpera.AnimVarAdapter or {}
 local Adapter = PNC.PuppetOpera.AnimVarAdapter
 
 local MANAGED_VARS = {
-    "PNC_OperaActive",
-    "PNC_OperaStyle",
-    "PNC_OperaRole",
-    "PNC_OperaPhase",
-    "PNC_OperaMoving",
-    "PNC_OperaProgress",
+    "PNC_AnimActive",
+    "PNC_AnimStyle",
+    "PNC_AnimRole",
+    "PNC_AnimPhase",
+    "PNC_AnimMoving",
+    "PNC_AnimProgress",
 }
 
 local function setVar(body, name, value)
@@ -43,12 +43,17 @@ function Adapter.Apply(body, track, options)
         return false, "anim_vars_arguments_invalid"
     end
     options = type(options) == "table" and options or {}
-    setVar(body, "PNC_OperaActive", true)
-    setVar(body, "PNC_OperaStyle", tostring(track.style or track.anim or "custom"))
-    setVar(body, "PNC_OperaRole", tostring(track.role or "Actor"))
-    setVar(body, "PNC_OperaPhase", tostring(track.phase or options.phase or "play"))
-    setVar(body, "PNC_OperaMoving", options.moving == true)
-    setVar(body, "PNC_OperaProgress", tonumber(options.progress) or 0)
+    local style = tostring(track.style or track.anim or "custom")
+    local role = tostring(track.role or "Actor")
+    local phase = tostring(track.phase or options.phase or "play")
+    local moving = options.moving == true
+    local progress = tonumber(options.progress) or 0
+    setVar(body, "PNC_AnimActive", true)
+    setVar(body, "PNC_AnimStyle", style)
+    setVar(body, "PNC_AnimRole", role)
+    setVar(body, "PNC_AnimPhase", phase)
+    setVar(body, "PNC_AnimMoving", moving)
+    setVar(body, "PNC_AnimProgress", progress)
     if type(track.variables) == "table" then
         for _, entry in ipairs(track.variables) do
             if type(entry) == "table" and entry.name then
@@ -62,10 +67,10 @@ end
 function Adapter.UpdateProgress(body, progress, moving)
     if not body then return false end
     if progress ~= nil then
-        setVar(body, "PNC_OperaProgress", tonumber(progress) or 0)
+        setVar(body, "PNC_AnimProgress", tonumber(progress) or 0)
     end
     if moving ~= nil then
-        setVar(body, "PNC_OperaMoving", moving == true)
+        setVar(body, "PNC_AnimMoving", moving == true)
     end
     return true
 end
