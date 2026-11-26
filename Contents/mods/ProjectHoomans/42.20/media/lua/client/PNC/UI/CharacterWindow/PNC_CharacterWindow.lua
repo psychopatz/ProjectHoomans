@@ -306,6 +306,15 @@ function CharacterWindow.ReceiveKnowledgeSnapshot(snapshot)
     end
 end
 
+function CharacterWindow.ReceiveDebugProfile(requestID, snapshot)
+    local window = CharacterWindow.instance
+    local view = window and window.tabViews and window.tabViews.Dossier
+    if not view or view.debugProfileRequest ~= requestID then return end
+    if snapshot and tostring(snapshot.npcID) ~= tostring(view.npcId) then return end
+    view.debugProfilePending = false
+    view.debugProfileSnapshot = snapshot
+end
+
 function CharacterWindow.OpenDossier(npcId)
     local window = CharacterWindow.Toggle(npcId)
     if window and window.tabPanel and window.tabPanel.activateViewById then

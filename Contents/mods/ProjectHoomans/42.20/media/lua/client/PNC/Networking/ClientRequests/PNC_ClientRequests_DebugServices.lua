@@ -10,7 +10,7 @@ local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 
-function Client.RequestKnowledgeDebug(npcID, showTruth, descriptorID)
+function Client.RequestKnowledgeDebug(npcID, showTruth, descriptorID, profileRequestID)
     if not Client.CanUseDebug() then return false, "not_authorized" end
     npcID = tostring(npcID or "")
     local player = Internal.GetPlayer()
@@ -18,6 +18,7 @@ function Client.RequestKnowledgeDebug(npcID, showTruth, descriptorID)
         npcID = npcID,
         showTruth = showTruth ~= false,
         descriptorID = descriptorID,
+        profileRequestID = profileRequestID,
     }
     ClientState.lastKnowledgeDebugRequestAt = Core.Now()
     if Core.IsClientOnly and Core.IsClientOnly() then
@@ -35,6 +36,12 @@ function Client.RequestKnowledgeDebug(npcID, showTruth, descriptorID)
     end
     local snapshot, reason = PNC.NPCKnowledge.BuildDebugSnapshotForPlayer(
         player, npcID, args.showTruth, descriptorID)
+    if profileRequestID then
+        if PNC.CharacterWindow and PNC.CharacterWindow.ReceiveDebugProfile then
+            PNC.CharacterWindow.ReceiveDebugProfile(profileRequestID, snapshot)
+        end
+        return snapshot ~= nil, reason
+    end
     ClientState.knowledgeDebugAuthorized = true
     ClientState.knowledgeDebug, ClientState.knowledgeDebugReason =
         snapshot, reason

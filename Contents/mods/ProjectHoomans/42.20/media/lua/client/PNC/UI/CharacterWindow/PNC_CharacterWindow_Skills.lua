@@ -20,9 +20,7 @@ local function loadTextures()
     separatorTexture = getTexture("media/ui/XpSystemUI/SkillBarSeparator.png")
 end
 
-local function drawSkillUnits(view, level, x, y, availableWidth)
-    local spacing = math.max(1, math.min(4, getCore and getCore():getOptionFontSizeReal() or 2))
-    local unit = math.max(7, math.min(14, math.floor((availableWidth - spacing * 9) / 10)))
+local function drawSkillUnits(view, level, x, y, unit, spacing)
     local i
     for i = 0, 9 do
         local drawX = x + i * (unit + spacing)
@@ -38,7 +36,6 @@ local function drawSkillUnits(view, level, x, y, availableWidth)
             view:drawRectBorder(drawX, y, unit, unit, 0.9, i < level and 0.95 or 0.25, i < level and 0.86 or 0.25, i < level and 0.42 or 0.25)
         end
     end
-    return unit
 end
 
 function Tabs.RenderSkills(view, snapshot, payload, topY)
@@ -54,8 +51,12 @@ function Tabs.RenderSkills(view, snapshot, payload, topY)
     local group
     local skill
     local fontHeight = getTextManager():getFontHeight(UIFont.Small)
-    local barWidth = Shared.Clamp(math.floor(view.width * 0.42), 120, 220)
-    local barX = view.width - padding - barWidth
+    local scrollWidth = view.vscroll and view.vscroll:getWidth() or 0
+    local right = view.width - padding - scrollWidth
+    local spacing = Shared.Clamp(getCore and getCore():getOptionFontSizeReal() or 2, 1, 4)
+    local unit = Shared.Clamp(math.floor((view.width * .42 - spacing * 9) / 10), 7, 14)
+    local barX = right - (unit * 10 + spacing * 9)
+    local rowHeight = math.max(fontHeight, unit) + 5
     local labelX = padding + 22
 
     for i = 1, #groups do
@@ -63,9 +64,9 @@ function Tabs.RenderSkills(view, snapshot, payload, topY)
         view:drawText(group.display, padding + 8, y, 1, 1, 1, 1, UIFont.Small)
         y = y + fontHeight + 3
         if separatorTexture then
-            view:drawTextureScaled(separatorTexture, padding, y, view.width - padding * 2, 2, 1, 1, 1, 1)
+            view:drawTextureScaled(separatorTexture, padding, y, right - padding, 2, 1, 1, 1, 1)
         else
-            view:drawRect(padding, y, view.width - padding * 2, 1, 0.6, 0.4, 0.4, 0.4)
+            view:drawRect(padding, y, right - padding, 1, 0.6, 0.4, 0.4, 0.4)
         end
         y = y + 7
         for j = 1, #(group.skills or {}) do
@@ -74,11 +75,12 @@ function Tabs.RenderSkills(view, snapshot, payload, topY)
             local level = unlocked and Shared.Clamp(math.floor(tonumber(skillLevels[skill.id]) or 0), 0, 10) or 0
             local label = PsychopatzCore.UI.Layout.Ellipsize(skill.display, UIFont.Small, math.max(60, barX - labelX - 10))
             view:drawText(label, labelX, y, unlocked and 0.9 or 0.5, unlocked and 0.9 or 0.5, unlocked and 0.9 or 0.5, 1, UIFont.Small)
-            local unit = drawSkillUnits(view, level, barX, y + math.floor((fontHeight - 10) / 2), barWidth)
-            if not unlocked then
+            if unlocked then
+                drawSkillUnits(view, level, barX, y + math.floor((fontHeight - unit) / 2), unit, spacing)
+            else
                 view:drawText(Shared.Text("UI_PNC_Character_Skills_Locked", "LOCKED"), barX, y, 0.7, 0.55, 0.18, 1, UIFont.Small)
             end
-            y = y + math.max(fontHeight + 5, unit + 5)
+            y = y + rowHeight
         end
         y = y + 9
     end

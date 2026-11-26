@@ -64,13 +64,35 @@ for _, valueType in ipairs({ "categorical", "boolean", "band", "scalar", "text_e
     end)
 end
 
-function Presentation.FormatFact(fact)
+local nameRank = {
+    ["identity.full_name"] = 1,
+    ["identity.name"] = 2,
+    ["identity.forename"] = 3,
+    ["identity.nickname"] = 4,
+    ["identity.surname"] = 5,
+}
+
+function Presentation.FormatFact(fact, omitConfirmed)
     if type(fact) ~= "table" then return "???" end
     local renderer = Renderers.byValueType[fact.valueType]
     local value = renderer and renderer(fact) or Presentation.FormatValue(fact.value)
+    if nameRank[fact.descriptorID] and type(fact.value) == "string" then
+        value = fact.value
+    end
     if fact.status == "suspected" then return confidenceBand(fact.confidence) .. " " .. value end
-    if fact.status == "confirmed" then return value .. " • Confirmed" end
+    if fact.status == "confirmed" and not omitConfirmed then return value .. " • Confirmed" end
     return value
+end
+
+local function preferredName(category)
+    local best
+    for _, descriptor in ipairs(category.descriptors or {}) do
+        local rank = nameRank[descriptor.descriptorID]
+        local confirmed = descriptor.status ~= "suspected"
+        local score = rank and (rank + (confirmed and 0 or 10))
+        if score and (not best or score < best) then best = score end
+    end
+    return best and (best > 10 and best - 10 or best)
 end
 
 function Presentation.BuildDossierRows(snapshot)
@@ -82,26 +104,58 @@ function Presentation.BuildDossierRows(snapshot)
                 title = words(category.id),
                 rows = {},
             }
+            local nameChoice = preferredName(category)
             for _, descriptor in ipairs(category.descriptors or {}) do
-                section.rows[#section.rows + 1] = {
-                    descriptorID = descriptor.descriptorID,
-                    label = Presentation.GetFactLabel(descriptor),
-                    value = Presentation.FormatFact(descriptor),
-                    confidence = tonumber(descriptor.confidence) or 0,
-                    status = descriptor.status,
-                    sourceSummary = descriptor.primarySource,
-                    tooltipLines = {
-                        descriptor.descriptorID,
-                        "Based on: " .. tostring(
-                            descriptor.primarySource or "your observations"
-                        ),
-                    },
-                }
+                local id = descriptor.descriptorID
+                local rank = nameRank[id]
+                local duplicate = id == "identity.archetype" or id == "faction.identity"
+                    or (rank and rank ~= nameChoice)
+                    or (descriptor.presentation and descriptor.presentation.topicID == "traits")
+                if not duplicate then
+                    section.rows[#section.rows + 1] = {
+                        descriptorID = descriptor.descriptorID,
+                        label = Presentation.GetFactLabel(descriptor),
+                        value = Presentation.FormatFact(descriptor, true),
+                        confidence = tonumber(descriptor.confidence) or 0,
+                        status = descriptor.status,
+                        sourceSummary = descriptor.primarySource,
+                        tooltipLines = {
+                            descriptor.descriptorID,
+                            "Based on: " .. tostring(
+                                descriptor.primarySource or "your observations"
+                            ),
+                        },
+                    }
+                end
             end
             if #section.rows > 0 then rows[#rows + 1] = section end
         end
     end
     return rows
+end
+
+function Presentation.BuildFullProfileRows(snapshot)
+    local sections, byCategory = {}, {}
+    for _, fact in ipairs(snapshot and snapshot.rows or {}) do
+        if fact.truth ~= nil and fact.category then
+            local section = byCategory[fact.category]
+            if not section then
+                section = { id = fact.category, title = words(fact.category), rows = {} }
+                sections[#sections + 1] = section
+                byCategory[fact.category] = section
+            end
+            section.rows[#section.rows + 1] = {
+                label = Presentation.GetFactLabel(fact),
+                value = Presentation.FormatFact({
+                    descriptorID = fact.descriptorID,
+                    value = fact.truth,
+                    valueType = fact.valueType,
+                }),
+            }
+        end
+    end
+    table.sort(sections, function(a, b) return a.id < b.id end)
+    return sections
 end
 
 local function knownFacts(snapshot)

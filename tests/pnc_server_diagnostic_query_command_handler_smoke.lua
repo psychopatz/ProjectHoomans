@@ -243,6 +243,23 @@ T.equal(worldKnowledgeDebugCall[3], true,
 T.equal(worldKnowledgeDebugCall[4], "ok",
     "world knowledge debug reason")
 
+player.access = ""
+debugArgs = nil
+Router.Handle("KnowledgeDebugRequest", player, {
+    npcID = "npc-profile", showTruth = true, profileRequestID = 7,
+})
+T.equal(debugArgs, nil, "unauthorized profile request cannot read truth")
+T.equal(knowledgeDebugCall[2], nil, "unauthorized profile response contains no snapshot")
+T.equal(knowledgeDebugCall[5], 7, "denied profile response matches the request")
+
+player.access = "admin"
+Router.Handle("KnowledgeDebugRequest", player, {
+    npcID = "npc-profile", showTruth = true, profileRequestID = 8,
+})
+T.equal(debugArgs.npcID, "npc-profile", "authorized profile requests the selected NPC")
+T.equal(debugArgs.showTruth, true, "authorized profile reads truth")
+T.equal(knowledgeDebugCall[5], 8, "authorized profile response matches the request")
+
 PNC.NPCKnowledge = nil
 knowledgeCalls = {}
 Router.Handle("NPCKnowledgeRequest", player, nil)

@@ -210,8 +210,9 @@ function Network.SendKnowledgeDisclosure(targetPlayer, payload)
     Internal.SendIdentityPayload(targetPlayer, Const.CMD_KNOWLEDGE_DISCLOSURE, payload)
 end
 
-function Network.SendKnowledgeDebug(targetPlayer, snapshot, authorized, reason)
-    local payload = { authorized = authorized == true, snapshot = authorized == true and snapshot or nil, reason = reason, serverTime = Core.Now() }
+function Network.SendKnowledgeDebug(targetPlayer, snapshot, authorized, reason, profileRequestID)
+    local payload = { authorized = authorized == true, snapshot = authorized == true and snapshot or nil, reason = reason,
+        profileRequestID = profileRequestID, serverTime = Core.Now() }
     if isServer and isServer() and targetPlayer then
         sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_KNOWLEDGE_DEBUG, payload)
     elseif not isServer or not isServer() then

@@ -73,7 +73,7 @@ function Knowledge.BuildDebugSnapshot(characterUUID, npcID, showTruth, detailDes
         local evidence = note and evidenceFor(note, descriptor.id) or {}
         rows[#rows + 1] = { descriptorID = descriptor.id, category = descriptor.category, providerID = descriptor.providerID,
             resolverID = descriptor.resolverID, valueType = descriptor.valueType, privacy = descriptor.privacy,
-            capabilities = deepCopy(descriptor.capabilities), discovery = deepCopy(descriptor.discovery), truth = truth,
+            presentation = deepCopy(descriptor.presentation), capabilities = deepCopy(descriptor.capabilities), discovery = deepCopy(descriptor.discovery), truth = truth,
             truthReason = reason, known = fact and deepCopy(fact) or nil, evidenceCount = #evidence,
             evidence = detailDescriptorID == descriptor.id and deepCopy(evidence) or nil, orphaned = false }
     end

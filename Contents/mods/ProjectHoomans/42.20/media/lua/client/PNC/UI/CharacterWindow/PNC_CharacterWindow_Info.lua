@@ -10,10 +10,7 @@ local Shared = PNC.CharacterWindowShared
 local Layout = PsychopatzCore.UI.Layout
 local IdentityPresentation = PNC.NPCIdentityPresentation
 
--- Temporary shared artwork until the Project Hoomans trait icon set is
--- generated. Keep this fallback centralized so the generated paths can be
--- added without changing the trait presentation flow.
-local TRAIT_ICON_PLACEHOLDER = "media/ui/Traits/trait_pnc_friendly.png"
+local DEFAULT_TRAIT_ICON = "media/ui/Traits/trait_generic.png"
 local TRAIT_ICON_SIZE = 18
 
 local function knowledgeSnapshot(npcID)
@@ -52,14 +49,17 @@ local function traitEntries(npcID)
                             or presentation.descriptionKey
                         local label = Shared.TraitLabel(
                             traitID, definition, labelKey)
+                        local iconPath = definition and definition.iconPath or presentation.iconPath
+                        if presentation.traitSource == "vanilla" and not iconPath then
+                            local textureID = rawTraitID == "veryunderweight" and "very underweight" or rawTraitID
+                            iconPath = "media/ui/Traits/trait_" .. textureID .. ".png"
+                        end
                         entries[#entries + 1] = {
                             id = traitID,
                             label = label,
                             description = Shared.TraitDescription(
                                 traitID, definition, descriptionKey, label),
-                            iconPath = definition and definition.iconPath
-                                or presentation.iconPath
-                                or TRAIT_ICON_PLACEHOLDER,
+                            iconPath = iconPath,
                         }
                         seen[traitID] = true
                     end
@@ -94,7 +94,7 @@ local function drawTraitIcons(view, entries, x, y, availableWidth)
     for index = 1, #entries do
         local texture = loadTraitIcon(entries[index].iconPath)
         if not texture then
-            texture = loadTraitIcon(TRAIT_ICON_PLACEHOLDER)
+            texture = loadTraitIcon(DEFAULT_TRAIT_ICON)
         end
         if texture then
             local column = drawn % columns
@@ -247,11 +247,8 @@ end
 function Tabs.RenderInfo(view, snapshot, payload, topY)
     local resolved = Shared.GetSnapshot(snapshot, payload)
     local data = Shared.GetCharacterData(snapshot, payload)
-    local identity = Shared.GetIdentity(snapshot, payload)
-    local survivor = identity.survivor or {}
     local carry = Shared.GetCarry(snapshot, payload)
     local equipment = Shared.GetEquipment(snapshot, payload)
-    local appearance = resolved.appearance or {}
     local knownFaction = IdentityPresentation.GetFaction(view.npcId)
     local padding = 12
     local portraitRight = view.portraitPanel and view.portraitPanel:getRight() or math.floor(view.width * 0.33)
@@ -266,8 +263,11 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
     local stamina = tostring(math.floor(tonumber(resolved.staminaCurrent) or 0)) .. "/" .. tostring(math.floor(tonumber(resolved.staminaMax) or 0))
     local carryText = tostring(Shared.Round(carry.usedWeight or 0, 1)) .. "/" .. tostring(Shared.Round(carry.maxWeight or 0, 1))
 
-    view:drawText(name, x, y, 1, 1, 1, 1, UIFont.Medium)
-    view:drawTextRight(archetype, x + width, y + 2, 1, 1, 1, 1, UIFont.Small)
+    local archetypeWidth = math.floor(width * .42)
+    view:drawText(Layout.Ellipsize(name, UIFont.Medium, width - archetypeWidth - 10),
+        x, y, 1, 1, 1, 1, UIFont.Medium)
+    view:drawTextRight(Layout.Ellipsize(archetype, UIFont.Small, archetypeWidth),
+        x + width, y + 2, 1, 1, 1, 1, UIFont.Small)
     y = y + (getTextManager():getFontHeight(UIFont.Medium) + 3)
     view:drawRect(x, y, width, 1, 0.8, 0.5, 0.5, 0.5)
     y = y + 14
@@ -309,22 +309,16 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
     y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Health", "Health"), hp, x, y, labelWidth)
     y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Stamina", "Stamina"), stamina, x, y, labelWidth)
     y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_CarryWeight", "Carry Weight"), carryText, x, y, labelWidth)
-    y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Hair", "Hair"), appearance.hairModel or survivor.hairModel or Shared.Text("UI_PNC_Character_Info_None", "None"), x, y, labelWidth)
-    if resolved.isFemale ~= true then
-        y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Beard", "Beard"), appearance.beardModel or survivor.beardModel or Shared.Text("UI_PNC_Character_Info_None", "None"), x, y, labelWidth)
-    end
     y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Weapon", "Weapon"), equipment.primaryFullType or Shared.Text("UI_PNC_Character_Info_BareHands", "Bare hands"), x, y, labelWidth)
     y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Combat", "Combat"), resolved.combatModeResolved or resolved.weaponMode or "melee", x, y, labelWidth)
     y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Recruited", "Recruited"), resolved.recruited == true and Shared.Text("UI_PNC_Character_Info_Yes", "Yes") or Shared.Text("UI_PNC_Character_Info_No", "No"), x, y, labelWidth)
     y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Owner", "Owner"), data.ownerUsername or "-", x, y, labelWidth)
 
+    y = Shared.DrawLabelValue(view,
+        Shared.Text("UI_PNC_Character_Info_ItemCount", "Inventory items"),
+        tostring(carry.itemCount or 0), x, y, labelWidth)
     local portraitBottom = view.portraitPanel and view.portraitPanel:getBottom() or y
-    local footerY = math.max(y + 8, portraitBottom + 10)
-    view:drawTextCentre(PNC.Translation.TrFormat(
-        "UI_PNC_Character_Info_InventoryItems", "Inventory Items  %1",
-        tostring(carry.itemCount or 0)
-    ), view.width / 2, footerY, 0.82, 0.82, 0.82, 1, UIFont.Small)
-    return footerY + getTextManager():getFontHeight(UIFont.Small) + 10
+    return math.max(y, portraitBottom) + padding
 end
 
 return Tabs

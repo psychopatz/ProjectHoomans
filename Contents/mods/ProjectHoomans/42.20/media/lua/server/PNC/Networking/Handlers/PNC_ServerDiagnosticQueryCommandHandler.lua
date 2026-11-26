@@ -124,8 +124,10 @@ Router.Register(Const.CMD_NPC_KNOWLEDGE_REQUEST,
 
 Router.Register(Const.CMD_KNOWLEDGE_DEBUG_REQUEST,
     function(player, args, rawArgs)
+        local profileRequestID = rawArgs and rawArgs.profileRequestID
+        if type(profileRequestID) ~= "number" then profileRequestID = nil end
         if not Router.CanUseDebug(player) then
-            Network.SendKnowledgeDebug(player, nil, false, "not_authorized")
+            Network.SendKnowledgeDebug(player, nil, false, "not_authorized", profileRequestID)
             return
         end
         local snapshot
@@ -141,7 +143,7 @@ Router.Register(Const.CMD_KNOWLEDGE_DEBUG_REQUEST,
         else
             reason = "knowledge_service_unavailable"
         end
-        Network.SendKnowledgeDebug(player, snapshot, true, reason)
+        Network.SendKnowledgeDebug(player, snapshot, true, reason, profileRequestID)
     end
 )
 

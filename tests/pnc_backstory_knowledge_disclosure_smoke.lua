@@ -272,8 +272,8 @@ end
 T.truthy(formerRow, "confirmed backstory fact missing from dossier rows")
 T.equal(formerRow.label, "Former work",
     "EN backstory dossier label was not translated")
-T.equal(formerRow.value, "Doctor • Confirmed",
-    "confirmed backstory dossier status was not rendered")
+T.equal(formerRow.value, "Doctor",
+    "confirmed backstory dossier should display the value alone")
 
 local suspectedSnapshot = {
     categories = {{

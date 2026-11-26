@@ -463,17 +463,17 @@ T.equal(rejectedCorpseReason, "NPC_NOT_AT_HOME",
 PNC.CorpseHaulService.RequestManual = requestManual
 T.equal(
     PNC.CompanionCommands.GetAttackTypeDefinition("auto").icon,
-    "media/ui/emotes/yes.png",
+    "media/ui/Emotes/PNC_EmoteAttackAuto.png",
     "auto attack icon"
 )
 T.equal(
     PNC.CompanionCommands.GetAttackTypeDefinition("melee").icon,
-    "media/ui/emotes/comefromfront.png",
+    "media/ui/Emotes/PNC_EmoteAttackMelee.png",
     "melee attack icon"
 )
 T.equal(
     PNC.CompanionCommands.GetAttackTypeDefinition("ranged").icon,
-    "media/ui/emotes/fire.png",
+    "media/ui/Emotes/PNC_EmoteAttackRanged.png",
     "ranged attack icon"
 )
 local affected, reason = PNC.CompanionCommands.Execute(player, {
@@ -1024,7 +1024,7 @@ T.equal(attackOptions[4].notAvailable, true,
     "current attack type is disabled and red")
 T.equal(
     context.options[1].submenu.options[5].iconTexture,
-    "media/ui/emotes/no.png",
+    "media/ui/Emotes/PNC_EmoteAttackNone.png",
     "context attack type icon did not reflect current setting"
 )
 attackOptions[3].callback()
@@ -1208,12 +1208,12 @@ T.equal(
 )
 T.equal(
     ISEmoteRadialMenu.icons.PNC_ClosestCompanionCommands,
-    "media/ui/emotes/no.png",
+    "media/ui/Emotes/PNC_EmoteAttackNone.png",
     "closest root icon did not reflect target attack type"
 )
 T.equal(
     ISEmoteRadialMenu.icons.PNC_ClosestCommandGroup_attack_type,
-    "media/ui/emotes/no.png",
+    "media/ui/Emotes/PNC_EmoteAttackNone.png",
     "attack subgroup icon did not reflect target attack type"
 )
 T.equal(

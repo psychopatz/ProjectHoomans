@@ -277,7 +277,7 @@ Commands.Register({
     labelKey = "UI_PNC_CommandReturnHome",
     label = "Go Home",
     emote = "followme",
-    icon = "media/ui/Emotes/PNC_EmoteFollow.png",
+    icon = "media/ui/Emotes/PNC_EmoteHome.png",
     -- Sending a colonist home is the order most often issued at radio range.
     radioRelay = true,
     apply = function(record, player)
@@ -314,7 +314,7 @@ Commands.Register({
     labelKey = "UI_PNC_CommandScavengeNearby",
     label = "Scavenge Nearby",
     emote = "lookaround",
-    icon = "media/ui/Emotes/PNC_EmoteMenu.png",
+    icon = "media/ui/Emotes/PNC_EmoteScavenge.png",
     personalized = true,
     clientOnly = true,
 })
@@ -455,7 +455,7 @@ Commands.Register({
     labelKey = "UI_PNC_CommandAttackAuto",
     label = "Auto",
     emote = "signalok",
-    icon = "media/ui/emotes/yes.png",
+    icon = "media/ui/Emotes/PNC_EmoteAttackAuto.png",
     attackType = Const.ATTACK_TYPE_AUTO or "auto",
 })
 
@@ -465,7 +465,7 @@ Commands.Register({
     labelKey = "UI_PNC_CommandAttackMelee",
     label = "Melee",
     emote = "comefront",
-    icon = "media/ui/emotes/comefromfront.png",
+    icon = "media/ui/Emotes/PNC_EmoteAttackMelee.png",
     attackType = Const.ATTACK_TYPE_MELEE or "melee",
 })
 
@@ -475,7 +475,7 @@ Commands.Register({
     labelKey = "UI_PNC_CommandAttackRanged",
     label = "Ranged",
     emote = "signalfire",
-    icon = "media/ui/emotes/fire.png",
+    icon = "media/ui/Emotes/PNC_EmoteAttackRanged.png",
     attackType = Const.ATTACK_TYPE_RANGED or "ranged",
 })
 
@@ -485,7 +485,7 @@ Commands.Register({
     labelKey = "UI_PNC_CommandAttackNone",
     label = "Don't Attack",
     emote = "no",
-    icon = "media/ui/emotes/no.png",
+    icon = "media/ui/Emotes/PNC_EmoteAttackNone.png",
     attackType = Const.ATTACK_TYPE_NONE or "none",
 })
 

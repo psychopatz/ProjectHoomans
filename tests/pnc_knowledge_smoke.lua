@@ -179,6 +179,25 @@ T.equal(#dossierWithoutSkills, 1,
     "dossier omits capabilities already represented by Skills tab")
 T.equal(dossierWithoutSkills[1].id, "identity",
     "non-skill dossier knowledge remains visible")
+local compactIdentity = PNC.KnowledgePresentation.BuildDossierRows({
+    categories = { { id = "identity", descriptors = {
+        { descriptorID = "identity.name", value = "Burton", status = "confirmed" },
+        { descriptorID = "identity.full_name", value = "Burton Sage", status = "confirmed" },
+        { descriptorID = "identity.archetype", value = "survivor", status = "confirmed" },
+    } } },
+})
+T.equal(#compactIdentity[1].rows, 1, "profile consolidates identity rows")
+T.equal(compactIdentity[1].rows[1].value, "Burton Sage", "profile shows the full name without status")
+local fullProfile = PNC.KnowledgePresentation.BuildFullProfileRows({ rows = {
+    { descriptorID = "skill.Aiming", category = "capabilities", truth = 0 },
+    { descriptorID = "trait.lighteater", category = "personality", truth = false },
+    { descriptorID = "personality.orientation", category = "personality",
+        known = { value = "gay" } },
+} })
+T.equal(#fullProfile, 2, "debug profile includes skill and trait categories")
+T.equal(fullProfile[1].rows[1].value, "0.00", "debug profile keeps zero values")
+T.equal(fullProfile[2].rows[1].value, "No", "debug profile keeps false values")
+T.equal(#fullProfile[2].rows, 1, "debug profile displays authoritative data only")
 local learned = PNC.KnowledgePresentation.GetNewFacts(
     { categories = {} },
     { categories = { {

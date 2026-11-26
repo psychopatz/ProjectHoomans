@@ -1,7 +1,3 @@
--- Player-learned NPC knowledge lives inside the existing character window.
--- This deliberately draws the compact fact list directly: character tabs
--- already provide scrolling, so a second native scrolling-list is redundant.
-
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PNC/UI/Knowledge/PNC_KnowledgePresentation"
 
@@ -14,72 +10,131 @@ local Theme = UI.Theme
 local Layout = UI.Layout
 local Presentation = PNC.KnowledgePresentation
 local ClientState = PNC.Network.ClientState
+local requestSequence = 0
+
+local function text(key, fallback)
+    return PNC.Translation.GetKey("UI_PNC_Character_Dossier_" .. key, fallback)
+end
 
 local function canDebug()
     return PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() == true
 end
 
-local function rebuildModel(view)
-    local snapshot = ClientState.npcKnowledge and ClientState.npcKnowledge[view.npcId] or nil
-    view.dossierModel = Presentation.BuildDossierModel(snapshot)
+local function clearDebug(view)
+    view.debugProfileRequest = nil
+    view.debugProfilePending = false
+    view.debugProfileSnapshot = nil
+end
+
+local function requestFullProfile(view)
+    requestSequence = requestSequence + 1
+    view.debugProfileRequest = requestSequence
+    view.debugProfilePending = true
+    if not PNC.Client.RequestKnowledgeDebug(view.npcId, true, nil, requestSequence) then
+        view.debugProfilePending = false
+    end
 end
 
 function Tabs.CreateDossierChildren(view)
     view.refreshDossierButton = UI.CreateButton(view, {
-        id = "refresh_dossier", title = PNC.Translation.GetKey("UI_PNC_Character_Dossier_Refresh", "Refresh"), target = view,
+        id = "refresh_dossier", title = text("Refresh", "Refresh"), target = view,
         onclick = function(target)
-            if PNC.Client and PNC.Client.RequestNPCKnowledge then
+            if target.debugProfileRequest and canDebug() then
+                requestFullProfile(target)
+            elseif PNC.Client and PNC.Client.RequestNPCKnowledge then
                 PNC.Client.RequestNPCKnowledge(target.npcId)
             end
         end, variant = "quiet",
     })
+    view.fullProfileButton = UI.CreateButton(view, {
+        id = "full_profile", title = text("ShowFull", "Show full profile"), target = view,
+        onclick = function(target)
+            if not canDebug() then return end
+            if target.debugProfileRequest then
+                clearDebug(target)
+            elseif target.npcId and PNC.Client.RequestKnowledgeDebug then
+                requestFullProfile(target)
+            end
+            target:setYScroll(0)
+        end, variant = "quiet",
+    })
+    view.fullProfileButton:setVisible(canDebug() == true)
 end
 
 function Tabs.SetDossierContext(view)
-    rebuildModel(view)
+    if view.dossierNPC ~= view.npcId then
+        clearDebug(view)
+        view.dossierNPC = view.npcId
+        view:setYScroll(0)
+    end
 end
 
 function Tabs.LayoutDossier(view)
     local pad = Layout.Pixels(12, view.uiScale)
     local height = Layout.Pixels(26, view.uiScale)
-    local refreshWidth = Layout.Pixels(82, view.uiScale)
-    local right = view.width - pad
+    local refreshWidth = Layout.Pixels(88, view.uiScale)
+    local fullWidth = Layout.Pixels(190, view.uiScale)
+    local scrollWidth = view.vscroll and view.vscroll:getWidth() or 0
+    local right = view.width - pad - scrollWidth
     Layout.SetBounds(view.refreshDossierButton, right - refreshWidth, pad, refreshWidth, height)
+    Layout.SetBounds(view.fullProfileButton, right - refreshWidth - pad - fullWidth, pad, fullWidth, height)
 end
 
 function Tabs.RenderDossier(view, _, _, topY)
-    rebuildModel(view)
-    local model = view.dossierModel or {}
+    local authorized = canDebug() == true
+    if not authorized then clearDebug(view) end
+    local full = view.debugProfileRequest ~= nil
+    view.fullProfileButton:setVisible(authorized)
+    view.fullProfileButton:setTitle(full and text("ShowKnown", "Show known profile")
+        or text("ShowFull", "Show full profile"))
+
+    local snapshot = ClientState.npcKnowledge and ClientState.npcKnowledge[view.npcId] or nil
+    local sections = full and Presentation.BuildFullProfileRows(view.debugProfileSnapshot)
+        or Presentation.BuildDossierRows(snapshot)
     local pad = Layout.Pixels(12, view.uiScale)
-    local y = topY + Layout.Pixels(42, view.uiScale)
-    local contentWidth = math.max(80, view.width - pad * 2)
+    local inset = Layout.Pixels(10, view.uiScale)
+    local scrollWidth = view.vscroll and view.vscroll:getWidth() or 0
+    local contentWidth = view.width - pad * 2 - scrollWidth
+    local y = topY + Layout.Pixels(36, view.uiScale)
+    local font = UIFont.Small
+    local rowHeight = getTextManager():getFontHeight(font) + Layout.Pixels(6, view.uiScale)
     local color = Theme.colors.text
     local muted = Theme.colors.textMuted
-    local sections = model.sections or {}
+    local labelX = pad + inset
+    local valueX = pad + math.min(Layout.Pixels(210, view.uiScale), math.floor(contentWidth * .43))
+
     if #sections == 0 then
-        view:drawText(PNC.Translation.GetKey("UI_PNC_Character_Dossier_NoObservations", "NO OBSERVATIONS YET"), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
-        y = y + Layout.Pixels(24, view.uiScale)
-        view:drawText(PNC.Translation.GetKey("UI_PNC_Character_Dossier_Hint", "Talk to, watch, or spend time with this NPC to build their dossier."), pad, y, color.r, color.g, color.b, color.a, UIFont.Small)
-        if canDebug() then
-            y = y + Layout.Pixels(22, view.uiScale)
-            view:drawText(PNC.Translation.GetKey("UI_PNC_Character_Dossier_DebugHint", "Debug: use Talk > Relationship tools > Discovery topics."), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+        local message
+        if full then
+            message = view.debugProfilePending and text("LoadingFull", "Loading full profile…")
+                or text("FullUnavailable", "Full profile unavailable")
+        else
+            message = text("NoObservations", "NO OBSERVATIONS YET")
         end
-        return y + Layout.Pixels(30, view.uiScale)
+        view:drawText(message, pad, y, muted.r, muted.g, muted.b, muted.a, font)
+        y = y + rowHeight
+        if not full then
+            local hint = text("Hint", "Talk to, watch, or spend time with this NPC to build their dossier.")
+            view:drawText(Layout.Ellipsize(hint, font, contentWidth), pad, y, color.r, color.g, color.b, color.a, font)
+            y = y + rowHeight
+        end
+        return y + pad
     end
-    view:drawText(PNC.Translation.GetKey("UI_PNC_Character_Dossier_KnownInformation", "KNOWN INFORMATION"), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
-    y = y + Layout.Pixels(24, view.uiScale)
+
     for _, section in ipairs(sections) do
-        view:drawText(string.upper(tostring(section.title)), pad, y, color.r, color.g, color.b, color.a, UIFont.Small)
-        y = y + Layout.Pixels(20, view.uiScale)
-        for _, row in ipairs(section.rows or {}) do
-            local labelWidth = math.min(Layout.Pixels(150, view.uiScale), math.floor(contentWidth * .42))
-            view:drawText(Layout.Ellipsize(row.label, UIFont.Small, labelWidth), pad + Layout.Pixels(12, view.uiScale), y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
-            view:drawText(Layout.Ellipsize(row.value, UIFont.Small, contentWidth - labelWidth - Layout.Pixels(28, view.uiScale)), pad + labelWidth + Layout.Pixels(18, view.uiScale), y, color.r, color.g, color.b, color.a, UIFont.Small)
-            y = y + Layout.Pixels(22, view.uiScale)
+        view:drawText(section.title, pad, y, color.r, color.g, color.b, color.a, font)
+        y = y + rowHeight
+        view:drawRect(pad, y - 3, contentWidth, 1, 0.35, muted.r, muted.g, muted.b)
+        for _, row in ipairs(section.rows) do
+            view:drawText(Layout.Ellipsize(row.label, font, valueX - labelX - inset),
+                labelX, y, muted.r, muted.g, muted.b, muted.a, font)
+            view:drawText(Layout.Ellipsize(row.value, font, pad + contentWidth - valueX),
+                valueX, y, color.r, color.g, color.b, color.a, font)
+            y = y + rowHeight
         end
-        y = y + Layout.Pixels(8, view.uiScale)
+        y = y + pad
     end
-    return y + pad
+    return y
 end
 
 return Tabs
