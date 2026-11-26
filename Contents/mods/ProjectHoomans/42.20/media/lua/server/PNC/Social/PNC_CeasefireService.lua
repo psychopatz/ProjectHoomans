@@ -93,14 +93,33 @@ end
 
 local function emitSurrenderBeat(speaker, responder, role, now)
     local Beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
-    if not Beats or type(Beats.Emit) ~= "function" then return end
-    Beats.Emit("combat.surrender", {
-        anchor = speaker,
-        speaker = speaker,
-        partner = responder,
-        role = role,
-        poolID = "semantic.combat.surrender",
-    }, now)
+    if Beats and type(Beats.Emit) == "function" then
+        Beats.Emit("combat.surrender", {
+            anchor = speaker,
+            speaker = speaker,
+            partner = responder,
+            role = role,
+            poolID = "semantic.combat.surrender",
+            anim = role == "surrender_plea" and "surrender" or nil,
+            animDurationMs = 5000,
+            voice = role == "surrender_plea" and "surrender" or nil,
+            allowInCombat = true,
+        }, now)
+    end
+    local Perf = PNC.Semantics and PNC.Semantics.SpeechPerformance or nil
+    if Perf and speaker and speaker.isPlayer ~= true then
+        if role == "surrender_plea" then
+            Perf.Perform(speaker, {
+                anim = "surrender",
+                animDurationMs = 5000,
+                voice = "surrender",
+                allowInCombat = true,
+                reason = "surrender_ceasefire",
+            }, now)
+        elseif role == "surrender_no_mercy" or role == "surrender_accept" then
+            Perf.Interrupt(speaker, role, now)
+        end
+    end
 end
 
 -- Core actor-agnostic surrender resolution.

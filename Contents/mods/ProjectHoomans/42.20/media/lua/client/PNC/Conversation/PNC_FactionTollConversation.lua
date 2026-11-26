@@ -12,9 +12,15 @@ TollConvo.ActiveDemand = TollConvo.ActiveDemand or nil
 local function sendTollDecision(demandID, decision)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     if not player or not sendClientCommand or not demandID then return false end
+    local choice = tostring(decision or "leave")
+    local Perf = PNC.Semantics and PNC.Semantics.SpeechPerformance or nil
+    if Perf and type(Perf.PerformForPlayer) == "function" then
+        local act = choice == "pay" and "ACCEPT" or (choice == "refuse" and "REFUSE" or "DEPART")
+        Perf.PerformForPlayer(player, { act = act })
+    end
     sendClientCommand(player, Const.MODULE, Const.CMD_FACTION_TOLL_RESPONSE, {
         demandID = demandID,
-        response = tostring(decision or "leave"),
+        response = choice,
     })
     TollConvo.ActiveDemand = nil
     return true

@@ -11,6 +11,7 @@ require "PNC/Semantics/PNC_SemanticBeatContext"
 require "PNC/Semantics/PNC_SemanticAudienceContext"
 require "PNC/Semantics/PNC_ConversationDirector"
 local Transport = require "PNC/Semantics/PNC_SemanticSpeechTransport"
+local SpeechPerf = require "PNC/Semantics/PNC_SemanticSpeechPerformance"
 
 local Beats = PNC.Semantics.DialogueBeats or {}
 PNC.Semantics.DialogueBeats = Beats
@@ -251,6 +252,33 @@ local function deliverTurn(t, tid, now, ctx)
     end
     if t.barkId and PNC.SecondaryChannel and PNC.SecondaryChannel.RequestBark then
         PNC.SecondaryChannel.RequestBark(sp, t.barkId, now)
+    end
+    if SpeechPerf then
+        local cue = nil
+        if t.anim ~= nil or t.voice ~= nil then
+            cue = {
+                anim = t.anim,
+                animDurationMs = t.animDurationMs,
+                voice = t.voice,
+                allowInCombat = t.allowInCombat == true,
+            }
+        elseif type(SpeechPerf.ResolveCue) == "function" then
+            cue = SpeechPerf.ResolveCue({
+                poolID = t.poolID,
+                role = t.role,
+                act = act,
+                eventType = ev,
+            })
+        end
+        if cue then
+            SpeechPerf.Perform(sp, {
+                anim = cue.anim,
+                animDurationMs = cue.animDurationMs,
+                voice = cue.voice,
+                allowInCombat = cue.allowInCombat == true,
+                reason = tostring(t.role or ev or "beat_turn"),
+            }, now)
+        end
     end
     local lane = (t.lane == "scene") and "scene" or "beat"
     local deliveredCtx = {}
@@ -628,6 +656,9 @@ end
 
 function Beats.Pump(now)
     now = nowMs(now)
+    if SpeechPerf and type(SpeechPerf.Pump) == "function" and SpeechPerf.ActiveCount() > 0 then
+        SpeechPerf.Pump(now)
+    end
     local fired = 0
     if (tonumber(Beats.PendingCount) or 0) > 0 then
         local reg, rem = PNC.Registry, {}
@@ -692,6 +723,7 @@ function Beats.ResetRuntime()
     if type(Beats.ResetWeatherExposureRuntime) == "function" then Beats.ResetWeatherExposureRuntime() end
     if type(Beats.ResetStateWatcherRuntime) == "function" then Beats.ResetStateWatcherRuntime() end
     if type(Beats.ResetVehicleBeatsRuntime) == "function" then Beats.ResetVehicleBeatsRuntime() end
+    if SpeechPerf and type(SpeechPerf.ResetRuntime) == "function" then SpeechPerf.ResetRuntime() end
     if type(Beats.ResetAuditRuntime) == "function" then Beats.ResetAuditRuntime() end
 end
 
