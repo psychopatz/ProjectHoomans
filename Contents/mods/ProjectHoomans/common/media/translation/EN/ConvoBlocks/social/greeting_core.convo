@@ -2,60 +2,61 @@
 language EN
 namespace hoomans
 
-flow semantic.greeting
-  say [npc.fed_up] (priority 13) as fed_up:
+dialogue semantic.greeting
+  use suggest.social_checkin
+  say [npc.fed_up] as fed_up:
     "What now? You've been talking my ear off."
-  say [player.rude] (priority 12) as rude_player:
+  say [player.rude] as rude_player:
     "{glue.pushback_rude} what do you want?"
-  say [mood.panicked] (priority 12) as panicked:
+  say [mood.panicked] as panicked:
     "Hey—keep it quick, I've got a bad feeling out here!"
-  say [mood.in_pain] (priority 12) as in_pain:
+  say [mood.in_pain] as in_pain:
     "Ngh... hey, {?term.address}. Not doing great right now."
-  say [relationship.bond=lover|spouse] (priority 11) as lover:
+  say [relationship.bond=lover|spouse] as lover:
     "Hey, {?term.address}! Good to have a moment with you. {?mood.tail}"
-  say [relationship.bond=parent] (priority 11) as parent:
+  say [relationship.bond=parent] as parent:
     "Hey, {?term.address}. Glad you're safe. {?mood.tail}"
-  say [relationship.bond=child] (priority 11) as child:
+  say [relationship.bond=child] as child:
     "Hey, {?term.address}! Everything okay?"
-  say [actor.role=looter|bandit] (priority 11) as bandit_looter:
+  say [actor.role=looter|bandit] as bandit_looter:
     "Hold it right there, {?term.address}. {?role.greeting_tail}"
-  say [actor.role=trader] (priority 10) as trader:
+  say [actor.role=trader] as trader:
     "Good to see you, {?term.address}. {?role.greeting_tail}"
-  say [relationship.state=FirstMeet] (priority 9) as first_meet:
+  say [relationship.state=FirstMeet] as first_meet:
     "Hey. Don't think we've met. {?clause.night_warning}"
-  say [actor.role=colonist, state.working] (priority 9) as colonist_working:
+  say [actor.role=colonist, state.working] as colonist_working:
     "{?mood.opener} Hey, {?term.address}. {?role.greeting_tail} {?clause.world_pressure}"
-  say [actor.role=colonist, state.sitting] (priority 9) as colonist_sitting:
+  say [actor.role=colonist, state.sitting] as colonist_sitting:
     "Hey, {?term.address}. {?role.greeting_tail} {?mood.tail}"
-  say [actor.role=companion] (priority 9) as companion:
+  say [actor.role=companion] as companion:
     "Hey, {?term.address}! {?role.greeting_tail} {?mood.tail}"
-  say [environment.time_band=dawn] (priority 8) as dawn:
+  say [environment.time_band=dawn] as dawn:
     "Good morning—early start, {?term.address}{end} {?role.greeting_tail}"
-  say [environment.raining] (priority 8) as rain:
+  say [environment.raining] as rain:
     "Hey there. Wet one today. {?clause.rain_note}"
-  say [environment.foggy] (priority 8) as fog:
+  say [environment.foggy] as fog:
     "Hey there. Hard to see much in this fog."
-  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] (priority 7) as thirsty:
+  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] as thirsty:
     "Hey there. You wouldn't happen to have water, would you?"
-  say [actor.busy] (priority 7) as busy:
+  say [actor.busy] as busy:
     "Hey. I'm in the middle of something."
-  say [actor.social_style=friendly] (priority 7) as friendly:
+  say [actor.social_style=friendly] as friendly:
     "Hey! Good to see you, {?term.address}. {?mood.tail}"
-  say [actor.social_style=withdrawn] (priority 7) as withdrawn:
+  say [actor.social_style=withdrawn] as withdrawn:
     "Hey."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Hey there, {?term.address}{end} {?role.greeting_tail} {?mood.tail}"
 
-flow semantic.offer
-  say [emotion.type=stress|panic, emotion.urgency=moderate|severe|critical|emergency] (priority 10) as stressed:
+dialogue semantic.offer
+  say [emotion.type=stress|panic, emotion.urgency=moderate|severe|critical|emergency] as stressed:
     "I appreciate it, but I need a moment before I can think about food."
-  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] (priority 9) as hungry:
+  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] as hungry:
     "I'd really like one. Could I have it?"
-  say [relationship.state=Friend|Trusted|Ally|Member|Lover] (priority 8) as trusted:
+  say [relationship.state=Friend|Trusted|Ally|Member|Lover] as trusted:
     "Thanks. I know I can count on you."
-  say [actor.social_style=friendly] (priority 8) as friendly:
+  say [actor.social_style=friendly] as friendly:
     "That's kind of you. I'll keep it in mind."
-  say [actor.social_style=withdrawn] (priority 8) as withdrawn:
+  say [actor.social_style=withdrawn] as withdrawn:
     "No, thanks. I'd rather handle it myself."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "No thanks, I'm not hungry."

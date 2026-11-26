@@ -3,11 +3,11 @@ language EN
 namespace hoomans
 
 extend semantic.banter.group
-  say [topic=post_settlement_radio, role=open] (priority 12) as post_settle_open:
+  say [topic=post_settlement_radio, role=open] as post_settle_open:
     "Hearing {slot.broadcast.topic} earlier was a good sign, {addressee.name}. People are actually rebuilding."
-  say [topic=post_settlement_radio, role=reply] (priority 12) as post_settle_reply:
+  say [topic=post_settlement_radio, role=reply] as post_settle_reply:
     "Gives you a little hope, {addressee.name}. Might be worth visiting them when we're ready."
-  say [topic=post_settlement_radio, role=chime] (priority 12) as post_settle_chime:
+  say [topic=post_settlement_radio, role=chime] as post_settle_chime:
     "Just remember to announce ourselves so their guards don't get twitchy."
-  say [topic=post_settlement_radio, role=wrap] (priority 12) as post_settle_wrap:
+  say [topic=post_settlement_radio, role=wrap] as post_settle_wrap:
     "Smart. Respect their perimeter."

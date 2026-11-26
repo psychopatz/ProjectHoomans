@@ -2,30 +2,30 @@
 language EN
 namespace hoomans
 
-flow semantic.tool_reply.order.accepted.generic
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.order.accepted.generic
+  say [default] as 1:
     "Understood."
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.order.camp
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.order.camp
+  say [default] as 1:
     "Understood."
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.order.follow
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.order.follow
+  say [default] as 1:
     "Understood."
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.order.rejected
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.order.rejected
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.order.stay
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.order.stay
+  say [default] as 1:
     "Understood."
     "Understood."

@@ -1,0 +1,53 @@
+# Subject: BODILY NEEDS, WOUND & STRESS REMEDIATION / RELIEF BEATS.
+language EN
+namespace hoomans
+
+dialogue semantic.needs.relief
+  say [role=wound_healed_open] as wound_healed_open:
+    "Patch job's holding nicely, {addressee.name}—feeling way better now."
+    "Glad that bleeding stopped, {addressee.name}. I'm back in fighting shape."
+    "Much better now that's bandaged up, {addressee.name}. Appreciate it."
+  say [role=wound_healed_reply] as wound_healed_reply:
+    "Good to hear, {addressee.name}—just take it easy on it for a bit."
+    "Glad you're patched up. Can't afford to lose anyone out here."
+  say [role=wound_healed_chime] as wound_healed_chime:
+    "Keep an eye on the dressing and let us know if it starts aching again."
+
+  say [role=fed_hydrated_open] as fed_hydrated_open:
+    "Ah, that hit the spot, {addressee.name}—much better on a full stomach."
+    "Nothing like food and water to bring you back to life, {addressee.name}."
+  say [role=fed_hydrated_reply] as fed_hydrated_reply:
+    "Right? Hard to stay sharp when your stomach's growling louder than the dead."
+    "Glad we got fed, {addressee.name}—ready to keep moving when you are."
+  say [role=fed_hydrated_chime] as fed_hydrated_chime:
+    "We'll stay a lot steadier now that everyone's topped up."
+
+  say [role=rested_open] as rested_open:
+    "That breather helped a lot, {addressee.name}—legs feel steady again."
+    "Feeling way more rested now, {addressee.name}. Ready for the next stretch."
+  say [role=rested_reply] as rested_reply:
+    "Same here, {addressee.name}. Pushing through exhaustion is how people slip up."
+    "Good—sharp eyes and steady hands beat rushing every time."
+  say [role=rested_chime] as rested_chime:
+    "Lead the way whenever you're ready."
+
+  say [role=cold_recovered_open] as cold_recovered_open:
+    "Sounds like you finally shook that cold, {addressee.name}—good to hear."
+    "Glad that cold cleared up, {addressee.name}. No more coughing to draw walkers."
+  say [role=cold_recovered_reply] as cold_recovered_reply:
+    "Yeah, huge relief—nothing worse than being sick out here."
+    "Staying dry and resting actually paid off for once."
+  say [role=cold_recovered_chime] as cold_recovered_chime:
+    "Let's keep ourselves warm so it doesn't come right back."
+
+  say [role=panic_calmed_open] as panic_calmed_open:
+    "Whew... heart rate's finally coming back down, {addressee.name}."
+    "Okay, I'm steady again, {addressee.name}. That got my adrenaline spiking."
+  say [role=panic_calmed_reply] as panic_calmed_reply:
+    "Take a slow breath, {addressee.name}—we're clear for now."
+    "You handled it fine. Good to have our nerves back under control."
+  say [role=panic_calmed_chime] as panic_calmed_chime:
+    "Stay calm and keep watching the corners—we've got each other's backs."
+
+  say [default] as default:
+    "Feeling much better now, {addressee.name}."

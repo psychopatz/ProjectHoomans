@@ -76,7 +76,7 @@ local directives = io.open(
 local dirText = directives and directives:read("*a") or ""
 if directives then directives:close() end
 local reactions = io.open(
-    "Contents/mods/ProjectHoomans/common/media/translation/EN/ConvoBlocks/beats/combat_horde_reactions.convo",
+    "Contents/mods/ProjectHoomans/common/media/translation/EN/ConvoBlocks/combat/combat_horde_reactions.convo",
     "r"
 )
 local reactText = reactions and reactions:read("*a") or ""

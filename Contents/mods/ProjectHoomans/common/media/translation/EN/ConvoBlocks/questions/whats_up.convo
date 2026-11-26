@@ -2,17 +2,17 @@
 language EN
 namespace hoomans
 
-flow semantic.question.whats_up
-  say [subject=CONVERSATION_TOPIC, npc.fed_up] (priority 11) as fed_up:
+dialogue semantic.question.whats_up
+  say [subject=CONVERSATION_TOPIC, npc.fed_up] as fed_up:
     "Nothing's changed since you just asked!"
-  say [subject=CONVERSATION_TOPIC, mood.bored] (priority 9) as bored:
+  say [subject=CONVERSATION_TOPIC, mood.bored] as bored:
     "Not much—honestly bored out of my mind. {?clause.world_pressure}"
-  say [subject=CONVERSATION_TOPIC, environment.raining] (priority 8) as weather:
+  say [subject=CONVERSATION_TOPIC, environment.raining] as weather:
     "The weather is the main thing on my mind right now. {?clause.rain_note}"
-  say [subject=CONVERSATION_TOPIC, actor.activity=traveling] (priority 8) as traveling:
+  say [subject=CONVERSATION_TOPIC, actor.activity=traveling] as traveling:
     "I'm keeping moving and watching what is ahead. {?clause.night_warning}"
-  say [subject=CONVERSATION_TOPIC, actor.busy] (priority 8) as busy:
+  say [subject=CONVERSATION_TOPIC, actor.busy] as busy:
     "I'm keeping busy and trying to stay useful. {?clause.world_pressure}"
-  say [subject=CONVERSATION_TOPIC] (priority 6) as default:
+  say [subject=CONVERSATION_TOPIC] as default:
     "Not much. I'm just trying to keep things together. {?mood.tail} {?clause.world_pressure}"
     "Same as ever. Staying alive and watching the {noun.road}. {?clause.world_pressure}"

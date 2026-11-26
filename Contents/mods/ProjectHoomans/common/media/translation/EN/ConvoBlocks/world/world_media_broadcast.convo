@@ -2,198 +2,198 @@
 language EN
 namespace hoomans
 
-flow semantic.world.media.broadcast
+dialogue semantic.world.media.broadcast
   # --- AEBS: Air Activity Detected (Chopper Warning) ---
-  say [role=aebs_air_activity_open] (priority 12) as aebs_air_activity_open:
+  say [role=aebs_air_activity_open] as aebs_air_activity_open:
     "Hold up, {addressee.name}! Did you catch {slot.broadcast.episode} on {slot.broadcast.channel}? Air activity detected means a chopper is coming!"
     "Listen to {slot.broadcast.channel}, {addressee.name}! Air activity warning. We need a solid roof nearby today."
-  say [role=aebs_air_activity_reply] (priority 12) as aebs_air_activity_reply:
+  say [role=aebs_air_activity_reply] as aebs_air_activity_reply:
     "Yeah, I heard it, {addressee.name}. If that helicopter spots us in the open, it'll drag every walker in the county right on top of us."
-  say [role=aebs_air_activity_chime] (priority 12) as aebs_air_activity_chime:
+  say [role=aebs_air_activity_chime] as aebs_air_activity_chime:
     "Let's keep our runs short and stay close to buildings until it passes."
-  say [role=aebs_air_activity_wrap] (priority 12) as aebs_air_activity_wrap:
+  say [role=aebs_air_activity_wrap] as aebs_air_activity_wrap:
     "Good thing we had the emergency frequency tuned in. Stay sharp."
 
   # --- AEBS: Power Grid Warning ---
-  say [role=aebs_power_warning_open] (priority 12) as aebs_power_warning_open:
+  say [role=aebs_power_warning_open] as aebs_power_warning_open:
     "Bad news on {slot.broadcast.channel}, {addressee.name}. {slot.broadcast.episode} says the power grid is starting to fail."
-  say [role=aebs_power_warning_reply] (priority 12) as aebs_power_warning_reply:
+  say [role=aebs_power_warning_reply] as aebs_power_warning_reply:
     "Means the lights and fridges are on borrowed time, {addressee.name}. We should cook perishables and hunt for a generator."
-  say [role=aebs_power_warning_chime] (priority 12) as aebs_power_warning_chime:
+  say [role=aebs_power_warning_chime] as aebs_power_warning_chime:
     "Don't forget fuel cans and a manual if we find one. Dark nights are gonna get a lot rougher."
-  say [role=aebs_power_warning_wrap] (priority 12) as aebs_power_warning_wrap:
+  say [role=aebs_power_warning_wrap] as aebs_power_warning_wrap:
     "At least we got a heads-up before everything went dark."
 
   # --- AEBS: Weather Forecast ---
-  say [role=aebs_weather_warning_open] (priority 11) as aebs_weather_warning_open:
+  say [role=aebs_weather_warning_open] as aebs_weather_warning_open:
     "Catch that on {slot.broadcast.channel}, {addressee.name}? {slot.broadcast.episode} says rough weather is heading our way."
-  say [role=aebs_weather_warning_reply] (priority 11) as aebs_weather_warning_reply:
+  say [role=aebs_weather_warning_reply] as aebs_weather_warning_reply:
     "Appreciate the warning, {addressee.name}. Let's pack warm layers and plan a dry place to hole up."
-  say [role=aebs_weather_warning_chime] (priority 11) as aebs_weather_warning_chime:
+  say [role=aebs_weather_warning_chime] as aebs_weather_warning_chime:
     "Fighting the dead in a storm is miserable. Better to be ready early."
-  say [role=aebs_weather_warning_wrap] (priority 11) as aebs_weather_warning_wrap:
+  say [role=aebs_weather_warning_wrap] as aebs_weather_warning_wrap:
     "Keep that emergency channel handy, it's the only honest forecast left."
 
   # --- Military Frequency (Classified M1A1) ---
-  say [role=military_comms_open] (priority 11) as military_comms_open:
+  say [role=military_comms_open] as military_comms_open:
     "Shh, {addressee.name}, listen to {slot.broadcast.channel}. That's military traffic, and it doesn't sound like they're holding."
-  say [role=military_comms_reply] (priority 11) as military_comms_reply:
+  say [role=military_comms_reply] as military_comms_reply:
     "If the army's falling back on {slot.broadcast.channel}, {addressee.name}, nobody's coming to rescue us."
-  say [role=military_comms_chime] (priority 11) as military_comms_chime:
+  say [role=military_comms_chime] as military_comms_chime:
     "At least now we know the truth instead of waiting for an evacuation that's never coming."
-  say [role=military_comms_wrap] (priority 11) as military_comms_wrap:
+  say [role=military_comms_wrap] as military_comms_wrap:
     "We rely on ourselves from here on out."
 
   # --- Amateur / Survivor Radio ---
-  say [role=survivor_radio_open] (priority 11) as survivor_radio_open:
+  say [role=survivor_radio_open] as survivor_radio_open:
     "Wait, {addressee.name}! Someone's talking on {slot.broadcast.channel}. There are still other people out there."
-  say [role=survivor_radio_reply] (priority 11) as survivor_radio_reply:
+  say [role=survivor_radio_reply] as survivor_radio_reply:
     "Hard to tell how far away they are, {addressee.name}, or whether they're friendly."
-  say [role=survivor_radio_chime] (priority 11) as survivor_radio_chime:
+  say [role=survivor_radio_chime] as survivor_radio_chime:
     "Still... feels a little less lonely hearing live voices on the air."
-  say [role=survivor_radio_wrap] (priority 11) as survivor_radio_wrap:
+  say [role=survivor_radio_wrap] as survivor_radio_wrap:
     "Keep listening, we might learn which roads are still clear."
 
   # --- Outbreak News (Triple-N, WBLN, GBC, LBMW, NNR, KnoxTalk) ---
-  say [role=news_outbreak_open] (priority 11) as news_outbreak_open:
+  say [role=news_outbreak_open] as news_outbreak_open:
     "Look at {slot.broadcast.channel}, {addressee.name}. Hearing {slot.broadcast.topic} makes it feel all too real."
     "Did you hear what {slot.broadcast.channel} just reported about {slot.broadcast.topic}, {addressee.name}? Things are falling apart fast."
-  say [role=news_outbreak_reply] (priority 11) as news_outbreak_reply:
+  say [role=news_outbreak_reply] as news_outbreak_reply:
     "Half of what they're saying on {slot.broadcast.channel} is already behind what we've seen on the streets, {addressee.name}."
-  say [role=news_outbreak_chime] (priority 11) as news_outbreak_chime:
+  say [role=news_outbreak_chime] as news_outbreak_chime:
     "Still worth watching while the signal lasts. Any clue about what's happening outside Knox helps."
-  say [role=news_outbreak_wrap] (priority 11) as news_outbreak_wrap:
+  say [role=news_outbreak_wrap] as news_outbreak_wrap:
     "Yeah. Let's stay focused on surviving right here."
 
   # --- General News ---
-  say [role=news_general_open] (priority 10) as news_general_open:
+  say [role=news_general_open] as news_general_open:
     "Still getting a signal from {slot.broadcast.channel}, {addressee.name}. Let's see what they're saying."
-  say [role=news_general_reply] (priority 10) as news_general_reply:
+  say [role=news_general_reply] as news_general_reply:
     "Good call, {addressee.name}. Never know when something actually useful slips through."
-  say [role=news_general_chime] (priority 10) as news_general_chime:
+  say [role=news_general_chime] as news_general_chime:
     "Just keep the volume reasonable so we don't draw company."
-  say [role=news_general_wrap] (priority 10) as news_general_wrap:
+  say [role=news_general_wrap] as news_general_wrap:
     "Fair point. Ears open."
 
   # --- Skill Shows & Life and Living / Skill VHS ---
-  say [role=tv_watching_life_and_living_open] (priority 10) as tv_watching_life_and_living_open:
+  say [role=tv_watching_life_and_living_open] as tv_watching_life_and_living_open:
     "Catching {slot.show.name} on {slot.broadcast.channel}, {addressee.name}. Might actually pick up something useful."
-  say [role=tv_watching_life_and_living_reply] (priority 10) as tv_watching_life_and_living_reply:
+  say [role=tv_watching_life_and_living_reply] as tv_watching_life_and_living_reply:
     "Smart move, {addressee.name}. {slot.show.name} always has practical tips we can use out here."
-  say [role=tv_watching_life_and_living_chime] (priority 10) as tv_watching_life_and_living_chime:
+  say [role=tv_watching_life_and_living_chime] as tv_watching_life_and_living_chime:
     "Take notes while we still have power. Half of survival is knowing how to fix and build things."
-  say [role=tv_watching_life_and_living_wrap] (priority 10) as tv_watching_life_and_living_wrap:
+  say [role=tv_watching_life_and_living_wrap] as tv_watching_life_and_living_wrap:
     "Beats learning the hard way, that's for sure."
 
   # --- Home VHS ---
-  say [role=home_vhs_open] (priority 10) as home_vhs_open:
+  say [role=home_vhs_open] as home_vhs_open:
     "Whoa... {slot.show.name} is somebody's home tape, {addressee.name}. Feels strange peeking into their old life."
-  say [role=home_vhs_reply] (priority 10) as home_vhs_reply:
+  say [role=home_vhs_reply] as home_vhs_reply:
     "Yeah, {addressee.name}. Makes you wonder if they made it out alright."
-  say [role=home_vhs_chime] (priority 10) as home_vhs_chime:
+  say [role=home_vhs_chime] as home_vhs_chime:
     "Hard to believe how normal everything looked just weeks ago."
-  say [role=home_vhs_wrap] (priority 10) as home_vhs_wrap:
+  say [role=home_vhs_wrap] as home_vhs_wrap:
     "Let's keep moving when we're done. Don't want to get lost in the past."
 
   # --- Music Radio / Music TV / CDs ---
-  say [role=music_radio_open] (priority 10) as music_radio_open:
+  say [role=music_radio_open] as music_radio_open:
     "Hey, {slot.show.name} is playing, {addressee.name}. Forgot how good a little music feels."
-  say [role=music_radio_reply] (priority 10) as music_radio_reply:
+  say [role=music_radio_reply] as music_radio_reply:
     "No kidding, {addressee.name}. Beats listening to groaning walkers all day."
-  say [role=music_radio_chime] (priority 10) as music_radio_chime:
+  say [role=music_radio_chime] as music_radio_chime:
     "Just don't crank it so loud the whole neighborhood dances over here."
-  say [role=music_radio_wrap] (priority 10) as music_radio_wrap:
+  say [role=music_radio_wrap] as music_radio_wrap:
     "Hah, deal. Low volume, high morale."
 
   # --- Entertainment TV / Movies / Sports / Cartoons ---
-  say [role=tv_watching_show_open] (priority 9) as tv_watching_show_open:
+  say [role=tv_watching_show_open] as tv_watching_show_open:
     "Keeping an eye on {slot.show.name}, {addressee.name}. Feels surreal watching TV like nothing happened."
-  say [role=tv_watching_show_reply] (priority 9) as tv_watching_show_reply:
+  say [role=tv_watching_show_reply] as tv_watching_show_reply:
     "Honestly, {addressee.name}, five minutes of {slot.show.name} is a nice break from reality."
-  say [role=tv_watching_show_chime] (priority 9) as tv_watching_show_chime:
+  say [role=tv_watching_show_chime] as tv_watching_show_chime:
     "Enjoy it while the signal holds. Won't last forever."
-  say [role=tv_watching_show_wrap] (priority 9) as tv_watching_show_wrap:
+  say [role=tv_watching_show_wrap] as tv_watching_show_wrap:
     "True enough. Let's catch our breath and stay ready."
 
   # --- Open World Band: Looter Trap Warning ---
-  say [role=open_band_looter_trap_open] (priority 12) as ob_looter_open:
+  say [role=open_band_looter_trap_open] as ob_looter_open:
     "Don't buy a word of that broadcast, {addressee.name}. Free supplies and 'come alone' screams ambush."
-  say [role=open_band_looter_trap_reply] (priority 12) as ob_looter_reply:
+  say [role=open_band_looter_trap_reply] as ob_looter_reply:
     "Yeah, {addressee.name}, nobody hands out free food to strangers out here unless they're setting a trap."
-  say [role=open_band_looter_trap_chime] (priority 12) as ob_looter_chime:
+  say [role=open_band_looter_trap_chime] as ob_looter_chime:
     "If we ever go near them, we go armed and we don't walk in blind."
-  say [role=open_band_looter_trap_wrap] (priority 12) as ob_looter_wrap:
+  say [role=open_band_looter_trap_wrap] as ob_looter_wrap:
     "Agreed. Keep our distance unless we're ready for a fight."
 
   # --- Open World Band: Trader Caravan ---
-  say [role=open_band_trader_open] (priority 12) as ob_trader_open:
+  say [role=open_band_trader_open] as ob_trader_open:
     "Did you hear that on {slot.broadcast.channel}, {addressee.name}? Sounds like a trader caravan is passing through."
-  say [role=open_band_trader_reply] (priority 12) as ob_trader_reply:
+  say [role=open_band_trader_reply] as ob_trader_reply:
     "Could be worth checking out, {addressee.name}. Extra tools, batteries, or medicine are hard to come by."
-  say [role=open_band_trader_chime] (priority 12) as ob_trader_chime:
+  say [role=open_band_trader_chime] as ob_trader_chime:
     "Let's check what we can spare to barter before we head their way."
-  say [role=open_band_trader_wrap] (priority 12) as ob_trader_wrap:
+  say [role=open_band_trader_wrap] as ob_trader_wrap:
     "Good call. Keep weapons slung, stay polite, and watch their hands."
 
   # --- Open World Band: Refugee Mayday ---
-  say [role=open_band_refugee_open] (priority 12) as ob_refugee_open:
+  say [role=open_band_refugee_open] as ob_refugee_open:
     "Rough call on {slot.broadcast.channel}, {addressee.name}. Sounds like a group of wounded refugees asking for help."
-  say [role=open_band_refugee_reply] (priority 12) as ob_refugee_reply:
+  say [role=open_band_refugee_reply] as ob_refugee_reply:
     "Hate hearing families stuck out there like that, {addressee.name}. If we can spare medicine, maybe we should look for them."
-  say [role=open_band_refugee_chime] (priority 12) as ob_refugee_chime:
+  say [role=open_band_refugee_chime] as ob_refugee_chime:
     "Just be careful if we go. Desperate people can still get spooked easily."
-  say [role=open_band_refugee_wrap] (priority 12) as ob_refugee_wrap:
+  say [role=open_band_refugee_wrap] as ob_refugee_wrap:
     "Fair point. If we help them, we approach slow and announce ourselves."
 
   # --- Open World Band: Settlement Enclave ---
-  say [role=open_band_settlement_open] (priority 12) as ob_settle_open:
+  say [role=open_band_settlement_open] as ob_settle_open:
     "Whoa, listen to {slot.broadcast.channel}, {addressee.name}. Sounds like a real settlement with a working perimeter."
-  say [role=open_band_settlement_reply] (priority 12) as ob_settle_reply:
+  say [role=open_band_settlement_reply] as ob_settle_reply:
     "They sounded serious about identifying ourselves on approach, {addressee.name}. At least they're organized."
-  say [role=open_band_settlement_chime] (priority 12) as ob_settle_chime:
+  say [role=open_band_settlement_chime] as ob_settle_chime:
     "Knowing there's an enclave holding out nearby gives us options if we need allies."
-  say [role=open_band_settlement_wrap] (priority 12) as ob_settle_wrap:
+  say [role=open_band_settlement_wrap] as ob_settle_wrap:
     "Let's remember where they're broadcasting from. Could come in handy."
 
   # --- Open World Band: On-Air Argument / Faction Conflict ---
-  say [role=open_band_conflict_open] (priority 11) as ob_conflict_open:
+  say [role=open_band_conflict_open] as ob_conflict_open:
     "Hah, listen to them going at each other on {slot.broadcast.channel}, {addressee.name}. Even the apocalypse doesn't stop people from bickering."
-  say [role=open_band_conflict_reply] (priority 11) as ob_conflict_reply:
+  say [role=open_band_conflict_reply] as ob_conflict_reply:
     "Sounds like rival groups fighting over supplies, {addressee.name}. Better them than us."
-  say [role=open_band_conflict_chime] (priority 11) as ob_conflict_chime:
+  say [role=open_band_conflict_chime] as ob_conflict_chime:
     "At least they're broadcasting their drama so we know who to steer clear of."
-  say [role=open_band_conflict_wrap] (priority 11) as ob_conflict_wrap:
+  say [role=open_band_conflict_wrap] as ob_conflict_wrap:
     "Yeah. Let's stay out of their crossfire."
 
   # --- Vanilla Hidden Arc: Classified M1A1 Numbers Station ---
-  say [role=numbers_station_open] (priority 12) as num_stat_open:
+  say [role=numbers_station_open] as num_stat_open:
     "What the hell is that on {slot.broadcast.channel}, {addressee.name}? Just numbers and callsigns repeating..."
-  say [role=numbers_station_reply] (priority 12) as num_stat_reply:
+  say [role=numbers_station_reply] as num_stat_reply:
     "Gives me the creeps, {addressee.name}. Either it's an automated military loop or somebody's still sending coded orders."
-  say [role=numbers_station_chime] (priority 12) as num_stat_chime:
+  say [role=numbers_station_chime] as num_stat_chime:
     "Whatever it is, it's not meant for regular folks like us."
-  say [role=numbers_station_wrap] (priority 12) as num_stat_wrap:
+  say [role=numbers_station_wrap] as num_stat_wrap:
     "Yeah, let's tune past it before it gets in my head."
 
   # --- Vanilla Hidden Arc: Civilian Radio Cannibals ---
-  say [role=cannibal_radio_open] (priority 12) as cann_rad_open:
+  say [role=cannibal_radio_open] as cann_rad_open:
     "Turn that down, {addressee.name}... did you hear how they were talking about people on {slot.broadcast.channel}?"
-  say [role=cannibal_radio_reply] (priority 12) as cann_rad_reply:
+  say [role=cannibal_radio_reply] as cann_rad_reply:
     "That made my stomach turn, {addressee.name}. Some folks lost their humanity way faster than the dead did."
-  say [role=cannibal_radio_chime] (priority 12) as cann_rad_chime:
+  say [role=cannibal_radio_chime] as cann_rad_chime:
     "We ever run into people like that, we don't hesitate. Keep our guard up."
-  say [role=cannibal_radio_wrap] (priority 12) as cann_rad_wrap:
+  say [role=cannibal_radio_wrap] as cann_rad_wrap:
     "Stay close to each other. The dead aren't the only monsters out here."
 
   # --- Vanilla Hidden Arc: NNR Radio Doomsday Pastor ---
-  say [role=pastor_radio_open] (priority 11) as past_rad_open:
+  say [role=pastor_radio_open] as past_rad_open:
     "Listen to that preacher on {slot.broadcast.channel}, {addressee.name}. Guy's still broadcasting sermons into the void."
-  say [role=pastor_radio_reply] (priority 11) as past_rad_reply:
+  say [role=pastor_radio_reply] as past_rad_reply:
     "Can't blame people for looking for meaning when the whole world collapses, {addressee.name}."
-  say [role=pastor_radio_chime] (priority 11) as past_rad_chime:
+  say [role=pastor_radio_chime] as past_rad_chime:
     "Faith is fine, just as long as we keep our blades sharp too."
-  say [role=pastor_radio_wrap] (priority 11) as past_rad_wrap:
+  say [role=pastor_radio_wrap] as past_rad_wrap:
     "Amen to that. Let's stay practical."
 
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Still catching a signal on that broadcast."

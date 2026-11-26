@@ -2,23 +2,23 @@
 language EN
 namespace hoomans
 
-flow semantic.question.wellbeing.unknown
-  say [default] (priority 5) as default:
+dialogue semantic.question.wellbeing.unknown
+  say [default] as default:
     "I'm not sure how I'm doing right now."
 
-flow semantic.question.wellbeing.follow_up
-  say [emotion.type=panic, emotion.urgency=critical|emergency] (priority 9) as panic:
+dialogue semantic.question.wellbeing.follow_up
+  say [emotion.type=panic, emotion.urgency=critical|emergency] as panic:
     "I'm still pretty shaken up{end}"
-  say [emotion.type=stress, emotion.urgency=critical|emergency] (priority 8) as stress:
+  say [emotion.type=stress, emotion.urgency=critical|emergency] as stress:
     "I'm still tense and having trouble settling down."
-  say [actor.health=injured|wounded|critical] (priority 7) as injured:
+  say [actor.health=injured|wounded|critical] as injured:
     "I took a {adj.hit} hit. It's still bothering me."
-  say [actor.health=unknown] (priority 6) as unknown:
+  say [actor.health=unknown] as unknown:
     "I don't have enough detail to say what's wrong yet."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "I don't have enough detail to say what's wrong yet."
 
-flow semantic.self_state
-  say [subject=WELLBEING] (priority 7) as wellbeing:
+dialogue semantic.self_state
+  say [subject=WELLBEING] as wellbeing:
     "I'm glad to hear it. Thanks for checking in."
     "That's good to hear. I appreciate you asking."

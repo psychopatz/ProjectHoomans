@@ -1,0 +1,184 @@
+# Interactive branching gossip story: TV, VHS, skill shows, and music broadcasts.
+# Actor-agnostic: players choose via UI; NPCs score choices via `ai_bias` + personality + mood + relationship.
+# Each `reply [when]:` block owns asymmetric `approval` / `respect` / `familiarity` / `morale` outcomes
+# so everyday chatter naturally breeds friendships, rivalries, or conflicts.
+language EN
+namespace hoomans
+
+story convo.gossip.media
+  trigger intent=INFORM, subject=MEDIA_GOSSIP
+  guard safe_to_talk
+
+  say [topic=skill_show, actor.social_style=warm|friendly|protective]:
+    "Watched {slot.show.name} on {slot.broadcast.channel} {slot.gossip_time}! Actually picked up some really useful tricks."
+  say [topic=skill_show, actor.social_style=guarded|withdrawn|hostile]:
+    "Caught {slot.show.name} {slot.gossip_time}. Half of TV advice is too clean for the real world, though a couple tips might hold up."
+  say [topic=skill_show]:
+    "Caught {slot.show.name} {slot.gossip_time}—could come in handy next time we build or repair something."
+  say [topic=home_vhs, actor.social_style=warm|friendly|protective]:
+    "Watched {slot.show.name} {slot.gossip_time}. Strange how comforting it is seeing ordinary life again."
+  say [topic=home_vhs, actor.social_style=guarded|withdrawn|hostile]:
+    "Watched {slot.show.name} {slot.gossip_time}. Honestly just depressing staring at ghosts of the old world."
+  say [topic=home_vhs]:
+    "Watched {slot.show.name} {slot.gossip_time}. Weird peeking into somebody else's tape."
+  say [topic=music_radio, actor.social_style=warm|friendly|protective]:
+    "Caught {slot.show.name} playing {slot.gossip_time}. Really lifted my mood hearing real music again."
+  say [topic=music_radio]:
+    "Caught {slot.show.name} playing {slot.gossip_time}. Nice break from all the static."
+  say [default]:
+    "Caught {slot.show.name} {slot.gossip_time}. Nice to forget about the {noun.zombie|s} for five minutes."
+
+    choice positive (intent=AGREE, subject=MEDIA_GOSSIP, utility=openness, ai_bias=compassion+|sociability+|warm+|cheerful+|friend+, tone=warm):
+      label: "Agree — it's good for morale"
+      say: "Honestly, holding onto little pieces of normal life keeps us sane."
+
+      reply [actor.social_style=warm|friendly|protective]:
+        "Right? Feels good knowing you see it the same way, {term.address}."
+        "Glad it's not just me, {term.address}. We need moments like that."
+        do relationship.approval +3
+        do relationship.familiarity +2
+        do morale +3
+
+        choice positive_apply (intent=SUGGEST, subject=PLAN, utility=openness, ai_bias=sociability+|loyalty+):
+          label: "Let's put what we saw to use"
+          say: "Next quiet hour we get, let's test those tips around camp."
+          reply [default]:
+            "Deal, {term.address}. Better to practice before we actually need it."
+            do relationship.respect +2
+            do relationship.approval +1
+            end
+
+        choice positive_reminisce (intent=INFORM, subject=SOCIAL, utility=compassion, ai_bias=compassion+|warm+|friend+):
+          label: "Share an old-world memory"
+          say: "Reminds me of lazy evenings before everything went sideways."
+          reply [default]:
+            "Yeah... feels like a lifetime ago, {term.address}. Thanks for talking."
+            do relationship.approval +3
+            do relationship.familiarity +2
+            do mood.calm
+            end
+
+      reply [actor.style=tactical|cold]:
+        "Morale's fine, long as nobody forgets to check the locks."
+        do relationship.familiarity +1
+        do mood.calm
+        end
+
+      reply [actor.style=aggressive|hostile]:
+        "Soft talk won't keep the dead off the fence, {term.address}."
+        do relationship.approval -2
+        do relationship.respect -1
+        end
+
+      reply [default]:
+        "Yeah, {term.address}. Five minutes of quiet goes a long way."
+        do relationship.approval +1
+        do relationship.familiarity +1
+        do mood.cheerful
+        end
+
+    choice neutral (intent=CLARIFY, subject=MEDIA_GOSSIP, utility=caution, ai_bias=guarded+|tactical+|sociability-, tone=neutral):
+      label: "Keep it practical — watch the noise"
+      say: "Nice to catch a break, just keep the volume low so we don't draw company."
+
+      reply [actor.style=tactical|cold]:
+        "Way ahead of you, {term.address}. Volume down, curtains drawn."
+        do relationship.respect +2
+        do relationship.familiarity +1
+        do mood.calm
+        end
+
+      reply [actor.social_style=guarded|withdrawn]:
+        "Fair point. I keep it barely above a whisper anyway."
+        do relationship.respect +1
+        do relationship.approval +1
+        do mood.calm
+        end
+
+      reply [default]:
+        "Fair call, {term.address}. Headphones or low volume only."
+        do relationship.familiarity +1
+        do mood.calm
+        end
+
+    choice negative (intent=DISAGREE, subject=MEDIA_GOSSIP, utility=assertive, ai_bias=aggression+|bravery+|compassion-|stressed+|rival+, tone=guarded):
+      label: "Push back — waste of power and risky"
+      say: "Feels like a waste of power watching old tapes while the world burns."
+
+      reply [actor.style=tactical|cold]:
+        "Finally someone thinking straight. Power's too precious for reruns."
+        do relationship.respect +3
+        do relationship.approval +1
+        do relationship.familiarity +1
+        do guard_perimeter
+        end
+
+      reply [actor.style=aggressive|hostile, mood.stressed]:
+        "Nobody asked for a lecture, {term.address}. Mind your own watch."
+        do relationship.approval -4
+        do relationship.respect -1
+        do morale -2
+
+        choice deescalate (intent=APOLOGIZE, subject=SOCIAL, utility=forgiveness, ai_bias=forgiveness+|compassion+|sociability+):
+          label: "Back off — keep the peace"
+          say: "Alright, fair enough. Didn't mean to jump down your throat."
+          reply [default]:
+            "Yeah. Well—just let me breathe for five minutes."
+            do relationship.approval +2
+            do relationship.respect +1
+            do mood.calm
+            end
+
+        choice double_down (intent=INSULT, subject=CONFLICT, utility=assertive, ai_bias=aggression+|bravery+|forgiveness-|rival+):
+          label: "Stand your ground"
+          say: "If a loud tape gets us overrun, it is my business."
+          reply [default]:
+            "Unbelievable. Stay out of my way, {term.address}."
+            do relationship.approval -5
+            do relationship.respect +1
+            do morale -3
+            end
+
+      reply [actor.social_style=warm|friendly|protective]:
+        "That's pretty cold, {term.address}. People still need something to keep going."
+        do relationship.approval -3
+        do morale -2
+        end
+
+      reply [actor.style=shaken|exhausted]:
+        "Look, I just needed five minutes not thinking about the {noun.zombie|s}, alright?"
+        do relationship.approval -2
+        do morale -3
+        do mood.stressed
+        end
+
+      reply [default]:
+        "Suit yourself, {term.address}. I'll keep watch instead."
+        do relationship.approval -1
+        do relationship.respect +1
+        do guard_perimeter
+        end
+
+    choice tactical [actor.style=tactical] (intent=SUGGEST, subject=PLAN, utility=caution, ai_bias=tactical+|bravery+|loyalty+, tone=tactical):
+      label: "Tactical angle — log useful intel"
+      say: "Anything practical in that broadcast we can turn into a real advantage?"
+
+      reply [actor.style=tactical|brave]:
+        "Smart thinking, {term.address}. Caught a couple tricks we can use on our next run."
+        do relationship.respect +3
+        do relationship.approval +1
+        recommend convo.travel_excursion
+        end
+
+      reply [actor.social_style=warm|friendly]:
+        "Always thinking two steps ahead, huh? Yeah, a couple things looked solid."
+        do relationship.respect +2
+        do relationship.familiarity +1
+        recommend convo.travel_excursion
+        end
+
+      reply [default]:
+        "Maybe a thing or two, {term.address}. Worth keeping in mind next run."
+        do relationship.respect +1
+        do relationship.familiarity +1
+        end

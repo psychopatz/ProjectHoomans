@@ -1,0 +1,55 @@
+# Nested branching story: camp rest break with follow-up sub-choices and server-safe `do` actions.
+language EN
+namespace hoomans
+
+story convo.camp_rest_break
+  trigger intent=SUGGEST, subject=REST
+  guard safe_to_talk
+
+  say [mood.tired]:
+    "I'm beat, {term.address}. Think we can set up camp here for a bit?"
+    "Running on fumes, {term.address}—mind if we hold up here and rest?"
+
+    choice 1 (intent=ACCEPT, subject=REST, tone=warm):
+      label: "Sure, let's camp here"
+      say: "Alright, take a breather—I'll watch the perimeter."
+      reply:
+        "Thanks, {term.address}. Setting up for a quick breather."
+        "Appreciate it, {term.address}. Won't take long."
+      do camp
+      do relationship.trust +1
+
+      choice 1a [any.injured] (intent=OFFER, subject=MEDICAL):
+        label: "Let me check your wounds first"
+        say: "Hold still—let me check that wound before you sit."
+        reply:
+          "Good call, {term.address}. It's been stinging since that last fight."
+        do medical.check_wounds
+        end
+
+      choice 1b (intent=INFORM, subject=WATCH):
+        label: "I'll take first watch"
+        say: "Get some shut-eye. I've got first watch."
+        reply:
+          "You're a lifesaver, {term.address}."
+        do relationship.trust +1
+        end
+
+    choice 2 [environment.night_or_dusk] (intent=DEFER, subject=REST, tone=cautious):
+      label: "Too dark here—let's find a house"
+      say: "Too exposed in {noun.dark}. Let's push to the next building first."
+      reply:
+        "Fair point, {term.address}. Lead the way—I'll stay close."
+      do follow
+      recommend convo.travel_excursion
+      end
+
+    choice 3 (intent=REFUSE, subject=REST, tone=firm):
+      label: "No time, keep moving"
+      say: "Can't stop right now. Keep moving."
+      reply [npc.annoyed]:
+        "Unbelievable... fine, {term.address}. Don't blame me if I slow us down."
+      reply [default]:
+        "Copy that, {term.address}. Staying right behind you."
+      do relationship.trust -1
+      end

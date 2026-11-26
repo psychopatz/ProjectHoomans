@@ -11,6 +11,19 @@ local Relation = PsychopatzCore
     or require "PsychopatzCore/Spatial/PsychopatzSpatialRelation"
 
 Projection.DEFAULT_MAX_THREAT_AGE_MS = 2000
+-- Project Zomboid uses a fixed isometric camera looking toward Northwest (-X, -Y):
+--   Screen UP    = NW (-0.7071, -0.7071) -> AHEAD / 12 o'clock
+--   Screen RIGHT = NE (+0.7071, -0.7071) -> RIGHT / 3 o'clock
+--   Screen DOWN  = SE (+0.7071, +0.7071) -> BEHIND / 6 o'clock
+--   Screen LEFT  = SW (-0.7071, +0.7071) -> LEFT / 9 o'clock
+-- Defaulting combat callouts to "screen" prevents left/right inversion whenever
+-- an NPC happens to be facing downward/toward the camera.
+Projection.DEFAULT_REFERENCE_FRAME = "screen"
+Projection.ISOMETRIC_SCREEN_HEADING = {
+    x = -0.7071067811865476,
+    y = -0.7071067811865476,
+    source = "isometric_screen",
+}
 
 local function finite(value)
     local number = tonumber(value)
@@ -71,14 +84,27 @@ function Projection.Project(record, threat, options)
 
     local body = resolveBody(record, options)
     local origin, originSource = observerPoint(record, body)
-    local heading, headingReason = Facing.Resolve(record, {
-        body = body,
-        now = now,
-        allowCached = options.allowCachedFacing,
-        maxCachedAgeMs = options.maxCachedFacingAgeMs,
-    })
-    if not heading then
-        return nil, headingReason or "HEADING_UNAVAILABLE"
+    local referenceFrame = tostring(options.referenceFrame or Projection.DEFAULT_REFERENCE_FRAME)
+    local heading, headingReason
+    if referenceFrame == "heading" or referenceFrame == "body" then
+        heading, headingReason = Facing.Resolve(record, {
+            body = body,
+            now = now,
+            allowCached = options.allowCachedFacing,
+            maxCachedAgeMs = options.maxCachedFacingAgeMs,
+        })
+        if not heading then
+            return nil, headingReason or "HEADING_UNAVAILABLE"
+        end
+    else
+        referenceFrame = "screen"
+        heading = {
+            x = Projection.ISOMETRIC_SCREEN_HEADING.x,
+            y = Projection.ISOMETRIC_SCREEN_HEADING.y,
+            source = Projection.ISOMETRIC_SCREEN_HEADING.source,
+            observedAt = now,
+            ageMs = 0,
+        }
     end
 
     local target = {
@@ -86,15 +112,27 @@ function Projection.Project(record, threat, options)
         y = threat.y,
         z = threat.z ~= nil and threat.z or record.z or 0,
     }
-    local relation, relationReason = Relation.RelativeToHeading(
-        origin,
-        target,
-        { x = heading.x, y = heading.y },
-        {
-            sameAreaThreshold = options.sameAreaThreshold,
-            distanceBands = options.distanceBands,
-        }
-    )
+    local relation, relationReason
+    if referenceFrame == "screen" and type(Relation.RelativeToIsometricScreen) == "function" then
+        relation, relationReason = Relation.RelativeToIsometricScreen(
+            origin,
+            target,
+            {
+                sameAreaThreshold = options.sameAreaThreshold,
+                distanceBands = options.distanceBands,
+            }
+        )
+    else
+        relation, relationReason = Relation.RelativeToHeading(
+            origin,
+            target,
+            { x = heading.x, y = heading.y },
+            {
+                sameAreaThreshold = options.sameAreaThreshold,
+                distanceBands = options.distanceBands,
+            }
+        )
+    end
     if not relation then return nil, relationReason end
 
     local ageMs
@@ -107,6 +145,7 @@ function Projection.Project(record, threat, options)
         targetRef = threat.id or threat.ref,
         targetPositionSource = threat.positionSource or "provided",
         observerPositionSource = originSource,
+        referenceFrame = referenceFrame,
         headingSource = heading.source,
         headingObservedAt = heading.observedAt,
         headingAgeMs = heading.ageMs,

@@ -3,19 +3,19 @@ language EN
 namespace hoomans
 
 blueprint offer.medical_distress_nudges
-  offer medical.what_happened:
+  choice medical.what_happened:
     label: "What happened?"
     say: "What happened?"
     utility: directness
     intent: QUESTION
     subject: CONTEXT_REFERENCE
-  offer medical.who_hurt_you:
+  choice medical.who_hurt_you:
     label: "Who hurt you?"
     say: "Who hurt you?"
     utility: directness
     intent: QUESTION
     subject: CONTEXT_REFERENCE
-  offer medical.what_need:
+  choice medical.what_need:
     label: "What do you need?"
     say: "What do you need?"
     utility: openness

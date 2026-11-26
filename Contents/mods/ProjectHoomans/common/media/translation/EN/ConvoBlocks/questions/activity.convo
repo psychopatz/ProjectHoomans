@@ -3,49 +3,49 @@ language EN
 namespace hoomans
 
 lexicon clause.world_pressure
-  [world.food_crisis] (priority 9):  "With food running thin everywhere, nobody can afford to slack off." | "Supplies are getting tight out here."
-  [world.raider_surge] (priority 9): "Especially with raiders stirring up trouble on the roads." | "Not safe to let our guard down with raiders around."
-  [world.power_off] (priority 7):    "Everything takes twice as long with the power out." | "Grid being dead sure doesn't make it easier."
-  [world.water_off] (priority 7):    "Trying to stay ahead of the water shortage too."
+  [world.food_crisis]:  "With food running thin everywhere, nobody can afford to slack off." | "Supplies are getting tight out here."
+  [world.raider_surge]: "Especially with raiders stirring up trouble on the roads." | "Not safe to let our guard down with raiders around."
+  [world.power_off]:    "Everything takes twice as long with the power out." | "Grid being dead sure doesn't make it easier."
+  [world.water_off]:    "Trying to stay ahead of the water shortage too."
 
-flow semantic.question.activity
-  say [npc.fed_up] (priority 12) as activity_fed_up:
+dialogue semantic.question.activity
+  say [npc.fed_up] as activity_fed_up:
     "How many times are you going to ask me that? Same thing I was doing a minute ago!"
-  say [npc.fed_up, state.working] (priority 12) as activity_fed_up_working:
+  say [npc.fed_up, state.working] as activity_fed_up_working:
     "Seriously, stop hovering—you can see I'm still {state.job}!"
-  say [npc.annoyed, state.working] (priority 11) as activity_annoyed_working:
+  say [npc.annoyed, state.working] as activity_annoyed_working:
     "Still {state.job}, same as the last time you asked."
-  say [npc.annoyed] (priority 10) as activity_annoyed:
+  say [npc.annoyed] as activity_annoyed:
     "Still doing the same thing. Do you need something, or are you just checking up on me?"
-  say [mood.panicked] (priority 10) as activity_panicked:
+  say [mood.panicked] as activity_panicked:
     "Trying not to get killed right now! Keep your eyes open!"
-  say [mood.in_pain] (priority 10) as activity_in_pain:
+  say [mood.in_pain] as activity_in_pain:
     "Just trying to hold myself together—this pain isn't letting up."
-  say [state.sleeping] (priority 9) as sleeping:
+  say [state.sleeping] as sleeping:
     "Trying to catch some sleep... {?clause.night_warning}"
-  say [state.sitting, place.in_settlement] (priority 9) as sitting_settlement:
+  say [state.sitting, place.in_settlement] as sitting_settlement:
     "Just sitting down here at {place.name}, taking the weight off my feet. {?mood.tail} {?clause.world_pressure}"
-  say [state.sitting] (priority 8) as sitting:
+  say [state.sitting] as sitting:
     "Just sitting down for a bit—giving my legs a break. {?mood.tail} {?clause.night_warning}"
-  say [state.working, place.in_settlement] (priority 9) as working_settlement:
+  say [state.working, place.in_settlement] as working_settlement:
     "{?mood.opener} Busy {state.job} here at {place.name}{end} {?clause.world_pressure}"
-  say [state.working] (priority 8) as working_job:
+  say [state.working] as working_job:
     "{?mood.opener} Right now I'm {state.job}{end} {?mood.tail} {?clause.world_pressure}"
-  say [actor.activity=combat] (priority 8) as combat:
+  say [actor.activity=combat] as combat:
     "Keeping an eye on these {noun.zombie|s}{end}"
-  say [actor.activity=fishing] (priority 7) as fishing:
+  say [actor.activity=fishing] as fishing:
     "Fishing is a solid way to secure fresh food. {?clause.world_pressure}"
-  say [actor.activity=traveling] (priority 7) as traveling:
+  say [actor.activity=traveling] as traveling:
     "On the move down this {noun.road}. {?mood.tail} {?clause.night_warning}"
-  say [actor.activity=resting] (priority 7) as resting:
+  say [actor.activity=resting] as resting:
     "Taking a breather for a minute. {?mood.tail} {?clause.world_pressure}"
-  say [actor.activity=working] (priority 7) as working_generic:
+  say [actor.activity=working] as working_generic:
     "In the middle of some work right now. {?mood.tail} {?clause.world_pressure}"
-  say [mood.bored] (priority 7) as idle_bored:
+  say [mood.bored] as idle_bored:
     "Honestly? Just killing time and bored out of my mind. Got something for me to do?"
-  say [mood.unhappy] (priority 7) as idle_unhappy:
+  say [mood.unhappy] as idle_unhappy:
     "Nothing much... just trying to keep my head above water."
-  say [mood.cheerful] (priority 7) as idle_cheerful:
+  say [mood.cheerful] as idle_cheerful:
     "Just enjoying a quiet moment! Everything's looking alright for once."
-  say [default] (priority 6) as idle_default:
+  say [default] as idle_default:
     "Just doing what I can to keep things moving. {?mood.tail} {?clause.world_pressure}"

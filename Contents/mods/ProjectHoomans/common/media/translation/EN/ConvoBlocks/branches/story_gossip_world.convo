@@ -1,0 +1,168 @@
+# Interactive branching gossip story: World rumors, choppers, alarms, nearby fights & supplies.
+# Actor-agnostic: players choose via UI; NPCs score choices via `ai_bias` + personality + mood + relationship.
+# Asymmetric personality reactions drive organic friendship, rivalry, or escalation.
+language EN
+namespace hoomans
+
+story convo.gossip.world
+  trigger intent=INFORM, subject=GOSSIP
+  guard safe_to_talk
+
+  say [topic=chopper, actor.style=shaken]:
+    "You hear those rotors {slot.gossip_time}? That chopper's going to drag every {noun.zombie} in the county straight to us."
+  say [topic=chopper]:
+    "You hear those rotors {slot.gossip_time}? That chopper's going to drag every {noun.zombie} for miles."
+  say [topic=alarm]:
+    "Someone tripped a building alarm {slot.gossip_time}. Whole street lit up with {noun.zombie|s}."
+  say [topic=fight, actor.style=tactical|brave]:
+    "Shots rang out nearby {slot.gossip_time}. Either survivors holding ground or someone got jumped."
+  say [topic=fight]:
+    "Heard gunfire nearby {slot.gossip_time}. Someone's having a rough day out there."
+  say [default]:
+    "Word's going around {slot.gossip_time}—things are shifting fast out there."
+
+    choice positive (intent=AGREE, subject=GOSSIP, utility=compassion, ai_bias=compassion+|sociability+|warm+|friend+, tone=warm):
+      label: "Stay hopeful — check if anyone needs help"
+      say: "Thanks for telling me. If we stay sharp and stick together, we'll make it through."
+
+      reply [actor.social_style=warm|friendly|protective]:
+        "Needed to hear that, {term.address}. Good to know we're still looking out for people."
+        do relationship.approval +3
+        do relationship.familiarity +2
+        do morale +3
+
+        choice world_move_out (intent=SUGGEST, subject=FOLLOW, utility=assertive, ai_bias=bravery+|loyalty+|protective+):
+          label: "Move out together"
+          say: "Come on—stay on my six and let's check the perimeter."
+          reply [default]:
+            "Right behind you, {term.address}. Lead the way."
+            do follow
+            do relationship.respect +2
+            end
+
+        choice world_camp (intent=SUGGEST, subject=CAMP, utility=caution, ai_bias=caution+|tired+|guarded+):
+          label: "Hold position and rest up"
+          say: "No sense rushing into trouble. Let's hold up here and stay ready."
+          reply [default]:
+            "Smart call, {term.address}. Setting up camp right here."
+            do camp
+            do relationship.approval +1
+            do mood.calm
+            end
+
+      reply [actor.style=tactical|cold]:
+        "Hope's fine, {term.address}, just keep your head on a swivel."
+        do relationship.familiarity +1
+        do mood.calm
+        end
+
+      reply [actor.style=aggressive|hostile]:
+        "Other folks' problems aren't ours, {term.address}. Worry about our own necks."
+        do relationship.approval -2
+        do relationship.respect -1
+        end
+
+      reply [default]:
+        "Yeah, {term.address}. Sticking together's the only thing that's worked so far."
+        do relationship.approval +1
+        do relationship.familiarity +1
+        do mood.calm
+        end
+
+    choice neutral (intent=CLARIFY, subject=GOSSIP, utility=caution, ai_bias=guarded+|tactical+|sociability-, tone=neutral):
+      label: "Play it safe — stay quiet and observe"
+      say: "Let the dust settle before we stick our necks out. Keep eyes open and stay low."
+
+      reply [actor.style=tactical|cold]:
+        "Agreed, {term.address}. Patience keeps you alive."
+        do relationship.respect +2
+        do relationship.familiarity +1
+        do mood.calm
+        end
+
+      reply [actor.social_style=guarded|withdrawn]:
+        "Glad you think so. Last thing we need is walking into somebody else's mess."
+        do relationship.approval +1
+        do relationship.respect +1
+        do mood.calm
+        end
+
+      reply [default]:
+        "Works for me, {term.address}. No rush to walk into trouble."
+        do relationship.familiarity +1
+        do mood.calm
+        end
+
+    choice negative (intent=DISAGREE, subject=GOSSIP, utility=assertive, ai_bias=aggression+|bravery+|compassion-|stressed+|rival+, tone=guarded):
+      label: "Cut it short — stop spreading panic"
+      say: "Quit dwelling on rumors. Talking about every noise just gets everyone jumpy."
+
+      reply [actor.style=tactical|cold]:
+        "Fair enough. Less chatter, more watching the doors."
+        do relationship.respect +2
+        do guard_perimeter
+        end
+
+      reply [actor.style=aggressive|hostile]:
+        "I'm not panicking, {term.address}—I'm warning you. Don't snap at me."
+        do relationship.approval -4
+        do morale -2
+
+        choice world_deescalate (intent=APOLOGIZE, subject=SOCIAL, utility=forgiveness, ai_bias=forgiveness+|compassion+):
+          label: "Ease off — didn't mean it like that"
+          say: "My bad. Nerves are frayed—I appreciate the heads-up."
+          reply [default]:
+            "Alright. Just don't shoot the messenger next time."
+            do relationship.approval +2
+            do relationship.respect +1
+            do mood.calm
+            end
+
+        choice world_escalate (intent=INSULT, subject=CONFLICT, utility=assertive, ai_bias=aggression+|bravery+|forgiveness-|rival+):
+          label: "Double down"
+          say: "Then keep your warnings useful instead of jumping at every sound."
+          reply [default]:
+            "Next time I'll let you walk straight into it, {term.address}."
+            do relationship.approval -5
+            do relationship.respect +1
+            do morale -3
+            end
+
+      reply [actor.social_style=warm|friendly|protective]:
+        "I was just trying to keep us informed, {term.address}. No need to bite my head off."
+        do relationship.approval -3
+        do morale -2
+        end
+
+      reply [default]:
+        "Alright, {term.address}, dropping it. Eyes on the perimeter."
+        do relationship.approval -1
+        do mood.stressed
+        do guard_perimeter
+        end
+
+    choice protective [actor.social_style=protective|friendly] (intent=OFFER, subject=GUARD, utility=loyalty, ai_bias=protective+|loyalty+|compassion+, tone=warm):
+      label: "Protective stance — take first watch"
+      say: "You catch your breath—I'll take first watch and make sure nothing sneaks up on us."
+
+      reply [actor.style=shaken|exhausted]:
+        "Thank you, {term.address}. Seriously, I needed a minute."
+        do relationship.approval +4
+        do relationship.respect +2
+        do morale +3
+        do guard_perimeter
+        end
+
+      reply [actor.social_style=guarded|withdrawn]:
+        "Didn't expect that. Alright—wake me if anything moves."
+        do relationship.approval +2
+        do relationship.respect +2
+        do guard_perimeter
+        end
+
+      reply [default]:
+        "Thanks, {term.address}. Means a lot knowing someone's watching the door."
+        do relationship.approval +2
+        do relationship.respect +2
+        do guard_perimeter
+        end

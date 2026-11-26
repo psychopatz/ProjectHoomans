@@ -2,70 +2,70 @@
 language EN
 namespace hoomans
 
-flow semantic.command.player
-  say [command.id=follow] (priority 7) as follow:
+dialogue semantic.command.player
+  say [command.id=follow] as follow:
     "{addressee.name}, on me."
-  say [command.id=stay] (priority 7) as stay:
+  say [command.id=stay] as stay:
     "{addressee.name}, wait here."
-  say [command.id=camp] (priority 7) as camp:
+  say [command.id=camp] as camp:
     "Make camp here, {addressee.name}."
-  say [command.id=camp, command.outcome=none] (priority 9) as camp_none:
+  say [command.id=camp, command.outcome=none] as camp_none:
     "..."
-  say [command.id=camp, command.outcome=invalid] (priority 9) as camp_rejected:
+  say [command.id=camp, command.outcome=invalid] as camp_rejected:
     "I can't find a safe room or campfire nearby."
-  say [command.id=return_home] (priority 7) as return_home:
+  say [command.id=return_home] as return_home:
     "{addressee.name}, head home."
-  say [command.id=attack_auto] (priority 7) as attack_auto:
+  say [command.id=attack_auto] as attack_auto:
     "{addressee.name}, use your best judgment."
-  say [command.id=attack_melee] (priority 7) as attack_melee:
+  say [command.id=attack_melee] as attack_melee:
     "{addressee.name}, keep it close."
-  say [command.id=attack_ranged] (priority 7) as attack_ranged:
+  say [command.id=attack_ranged] as attack_ranged:
     "{addressee.name}, keep your distance."
-  say [command.id=attack_none] (priority 7) as attack_none:
+  say [command.id=attack_none] as attack_none:
     "{addressee.name}, stay out of the fight."
-  say [default] (priority 5) as generic:
+  say [default] as generic:
     "Understood, {addressee.name}."
 
-flow semantic.command.reply
-  say [command.id=follow] (priority 7) as follow:
+dialogue semantic.command.reply
+  say [command.id=follow] as follow:
     "Right behind you."
-  say [command.id=stay] (priority 7) as stay:
+  say [command.id=stay] as stay:
     "I'll stay here."
-  say [command.id=camp] (priority 7) as camp:
+  say [command.id=camp] as camp:
     "We'll make camp here."
-  say [command.id=return_home] (priority 7) as return_home:
+  say [command.id=return_home] as return_home:
     "Heading home."
-  say [command.id=attack_auto] (priority 7) as attack_auto:
+  say [command.id=attack_auto] as attack_auto:
     "I'll handle it."
-  say [command.id=attack_melee] (priority 7) as attack_melee:
+  say [command.id=attack_melee] as attack_melee:
     "Going in close."
-  say [command.id=attack_ranged] (priority 7) as attack_ranged:
+  say [command.id=attack_ranged] as attack_ranged:
     "I'll cover you."
-  say [command.id=attack_none] (priority 7) as attack_none:
+  say [command.id=attack_none] as attack_none:
     "I'll avoid trouble."
-  say [command.id=camp, command.outcome=invalid] (priority 9) as camp_rejected:
+  say [command.id=camp, command.outcome=invalid] as camp_rejected:
     "I can't find a safe room or campfire nearby."
-  say [command.outcome=invalid] (priority 7) as generic_rejected:
+  say [command.outcome=invalid] as generic_rejected:
     "I can't do that right now."
-  say [default] (priority 5) as generic:
+  say [default] as generic:
     "Stay sharp."
 
-flow semantic.combat.horde.ack
-  say [combat.style=aggressive|brave, command.id=combat_engage] (priority 9) as engage_eager:
+dialogue semantic.combat.horde.ack
+  say [combat.style=aggressive|brave, command.id=combat_engage] as engage_eager:
     "Ready to strike! Let's take them down."
-  say [combat.style=shaken, command.id=combat_engage] (priority 9) as engage_hesitant:
+  say [combat.style=shaken, command.id=combat_engage] as engage_hesitant:
     "If you say so... alright. I'm with you."
-  say [combat.style=reserved|cold, command.id=combat_engage] (priority 8) as engage_reserved:
+  say [combat.style=reserved|cold, command.id=combat_engage] as engage_reserved:
     "Alright. Moving."
-  say [command.id=combat_engage] (priority 7) as engage_default:
+  say [command.id=combat_engage] as engage_default:
     "I'm with you. Let's go."
-  say [combat.style=shaken|supportive, command.id=combat_avoid] (priority 9) as avoid_relief:
+  say [combat.style=shaken|supportive, command.id=combat_avoid] as avoid_relief:
     "Good. Let's go around."
-  say [command.id=combat_avoid] (priority 7) as avoid_default:
+  say [command.id=combat_avoid] as avoid_default:
     "Copy. We go around."
-  say [combat.style=aggressive|brave, command.id=combat_hold] (priority 8) as hold_eager:
+  say [combat.style=aggressive|brave, command.id=combat_hold] as hold_eager:
     "Holding. Say when."
-  say [combat.style=shaken, command.id=combat_hold] (priority 8) as hold_hesitant:
+  say [combat.style=shaken, command.id=combat_hold] as hold_hesitant:
     "Okay. Holding here."
-  say [command.id=combat_hold] (priority 7) as hold_default:
+  say [command.id=combat_hold] as hold_default:
     "Holding for now."

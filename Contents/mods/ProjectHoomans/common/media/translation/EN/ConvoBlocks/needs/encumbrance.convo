@@ -3,20 +3,20 @@ language EN
 namespace hoomans
 
 lexicon encumbrance.observe
-  [actor.social_style=warm|friendly|protective] (priority 8): "That pack looks heavy" | "You're carrying a ton of gear"
-  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "You're hauling too much junk" | "You're overloaded"
+  [actor.social_style=warm|friendly|protective]: "That pack looks heavy" | "You're carrying a ton of gear"
+  [actor.social_style=hostile|guarded|withdrawn]: "You're hauling too much junk" | "You're overloaded"
   [default]: "Looks like you're carrying a lot" | "You're weighed down"
 
 lexicon encumbrance.suggest
-  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Drop some weight before we have to run." | "Ditch the dead weight."
+  [actor.social_style=hostile|guarded|withdrawn]: "Drop some weight before we have to run." | "Ditch the dead weight."
   [default]: "Let's lighten your load when we can." | "Might want to shed some weight."
 
 lexicon encumbrance.ack
   [default]: "Much better, {term.address}. We'll move faster like that." | "Good call dropping the extra weight."
 
 extend semantic.companion.moodle_suggest
-  say [role=suggest_drop_load] (priority 8) as suggest_drop_load_composed_a:
+  say [role=suggest_drop_load] as suggest_drop_load_composed_a:
     "{encumbrance.observe}, {term.address}. {encumbrance.suggest}"
     "{opener.casual} {term.address}, {encumbrance.observe}. {encumbrance.suggest}"
-  say [role=ack_drop_load] (priority 8) as ack_drop_load_composed:
+  say [role=ack_drop_load] as ack_drop_load_composed:
     "{encumbrance.ack}"

@@ -2,57 +2,57 @@
 language EN
 namespace hoomans
 
-flow semantic.tool_reply.social.queued.admire
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.social.queued.admire
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.social.queued.apologize
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.social.queued.apologize
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.social.queued.comfort
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.social.queued.comfort
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.social.queued.compliment
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.social.queued.compliment
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.social.queued.flirt
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.social.queued.flirt
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.social.queued.generic
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.social.queued.generic
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.social.queued.hostile_abuse
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.social.queued.hostile_abuse
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.social.queued.insult
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.social.queued.insult
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.social.queued.praise
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.social.queued.praise
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.social.queued.romantic_interest
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.social.queued.romantic_interest
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.social.queued.sexual_advance
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.social.queued.sexual_advance
+  say [default] as 1:
     "Understood."
     "Understood."

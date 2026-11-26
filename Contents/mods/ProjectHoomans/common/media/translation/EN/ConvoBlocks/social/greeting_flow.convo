@@ -2,22 +2,22 @@
 language EN
 namespace hoomans
 
-flow semantic.flow.greeting.opening
-  offer greeting.check_in.report_wellbeing:
+dialogue semantic.flow.greeting.opening
+  choice greeting.check_in.report_wellbeing:
     label: "Say you're doing fine"
     say: "I'm fine, thank you."
     utility: openness
     intent: INFORM
     subject: WELLBEING
-  say [environment.raining] (priority 9) as rain:
+  say [environment.raining] as rain:
     "Hey there. Wet one today. >> How are you holding up?"
-  say [actor.social_style=friendly|protective] (priority 8) as friendly:
+  say [actor.social_style=friendly|protective] as friendly:
     "Hey there! Good to see you. >> How are you doing?"
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Hey there. >> How are you holding up?"
 
-flow semantic.flow.greeting.followup
-  say [actor.social_style=friendly|protective] (priority 8) as friendly:
+dialogue semantic.flow.greeting.followup
+  say [actor.social_style=friendly|protective] as friendly:
     "You're welcome. It's good to see you too."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Good to hear. Take care out there."

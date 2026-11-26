@@ -1,0 +1,31 @@
+# Subject: UTILITY OUTAGE & WORLD OBJECT NOTICES.
+language EN
+namespace hoomans
+
+dialogue semantic.world.utility.outage
+  say [role=power_shutoff_open] as power_shutoff_open:
+    "The grid's finally gone... no more power, {addressee.name}."
+  say [role=power_shutoff_reply] as power_shutoff_reply:
+    "Knew it was coming. We'll need generators and flashlights now."
+  say [role=power_shutoff_chime] as power_shutoff_chime:
+    "Everything in the fridges is going to spoil fast—let's grab what's still good."
+  say [role=water_shutoff_open] as water_shutoff_open:
+    "Taps just ran dry, {addressee.name}. Water pressure's gone."
+  say [role=water_shutoff_reply] as water_shutoff_reply:
+    "Time to start collecting rain and rationing every bottle."
+  say [role=water_shutoff_chime] as water_shutoff_chime:
+    "We should fill every pot and barrel we can find before we run low."
+  say [default] as default:
+    "Utilities are failing—things are about to get tougher."
+
+dialogue semantic.world.object.notice
+  say [role=tv_reminisce_open] as tv_reminisce_open:
+    "Weird seeing a TV still sitting there like the world didn't end."
+  say [role=tv_reminisce_reply] as tv_reminisce_reply:
+    "Feels like a lifetime ago."
+  say [role=tv_power_out_open] as tv_power_out_open:
+    "Just dead glass now without power."
+  say [role=tv_power_out_reply] as tv_power_out_reply:
+    "Yeah, nothing left on the air anyway."
+  say [default] as default:
+    "Strange reminder of how things used to be."

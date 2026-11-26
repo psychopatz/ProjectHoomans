@@ -177,6 +177,12 @@ return function(Catalog, Core)
         return true, pool
     end
 
+    function Catalog.GetRaw(id)
+        local key = tostring(id or "")
+        if key == "" then return nil end
+        return Catalog.POOLS[key]
+    end
+
     function Catalog.Get(id)
         local key = tostring(id or "")
         local pool = Catalog.POOLS[key]
@@ -228,7 +234,8 @@ return function(Catalog, Core)
 
     function Catalog.Extend(id, definition)
         id = tostring(id or "")
-        local pool = Catalog.Get(id)
+        local pool = Catalog.POOLS[id]
+        if pool == nil then pool = Catalog.Get(id) end
         local variants = type(definition) == "table" and definition.variants
         if not pool then return false, "response_pool_unavailable" end
         if type(variants) ~= "table" or #variants == 0 then
@@ -238,15 +245,15 @@ return function(Catalog, Core)
             return false, "response_variant_limit"
         end
 
-        local seenIDs = {}
+        local existingByID = type(pool.byID) == "table" and pool.byID or nil
+        local batchSeen = {}
         local index
         local variant
-        if type(pool.byID) == "table" then
-            for existingID in pairs(pool.byID) do seenIDs[existingID] = true end
-        else
+        if existingByID == nil then
+            existingByID = {}
             for index = 1, #pool.variants do
                 variant = pool.variants[index]
-                seenIDs[variant.id] = true
+                existingByID[variant.id] = variant
             end
         end
         local additions = {}
@@ -256,10 +263,10 @@ return function(Catalog, Core)
                 id, #pool.variants + index, variants[index]
             )
             if not normalized then return false, "invalid_response_variant" end
-            if seenIDs[normalized.id] then
+            if existingByID[normalized.id] ~= nil or batchSeen[normalized.id] then
                 return false, "duplicate_response_variant_id"
             end
-            seenIDs[normalized.id] = true
+            batchSeen[normalized.id] = true
             additions[#additions + 1] = normalized
         end
         local origin = registrationSource()

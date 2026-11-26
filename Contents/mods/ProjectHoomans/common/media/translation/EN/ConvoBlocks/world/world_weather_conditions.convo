@@ -1,0 +1,67 @@
+# Subject: SNOW, BLIZZARD, FOG, WIND & TEMPERATURE BEATS.
+language EN
+namespace hoomans
+
+dialogue semantic.world.weather.snow
+  say [role=weather_blizzard_open] as weather_blizzard_open:
+    "Blizzard's rolling in hard, {addressee.name}! We can't stay out in whiteout conditions!"
+    "Can barely see my own hand out here, {addressee.name}—we need shelter from this blizzard!"
+  say [role=weather_blizzard_reply] as weather_blizzard_reply:
+    "Agreed, {addressee.name}—we'll freeze solid if we keep pushing through this!"
+    "Let's get indoors and find some heat before hypothermia sets in."
+  say [role=weather_blizzard_chime] as weather_blizzard_chime:
+    "Stay within arm's reach—nobody wanders off in a whiteout."
+  say [role=weather_snow_open] as weather_snow_open:
+    "Snow's coming down now, {addressee.name}. Hope everyone's layered up."
+    "It's starting to snow, {addressee.name}—going to get bitter out here fast."
+  say [role=weather_snow_reply] as weather_snow_reply:
+    "Yeah, {addressee.name}, watch the ground—slick footing and cold fingers are a bad mix."
+    "Good reminder to keep moving or find somewhere warm soon."
+  say [role=weather_snow_chime] as weather_snow_chime:
+    "At least snow makes tracks easy to spot if anything's following us."
+  say [default] as default:
+    "Snow's coming down—keep warm and stay close."
+
+dialogue semantic.world.weather.fog
+  say [role=weather_fog_open] as weather_fog_open:
+    "Fog's getting thick out here, {addressee.name}. Can barely see past the next block."
+    "Look at that mist rolling in, {addressee.name}—anything could walk right out of it."
+  say [role=weather_fog_reply] as weather_fog_reply:
+    "Stay tight, {addressee.name}. Listen for footsteps instead of trusting your eyes."
+    "Yeah, I hate this soup—keep weapons ready and don't split up."
+  say [role=weather_fog_chime] as weather_fog_chime:
+    "If we don't have to be out in this visibility, waiting it out indoors wouldn't hurt."
+  say [default] as default:
+    "Thick fog—watch every shadow."
+
+dialogue semantic.world.weather.wind
+  say [role=weather_wind_open] as weather_wind_open:
+    "Wind's howling out here, {addressee.name}—hard to hear anything over it."
+    "These gusts are brutal, {addressee.name}. Feels like a storm's pushing right through."
+  say [role=weather_wind_reply] as weather_wind_reply:
+    "Yeah, {addressee.name}, keep your eyes moving since we can't rely on hearing."
+    "Let's hug the buildings to cut the wind when we can."
+  say [role=weather_wind_chime] as weather_wind_chime:
+    "Every rattling door sounds like a walker in wind like this."
+  say [default] as default:
+    "Strong wind out here—stay sharp."
+
+dialogue semantic.world.weather.temperature
+  say [role=weather_cold_open] as weather_cold_open:
+    "Temperature's really dropping, {addressee.name}. Can see my breath out here."
+    "It's getting freezing out here, {addressee.name}—we shouldn't stay exposed too long."
+  say [role=weather_cold_reply] as weather_cold_reply:
+    "Yeah, {addressee.name}, let's keep an eye out for a warm spot indoors."
+    "My hands are already going numb—shelter sounds pretty good right now."
+  say [role=weather_cold_chime] as weather_cold_chime:
+    "Keep dry too—wet clothes in this cold will knock us out faster than walkers."
+  say [role=weather_heat_open] as weather_heat_open:
+    "It's baking out here, {addressee.name}. Make sure you're drinking water."
+    "This heat is brutal, {addressee.name}—we should grab some shade when we can."
+  say [role=weather_heat_reply] as weather_heat_reply:
+    "Tell me about it, {addressee.name}. Carrying all this gear in the sun is draining."
+    "Yeah, let's duck into the shade for a breather if we spot a safe building."
+  say [role=weather_heat_chime] as weather_heat_chime:
+    "Don't push through heatstroke—pace ourselves and check our bottles."
+  say [default] as default:
+    "Rough temperature out here—take care of yourselves."

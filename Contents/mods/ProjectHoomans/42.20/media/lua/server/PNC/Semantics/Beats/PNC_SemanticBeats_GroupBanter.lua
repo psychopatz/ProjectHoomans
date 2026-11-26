@@ -124,7 +124,9 @@ local function pickSmartTopic(groupKey, members, aud, now)
     if anyCamped then addTopic("camp_life", 75) end
     local tod = weather and tostring(weather.timeOfDay or "") or ""
     if tod == "night" or tod == "dusk" then addTopic("night_watch", 70) end
-    if weather and (weather.isRaining == true or weather.weather == "fog" or weather.weather == "cold" or weather.weather == "snow") then
+    if weather and (weather.isHarshWeather == true or weather.isRaining == true
+        or weather.weather == "fog" or weather.weather == "cold" or weather.weather == "snow")
+    then
         addTopic("weather_talk", 68)
     end
     if util and (util.powerOn == false or util.waterOn == false) then

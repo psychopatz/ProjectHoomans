@@ -2,39 +2,39 @@
 language EN
 namespace hoomans
 
-flow command.follow.redundant
+dialogue command.follow.redundant
   use offer.redundant_follow_nudges
-  say [npc.fed_up, player.rude] (priority 13) as fed_up_rude:
+  say [npc.fed_up, player.rude] as fed_up_rude:
     "Stop barking at me to follow you—I haven't left your side!"
-  say [npc.fed_up] (priority 12) as fed_up:
+  say [npc.fed_up] as fed_up:
     "I heard you the first three times! Look behind you, I'm literally right here!"
-  say [npc.annoyed, mood.tired] (priority 11) as annoyed_tired:
+  say [npc.annoyed, mood.tired] as annoyed_tired:
     "I'm already dragging myself behind you. Give me a break, I'm beat."
-  say [npc.annoyed] (priority 10) as annoyed:
+  say [npc.annoyed] as annoyed:
     "Still following you. You don't need to keep repeating it."
-  say [mood.panicked] (priority 10) as panicked:
+  say [mood.panicked] as panicked:
     "I'm already right behind you—just keep moving!"
-  say [mood.in_pain] (priority 10) as in_pain:
+  say [mood.in_pain] as in_pain:
     "I'm already following you as fast as I can... give me a second, I'm hurting."
-  say [mood.stressed] (priority 9) as stressed:
+  say [mood.stressed] as stressed:
     "Already with you, alright? Let's just get somewhere safe."
-  say [mood.tired] (priority 8) as tired:
+  say [mood.tired] as tired:
     "Still right behind you... just don't sprint, I'm exhausted."
-  say [mood.cheerful] (priority 8) as cheerful:
+  say [mood.cheerful] as cheerful:
     "Haha, still right behind you! Didn't lose me yet."
-  say [npc.annoyance=mild] (priority 7) as mild:
+  say [npc.annoyance=mild] as mild:
     "I'm already following you—just lead on."
-  say [default] (priority 6) as calm:
+  say [default] as calm:
     "I'm already right behind you{end} {?mood.tail}"
 
-flow command.stay.redundant
-  say [npc.fed_up] (priority 12) as fed_up:
+dialogue command.stay.redundant
+  say [npc.fed_up] as fed_up:
     "I'm not going anywhere! You already told me to stay!"
-  say [npc.annoyed] (priority 10) as annoyed:
+  say [npc.annoyed] as annoyed:
     "Still holding position. I heard you the first time."
-  say [mood.tired] (priority 8) as tired:
+  say [mood.tired] as tired:
     "Trust me, I wasn't planning on moving anyway."
-  say [mood.cheerful] (priority 8) as cheerful:
+  say [mood.cheerful] as cheerful:
     "Already planted right here! Take your time."
-  say [default] (priority 6) as calm:
+  say [default] as calm:
     "Already holding position right here{end} {?mood.tail}"

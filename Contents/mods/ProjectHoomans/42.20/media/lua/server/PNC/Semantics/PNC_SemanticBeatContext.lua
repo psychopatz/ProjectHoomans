@@ -11,12 +11,14 @@ PNC.Semantics.BeatContext = BC
 BC.VERSION = 1
 
 local WEATHER_TTL_MS = 2000
+local EXPOSURE_TTL_MS = 2000
 local UTILITIES_TTL_MS = 5000
 local ACTOR_STATS_TTL_MS = 1500
 local MAX_ACTOR_CACHE = 64
 local providers = {}
 local providerOrder = {}
 local weatherCache = { expiresAt = -1, data = nil }
+local exposureCache = { expiresAt = -1, data = nil }
 local utilitiesCache = { expiresAt = -1, data = nil }
 local actorStatsCache = {}
 local actorStatsOrder = {}
@@ -61,7 +63,18 @@ function BC.GetWorldWeather(now, force)
     local rain = tonumber(safeCall(cm, "getRainIntensity")) or (isRain and 0.5 or 0)
     local fog = tonumber(safeCall(cm, "getFogIntensity")) or 0
     local isSnow = safeCall(cm, "isSnowing") == true
+    local snowIntensity = tonumber(safeCall(cm, "getSnowIntensity")) or (isSnow and 0.5 or 0)
+    local windIntensity = tonumber(safeCall(cm, "getWindIntensity")) or 0
+    local windKph = tonumber(safeCall(cm, "getWindspeedKph")) or 0
     local temp = tonumber(safeCall(cm, "getTemperature"))
+    local isThunder = safeCall(cm, "getIsThunderStorming") == true
+    local wp = safeCall(cm, "getWeatherPeriod")
+    local wpRunning = wp ~= nil and safeCall(wp, "isRunning") == true
+    local isBlizzard = wpRunning and safeCall(wp, "isBlizzard") == true
+    local isTropical = wpRunning and safeCall(wp, "isTropicalStorm") == true
+    local isPeriodThunder = wpRunning and safeCall(wp, "isThunderStorm") == true
+    local isThunderStorming = isThunder or isPeriodThunder
+
     local clock = PNC.WorldClock
     local hour
     local tod
@@ -79,21 +92,120 @@ function BC.GetWorldWeather(now, force)
     end
 
     local weather = "clear"
-    if isSnow then weather = "snow"
+    if isBlizzard then weather = "blizzard"
+    elseif isTropical then weather = "tropical_storm"
+    elseif isThunderStorming then weather = "thunderstorm"
+    elseif isSnow or snowIntensity >= 0.15 then weather = "snow"
     elseif isRain or rain >= 0.15 then weather = rain >= 0.7 and "storm" or "rain"
     elseif fog >= 0.35 then weather = "fog"
-    elseif temp ~= nil and temp <= 5 then weather = "cold" end
+    elseif windIntensity >= 0.65 or windKph >= 45 then weather = "wind"
+    elseif temp ~= nil and temp <= 5 then weather = "cold"
+    elseif temp ~= nil and temp >= 32 then weather = "heat" end
 
+    local isRainingFlag = isRain or rain >= 0.15
+        or weather == "rain" or weather == "storm"
+        or weather == "thunderstorm" or weather == "tropical_storm"
     local data = {
         weather = weather,
-        isRaining = weather == "rain" or weather == "storm",
+        isRaining = isRainingFlag,
+        isSnowing = isSnow or snowIntensity >= 0.15 or isBlizzard,
+        isThunderStorming = isThunderStorming,
+        isBlizzard = isBlizzard,
+        isTropicalStorm = isTropical,
+        isFoggy = fog >= 0.35,
+        isWindy = windIntensity >= 0.65 or windKph >= 45,
+        isCold = temp ~= nil and temp <= 5,
+        isHot = temp ~= nil and temp >= 32,
+        isHarshWeather = weather ~= "clear",
         rainIntensity = rain,
+        snowIntensity = snowIntensity,
         fogIntensity = fog,
+        windIntensity = windIntensity,
+        windSpeedKph = windKph,
         temperature = temp,
         timeOfDay = tod,
     }
     weatherCache.data = data
     weatherCache.expiresAt = now + WEATHER_TTL_MS
+    return data
+end
+
+local function primaryPlayerForExposure(player)
+    if player ~= nil then return player end
+    if type(getPlayer) == "function" then
+        local ok, p = pcall(getPlayer)
+        if ok and p ~= nil then return p end
+    end
+    if type(getOnlinePlayers) == "function" then
+        local ok, list = pcall(getOnlinePlayers)
+        if ok and list and type(list.size) == "function" and list:size() > 0 then
+            return list:get(0)
+        end
+    end
+    return nil
+end
+
+function BC.GetPlayerExposure(player, now, force)
+    now = tonumber(now) or (PNC.Core and type(PNC.Core.Now) == "function" and tonumber(PNC.Core.Now())) or 0
+    if player == nil and not force and exposureCache.data
+        and now < (tonumber(exposureCache.expiresAt) or 0)
+    then
+        return exposureCache.data
+    end
+    local p = primaryPlayerForExposure(player)
+    if not p then
+        return {
+            hasPlayer = false,
+            isOutside = false,
+            wetLevel = 0,
+            wetness = 0,
+            hypoLevel = 0,
+            hyperLevel = 0,
+            windchillLevel = 0,
+            coldMoodleLevel = 0,
+            hasCold = false,
+            isSoakingWet = false,
+            isFreezing = false,
+            isChilly = false,
+            isOverheating = false,
+            isHot = false,
+        }
+    end
+    local isOutside = safeCall(p, "isOutside") == true
+    local moodles = safeCall(p, "getMoodles")
+    local mt = rawget(_G, "MoodleType")
+    local wetLevel = (moodles and mt and mt.WET and tonumber(safeCall(moodles, "getMoodleLevel", mt.WET))) or 0
+    local hypoLevel = (moodles and mt and mt.HYPOTHERMIA and tonumber(safeCall(moodles, "getMoodleLevel", mt.HYPOTHERMIA))) or 0
+    local hyperLevel = (moodles and mt and mt.HYPERTHERMIA and tonumber(safeCall(moodles, "getMoodleLevel", mt.HYPERTHERMIA))) or 0
+    local windchillLevel = (moodles and mt and mt.WINDCHILL and tonumber(safeCall(moodles, "getMoodleLevel", mt.WINDCHILL))) or 0
+    local coldMoodleLevel = (moodles and mt and mt.HAS_A_COLD and tonumber(safeCall(moodles, "getMoodleLevel", mt.HAS_A_COLD))) or 0
+
+    local stats = safeCall(p, "getStats")
+    local cs = rawget(_G, "CharacterStat")
+    local wetness = (stats and cs and cs.WETNESS and tonumber(safeCall(stats, "get", cs.WETNESS))) or 0
+    local bd = safeCall(p, "getBodyDamage")
+    local hasCold = (bd and safeCall(bd, "isHasACold") == true) or coldMoodleLevel >= 1
+
+    local data = {
+        hasPlayer = true,
+        isOutside = isOutside,
+        wetLevel = wetLevel,
+        wetness = wetness,
+        hypoLevel = hypoLevel,
+        hyperLevel = hyperLevel,
+        windchillLevel = windchillLevel,
+        coldMoodleLevel = coldMoodleLevel,
+        hasCold = hasCold,
+        isSoakingWet = wetLevel >= 2 or wetness >= 35,
+        isFreezing = hypoLevel >= 2 or (hypoLevel >= 1 and windchillLevel >= 2),
+        isChilly = hypoLevel >= 1 or windchillLevel >= 2,
+        isOverheating = hyperLevel >= 2,
+        isHot = hyperLevel >= 1,
+    }
+    if player == nil then
+        exposureCache.data = data
+        exposureCache.expiresAt = now + EXPOSURE_TTL_MS
+    end
     return data
 end
 
@@ -169,6 +281,110 @@ local function isRecordIndoors(sp)
         math.floor(tonumber(sp.x) or 0), math.floor(tonumber(sp.y) or 0), math.floor(tonumber(sp.z) or 0)
     )
     return sq ~= nil and sq.getRoom and sq:getRoom() ~= nil
+end
+
+function BC.IsActorIndoors(actor)
+    if type(actor) == "table" then
+        if actor.isOutside ~= nil and type(actor.isOutside) == "function" then
+            return safeCall(actor, "isOutside") == false
+        end
+        if actor.isIndoors ~= nil then
+            return actor.isIndoors == true
+        end
+        if actor.isOutside ~= nil then
+            return actor.isOutside == false
+        end
+        return isRecordIndoors(actor)
+    end
+    if actor ~= nil and type(actor.isOutside) == "function" then
+        return safeCall(actor, "isOutside") == false
+    end
+    return false
+end
+
+-- Actor-agnostic group exposure snapshot: works for both player-led groups and
+-- autonomous AI-controlled NPC squads (zero player dependency).
+function BC.GetGroupExposure(group, env, now)
+    now = tonumber(now) or (PNC.Core and type(PNC.Core.Now) == "function" and tonumber(PNC.Core.Now())) or 0
+    local members = type(group) == "table" and group.members or nil
+    if type(members) ~= "table" or #members == 0 then
+        return BC.GetPlayerExposure(nil, now)
+    end
+
+    -- Check if this group is following/owned by a live player; if so, blend
+    -- player's Build 42 moodles/stats with the squad's indoor/outdoor state.
+    local player = nil
+    local common = PNC.BehaviorCommon
+    for i = 1, #members do
+        local m = members[i]
+        local orderKind = tostring(m.orderSpec and m.orderSpec.kind or "")
+        local following = orderKind == tostring(PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
+            or (m.runtime and m.runtime.followOrderActive == true)
+        if following and common and type(common.GetOwner) == "function" then
+            local owner = common.GetOwner(m)
+            if owner and safeCall(owner, "isDead") ~= true then
+                player = owner
+                break
+            end
+        end
+    end
+
+    if player ~= nil then
+        local pe = BC.GetPlayerExposure(player, now)
+        pe.isPlayerLed = true
+        return pe
+    end
+
+    -- Pure AI-controlled group: derive exposure directly from member squares,
+    -- conditionStats/needs, and live world weather.
+    local outsideCount = 0
+    local maxWetness = 0
+    local maxWetLevel = 0
+    local maxHypo = 0
+    local maxHyper = 0
+    local anyCold = false
+    for i = 1, #members do
+        local m = members[i]
+        if not BC.IsActorIndoors(m) then
+            outsideCount = outsideCount + 1
+        end
+        local c = type(m.conditionStats) == "table" and m.conditionStats or nil
+        if c then
+            local w = tonumber(c.wetness) or 0
+            if w > maxWetness then maxWetness = w end
+            local wl = tonumber(c.wetLevel) or 0
+            if wl > maxWetLevel then maxWetLevel = wl end
+            local hy = tonumber(c.hypothermia) or 0
+            if hy > maxHypo then maxHypo = hy end
+            local ht = tonumber(c.hyperthermia) or 0
+            if ht > maxHyper then maxHyper = ht end
+            if c.hasCold == true then anyCold = true end
+        end
+    end
+
+    local isOutside = outsideCount > 0
+    local isRaining = env and env.isRaining == true
+    local isColdWeather = env and (env.isCold == true or env.isSnowing == true or env.isBlizzard == true)
+    local isHotWeather = env and env.isHot == true
+
+    return {
+        hasPlayer = false,
+        isPlayerLed = false,
+        isOutside = isOutside,
+        wetLevel = maxWetLevel,
+        wetness = maxWetness,
+        hypoLevel = maxHypo,
+        hyperLevel = maxHyper,
+        windchillLevel = (isOutside and env and env.isWindy and isColdWeather) and 2 or 0,
+        coldMoodleLevel = anyCold and 1 or 0,
+        hasCold = anyCold,
+        isSoakingWet = maxWetLevel >= 2 or maxWetness >= 35,
+        isFreezing = maxHypo >= 2 or (isOutside and env and env.isBlizzard == true),
+        isChilly = maxHypo >= 1 or (isOutside and isColdWeather),
+        isOverheating = maxHyper >= 2,
+        isHot = maxHyper >= 1 or (isOutside and isHotWeather),
+        isRainingOutside = isOutside and isRaining,
+    }
 end
 
 local function resolveDispositionProjection()
@@ -403,6 +619,8 @@ end
 function BC.ResetRuntime()
     weatherCache.expiresAt = -1
     weatherCache.data = nil
+    exposureCache.expiresAt = -1
+    exposureCache.data = nil
     utilitiesCache.expiresAt = -1
     utilitiesCache.data = nil
     actorStatsCache = {}

@@ -453,6 +453,21 @@ function Beats.CheckEnvironment(now)
         Beats.MaybeLogPeriodicAuditSnapshot("env_check", now)
     end
 
+    local wxEmitted = false
+    if type(Beats.CheckWeatherAndExposure) == "function" then
+        wxEmitted = Beats.CheckWeatherAndExposure(now) == true
+    end
+    local watcherEmitted = false
+    if type(Beats.CheckStateWatchers) == "function" then
+        watcherEmitted = Beats.CheckStateWatchers(now) == true
+    end
+    if wxEmitted or watcherEmitted then
+        return true
+    end
+    if type(Beats.CheckWeatherAndExposure) == "function" then
+        return false
+    end
+
     local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
     if not BC or type(BC.GetWorldWeather) ~= "function" then return false end
     local env = BC.GetWorldWeather(now)
@@ -476,11 +491,13 @@ Beats.RegisterHook("environment.weather_rain", {
     cooldownMs = 0,
     evaluate = function(_, payload, ctx)
         local w = tostring(payload.weather or (ctx.env and ctx.env.weather) or "")
-        if w ~= "rain" and w ~= "storm" then return nil end
+        if w ~= "rain" and w ~= "storm" and w ~= "thunderstorm" and w ~= "tropical_storm" then return nil end
+        local isStorm = w == "storm" or w == "thunderstorm" or w == "tropical_storm"
+        local prefix = isStorm and "weather_storm" or "weather_rain"
         local a, b = payload.anchor or payload.speaker, payload.partner or payload.addressee
         return Beats.BuildWorldThread(a, b, {
-            refPrefix = "weather:rain:" .. tostring(payload.groupIndex or 1),
-            family = "environment_weather_rain",
+            refPrefix = "weather:" .. w .. ":" .. tostring(payload.groupIndex or 1),
+            family = isStorm and "environment_weather_storm" or "environment_weather_rain",
             poolID = "semantic.world.weather.rain",
             eventType = "world_weather_beat",
             domain = "weather",
@@ -488,12 +505,12 @@ Beats.RegisterHook("environment.weather_rain", {
             topic = "weather",
             openAct = "REACT",
             replyAct = "REACT",
-            openRole = "weather_rain_open",
-            replyRole = "weather_rain_reply",
-            chimeRole = "weather_rain_chime",
+            openRole = prefix .. "_open",
+            replyRole = prefix .. "_reply",
+            chimeRole = prefix .. "_chime",
             third = payload.third,
             openingDelayMs = payload.openingDelayMs,
-            priority = 30,
+            priority = isStorm and 33 or 30,
             delayMs = 900,
             chimeDelayMs = 2100,
         })

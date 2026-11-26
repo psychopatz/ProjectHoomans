@@ -1,55 +1,93 @@
-# Reusable stance & follow-up offer blueprints for world gossip pools.
+# Shared interactive gossip choice blueprints.
+# Used by both players (dialogue UI buttons) and autonomous NPCs (OfferRealizer.PickAutonomous).
+# Positive, neutral, negative, and trait/role-specialized choices carry `ai_bias` so NPCs pick
+# organically from their personality axes, mood, and relationship toward the speaker.
 language EN
 namespace hoomans
 
 blueprint offer.gossip_opening_stances
-  offer world_gossip.stance_positive:
-    label: "Agree / take it seriously"
-    say: "I agree, that makes sense."
-    utility: warmth
+  choice gossip.stance.positive:
+    label: "Agree — good for morale"
+    say: "Good to hear—holding onto moments like that keeps us going."
     intent: AGREE
-    subject: CONVERSATION_TOPIC
-  offer world_gossip.stance_neutral:
-    label: "Not sure / ask more"
-    say: "Hard to say. Tell me more about that."
-    utility: curiosity
+    subject: GOSSIP
+    utility: compassion
+    ai_bias: compassion+|sociability+|warm+|cheerful+|friend+
+    tone: warm
+  choice gossip.stance.ask_more:
+    label: "Ask what else they heard"
+    say: "Did you catch any more details on that?"
+    intent: QUESTION
+    subject: GOSSIP
+    utility: openness
+    ai_bias: sociability+|openness+
+    tone: neutral
+  choice gossip.stance.neutral_cautious:
+    label: "Stay cautious — play it safe"
+    say: "Good to know. Let's keep our heads down and not take chances."
     intent: CLARIFY
-    subject: CONVERSATION_TOPIC
-  offer world_gossip.stance_negative:
-    label: "Skeptical / call bullshit"
-    say: "I don't buy it, sounds like bullshit."
-    utility: conflict
+    subject: GOSSIP
+    utility: caution
+    ai_bias: guarded+|tactical+|sociability-
+    tone: neutral
+  choice gossip.stance.negative_dismiss:
+    label: "Brush it off — focus on surviving"
+    say: "Sounds like a distraction. We've got bigger problems right in front of us."
     intent: DISAGREE
-    subject: CONVERSATION_TOPIC
-  offer world_gossip.ask_where:
-    label: "Where was that?"
-    say: "Where was that?"
-    utility: curiosity
-    intent: QUESTION
-    subject: LOCATION
-  offer world_gossip.ask_when:
-    label: "When did that happen?"
-    say: "When did that happen?"
-    utility: curiosity
-    intent: QUESTION
-    subject: TIME
+    subject: GOSSIP
+    utility: assertive
+    ai_bias: aggression+|bravery+|compassion-|stressed+|rival+
+    tone: guarded
+  choice gossip.stance.tactical:
+    when: [actor.style=tactical]
+    label: "Tactical angle — use the intel"
+    say: "If that's solid intel, we should adjust our route and perimeter now."
+    intent: SUGGEST
+    subject: GUARD
+    utility: assertive
+    ai_bias: tactical+|bravery+|loyalty+
+    tone: tactical
+  choice gossip.stance.trader:
+    when: [actor.role=trader]
+    label: "Trader angle — check supply impact"
+    say: "News like that shifts what people need. Worth checking our stock."
+    intent: SUGGEST
+    subject: TRADE
+    utility: materialism
+    ai_bias: materialism+|trader+|sociability+
+    tone: casual
+  choice gossip.stance.protective:
+    when: [actor.social_style=protective|friendly]
+    label: "Check on everyone's safety"
+    say: "Long as our people are safe, that's what matters. Stay close."
+    intent: OFFER
+    subject: GUARD
+    utility: loyalty
+    ai_bias: protective+|loyalty+|compassion+
+    tone: warm
 
 blueprint offer.gossip_followup_stances
-  offer world_gossip.stance_positive:
-    label: "Agree / support"
-    say: "I agree with you on that."
-    utility: warmth
+  choice gossip.followup.bond:
+    label: "Keep talking — good for nerves"
+    say: "Feels good just talking things through for a minute."
     intent: AGREE
-    subject: CONVERSATION_TOPIC
-  offer world_gossip.stance_neutral:
-    label: "Not sure / weigh it"
-    say: "Hard to say. What should we do?"
-    utility: practical
-    intent: CLARIFY
-    subject: CONVERSATION_TOPIC
-  offer world_gossip.stance_negative:
-    label: "Disagree / push back"
-    say: "I don't buy it, that's bullshit."
-    utility: conflict
+    subject: SOCIAL
+    utility: compassion
+    ai_bias: compassion+|sociability+|warm+|friend+
+    tone: warm
+  choice gossip.followup.plan:
+    label: "Turn it into a plan"
+    say: "Alright, let's keep that in mind for our next move."
+    intent: SUGGEST
+    subject: PLAN
+    utility: caution
+    ai_bias: tactical+|bravery+|loyalty+
+    tone: neutral
+  choice gossip.followup.drop_it:
+    label: "Enough talk — stay alert"
+    say: "That's enough chatter. Eyes back on the street."
     intent: DISAGREE
-    subject: CONVERSATION_TOPIC
+    subject: SOCIAL
+    utility: assertive
+    ai_bias: aggression+|guarded+|stressed+|rival+
+    tone: guarded

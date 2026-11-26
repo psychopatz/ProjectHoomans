@@ -674,10 +674,15 @@ function Beats.ResetRuntime()
     if type(Beats.ResetGroupBanterRuntime) == "function" then Beats.ResetGroupBanterRuntime() end
     if type(Beats.ResetCompanionNeedsRuntime) == "function" then Beats.ResetCompanionNeedsRuntime() end
     if type(Beats.ResetFinalKillRuntime) == "function" then Beats.ResetFinalKillRuntime() end
+    if type(Beats.ResetWeatherExposureRuntime) == "function" then Beats.ResetWeatherExposureRuntime() end
+    if type(Beats.ResetStateWatcherRuntime) == "function" then Beats.ResetStateWatcherRuntime() end
     if type(Beats.ResetAuditRuntime) == "function" then Beats.ResetAuditRuntime() end
 end
 
 require "PNC/Semantics/PNC_SemanticDialogueBeats_Environment"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_WeatherAndExposure"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_StateWatcher"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_DefaultWatchers"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_HouseAlarm"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_Utilities"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_WorldObjects"

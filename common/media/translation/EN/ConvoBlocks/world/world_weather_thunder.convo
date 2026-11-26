@@ -1,0 +1,26 @@
+# Subject: THUNDER & LIGHTNING STARTLE BEATS.
+language EN
+namespace hoomans
+
+dialogue semantic.world.weather.thunder
+  say [role=thunder_strike_open] as thunder_strike_open:
+    "Whoa—! Did you hear that crack, {addressee.name}?! That bolt landed way too close!"
+    "Jesus! That thunder nearly stopped my heart, {addressee.name}!"
+    "Shit—! Keep low, {addressee.name}, that lightning struck right nearby!"
+  say [role=thunder_strike_reply] as thunder_strike_reply:
+    "Yeah, I jumped too, {addressee.name}! We shouldn't be standing out in the open in this."
+    "Too damn close—and that flash lit up the whole street for the dead."
+    "I'm fine, just rattled! Let's get under a roof before the next bolt hits."
+  say [role=thunder_strike_chime] as thunder_strike_chime:
+    "Every walker in earshot is gonna stir after a boom like that—eyes up!"
+    "Definitely not the time to be carrying metal out on an open road."
+  say [role=thunder_rumble_open] as thunder_rumble_open:
+    "Hear that thunder rolling in, {addressee.name}? Storm's getting closer."
+    "Lightning on the horizon, {addressee.name}—we might want to plan for shelter soon."
+  say [role=thunder_rumble_reply] as thunder_rumble_reply:
+    "Yeah, I heard it. Better to find a dry spot before it breaks right over us."
+    "Sounds like it's moving fast—let's keep a building in mind."
+  say [role=thunder_rumble_chime] as thunder_rumble_chime:
+    "At least the rumble gives us a heads-up before the real downpour hits."
+  say [default] as default:
+    "Thunder's rolling—stay alert out here."

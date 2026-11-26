@@ -2,43 +2,43 @@
 language EN
 namespace hoomans
 
-flow semantic.question.current_location
-  say [npc.annoyed] (priority 11) as annoyed:
+dialogue semantic.question.current_location
+  say [npc.annoyed] as annoyed:
     "We're {location.phrase}. Keep your bearings."
-  say [mood.panicked] (priority 11) as panicked:
+  say [mood.panicked] as panicked:
     "We're {location.phrase}—just keep moving and stay sharp!"
-  say [relationship.bond=lover|spouse] (priority 10) as lover:
+  say [relationship.bond=lover|spouse] as lover:
     "We're {location.phrase}, {?term.address}. Stick close to me."
-  say [actor.role=trader] (priority 9) as trader:
+  say [actor.role=trader] as trader:
     "We're {location.phrase}. Good landmark to keep on your map."
-  say [actor.role=looter|bandit] (priority 9) as bandit_looter:
+  say [actor.role=looter|bandit] as bandit_looter:
     "You're {location.phrase}. Why do you care?"
-  say [default] (priority 6) as default:
+  say [default] as default:
     "We're {location.phrase}."
     "Looks like we're {location.phrase}."
     "Right now we're {location.phrase}."
 
-flow semantic.question.current_location.local
-  say [relationship.bond=lover|spouse] (priority 10) as lover:
+dialogue semantic.question.current_location.local
+  say [relationship.bond=lover|spouse] as lover:
     "I grew up around here, {?term.address}—we're {location.phrase}."
-  say [actor.role=trader] (priority 9) as trader:
+  say [actor.role=trader] as trader:
     "Home turf for me—we're {location.phrase}."
-  say [default] (priority 6) as default:
+  say [default] as default:
     "I know this area well—we're {location.phrase}."
     "I grew up around here. We're {location.phrase}."
     "Familiar ground—we're {location.phrase}."
 
-flow semantic.question.current_location.unfamiliar_room
-  say [default] (priority 6) as default:
+dialogue semantic.question.current_location.unfamiliar_room
+  say [default] as default:
     "We're {location.immediate}, though I'm not really familiar with this town."
     "Looks like we're {location.immediate}, but I don't know this area well."
 
-flow semantic.question.current_location.unfamiliar
-  say [default] (priority 6) as default:
+dialogue semantic.question.current_location.unfamiliar
+  say [default] as default:
     "Honestly, I'm not from around here—I don't really know this area."
     "Couldn't tell you for sure. I'm not familiar with this town."
 
-flow semantic.question.current_location.unknown
-  say [default] (priority 6) as default:
+dialogue semantic.question.current_location.unknown
+  say [default] as default:
     "Honestly, I'm not completely sure where we are right now."
     "Hard to tell from here—everything out here starts looking the same."

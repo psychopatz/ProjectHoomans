@@ -2,70 +2,70 @@
 language EN
 namespace hoomans
 
-flow semantic.hostile_remark
-  say [social.hostility_count=2|3|4|5|6] (priority 10) as escalated:
+dialogue semantic.hostile_remark
+  say [social.hostility_count=2|3|4|5|6] as escalated:
     "That's enough. Keep it up and we're done."
-  say [npc.fed_up] (priority 9) as fed_up:
+  say [npc.fed_up] as fed_up:
     "I've listened to enough of your mouth. Back off!"
-  say [emotion.type=stress|panic, emotion.urgency=moderate|severe|critical|emergency] (priority 8) as stressed:
+  say [emotion.type=stress|panic, emotion.urgency=moderate|severe|critical|emergency] as stressed:
     "I've had enough already."
-  say [actor.busy] (priority 8) as busy:
+  say [actor.busy] as busy:
     "Not now. I have enough to deal with."
-  say [actor.social_style=withdrawn] (priority 8) as withdrawn:
+  say [actor.social_style=withdrawn] as withdrawn:
     "Then leave me alone."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Don't talk to me like that."
     "Watch your mouth."
 
-flow semantic.combat.assault.react
-  say [conflict.assault_kind=neutral_turned_hostile, combat.style=shaken] (priority 12) as betrayal_shaken:
+dialogue semantic.combat.assault.react
+  say [conflict.assault_kind=neutral_turned_hostile, combat.style=shaken] as betrayal_shaken:
     "Why are you attacking me?! Stay back! I'll fight if I have to!"
-  say [conflict.assault_kind=neutral_turned_hostile, combat.style=aggressive] (priority 12) as betrayal_aggressive:
+  say [conflict.assault_kind=neutral_turned_hostile, combat.style=aggressive] as betrayal_aggressive:
     "Thought I was an easy target, huh?! Big mistake!"
-  say [conflict.assault_kind=neutral_turned_hostile, combat.style=brave] (priority 12) as betrayal_brave:
+  say [conflict.assault_kind=neutral_turned_hostile, combat.style=brave] as betrayal_brave:
     "Big mistake jumping someone who wasn't bothering you!"
-  say [conflict.assault_kind=neutral_turned_hostile] (priority 10) as betrayal_default:
+  say [conflict.assault_kind=neutral_turned_hostile] as betrayal_default:
     "I wasn't even looking for a fight! Now you're dead!"
-  say [combat.style=shaken] (priority 8) as shaken:
+  say [combat.style=shaken] as shaken:
     "What the hell?! Stay back!"
-  say [combat.style=aggressive] (priority 8) as aggressive:
+  say [combat.style=aggressive] as aggressive:
     "You just made a big mistake."
-  say [combat.style=brave] (priority 7) as brave:
+  say [combat.style=brave] as brave:
     "That's it. You're done."
-  say [combat.style=reserved] (priority 6) as reserved:
+  say [combat.style=reserved] as reserved:
     "Back off. Now."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Why did you do that?!"
 
-flow semantic.threat
-  say [emotion.type=stress|panic, emotion.urgency=moderate|severe|critical|emergency] (priority 10) as stressed:
+dialogue semantic.threat
+  say [emotion.type=stress|panic, emotion.urgency=moderate|severe|critical|emergency] as stressed:
     "I've had enough. Back off before this gets worse."
-  say [actor.busy] (priority 8) as busy:
+  say [actor.busy] as busy:
     "Pick another fight."
-  say [actor.social_style=withdrawn] (priority 7) as withdrawn:
+  say [actor.social_style=withdrawn] as withdrawn:
     "Keep your distance. I'm not discussing this."
-  say [relationship.state=Friend|Trusted|Ally|Member|Lover] (priority 7) as trusted:
+  say [relationship.state=Friend|Trusted|Ally|Member|Lover] as trusted:
     "Don't make this personal. Step back."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Back off."
     "Don't threaten me."
 
-flow semantic.combat.assault.friendly_fire
-  say [conflict.push_tier=penalty] (priority 10) as penalty:
+dialogue semantic.combat.assault.friendly_fire
+  say [conflict.push_tier=penalty] as penalty:
     "I've had enough of you shoving me around today. Stay out of my space!"
-  say [conflict.push_tier=warn] (priority 9) as warn:
+  say [conflict.push_tier=warn] as warn:
     "Seriously, knock it off with the shoving!"
-  say [conflict.push_tier=first] (priority 8) as first:
+  say [conflict.push_tier=first] as first:
     "Whoa, easy there! I'm on your side!"
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Hey, watch where you're swinging!"
 
-flow semantic.combat.assault.hostile_taunt
-  say [loot.category=backpack] (priority 9) as backpack:
+dialogue semantic.combat.assault.hostile_taunt
+  say [loot.category=backpack] as backpack:
     "Nice {slot.loot.name} on your back! Drop it before I pry it off you!"
-  say [loot.category=weapon] (priority 9) as weapon:
+  say [loot.category=weapon] as weapon:
     "Nice {slot.loot.name} you've got there! It'll look better in my hands!"
-  say [loot.category=money] (priority 9) as money:
+  say [loot.category=money] as money:
     "Still carrying {slot.loot.name} around? Empty your pockets!"
-  say [default] (priority 5) as general:
+  say [default] as general:
     "Empty your pockets now or bleed for every scrap you're carrying!"

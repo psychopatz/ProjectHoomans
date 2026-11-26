@@ -2,18 +2,18 @@
 language EN
 namespace hoomans
 
-flow semantic.compat.companion_dogs.greeting
-  say [dog.sex=male] (priority 8) as male:
+dialogue semantic.compat.companion_dogs.greeting
+  say [dog.sex=male] as male:
     "Who is a good boy?"
-  say [dog.sex=female] (priority 8) as female:
+  say [dog.sex=female] as female:
     "Who is a good girl?"
-  say [dog.sex=unknown] (priority 8) as unknown:
+  say [dog.sex=unknown] as unknown:
     "Who is a good dog?"
 
-flow semantic.compat.companion_dogs.feed
-  say [dog.sex=male] (priority 8) as male:
+dialogue semantic.compat.companion_dogs.feed
+  say [dog.sex=male] as male:
     "Here you go, good boy."
-  say [dog.sex=female] (priority 8) as female:
+  say [dog.sex=female] as female:
     "Here you go, good girl."
-  say [dog.sex=unknown] (priority 8) as unknown:
+  say [dog.sex=unknown] as unknown:
     "Here you go, good dog."

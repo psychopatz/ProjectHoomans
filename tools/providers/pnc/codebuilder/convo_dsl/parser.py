@@ -9,17 +9,18 @@ from typing import Any
 
 from .schema import resolve_predicate
 
-HEADER_RE = re.compile(r"^(pool|beat|flow|extend)(?:\s+pool)?\s+([a-zA-Z0-9_.-]+)\s*$")
+HEADER_RE = re.compile(r"^(dialogue|pool|beat|flow|extend)(?:\s+(?:dialogue|pool))?\s+([a-zA-Z0-9_.-]+)\s*$")
 BLUEPRINT_HEADER_RE = re.compile(r"^(?:extend\s+)?blueprint\s+([a-zA-Z0-9_.-]+)\s*$")
 USE_RE = re.compile(r"^use\s+([a-zA-Z0-9_.-]+)\s*$")
 LEX_HEADER_RE = re.compile(r"^(?:extend\s+)?(?:lexicon|lex)\s+([a-zA-Z0-9_.-]+)\s*$")
 LEX_ENTRY_RE = re.compile(
-    r"^(?:\[([^\]]*)\])?(?:\s*\((?:priority|pri)\s+(\d+)\))?\s*:\s*(.+?)\s*$"
+    r"^(?:\[([^\]]*)\])?(?:\s*\((?:priority|pri)\s+(\d+|low|normal|high|urgent)\))?\s*:\s*(.+?)\s*$"
 )
 SAY_RE = re.compile(
-    r'^say(?:\s+\[([^\]]*)\])?(?:\s+\((?:priority|pri)\s+(\d+)\))?(?:\s+as\s+([a-zA-Z0-9_.-]+))?\s*:\s*(?:"(.*)")?\s*$'
+    r'^say(?:\s+\[([^\]]*)\])?(?:\s+\((?:priority|pri)\s+(\d+|low|normal|high|urgent)\))?(?:\s+as\s+([a-zA-Z0-9_.-]+))?\s*:\s*(?:"(.*)")?\s*$'
 )
-OFFER_RE = re.compile(r"^offer\s+([a-zA-Z0-9_.-]+)\s*:\s*$")
+NAMED_PRIORITIES = {"low": 4, "normal": 6, "high": 9, "urgent": 11}
+OFFER_RE = re.compile(r"^(?:choice|offer)\s+([a-zA-Z0-9_.-]+)(?:\s+\[[^\]]*\])?(?:\s+\([^)]*\))?(?:\s*->\s*[a-zA-Z0-9_.-]+)?\s*:\s*$")
 KV_RE = re.compile(r"^([a-zA-Z0-9_]+)\s*:\s*(.+?)\s*$")
 TOKEN_RE = re.compile(r"\{([^}]+)\}")
 
@@ -293,7 +294,7 @@ def parse_convo_text(text: str, source_path: str = "<memory>") -> ConvoScript:
                 raise ValueError(f"{source_path}:{idx}: invalid lex entry '{stripped}'")
             raw_preds, raw_pri, raw_words = m_entry.groups()
             when = _parse_predicates(raw_preds, source_path, idx)
-            pri = int(raw_pri) if raw_pri is not None else 6
+            pri = (NAMED_PRIORITIES[raw_pri] if raw_pri in NAMED_PRIORITIES else int(raw_pri)) if raw_pri is not None else (6 if when else 5)
             words = _parse_word_list(raw_words, source_path, idx)
             current_lex.entries.append(
                 LexEntryNode(words=words, when=when, priority=pri, line_no=idx)
@@ -321,7 +322,7 @@ def parse_convo_text(text: str, source_path: str = "<memory>") -> ConvoScript:
 
         if current_offer is not None:
             m_kv = KV_RE.match(stripped)
-            if m_kv and m_kv.group(1) in ("label", "say", "intent", "subject", "action", "claim", "style", "utility", "when"):
+            if m_kv and m_kv.group(1) in ("label", "say", "intent", "subject", "action", "claim", "style", "tone", "utility", "ai_bias", "when"):
                 key, val = m_kv.group(1), m_kv.group(2)
                 if key == "label":
                     current_offer.label = _strip_quotes(val)
@@ -335,10 +336,12 @@ def parse_convo_text(text: str, source_path: str = "<memory>") -> ConvoScript:
                     current_offer.action = _strip_quotes(val)
                 elif key == "claim":
                     current_offer.claim = _strip_quotes(val)
-                elif key == "style":
+                elif key in ("style", "tone"):
                     current_offer.style = _strip_quotes(val)
                 elif key == "utility":
                     current_offer.utility = _strip_quotes(val)
+                elif key == "ai_bias":
+                    setattr(current_offer, "ai_bias", _strip_quotes(val))
                 elif key == "when":
                     inner = val.strip()
                     if inner.startswith("[") and inner.endswith("]"):
@@ -351,7 +354,7 @@ def parse_convo_text(text: str, source_path: str = "<memory>") -> ConvoScript:
             current_offer = None
             raw_preds, raw_pri, explicit_id, inline_text = m_say.groups()
             when = _parse_predicates(raw_preds, source_path, idx)
-            pri = int(raw_pri) if raw_pri is not None else 6
+            pri = (NAMED_PRIORITIES[raw_pri] if raw_pri in NAMED_PRIORITIES else int(raw_pri)) if raw_pri is not None else (6 if when else 5)
             if inline_text is not None:
                 vid = explicit_id or f"v{len(current_pool.variants) + 1}"
                 current_pool.variants.append(

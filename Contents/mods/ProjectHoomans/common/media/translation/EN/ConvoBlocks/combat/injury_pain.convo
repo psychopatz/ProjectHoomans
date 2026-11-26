@@ -2,108 +2,108 @@
 language EN
 namespace hoomans
 
-flow semantic.combat.injury.pain_reaction
+dialogue semantic.combat.injury.pain_reaction
   use offer.combat_injury_nudges
-  say [role=scratch_minor] (priority 12) as scratch_minor:
+  say [role=scratch_minor] as scratch_minor:
     "Ah, scratched my {slot.wound.part}!"
-  say [role=scratch_stoic] (priority 12) as scratch_stoic:
+  say [role=scratch_stoic] as scratch_stoic:
     "Hmph. Barely grazed my {slot.wound.part}."
-  say [role=scratch_aggressive] (priority 12) as scratch_aggressive:
+  say [role=scratch_aggressive] as scratch_aggressive:
     "Bastard nicked my {slot.wound.part}!"
-  say [role=laceration_moderate] (priority 12) as laceration_moderate:
+  say [role=laceration_moderate] as laceration_moderate:
     "Gah! Cut open my {slot.wound.part}!"
-  say [role=laceration_severe] (priority 12) as laceration_severe:
+  say [role=laceration_severe] as laceration_severe:
     "Agh! Torn deep across my {slot.wound.part}, bleeding fast!"
-  say [role=laceration_aggressive] (priority 12) as laceration_aggressive:
+  say [role=laceration_aggressive] as laceration_aggressive:
     "Son of a bitch sliced my {slot.wound.part}!"
-  say [role=laceration_stoic] (priority 12) as laceration_stoic:
+  say [role=laceration_stoic] as laceration_stoic:
     "Ngh, bad cut on my {slot.wound.part}. Still standing."
-  say [role=fracture] (priority 12) as fracture:
+  say [role=fracture] as fracture:
     "Crack, agh! Something broke in my {slot.wound.part}!"
-  say [role=deep_wound] (priority 12) as deep_wound:
+  say [role=deep_wound] as deep_wound:
     "Gah! Ripped wide open on my {slot.wound.part}!"
-  say [role=deep_wound_glass] (priority 12) as deep_wound_glass:
+  say [role=deep_wound_glass] as deep_wound_glass:
     "Agh! Shards drove straight into my {slot.wound.part}!"
-  say [role=burn] (priority 12) as burn:
+  say [role=burn] as burn:
     "Agh! Searing burn across my {slot.wound.part}!"
-  say [role=bullet] (priority 12) as bullet:
+  say [role=bullet] as bullet:
     "Agh, I'm shot! Round hit my {slot.wound.part}!"
-  say [role=bullet_stoic] (priority 12) as bullet_stoic:
+  say [role=bullet_stoic] as bullet_stoic:
     "Ngh, took a round in my {slot.wound.part}!"
-  say [role=bite] (priority 12) as bite:
+  say [role=bite] as bite:
     "No, agh! Teeth sank into my {slot.wound.part}!"
-  say [role=bite_panicked] (priority 12) as bite_panicked:
+  say [role=bite_panicked] as bite_panicked:
     "No, no, no! It bit my {slot.wound.part}, get it off me!"
-  say [role=bite_non_transmissible] (priority 12) as bite_non_transmissible:
+  say [role=bite_non_transmissible] as bite_non_transmissible:
     "Agh! Filthy teeth tore my {slot.wound.part}, won't turn me, but it's bleeding hard!"
-  say [role=multiple_hits_severe] (priority 12) as multiple_hits_severe:
+  say [role=multiple_hits_severe] as multiple_hits_severe:
     "Agh, another hard hit on my {slot.wound.part}! I'm taking too many wounds!"
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Gah, took a hit to my {slot.wound.part}!"
 
-flow semantic.combat.injury.visible_observation
+dialogue semantic.combat.injury.visible_observation
   use offer.combat_injury_nudges
-  say [role=open_wound] (priority 12) as open_wound:
+  say [role=open_wound] as open_wound:
     "You've got an open wound on your {slot.wound.part}, {addressee.name}. You should get that covered."
-  say [role=heavy_bleeding] (priority 12) as heavy_bleeding:
+  say [role=heavy_bleeding] as heavy_bleeding:
     "You're bleeding hard from your {slot.wound.part}, {addressee.name}! Patch it up right now!"
-  say [role=dirty_bandage] (priority 12) as dirty_bandage:
+  say [role=dirty_bandage] as dirty_bandage:
     "That bandage on your {slot.wound.part} looks filthy, {addressee.name}. Change it when you can."
-  say [role=suspected_infection] (priority 12) as suspected_infection:
+  say [role=suspected_infection] as suspected_infection:
     "That wound on your {slot.wound.part} might be infected, {addressee.name}."
-  say [role=medic_infection_assessment] (priority 12) as medic_infection_assessment:
+  say [role=medic_infection_assessment] as medic_infection_assessment:
     "Hold still, {addressee.name}. That wound on your {slot.wound.part} is inflamed, we need to disinfect and dress it."
-  say [role=medic_triage_offer] (priority 12) as medic_triage_offer:
+  say [role=medic_triage_offer] as medic_triage_offer:
     "Hold still, {addressee.name}. Let me see that {slot.wound.part}."
-  say [role=limp_mobility] (priority 12) as limp_mobility:
+  say [role=limp_mobility] as limp_mobility:
     "You're favoring your {slot.wound.part} and limping, {addressee.name}. Don't push your stride too hard."
-  say [role=multiple_wounds_escalation] (priority 12) as multiple_wounds_escalation:
+  say [role=multiple_wounds_escalation] as multiple_wounds_escalation:
     "You got hit again on your {slot.wound.part}, {addressee.name}! You're taking too many wounds!"
-  say [role=new_wound_noticed] (priority 12) as new_wound_noticed:
+  say [role=new_wound_noticed] as new_wound_noticed:
     "Wait, {addressee.name}, you took a new hit on your {slot.wound.part} too?"
-  say [role=visible_bite] (priority 12) as visible_bite:
+  say [role=visible_bite] as visible_bite:
     "Wait... is that a bite mark on your {slot.wound.part}, {addressee.name}?"
-  say [role=feverish_weak] (priority 12) as feverish_weak:
+  say [role=feverish_weak] as feverish_weak:
     "You look feverish, {addressee.name}. Can you sit for a minute?"
-  say [role=aid_supply_offer] (priority 12) as aid_supply_offer:
+  say [role=aid_supply_offer] as aid_supply_offer:
     "I've got a bandage I can spare. Want it?"
-  say [role=aid_treatment_offer] (priority 12) as aid_treatment_offer:
+  say [role=aid_treatment_offer] as aid_treatment_offer:
     "If you can hold still, I can put a dressing on that."
-  say [role=aid_no_supply] (priority 12) as aid_no_supply:
+  say [role=aid_no_supply] as aid_no_supply:
     "I don't have any bandages either."
-  say [role=aid_refused] (priority 12) as aid_refused:
+  say [role=aid_refused] as aid_refused:
     "I can't spare a dressing right now."
-  say [role=aid_acknowledged] (priority 12) as aid_acknowledged:
+  say [role=aid_acknowledged] as aid_acknowledged:
     "All right. Let me know if that changes."
-  say [role=aid_dismissed] (priority 12) as aid_dismissed:
+  say [role=aid_dismissed] as aid_dismissed:
     "Fine. I'll give you some room."
-  say [role=aid_taken] (priority 12) as aid_taken:
+  say [role=aid_taken] as aid_taken:
     "There. You've got a bandage now."
-  say [role=aid_treated] (priority 12) as aid_treated:
+  say [role=aid_treated] as aid_treated:
     "There. The dressing's on."
-  say [role=aid_changed] (priority 12) as aid_changed:
+  say [role=aid_changed] as aid_changed:
     "Hang on. I can't help with it right now."
-  say [role=observer_supportive] (priority 12) as observer_supportive:
+  say [role=observer_supportive] as observer_supportive:
     "Sit down a second. Let me help you with that."
-  say [role=observer_clinical] (priority 12) as observer_clinical:
+  say [role=observer_clinical] as observer_clinical:
     "Hold still. Let me take a look at that wound."
-  say [role=observer_protective] (priority 12) as observer_protective:
+  say [role=observer_protective] as observer_protective:
     "Get that wound covered before we move."
-  say [role=observer_dismissive] (priority 12) as observer_dismissive:
+  say [role=observer_dismissive] as observer_dismissive:
     "Get that dealt with. We can't keep stopping."
-  say [role=observer_hostile] (priority 12) as observer_hostile:
+  say [role=observer_hostile] as observer_hostile:
     "That's your problem. Keep it away from me."
-  say [role=aid_scarce] (priority 12) as aid_scarce:
+  say [role=aid_scarce] as aid_scarce:
     "It's the last dressing I've got. I need to keep it."
-  say [role=aid_disappointed] (priority 12) as aid_disappointed:
+  say [role=aid_disappointed] as aid_disappointed:
     "You went out without a dressing? I can spare this one."
-  say [role=aid_hostile] (priority 12) as aid_hostile:
+  say [role=aid_hostile] as aid_hostile:
     "Sounds like your problem."
-  say [role=aid_gratitude] (priority 12) as aid_gratitude:
+  say [role=aid_gratitude] as aid_gratitude:
     "Anytime. Take it easy for a minute."
-  say [role=aid_debt] (priority 12) as aid_debt:
+  say [role=aid_debt] as aid_debt:
     "You don't owe me anything. Just get better."
-  say [role=aid_reassured] (priority 12) as aid_reassured:
+  say [role=aid_reassured] as aid_reassured:
     "I'm sure. You're the one who needs it."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "You're hurt on your {slot.wound.part}, {addressee.name}. Take care of that wound."

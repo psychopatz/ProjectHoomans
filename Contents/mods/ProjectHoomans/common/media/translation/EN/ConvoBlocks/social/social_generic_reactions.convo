@@ -2,26 +2,26 @@
 language EN
 namespace hoomans
 
-flow semantic.companion.reaction
-  say [command.id=camp, event.type=companion_command_rejection] (priority 13) as camp_rejected:
+dialogue semantic.companion.reaction
+  say [command.id=camp, event.type=companion_command_rejection] as camp_rejected:
     "I can't find a safe room or campfire nearby."
-  say [event.type=follower_abandoned_zombie|follower_abandoned_hostile_npc] (priority 8) as abandonment:
+  say [event.type=follower_abandoned_zombie|follower_abandoned_hostile_npc] as abandonment:
     "Stay with me next time. We watch each other's backs."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "I heard you. We will handle it together."
 
-flow semantic.social.reaction
-  say [default] (priority 5) as default:
+dialogue semantic.social.reaction
+  say [default] as default:
     "I hear you."
 
-flow semantic.conversation.safety
-  say [event.type=conversation_safety] (priority 7) as danger:
+dialogue semantic.conversation.safety
+  say [event.type=conversation_safety] as danger:
     "Watch out. We need to move now."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Stay alert."
 
-flow semantic.corpse.reaction
-  say [corpse.revenge] (priority 8) as revenge:
+dialogue semantic.corpse.reaction
+  say [corpse.revenge] as revenge:
     "Someone is going to answer for this."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Someone died here. We should remember that."

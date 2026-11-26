@@ -2,145 +2,145 @@
 language EN
 namespace hoomans
 
-flow semantic.combat.fighting.injured_callout
+dialogue semantic.combat.fighting.injured_callout
   use offer.combat_injury_nudges
-  say [role=with_wounds_head_neck_critical] (priority 12) as with_wounds_head_neck_critical:
+  say [role=with_wounds_head_neck_critical] as with_wounds_head_neck_critical:
     "Blood is getting in my eyes, {addressee.name}! My {slot.wound.part} is torn open, keep them off me!"
-  say [role=with_wounds_head_neck] (priority 12) as with_wounds_head_neck:
+  say [role=with_wounds_head_neck] as with_wounds_head_neck:
     "Watch my blind side, {addressee.name}, took an open cut to my {slot.wound.part}!"
-  say [role=with_wounds_torso_critical] (priority 12) as with_wounds_torso_critical:
+  say [role=with_wounds_torso_critical] as with_wounds_torso_critical:
     "Holding my ribs together, {addressee.name}! Open wound on my {slot.wound.part}, don't let them close in!"
-  say [role=with_wounds_torso] (priority 12) as with_wounds_torso:
+  say [role=with_wounds_torso] as with_wounds_torso:
     "Still standing, {addressee.name}, though my {slot.wound.part} is bleeding through my shirt!"
-  say [role=with_wounds_pelvis_groin_severe] (priority 12) as with_wounds_pelvis_groin_severe:
+  say [role=with_wounds_pelvis_groin_severe] as with_wounds_pelvis_groin_severe:
     "My hip and {slot.wound.part} are torn open, {addressee.name}! I can barely pivot, hold my flank!"
-  say [role=with_wounds_pelvis_groin] (priority 12) as with_wounds_pelvis_groin:
+  say [role=with_wounds_pelvis_groin] as with_wounds_pelvis_groin:
     "Caught an open gash across my {slot.wound.part}, {addressee.name}, can't twist fast so watch my side!"
-  say [role=with_wounds_upper_limb_severe] (priority 12) as with_wounds_upper_limb_severe:
+  say [role=with_wounds_upper_limb_severe] as with_wounds_upper_limb_severe:
     "My {slot.wound.part} is bleeding bad, {addressee.name}, weapon feels heavy but I'm not stopping!"
-  say [role=with_wounds_upper_limb] (priority 12) as with_wounds_upper_limb:
+  say [role=with_wounds_upper_limb] as with_wounds_upper_limb:
     "Got an open wound on my {slot.wound.part}, {addressee.name}, still fighting though!"
-  say [role=with_wounds_lower_limb_severe] (priority 12) as with_wounds_lower_limb_severe:
+  say [role=with_wounds_lower_limb_severe] as with_wounds_lower_limb_severe:
     "My {slot.wound.part} is giving way, {addressee.name}! Can't sprint with this bleeding wound, hold the line!"
-  say [role=with_wounds_lower_limb] (priority 12) as with_wounds_lower_limb:
+  say [role=with_wounds_lower_limb] as with_wounds_lower_limb:
     "Footwork's sluggish with this open hit on my {slot.wound.part}, {addressee.name}, stay tight with me!"
-  say [role=with_wounds_minor] (priority 12) as with_wounds_minor:
+  say [role=with_wounds_minor] as with_wounds_minor:
     "Still fighting through a fresh {slot.wound.label} on my {slot.wound.part}, {addressee.name}, we got this."
-  say [role=with_wounds_dirty_bandage] (priority 12) as with_wounds_dirty_bandage:
+  say [role=with_wounds_dirty_bandage] as with_wounds_dirty_bandage:
     "The dressing on my {slot.wound.part} is soaked filthy, {addressee.name}! I need a clean wrap once we clear!"
-  say [role=patched_up_head_neck_severe] (priority 12) as patched_up_head_neck_severe:
+  say [role=patched_up_head_neck_severe] as patched_up_head_neck_severe:
     "Bandages around my {slot.wound.part} are barely holding, {addressee.name}, help me finish these fast!"
-  say [role=patched_up_head_neck] (priority 12) as patched_up_head_neck:
+  say [role=patched_up_head_neck] as patched_up_head_neck:
     "Dressing on my {slot.wound.part} is holding for now, {addressee.name}, keep fighting!"
-  say [role=patched_up_torso_severe] (priority 12) as patched_up_torso_severe:
+  say [role=patched_up_torso_severe] as patched_up_torso_severe:
     "Wraps across my {slot.wound.part} are soaking red, {addressee.name}, help me drop the rest quick!"
-  say [role=patched_up_torso] (priority 12) as patched_up_torso:
+  say [role=patched_up_torso] as patched_up_torso:
     "Bandage on my {slot.wound.part} is holding, {addressee.name}, breathing hurts a bit but I'm steady."
-  say [role=patched_up_pelvis_groin_severe] (priority 12) as patched_up_pelvis_groin_severe:
+  say [role=patched_up_pelvis_groin_severe] as patched_up_pelvis_groin_severe:
     "Bound my {slot.wound.part} as tight as I could, {addressee.name}, can't lunge far so keep them in front!"
-  say [role=patched_up_pelvis_groin] (priority 12) as patched_up_pelvis_groin:
+  say [role=patched_up_pelvis_groin] as patched_up_pelvis_groin:
     "Got my {slot.wound.part} wrapped up, {addressee.name}, stride's short but I'm holding the line!"
-  say [role=patched_up_upper_limb_severe] (priority 12) as patched_up_upper_limb_severe:
+  say [role=patched_up_upper_limb_severe] as patched_up_upper_limb_severe:
     "Wrap on my {slot.wound.part} is tight, {addressee.name}, hurts like hell to swing but I'll keep swinging!"
-  say [role=patched_up_upper_limb] (priority 12) as patched_up_upper_limb:
+  say [role=patched_up_upper_limb] as patched_up_upper_limb:
     "Bandaged my {slot.wound.part} and I'm still fighting, {addressee.name}, watch the left!"
-  say [role=patched_up_lower_limb_severe] (priority 12) as patched_up_lower_limb_severe:
+  say [role=patched_up_lower_limb_severe] as patched_up_lower_limb_severe:
     "Dressing on my {slot.wound.part} is taking all I've got, {addressee.name}, stay on my shoulder!"
-  say [role=patched_up_lower_limb] (priority 12) as patched_up_lower_limb:
+  say [role=patched_up_lower_limb] as patched_up_lower_limb:
     "Got my {slot.wound.part} patched up, {addressee.name}, still standing my ground!"
-  say [role=patched_up_minor] (priority 12) as patched_up_minor:
+  say [role=patched_up_minor] as patched_up_minor:
     "Already patched that scrape on my {slot.wound.part}, {addressee.name}, ready to clear the rest."
-  say [role=with_wounds_bite_lethal] (priority 12) as with_wounds_bite_lethal:
+  say [role=with_wounds_bite_lethal] as with_wounds_bite_lethal:
     "I'm bleeding from this bite on my {slot.wound.part}, {addressee.name}! I'll fight till I drop, keep them off me!"
-  say [role=with_wounds_bite_possible_exposure] (priority 12) as with_wounds_bite_possible_exposure:
+  say [role=with_wounds_bite_possible_exposure] as with_wounds_bite_possible_exposure:
     "Teeth tore my {slot.wound.part}, {addressee.name}! I don't feel feverish yet, just help me fight clear so I can wrap it!"
-  say [role=with_wounds_bite_confirmed_symptomatic] (priority 12) as with_wounds_bite_confirmed_symptomatic:
+  say [role=with_wounds_bite_confirmed_symptomatic] as with_wounds_bite_confirmed_symptomatic:
     "Fever's burning and my {slot.wound.part} bite is still bleeding, {addressee.name}! Let me take these dead down with me!"
-  say [role=with_wounds_bite_non_transmissible] (priority 12) as with_wounds_bite_non_transmissible:
+  say [role=with_wounds_bite_non_transmissible] as with_wounds_bite_non_transmissible:
     "Fighting with an open bite on my {slot.wound.part}, {addressee.name}, hurts awful but saliva won't turn me!"
-  say [role=patched_up_bite_lethal] (priority 12) as patched_up_bite_lethal:
+  say [role=patched_up_bite_lethal] as patched_up_bite_lethal:
     "Wrapped the bite on my {slot.wound.part}, {addressee.name}, buying every minute I can to help you clear out!"
-  say [role=patched_up_bite_possible_exposure] (priority 12) as patched_up_bite_possible_exposure:
+  say [role=patched_up_bite_possible_exposure] as patched_up_bite_possible_exposure:
     "Wrapped the bite on my {slot.wound.part} tight, {addressee.name}, praying the fever doesn't come while we clear this!"
-  say [role=patched_up_bite_confirmed_symptomatic] (priority 12) as patched_up_bite_confirmed_symptomatic:
+  say [role=patched_up_bite_confirmed_symptomatic] as patched_up_bite_confirmed_symptomatic:
     "Bite on my {slot.wound.part} is wrapped, {addressee.name}, but the fever's setting in—let me hold the front for you!"
-  say [role=patched_up_bite_non_transmissible] (priority 12) as patched_up_bite_non_transmissible:
+  say [role=patched_up_bite_non_transmissible] as patched_up_bite_non_transmissible:
     "Got the bite on my {slot.wound.part} wrapped tight, {addressee.name}, sore as hell but I'm not turning!"
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Still fighting with a hit on my {slot.wound.part}, {addressee.name}, keep our spacing tight!"
 
-flow semantic.combat.wound.received_beat
+dialogue semantic.combat.wound.received_beat
   use offer.combat_injury_nudges
-  say [combat.wound_type=bite_lethal] (priority 12) as bite_lethal:
+  say [combat.wound_type=bite_lethal] as bite_lethal:
     "No, no! It bit my {slot.wound.part}, {addressee.name}! Teeth went straight through!"
-  say [combat.wound_type=bite_possible_exposure] (priority 12) as bite_possible_exposure:
+  say [combat.wound_type=bite_possible_exposure] as bite_possible_exposure:
     "Agh! Teeth broke skin on my {slot.wound.part}, {addressee.name}! Help me clear out so we can see how deep that bite went!"
-  say [combat.wound_type=bite_confirmed_symptomatic] (priority 12) as bite_confirmed_symptomatic:
+  say [combat.wound_type=bite_confirmed_symptomatic] as bite_confirmed_symptomatic:
     "My skin's burning up and that bite on my {slot.wound.part} is throbbing, {addressee.name}! The fever's taking hold!"
-  say [combat.wound_type=bite_non_transmissible] (priority 12) as bite_non_transmissible:
+  say [combat.wound_type=bite_non_transmissible] as bite_non_transmissible:
     "Agh! Teeth tore right into my {slot.wound.part}, {addressee.name}! Hurts like hell, help me wrap it once we clear!"
-  say [combat.wound_type=bullet] (priority 12) as bullet:
+  say [combat.wound_type=bullet] as bullet:
     "I'm shot! Took a round in my {slot.wound.part}, {addressee.name}!"
-  say [combat.wound_type=deep_wound_glass] (priority 12) as deep_wound_glass:
+  say [combat.wound_type=deep_wound_glass] as deep_wound_glass:
     "Agh! Glass went deep into my {slot.wound.part}, {addressee.name}, bleeding everywhere!"
-  say [combat.wound_type=deep_wound] (priority 12) as deep_wound:
+  say [combat.wound_type=deep_wound] as deep_wound:
     "Ripped wide open on my {slot.wound.part}, {addressee.name}! Deep gash, I need stitches after this!"
-  say [combat.wound_type=fracture] (priority 12) as fracture:
+  say [combat.wound_type=fracture] as fracture:
     "Crack! Something snapped in my {slot.wound.part}, {addressee.name}!"
-  say [combat.wound_type=burn] (priority 12) as burn:
+  say [combat.wound_type=burn] as burn:
     "Agh! Burned my {slot.wound.part}, {addressee.name}, skin's blistering bad!"
-  say [combat.wound_type=laceration] (priority 12) as laceration:
+  say [combat.wound_type=laceration] as laceration:
     "Slashed my {slot.wound.part}, {addressee.name}! Nasty laceration, keep them back!"
-  say [combat.wound_type=scratch] (priority 12) as scratch:
+  say [combat.wound_type=scratch] as scratch:
     "Tch, grazed my {slot.wound.part}, {addressee.name}, just a scratch."
-  say [combat.wound_type=post_combat_injury_check] (priority 12) as post_combat_injury_check:
+  say [combat.wound_type=post_combat_injury_check] as post_combat_injury_check:
     "Area's clear, {addressee.name}, but this {slot.wound.label} on my {slot.wound.part} needs attention right now."
-  say [combat.wound_type=severity_escalation] (priority 12) as severity_escalation:
+  say [combat.wound_type=severity_escalation] as severity_escalation:
     "My {slot.wound.part} is getting worse, {addressee.name}! I'm losing too much blood!"
-  say [combat.wound_type=bandage_dirty] (priority 12) as bandage_dirty:
+  say [combat.wound_type=bandage_dirty] as bandage_dirty:
     "Bandage on my {slot.wound.part} is soaked and dirty, {addressee.name}, I need a fresh dressing soon."
-  say [combat.wound_type=treatment_stabilized] (priority 12) as treatment_stabilized:
+  say [combat.wound_type=treatment_stabilized] as treatment_stabilized:
     "Got my {slot.wound.part} bound up tight, {addressee.name}. Bleeding's finally under control."
-  say [combat.wound_type=knox_symptom_onset] (priority 12) as knox_symptom_onset:
+  say [combat.wound_type=knox_symptom_onset] as knox_symptom_onset:
     "Stomach's turning and my skin feels clammy, {addressee.name}... something's wrong after that wound on my {slot.wound.part}."
-  say [combat.wound_type=fever_onset] (priority 12) as fever_onset:
+  say [combat.wound_type=fever_onset] as fever_onset:
     "Burning up with fever, {addressee.name}... my head is pounding and I can barely focus."
-  say [combat.wound_type=cold_illness_onset] (priority 12) as cold_illness_onset:
+  say [combat.wound_type=cold_illness_onset] as cold_illness_onset:
     "Caught a nasty chill in my chest, {addressee.name}, can't stop coughing and sneezing."
-  say [combat.wound_type=hypothermia_onset] (priority 12) as hypothermia_onset:
+  say [combat.wound_type=hypothermia_onset] as hypothermia_onset:
     "Hands are numb and I can't stop shivering, {addressee.name}! I'm freezing out here!"
-  say [combat.wound_type=hyperthermia_onset] (priority 12) as hyperthermia_onset:
+  say [combat.wound_type=hyperthermia_onset] as hyperthermia_onset:
     "Dizzy from the heat, {addressee.name}... I'm overheating in this gear!"
-  say [combat.wound_type=soaked_chill] (priority 12) as soaked_chill:
+  say [combat.wound_type=soaked_chill] as soaked_chill:
     "Soaked to the bone and shivering, {addressee.name}—I'll catch a fever if I stay wet like this."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Took a hit to my {slot.wound.part}, {addressee.name}, watch that angle!"
 
-flow semantic.combat.wound.ally_reaction
+dialogue semantic.combat.wound.ally_reaction
   use offer.combat_injury_nudges
-  say [role=close_bond_bite_lethal] (priority 12) as close_bond_bite_lethal:
+  say [role=close_bond_bite_lethal] as close_bond_bite_lethal:
     "No! Don't talk like that, {addressee.name}! Stay beside me, I'm not leaving you out here!"
-  say [role=close_bond_critical] (priority 12) as close_bond_critical:
+  say [role=close_bond_critical] as close_bond_critical:
     "Stay with me, {addressee.name}! Don't you dare go down on my watch, I've got you!"
-  say [role=close_bond_patched] (priority 12) as close_bond_patched:
+  say [role=close_bond_patched] as close_bond_patched:
     "Easy, {addressee.name}, watch that patched {slot.wound.part}! Stick right by my shoulder, I'm not losing you!"
-  say [role=supportive_cover_wounded] (priority 12) as supportive_cover_wounded:
+  say [role=supportive_cover_wounded] as supportive_cover_wounded:
     "Fall back behind me, {addressee.name}, your {slot.wound.part} needs wrapping before you bleed out!"
-  say [role=supportive_cover_patched] (priority 12) as supportive_cover_patched:
+  say [role=supportive_cover_patched] as supportive_cover_patched:
     "Watch your dressing on that {slot.wound.part}, {addressee.name}, shout if it starts soaking through!"
-  say [role=tactical_cover_wounded] (priority 12) as tactical_cover_wounded:
+  say [role=tactical_cover_wounded] as tactical_cover_wounded:
     "Copy that, {addressee.name}, pull behind the line and tie off your {slot.wound.part}!"
-  say [role=tactical_cover_patched] (priority 12) as tactical_cover_patched:
+  say [role=tactical_cover_patched] as tactical_cover_patched:
     "Keep your {slot.wound.part} protected, {addressee.name}, we hold spacing until clear!"
-  say [role=squad_crossfire_wingman] (priority 12) as squad_crossfire_wingman:
+  say [role=squad_crossfire_wingman] as squad_crossfire_wingman:
     "I'm closing the gap on your flank, {addressee.name}! Squad, tighten up and cover that {slot.wound.part}!"
-  say [role=bite_non_transmissible_relief] (priority 12) as bite_non_transmissible_relief:
+  say [role=bite_non_transmissible_relief] as bite_non_transmissible_relief:
     "You're not turning, {addressee.name}, saliva doesn't spread it! Keep pressure on your {slot.wound.part} and keep moving!"
-  say [role=low_rel_dismissive] (priority 12) as low_rel_dismissive:
+  say [role=low_rel_dismissive] as low_rel_dismissive:
     "Quit groaning about your {slot.wound.part}, {addressee.name}, either hold your corner or get out of my way."
-  say [role=low_rel_bite_execution_threat] (priority 12) as low_rel_bite_execution_threat:
+  say [role=low_rel_bite_execution_threat] as low_rel_bite_execution_threat:
     "You got bit, {addressee.name}. Stay five steps back, and the second you look feverish I'm ending you."
-  say [role=psychopath_bite_execution_threat] (priority 12) as psychopath_bite_execution_threat:
+  say [role=psychopath_bite_execution_threat] as psychopath_bite_execution_threat:
     "You're bitten, {addressee.name}. Forget bandages. I'm putting you down myself before you turn on us."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Stay sharp on your feet, {addressee.name}, keep watching your {slot.wound.part}!"

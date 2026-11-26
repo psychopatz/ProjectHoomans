@@ -43,6 +43,8 @@ Core.CONDITION_FIELDS = {
     "npcAnnoyance", "npcAnnoyed", "npcFedUp", "convoRepeatCount", "commandRedundant",
     "groupSize", "groupBroadcast", "floorSpeakerIsNPC", "floorInterjectionKind",
     "floorSideWithSpeaker", "floorSpeakerAnnoyed", "floorSpeakerInjured",
+    "personalityCompassion", "personalitySociability", "personalityForgiveness",
+    "personalityBravery", "personalityMaterialism", "personalityAggression", "personalityLoyalty",
     "actorRole", "relBond", "actorAgeBand",
 }
 
@@ -75,6 +77,8 @@ local PASSTHROUGH_FIELDS = {
     "npcAnnoyance", "npcAnnoyed", "npcFedUp", "convoRepeatCount", "commandRedundant",
     "groupSize", "groupBroadcast", "floorSpeakerIsNPC", "floorInterjectionKind",
     "floorSideWithSpeaker", "floorSpeakerAnnoyed", "floorSpeakerInjured",
+    "personalityCompassion", "personalitySociability", "personalityForgiveness",
+    "personalityBravery", "personalityMaterialism", "personalityAggression", "personalityLoyalty",
     "actorRole", "relBond", "actorAgeBand",
 }
 

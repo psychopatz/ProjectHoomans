@@ -68,6 +68,26 @@ function Beats.LogAuditSnapshot(reason, at)
         for _ in pairs(Beats.ActiveThreads) do activeThreads = activeThreads + 1 end
     end
 
+    local convoPools = 0
+    local convoPending = 0
+    local convoErrors = 0
+    local cat = PNC.ConvoEngine and PNC.ConvoEngine.ResponseCatalog or nil
+    if type(cat) == "table" then
+        convoPools = tonumber(cat.POOL_COUNT) or 0
+    end
+    local dsl = PNC.ConvoEngine and PNC.ConvoEngine.ConvoDSL or nil
+    if type(dsl) == "table" then
+        if type(dsl.PendingCount) == "function" then
+            convoPending = tonumber(dsl.PendingCount()) or 0
+        end
+        if type(dsl.GetDiagnostics) == "function" then
+            local diag = dsl.GetDiagnostics()
+            if type(diag) == "table" and type(diag.errors) == "table" then
+                convoErrors = #diag.errors
+            end
+        end
+    end
+
     Beats.AuditLog("snapshot", {
         "reason=" .. tostring(reason or "manual"),
         "now=" .. tostring(math.floor(now)),
@@ -81,6 +101,10 @@ function Beats.LogAuditSnapshot(reason, at)
         "hookCount=" .. tostring(#hookEntries),
         "objectHookCount=" .. tostring(#objEntries),
         "deviceHookCount=" .. tostring(#devEntries),
+        "convoPools=" .. tostring(convoPools),
+        "convoPending=" .. tostring(convoPending),
+        "convoErrors=" .. tostring(convoErrors),
+        "thunderHooked=" .. tostring(Beats._ThunderEventHooked == true),
         "worldSoundHooked=" .. tostring(Beats._HouseAlarmWorldSoundHooked == true),
         "ambientSoundHooked=" .. tostring(Beats._HouseAlarmAmbientSoundHooked == true),
         "metaAmbientSoundHooked=" .. tostring(Beats._MetaAmbientSoundHooked == true),
@@ -102,9 +126,17 @@ function Beats.LogAuditSnapshot(reason, at)
             and Beats.GetUtilitiesAuditState() or {}
         Beats.AuditLog("env_state", {
             "weather=" .. tostring(w and w.weather or "nil"),
+            "isHarsh=" .. tostring(w and w.isHarshWeather == true),
             "isRaining=" .. tostring(w and w.isRaining == true),
             "rainIntensity=" .. tostring(w and w.rainIntensity or "nil"),
+            "isSnowing=" .. tostring(w and w.isSnowing == true),
+            "snowIntensity=" .. tostring(w and w.snowIntensity or "nil"),
             "fogIntensity=" .. tostring(w and w.fogIntensity or "nil"),
+            "windIntensity=" .. tostring(w and w.windIntensity or "nil"),
+            "windKph=" .. tostring(w and w.windSpeedKph or "nil"),
+            "isThunder=" .. tostring(w and w.isThunderStorming == true),
+            "isBlizzard=" .. tostring(w and w.isBlizzard == true),
+            "isTropical=" .. tostring(w and w.isTropicalStorm == true),
             "temp=" .. tostring(w and w.temperature or "nil"),
             "timeOfDay=" .. tostring(w and w.timeOfDay or "nil"),
             "currentDay=" .. tostring(u and u.currentDay or "nil"),
@@ -117,6 +149,27 @@ function Beats.LogAuditSnapshot(reason, at)
             "emittedPowerDay=" .. tostring(utilState.emittedPowerDay or "nil"),
             "emittedWaterDay=" .. tostring(utilState.emittedWaterDay or "nil"),
         })
+        if type(BC.GetPlayerExposure) == "function" then
+            local exp = BC.GetPlayerExposure(nil, now)
+            local wxState = type(Beats.GetWeatherExposureAuditState) == "function"
+                and Beats.GetWeatherExposureAuditState(now) or {}
+            Beats.AuditLog("exposure_state", {
+                "hasPlayer=" .. tostring(exp and exp.hasPlayer == true),
+                "isOutside=" .. tostring(exp and exp.isOutside == true),
+                "wetLevel=" .. tostring(exp and exp.wetLevel or 0),
+                "wetness=" .. tostring(exp and math.floor(tonumber(exp.wetness) or 0) or 0),
+                "hypo=" .. tostring(exp and exp.hypoLevel or 0),
+                "hyper=" .. tostring(exp and exp.hyperLevel or 0),
+                "windchill=" .. tostring(exp and exp.windchillLevel or 0),
+                "hasCold=" .. tostring(exp and exp.hasCold == true),
+                "isSoakingWet=" .. tostring(exp and exp.isSoakingWet == true),
+                "lastCondition=" .. tostring(wxState.lastCondition or "none"),
+                "exposureCdMs=" .. tostring(wxState.exposureCooldownRemainingMs or 0),
+                "thunderStrikeCdMs=" .. tostring(wxState.thunderStrikeCooldownRemainingMs or 0),
+                "thunderRumbleCdMs=" .. tostring(wxState.thunderRumbleCooldownRemainingMs or 0),
+                "outdoorRainDwellMs=" .. tostring(wxState.outdoorRainDwellMs or 0),
+            })
+        end
     end
 
     if type(Beats.GetHouseAlarmAuditState) == "function" then
@@ -165,6 +218,18 @@ function Beats.LogAuditSnapshot(reason, at)
             "globalCooldownRemainingMs=" .. tostring(gb.globalCooldownRemainingMs or 0),
             "trackedGroups=" .. tostring(gb.trackedGroups or 0),
             "banterSeq=" .. tostring(gb.banterSeq or 0),
+        })
+    end
+
+    if type(Beats.GetStateWatcherAuditState) == "function" then
+        local sw = Beats.GetStateWatcherAuditState()
+        Beats.AuditLog("watcher_state", {
+            "registered=" .. tostring(sw.registeredCount or 0),
+            "tracked=" .. tostring(sw.trackedEntries or 0),
+            "transitions=" .. tostring(sw.transitionCount or 0),
+            "activeCount=" .. tostring(sw.activeCount or 0),
+            "armedCount=" .. tostring(sw.armedCount or 0),
+            "armed=" .. tostring(sw.armed or "none"),
         })
     end
 

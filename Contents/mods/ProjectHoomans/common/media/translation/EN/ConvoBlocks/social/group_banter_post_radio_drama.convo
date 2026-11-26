@@ -3,11 +3,11 @@ language EN
 namespace hoomans
 
 extend semantic.banter.group
-  say [topic=post_radio_drama, role=open] (priority 12) as post_drama_open:
+  say [topic=post_radio_drama, role=open] as post_drama_open:
     "Still laughing about {slot.broadcast.topic} earlier, {addressee.name}. Glad our crew doesn't air our laundry on an open frequency."
-  say [topic=post_radio_drama, role=reply] (priority 12) as post_drama_reply:
+  say [topic=post_radio_drama, role=reply] as post_drama_reply:
     "No kidding, {addressee.name}. Last thing we need is half the county listening to us argue."
-  say [topic=post_radio_drama, role=chime] (priority 12) as post_drama_chime:
+  say [topic=post_radio_drama, role=chime] as post_drama_chime:
     "At least we know those groups are too busy fighting each other to bother us."
-  say [topic=post_radio_drama, role=wrap] (priority 12) as post_drama_wrap:
+  say [topic=post_radio_drama, role=wrap] as post_drama_wrap:
     "True enough. Let's keep our own house in order."

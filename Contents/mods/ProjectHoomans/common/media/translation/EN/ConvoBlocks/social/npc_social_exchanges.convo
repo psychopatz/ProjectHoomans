@@ -2,32 +2,32 @@
 language EN
 namespace hoomans
 
-beat semantic.social.npc_exchange.intro
-  say [role=open] (priority 8) as open:
+dialogue semantic.social.npc_exchange.intro
+  say [role=open] as open:
     "Hey, I don't think we've met. I'm {speaker.name}."
-  say [role=reply] (priority 8) as reply:
+  say [role=reply] as reply:
     "I'm {speaker.name}. Stay safe out here."
 
-beat semantic.social.npc_exchange.friend
-  say [role=open] (priority 8) as open:
+dialogue semantic.social.npc_exchange.friend
+  say [role=open] as open:
     "Honestly {addressee.name}, it's good knowing I can count on you."
-  say [role=reply] (priority 8) as reply:
+  say [role=reply] as reply:
     "Same goes for you, {addressee.name}. We'll look out for each other."
 
-beat semantic.social.npc_exchange.lover
-  say [role=open] (priority 8) as open:
+dialogue semantic.social.npc_exchange.lover
+  say [role=open] as open:
     "You know, {addressee.name}, I'm really glad we found each other out here."
-  say [role=reply] (priority 8) as reply:
+  say [role=reply] as reply:
     "Me too, {addressee.name}. I've got your back—always."
 
-beat semantic.social.npc_exchange.gossip
-  say [role=open] (priority 8) as open:
+dialogue semantic.social.npc_exchange.gossip
+  say [role=open] as open:
     "Hey {addressee.name}, did you hear what happened {slot.gossip_time}, {slot.gossip_location}?"
-  say [role=reply] (priority 8) as reply:
+  say [role=reply] as reply:
     "Really? Good to know, {addressee.name}. I'll keep an eye out."
 
-beat semantic.social.npc_exchange.chat
-  say [role=open] (priority 8) as open:
+dialogue semantic.social.npc_exchange.chat
+  say [role=open] as open:
     "Holding up alright, {addressee.name}?"
-  say [role=reply] (priority 8) as reply:
+  say [role=reply] as reply:
     "Managing so far, {addressee.name}. Just taking it day by day."

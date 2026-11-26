@@ -3,17 +3,17 @@ language EN
 namespace hoomans
 
 lexicon noun.zombie
-  [actor.style=tactical] (priority 8):   "hostile" | "infected" | "dead"
-  [actor.style=shaken] (priority 8):     "thing" | "dead" | "biter"
-  [actor.style=aggressive] (priority 8): "rotter" | "biter" | "walker"
+  [actor.style=tactical]:   "hostile" | "infected" | "dead"
+  [actor.style=shaken]:     "thing" | "dead" | "biter"
+  [actor.style=aggressive]: "rotter" | "biter" | "walker"
   [default]:                        "walker" | "dead" | "biter"
 
 lexicon noun.pack
-  [actor.style=tactical] (priority 8):   "cluster" | "pack" | "group"
+  [actor.style=tactical]:   "cluster" | "pack" | "group"
   [default]:                        "pack" | "swarm" | "mob" | "bunch"
 
 lexicon noun.group
-  [actor.style=tactical] (priority 8):   "squad" | "unit" | "team"
+  [actor.style=tactical]:   "squad" | "unit" | "team"
   [default]:                        "crew" | "group" | "folks" | "outfit"
 
 lexicon noun.dark
@@ -23,8 +23,8 @@ lexicon noun.road
   [default]: "road" | "street" | "block" | "stretch"
 
 lexicon adj.fight
-  [actor.style=aggressive] (priority 8): "brutal" | "bloody" | "vicious"
-  [actor.style=shaken] (priority 8):     "awful" | "ugly" | "terrifying"
+  [actor.style=aggressive]: "brutal" | "bloody" | "vicious"
+  [actor.style=shaken]:     "awful" | "ugly" | "terrifying"
   [default]:                        "rough" | "ugly" | "nasty" | "close"
 
 lexicon adj.hit
@@ -37,10 +37,10 @@ lexicon adv.barely
   [default]: "barely" | "just barely" | "by the skin of my teeth"
 
 lexicon opener.relief
-  [actor.style=shaken] (priority 8):     "Christ" | "Thank God" | "Jesus"
-  [actor.style=brave] (priority 8):      "Whew" | "Hell" | "Alright"
-  [actor.style=aggressive] (priority 8): "Damn right" | "Hell yeah" | "About time"
-  [actor.style=cold] (priority 8):       "Good" | "Well" | "Alright"
+  [actor.style=shaken]:     "Christ" | "Thank God" | "Jesus"
+  [actor.style=brave]:      "Whew" | "Hell" | "Alright"
+  [actor.style=aggressive]: "Damn right" | "Hell yeah" | "About time"
+  [actor.style=cold]:       "Good" | "Well" | "Alright"
   [default]:                        "Whew" | "Man" | "Hey"
 
 lexicon opener.casual
@@ -51,22 +51,22 @@ lexicon opener.wary
 
 # Orthogonal persona-address & role-flavor lexicons
 lexicon term.address
-  [relationship.bond=lover|spouse] (priority 12):   "love" | "babe" | "sweetheart" | "{addressee.name}"
-  [relationship.bond=parent] (priority 12):         "{rel.kin_title}" | "{addressee.name}"
-  [relationship.bond=child] (priority 11):          "kiddo" | "kid" | "{addressee.name}"
-  [relationship.bond=sibling|family] (priority 10): "{addressee.name}" | "fam"
-  [actor.role=looter|bandit] (priority 9): "pal" | "tough guy" | "stranger"
-  [actor.role=trader] (priority 9):        "traveler" | "friend" | "{addressee.name}"
-  [actor.age_band=elder] (priority 8):     "kiddo" | "youngster" | "{addressee.name}"
-  [relationship.tier=ally|trusted] (priority 7):    "partner" | "{addressee.name}"
+  [relationship.bond=lover|spouse]:   "love" | "babe" | "sweetheart" | "{addressee.name}"
+  [relationship.bond=parent]:         "{rel.kin_title}" | "{addressee.name}"
+  [relationship.bond=child]:          "kiddo" | "kid" | "{addressee.name}"
+  [relationship.bond=sibling|family]: "{addressee.name}" | "fam"
+  [actor.role=looter|bandit]: "pal" | "tough guy" | "stranger"
+  [actor.role=trader]:        "traveler" | "friend" | "{addressee.name}"
+  [actor.age_band=elder]:     "kiddo" | "youngster" | "{addressee.name}"
+  [relationship.tier=ally|trusted]:    "partner" | "{addressee.name}"
   [default]:                          "{addressee.name}"
 
 lexicon role.greeting_tail
-  [actor.role=trader] (priority 10):                "Looking to buy or sell?" | "Got fresh stock if you're trading."
-  [actor.role=looter|bandit] (priority 10):         "Make it quick. What do you want?" | "Keep your hands where I can see them."
-  [actor.role=colonist, state.working] (priority 9): "Busy {state.job} here at {place.name}." | "Just wrapping up {state.job}."
-  [actor.role=colonist, state.sitting] (priority 9): "Just catching a breather here." | "Taking the weight off my feet for a minute."
-  [actor.role=colonist] (priority 8):               "Everything holding steady around camp?" | "What do you need?"
-  [actor.role=companion] (priority 8):              "Right with you—what's the call?" | "Watching your back. Need something?"
-  [actor.role=guard] (priority 8):                  "Perimeter's quiet so far." | "Eyes are on the road. What's up?"
+  [actor.role=trader]:                "Looking to buy or sell?" | "Got fresh stock if you're trading."
+  [actor.role=looter|bandit]:         "Make it quick. What do you want?" | "Keep your hands where I can see them."
+  [actor.role=colonist, state.working]: "Busy {state.job} here at {place.name}." | "Just wrapping up {state.job}."
+  [actor.role=colonist, state.sitting]: "Just catching a breather here." | "Taking the weight off my feet for a minute."
+  [actor.role=colonist]:               "Everything holding steady around camp?" | "What do you need?"
+  [actor.role=companion]:              "Right with you—what's the call?" | "Watching your back. Need something?"
+  [actor.role=guard]:                  "Perimeter's quiet so far." | "Eyes are on the road. What's up?"
   [default]:                                   "What's on your mind?" | "Need something?"

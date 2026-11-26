@@ -9,26 +9,26 @@ lexicon glue.shift
   [default]: "Anyway," | "Changing subjects—" | "Moving on,"
 
 lexicon glue.pushback_rude
-  [player.shouting] (priority 9): "Easy, no need to yell—" | "Lower your voice—"
-  [player.rude] (priority 8):     "Watch the tone—" | "No need to snap—" | "Hey, take it easy—"
+  [player.shouting]: "Easy, no need to yell—" | "Lower your voice—"
+  [player.rude]:     "Watch the tone—" | "No need to snap—" | "Hey, take it easy—"
 
 lexicon glue.followup
   [default]: "Well," | "Like I said," | "Thing is,"
 
 lexicon mood.opener
-  [mood.panicked] (priority 10): "Oh god—" | "Wait—hold on—" | "Keep it quick—"
-  [mood.in_pain] (priority 10):  "Ngh—" | "Ugh, hold on—" | "Easy, it hurts—"
-  [npc.fed_up] (priority 9):     "Seriously—" | "Come on—" | "Look, I already said—"
-  [mood.stressed] (priority 8):  "Look, I'm on edge—" | "Make it quick—"
-  [mood.tired] (priority 8):     "Ugh..." | "Man, I'm beat—"
-  [mood.unhappy] (priority 7):   "Sigh..." | "Whatever..."
-  [mood.bored] (priority 7):     "Finally, something to talk about—" | "Well..."
-  [mood.cheerful] (priority 7):  "Hey!" | "Sure thing!" | "Glad you asked—"
+  [mood.panicked]: "Oh god—" | "Wait—hold on—" | "Keep it quick—"
+  [mood.in_pain]:  "Ngh—" | "Ugh, hold on—" | "Easy, it hurts—"
+  [npc.fed_up]:     "Seriously—" | "Come on—" | "Look, I already said—"
+  [mood.stressed]:  "Look, I'm on edge—" | "Make it quick—"
+  [mood.tired]:     "Ugh..." | "Man, I'm beat—"
+  [mood.unhappy]:   "Sigh..." | "Whatever..."
+  [mood.bored]:     "Finally, something to talk about—" | "Well..."
+  [mood.cheerful]:  "Hey!" | "Sure thing!" | "Glad you asked—"
 
 lexicon mood.tail
-  [mood.hungry] (priority 8):    "Could really use some food though." | "Stomach's been growling nonstop."
-  [mood.tired] (priority 8):     "Need some rest before I drop." | "Running on fumes here."
-  [mood.stressed] (priority 8):  "Nerves are shot right now." | "Hard to stay calm out here."
-  [mood.bored] (priority 7):     "Honestly bored out of my mind." | "Nothing much happening around here."
-  [mood.unhappy] (priority 7):   "Just trying to get through the day." | "Not my best day."
-  [mood.cheerful] (priority 7):  "Feeling pretty good today, all things considered."
+  [mood.hungry]:    "Could really use some food though." | "Stomach's been growling nonstop."
+  [mood.tired]:     "Need some rest before I drop." | "Running on fumes here."
+  [mood.stressed]:  "Nerves are shot right now." | "Hard to stay calm out here."
+  [mood.bored]:     "Honestly bored out of my mind." | "Nothing much happening around here."
+  [mood.unhappy]:   "Just trying to get through the day." | "Not my best day."
+  [mood.cheerful]:  "Feeling pretty good today, all things considered."

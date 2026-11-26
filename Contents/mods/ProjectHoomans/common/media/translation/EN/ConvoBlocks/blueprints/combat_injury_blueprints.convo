@@ -3,20 +3,20 @@ language EN
 namespace hoomans
 
 blueprint offer.combat_injury_nudges
-  offer combat.injury.check_where_hit:
+  choice combat.injury.check_where_hit:
     label: "Ask where you're hit and how bad it is"
     say: "Where did they get you? Is that wrap still holding?"
     utility: directness
     intent: QUESTION
     subject: COMBAT_INJURY
-  offer combat.injury.offer_cover_wrap:
+  choice combat.injury.offer_cover_wrap:
     when: [medical.open_wounds]
     label: "Cover them while they patch up"
     say: "I have eyes on the dead. Tie that wound off right now!"
     utility: openness
     intent: ACCEPT
     subject: COMBAT_INJURY
-  offer combat.injury.check_bite_exposure:
+  choice combat.injury.check_bite_exposure:
     when: [medical.is_bitten]
     label: "Check the bite mark immediately"
     say: "Wait, was that teeth? Let me see that bite right now!"

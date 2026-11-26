@@ -2,12 +2,12 @@
 language EN
 namespace hoomans
 
-flow semantic.compat.bandits.hooman_hurt
-  say [social.role=colonist] (priority 9) as colonist:
+dialogue semantic.compat.bandits.hooman_hurt
+  say [social.role=colonist] as colonist:
     "Bandit fire! Pull back and cover the wounded colonist."
-  say [social.role=lover] (priority 9) as lover:
+  say [social.role=lover] as lover:
     "Bandit fire. Stay close; I have got you."
-  say [social.role=family] (priority 9) as family:
+  say [social.role=family] as family:
     "Bandit fire! Stay together and cover the wounded family member."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Bandit fire! Stay with the wounded survivor and watch the flank."

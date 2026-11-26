@@ -2,22 +2,22 @@
 language EN
 namespace hoomans
 
-flow semantic.tool_reply.ask_name.named
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.ask_name.named
+  say [default] as 1:
     "Understood."
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.ask_name.prompt
-  say [default] (priority 6) as prompt:
+dialogue semantic.tool_reply.ask_name.prompt
+  say [default] as prompt:
     "I'll tell you my name once we've established some trust. What's your name?"
 
-flow semantic.tool_reply.ask_name.rejected
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.ask_name.rejected
+  say [default] as 1:
     "Understood."
     "Understood."
 
-flow semantic.tool_reply.ask_name.unnamed
-  say [default] (priority 6) as 1:
+dialogue semantic.tool_reply.ask_name.unnamed
+  say [default] as 1:
     "Understood."
     "Understood."

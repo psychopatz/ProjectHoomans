@@ -2,31 +2,31 @@
 language EN
 namespace hoomans
 
-flow semantic.question.relationship_status.committed
-  say [default] (priority 6) as default:
+dialogue semantic.question.relationship_status.committed
+  say [default] as default:
     "I thought we were already together."
 
-flow semantic.question.relationship_status.unknown
-  say [actor.social_style=withdrawn] (priority 7) as withdrawn:
+dialogue semantic.question.relationship_status.unknown
+  say [actor.social_style=withdrawn] as withdrawn:
     "I'd rather not get into that. There's too much going on right now."
-  say [default] (priority 5) as uncertain:
+  say [default] as uncertain:
     "I haven't really thought about dating. Right now, I'm focused on surviving."
     "Honestly, I haven't had much room to think about relationships lately."
 
-flow semantic.question.relationship_status.committed_after_compliment
-  say [default] (priority 6) as committed:
+dialogue semantic.question.relationship_status.committed_after_compliment
+  say [default] as committed:
     "Thanks for the compliment, but I thought we were already together."
 
-flow semantic.question.relationship_status.unknown_after_compliment
-  say [actor.social_style=withdrawn] (priority 7) as withdrawn:
+dialogue semantic.question.relationship_status.unknown_after_compliment
+  say [actor.social_style=withdrawn] as withdrawn:
     "Thanks, but I'd rather keep that personal."
-  say [default] (priority 5) as unknown:
+  say [default] as unknown:
     "That's kind of you to ask. I don't have a clear answer right now."
     "Thanks for saying that. I can't give you a clear answer about relationships right now."
 
-flow semantic.question.relationship_status.acknowledged
-  say [actor.social_style=withdrawn] (priority 7) as withdrawn:
+dialogue semantic.question.relationship_status.acknowledged
+  say [actor.social_style=withdrawn] as withdrawn:
     "Thanks. I'd rather leave it there for now."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Thanks for understanding. It's hard to think about relationships with everything going on."
     "I appreciate you listening. It's hard to make plans while we're trying to survive."

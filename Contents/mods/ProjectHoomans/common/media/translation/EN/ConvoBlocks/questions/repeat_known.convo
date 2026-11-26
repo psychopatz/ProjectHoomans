@@ -2,24 +2,24 @@
 language EN
 namespace hoomans
 
-flow semantic.question.repeat_known
-  say [npc.fed_up] (priority 12) as fed_up:
+dialogue semantic.question.repeat_known
+  say [npc.fed_up] as fed_up:
     "Stop asking me the same thing over and over—it's {slot.known_value}. Move on."
-  say [npc.annoyed, topic=identity] (priority 11) as annoyed_identity:
+  say [npc.annoyed, topic=identity] as annoyed_identity:
     "Seriously? It's {slot.known_value}. You already asked me that."
-  say [npc.annoyed, topic=faction] (priority 11) as annoyed_faction:
+  say [npc.annoyed, topic=faction] as annoyed_faction:
     "You've asked me twice now — {slot.known_value}. Are you even listening?"
-  say [npc.annoyed, topic=surname] (priority 11) as annoyed_surname:
+  say [npc.annoyed, topic=surname] as annoyed_surname:
     "Again? It's {slot.known_value}. Try to keep up."
-  say [npc.annoyed] (priority 10) as annoyed_default:
+  say [npc.annoyed] as annoyed_default:
     "You already asked me that — {slot.known_value}."
-  say [topic=identity] (priority 8) as repeat_identity:
+  say [topic=identity] as repeat_identity:
     "I already told you — it's {slot.known_value}. Everything alright?"
-  say [topic=faction] (priority 8) as repeat_faction:
+  say [topic=faction] as repeat_faction:
     "I told you before, I'm with {slot.known_value}."
-  say [topic=surname] (priority 8) as repeat_surname:
+  say [topic=surname] as repeat_surname:
     "Already told you — my surname is {slot.known_value}."
-  say [topic=nickname] (priority 8) as repeat_nickname:
+  say [topic=nickname] as repeat_nickname:
     "I already said most people call me {slot.known_value}."
-  say [default] (priority 5) as repeat_default:
+  say [default] as repeat_default:
     "I told you already — {slot.known_value}."

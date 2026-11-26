@@ -2,30 +2,30 @@
 language EN
 namespace hoomans
 
-flow semantic.question.community_role_whereabouts.unknown
-  say [default] (priority 6) as default:
+dialogue semantic.question.community_role_whereabouts.unknown
+  say [default] as default:
     "I don't know where our {role} is."
 
-flow semantic.question.community_role_whereabouts.home
-  say [default] (priority 6) as default:
+dialogue semantic.question.community_role_whereabouts.home
+  say [default] as default:
     "Our {role} is here."
 
-flow semantic.question.community_role_whereabouts.preparing
-  say [default] (priority 6) as default:
+dialogue semantic.question.community_role_whereabouts.preparing
+  say [default] as default:
     "Our {role} is preparing to leave."
 
-flow semantic.question.community_role_whereabouts.away
-  say [default] (priority 6) as default:
+dialogue semantic.question.community_role_whereabouts.away
+  say [default] as default:
     "Our {role} is away right now."
 
-flow semantic.question.community_role_whereabouts.returning
-  say [default] (priority 6) as default:
+dialogue semantic.question.community_role_whereabouts.returning
+  say [default] as default:
     "Our {role} is on the way home."
 
-flow semantic.question.community_role_whereabouts.visiting
-  say [default] (priority 6) as default:
+dialogue semantic.question.community_role_whereabouts.visiting
+  say [default] as default:
     "Our {role} is at {destination}, {direction} of here."
 
-flow semantic.question.community_role_whereabouts.visiting_eta
-  say [default] (priority 6) as default:
+dialogue semantic.question.community_role_whereabouts.visiting_eta
+  say [default] as default:
     "Our {role} is at {destination}, {direction} of here. They should be back {eta}."

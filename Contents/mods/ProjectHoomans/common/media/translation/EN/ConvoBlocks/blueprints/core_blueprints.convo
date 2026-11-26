@@ -3,7 +3,7 @@ language EN
 namespace hoomans
 
 blueprint offer.social_repair
-  offer repair.apologize:
+  choice repair.apologize:
     when: [player.rude]
     label: "Apologize for snapping"
     say: "Sorry, {addressee.name}—didn't mean to snap like that."
@@ -12,7 +12,7 @@ blueprint offer.social_repair
     subject: SOCIAL
 
 blueprint offer.post_assist_nudges
-  offer assist.check_wound:
+  choice assist.check_wound:
     when: [any.injured]
     label: "Check on {addressee.pos} wound"
     say: "Hold still—let me check {addressee.pos} wound{end}"
@@ -20,14 +20,14 @@ blueprint offer.post_assist_nudges
     intent: OFFER
     subject: MEDICAL
 
-  offer assist.ask_supplies:
+  choice assist.ask_supplies:
     label: "Ask about {mention.items|list_a}"
     say: "You got any spare {mention.items|list}?"
     utility: openness
     intent: QUESTION
     subject: INVENTORY
 
-  offer assist.stay_safe:
+  choice assist.stay_safe:
     label: "Tell {addressee.obj} to stay safe"
     say: "{clause.stay_sharp}"
     utility: caution

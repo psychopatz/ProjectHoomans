@@ -3,11 +3,11 @@ language EN
 namespace hoomans
 
 extend semantic.banter.group
-  say [topic=post_home_vhs, role=open] (priority 12) as post_hvhs_open:
+  say [topic=post_home_vhs, role=open] as post_hvhs_open:
     "That {slot.broadcast.episode} tape we watched earlier hit harder than I expected, {addressee.name}."
-  say [topic=post_home_vhs, role=reply] (priority 12) as post_hvhs_reply:
+  say [topic=post_home_vhs, role=reply] as post_hvhs_reply:
     "Yeah, {addressee.name}. Reminds you what we're fighting to get back to someday."
-  say [topic=post_home_vhs, role=chime] (priority 12) as post_hvhs_chime:
+  say [topic=post_home_vhs, role=chime] as post_hvhs_chime:
     "Just glad we're still here to remember it."
-  say [topic=post_home_vhs, role=wrap] (priority 12) as post_hvhs_wrap:
+  say [topic=post_home_vhs, role=wrap] as post_hvhs_wrap:
     "Same. Let's keep looking out for each other."

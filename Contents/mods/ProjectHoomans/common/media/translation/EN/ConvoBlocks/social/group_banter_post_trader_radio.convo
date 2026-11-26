@@ -3,11 +3,11 @@ language EN
 namespace hoomans
 
 extend semantic.banter.group
-  say [topic=post_trader_radio, role=open] (priority 12) as post_trader_open:
+  say [topic=post_trader_radio, role=open] as post_trader_open:
     "Think we should try to catch up with {slot.broadcast.topic} we heard earlier, {addressee.name}?"
-  say [topic=post_trader_radio, role=reply] (priority 12) as post_trader_reply:
+  say [topic=post_trader_radio, role=reply] as post_trader_reply:
     "Could be worth it, {addressee.name}, if we've got spare gear to trade."
-  say [topic=post_trader_radio, role=chime] (priority 12) as post_trader_chime:
+  say [topic=post_trader_radio, role=chime] as post_trader_chime:
     "A fair trade beats kicking down ten locked doors any day."
-  say [topic=post_trader_radio, role=wrap] (priority 12) as post_trader_wrap:
+  say [topic=post_trader_radio, role=wrap] as post_trader_wrap:
     "Keep it in mind on our next run."

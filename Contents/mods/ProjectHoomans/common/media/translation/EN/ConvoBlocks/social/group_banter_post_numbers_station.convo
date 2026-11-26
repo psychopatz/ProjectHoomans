@@ -3,11 +3,11 @@ language EN
 namespace hoomans
 
 extend semantic.banter.group
-  say [topic=post_numbers_station, role=open] (priority 12) as post_num_open:
+  say [topic=post_numbers_station, role=open] as post_num_open:
     "That {slot.broadcast.topic} we caught on {slot.broadcast.channel} still gives me chills, {addressee.name}."
-  say [topic=post_numbers_station, role=reply] (priority 12) as post_num_reply:
+  say [topic=post_numbers_station, role=reply] as post_num_reply:
     "Same, {addressee.name}. Wonder if anybody's actually left on the other end decoding it."
-  say [topic=post_numbers_station, role=chime] (priority 12) as post_num_chime:
+  say [topic=post_numbers_station, role=chime] as post_num_chime:
     "Probably just some bunker tape spinning until the generators die."
-  say [topic=post_numbers_station, role=wrap] (priority 12) as post_num_wrap:
+  say [topic=post_numbers_station, role=wrap] as post_num_wrap:
     "Either way, I'd rather not find out."

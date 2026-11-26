@@ -3,13 +3,13 @@ language EN
 namespace hoomans
 
 extend semantic.banter.group
-  say [topic=post_fight, role=open] (priority 12) as post_fight_open:
+  say [topic=post_fight, role=open] as post_fight_open:
     "That last scrap got way too close, {addressee.name}. Everybody still in one piece?"
     "Catch your breath, {addressee.name}. That fight took more out of us than I expected."
-  say [topic=post_fight, role=reply] (priority 12) as post_fight_reply:
+  say [topic=post_fight, role=reply] as post_fight_reply:
     "Still breathing, {addressee.name}. Shaking a little, but we put them down."
     "Could've gone sideways fast if we hadn't covered each other."
-  say [topic=post_fight, role=chime] (priority 12) as post_fight_chime:
+  say [topic=post_fight, role=chime] as post_fight_chime:
     "Check your gear and bandages while it's quiet. Never know when the next pack shows up."
-  say [topic=post_fight, role=wrap] (priority 12) as post_fight_wrap:
+  say [topic=post_fight, role=wrap] as post_fight_wrap:
     "Yeah. Let's patch up and stay tight."

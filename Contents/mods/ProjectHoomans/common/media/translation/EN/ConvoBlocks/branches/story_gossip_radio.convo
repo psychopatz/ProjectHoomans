@@ -1,0 +1,192 @@
+# Interactive branching gossip story: AEBS, military, pastor, cannibal, numbers & looter radio.
+# Actor-agnostic: players choose via UI; NPCs score choices via `ai_bias` + personality + mood + relationship.
+# Asymmetric personality reactions drive organic trust, respect, rivalry, or tactical/trade actions.
+language EN
+namespace hoomans
+
+story convo.gossip.radio
+  trigger intent=INFORM, subject=RADIO_GOSSIP
+  guard safe_to_talk
+
+  say [topic=aebs_alert, actor.style=tactical|brave]:
+    "AEBS just pushed an emergency broadcast {slot.gossip_time}. Worth adjusting our plan before it hits."
+  say [topic=aebs_alert]:
+    "AEBS just pushed an emergency broadcast {slot.gossip_time}. Sounds like rough conditions heading our way."
+  say [topic=military_radio, actor.social_style=guarded|withdrawn|hostile]:
+    "Picked up a military frequency {slot.gossip_time}. Hard to tell if it's real orders or a dead loop."
+  say [topic=military_radio]:
+    "Picked up a military frequency {slot.gossip_time}. Someone's still trying to hold a line out there."
+  say [topic=cannibal_radio]:
+    "Caught a sick frequency {slot.gossip_time}—folks hunting survivors like game. Made my skin crawl."
+  say [topic=looter_trap]:
+    "Heard a fake distress call {slot.gossip_time}. Classic ambush bait—good thing we didn't bite."
+  say [topic=pastor_radio]:
+    "Caught a preacher broadcasting on the airwaves {slot.gossip_time}. Still trying to keep folks' spirits up."
+  say [default]:
+    "Caught something strange over the radio {slot.gossip_time}. Still trying to make sense of it."
+
+    choice positive (intent=AGREE, subject=RADIO_GOSSIP, utility=compassion, ai_bias=compassion+|sociability+|warm+|protective+, tone=warm):
+      label: "Reassure — we'll handle it together"
+      say: "Good catch letting me know. Whatever's out there, we'll watch each other's backs."
+
+      reply [actor.social_style=warm|friendly|protective]:
+        "Appreciate that, {term.address}. Knowing you've got my back makes the static easier to stomach."
+        do relationship.approval +3
+        do relationship.respect +1
+        do morale +3
+
+        choice positive_hunker (intent=SUGGEST, subject=CAMP, utility=caution, ai_bias=caution+|protective+|tired+):
+          label: "Let's fortify and hunker down"
+          say: "Let's check the doors and hold tight here until we know it's clear."
+          reply [default]:
+            "Good call, {term.address}. Setting up camp tight until it blows over."
+            do camp
+            do relationship.respect +2
+            end
+
+        choice positive_patrol (intent=SUGGEST, subject=GUARD, utility=assertive, ai_bias=bravery+|loyalty+|tactical+):
+          label: "Keep watch together"
+          say: "Stay close—let's sweep the perimeter together."
+          reply [default]:
+            "Right behind you, {term.address}. Eyes open."
+            do guard_perimeter
+            do relationship.approval +1
+            do relationship.respect +2
+            end
+
+      reply [actor.style=tactical|cold]:
+        "Words are cheap, {term.address}, but keeping our eyes open isn't. Let's stay sharp."
+        do relationship.respect +1
+        do relationship.familiarity +1
+        do guard_perimeter
+        end
+
+      reply [actor.style=shaken]:
+        "God, I hope so, {term.address}. That broadcast had my hands shaking."
+        do relationship.approval +2
+        do morale +2
+        do mood.calm
+        end
+
+      reply [default]:
+        "Good to hear, {term.address}. Better to face it together than blind."
+        do relationship.approval +1
+        do relationship.familiarity +1
+        do mood.calm
+        end
+
+    choice neutral (intent=CLARIFY, subject=RADIO_GOSSIP, utility=caution, ai_bias=guarded+|tactical+|sociability-, tone=neutral):
+      label: "Stay skeptical — verify before acting"
+      say: "Half the airwaves are traps or automated loops. Keep listening, don't jump at shadows."
+
+      reply [actor.style=tactical|cold]:
+        "Exactly my read, {term.address}. Log the frequency and verify before we move."
+        do relationship.respect +3
+        do relationship.familiarity +1
+        do mood.calm
+        end
+
+      reply [actor.social_style=warm|friendly]:
+        "Probably smart, {term.address}. Still hate thinking someone out there might actually need help."
+        do relationship.respect +1
+        do relationship.familiarity +1
+        end
+
+      reply [default]:
+        "Smart call, {term.address}. I'll keep an ear on the dial without doing anything reckless."
+        do relationship.respect +1
+        do mood.calm
+        end
+
+    choice negative (intent=DISAGREE, subject=RADIO_GOSSIP, utility=assertive, ai_bias=aggression+|compassion-|stressed+|rival+, tone=guarded):
+      label: "Dismiss it — turn that junk off"
+      say: "Shut that radio off. Listening to ghosts and lunatics just burns batteries and nerves."
+
+      reply [actor.style=tactical|brave]:
+        "Running blind gets people killed, {term.address}. I'm keeping the dial on."
+        do relationship.approval -2
+        do relationship.respect -2
+
+        choice radio_concede (intent=AGREE, subject=RADIO_GOSSIP, utility=forgiveness, ai_bias=forgiveness+|caution+):
+          label: "Concede — keep it quiet then"
+          say: "Fine, keep it on—just keep it low and don't burn our last spare battery."
+          reply [default]:
+            "Fair enough, {term.address}. Short checks on the hour."
+            do relationship.respect +2
+            do relationship.approval +1
+            end
+
+        choice radio_clash (intent=DISAGREE, subject=CONFLICT, utility=assertive, ai_bias=aggression+|bravery+|forgiveness-|rival+):
+          label: "Insist — it's dead weight"
+          say: "Do what you want, just don't expect me to haul batteries for static."
+          reply [default]:
+            "Fine. I'll carry my own gear and my own intel, {term.address}."
+            do relationship.approval -4
+            do relationship.respect +1
+            do morale -2
+            end
+
+      reply [actor.social_style=warm|friendly|protective]:
+        "Easy, {term.address}. Knowing what's coming could save our necks."
+        do relationship.approval -3
+        do morale -2
+        end
+
+      reply [actor.style=aggressive|hostile]:
+        "Don't tell me what to tune into, {term.address}."
+        do relationship.approval -4
+        do morale -2
+        do mood.stressed
+        end
+
+      reply [default]:
+        "Fine, {term.address}. Turning it down—just don't say I didn't warn you."
+        do relationship.approval -1
+        do mood.stressed
+        end
+
+    choice tactical [actor.style=tactical] (intent=SUGGEST, subject=GUARD, utility=assertive, ai_bias=tactical+|bravery+|loyalty+, tone=tactical):
+      label: "Tactical response — lock down the perimeter"
+      say: "Treat it as live intel. Check sightlines, keep weapons ready, and move only on our terms."
+
+      reply [actor.style=tactical|brave]:
+        "Copy that, {term.address}. Securing the perimeter now."
+        do relationship.respect +3
+        do relationship.approval +1
+        do guard_perimeter
+        end
+
+      reply [actor.style=shaken]:
+        "Okay—okay, I'll watch the back door. Just stay in sight, {term.address}."
+        do relationship.respect +2
+        do guard_perimeter
+        end
+
+      reply [default]:
+        "Roger that, {term.address}. Keeping eyes on the approaches."
+        do relationship.respect +2
+        do guard_perimeter
+        end
+
+    choice trader [actor.role=trader] (intent=SUGGEST, subject=TRADE, utility=materialism, ai_bias=materialism+|trader+|sociability+, tone=casual):
+      label: "Trader angle — check supply value"
+      say: "If routes are shifting out there, supplies are going to spike. Want to check stock and trade?"
+
+      reply [personality.materialism=high]:
+        "Now you're talking, {term.address}. Let's see what we've got before prices climb."
+        do relationship.approval +2
+        do relationship.respect +2
+        do trade
+        end
+
+      reply [actor.social_style=guarded|withdrawn]:
+        "Always counting coin, huh? Alright, show me what you've got—make it quick."
+        do relationship.familiarity +1
+        do trade
+        end
+
+      reply [default]:
+        "Always thinking about margins, {term.address}. Alright, let's look over what we've got."
+        do relationship.familiarity +1
+        do trade
+        end

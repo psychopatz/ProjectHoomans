@@ -7,7 +7,9 @@ return function(Catalog, Core)
             if type(dsl.EnsureActiveLanguage) == "function" then
                 dsl.EnsureActiveLanguage()
             end
-            if type(dsl.EnsurePoolLoaded) == "function" then
+            if type(dsl.PendingCount) == "function" and dsl.PendingCount() > 0
+                and type(dsl.EnsurePoolLoaded) == "function"
+            then
                 dsl.EnsurePoolLoaded(id)
             end
         end

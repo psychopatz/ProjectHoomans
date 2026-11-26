@@ -3,20 +3,20 @@ language EN
 namespace hoomans
 
 lexicon rest.observe
-  [actor.social_style=warm|friendly|protective] (priority 8): "You don't look so hot" | "You look like you're hurting"
-  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "You look rough" | "You're barely holding it together"
+  [actor.social_style=warm|friendly|protective]: "You don't look so hot" | "You look like you're hurting"
+  [actor.social_style=hostile|guarded|withdrawn]: "You look rough" | "You're barely holding it together"
   [default]: "You're looking a little rough" | "You look pretty banged up"
 
 lexicon rest.suggest
-  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Slow down before you keel over." | "Take a breather before you drop."
+  [actor.social_style=hostile|guarded|withdrawn]: "Slow down before you keel over." | "Take a breather before you drop."
   [default]: "Take it easy for a bit, okay?" | "Maybe we should take it slow for a bit."
 
 lexicon rest.ack
   [default]: "Good call taking it easy, {term.address}. I've got your back." | "Smart move—rest up for a minute."
 
 extend semantic.companion.moodle_suggest
-  say [role=suggest_rest] (priority 8) as suggest_rest_composed_a:
+  say [role=suggest_rest] as suggest_rest_composed_a:
     "{rest.observe}, {term.address}. {rest.suggest}"
     "{opener.casual} {term.address}, {rest.observe}. {rest.suggest}"
-  say [role=ack_rest] (priority 8) as ack_rest_composed:
+  say [role=ack_rest] as ack_rest_composed:
     "{rest.ack}"

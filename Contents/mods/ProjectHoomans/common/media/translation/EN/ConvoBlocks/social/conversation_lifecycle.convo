@@ -3,88 +3,88 @@
 language EN
 namespace hoomans
 
-flow semantic.conversation.pause_switch.say
-  say [relationship.bond=lover|spouse] (priority 11) as lover:
+dialogue semantic.conversation.pause_switch.say
+  say [relationship.bond=lover|spouse] as lover:
     "Hold on a second, {?term.address}—I'll be right back with you."
-  say [relationship.bond=parent|child|sibling|family] (priority 10) as family:
+  say [relationship.bond=parent|child|sibling|family] as family:
     "Give me a second, {?term.address}, let me check in over here first."
-  say [actor.role=trader] (priority 9) as trader:
+  say [actor.role=trader] as trader:
     "Hold that thought—let me talk to the others for a moment."
-  say [actor.role=looter|bandit] (priority 9) as bandit:
+  say [actor.role=looter|bandit] as bandit:
     "Stay put. I'll be back in a second."
-  say [actor.age_band=elder] (priority 8) as elder:
+  say [actor.age_band=elder] as elder:
     "Excuse me a moment—I'll be right back."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Hold on a moment, {?term.address}—I'll talk to you in a bit."
 
-flow semantic.conversation.pause_switch.ack
-  say [npc.fed_up] (priority 12) as fed_up:
+dialogue semantic.conversation.pause_switch.ack
+  say [npc.fed_up] as fed_up:
     "Yeah, fine—go ahead."
-  say [mood.panicked] (priority 11) as panicked:
+  say [mood.panicked] as panicked:
     "Just don't wander off!"
-  say [relationship.bond=lover|spouse] (priority 10) as lover:
+  say [relationship.bond=lover|spouse] as lover:
     "Take your time, {?term.address}. I'll be right here."
-  say [relationship.bond=parent|child|sibling|family] (priority 10) as family:
+  say [relationship.bond=parent|child|sibling|family] as family:
     "Sure thing, {?term.address}. I'm not going anywhere."
-  say [actor.role=trader] (priority 9) as trader:
+  say [actor.role=trader] as trader:
     "No rush—my stock isn't going anywhere."
-  say [actor.role=looter|bandit] (priority 9) as bandit:
+  say [actor.role=looter|bandit] as bandit:
     "Don't waste my time."
-  say [actor.age_band=elder] (priority 8) as elder:
+  say [actor.age_band=elder] as elder:
     "Go on ahead, {?term.address}. I'll wait right here."
-  say [mood.cheerful] (priority 7) as cheerful:
+  say [mood.cheerful] as cheerful:
     "Sure thing! Catch you in a second."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Alright, take your time{end}"
 
-flow semantic.conversation.resume
-  say [npc.fed_up] (priority 12) as fed_up:
+dialogue semantic.conversation.resume
+  say [npc.fed_up] as fed_up:
     "Back again? Alright, spit it out."
-  say [relationship.bond=lover|spouse] (priority 11) as lover:
+  say [relationship.bond=lover|spouse] as lover:
     "Welcome back, {?term.address}. Where were we?"
-  say [relationship.bond=parent|child|sibling|family] (priority 10) as family:
+  say [relationship.bond=parent|child|sibling|family] as family:
     "Back already, {?term.address}? Go ahead."
-  say [actor.role=trader] (priority 9) as trader:
+  say [actor.role=trader] as trader:
     "Ready to pick back up where we left off?"
-  say [actor.role=looter|bandit] (priority 9) as bandit:
+  say [actor.role=looter|bandit] as bandit:
     "You're back. Make it quick."
-  say [actor.age_band=elder] (priority 8) as elder:
+  say [actor.age_band=elder] as elder:
     "There you are, {?term.address}. What were we saying?"
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Alright, I'm listening again. Where were we?"
 
-flow semantic.conversation.farewell.player
-  say [relationship.bond=lover|spouse] (priority 11) as lover:
+dialogue semantic.conversation.farewell.player
+  say [relationship.bond=lover|spouse] as lover:
     "Stay safe, {?term.address}. Talk soon."
-  say [relationship.bond=parent|child|sibling|family] (priority 10) as family:
+  say [relationship.bond=parent|child|sibling|family] as family:
     "Take care of yourself, {?term.address}. Catch you later."
-  say [actor.role=trader] (priority 9) as trader:
+  say [actor.role=trader] as trader:
     "That's all for now. Safe roads."
-  say [actor.role=looter|bandit] (priority 9) as bandit:
+  say [actor.role=looter|bandit] as bandit:
     "We're done here."
-  say [environment.night_or_dusk] (priority 8) as night:
+  say [environment.night_or_dusk] as night:
     "That's all. Stay safe in the dark."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "That's all for now. Stay safe."
 
-flow semantic.conversation.farewell.reply
-  say [npc.fed_up] (priority 12) as fed_up:
+dialogue semantic.conversation.farewell.reply
+  say [npc.fed_up] as fed_up:
     "Finally. See you around."
-  say [mood.panicked] (priority 11) as panicked:
+  say [mood.panicked] as panicked:
     "Stay sharp—watch your back out there!"
-  say [relationship.bond=lover|spouse] (priority 11) as lover:
+  say [relationship.bond=lover|spouse] as lover:
     "Be careful out there, {?term.address}. Come back in one piece."
-  say [relationship.bond=parent|child|sibling|family] (priority 10) as family:
+  say [relationship.bond=parent|child|sibling|family] as family:
     "You too, {?term.address}. Don't take unnecessary risks."
-  say [actor.role=trader] (priority 9) as trader:
+  say [actor.role=trader] as trader:
     "Safe travels, {?term.address}. Come find me next time you need supplies."
-  say [actor.role=looter|bandit] (priority 9) as bandit:
+  say [actor.role=looter|bandit] as bandit:
     "Yeah, get moving."
-  say [actor.age_band=elder] (priority 8) as elder:
+  say [actor.age_band=elder] as elder:
     "Look after yourself, {?term.address}."
-  say [environment.night_or_dusk] (priority 8) as night:
+  say [environment.night_or_dusk] as night:
     "Keep your light low and stay safe tonight."
-  say [mood.cheerful] (priority 7) as cheerful:
+  say [mood.cheerful] as cheerful:
     "Catch you later, {?term.address}! Stay safe!"
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Stay safe out there{end} {?clause.stay_sharp}"

@@ -2,14 +2,14 @@
 language EN
 namespace hoomans
 
-flow semantic.question.medical_bite.positive
-  say [default] (priority 6) as default:
+dialogue semantic.question.medical_bite.positive
+  say [default] as default:
     "Yes, I've been bitten."
 
-flow semantic.question.medical_bite.negative
-  say [default] (priority 6) as default:
+dialogue semantic.question.medical_bite.negative
+  say [default] as default:
     "No, I don't have a recorded bite."
 
-flow semantic.question.medical_bite.unknown
-  say [default] (priority 6) as default:
+dialogue semantic.question.medical_bite.unknown
+  say [default] as default:
     "I can't confirm whether I've been bitten."

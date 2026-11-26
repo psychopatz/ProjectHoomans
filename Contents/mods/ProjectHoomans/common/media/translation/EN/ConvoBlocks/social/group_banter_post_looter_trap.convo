@@ -3,11 +3,11 @@ language EN
 namespace hoomans
 
 extend semantic.banter.group
-  say [topic=post_looter_trap, role=open] (priority 12) as post_looter_open:
+  say [topic=post_looter_trap, role=open] as post_looter_open:
     "Still can't believe those looters tried pulling {slot.broadcast.topic} on {slot.broadcast.channel}, {addressee.name}."
-  say [topic=post_looter_trap, role=reply] (priority 12) as post_looter_reply:
+  say [topic=post_looter_trap, role=reply] as post_looter_reply:
     "Yeah, {addressee.name}. Good thing we spotted it for the ambush it was."
-  say [topic=post_looter_trap, role=chime] (priority 12) as post_looter_chime:
+  say [topic=post_looter_trap, role=chime] as post_looter_chime:
     "Just hope nobody else falls for their free supplies routine."
-  say [topic=post_looter_trap, role=wrap] (priority 12) as post_looter_wrap:
+  say [topic=post_looter_trap, role=wrap] as post_looter_wrap:
     "Lesson learned. Trust our instincts."

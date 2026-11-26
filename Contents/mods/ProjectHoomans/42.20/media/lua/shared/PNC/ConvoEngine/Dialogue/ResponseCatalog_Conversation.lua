@@ -94,7 +94,8 @@ return function(Catalog, responsePools)
             error("Conversation registry contains an invalid response pool")
         end
         targetID = canonicalPoolID(pool.id)
-        local existing = Catalog.Get(targetID)
+        local existing = type(Catalog.GetRaw) == "function" and Catalog.GetRaw(targetID)
+            or (type(Catalog.POOLS) == "table" and Catalog.POOLS[targetID] or nil)
         local canonicalPool = canonicalPoolDefinition(pool, targetID, existing ~= nil)
         if existing then
             registered, reason = Catalog.Extend(targetID, canonicalPool)

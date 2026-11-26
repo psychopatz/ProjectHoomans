@@ -2,33 +2,33 @@
 language EN
 namespace hoomans
 
-flow semantic.question.wellbeing
-  say [npc.fed_up] (priority 12) as fed_up:
+dialogue semantic.question.wellbeing
+  say [npc.fed_up] as fed_up:
     "Same as two minutes ago! You don't need to keep asking."
-  say [emotion.type=panic, emotion.urgency=critical|emergency] (priority 10) as panic:
+  say [emotion.type=panic, emotion.urgency=critical|emergency] as panic:
     "I'm pretty shaken up right now{end}"
-  say [emotion.type=stress, emotion.urgency=critical|emergency] (priority 9) as stress:
+  say [emotion.type=stress, emotion.urgency=critical|emergency] as stress:
     "I'm tense, but I can keep going."
-  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] (priority 9) as thirst:
+  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] as thirst:
     "I'm pretty thirsty. Could you spare some water?"
     "I could really use a drink. Do you have any water?"
-  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] (priority 8) as hunger:
+  say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] as hunger:
     "I'm pretty hungry, if I'm honest. Do you have anything to eat?"
     "I'm getting hungry. Could you spare something to eat?"
-  say [need.type=fatigue, need.urgency=moderate|severe|emergency|critical] (priority 8) as fatigue:
+  say [need.type=fatigue, need.urgency=moderate|severe|emergency|critical] as fatigue:
     "I'm worn out, but I can still manage."
     "I'm tired. A little rest would help."
-  say [actor.health=injured|wounded|critical] (priority 8) as injured:
+  say [actor.health=injured|wounded|critical] as injured:
     "A little banged up, but I'll manage."
-  say [mood.cheerful] (priority 7) as cheerful:
+  say [mood.cheerful] as cheerful:
     "Doing pretty well, all things considered! How about you?"
-  say [default] (priority 5) as default:
+  say [default] as default:
     "I'm okay. How about you?"
 
-flow semantic.question.wellbeing.grounded
-  say [actor.health=injured|wounded|critical, actor.social_style=friendly|protective] (priority 9) as friendly:
+dialogue semantic.question.wellbeing.grounded
+  say [actor.health=injured|wounded|critical, actor.social_style=friendly|protective] as friendly:
     "I took a {adj.hit} hit, but I'm steady enough to keep moving. Thanks for checking in."
-  say [actor.health=injured|wounded|critical, actor.social_style=withdrawn] (priority 9) as withdrawn:
+  say [actor.health=injured|wounded|critical, actor.social_style=withdrawn] as withdrawn:
     "I'm hurt, but I'm managing. I'd rather not make a big thing of it."
-  say [default] (priority 5) as default:
+  say [default] as default:
     "I took a hit, but I'm holding together."

@@ -26,9 +26,11 @@ local body = {
     end,
 }
 
-local angle240 = math.rad(240)
-local centroidX = 100 + math.sin(angle240) * 10
-local centroidY = 100 - math.cos(angle240) * 10
+-- On Project Zomboid's fixed isometric camera (screen-UP = NW = 315 deg),
+-- 8 o'clock (240 deg clockwise from screen-UP) is compass 195 deg (SSW / screen bottom-left).
+local angleScreen8 = math.rad(195)
+local centroidX = 100 + math.sin(angleScreen8) * 10
+local centroidY = 100 - math.cos(angleScreen8) * 10
 
 PNC = {
     SocialEventHooks = {

@@ -3,57 +3,57 @@ language EN
 namespace hoomans
 
 lexicon thirst.observe
-  [actor.social_style=warm|friendly|protective] (priority 8): "You look parched" | "You haven't had a drink in a while"
-  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Dehydration slows you down" | "You're drying out"
+  [actor.social_style=warm|friendly|protective]: "You look parched" | "You haven't had a drink in a while"
+  [actor.social_style=hostile|guarded|withdrawn]: "Dehydration slows you down" | "You're drying out"
   [default]: "You seem thirsty" | "You look like you need water"
 
 lexicon thirst.suggest
-  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Drink some water before you drop." | "Take a drink and keep moving."
+  [actor.social_style=hostile|guarded|withdrawn]: "Drink some water before you drop." | "Take a drink and keep moving."
   [default]: "Take a sip of water before you dry out." | "Better grab a drink soon." | "Grab some water when you get a second."
 
 lexicon thirst.ack
-  [actor.social_style=warm|friendly|protective] (priority 8): "Good, stay hydrated out here, {term.address}." | "Glad you got some water in you."
-  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Smart. Keep the water down." | "Good—stay hydrated."
+  [actor.social_style=warm|friendly|protective]: "Good, stay hydrated out here, {term.address}." | "Glad you got some water in you."
+  [actor.social_style=hostile|guarded|withdrawn]: "Smart. Keep the water down." | "Good—stay hydrated."
   [default]: "Good call on the water, {term.address}." | "Smart move grabbing a drink."
 
 lexicon thirst.request_need
-  [actor.social_style=warm|friendly|protective] (priority 8): "My throat's dry as dust" | "I'm parched"
-  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "I need water" | "I'm drying out here"
+  [actor.social_style=warm|friendly|protective]: "My throat's dry as dust" | "I'm parched"
+  [actor.social_style=hostile|guarded|withdrawn]: "I need water" | "I'm drying out here"
   [default]: "I'm really thirsty" | "Could really use some water"
 
 lexicon thirst.request_ask
-  [actor.social_style=hostile|guarded|withdrawn] (priority 8): "Give me a second to drink." | "Hold up—I need water."
+  [actor.social_style=hostile|guarded|withdrawn]: "Give me a second to drink." | "Hold up—I need water."
   [default]: "Mind if I grab a quick drink?" | "Can I stop for a drink?"
 
 extend semantic.companion.moodle_suggest
-  say [role=suggest_drink] (priority 8) as suggest_drink_composed_a:
+  say [role=suggest_drink] as suggest_drink_composed_a:
     "{thirst.observe}, {term.address}. {thirst.suggest}"
     "{opener.casual} {term.address}, {thirst.suggest}"
-  say [role=ack_drink] (priority 8) as ack_drink_composed:
+  say [role=ack_drink] as ack_drink_composed:
     "{thirst.ack}"
 
 extend semantic.companion.need_request
-  say [role=request_drink] (priority 8) as req_drink_composed_a:
+  say [role=request_drink] as req_drink_composed_a:
     "{term.address}, {thirst.request_need}. {thirst.request_ask}"
     "{opener.casual} {term.address}, {thirst.request_need}. {thirst.request_ask}"
 
 extend semantic.question.needs.offer
-  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] (priority 8) as thirst:
+  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] as thirst:
     "Water would help, but I don't have an exact amount yet. {?clause.world_pressure}"
 
 extend semantic.question.needs.quantity
-  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] (priority 8) as thirst:
+  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] as thirst:
     "I know water is what I need, but I can't give you an exact amount yet."
 
 extend semantic.question.needs.proposal
-  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] (priority 8) as thirst:
+  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] as thirst:
     "I can keep that as a proposal, but I still need the item and amount before I record a commitment."
 
 extend semantic.question.wellbeing.follow_up
-  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] (priority 8) as thirst:
+  say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] as thirst:
     "I'm still pretty thirsty."
 
 extend semantic.self_state
-  say [subject=THIRST] (priority 7) as thirst:
+  say [subject=THIRST] as thirst:
     "I hope we can find some water for you soon."
     "That's rough. Let's look for something to drink."

@@ -2,13 +2,13 @@
 language EN
 namespace hoomans
 
-flow social.annoyance.nag
+dialogue social.annoyance.nag
   use offer.social_repair
-  say [npc.fed_up, player.rude] (priority 12) as fed_up_rude:
+  say [npc.fed_up, player.rude] as fed_up_rude:
     "Enough! Keep barking at me like that and you can handle things yourself!"
-  say [npc.fed_up] (priority 11) as fed_up:
+  say [npc.fed_up] as fed_up:
     "Look, give me a minute—you've been on my case nonstop."
-  say [npc.annoyed] (priority 9) as annoyed:
+  say [npc.annoyed] as annoyed:
     "You just asked me that. Something else on your mind?"
-  say [default] (priority 6) as mild:
+  say [default] as mild:
     "Like I said a moment ago—nothing's changed."

@@ -109,11 +109,12 @@ local record = {
     affiliation = { role = "guard" },
     runtime = {},
 }
+-- On Project Zomboid's fixed isometric camera, Northeast (+10, -10) is screen RIGHT (3 o'clock).
 local target = {
     kind = "npc",
     id = "hostile-1",
     x = 10,
-    y = 0,
+    y = -10,
     z = 0,
 }
 

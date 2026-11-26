@@ -2,82 +2,82 @@
 language EN
 namespace hoomans
 
-flow semantic.progression.level_up
+dialogue semantic.progression.level_up
   # --- Level-Up via TV / VHS Broadcast ---
-  say [role=tv_broadcast_open] (priority 12) as tv_lvl_open:
+  say [role=tv_broadcast_open] as tv_lvl_open:
     "Hey {addressee.name}, watching {slot.show.name} actually clicked! I feel like I finally get {slot.skill.name} now."
     "Didn't expect {slot.show.name} to teach me this much, {addressee.name}. My {slot.skill.name} just jumped up a notch."
-  say [role=tv_broadcast_reply] (priority 12) as tv_lvl_reply:
+  say [role=tv_broadcast_reply] as tv_lvl_reply:
     "Nice work, {addressee.name}! Good thing we caught that episode while the signal lasted."
-  say [role=tv_broadcast_chime] (priority 12) as tv_lvl_chime:
+  say [role=tv_broadcast_chime] as tv_lvl_chime:
     "Keep watching whenever we get the chance. Every bit of {slot.skill.name} helps the whole crew."
 
   # --- Level-Up via Combat ---
-  say [role=combat_open] (priority 12) as combat_lvl_open:
+  say [role=combat_open] as combat_lvl_open:
     "Getting a much better feel for {slot.skill.name}, {addressee.name}. Those fights are sharpening my instincts."
     "That last scrap taught me a thing or two about {slot.skill.name}, {addressee.name}. Feeling steadier already."
-  say [role=combat_reply] (priority 12) as combat_lvl_reply:
+  say [role=combat_reply] as combat_lvl_reply:
     "I noticed, {addressee.name}. You're handling yourself way cleaner out there."
-  say [role=combat_chime] (priority 12) as combat_lvl_chime:
+  say [role=combat_chime] as combat_lvl_chime:
     "Good to hear. Stronger hands in a fight keep all of us breathing."
 
   # --- Level-Up via Building / Crafting ---
-  say [role=building_open] (priority 12) as build_lvl_open:
+  say [role=building_open] as build_lvl_open:
     "Hah, check that out, {addressee.name}! All this hands-on work is really paying off with my {slot.skill.name}."
     "Finally getting the hang of {slot.skill.name}, {addressee.name}. My joints and cuts are coming together way cleaner."
-  say [role=building_reply] (priority 12) as build_lvl_reply:
+  say [role=building_reply] as build_lvl_reply:
     "Looking solid, {addressee.name}. Having someone good at {slot.skill.name} is huge for our camp."
-  say [role=building_chime] (priority 12) as build_lvl_chime:
+  say [role=building_chime] as build_lvl_chime:
     "Keep at it. Better walls and gear mean safer nights."
 
   # --- Level-Up via Exercise / Conditioning ---
-  say [role=exercise_open] (priority 12) as ex_lvl_open:
+  say [role=exercise_open] as ex_lvl_open:
     "Whew... pushing myself is finally paying off, {addressee.name}. My {slot.skill.name} feels noticeably stronger."
     "All that training is starting to show, {addressee.name}. Definitely leveled up my {slot.skill.name}."
-  say [role=exercise_reply] (priority 12) as ex_lvl_reply:
+  say [role=exercise_reply] as ex_lvl_reply:
     "Way to stick with it, {addressee.name}. Outrunning a horde is half the battle."
-  say [role=exercise_chime] (priority 12) as ex_lvl_chime:
+  say [role=exercise_chime] as ex_lvl_chime:
     "Might have to join your routine before I fall behind."
 
   # --- Level-Up via Cooking ---
-  say [role=cooking_open] (priority 12) as cook_lvl_open:
+  say [role=cooking_open] as cook_lvl_open:
     "I'm getting the hang of {slot.skill.name}, {addressee.name}. Can actually make scavenged food taste decent now."
-  say [role=cooking_reply] (priority 12) as cook_lvl_reply:
+  say [role=cooking_reply] as cook_lvl_reply:
     "Now that's the best news I've heard all week, {addressee.name}."
-  say [role=cooking_chime] (priority 12) as cook_lvl_chime:
+  say [role=cooking_chime] as cook_lvl_chime:
     "A hot meal does wonders for morale out here."
 
   # --- Level-Up via Medical / First Aid ---
-  say [role=medical_open] (priority 12) as med_lvl_open:
+  say [role=medical_open] as med_lvl_open:
     "My hands are getting steadier with {slot.skill.name}, {addressee.name}. Patching wounds feels second nature now."
-  say [role=medical_reply] (priority 12) as med_lvl_reply:
+  say [role=medical_reply] as med_lvl_reply:
     "Glad to have you on our side, {addressee.name}. Good medical hands save lives."
-  say [role=medical_chime] (priority 12) as med_lvl_chime:
+  say [role=medical_chime] as med_lvl_chime:
     "Hopefully we won't need it often, but it's reassuring knowing you've got us covered."
 
   # --- Level-Up via Survival / Farming / Fishing / Mechanics ---
-  say [role=survival_open] (priority 12) as surv_lvl_open:
+  say [role=survival_open] as surv_lvl_open:
     "Starting to get a real knack for {slot.skill.name}, {addressee.name}. Practical experience beats everything."
-  say [role=survival_reply] (priority 12) as surv_lvl_reply:
+  say [role=survival_reply] as surv_lvl_reply:
     "Nice, {addressee.name}. That's going to keep us self-sufficient out here."
-  say [role=survival_chime] (priority 12) as surv_lvl_chime:
+  say [role=survival_chime] as surv_lvl_chime:
     "Every new trick we learn buys us another week."
 
   # --- Level-Up via Reading ---
-  say [role=reading_open] (priority 12) as read_lvl_open:
+  say [role=reading_open] as read_lvl_open:
     "That book actually made {slot.skill.name} click, {addressee.name}. Makes way more sense now."
-  say [role=reading_reply] (priority 12) as read_lvl_reply:
+  say [role=reading_reply] as read_lvl_reply:
     "Good stuff, {addressee.name}. Knowledge doesn't weigh down a backpack."
-  say [role=reading_chime] (priority 12) as read_lvl_chime:
+  say [role=reading_chime] as read_lvl_chime:
     "Let's grab any more manuals we spot on supply runs."
 
   # --- General Level-Up Fallback ---
-  say [role=general_open] (priority 10) as gen_lvl_open:
+  say [role=general_open] as gen_lvl_open:
     "I think I'm really improving at {slot.skill.name}, {addressee.name}. Practice is paying off."
-  say [role=general_reply] (priority 10) as gen_lvl_reply:
+  say [role=general_reply] as gen_lvl_reply:
     "Good job, {addressee.name}. Every bit of skill counts out here."
-  say [role=general_chime] (priority 10) as gen_lvl_chime:
+  say [role=general_chime] as gen_lvl_chime:
     "Keep it up, we're getting stronger as a group."
 
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Feels like I'm getting better at {slot.skill.name} every day."

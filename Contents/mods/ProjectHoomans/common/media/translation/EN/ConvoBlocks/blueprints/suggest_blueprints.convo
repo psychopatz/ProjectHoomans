@@ -1,0 +1,61 @@
+# Reusable semantic suggestion blueprints for interactive dialogues.
+# Attach to any pool or story node via `use suggest.<name>`.
+language EN
+namespace hoomans
+
+blueprint suggest.needs_rest
+  choice needs.take_break:
+    label: "Let's take a quick break"
+    say: "Good idea—let's stop and take care of that."
+    utility: compassion
+    intent: ACCEPT
+    subject: REST
+  choice needs.push_on:
+    label: "Hold on a bit longer"
+    say: "Hang in there—let's get somewhere safer first."
+    utility: caution
+    intent: DEFER
+    subject: REST
+
+blueprint suggest.weather_chat
+  choice weather.find_shelter:
+    when: [environment.raining]
+    label: "Let's get indoors"
+    say: "Let's duck inside until this rain lets up."
+    utility: caution
+    intent: SUGGEST
+    subject: SHELTER
+  choice weather.keep_moving:
+    label: "Keep moving"
+    say: "Weather won't stop us—let's keep moving."
+    utility: assertive
+    intent: INFORM
+    subject: WEATHER
+
+blueprint suggest.alarm_reaction
+  choice alarm.move_out:
+    label: "Move away from the alarm"
+    say: "Let's clear out before the block swarms."
+    utility: caution
+    intent: SUGGEST
+    subject: MOVE
+  choice alarm.hold_ground:
+    label: "Weapons ready, hold here"
+    say: "Weapons ready—we hold this angle."
+    utility: assertive
+    intent: INFORM
+    subject: COMBAT
+
+blueprint suggest.social_checkin
+  choice checkin.ask_wellbeing:
+    label: "How are you holding up?"
+    say: "How are you holding up?"
+    utility: warmth
+    intent: QUESTION
+    subject: WELLBEING
+  choice checkin.ask_needs:
+    label: "Need anything?"
+    say: "Do you need food, water, or rest?"
+    utility: compassion
+    intent: QUESTION
+    subject: NEEDS

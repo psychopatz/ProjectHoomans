@@ -1,0 +1,53 @@
+# Subject: WEATHER & EXPOSURE REMEDIATION / RELIEF BEATS.
+language EN
+namespace hoomans
+
+dialogue semantic.world.exposure.relief
+  say [role=out_of_rain_open] as out_of_rain_open:
+    "Ah, finally out of that downpour, {addressee.name}! Thought we were gonna drown out there."
+    "Thank god for a solid roof, {addressee.name}—so much better than standing in that rain."
+    "Good call getting us indoors, {addressee.name}. My boots were turning into buckets."
+  say [role=out_of_rain_reply] as out_of_rain_reply:
+    "No kidding, {addressee.name}—feels ten times better already just being out of the rain."
+    "Yeah, glad we ducked in here. Let's catch our breath and shake off the water."
+  say [role=out_of_rain_chime] as out_of_rain_chime:
+    "Best decision we've made all day—dry floors beat muddy streets every time."
+
+  say [role=dried_off_open] as dried_off_open:
+    "Feels good to finally be dry again, {addressee.name}. Wet clothes weigh you down fast."
+    "Thank goodness we dried off, {addressee.name}—I was starting to shiver."
+  say [role=dried_off_reply] as dried_off_reply:
+    "Same here, {addressee.name}. Way easier to move when you're not soaked through."
+    "Yeah, glad we didn't let that turn into a cold."
+  say [role=dried_off_chime] as dried_off_chime:
+    "Let's try to keep it that way if the sky opens up again."
+
+  say [role=warmed_up_open] as warmed_up_open:
+    "Finally warming back up, {addressee.name}—feeling's coming back to my fingers."
+    "Ah, that's better, {addressee.name}. Thought I was gonna freeze solid out there."
+  say [role=warmed_up_reply] as warmed_up_reply:
+    "Tell me about it, {addressee.name}. Nice to stop shivering for a minute."
+    "Yeah, much better—cold saps your strength faster than people think."
+  say [role=warmed_up_chime] as warmed_up_chime:
+    "Good timing getting warm before hypothermia set in."
+
+  say [role=cooled_down_open] as cooled_down_open:
+    "Whew—much better out of that heat, {addressee.name}. Thought I was gonna melt."
+    "That shade hits the spot, {addressee.name}. Finally cooling down."
+  say [role=cooled_down_reply] as cooled_down_reply:
+    "Seriously, {addressee.name}, my head was pounding in that sun. Good breather."
+    "Yeah, feels way better now—we'll last longer if we pace ourselves."
+  say [role=cooled_down_chime] as cooled_down_chime:
+    "Smart move taking a break before heatstroke caught up with us."
+
+  say [role=weather_cleared_open] as weather_cleared_open:
+    "Looks like the worst of that weather finally blew over, {addressee.name}."
+    "Skies are clearing up, {addressee.name}—nice to see straight again."
+  say [role=weather_cleared_reply] as weather_cleared_reply:
+    "About time, {addressee.name}. Makes scouting way less nerve-wracking."
+    "Good—let's make the most of the clear stretch while we have it."
+  say [role=weather_cleared_chime] as weather_cleared_chime:
+    "Still keep your eyes peeled—clear skies mean walkers can spot us easier too."
+
+  say [default] as default:
+    "Glad that's behind us, {addressee.name}."

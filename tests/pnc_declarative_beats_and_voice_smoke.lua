@@ -101,7 +101,7 @@ T.truthy(string.find(pyOut, "PY_VOICE_GUARD_OK", 1, true) ~= nil,
 
 -- 2. Verify world_alarm.convo contains semantic.world.alarm.react
 local scFile = io.open(
-    "Contents/mods/ProjectHoomans/common/media/translation/EN/ConvoBlocks/beats/world_alarm.convo",
+    "Contents/mods/ProjectHoomans/common/media/translation/EN/ConvoBlocks/world/world_alarm.convo",
     "r"
 )
 T.truthy(scFile ~= nil, "world_alarm.convo must exist")

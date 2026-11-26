@@ -60,10 +60,11 @@ T.equal(facing.y, -1, "live heading y")
 local projected, projectionReason = Projection.Project(record, threat, {
     now = now,
     sameAreaThreshold = 0.1,
+    referenceFrame = "heading",
 })
 T.truthy(projected, projectionReason)
-T.equal(projected.clockToken, "CLOCK_08", "rear-left threat resolves to eight o'clock")
-T.equal(projected.relativeSector8, "REAR_LEFT", "coarse rear-left sector")
+T.equal(projected.clockToken, "CLOCK_08", "rear-left threat resolves to eight o'clock (body heading)")
+T.equal(projected.relativeSector8, "REAR_LEFT", "coarse rear-left sector (body heading)")
 T.equal(projected.headingSource, "live_body", "projection records heading source")
 T.equal(projected.targetPositionSource, "combat_centroid",
     "projection records target geometry source")
@@ -72,10 +73,39 @@ heading = { x = 1, y = 0 }
 local rotated = Projection.Project(record, threat, {
     now = now,
     sameAreaThreshold = 0.1,
+    referenceFrame = "heading",
 })
 T.truthy(rotated, "rotated projection remains available")
 T.falsy(rotated.clockToken == projected.clockToken,
-    "turning observer updates ephemeral clock relation")
+    "turning observer updates ephemeral clock relation in body-heading mode")
+
+-- Default PZ isometric screen-relative mode: even when NPC body faces South (0, +1),
+-- NE (+10, -10) is screen RIGHT (3 o'clock) and SW (-10, +10) is screen LEFT (9 o'clock).
+heading = { x = 0, y = 1 }
+local screenRight = Projection.Project(record, {
+    id = "z-right", kind = "zombie", x = 110, y = 90, z = 0, observedAt = now,
+}, { now = now, sameAreaThreshold = 0.1 })
+T.equal(screenRight.referenceFrame, "screen", "default referenceFrame is isometric screen")
+T.equal(screenRight.relativeSector8, "RIGHT", "NE threat is screen RIGHT even when NPC faces South")
+T.equal(screenRight.clockToken, "CLOCK_03", "NE threat is 3 o'clock on isometric screen")
+
+local screenLeft = Projection.Project(record, {
+    id = "z-left", kind = "zombie", x = 90, y = 110, z = 0, observedAt = now,
+}, { now = now, sameAreaThreshold = 0.1 })
+T.equal(screenLeft.relativeSector8, "LEFT", "SW threat is screen LEFT even when NPC faces South")
+T.equal(screenLeft.clockToken, "CLOCK_09", "SW threat is 9 o'clock on isometric screen")
+
+local screenUp = Projection.Project(record, {
+    id = "z-up", kind = "zombie", x = 90, y = 90, z = 0, observedAt = now,
+}, { now = now, sameAreaThreshold = 0.1 })
+T.equal(screenUp.relativeSector8, "AHEAD", "NW threat is screen AHEAD")
+T.equal(screenUp.clockToken, "CLOCK_12", "NW threat is 12 o'clock on isometric screen")
+
+local screenDown = Projection.Project(record, {
+    id = "z-down", kind = "zombie", x = 110, y = 110, z = 0, observedAt = now,
+}, { now = now, sameAreaThreshold = 0.1 })
+T.equal(screenDown.relativeSector8, "BEHIND", "SE threat is screen BEHIND")
+T.equal(screenDown.clockToken, "CLOCK_06", "SE threat is 6 o'clock on isometric screen")
 
 local cachedRecord = {
     id = "npc-cached",
@@ -123,6 +153,7 @@ T.equal(staleThreatReason, "THREAT_STALE", "stale threat reason")
 heading = { x = 0, y = 0 }
 local unavailable, unavailableReason = Projection.Project(record, threat, {
     now = now,
+    referenceFrame = "heading",
 })
 T.equal(unavailable, nil, "invalid live heading is not fabricated")
 T.equal(unavailableReason, "HEADING_UNAVAILABLE", "invalid heading omission reason")

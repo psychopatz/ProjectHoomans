@@ -450,3 +450,11 @@ Current attribution limitations are deliberate:
 Future work should first complete the documented in-game SP, hosted, and
 dedicated callback validation. Memory consolidation, gossip, factions, AI
 decisions, and presentation remain later consumers of this foundation.
+
+## Related Dialogue Integration
+
+- See [EmergentSocialDialogue.md](EmergentSocialDialogue.md) for how `.convo`
+  branching stories and actor-agnostic choices (`ai_bias` + personality-scoped
+  `reply` reactions) emit bounded `approval`, `respect`, `familiarity`, and
+  `morale` deltas into this relationship model for both Player↔NPC and NPC↔NPC
+  interactions.

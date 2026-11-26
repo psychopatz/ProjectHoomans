@@ -1,0 +1,64 @@
+# Subject: CHARACTER EXPOSURE & SHELTER SUGGESTION BEATS.
+language EN
+namespace hoomans
+
+dialogue semantic.world.exposure.suggest
+  say [role=soaking_wet_rain_open] as soaking_wet_rain_open:
+    "We're soaking wet out here, {addressee.name}—can't we duck under a roof or find shelter at this point?"
+    "We're drenched to the bone, {addressee.name}. Shouldn't we head inside somewhere and dry off?"
+    "Look at us, {addressee.name}, completely soaked in this rain—let's find some cover before we catch a cold."
+  say [role=soaking_wet_rain_reply] as soaking_wet_rain_reply:
+    "Seriously, {addressee.name}, my boots are sloshing with every step. Any dry building will do."
+    "I'm with them—standing out in the downpour isn't doing us any favors. Let's duck inside."
+    "Yeah, let's grab a roof overhead and wring out before we end up sick."
+  say [role=soaking_wet_rain_chime] as soaking_wet_rain_chime:
+    "A quick stop indoors to dry off and check our gear sounds way smarter than marching through this."
+    "Even an awning or an empty storefront would beat standing out in the open rain."
+
+  say [role=exposed_rain_open] as exposed_rain_open:
+    "We've been out in this rain a while, {addressee.name}—want to duck under cover before we get soaked?"
+    "Still pouring out here, {addressee.name}. Maybe we should head inside until it eases up?"
+  say [role=exposed_rain_reply] as exposed_rain_reply:
+    "Good call, {addressee.name}—better to get under a roof before our clothes are completely waterlogged."
+    "Yeah, I'd rather wait out the worst of it indoors if we can."
+  say [role=exposed_rain_chime] as exposed_rain_chime:
+    "Lead the way whenever you spot a safe door, {addressee.name}."
+
+  say [role=freezing_exposure_open] as freezing_exposure_open:
+    "We're freezing out here, {addressee.name}—can we get indoors and warm up before someone gets hypothermia?"
+    "I'm shivering through my coat, {addressee.name}. We really need shelter and heat soon."
+  say [role=freezing_exposure_reply] as freezing_exposure_reply:
+    "Same here, {addressee.name}—hard to hold a weapon steady when your fingers are numb."
+    "Yeah, let's get out of this wind and find a room we can close up."
+  say [role=freezing_exposure_chime] as freezing_exposure_chime:
+    "Even ten minutes out of the cold will keep us sharp."
+
+  say [role=overheating_exposure_open] as overheating_exposure_open:
+    "We're roasting out here, {addressee.name}—can't we duck into some shade and cool down for a minute?"
+    "This heat's draining us fast, {addressee.name}. Let's get out of the sun and catch our breath."
+  say [role=overheating_exposure_reply] as overheating_exposure_reply:
+    "Agreed, {addressee.name}—sweating buckets out here. Shade and water sound amazing."
+    "Yeah, let's step inside somewhere cool before we burn out."
+  say [role=overheating_exposure_chime] as overheating_exposure_chime:
+    "Remember to hydrate while we're at it."
+
+  say [role=catching_cold_open] as catching_cold_open:
+    "You sound like you're catching a cold, {addressee.name}—staying out in this weather is only gonna make it worse. Let's get indoors."
+    "Careful, {addressee.name}, coughing out here will draw walkers. Can we duck inside and get dry?"
+  say [role=catching_cold_reply] as catching_cold_reply:
+    "They're right, {addressee.name}—a bad cold in this weather is dangerous. Let's find a warm room."
+    "Let's get off the street and rest up before it turns into something worse."
+  say [role=catching_cold_chime] as catching_cold_chime:
+    "I'll keep watch on the door if we stop inside to recover."
+
+  say [role=exposed_harsh_weather_open] as exposed_harsh_weather_open:
+    "Rough weather to be standing out in the open, {addressee.name}—shouldn't we find some shelter?"
+    "We're pretty exposed out here in this weather, {addressee.name}. Want to duck inside for a bit?"
+  say [role=exposed_harsh_weather_reply] as exposed_harsh_weather_reply:
+    "Sounds smart to me, {addressee.name}—no sense fighting the weather and the dead at the same time."
+    "Yeah, let's get under cover when we see a clear building."
+  say [role=exposed_harsh_weather_chime] as exposed_harsh_weather_chime:
+    "Just say the word and we'll follow you inside."
+
+  say [default] as default:
+    "We shouldn't stay exposed out here longer than we have to, {addressee.name}."

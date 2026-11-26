@@ -3,17 +3,17 @@ language EN
 namespace hoomans
 
 extend semantic.banter.group
-  say [topic=road_morale, role=open] (priority 10) as road_open:
+  say [topic=road_morale, role=open] as road_open:
     "Still hanging in there, {addressee.name}? Feels like we've walked half of Kentucky."
     "Hard to believe how empty these streets got, {addressee.name}."
     "Hey {addressee.name}—glad we're not doing this solo. Too many ways to get blindsided alone."
-  say [topic=road_morale, role=reply] (priority 10) as road_reply:
+  say [topic=road_morale, role=reply] as road_reply:
     "Still standing, {addressee.name}. As long as we stick together, we've got a shot."
     "Yeah, eerie as hell—used to be traffic everywhere, now it's just wind and dead ones."
     "No argument there. Extra pair of eyes saves your skin out here."
-  say [topic=road_morale, role=chime] (priority 10) as road_chime:
+  say [topic=road_morale, role=chime] as road_chime:
     "Speak for yourselves, I'm just here for the great company."
     "One mile at a time. That's all we can do."
-  say [topic=road_morale, role=wrap] (priority 10) as road_wrap:
+  say [topic=road_morale, role=wrap] as road_wrap:
     "Hah—alright, keep it moving then."
     "Damn right. Eyes forward."

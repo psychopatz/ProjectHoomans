@@ -10,10 +10,10 @@ story convo.weather_context
     gate [environment.raining] -> raining | clear | unknown
 
   node raining terminal
-    pool semantic.flow.weather.raining
+    dialogue semantic.flow.weather.raining
 
   node clear terminal
-    pool semantic.flow.weather.clear
+    dialogue semantic.flow.weather.clear
 
   node unknown terminal
-    pool semantic.flow.weather.unknown
+    dialogue semantic.flow.weather.unknown

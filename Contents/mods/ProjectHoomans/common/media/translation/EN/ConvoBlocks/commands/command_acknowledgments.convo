@@ -3,199 +3,199 @@
 language EN
 namespace hoomans
 
-flow semantic.command.ack
+dialogue semantic.command.ack
   # --- Follow / Stay / Wait At / Guard / Patrol / Camp ---
-  say [role=ack_follow, actor.social_style=warm|friendly|protective] (priority 8) as ack_follow_warm:
+  say [role=ack_follow, actor.social_style=warm|friendly|protective] as ack_follow_warm:
     "Right behind you, {addressee.name}. Lead the way."
-  say [role=ack_follow, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_follow_guarded:
+  say [role=ack_follow, actor.social_style=hostile|guarded|withdrawn] as ack_follow_guarded:
     "Fine, {addressee.name}. Just keep moving."
-  say [role=ack_follow] (priority 7) as ack_follow_default:
+  say [role=ack_follow] as ack_follow_default:
     "On your tail, {addressee.name}."
 
-  say [role=ack_stay, actor.social_style=warm|friendly|protective] (priority 8) as ack_stay_warm:
+  say [role=ack_stay, actor.social_style=warm|friendly|protective] as ack_stay_warm:
     "Got it, {addressee.name}. I'll hold right here."
-  say [role=ack_stay, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_stay_guarded:
+  say [role=ack_stay, actor.social_style=hostile|guarded|withdrawn] as ack_stay_guarded:
     "Alright. Staying put."
-  say [role=ack_stay] (priority 7) as ack_stay_default:
+  say [role=ack_stay] as ack_stay_default:
     "Understood, {addressee.name}. Holding position."
 
-  say [role=ack_wait_at, actor.social_style=warm|friendly|protective] (priority 8) as ack_wait_at_warm:
+  say [role=ack_wait_at, actor.social_style=warm|friendly|protective] as ack_wait_at_warm:
     "Heading over to {slot.target}, {addressee.name}. I'll wait for you there."
-  say [role=ack_wait_at, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_wait_at_guarded:
+  say [role=ack_wait_at, actor.social_style=hostile|guarded|withdrawn] as ack_wait_at_guarded:
     "Fine, I'll wait by {slot.target}."
-  say [role=ack_wait_at] (priority 7) as ack_wait_at_default:
+  say [role=ack_wait_at] as ack_wait_at_default:
     "Got it, waiting by {slot.target}, {addressee.name}."
 
-  say [role=ack_guard, actor.social_style=warm|friendly|protective] (priority 8) as ack_guard_warm:
+  say [role=ack_guard, actor.social_style=warm|friendly|protective] as ack_guard_warm:
     "I've got watch, {addressee.name}. Nothing gets past me."
-  say [role=ack_guard, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_guard_guarded:
+  say [role=ack_guard, actor.social_style=hostile|guarded|withdrawn] as ack_guard_guarded:
     "Eyes open. Leave the perimeter to me."
-  say [role=ack_guard] (priority 7) as ack_guard_default:
+  say [role=ack_guard] as ack_guard_default:
     "Copy that, {addressee.name}. Keeping watch."
 
-  say [role=ack_patrol, actor.social_style=warm|friendly|protective] (priority 8) as ack_patrol_warm:
+  say [role=ack_patrol, actor.social_style=warm|friendly|protective] as ack_patrol_warm:
     "Starting patrol rounds now, {addressee.name}."
-  say [role=ack_patrol] (priority 7) as ack_patrol_default:
+  say [role=ack_patrol] as ack_patrol_default:
     "On patrol, {addressee.name}."
 
-  say [role=ack_camp, actor.social_style=warm|friendly|protective] (priority 8) as ack_camp_warm:
+  say [role=ack_camp, actor.social_style=warm|friendly|protective] as ack_camp_warm:
     "Heading back to camp, {addressee.name}. See you there."
-  say [role=ack_camp, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_camp_guarded:
+  say [role=ack_camp, actor.social_style=hostile|guarded|withdrawn] as ack_camp_guarded:
     "About time. Heading back to base."
-  say [role=ack_camp] (priority 7) as ack_camp_default:
+  say [role=ack_camp] as ack_camp_default:
     "Heading back to camp now, {addressee.name}."
 
   # --- Colonist Activity Buttons (Eat, Drink, Refill, Sleep, Provisions, Corpses, Inventory) ---
-  say [role=ack_eat, actor.social_style=warm|friendly|protective] (priority 8) as ack_eat_warm:
+  say [role=ack_eat, actor.social_style=warm|friendly|protective] as ack_eat_warm:
     "Thanks, {addressee.name}. I'll grab something to eat."
-  say [role=ack_eat, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_eat_guarded:
+  say [role=ack_eat, actor.social_style=hostile|guarded|withdrawn] as ack_eat_guarded:
     "Good. I needed food anyway."
-  say [role=ack_eat] (priority 7) as ack_eat_default:
+  say [role=ack_eat] as ack_eat_default:
     "Alright, grabbing a bite now, {addressee.name}."
 
-  say [role=ack_drink, actor.social_style=warm|friendly|protective] (priority 8) as ack_drink_warm:
+  say [role=ack_drink, actor.social_style=warm|friendly|protective] as ack_drink_warm:
     "Good call, {addressee.name}. Taking a drink now."
-  say [role=ack_drink, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_drink_guarded:
+  say [role=ack_drink, actor.social_style=hostile|guarded|withdrawn] as ack_drink_guarded:
     "Sure, grabbing some water."
-  say [role=ack_drink] (priority 7) as ack_drink_default:
+  say [role=ack_drink] as ack_drink_default:
     "Getting a drink now, {addressee.name}."
 
-  say [role=ack_refill_water, actor.social_style=warm|friendly|protective] (priority 8) as ack_refill_warm:
+  say [role=ack_refill_water, actor.social_style=warm|friendly|protective] as ack_refill_warm:
     "On it, {addressee.name}. Going to top off my water."
-  say [role=ack_refill_water] (priority 7) as ack_refill_default:
+  say [role=ack_refill_water] as ack_refill_default:
     "Heading out to refill my water, {addressee.name}."
 
-  say [role=ack_sleep, actor.social_style=warm|friendly|protective] (priority 8) as ack_sleep_warm:
+  say [role=ack_sleep, actor.social_style=warm|friendly|protective] as ack_sleep_warm:
     "Thanks, {addressee.name}. I'll go get some shut-eye."
-  say [role=ack_sleep, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_sleep_guarded:
+  say [role=ack_sleep, actor.social_style=hostile|guarded|withdrawn] as ack_sleep_guarded:
     "Finally. Wake me if trouble shows up."
-  say [role=ack_sleep] (priority 7) as ack_sleep_default:
+  say [role=ack_sleep] as ack_sleep_default:
     "Alright, heading to get some sleep, {addressee.name}."
 
-  say [role=ack_wake, actor.social_style=warm|friendly|protective] (priority 8) as ack_wake_warm:
+  say [role=ack_wake, actor.social_style=warm|friendly|protective] as ack_wake_warm:
     "I'm up, {addressee.name}. Ready when you are."
-  say [role=ack_wake, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_wake_guarded:
+  say [role=ack_wake, actor.social_style=hostile|guarded|withdrawn] as ack_wake_guarded:
     "Yeah, yeah, I'm awake."
-  say [role=ack_wake] (priority 7) as ack_wake_default:
+  say [role=ack_wake] as ack_wake_default:
     "Up and ready, {addressee.name}."
 
-  say [role=ack_provision, actor.social_style=warm|friendly|protective] (priority 8) as ack_provision_warm:
+  say [role=ack_provision, actor.social_style=warm|friendly|protective] as ack_provision_warm:
     "On it, {addressee.name}. I'll grab some provisions."
-  say [role=ack_provision] (priority 7) as ack_provision_default:
+  say [role=ack_provision] as ack_provision_default:
     "Going to stock up on provisions, {addressee.name}."
 
-  say [role=ack_corpse_haul, actor.social_style=warm|friendly|protective] (priority 8) as ack_corpse_warm:
+  say [role=ack_corpse_haul, actor.social_style=warm|friendly|protective] as ack_corpse_warm:
     "Dirty job, but someone's got to do it. Clearing the bodies now, {addressee.name}."
-  say [role=ack_corpse_haul, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_corpse_guarded:
+  say [role=ack_corpse_haul, actor.social_style=hostile|guarded|withdrawn] as ack_corpse_guarded:
     "Ugh, corpse duty again. Fine, I'll haul them."
-  say [role=ack_corpse_haul] (priority 7) as ack_corpse_default:
+  say [role=ack_corpse_haul] as ack_corpse_default:
     "Alright, {addressee.name}. I'll start clearing the corpses."
 
-  say [role=ack_inventory, actor.social_style=warm|friendly|protective] (priority 8) as ack_inventory_warm:
+  say [role=ack_inventory, actor.social_style=warm|friendly|protective] as ack_inventory_warm:
     "Sure thing, {addressee.name}, go ahead and check my pack."
-  say [role=ack_inventory, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_inventory_guarded:
+  say [role=ack_inventory, actor.social_style=hostile|guarded|withdrawn] as ack_inventory_guarded:
     "Make it quick, {addressee.name}. Don't mess up my gear."
-  say [role=ack_inventory] (priority 7) as ack_inventory_default:
+  say [role=ack_inventory] as ack_inventory_default:
     "Here's what I'm carrying, {addressee.name}."
 
   # --- Work / Task Orders ---
-  say [role=ack_scavenge] (priority 7) as ack_scavenge_default:
+  say [role=ack_scavenge] as ack_scavenge_default:
     "I'll keep my eyes peeled for supplies, {addressee.name}."
-  say [role=ack_lumber] (priority 7) as ack_lumber_default:
+  say [role=ack_lumber] as ack_lumber_default:
     "Got it, {addressee.name}. Heading out to cut timber."
-  say [role=ack_fish] (priority 7) as ack_fish_default:
+  say [role=ack_fish] as ack_fish_default:
     "Alright, {addressee.name}. I'll try to catch us some fish."
-  say [role=ack_heal] (priority 7) as ack_heal_default:
+  say [role=ack_heal] as ack_heal_default:
     "On it, {addressee.name}. Tending to the wounds now."
-  say [role=ack_task] (priority 7) as ack_task_default:
+  say [role=ack_task] as ack_task_default:
     "Understood, {addressee.name}. Getting on it now."
 
   # --- Behavior Script Plan Affirmation, Cancellation, and Completion ---
-  say [role=ack_script_plan, actor.social_style=warm|friendly|protective] (priority 8) as ack_script_plan_warm:
+  say [role=ack_script_plan, actor.social_style=warm|friendly|protective] as ack_script_plan_warm:
     "Got it, {addressee.name} - I'll {slot.plan.summary}."
-  say [role=ack_script_plan, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_script_plan_guarded:
+  say [role=ack_script_plan, actor.social_style=hostile|guarded|withdrawn] as ack_script_plan_guarded:
     "Alright, {addressee.name}. Going to {slot.plan.summary}."
-  say [role=ack_script_plan] (priority 7) as ack_script_plan_default:
+  say [role=ack_script_plan] as ack_script_plan_default:
     "Copy that, {addressee.name}. I'll {slot.plan.summary}."
 
-  say [role=ack_script_cancelled, actor.social_style=warm|friendly|protective] (priority 8) as ack_script_cancel_warm:
+  say [role=ack_script_cancelled, actor.social_style=warm|friendly|protective] as ack_script_cancel_warm:
     "Alright, stopping now, {addressee.name}. What's next?"
-  say [role=ack_script_cancelled, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_script_cancel_guarded:
+  say [role=ack_script_cancelled, actor.social_style=hostile|guarded|withdrawn] as ack_script_cancel_guarded:
     "Fine, dropping it."
-  say [role=ack_script_cancelled] (priority 7) as ack_script_cancel_default:
+  say [role=ack_script_cancelled] as ack_script_cancel_default:
     "Got it, {addressee.name}. Stopping what I was doing."
 
-  say [role=ack_script_done, actor.social_style=warm|friendly|protective] (priority 8) as ack_script_done_warm:
+  say [role=ack_script_done, actor.social_style=warm|friendly|protective] as ack_script_done_warm:
     "All done, {addressee.name}!"
-  say [role=ack_script_done] (priority 7) as ack_script_done_default:
+  say [role=ack_script_done] as ack_script_done_default:
     "Finished up, {addressee.name}."
 
-  say [role=ack_script_done_loot, actor.social_style=warm|friendly|protective] (priority 8) as ack_script_done_loot_warm:
+  say [role=ack_script_done_loot, actor.social_style=warm|friendly|protective] as ack_script_done_loot_warm:
     "All done, {addressee.name} - I found {slot.loot.summary}!"
-  say [role=ack_script_done_loot, actor.social_style=hostile|guarded|withdrawn] (priority 8) as ack_script_done_loot_guarded:
+  say [role=ack_script_done_loot, actor.social_style=hostile|guarded|withdrawn] as ack_script_done_loot_guarded:
     "Done. Grabbed {slot.loot.summary}."
-  say [role=ack_script_done_loot] (priority 7) as ack_script_done_loot_default:
+  say [role=ack_script_done_loot] as ack_script_done_loot_default:
     "Finished up, {addressee.name}. I found {slot.loot.summary}."
 
-  say [role=ack_script_done_empty, actor.social_style=warm|friendly|protective] (priority 8) as ack_script_done_empty_warm:
+  say [role=ack_script_done_empty, actor.social_style=warm|friendly|protective] as ack_script_done_empty_warm:
     "Checked around, {addressee.name} - didn't find anything useful."
-  say [role=ack_script_done_empty] (priority 7) as ack_script_done_empty_default:
+  say [role=ack_script_done_empty] as ack_script_done_empty_default:
     "Looked around, {addressee.name}, nothing worth taking."
 
   # --- Throttled Loot-Grab Callout Beats ---
-  say [role=loot_grab_item, actor.social_style=warm|friendly|protective] (priority 8) as loot_grab_item_warm:
+  say [role=loot_grab_item, actor.social_style=warm|friendly|protective] as loot_grab_item_warm:
     "Found {slot.item.name} - grabbing it!"
-  say [role=loot_grab_item, actor.social_style=hostile|guarded|withdrawn] (priority 8) as loot_grab_item_guarded:
+  say [role=loot_grab_item, actor.social_style=hostile|guarded|withdrawn] as loot_grab_item_guarded:
     "Taking {slot.item.name}."
-  say [role=loot_grab_item] (priority 7) as loot_grab_item_default:
+  say [role=loot_grab_item] as loot_grab_item_default:
     "Grabbing {slot.item.name}."
 
   # --- Emote Reactions ---
-  say [role=emote_wavehi, actor.social_style=warm|friendly|protective] (priority 8) as emote_wavehi_warm:
+  say [role=emote_wavehi, actor.social_style=warm|friendly|protective] as emote_wavehi_warm:
     "Hey there, {addressee.name}! Good to see you."
-  say [role=emote_wavehi, actor.social_style=hostile|guarded|withdrawn] (priority 8) as emote_wavehi_guarded:
+  say [role=emote_wavehi, actor.social_style=hostile|guarded|withdrawn] as emote_wavehi_guarded:
     "Yeah, hey."
-  say [role=emote_wavehi] (priority 7) as emote_wavehi_default:
+  say [role=emote_wavehi] as emote_wavehi_default:
     "Hey, {addressee.name}."
 
-  say [role=emote_wavebye, actor.social_style=warm|friendly|protective] (priority 8) as emote_wavebye_warm:
+  say [role=emote_wavebye, actor.social_style=warm|friendly|protective] as emote_wavebye_warm:
     "Stay safe out there, {addressee.name}!"
-  say [role=emote_wavebye] (priority 7) as emote_wavebye_default:
+  say [role=emote_wavebye] as emote_wavebye_default:
     "See you around, {addressee.name}."
 
-  say [role=emote_shhh] (priority 7) as emote_shhh_default:
+  say [role=emote_shhh] as emote_shhh_default:
     "Got it, keeping it quiet, {addressee.name}."
 
-  say [role=emote_thankyou, actor.social_style=warm|friendly|protective] (priority 8) as emote_thankyou_warm:
+  say [role=emote_thankyou, actor.social_style=warm|friendly|protective] as emote_thankyou_warm:
     "Anytime, {addressee.name}. Glad to help."
-  say [role=emote_thankyou] (priority 7) as emote_thankyou_default:
+  say [role=emote_thankyou] as emote_thankyou_default:
     "No problem, {addressee.name}."
 
-  say [role=emote_thumbsup, actor.social_style=warm|friendly|protective] (priority 8) as emote_thumbsup_warm:
+  say [role=emote_thumbsup, actor.social_style=warm|friendly|protective] as emote_thumbsup_warm:
     "Right back at you, {addressee.name}!"
-  say [role=emote_thumbsup] (priority 7) as emote_thumbsup_default:
+  say [role=emote_thumbsup] as emote_thumbsup_default:
     "Glad we're on the same page, {addressee.name}."
 
-  say [role=emote_thumbsdown, actor.social_style=hostile|guarded|withdrawn] (priority 8) as emote_thumbsdown_guarded:
+  say [role=emote_thumbsdown, actor.social_style=hostile|guarded|withdrawn] as emote_thumbsdown_guarded:
     "Yeah? Well, I'm not thrilled either, {addressee.name}."
-  say [role=emote_thumbsdown] (priority 7) as emote_thumbsdown_default:
+  say [role=emote_thumbsdown] as emote_thumbsdown_default:
     "Alright, {addressee.name}, point taken."
 
-  say [role=emote_salute] (priority 7) as emote_salute_default:
+  say [role=emote_salute] as emote_salute_default:
     "Ready for orders, {addressee.name}."
 
-  say [role=emote_insult, actor.social_style=hostile|guarded|withdrawn] (priority 8) as emote_insult_guarded:
+  say [role=emote_insult, actor.social_style=hostile|guarded|withdrawn] as emote_insult_guarded:
     "Watch your mouth, {addressee.name}."
-  say [role=emote_insult] (priority 7) as emote_insult_default:
+  say [role=emote_insult] as emote_insult_default:
     "Hey, no need for that, {addressee.name}."
 
   # --- Rejections & Default ---
-  say [role=reject_generic, actor.social_style=warm|friendly|protective] (priority 8) as reject_warm:
+  say [role=reject_generic, actor.social_style=warm|friendly|protective] as reject_warm:
     "Sorry, {addressee.name}, I can't do that right now."
-  say [role=reject_generic, actor.social_style=hostile|guarded|withdrawn] (priority 8) as reject_guarded:
+  say [role=reject_generic, actor.social_style=hostile|guarded|withdrawn] as reject_guarded:
     "Not happening right now, {addressee.name}."
-  say [role=reject_generic] (priority 7) as reject_default:
+  say [role=reject_generic] as reject_default:
     "Can't do that right now, {addressee.name}."
 
-  say [default] (priority 5) as default:
+  say [default] as default:
     "Copy that, {addressee.name}."
