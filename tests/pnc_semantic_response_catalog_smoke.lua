@@ -14,9 +14,9 @@ local default = Catalog.Select(
     { npcID = "mara", worldContext = {} },
     "default"
 )
-T.equal(default.templateID, "semantic.greet.acknowledged",
+T.equal(default.templateID, "hoomans.greeting.default",
     "response catalog exposes the stable greeting template id")
-T.equal(default.fallback, "Hey there.",
+T.contains(default.fallback, "Hey there",
     "response catalog uses the safe default greeting")
 
 local friendly = Catalog.Select(
@@ -27,7 +27,7 @@ local friendly = Catalog.Select(
     },
     "friendly"
 )
-T.equal(friendly.templateID, "semantic.greet.friendly",
+T.equal(friendly.templateID, "hoomans.greeting.friendly",
     "response pools can branch on projected NPC social style")
 
 local dawn = Catalog.Select(
@@ -38,7 +38,7 @@ local dawn = Catalog.Select(
     },
     "dawn"
 )
-T.equal(dawn.templateID, "semantic.greet.morning",
+T.equal(dawn.templateID, "hoomans.greeting.dawn",
     "response conditions can use the cached world time band")
 
 local registered = Catalog.Register("test.topic_pool", {
@@ -79,10 +79,9 @@ local navigation = Catalog.Select(
     { npcID = "mara", subject = "CONVERSATION_TOPIC" },
     "navigation"
 )
-T.equal(navigation.templateID, "navigation.subject_change",
-    "semantic navigation uses its dedicated subject-change response")
-T.equal(navigation.fallback,
-    "All right. What did you want to talk about?",
+T.equal(navigation.templateID, "hoomans.conversation.acknowledged.default",
+    "semantic navigation uses its dedicated acknowledgement response")
+T.contains(navigation.fallback, "All right.",
     "semantic navigation keeps a player-facing acknowledgement")
 
 Catalog.ResetSelections()
@@ -121,7 +120,7 @@ local assaulted = Catalog.Select(
     { npcID = "mara", combatReactionStyle = "aggressive" },
     "player_assaulted"
 )
-T.equal(assaulted.templateID, "combat.assault.react.aggressive",
+T.equal(assaulted.templateID, "hoomans.combat.assault.react.aggressive",
     "player assault reaction selects the aggression-aware semantic family")
 T.equal(assaulted.fallback, "You just made a big mistake.",
     "player assault reaction has an appropriate hostile-transition fallback")

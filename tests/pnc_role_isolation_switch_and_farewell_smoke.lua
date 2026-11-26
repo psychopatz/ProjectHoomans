@@ -2,19 +2,13 @@
 -- 2-second interruptible speaker-switch handoff with log preservation/resume,
 -- and standardized red Goodbye / close-as-goodbye controller.
 
-local repoRoot = "/home/psychopatz/Zomboid/Workshop/ProjectHoomans"
-local coreRoot = "/home/psychopatz/Zomboid/Workshop/psychopatzCore"
-local dtRoot = "/home/psychopatz/Zomboid/Workshop/DynamicTrading"
+local T = require "tests/support/test"
+T.addPackagePaths()
+
+local repoRoot = os.getenv("PZ_TEST_REPOSITORY") or "."
+local dtRoot = repoRoot .. "/../DynamicTrading"
 
 package.path = table.concat({
-    repoRoot .. "/Contents/mods/ProjectHoomans/42.20/media/lua/shared/?.lua",
-    repoRoot .. "/Contents/mods/ProjectHoomans/42.20/media/lua/client/?.lua",
-    repoRoot .. "/Contents/mods/ProjectHoomans/42.20/media/lua/server/?.lua",
-    repoRoot .. "/Contents/mods/ProjectHoomans/common/media/lua/shared/?.lua",
-    repoRoot .. "/Contents/mods/ProjectHoomans/common/media/lua/client/?.lua",
-    repoRoot .. "/Contents/mods/ProjectHoomans/common/media/lua/server/?.lua",
-    coreRoot .. "/Contents/mods/PsychopatzCore/common/media/lua/shared/?.lua",
-    coreRoot .. "/Contents/mods/PsychopatzCore/common/media/lua/client/?.lua",
     dtRoot .. "/Contents/mods/DTCommon/42.20/media/lua/shared/?.lua",
     dtRoot .. "/Contents/mods/DTCommon/42.20/media/lua/client/?.lua",
     package.path,
