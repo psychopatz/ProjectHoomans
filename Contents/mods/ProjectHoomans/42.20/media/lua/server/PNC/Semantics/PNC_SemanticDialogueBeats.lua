@@ -434,11 +434,26 @@ function Beats.StartThread(plan, now, ctx)
     return tid, ok
 end
 
-function Beats.CancelThread(threadID)
+function Beats.CancelThread(threadID, opts)
     local tid = tostring(threadID or "")
     if tid == "" then return 0 end
     local removed = purgeTurnsForThread(tid)
-    local hadThread = Beats.ActiveThreads[tid] ~= nil
+    local active = Beats.ActiveThreads[tid]
+    local hadThread = active ~= nil
+    if removed > 0 and string.sub(tid, 1, 7) == "banter:" then
+        local topic, speakerID = string.match(tid, "^banter:([^:]+):(.+)$")
+        local groupKey = (type(opts) == "table" and opts.groupKey)
+            or (active and active.groupKey)
+            or nil
+        local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
+        if topic and groupKey and Dir and type(Dir.RecordInterruption) == "function" then
+            Dir.RecordInterruption(groupKey, {
+                topic = topic,
+                speakerID = speakerID,
+                reason = (type(opts) == "table" and opts.reason) or "cancelled",
+            }, nowMs(nil))
+        end
+    end
     Beats.ActiveThreads[tid] = nil
     removeOrder(tid)
     syncMeta()
@@ -676,6 +691,7 @@ function Beats.ResetRuntime()
     if type(Beats.ResetFinalKillRuntime) == "function" then Beats.ResetFinalKillRuntime() end
     if type(Beats.ResetWeatherExposureRuntime) == "function" then Beats.ResetWeatherExposureRuntime() end
     if type(Beats.ResetStateWatcherRuntime) == "function" then Beats.ResetStateWatcherRuntime() end
+    if type(Beats.ResetVehicleBeatsRuntime) == "function" then Beats.ResetVehicleBeatsRuntime() end
     if type(Beats.ResetAuditRuntime) == "function" then Beats.ResetAuditRuntime() end
 end
 
@@ -683,6 +699,7 @@ require "PNC/Semantics/PNC_SemanticDialogueBeats_Environment"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_WeatherAndExposure"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_StateWatcher"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_DefaultWatchers"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_Vehicles"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_HouseAlarm"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_Utilities"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_WorldObjects"

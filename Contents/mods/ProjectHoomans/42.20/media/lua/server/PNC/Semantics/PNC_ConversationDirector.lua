@@ -18,14 +18,20 @@ local MAX_VOICE_CACHE = 64
 local MAX_SATURATION_KEYS = 64
 local MAX_STORY_GROUPS = 24
 local MAX_STORY_MOMENTS = 6
+local MAX_CHRONICLE_PER_GROUP = 5
+local CHRONICLE_PROMOTE_SALIENCE = 58
 local STORY_TTL_MS = 12 * 60 * 1000
 local MAX_PAIR_BUDGET_KEYS = 64
+local MAX_INTERRUPTED_GROUPS = 16
+local INTERRUPTION_TTL_MS = 60000
 local MAX_APPROVAL_PER_HOUR = 6
 local MAX_RESPECT_PER_HOUR = 4
 
 local voiceCache, voiceOrder = {}, {}
 local saturation, saturationOrder = {}, {}
 local storyMoments, storyGroupOrder = {}, {}
+local groupChronicles, chronicleGroupOrder = {}, {}
+local interruptedThreads, interruptedOrder = {}, {}
 local recentSpeakerAt = {}
 local pairDeltaBudgets, pairBudgetOrder = {}, {}
 local evalSeq = 0
@@ -236,6 +242,44 @@ function Director.MarkSpoken(scopeKey, topic, tier, at, speakerId)
     end
 end
 
+function Director.PromoteToChronicle(groupKey, moment, at)
+    if type(moment) ~= "table" then return false end
+    local gKey = tostring(groupKey or "global")
+    local kind = tostring(moment.kind or "event")
+    local ring = groupChronicles[gKey]
+    if not ring then
+        ring = {}
+        lruPut(groupChronicles, chronicleGroupOrder, gKey, ring, MAX_STORY_GROUPS)
+    end
+    for i = #ring, 1, -1 do
+        if ring[i].kind == kind then
+            table.remove(ring, i)
+        end
+    end
+    while #ring >= MAX_CHRONICLE_PER_GROUP do
+        table.remove(ring, 1)
+    end
+    ring[#ring + 1] = {
+        kind = kind,
+        topic = tostring(moment.topic or "world_event"),
+        actorId = moment.actorId and tostring(moment.actorId) or nil,
+        salience = tonumber(moment.salience) or CHRONICLE_PROMOTE_SALIENCE,
+        at = nowMs(at),
+    }
+    return true
+end
+
+function Director.GetChronicle(groupKey)
+    local gKey = tostring(groupKey or "global")
+    local ring = groupChronicles[gKey]
+    local out = {}
+    if type(ring) ~= "table" then return out end
+    for i = #ring, 1, -1 do
+        out[#out + 1] = ring[i]
+    end
+    return out
+end
+
 function Director.RecordStoryMoment(groupKey, moment, at)
     if type(moment) ~= "table" then return false end
     local now = nowMs(at)
@@ -248,7 +292,7 @@ function Director.RecordStoryMoment(groupKey, moment, at)
     while #ring >= MAX_STORY_MOMENTS do
         table.remove(ring, 1)
     end
-    ring[#ring + 1] = {
+    local entry = {
         kind = tostring(moment.kind or "event"),
         topic = tostring(moment.topic or "world_event"),
         actorId = moment.actorId and tostring(moment.actorId) or nil,
@@ -258,6 +302,10 @@ function Director.RecordStoryMoment(groupKey, moment, at)
         at = now,
         expiresAt = now + (tonumber(moment.ttlMs) or STORY_TTL_MS),
     }
+    ring[#ring + 1] = entry
+    if entry.salience >= CHRONICLE_PROMOTE_SALIENCE or moment.chronicle == true then
+        Director.PromoteToChronicle(gKey, entry, now)
+    end
     if PNC.PerformanceScalingDiagnostics
         and PNC.PerformanceScalingDiagnostics.BeatsAuditEnabled == true
         and PNC.PerformanceScalingDiagnostics.LogBeatsAudit
@@ -705,10 +753,38 @@ function Director.GetAuditState(at)
     }
 end
 
+function Director.RecordInterruption(groupKey, info, at)
+    groupKey = tostring(groupKey or "")
+    if groupKey == "" or type(info) ~= "table" or not info.topic then return false end
+    local now = nowMs(at)
+    lruPut(interruptedThreads, interruptedOrder, groupKey, {
+        topic = tostring(info.topic),
+        speakerID = info.speakerID and tostring(info.speakerID) or nil,
+        reason = tostring(info.reason or "interrupted"),
+        recordedAt = now,
+        expiresAt = now + (tonumber(info.ttlMs) or INTERRUPTION_TTL_MS),
+    }, MAX_INTERRUPTED_GROUPS)
+    return true
+end
+
+function Director.ConsumeInterruption(groupKey, at)
+    groupKey = tostring(groupKey or "")
+    local entry = interruptedThreads[groupKey]
+    if type(entry) ~= "table" then return nil end
+    interruptedThreads[groupKey] = nil
+    local now = nowMs(at)
+    if now > (tonumber(entry.expiresAt) or 0) then
+        return nil
+    end
+    return entry
+end
+
 function Director.ResetRuntime()
     voiceCache, voiceOrder = {}, {}
     saturation, saturationOrder = {}, {}
     storyMoments, storyGroupOrder = {}, {}
+    groupChronicles, chronicleGroupOrder = {}, {}
+    interruptedThreads, interruptedOrder = {}, {}
     recentSpeakerAt = {}
     pairDeltaBudgets, pairBudgetOrder = {}, {}
     evalSeq = 0

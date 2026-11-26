@@ -443,8 +443,22 @@ function Beats.CheckEnvironment(now)
     if type(Beats.CheckNearbyWorldObjects) == "function" then
         Beats.CheckNearbyWorldObjects(now)
     end
+    local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
+    local frame = {
+        now = now,
+        env = BC and type(BC.GetWorldWeather) == "function" and BC.GetWorldWeather(now) or nil,
+        util = BC and type(BC.GetWorldUtilities) == "function" and BC.GetWorldUtilities(now) or nil,
+        groups = nil,
+    }
+    frame.getGroups = function(maxGroups, radius)
+        if frame.groups == nil and type(Beats.FindCalmGroupsNearPlayer) == "function" then
+            frame.groups = Beats.FindCalmGroupsNearPlayer(now, maxGroups or 3, radius or 18)
+        end
+        return frame.groups or {}
+    end
+
     if Beats.LastWeather ~= nil and type(Beats.CheckGroupBanter) == "function" then
-        Beats.CheckGroupBanter(now)
+        Beats.CheckGroupBanter(now, frame)
     end
     if type(Beats.CheckCompanionNeeds) == "function" then
         Beats.CheckCompanionNeeds(now)
@@ -455,11 +469,11 @@ function Beats.CheckEnvironment(now)
 
     local wxEmitted = false
     if type(Beats.CheckWeatherAndExposure) == "function" then
-        wxEmitted = Beats.CheckWeatherAndExposure(now) == true
+        wxEmitted = Beats.CheckWeatherAndExposure(now, frame) == true
     end
     local watcherEmitted = false
     if type(Beats.CheckStateWatchers) == "function" then
-        watcherEmitted = Beats.CheckStateWatchers(now) == true
+        watcherEmitted = Beats.CheckStateWatchers(now, frame) == true
     end
     if wxEmitted or watcherEmitted then
         return true

@@ -302,4 +302,260 @@ Beats.RegisterStateWatcher("actor.panic_calmed", {
     },
 })
 
+local NOTABLE_ROOMS = {
+    pharmacy = true,
+    clinic = true,
+    armory = true,
+    police = true,
+    firestation = true,
+    military = true,
+    prison = true,
+    library = true,
+    school = true,
+    kitchen = true,
+    restaurant = true,
+    bakery = true,
+    bar = true,
+    church = true,
+    grocery = true,
+    hardware = true,
+    clothing = true,
+    electronics = true,
+    bank = true,
+    office = true,
+    motel = true,
+    garage = true,
+    gasstation = true,
+    warehouse = true,
+    farm = true,
+    gym = true,
+    store = true,
+    house = true,
+}
+
+local function sampleGroupRoom(ctx)
+    local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
+    if not BC or type(BC.GetActorRoomKind) ~= "function" then return "outside" end
+    local members = ctx.group and ctx.group.members or nil
+    if type(members) == "table" and members[1] then
+        return BC.GetActorRoomKind(members[1])
+    end
+    return "outside"
+end
+
+local function isGroupSquareLit(ctx)
+    local util = ctx.util or {}
+    if util.powerOn == true then return true end
+    local members = ctx.group and ctx.group.members or nil
+    local m = type(members) == "table" and members[1] or nil
+    if type(m) == "table" and m.hasLight ~= nil then
+        return m.hasLight == true
+    end
+    if type(m) == "table" and type(getCell) == "function" then
+        local cell = getCell()
+        local sq = cell and type(cell.getGridSquare) == "function" and cell:getGridSquare(
+            math.floor(tonumber(m.x) or 0), math.floor(tonumber(m.y) or 0), math.floor(tonumber(m.z) or 0)
+        ) or nil
+        if sq and type(sq.haveElectricity) == "function" then
+            local ok, elec = pcall(sq.haveElectricity, sq)
+            if ok and elec == true then return true end
+        end
+    end
+    return false
+end
+
+-- 11. Room-entry awareness (group-scoped, actor-agnostic)
+Beats.RegisterStateWatcher("environment.room_entered", {
+    scope = "group",
+    priority = 27,
+    minActiveMs = 0,
+    onsetCooldownMs = 180000,
+    sample = function(ctx)
+        local rk = sampleGroupRoom(ctx)
+        if NOTABLE_ROOMS[rk] then
+            return true, "room_" .. rk, "entered_" .. rk
+        end
+        return false, nil, rk
+    end,
+    onset = {
+        poolID = "semantic.world.room.notice",
+        act = "REACT",
+        replyAct = "AGREE",
+        domain = "scavenging",
+        channel = "world",
+        topic = "supplies_check",
+    },
+})
+
+-- 12. Indoors in unpowered darkness -> light/power restored (group-scoped, actor-agnostic)
+Beats.RegisterStateWatcher("exposure.darkness_lit", {
+    scope = "group",
+    priority = 30,
+    minActiveMs = 10000,
+    remediateWindowMs = 600000,
+    onsetCooldownMs = 240000,
+    remediateCooldownMs = 180000,
+    sample = function(ctx)
+        local exp = ctx.exposure or {}
+        local env = ctx.env or {}
+        local tod = tostring(env.timeOfDay or "day")
+        local isDarkHours = tod == "night" or tod == "dusk"
+        local indoors = exp.isOutside == false
+        local lit = isGroupSquareLit(ctx)
+        local darkIndoors = indoors and isDarkHours and not lit
+        return darkIndoors, "dark_indoors", darkIndoors and "unpowered_dark" or "lit_or_outside"
+    end,
+    onset = {
+        poolID = "semantic.world.darkness",
+        rolePrefix = "dark_indoors",
+        act = "WARN",
+        replyAct = "AGREE",
+        domain = "world",
+        channel = "world",
+        topic = "night_watch",
+    },
+    remediate = {
+        poolID = "semantic.world.darkness",
+        rolePrefix = "light_restored",
+        act = "REACT",
+        replyAct = "AGREE",
+        domain = "world",
+        channel = "world",
+        topic = "night_watch",
+        storyKind = "light_restored",
+        storyTopic = "night_watch",
+        storySalience = 54,
+    },
+})
+
+-- 13. Dusk warning -> night survived at dawn (world-scoped)
+Beats.RegisterStateWatcher("world.night_survived", {
+    scope = "world",
+    priority = 28,
+    minActiveMs = 15000,
+    remediateWindowMs = 3600000,
+    onsetCooldownMs = 600000,
+    remediateCooldownMs = 600000,
+    sample = function(ctx)
+        local tod = tostring(ctx.env and ctx.env.timeOfDay or "day")
+        local isNightOrDusk = tod == "dusk" or tod == "night"
+        return isNightOrDusk, tod, isNightOrDusk and tod or "daylight"
+    end,
+    onset = {
+        poolID = "semantic.world.daycycle",
+        rolePrefix = "dusk_warning",
+        act = "SUGGEST",
+        replyAct = "AGREE",
+        domain = "world",
+        channel = "world",
+        topic = "night_watch",
+    },
+    remediate = {
+        poolID = "semantic.world.daycycle",
+        rolePrefix = "dawn_survived",
+        act = "REACT",
+        replyAct = "AGREE",
+        domain = "world",
+        channel = "world",
+        topic = "road_morale",
+        storyKind = "night_survived",
+        storyTopic = "night_watch",
+        storySalience = 60,
+    },
+})
+
+-- 14. Calm indoor dusk/night downtime reflection (group-scoped, actor-agnostic)
+Beats.RegisterStateWatcher("social.quiet_moment", {
+    scope = "group",
+    priority = 22,
+    minActiveMs = 60000,
+    onsetDelayMs = 60000,
+    onsetCooldownMs = 600000,
+    sample = function(ctx)
+        local exp = ctx.exposure or {}
+        local env = ctx.env or {}
+        local tod = tostring(env.timeOfDay or "day")
+        local calmEvening = (tod == "dusk" or tod == "night")
+            and exp.isOutside == false
+            and exp.isSoakingWet ~= true
+            and exp.isFreezing ~= true
+            and exp.isOverheating ~= true
+        return calmEvening, "quiet_downtime", calmEvening and "calm_safehouse_evening" or "not_downtime"
+    end,
+    onset = {
+        poolID = "semantic.world.quiet_moment",
+        rolePrefix = "quiet_downtime",
+        act = "CHAT",
+        replyAct = "AGREE",
+        domain = "social",
+        channel = "social",
+        topic = "road_morale",
+        storyKind = "quiet_moment_shared",
+        storyTopic = "road_morale",
+        storySalience = 54,
+    },
+})
+
+local function sampleGroupTerritory(ctx)
+    local Perc = PNC.Perception
+    if not Perc or type(Perc.ResolveTerritoryAt) ~= "function" then return nil end
+    local members = ctx.group and ctx.group.members or nil
+    local anchor = type(members) == "table" and members[1] or nil
+    if type(anchor) ~= "table" then return nil end
+    local fid = tostring(anchor.factionId or anchor.factionID or "")
+    return Perc.ResolveTerritoryAt(anchor, nil, nil, fid)
+end
+
+-- 15. Arriving at a player-owned or NPC base / territory (group-scoped, actor-agnostic)
+Beats.RegisterStateWatcher("territory.base_arrival", {
+    scope = "group",
+    priority = 34,
+    minActiveMs = 0,
+    onsetCooldownMs = 180000,
+    sample = function(ctx)
+        local t = sampleGroupTerritory(ctx)
+        if t and t.relation then
+            return true, t.relation, "entered_" .. tostring(t.relation)
+        end
+        return false, nil, "outside_territory"
+    end,
+    onset = {
+        poolID = "semantic.world.territory.arrival",
+        act = "REACT",
+        replyAct = "AGREE",
+        domain = "travel",
+        channel = "world",
+        topic = "road_morale",
+        storyKind = "arrived_at_base",
+        storyTopic = "road_morale",
+        storySalience = 56,
+    },
+})
+
+-- 16. Escaping / leaving hostile gang territory safely (group-scoped, actor-agnostic)
+Beats.RegisterStateWatcher("territory.hostile_escaped", {
+    scope = "group",
+    priority = 33,
+    minActiveMs = 8000,
+    remediateWindowMs = 600000,
+    remediateCooldownMs = 180000,
+    sample = function(ctx)
+        local t = sampleGroupTerritory(ctx)
+        local inHostile = t ~= nil and t.relation == "hostile_base"
+        return inHostile, "hostile_base", inHostile and "in_hostile_turf" or "clear_of_hostile_turf"
+    end,
+    remediate = {
+        poolID = "semantic.world.territory.arrival",
+        rolePrefix = "left_hostile_base",
+        act = "REACT",
+        replyAct = "AGREE",
+        domain = "travel",
+        channel = "world",
+        topic = "road_morale",
+        storyKind = "escaped_hostile_turf",
+        storyTopic = "road_morale",
+        storySalience = 60,
+    },
+})
+
 return Beats

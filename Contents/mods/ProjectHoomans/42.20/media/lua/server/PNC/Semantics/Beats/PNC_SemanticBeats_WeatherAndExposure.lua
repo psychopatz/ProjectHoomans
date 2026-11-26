@@ -374,12 +374,13 @@ function Beats.OnThunderEvent(x, y, doStrike, doLightning, doRumble, at)
     return ok, reason
 end
 
-function Beats.CheckWeatherAndExposure(now)
+function Beats.CheckWeatherAndExposure(now, frame)
     now = nowMs(now)
     local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
     if not BC or type(BC.GetWorldWeather) ~= "function" then return false end
 
-    local env = BC.GetWorldWeather(now)
+    local env = (type(frame) == "table" and type(frame.env) == "table")
+        and frame.env or BC.GetWorldWeather(now)
     local cur = tostring(env and env.weather or "clear")
     local prev = Beats.LastWeather
     Beats.LastWeather = cur

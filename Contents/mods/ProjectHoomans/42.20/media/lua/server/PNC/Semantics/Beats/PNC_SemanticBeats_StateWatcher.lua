@@ -148,6 +148,26 @@ local function recordStoryMomentIfConfigured(phaseSpec, groupKey, speaker, now)
     end
 end
 
+local WATCHER_REPLY_FRONTIER = {
+    { id = "sw_agree",    speechAct = "AGREE",    priority = 12 },
+    { id = "sw_reassure", speechAct = "REASSURE", priority = 10 },
+    { id = "sw_disagree", speechAct = "DISAGREE", priority = 5 },
+}
+
+local function resolvePersonalityReplyAct(partner, speaker, defaultAct, now)
+    local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
+    if partner and Dir and type(Dir.SelectSuggestionForNPC) == "function" then
+        local chosen = Dir.SelectSuggestionForNPC(partner, speaker, WATCHER_REPLY_FRONTIER, {
+            now = now,
+            sceneTension = 0,
+        })
+        if chosen and chosen.speechAct then
+            return tostring(chosen.speechAct)
+        end
+    end
+    return tostring(defaultAct or "AGREE")
+end
+
 local function emitWatcherBeat(watcher, phase, phaseSpec, variantKey, group, actor, now)
     if type(phaseSpec) ~= "table" or not phaseSpec.poolID then return false, "no_spec" end
     local rolePrefix = tostring(phaseSpec.rolePrefix or variantKey or "")
@@ -185,6 +205,9 @@ local function emitWatcherBeat(watcher, phase, phaseSpec, variantKey, group, act
         basePayload.speaker = a
         basePayload.partner = b
         basePayload.third = c
+        if b and phaseSpec.personalityReply ~= false then
+            basePayload.replyAct = resolvePersonalityReplyAct(b, a, basePayload.replyAct, now)
+        end
         ok, reason = Beats.Emit("environment.state_watcher", basePayload, now)
         if ok then
             recordStoryMomentIfConfigured(phaseSpec, group.key, speaker, now)
@@ -311,14 +334,22 @@ local function evaluateOne(watcher, stateKey, scopeKey, sampleCtx, group, actor,
     return okRem
 end
 
-function Beats.CheckStateWatchers(now)
+function Beats.CheckStateWatchers(now, frame)
     if #watcherOrder == 0 then return false end
     now = nowMs(now)
     local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
-    local env = (BC and type(BC.GetWorldWeather) == "function") and BC.GetWorldWeather(now) or {}
-    local util = (BC and type(BC.GetWorldUtilities) == "function") and BC.GetWorldUtilities(now) or {}
-    local groups = type(Beats.FindCalmGroupsNearPlayer) == "function"
-        and Beats.FindCalmGroupsNearPlayer(now, 3, GROUP_SEARCH_RADIUS) or {}
+    local env = (type(frame) == "table" and type(frame.env) == "table") and frame.env
+        or ((BC and type(BC.GetWorldWeather) == "function") and BC.GetWorldWeather(now) or {})
+    local util = (type(frame) == "table" and type(frame.util) == "table") and frame.util
+        or ((BC and type(BC.GetWorldUtilities) == "function") and BC.GetWorldUtilities(now) or {})
+    local groups
+    if type(frame) == "table" and type(frame.getGroups) == "function" then
+        groups = frame.getGroups(3, GROUP_SEARCH_RADIUS)
+    elseif type(Beats.FindCalmGroupsNearPlayer) == "function" then
+        groups = Beats.FindCalmGroupsNearPlayer(now, 3, GROUP_SEARCH_RADIUS)
+    else
+        groups = {}
+    end
 
     local groupExposureByKey = {}
     local anyEmitted = false
@@ -334,7 +365,7 @@ function Beats.CheckStateWatchers(now)
             elseif watcher.scope == "group" then
                 for gi = 1, #groups do
                     local g = groups[gi]
-                    local gKey = tostring(g.key or ("group:" .. tostring(gi)))
+                    local gKey = tostring(g.teamKey or g.key or ("group:" .. tostring(gi)))
                     local exp = groupExposureByKey[gKey]
                     if exp == nil and BC and type(BC.GetGroupExposure) == "function" then
                         exp = BC.GetGroupExposure(g, env, now)

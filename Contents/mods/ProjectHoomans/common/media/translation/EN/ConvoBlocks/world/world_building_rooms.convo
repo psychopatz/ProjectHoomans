@@ -1,0 +1,137 @@
+# Subject: EXTENDED BASE-GAME BUILDING & ROOM ENTRY BEATS.
+language EN
+namespace hoomans
+
+extend semantic.world.room.notice
+  say [role=room_police_open] as room_police_open:
+    "Police station, {addressee.name}—check the evidence lockers and armory door."
+  say [role=room_police_reply] as room_police_reply:
+    "Stay sharp, {addressee.name}—cops in riot gear are tough to put down if any turned inside."
+  say [role=room_police_chime] as room_police_chime:
+    "Grab any holsters, radios, or spare mags we spot."
+
+  say [role=room_firestation_open] as room_firestation_open:
+    "Fire station! Best place in Knox for axes, turnout gear, and medkits, {addressee.name}."
+  say [role=room_firestation_reply] as room_firestation_reply:
+    "Good call, {addressee.name}—a solid fire axe and heavy jacket beat getting scratched."
+  say [role=room_firestation_chime] as room_firestation_chime:
+    "Check the bays and upstairs bunks—firehouses make great temporary bases too."
+
+  say [role=room_military_open] as room_military_open:
+    "Military compound, {addressee.name}—expect heavy gear and heavy resistance."
+  say [role=room_military_reply] as room_military_reply:
+    "Watch every doorway, {addressee.name}. If soldiers went down here, it wasn't quiet."
+  say [role=room_military_chime] as room_military_chime:
+    "MREs, rucksacks, and rifles—worth sweeping carefully."
+
+  say [role=room_prison_open] as room_prison_open:
+    "A prison, {addressee.name}? Tell me we're not staying long—this place is a death trap."
+  say [role=room_prison_reply] as room_prison_reply:
+    "Keep an exit route clear at all times, {addressee.name}. One locked gate and we're boxed in."
+  say [role=room_prison_chime] as room_prison_chime:
+    "Guard towers and armory first, then get out."
+
+  say [role=room_school_open] as room_school_open:
+    "School building, {addressee.name}—check the lockers for backpacks and the library for books."
+  say [role=room_school_reply] as room_school_reply:
+    "Long hallways echo bad in here, {addressee.name}—keep our voices low."
+  say [role=room_school_chime] as room_school_chime:
+    "Cafeteria and nurse's office are worth a sweep too."
+
+  say [role=room_restaurant_open] as room_restaurant_open:
+    "Diner's right here, {addressee.name}—kitchen back there might still have dry goods or utensils."
+  say [role=room_restaurant_reply] as room_restaurant_reply:
+    "Check the dry storage shelves, {addressee.name}—anything in the freezers is probably spoiled by now."
+  say [role=room_restaurant_chime] as room_restaurant_chime:
+    "Man, I'd trade half my pack for a fresh hot burger right about now."
+
+  say [role=room_bakery_open] as room_bakery_open:
+    "Bakery, {addressee.name}—might still have flour, sugar, or canned stock in the back."
+  say [role=room_bakery_reply] as room_bakery_reply:
+    "Good eye, {addressee.name}—non-perishables and big cooking pots are always handy."
+  say [role=room_bakery_chime] as room_bakery_chime:
+    "Check behind the counter before we move on."
+
+  say [role=room_grocery_open] as room_grocery_open:
+    "Grocery store! Let's hit the canned aisles before anyone else clears it out, {addressee.name}."
+  say [role=room_grocery_reply] as room_grocery_reply:
+    "Watch the endcaps, {addressee.name}—big stores always have stragglers wandering the aisles."
+  say [role=room_grocery_chime] as room_grocery_chime:
+    "Grab high-calorie cans and water bottles first."
+
+  say [role=room_hardware_open] as room_hardware_open:
+    "Hardware store, {addressee.name}—nails, saws, sledges, and duct tape heaven!"
+  say [role=room_hardware_reply] as room_hardware_reply:
+    "Now we're talking, {addressee.name}. One good crowbar or box of nails goes a long way."
+  say [role=room_hardware_chime] as room_hardware_chime:
+    "Check the back loading bay for generators or gas cans too."
+
+  say [role=room_clothing_open] as room_clothing_open:
+    "Clothing shop, {addressee.name}—good chance to swap out torn layers or grab warmer coats."
+  say [role=room_clothing_reply] as room_clothing_reply:
+    "Leather jackets and sturdy boots beat thin shirts any day, {addressee.name}."
+  say [role=room_clothing_chime] as room_clothing_chime:
+    "Even extra cloth strips for bandages are worth grabbing."
+
+  say [role=room_electronics_open] as room_electronics_open:
+    "Electronics shop, {addressee.name}—check for batteries, flashlights, and HAM radios."
+  say [role=room_electronics_reply] as room_electronics_reply:
+    "Grab any skill VHS tapes or walkie-talkies we spot too, {addressee.name}."
+  say [role=room_electronics_chime] as room_electronics_chime:
+    "Spare scrap electronics are great for fixing generators later."
+
+  say [role=room_bank_open] as room_bank_open:
+    "A bank, {addressee.name}—funny how stacks of cash aren't worth a single can of beans anymore."
+  say [role=room_bank_reply] as room_bank_reply:
+    "Still worth checking the break room and guard desk, {addressee.name}—sometimes there's a pistol or first-aid kit."
+  say [role=room_bank_chime] as room_bank_chime:
+    "Heavy doors at least—could hold off a crowd in a pinch."
+
+  say [role=room_office_open] as room_office_open:
+    "Office building, {addressee.name}—check the break room for snacks and desks for tools or notes."
+  say [role=room_office_reply] as room_office_reply:
+    "Watch the cubicles, {addressee.name}—easy for walkers to hide behind partitions."
+  say [role=room_office_chime] as room_office_chime:
+    "Good vantage points upstairs if we ever need to scout the block."
+
+  say [role=room_motel_open] as room_motel_open:
+    "Motel rooms, {addressee.name}—decent spot to hole up for the night if we clear the doors."
+  say [role=room_motel_reply] as room_motel_reply:
+    "Knock or listen at every door before opening, {addressee.name}—motels are full of surprises."
+  say [role=room_motel_chime] as room_motel_chime:
+    "Luggage inside sometimes has spare clothes and meds."
+
+  say [role=room_gasstation_open] as room_gasstation_open:
+    "Gas station! Check the pumps and grab any fuel cans or snacks inside, {addressee.name}."
+  say [role=room_gasstation_reply] as room_gasstation_reply:
+    "Keep an eye on the forecourt, {addressee.name}—gas stations are wide open from every side."
+  say [role=room_gasstation_chime] as room_gasstation_chime:
+    "If the power's out, a generator can still run those pumps later."
+
+  say [role=room_warehouse_open] as room_warehouse_open:
+    "Warehouse, {addressee.name}—those wooden crates could be packed with tools, seeds, or generators!"
+  say [role=room_warehouse_reply] as room_warehouse_reply:
+    "Sweep the catwalks and corners first, {addressee.name}—big echoey space in here."
+  say [role=room_warehouse_chime] as room_warehouse_chime:
+    "Bring a crowbar—there's always good loot buried in the back stack."
+
+  say [role=room_farm_open] as room_farm_open:
+    "Farmstead, {addressee.name}—check the barn and sheds for tools, seeds, and sacks."
+  say [role=room_farm_reply] as room_farm_reply:
+    "Quiet out here compared to town, {addressee.name}—good spot to catch our breath."
+  say [role=room_farm_chime] as room_farm_chime:
+    "Plenty of open sightlines too—easy to spot trouble coming."
+
+  say [role=room_gym_open] as room_gym_open:
+    "Rec center, {addressee.name}—check the locker rooms for duffel bags and water bottles."
+  say [role=room_gym_reply] as room_gym_reply:
+    "Wide open floor in here, {addressee.name}—easy to kite if anything wanders in."
+  say [role=room_gym_chime] as room_gym_chime:
+    "Never thought I'd be looting a gym just to stay alive."
+
+  say [role=room_house_open] as room_house_open:
+    "Residential house, {addressee.name}—sweep the rooms quick and check the bathroom cabinets for meds."
+  say [role=room_house_reply] as room_house_reply:
+    "Got it, {addressee.name}—closing curtains behind us keeps prying eyes off the windows."
+  say [role=room_house_chime] as room_house_chime:
+    "Check the closets and garage if there's one attached."

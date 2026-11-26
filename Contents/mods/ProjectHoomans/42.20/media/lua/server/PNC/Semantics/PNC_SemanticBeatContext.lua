@@ -283,6 +283,78 @@ local function isRecordIndoors(sp)
     return sq ~= nil and sq.getRoom and sq:getRoom() ~= nil
 end
 
+local ROOM_KIND_PATTERNS = {
+    { "pharmacy", "pharmacy" }, { "drugstore", "pharmacy" }, { "drug", "pharmacy" },
+    { "medical", "clinic" }, { "clinic", "clinic" }, { "hospital", "clinic" },
+    { "doctor", "clinic" }, { "dentist", "clinic" }, { "morgue", "clinic" }, { "vet", "clinic" },
+    { "armory", "armory" }, { "gunstore", "armory" }, { "gun", "armory" }, { "ammo", "armory" }, { "shooting", "armory" },
+    { "police", "police" }, { "sheriff", "police" }, { "detective", "police" }, { "interrogation", "police" },
+    { "firestation", "firestation" }, { "firedept", "firestation" }, { "firestorage", "firestation" },
+    { "military", "military" }, { "barracks", "military" }, { "bunker", "military" }, { "armystorage", "military" },
+    { "prison", "prison" }, { "jail", "prison" }, { "cellblock", "prison" },
+    { "library", "library" }, { "bookstore", "library" }, { "book", "library" }, { "study", "library" },
+    { "school", "school" }, { "classroom", "school" }, { "cafeteria", "school" }, { "locker", "school" }, { "principal", "school" },
+    { "restaurant", "restaurant" }, { "diner", "restaurant" }, { "spiffo", "restaurant" }, { "pizza", "restaurant" },
+    { "burger", "restaurant" }, { "cafe", "restaurant" }, { "coffee", "restaurant" }, { "donut", "restaurant" },
+    { "bakery", "bakery" }, { "butcher", "bakery" }, { "fishmarket", "bakery" },
+    { "kitchen", "kitchen" }, { "pantry", "kitchen" }, { "dining", "kitchen" },
+    { "bar", "bar" }, { "tavern", "bar" }, { "pub", "bar" }, { "liquor", "bar" }, { "nightclub", "bar" },
+    { "church", "church" }, { "chapel", "church" }, { "funeral", "church" },
+    { "grocery", "grocery" }, { "supermarket", "grocery" }, { "gigamart", "grocery" }, { "convenience", "grocery" }, { "market", "grocery" },
+    { "hardware", "hardware" }, { "toolstore", "hardware" }, { "logging", "hardware" }, { "carpentry", "hardware" }, { "construction", "hardware" },
+    { "clothing", "clothing" }, { "laundromat", "clothing" }, { "laundry", "clothing" }, { "tailor", "clothing" }, { "boutique", "clothing" },
+    { "electronics", "electronics" }, { "radio", "electronics" }, { "video", "electronics" }, { "vhs", "electronics" }, { "music", "electronics" }, { "arcade", "electronics" },
+    { "bank", "bank" }, { "vault", "bank" }, { "jewelry", "bank" }, { "pawn", "bank" },
+    { "gasstation", "gasstation" }, { "gasstore", "gasstation" }, { "fossoil", "gasstation" }, { "fuel", "gasstation" },
+    { "mechanic", "garage" }, { "autoshop", "garage" }, { "carrepair", "garage" }, { "garage", "garage" }, { "tire", "garage" },
+    { "warehouse", "warehouse" }, { "factory", "warehouse" }, { "storage", "warehouse" }, { "industrial", "warehouse" }, { "shipping", "warehouse" },
+    { "farm", "farm" }, { "barn", "farm" }, { "stable", "farm" }, { "greenhouse", "farm" }, { "shed", "farm" }, { "coop", "farm" },
+    { "gym", "gym" }, { "fitness", "gym" }, { "bowling", "gym" }, { "cinema", "gym" }, { "theater", "gym" }, { "museum", "gym" },
+    { "office", "office" }, { "postoffice", "office" }, { "courthouse", "office" }, { "newspaper", "office" }, { "lobby", "office" }, { "meeting", "office" },
+    { "motel", "motel" }, { "hotel", "motel" }, { "dorm", "motel" }, { "apartment", "motel" },
+    { "store", "store" }, { "shop", "store" }, { "mall", "store" }, { "camping", "store" }, { "hunting", "store" }, { "sport", "store" },
+    { "livingroom", "house" }, { "bedroom", "house" }, { "bathroom", "house" }, { "basement", "house" }, { "attic", "house" }, { "hall", "house" },
+}
+
+function BC.GetActorRoomKind(actor)
+    if type(actor) == "table" and type(actor.roomKind) == "string" and actor.roomKind ~= "" then
+        return actor.roomKind
+    end
+    local rawName = nil
+    if type(actor) == "table" and type(actor.roomName) == "string" and actor.roomName ~= "" then
+        rawName = actor.roomName
+    elseif type(actor) == "table" and type(getCell) == "function" then
+        local cell = getCell()
+        local sq = cell and type(cell.getGridSquare) == "function" and cell:getGridSquare(
+            math.floor(tonumber(actor.x) or 0), math.floor(tonumber(actor.y) or 0), math.floor(tonumber(actor.z) or 0)
+        ) or nil
+        local room = sq and sq.getRoom and sq:getRoom() or nil
+        if room and type(room.getName) == "function" then
+            rawName = tostring(room:getName() or "")
+        elseif room ~= nil then
+            return "indoors"
+        end
+    elseif actor ~= nil and type(actor.getCurrentSquare) == "function" then
+        local sq = safeCall(actor, "getCurrentSquare")
+        local room = sq and sq.getRoom and sq:getRoom() or nil
+        if room and type(room.getName) == "function" then
+            rawName = tostring(room:getName() or "")
+        elseif room ~= nil then
+            return "indoors"
+        end
+    end
+    if not rawName or rawName == "" then
+        return BC.IsActorIndoors(actor) and "indoors" or "outside"
+    end
+    local lower = string.lower(rawName)
+    for i = 1, #ROOM_KIND_PATTERNS do
+        if string.find(lower, ROOM_KIND_PATTERNS[i][1], 1, true) then
+            return ROOM_KIND_PATTERNS[i][2]
+        end
+    end
+    return "indoors"
+end
+
 function BC.IsActorIndoors(actor)
     if type(actor) == "table" then
         if actor.isOutside ~= nil and type(actor.isOutside) == "function" then
@@ -588,11 +660,16 @@ BC.RegisterProvider("environment_weather", function(ctx, sp)
     ctx.env = env
 end)
 
-BC.RegisterProvider("environment_utilities", function(ctx)
+BC.RegisterProvider("environment_utilities", function(ctx, speaker)
     local u = BC.GetWorldUtilities(ctx.now)
     local env = type(ctx.env) == "table" and ctx.env or {}
     for k, v in pairs(u) do env[k] = v end
+    local roomKind = BC.GetActorRoomKind(speaker)
+    env.roomKind = roomKind
     ctx.env = env
+    if roomKind and roomKind ~= "outside" and roomKind ~= "indoors" then
+        ctx.tokens["scene.room"] = roomKind
+    end
 end)
 
 function BC.Build(speaker, addressee, opts)

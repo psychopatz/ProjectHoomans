@@ -233,6 +233,23 @@ function Beats.LogAuditSnapshot(reason, at)
         })
     end
 
+    local dsHealth = (Dir and type(Dir.GetAuditState) == "function") and Dir.GetAuditState(now) or {}
+    local swHealth = type(Beats.GetStateWatcherAuditState) == "function"
+        and Beats.GetStateWatcherAuditState() or {}
+    local pRoom = (BC and type(BC.GetActorRoomKind) == "function" and type(getPlayer) == "function")
+        and BC.GetActorRoomKind(getPlayer()) or "unknown"
+    Beats.AuditLog("beats_health", {
+        "convoPools=" .. tostring(convoPools),
+        "convoPending=" .. tostring(convoPending),
+        "convoErrors=" .. tostring(convoErrors),
+        "dirEvals=" .. tostring(dsHealth.evalCount or 0),
+        "dirAdmitted=" .. tostring(dsHealth.admittedCount or 0),
+        "dirSuppressed=" .. tostring(dsHealth.suppressedCount or 0),
+        "watcherTransitions=" .. tostring(swHealth.transitionCount or 0),
+        "armedWatchers=" .. tostring(swHealth.armedCount or 0),
+        "playerRoom=" .. tostring(pRoom),
+    })
+
     return true
 end
 

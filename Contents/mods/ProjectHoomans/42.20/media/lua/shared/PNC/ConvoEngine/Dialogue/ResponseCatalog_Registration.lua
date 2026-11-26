@@ -45,8 +45,47 @@ return function(Catalog, Core)
             if sa ~= sb then return sa > sb end
             return a < b
         end)
+
+        -- Pre-index single-string role & topic predicates in _evalOrder so
+        -- hot-path Select() scans only matching buckets + fallback variants.
+        local byRole, noRole, hasRoleBuckets = {}, {}, false
+        local byTopic, noTopic, hasTopicBuckets = {}, {}, false
+        for step = 1, #evalOrder do
+            local index = evalOrder[step]
+            local w = variants[index] and variants[index].when
+            local roleVal = type(w) == "table" and w.combatReactionRole or nil
+            if type(roleVal) == "string" and roleVal ~= "" then
+                local bucket = byRole[roleVal]
+                if not bucket then
+                    bucket = {}
+                    byRole[roleVal] = bucket
+                end
+                bucket[#bucket + 1] = index
+                hasRoleBuckets = true
+            else
+                noRole[#noRole + 1] = index
+            end
+
+            local topicVal = type(w) == "table" and w.topic or nil
+            if type(topicVal) == "string" and topicVal ~= "" then
+                local bucket = byTopic[topicVal]
+                if not bucket then
+                    bucket = {}
+                    byTopic[topicVal] = bucket
+                end
+                bucket[#bucket + 1] = index
+                hasTopicBuckets = true
+            else
+                noTopic[#noTopic + 1] = index
+            end
+        end
+
         pool.byID = byID
         pool._evalOrder = evalOrder
+        pool._byRole = hasRoleBuckets and byRole or nil
+        pool._noRole = hasRoleBuckets and noRole or nil
+        pool._byTopic = hasTopicBuckets and byTopic or nil
+        pool._noTopic = hasTopicBuckets and noTopic or nil
     end
 
     local function isOverOptionalPoolLimit()

@@ -64,6 +64,9 @@ function H.Send(player, payload)
 end
 
 function H.Inside(community, player)
+    if PNC.Perception and type(PNC.Perception.IsInsideCommunityTerritory) == "function" then
+        return PNC.Perception.IsInsideCommunityTerritory(community, player) == true
+    end
     return community and community.status == "active"
         and player and player.getX and player.getY
         and PNC.CommunityMath

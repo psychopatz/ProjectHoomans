@@ -1,0 +1,54 @@
+# Subject: BASE & TERRITORY ARRIVAL / DEPARTURE BEATS (player-owned & NPC bases).
+language EN
+namespace hoomans
+
+dialogue semantic.world.territory.arrival
+  say [role=own_base_open] as own_base_open:
+    "Home sweet home, {addressee.name}! Sure feels good to be back behind our own walls."
+    "We're back at base, {addressee.name}—let's unload our gear and catch our breath."
+    "Made it back safe, {addressee.name}. Nothing beats seeing our own perimeter."
+  say [role=own_base_reply] as own_base_reply:
+    "Amen to that, {addressee.name}. Ready to drop this pack and check the stockpiles."
+    "Good run out there—glad we all made it home in one piece."
+  say [role=own_base_chime] as own_base_chime:
+    "I'll double-check the gates and perimeter while everyone settles in."
+
+  say [role=allied_base_open] as allied_base_open:
+    "Allied camp up ahead, {addressee.name}—keep weapons lowered and let them see it's us."
+    "We're entering friendly territory, {addressee.name}. Good to have neighbors we can trust."
+  say [role=allied_base_reply] as allied_base_reply:
+    "Copy that, {addressee.name}—safety on, hands visible. Maybe they've got news or trades."
+    "Always nice visiting a friendly camp instead of dodging bullets."
+  say [role=allied_base_chime] as allied_base_chime:
+    "Let's check in with their lookouts so nobody gets jumpy."
+
+  say [role=neutral_base_open] as neutral_base_open:
+    "Survivor outpost ahead, {addressee.name}—stay polite and don't make any sudden moves."
+    "Looks like someone's claimed this turf, {addressee.name}. Keep it calm and see if they're open to talk."
+  say [role=neutral_base_reply] as neutral_base_reply:
+    "Right behind you, {addressee.name}. Watching their lookouts just in case."
+    "No need to start trouble—let's see what kind of outfit they're running."
+  say [role=neutral_base_chime] as neutral_base_chime:
+    "Keep our exit route in mind until we know they're friendly."
+
+  say [role=hostile_base_open] as hostile_base_open:
+    "Watch it, {addressee.name}—we just crossed into hostile turf! Stay frosty!"
+    "Heads up, {addressee.name}, this is gang territory—they don't take kindly to trespassers!"
+    "Careful, {addressee.name}—we're inside hostile territory. Weapons ready and eyes on the corners!"
+  say [role=hostile_base_reply] as hostile_base_reply:
+    "I see it, {addressee.name}—finger off the trigger until we have to, or should we back out?"
+    "Tight formation, {addressee.name}. If they spot us, this could go loud fast."
+  say [role=hostile_base_chime] as hostile_base_chime:
+    "Don't linger here unless we're ready for a fight or paying a toll."
+
+  say [role=left_hostile_base_open] as left_hostile_base_open:
+    "Whew—we're clear of their turf, {addressee.name}. Glad that didn't turn into a bloodbath."
+    "Out of hostile territory, {addressee.name}. Good call getting clear before they swarmed us."
+  say [role=left_hostile_base_reply] as left_hostile_base_reply:
+    "No kidding, {addressee.name}—my heart was hammering the whole way past their perimeter."
+    "Yeah, let's put a little more distance between us and them."
+  say [role=left_hostile_base_chime] as left_hostile_base_chime:
+    "Keep checking behind us for a block or two just in case they tail us."
+
+  say [default] as default:
+    "We're entering claimed territory, {addressee.name}—stay alert."

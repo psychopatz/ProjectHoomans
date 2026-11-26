@@ -201,13 +201,19 @@ Beats.RegisterHook("ambient.group_banter", {
     end,
 })
 
-function Beats.CheckGroupBanter(at)
+function Beats.CheckGroupBanter(at, frame)
     local now = nowMs(at)
     if now < globalBanterCooldownUntil then return false end
     -- Never talk over an active beat thread (alarm, chopper, combat, etc.).
     if (tonumber(Beats.PendingCount) or 0) > 0 then return false end
-    if type(Beats.FindCalmGroupsNearPlayer) ~= "function" then return false end
-    local groups = Beats.FindCalmGroupsNearPlayer(now, 3, BANTER_SEARCH_RADIUS)
+    local groups
+    if type(frame) == "table" and type(frame.getGroups) == "function" then
+        groups = frame.getGroups(3, BANTER_SEARCH_RADIUS)
+    elseif type(Beats.FindCalmGroupsNearPlayer) == "function" then
+        groups = Beats.FindCalmGroupsNearPlayer(now, 3, BANTER_SEARCH_RADIUS)
+    else
+        return false
+    end
     if #groups == 0 then return false end
 
     local audSvc = PNC.Semantics and PNC.Semantics.AudienceContext or nil
@@ -241,7 +247,14 @@ function Beats.CheckGroupBanter(at)
                 and audSvc.Resolve(a, { b, c, d }, { includeNearbyPlayer = true, playerRadius = BANTER_SEARCH_RADIUS }) or nil
             -- Allow 2+ NPCs OR a solo companion/NPC when an allied player is nearby.
             if #ordered >= 2 or (aud and aud.includesPlayer == true) then
-                local topic, isRecall, recallMeta = pickSmartTopic(gKey, ordered, aud, now)
+                local resumed = Dir and type(Dir.ConsumeInterruption) == "function"
+                    and Dir.ConsumeInterruption(gKey, now) or nil
+                local topic, isRecall, recallMeta
+                if resumed and resumed.topic then
+                    topic, isRecall, recallMeta = tostring(resumed.topic), true, nil
+                else
+                    topic, isRecall, recallMeta = pickSmartTopic(gKey, ordered, aud, now)
+                end
                 local admitted = true
                 if Dir and type(Dir.EvaluateCandidate) == "function" then
                     admitted = Dir.EvaluateCandidate({

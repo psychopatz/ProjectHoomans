@@ -1,0 +1,44 @@
+# Subject: ROAD-TRIP & VEHICLE BANTER BEATS.
+language EN
+namespace hoomans
+
+dialogue semantic.world.vehicle.banter
+  say [role=vehicle_enter_open] as vehicle_enter_open:
+    "Shotgun! Everybody buckled in, {addressee.name}?"
+    "Nice to give our legs a break, {addressee.name}. Where are we headed?"
+    "Engines beat walking any day, {addressee.name}—just keep an eye on the roadblocks."
+  say [role=vehicle_enter_reply] as vehicle_enter_reply:
+    "All set back here, {addressee.name}. Doors locked and weapons within reach."
+    "Let's roll before the engine noise draws the whole neighborhood."
+  say [role=vehicle_enter_chime] as vehicle_enter_chime:
+    "I'll watch the mirrors—try not to clip any wrecks on the way out."
+
+  say [role=vehicle_low_fuel_open] as vehicle_low_fuel_open:
+    "Heads up, {addressee.name}—fuel needle's practically sitting on empty! We need gas soon."
+    "We're running on fumes here, {addressee.name}. Better spot a gas station or siphon a wreck."
+  say [role=vehicle_low_fuel_reply] as vehicle_low_fuel_reply:
+    "Last thing we need is stalling out in the middle of a highway horde, {addressee.name}."
+    "Keep an eye out for parked cars we can siphon if we can't reach a pump."
+  say [role=vehicle_low_fuel_chime] as vehicle_low_fuel_chime:
+    "If it sputters, be ready to bail out fast."
+
+  say [role=vehicle_exit_open] as vehicle_exit_open:
+    "Alright, stepping out—eyes up and weapons ready, {addressee.name}."
+    "Engine's off, {addressee.name}. Remember where we parked in case we need a fast exit."
+  say [role=vehicle_exit_reply] as vehicle_exit_reply:
+    "Covering the flank—looks clear enough to dismount, {addressee.name}."
+    "Got your back. Let's keep the car within sprinting distance."
+  say [role=vehicle_exit_chime] as vehicle_exit_chime:
+    "Check the trunk if we need extra room for loot."
+
+  say [role=vehicle_roadtrip_open] as vehicle_roadtrip_open:
+    "Open road almost feels normal for a second, doesn't it, {addressee.name}?"
+    "Good pace, {addressee.name}—watch the shoulders for stragglers stepping into the lane."
+  say [role=vehicle_roadtrip_reply] as vehicle_roadtrip_reply:
+    "Almost—until you pass a burned-out pileup. Still beats hiking ten miles."
+    "I'm scanning the treeline. Keep steady on the wheel, {addressee.name}."
+  say [role=vehicle_roadtrip_chime] as vehicle_roadtrip_chime:
+    "Beats blisters and rain any day of the week."
+
+  say [default] as default:
+    "Stay sharp on the road, {addressee.name}."

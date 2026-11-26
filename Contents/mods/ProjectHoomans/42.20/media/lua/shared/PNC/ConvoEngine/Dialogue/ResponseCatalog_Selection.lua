@@ -23,43 +23,69 @@ return function(Catalog, Core)
         local variants = pool.variants or {}
         local evalOrder = (not explain and type(pool._evalOrder) == "table" and #pool._evalOrder == #variants)
             and pool._evalOrder or nil
-        local total = #variants
-        for step = 1, total do
-            local index = evalOrder and evalOrder[step] or step
-            local variant = variants[index]
-            if not explain and bestScore ~= nil and variant._maxScore ~= nil and variant._maxScore < bestScore then
-                break
-            end
-            local matched, specificity, checks
-            if type(variant.when) ~= "table"
-                or (variant._whenCompiled == true and variant._whenKeys == nil)
-            then
-                matched, specificity, checks = true, 0, explain and {} or nil
-            else
-                if condCtx == nil then condCtx = Core.conditionContext(context) end
-                if Core.matchesNormalized then
-                    matched, specificity, checks = Core.matchesNormalized(variant, condCtx, explain)
+
+        local function evaluateSlice(slice, count)
+            for step = 1, count do
+                local index = slice and slice[step] or step
+                local variant = variants[index]
+                if not explain and bestScore ~= nil and variant._maxScore ~= nil and variant._maxScore < bestScore then
+                    break
+                end
+                local matched, specificity, checks
+                if type(variant.when) ~= "table"
+                    or (variant._whenCompiled == true and variant._whenKeys == nil)
+                then
+                    matched, specificity, checks = true, 0, explain and {} or nil
                 else
-                    matched, specificity, checks = Core.matches(variant, context, explain)
+                    if condCtx == nil then condCtx = Core.conditionContext(context) end
+                    if Core.matchesNormalized then
+                        matched, specificity, checks = Core.matchesNormalized(variant, condCtx, explain)
+                    else
+                        matched, specificity, checks = Core.matches(variant, context, explain)
+                    end
+                end
+                local score = nil
+                if matched then
+                    score = (tonumber(variant.priority) or 0) * 100 + specificity
+                    if bestScore == nil or score > bestScore then
+                        bestScore = score
+                        candidates = { index }
+                    elseif score == bestScore then
+                        candidates[#candidates + 1] = index
+                    end
+                end
+                if explain then
+                    rows[#rows + 1] = {
+                        index = index, id = variant.id, eligible = matched,
+                        specificity = matched and specificity or 0, score = score,
+                        checks = checks or {},
+                    }
                 end
             end
-            local score = nil
-            if matched then
-                score = (tonumber(variant.priority) or 0) * 100 + specificity
-                if bestScore == nil or score > bestScore then
-                    bestScore = score
-                    candidates = { index }
-                elseif score == bestScore then
-                    candidates[#candidates + 1] = index
+        end
+
+        local usedBucket = false
+        if evalOrder ~= nil and type(context) == "table" then
+            local reqRole = context.combatReactionRole
+            if type(reqRole) == "string" and reqRole ~= "" and type(pool._byRole) == "table" then
+                local roleBucket = pool._byRole[reqRole]
+                if roleBucket then evaluateSlice(roleBucket, #roleBucket) end
+                local fallbackBucket = pool._noRole
+                if fallbackBucket then evaluateSlice(fallbackBucket, #fallbackBucket) end
+                usedBucket = true
+            else
+                local reqTopic = context.topic
+                if type(reqTopic) == "string" and reqTopic ~= "" and type(pool._byTopic) == "table" then
+                    local topicBucket = pool._byTopic[reqTopic]
+                    if topicBucket then evaluateSlice(topicBucket, #topicBucket) end
+                    local fallbackBucket = pool._noTopic
+                    if fallbackBucket then evaluateSlice(fallbackBucket, #fallbackBucket) end
+                    usedBucket = true
                 end
             end
-            if explain then
-                rows[#rows + 1] = {
-                    index = index, id = variant.id, eligible = matched,
-                    specificity = matched and specificity or 0, score = score,
-                    checks = checks or {},
-                }
-            end
+        end
+        if not usedBucket then
+            evaluateSlice(evalOrder, #variants)
         end
         if #candidates == 0 then
             if explain then

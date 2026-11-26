@@ -170,9 +170,49 @@ T.equal(sawWeatherCleared, true, "storm clearing fires weather_cleared remediati
 local recall = Dir.GatherStoryRecall(aiGroup.key, aiGroup.members, nil, 236000)
 T.truthy(type(recall) == "table" and #recall >= 1, "ConversationDirector recorded StoryMoment for AI group remediation")
 
--- Verify watcher_state in audit snapshot
+-- Verify watcher_state and beats_health in audit snapshot
 Beats.LogAuditSnapshot("test", 240000)
 T.truthy(auditEvents.watcher_state ~= nil, "audit snapshot includes watcher_state")
+T.truthy(auditEvents.beats_health ~= nil, "audit snapshot includes beats_health rollup")
+
+-- 3. Verify ResponseCatalog _byRole bucket indexing
+local reliefPool = Catalog.GetRaw("semantic.world.exposure.relief")
+T.truthy(reliefPool ~= nil and type(reliefPool._byRole) == "table", "ResponseCatalog builds _byRole bucket index")
+T.truthy(reliefPool._byRole["out_of_rain_open"] ~= nil, "_byRole indexes out_of_rain_open")
+
+-- 4. Verify BeatContext.GetActorRoomKind
+local BC = PNC.Semantics.BeatContext
+T.equal(BC.GetActorRoomKind({ roomName = "medicalstorage" }), "clinic", "medical room classified as clinic")
+T.equal(BC.GetActorRoomKind({ roomName = "pharmacy_back" }), "pharmacy", "pharmacy room classified as pharmacy")
+T.equal(BC.GetActorRoomKind({ roomName = "kitchen" }), "kitchen", "kitchen classified as kitchen")
+T.equal(BC.GetActorRoomKind({ isIndoors = false }), "outside", "outdoor actor classified as outside")
+
+-- 5. Verify ConversationDirector interruption & resume (within TTL and after expiry)
+Dir.RecordInterruption("faction:ai_squad_1", { topic = "weather_talk", speakerID = "ai_alpha" }, 300000)
+local resumed = Dir.ConsumeInterruption("faction:ai_squad_1", 320000)
+T.truthy(resumed ~= nil and resumed.topic == "weather_talk", "interrupted banter resumes within 60s TTL")
+T.equal(Dir.ConsumeInterruption("faction:ai_squad_1", 321000), nil, "consumed interruption is cleared")
+Dir.RecordInterruption("faction:ai_squad_1", { topic = "camp_life" }, 300000)
+T.equal(Dir.ConsumeInterruption("faction:ai_squad_1", 370000), nil, "expired interruption (>60s) is discarded")
+
+-- 6. Verify shared frame snapshot calls FindCalmGroupsNearPlayer only once
+local groupScanCount = 0
+local sharedFrame = {
+    now = 400000,
+    env = BC.GetWorldWeather(400000),
+    util = BC.GetWorldUtilities(400000),
+    groups = nil,
+}
+sharedFrame.getGroups = function()
+    if sharedFrame.groups == nil then
+        groupScanCount = groupScanCount + 1
+        sharedFrame.groups = { aiGroup }
+    end
+    return sharedFrame.groups
+end
+Beats.CheckStateWatchers(400000, sharedFrame)
+Beats.CheckStateWatchers(400000, sharedFrame)
+T.equal(groupScanCount, 1, "shared frame reuses single group scan across checkers")
 
 Beats.FindCalmGroupsNearPlayer = origFindGroups
 Beats.Emit = origEmit

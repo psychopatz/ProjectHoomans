@@ -1,0 +1,68 @@
+# Subject: QUIET-MOMENT SAFEHOUSE DOWNTIME STORY (3-stance actor-agnostic).
+language EN
+namespace hoomans
+
+story convo.quiet_moment.downtime
+  trigger intent=CHAT, subject=QUIET_MOMENT
+  guard safe_to_talk
+
+  say [default]:
+    "Kinda strange having a quiet evening like this, {term.address}. Ever think about what life used to be like before Knox?"
+
+    choice positive (intent=AGREE, subject=QUIET_MOMENT, utility=compassion, ai_bias=compassion+|sociability+|warm+|friend+):
+      label: "Reflect warmly — grateful for the crew"
+      say: "All the time. I miss the old world, sure, but I'm glad I've got people I can trust watching my back."
+
+      reply [actor.social_style=warm|friendly|protective]:
+        "Same here, {term.address}. Having a crew that actually looks out for each other makes all the difference."
+        do relationship.approval +2
+        do relationship.familiarity +2
+        end
+
+      reply [actor.style=tactical|cold]:
+        "Sentiment doesn't keep the doors barred, {term.address}—but yeah, a reliable squad keeps us breathing."
+        do relationship.respect +2
+        do relationship.familiarity +1
+        end
+
+      reply [default]:
+        "Appreciate hearing that, {term.address}. Makes the rough days easier to stomach."
+        do relationship.approval +1
+        do relationship.familiarity +1
+        end
+
+    choice neutral (intent=CLARIFY, subject=QUIET_MOMENT, utility=caution, ai_bias=bravery+|loyalty+|practical+):
+      label: "Stay practical — focus on tomorrow"
+      say: "Try not to get lost in the past. Best thing we can do is rest up and stay sharp for tomorrow."
+
+      reply [actor.style=tactical|cold]:
+        "Smart mindset, {term.address}. Nostalgia gets people careless."
+        do relationship.respect +2
+        do relationship.familiarity +1
+        end
+
+      reply [default]:
+        "Fair point, {term.address}. Still nice to catch our breath while we can."
+        do relationship.respect +1
+        end
+
+    choice negative (intent=DISAGREE, subject=QUIET_MOMENT, utility=assertive, ai_bias=aggression+|cold+|hostile+|stressed+):
+      label: "Brush it off — don't get soft"
+      say: "Waste of time reminiscing. That world's dead and gone—getting sentimental just gets you bitten."
+
+      reply [actor.social_style=warm|friendly]:
+        "You don't have to be so harsh about it, {term.address}. Remembering who we are is half the reason we're still fighting."
+        do relationship.approval -2
+        do relationship.respect -1
+        end
+
+      reply [actor.style=aggressive|hostile]:
+        "Finally someone who isn't crying over yesterday. Let's keep our heads in the dirt and stay alive."
+        do relationship.respect +2
+        do relationship.approval +1
+        end
+
+      reply [default]:
+        "Alright, alright—message received, {term.address}. I'll keep it to myself."
+        do relationship.approval -1
+        end

@@ -1,0 +1,133 @@
+# Subject: ROOM-ENTRY, DARKNESS/LIGHT, DUSK/DAWN & QUIET-MOMENT BEATS.
+language EN
+namespace hoomans
+
+dialogue semantic.world.room.notice
+  say [role=room_pharmacy_open] as room_pharmacy_open:
+    "Pharmacy! Check behind the counter for antibiotics and bandages, {addressee.name}."
+    "Good spot, {addressee.name}—pharmacies are worth their weight in gold out here."
+  say [role=room_pharmacy_reply] as room_pharmacy_reply:
+    "On it, {addressee.name}—grabbing any painkillers or disinfectant we spot."
+  say [role=room_pharmacy_chime] as room_pharmacy_chime:
+    "Check the back storage room too—people usually miss the shelves behind the register."
+
+  say [role=room_clinic_open] as room_clinic_open:
+    "Medical clinic, {addressee.name}—keep your eyes open for suture needles and clean bandages."
+    "Clinic rooms always give me the creeps, {addressee.name}, but we need the medical gear."
+  say [role=room_clinic_reply] as room_clinic_reply:
+    "Agreed, {addressee.name}. Clear the exam rooms first before we start looting."
+  say [role=room_clinic_chime] as room_clinic_chime:
+    "Stay sharp—hospitals and clinics always drew crowds when things went sideways."
+
+  say [role=room_armory_open] as room_armory_open:
+    "Armory—fingers crossed it isn't picked clean, {addressee.name}."
+    "Check the racks and ammo boxes, {addressee.name}—could really use extra rounds."
+  say [role=room_armory_reply] as room_armory_reply:
+    "Hell yeah, {addressee.name}—just watch for locked doors and stragglers."
+  say [role=room_armory_chime] as room_armory_chime:
+    "Don't overload yourself on ammo if we still have to run."
+
+  say [role=room_library_open] as room_library_open:
+    "A library, {addressee.name}—might find some survival manuals or skill books in here."
+    "Quiet in here, {addressee.name}. Worth scanning the shelves for carpentry or medical guides."
+  say [role=room_library_reply] as room_library_reply:
+    "Good call, {addressee.name}—knowledge keeps us alive longer than luck."
+  say [role=room_library_chime] as room_library_chime:
+    "Grab a comic or magazine too if you see one—keeps morale up."
+
+  say [role=room_kitchen_open] as room_kitchen_open:
+    "Kitchen's right here, {addressee.name}—let's check the pantry and cabinets for canned goods."
+  say [role=room_kitchen_reply] as room_kitchen_reply:
+    "Watch the fridge if the power's been out—don't need food poisoning on top of everything."
+  say [role=room_kitchen_chime] as room_kitchen_chime:
+    "Check the drawers for a good knife or can opener too."
+
+  say [role=room_bar_open] as room_bar_open:
+    "A bar, {addressee.name}—grab any high-proof liquor for disinfecting wounds."
+  say [role=room_bar_reply] as room_bar_reply:
+    "Yeah, disinfectant... totally just for wounds, {addressee.name}."
+  say [role=room_bar_chime] as room_bar_chime:
+    "Check behind the tap—sometimes folks stashed a shotgun back there."
+
+  say [role=room_church_open] as room_church_open:
+    "Quiet in here, {addressee.name}... feels strange stepping into a church after all this."
+  say [role=room_church_reply] as room_church_reply:
+    "Yeah. Let's stay respectful, sweep the pews, and keep our voices low."
+  say [role=room_church_chime] as room_church_chime:
+    "Good thick walls at least—decent spot to catch our breath if it's clear."
+
+  say [role=room_store_open] as room_store_open:
+    "Storefront's right here, {addressee.name}—let's sweep the aisles quick and clean."
+  say [role=room_store_reply] as room_store_reply:
+    "Watch the glass windows—anything outside can spot us moving in here."
+  say [role=room_store_chime] as room_store_chime:
+    "Back storeroom usually has the untouched crates."
+
+  say [role=room_garage_open] as room_garage_open:
+    "Garage, {addressee.name}—keep an eye out for tools, gas cans, or a generator."
+  say [role=room_garage_reply] as room_garage_reply:
+    "Solid find—wrenches, duct tape, and spare parts are always useful."
+  say [role=room_garage_chime] as room_garage_chime:
+    "Check the shelves along the wall before we head back out."
+
+  say [default] as default:
+    "Let's sweep this room and see what's useful, {addressee.name}."
+
+dialogue semantic.world.darkness
+  say [role=dark_indoors_open] as dark_indoors_open:
+    "Pitch black in here, {addressee.name}—can't see two feet ahead. Anyone got a flashlight?"
+    "Power's dead in this place, {addressee.name}. Move slow so we don't walk into a sleeper."
+  say [role=dark_indoors_reply] as dark_indoors_reply:
+    "Stay close, {addressee.name}—listen for breathing before opening any doors."
+    "Yeah, hate clearing dark rooms. Keep weapons up."
+  say [role=dark_indoors_chime] as dark_indoors_chime:
+    "If we get a light going or hook up a generator, this place would feel ten times safer."
+
+  say [role=light_restored_open] as light_restored_open:
+    "There we go—finally some light in here, {addressee.name}!"
+    "Ah, much better, {addressee.name}! Hate stumbling around in the dark."
+  say [role=light_restored_reply] as light_restored_reply:
+    "Seriously, {addressee.name}—feels way less like a horror movie now."
+    "Good call—just keep curtains shut so we don't advertise our location."
+  say [role=light_restored_chime] as light_restored_chime:
+    "Having light makes checking gear and patching up a hundred times easier."
+
+  say [default] as default:
+    "Keep an eye on the shadows, {addressee.name}."
+
+dialogue semantic.world.daycycle
+  say [role=dusk_warning_open] as dusk_warning_open:
+    "Sun's dropping fast, {addressee.name}—we should lock down a safehouse before full dark."
+    "Getting late, {addressee.name}. Not a great idea to be caught on open streets after dusk."
+  say [role=dusk_warning_reply] as dusk_warning_reply:
+    "Agreed, {addressee.name}—once it's pitch black, every shadow looks like a walker."
+    "Let's start eyeing a solid building with curtains we can hold for the night."
+  say [role=dusk_warning_chime] as dusk_warning_chime:
+    "Sooner we're inside with the doors barred, better we'll sleep."
+
+  say [role=dawn_survived_open] as dawn_survived_open:
+    "Sun's coming up, {addressee.name}—we made it through another night."
+    "Dawn at last, {addressee.name}. Another day above ground."
+  say [role=dawn_survived_reply] as dawn_survived_reply:
+    "Feels good to see daylight again, {addressee.name}. Ready to see what today brings."
+    "Yeah, glad everyone's still breathing. Let's check supplies before heading out."
+  say [role=dawn_survived_chime] as dawn_survived_chime:
+    "One more sunrise in the books—let's keep the streak going."
+
+  say [default] as default:
+    "Keep an eye on the light, {addressee.name}."
+
+dialogue semantic.world.quiet_moment
+  say [role=quiet_downtime_open] as quiet_downtime_open:
+    "Kinda surreal having a quiet minute like this, {addressee.name}. Almost makes you forget what's outside."
+    "Been a while since we had a calm roof over our heads, {addressee.name}. How's everyone's head holding up?"
+    "You ever think about what you'd be doing right now if none of this had happened, {addressee.name}?"
+  say [role=quiet_downtime_reply] as quiet_downtime_reply:
+    "Honestly? Probably complaining about traffic and wishing for a day off. Funny how perspective changes."
+    "I try not to dwell on it too long, {addressee.name}, but I'm glad I'm not riding this out alone."
+    "Just glad we've got a solid crew watching each other's backs. That's worth more than anything."
+  say [role=quiet_downtime_chime] as quiet_downtime_chime:
+    "Take the quiet when you can get it—tomorrow's always loud enough."
+    "Here's to still being here. Let's make sure we keep it that way."
+  say [default] as default:
+    "Nice to catch a quiet breath for once, {addressee.name}."
