@@ -153,19 +153,21 @@ T.equal(findOption(debugMenu, "Debug Bandage All (Free)") ~= nil, true,
 T.equal(findOption(debugMenu, "Orders") ~= nil, true, "debug orders remain available")
 T.equal(findOption(debugMenu, "Combat") ~= nil, true, "debug combat controls remain available")
 T.equal(
-    findOption(debugMenu, "Animation Scene Lab") ~= nil,
+    findOption(debugMenu, "Animation Studio") ~= nil,
     true,
-    "scene lab is available from the NPC debug submenu"
+    "Animation Studio is the unified animation/scene/prop debug entry point"
 )
-T.equal(
-    findOption(debugMenu, "NPC Presentation Lab") ~= nil,
-    true,
-    "NPC presentation lab is the unified animation/firearm entry point"
+T.falsy(
+    findOption(debugMenu, "Animation Scene Lab"),
+    "retired standalone scene lab was removed"
 )
-T.equal(
-    findOption(debugMenu, "Player Animation Lab") ~= nil,
-    true,
-    "player animation lab is available from the NPC debug submenu"
+T.falsy(
+    findOption(debugMenu, "NPC Presentation Lab"),
+    "retired standalone NPC presentation lab was removed"
+)
+T.falsy(
+    findOption(debugMenu, "Player Animation Lab"),
+    "retired standalone player animation lab was removed"
 )
 T.falsy(
     findOption(debugMenu, "Debug: Firearm Anchor Probe"),

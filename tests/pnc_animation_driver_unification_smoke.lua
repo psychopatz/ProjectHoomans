@@ -24,7 +24,7 @@ PNC = {
         IsBumpActionActive = function() return bumpActive end,
         FinishBump = function() finishedCount = finishedCount + 1 end,
     },
-    PuppetOpera = {
+    Choreography = {
         AnimVarAdapter = {
             Apply = function() return true end,
             UpdateProgress = function() end,
@@ -41,7 +41,7 @@ local Scenes = T.load("ProjectHoomans", "shared",
 local Packs = T.load("ProjectHoomans", "shared",
     "PNC/Core/Visuals/PNC_AnimationPacks.lua")
 local OperaAnim = T.load("ProjectHoomans", "server",
-    "PNC/PuppetOpera/PNC_PuppetOpera_NPCAnimationAdapter.lua")
+    "PNC/Choreography/PNC_Choreography_NPCAnimationAdapter.lua")
 
 local modData = {}
 local body = {
@@ -83,7 +83,7 @@ T.equal(Driver.Stop(body, record, "scene:sit"), true, "owner stops cleanly")
 T.equal(Driver.GetOwner(body), nil, "ownership marker cleared on stop")
 T.equal(finishedCount, 1, "FinishBump invoked on stop")
 
--- 3. PuppetOpera beat referencing a sceneId inherits AnimationPacks overrides!
+-- 3. Choreography beat referencing a sceneId inherits AnimationPacks overrides!
 Scenes.Register("ambient.roam.eat", { bump = "Base_Eat", durationMs = 1500 })
 Packs.RegisterPack("apple_pack", {
     priority = 100,
@@ -101,12 +101,12 @@ local actor = { body = body, record = record }
 local beat = { durationMs = 1500, npc = { sceneId = "ambient.roam.eat" } }
 
 local okOpera, operaReason = OperaAnim.Start(session, actor, beat)
-T.equal(okOpera, true, "PuppetOpera starts beat referencing registered sceneId")
+T.equal(okOpera, true, "Choreography starts beat referencing registered sceneId")
 T.equal(operaReason, "npc_animation_started", "opera start reason preserved")
 T.equal(playedBumps[#playedBumps], "Pack_EatApple",
-    "PuppetOpera plays the modder AnimationPack's overridden bump")
+    "Choreography plays the modder AnimationPack's overridden bump")
 T.equal(Driver.IsOwnedBy(body, "opera:sess-42"), true,
-    "AnimationDriver tracks PuppetOpera ownership token")
+    "AnimationDriver tracks Choreography ownership token")
 
 -- 4. Primitive anim_vars animations can be registered and played directly on
 --    AnimationScenes too (with hand props)!

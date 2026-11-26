@@ -198,7 +198,7 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
         nextY,
         nextZ
     ) then
-        return false, "puppet_opera_traversal_blocked"
+        return false, "choreography_traversal_blocked"
     end
     lane.lastProgressAt = now
     lane.lastIssueAt = now
@@ -234,7 +234,7 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
         nextY,
         nextZ
     ) then
-        return false, "puppet_opera_traversal_blocked"
+        return false, "choreography_traversal_blocked"
     end
     crossed = Runtime.isFenceCrossed(zombie, action)
     if not crossed and not timedOut then

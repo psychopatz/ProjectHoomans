@@ -22,16 +22,16 @@ listing:close()
 -- PNC_SocialEventHooks_LeaderLoss, all guarded by the standard
 -- AllowsServerCode() early return and loaded through the
 -- PNC_SocialEventHooks barrel or FacilityJobs service composition root.
--- PNC_PuppetOpera_Authority_Guards is guarded by the same server-only
+-- PNC_Choreography_Authority_Guards is guarded by the same server-only
 -- authority entry path.
--- PNC_PuppetOpera_Authority_Lifecycle is loaded by the same guarded root.
--- PNC_PuppetOpera_Authority_Runtime_Timeline is loaded by the same guarded
+-- PNC_Choreography_Authority_Lifecycle is loaded by the same guarded root.
+-- PNC_Choreography_Authority_Runtime_Timeline is loaded by the same guarded
 -- runtime provider.
--- PNC_PuppetOpera_Authority_Runtime_Phases is loaded by that provider too.
--- PNC_PuppetOpera_Authority_Runtime_Safety is loaded by that provider too.
--- PNC_PuppetOpera_Authority_Runtime_Dispatch is loaded by that provider too.
--- PNC_PuppetOpera_Authority_Admission_Preflight and
--- PNC_PuppetOpera_Authority_Admission_Session are loaded by the admission
+-- PNC_Choreography_Authority_Runtime_Phases is loaded by that provider too.
+-- PNC_Choreography_Authority_Runtime_Safety is loaded by that provider too.
+-- PNC_Choreography_Authority_Runtime_Dispatch is loaded by that provider too.
+-- PNC_Choreography_Authority_Admission_Preflight and
+-- PNC_Choreography_Authority_Admission_Session are loaded by the admission
 -- composition root.
 -- PNC_CorpseHaulService_WorkAdapter_Targeting is loaded by the work adapter.
 -- PNC_CorpseHaulService_WorkAdapter_Cleanup is loaded by the work adapter.
@@ -41,18 +41,18 @@ listing:close()
 -- PNC_CorpseHaulService_Dispatch_Manual are loaded by Dispatch.
 -- PNC_CorpseHaulService_Reconciliation_Candidates is loaded by Reconciliation.
 -- PNC_CorpseHaulService_Reconciliation_Active is loaded after Candidates.
--- PNC_PuppetOpera_Authority_Requests_Session and
--- PNC_PuppetOpera_Authority_Requests_Readonly are loaded by Requests.
--- PNC_PuppetOpera_Authority_Lifecycle_Response is loaded by Lifecycle.
--- PNC_PuppetOpera_Authority_Context is loaded before authority spokes.
--- PNC_PuppetOpera_Authority_Bootstrap is loaded after authority spokes.
+-- PNC_Choreography_Authority_Requests_Session and
+-- PNC_Choreography_Authority_Requests_Readonly are loaded by Requests.
+-- PNC_Choreography_Authority_Lifecycle_Response is loaded by Lifecycle.
+-- PNC_Choreography_Authority_Context is loaded before authority spokes.
+-- PNC_Choreography_Authority_Bootstrap is loaded after authority spokes.
 -- PNC_FacilityResources_Activity is loaded by the resources composition root.
 -- PNC_FacilityJobs_Service_StartState_Activity and
 -- PNC_FacilityJobs_Service_StartState_Order are loaded by StartState.
 -- PNC_FacilityResources_Snapshot and PNC_FacilityResources_Detectors are
 -- loaded by the resources composition root.
 -- PNC_FacilityJobs_Service_Start_Targeting is loaded before StartState.
--- PNC_PuppetOpera_Override_Context, Override_Readiness,
+-- PNC_Choreography_Override_Context, Override_Readiness,
 -- Override_Maintenance and Override_Lifecycle are loaded by the
 -- OverrideAdapter composition root.
 -- PNC_LumberService_Execution_OutputCapture,

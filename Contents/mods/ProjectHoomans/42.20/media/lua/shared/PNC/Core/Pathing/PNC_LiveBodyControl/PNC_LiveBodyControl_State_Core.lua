@@ -41,7 +41,7 @@ function LiveBodyControl.SetAuthoritativePosition(zombie, x, y, z)
             ActorControl.NoteBlocked(
                 record,
                 "authoritative_position",
-                "puppet_opera_writer_blocked:authoritative_position"
+                "choreography_writer_blocked:authoritative_position"
             )
         end
         return false

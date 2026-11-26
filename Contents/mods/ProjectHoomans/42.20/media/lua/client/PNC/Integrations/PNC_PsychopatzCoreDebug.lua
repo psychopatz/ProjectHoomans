@@ -105,14 +105,14 @@ PsychopatzCore.DebugHub.RegisterTool({
 })
 
 PsychopatzCore.DebugHub.RegisterTool({
-    id = "pnc.playerAnimation",
+    id = "pnc.animationStudio",
     source = "Project Hoomans",
     order = 207,
-    title = translateHubText("UI_PNC_DebugHub_PlayerAnimation_Title",
-        "Player Animation Preview"),
+    title = translateHubText("UI_PNC_DebugHub_AnimationStudio_Title",
+        "Animation Studio"),
     description = translateHubText(
-        "UI_PNC_DebugHub_PlayerAnimation_Description",
-        "Preview zombie animation clips on the local ISOPlayer without changing NPC state."),
+        "UI_PNC_DebugHub_AnimationStudio_Description",
+        "Unified Clips (Player & NPC), Single-NPC & Multi-Actor Scenes, and Props & Firearm Anchors."),
     available = function()
         return PNC
             and PNC.Client
@@ -120,36 +120,9 @@ PsychopatzCore.DebugHub.RegisterTool({
             and PNC.Client.CanUseDebug()
     end,
     action = function()
-        require "PNC/UI/PNC_PlayerAnimationDebugWindow"
-        if PNC.PlayerAnimationDebugUI
-            and PNC.PlayerAnimationDebugUI.Open
-        then
-            PNC.PlayerAnimationDebugUI.Open()
-        end
-    end,
-})
-
-PsychopatzCore.DebugHub.RegisterTool({
-    id = "pnc.puppetOpera",
-    source = "Project Hoomans",
-    order = 208,
-    title = translateHubText("UI_PNC_DebugHub_PuppetOpera_Title",
-        "Multi-Actor Animation Scene Builder"),
-    description = translateHubText(
-        "UI_PNC_DebugHub_PuppetOpera_Description",
-        "Build multi-actor scenes from the existing player and NPC animation catalogs."),
-    available = function()
-        return PNC
-            and PNC.Client
-            and PNC.Client.CanUseDebug
-            and PNC.Client.CanUseDebug()
-    end,
-    action = function()
-        require "PNC/UI/PuppetOpera/PNC_PuppetOperaDebugWindow"
-        if PNC.PuppetOperaDebugWindow
-            and PNC.PuppetOperaDebugWindow.Open
-        then
-            PNC.PuppetOperaDebugWindow.Open()
+        require "PNC/UI/AnimationStudio/PNC_AnimationStudio"
+        if PNC.AnimationStudio and PNC.AnimationStudio.Open then
+            PNC.AnimationStudio.Open(nil, "clips", "player")
         end
     end,
 })

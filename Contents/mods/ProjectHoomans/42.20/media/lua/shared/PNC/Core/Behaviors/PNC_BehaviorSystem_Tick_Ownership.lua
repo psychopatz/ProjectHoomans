@@ -15,7 +15,7 @@ local Combat = H.Combat
 local ThreatGuard = H.ThreatGuard
 local AnimationScenes = H.AnimationScenes
 local Treatment = H.Treatment
-local puppetOperaOwnsBehavior = H.puppetOperaOwnsBehavior
+local choreographyOwnsBehavior = H.choreographyOwnsBehavior
 
 local function holdForIncomingMedicalCare(record, now)
     local runtime = record and record.runtime or nil
@@ -76,7 +76,7 @@ function H.Run(record, zombie, now)
         )
     end
 
-    if puppetOperaOwnsBehavior(record) then
+    if choreographyOwnsBehavior(record) then
         return true
     end
 

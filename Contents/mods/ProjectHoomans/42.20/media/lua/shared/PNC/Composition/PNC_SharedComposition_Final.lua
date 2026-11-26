@@ -9,7 +9,7 @@ require "PNC/Core/API/PNC_API"
 -- self-contained catalog; the composition root has one fixed import path.
 require "PNC/Generated/UniqueNPC/PNC_UniqueNPCDefinitions"
 require "PNC/Core/Health/PNC_PlayerDamage"
-require "PNC/Core/PuppetOpera/PNC_PuppetOperaRuntime"
+require "PNC/Core/Choreography/PNC_ChoreographyRuntime"
 require "PNC/Integrations/PNC_PsychopatzProfiler"
 require "PNC/AutonomyAd/Registry"
 require "PNC/ReactionPolicy/Registry"

@@ -147,7 +147,7 @@ function Service.StartScene(record, zombie, state, at)
     local reason
     local scenes = PNC.AnimationScenes
     if not Service.CanWrite(record, "roam_ambient_scene_start") then
-        return false, "puppet_opera_writer_blocked:roam_ambient_provider"
+        return false, "choreography_writer_blocked:roam_ambient_provider"
     end
     if not scenes or not scenes.Request then
         started, reason = false, "animation_api_unavailable"
@@ -175,7 +175,7 @@ function Service.StartInstantAction(record, zombie, plan, at)
     local common = PNC.BehaviorCommon
     record.runtime = runtime
     if not Service.CanWrite(record, "roam_ambient_start") then
-        return false, "puppet_opera_writer_blocked:roam_ambient_provider"
+        return false, "choreography_writer_blocked:roam_ambient_provider"
     end
     local state = {
         action = plan.action, sceneId = SCENE_BY_ACTION[plan.action],

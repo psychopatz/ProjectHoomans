@@ -93,9 +93,9 @@ local function tickPendingSleepWake(record, zombie)
     return true
 end
 
-local function puppetOperaOwnsBehavior(record)
+local function choreographyOwnsBehavior(record)
     local runtime = record and record.runtime or nil
-    local override = runtime and runtime.puppetOperaOverride or nil
+    local override = runtime and runtime.choreographyOverride or nil
     if not override or tostring(override.sessionId or "") == "" then
         return false
     end
@@ -104,13 +104,13 @@ local function puppetOperaOwnsBehavior(record)
     then
         return false
     end
-    record.activeJob = "PuppetOpera"
-    record.activeBehavior = "PuppetOpera:"
+    record.activeJob = "Choreography"
+    record.activeBehavior = "Choreography:"
         .. tostring(override.sessionId)
     return true
 end
 
-local function puppetOperaSafetyBoundary(record, zombie, now)
+local function choreographySafetyBoundary(record, zombie, now)
     if not ActorControl or not ActorControl.IsPuppetOwned
         or not ActorControl.IsPuppetOwned(record)
     then
@@ -259,7 +259,7 @@ Behavior.Internal.TickOwnership = {
     ThreatGuard = ThreatGuard,
     AnimationScenes = AnimationScenes,
     Treatment = Treatment,
-    puppetOperaOwnsBehavior = puppetOperaOwnsBehavior,
+    choreographyOwnsBehavior = choreographyOwnsBehavior,
 }
 require "PNC/Core/Behaviors/PNC_BehaviorSystem_Tick_Ownership"
 Behavior.Internal.TickPreflight = {
@@ -270,8 +270,8 @@ Behavior.Internal.TickPreflight = {
     Companion = Companion,
     AnimationScenes = AnimationScenes,
     tickPendingSleepWake = tickPendingSleepWake,
-    puppetOperaOwnsBehavior = puppetOperaOwnsBehavior,
-    puppetOperaSafetyBoundary = puppetOperaSafetyBoundary,
+    choreographyOwnsBehavior = choreographyOwnsBehavior,
+    choreographySafetyBoundary = choreographySafetyBoundary,
     clearStaleFacilityState = clearStaleFacilityState,
     isAbstractFollowRecord = isAbstractFollowRecord,
 }

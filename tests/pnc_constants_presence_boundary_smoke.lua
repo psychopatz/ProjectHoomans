@@ -60,11 +60,11 @@ T.equal(PNC.Const.CMD_SEMANTIC_SOCIAL_DEBUG, "SemanticSocialDebug",
 T.equal(PNC.Const.CMD_COMBAT_ENCOUNTER_INTENT_STATE,
     "CombatEncounterIntentState",
     "runtime combat encounter intent state command contract")
-T.equal(PNC.Const.CMD_PUPPET_OPERA_REQUEST, "PuppetOperaRequest",
+T.equal(PNC.Const.CMD_CHOREOGRAPHY_REQUEST, "ChoreographyRequest",
     "Puppet Opera request contract")
-T.equal(PNC.Const.CMD_PUPPET_OPERA_STATE, "PuppetOperaState",
+T.equal(PNC.Const.CMD_CHOREOGRAPHY_STATE, "ChoreographyState",
     "Puppet Opera state contract")
-T.equal(PNC.Const.CMD_PUPPET_OPERA_TRACE, "PuppetOperaTrace",
+T.equal(PNC.Const.CMD_CHOREOGRAPHY_TRACE, "ChoreographyTrace",
     "Puppet Opera trace contract")
 T.equal(PNC.Const.CMD_UNIFIED_AI_DEBUG_REQUEST, "RequestUnifiedAIDebug",
     "unified AI debug request contract")

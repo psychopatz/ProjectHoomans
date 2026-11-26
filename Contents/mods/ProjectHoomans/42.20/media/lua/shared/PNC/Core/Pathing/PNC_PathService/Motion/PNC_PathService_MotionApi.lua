@@ -23,7 +23,7 @@ function PathService.Reset(zombie, record, reason, owner)
             { reason = reason }
         )
         if accepted ~= true then
-            return false, "puppet_opera_writer_blocked:path_reset"
+            return false, "choreography_writer_blocked:path_reset"
         end
     end
     local lane = record and record.runtime and record.runtime.pathing or nil
@@ -124,7 +124,7 @@ function PathService.MoveToward(
             { reason = reason }
         )
         if accepted ~= true then
-            return false, "puppet_opera_writer_blocked:path_move"
+            return false, "choreography_writer_blocked:path_move"
         end
     end
     record.runtime = record.runtime or {}
@@ -179,8 +179,8 @@ function PathService.MoveToward(
     intent.ownerKind = controlOwner and controlOwner.kind or nil
     intent.ownerSessionId = controlOwner
         and (controlOwner.sessionId or controlOwner.ownerSessionId) or nil
-    intent.puppetOperaSessionId = controlOwner
-        and controlOwner.kind == "puppet_opera"
+    intent.choreographySessionId = controlOwner
+        and controlOwner.kind == "choreography"
         and (controlOwner.sessionId or controlOwner.ownerSessionId) or nil
     intent.updatedAt = Internal.Core.Now()
     intent.revision = (tonumber(intent.revision) or 0) + 1

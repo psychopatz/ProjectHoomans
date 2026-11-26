@@ -166,7 +166,7 @@ function ActionProps.Resolve(snapshot)
     end
 
     -- First-class data-driven hand props declared on the active scene step,
-    -- AnimationPack override, or PuppetOpera visual override.
+    -- AnimationPack override, or Choreography visual override.
     local propSpec, propSource = resolveScenePropSpec(visual)
     if propSpec then
         local declared = buildDeclaredDescriptor(

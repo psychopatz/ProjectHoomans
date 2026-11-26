@@ -25,7 +25,7 @@ local function applyRecoveredBody(
             ActorControl.NoteBlocked(
                 record,
                 "position_recovery",
-                "puppet_opera_writer_blocked:position_recovery"
+                "choreography_writer_blocked:position_recovery"
             )
         end
         return false

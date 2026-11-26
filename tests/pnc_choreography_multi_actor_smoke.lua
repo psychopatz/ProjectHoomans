@@ -1,0 +1,467 @@
+local T = require "tests/support/test"
+
+T.addPackagePaths({
+    { "ProjectHoomans", "shared" },
+    { "ProjectHoomans", "server" },
+})
+
+local clock = 1000
+local sent = {}
+local player
+local npcA
+local npcB
+local recordA
+local recordB
+
+PNC = {
+    Core = {
+        Now = function() return clock end,
+    },
+    Const = {
+        MODULE = "ProjectHoomans",
+        CMD_CHOREOGRAPHY_REQUEST = "ChoreographyRequest",
+        CMD_CHOREOGRAPHY_STATE = "ChoreographyState",
+        CMD_CHOREOGRAPHY_TRACE = "ChoreographyTrace",
+    },
+    Registry = {},
+    ServerCommandRouter = {
+        CanUseDebug = function() return true end,
+        Register = function() return true end,
+    },
+    BehaviorMoveIntent = {
+        RequestMove = function(targetRecord, x, y, z, _, _, reason)
+            targetRecord.runtime = targetRecord.runtime or {}
+            targetRecord.runtime.moveIntent = {
+                kind = "move",
+                x = x,
+                y = y,
+                z = z,
+                reason = reason,
+            }
+            return true, "requested"
+        end,
+        Hold = function(targetRecord, reason)
+            targetRecord.runtime.moveIntent = {
+                kind = "hold",
+                reason = reason,
+            }
+            return true
+        end,
+    },
+    Animation = {
+        PlayBump = function(targetBody, _, bumpType)
+            local modData = targetBody:getModData()
+            modData.PNC_BumpRequestedType = bumpType
+            targetBody.bumpFinished = true
+            return true, "started"
+        end,
+        ResolveBumpType = function(value) return value end,
+        IsBumpActionActive = function() return false end,
+        MaintainBump = function() return true, "maintained" end,
+        FinishBump = function() return true end,
+    },
+    Choreography = {},
+}
+
+Events = {
+    OnTick = { Add = function(callback) Events.tick = callback end },
+}
+
+function isServer() return true end
+
+function sendServerCommand(target, module, command, payload)
+    sent[#sent + 1] = {
+        target = target,
+        module = module,
+        command = command,
+        payload = payload,
+    }
+end
+
+local function actor(x, y, forwardX, forwardY)
+    local value = {
+        x = x,
+        y = y,
+        z = 0,
+        forwardX = forwardX,
+        forwardY = forwardY,
+        modData = {},
+        bumpFinished = false,
+    }
+    function value:getX() return self.x end
+    function value:getY() return self.y end
+    function value:getZ() return self.z end
+    function value:getForwardDirectionX() return self.forwardX end
+    function value:getForwardDirectionY() return self.forwardY end
+    function value:getModData() return self.modData end
+    function value:getVariableBoolean(name)
+        return name == "BumpAnimFinished" and self.bumpFinished == true
+    end
+    function value:isDead() return false end
+    function value:getVehicle() return nil end
+    function value:isSeatedInVehicle() return false end
+    function value:faceLocation(targetX, targetY)
+        local dx = targetX - self.x
+        local dy = targetY - self.y
+        if math.abs(dx) >= math.abs(dy) then
+            self.forwardX = dx >= 0 and 1 or -1
+            self.forwardY = 0
+        else
+            self.forwardX = 0
+            self.forwardY = dy >= 0 and 1 or -1
+        end
+    end
+    return value
+end
+
+player = actor(100.5, 200.5, 0, 1)
+function player:getUsername() return "PuppetTester" end
+function player:getOnlineID() return 99 end
+
+npcA = actor(100.5, 200.5, 0, 1)
+npcB = actor(100.5, 200.5, 0, 1)
+recordA = { id = "npc-a", runtime = {} }
+recordB = { id = "npc-b", runtime = {} }
+
+PNC.Registry.Get = function(id)
+    id = tostring(id)
+    if id == "npc-a" then return recordA end
+    if id == "npc-b" then return recordB end
+    return nil
+end
+PNC.Registry.GetLiveZombie = function(id)
+    id = tostring(id)
+    if id == "npc-a" then return npcA end
+    if id == "npc-b" then return npcB end
+    return nil
+end
+
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Choreography/PNC_Choreography_Blueprints.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Choreography/PNC_Choreography_Anchors.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Choreography/PNC_Choreography_Trace.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Choreography/PNC_Choreography.lua"
+)
+
+local Opera = PNC.Choreography
+local registered, blueprint = Opera.Blueprints.Register("rumors.dual_npc", {
+    id = "rumors.dual_npc",
+    version = 1,
+    actors = {
+        npc_a = { kind = "nearby_live_npc", anchor = "left" },
+        npc_b = { kind = "nearby_live_npc", anchor = "right" },
+    },
+    anchorFrame = {
+        tolerance = 0.75,
+        anchors = {
+            left = {
+                right = -1,
+                forward = 0,
+                z = 0,
+                faceTarget = "npc_b",
+            },
+            right = {
+                right = 1,
+                forward = 0,
+                z = 0,
+                faceTarget = "npc_a",
+            },
+        },
+    },
+    beats = {
+        {
+            id = "exchange",
+            durationMs = 900,
+            tracks = {
+                npc_a = {
+                    bump = "PNC_WaveHi",
+                    animation = "Bob_EmoteWaveHi",
+                    nonCombat = true,
+                },
+                npc_b = {
+                    bump = "PNC_WaveHi",
+                    animation = "Bob_EmoteWaveHi",
+                    nonCombat = true,
+                },
+            },
+        },
+    },
+    playback = { defaultMode = "once", allowLoop = true, gapMs = 0 },
+})
+T.truthy(registered, "two-NPC blueprint could not be registered")
+T.truthy(blueprint, "two-NPC blueprint normalization returned no value")
+T.equal(blueprint.beats[1].tracks.npc_a.bump, "PNC_WaveHi",
+    "first NPC track was not normalized")
+T.equal(blueprint.beats[1].tracks.npc_b.bump, "PNC_WaveHi",
+    "second NPC track was not normalized")
+T.truthy(Opera.Blueprints.ValidateRuntime(blueprint),
+    "two-NPC blueprint failed the runtime policy")
+
+local timelineRegistered, timelineBlueprint =
+    Opera.Blueprints.Register("rumors.timeline_npc", {
+        id = "rumors.timeline_npc",
+        version = 1,
+        actors = {
+            npc_a = { kind = "nearby_live_npc", anchor = "left" },
+            npc_b = { kind = "nearby_live_npc", anchor = "right" },
+        },
+        anchorFrame = {
+            tolerance = 0.75,
+            anchors = {
+                left = {
+                    right = -1, forward = 0, z = 0, faceTarget = "npc_b",
+                },
+                right = {
+                    right = 1, forward = 0, z = 0, faceTarget = "npc_a",
+                },
+            },
+        },
+        beats = {
+            {
+                id = "timeline_exchange",
+                durationMs = 900,
+                tracks = {
+                    npc_a = {
+                        bump = "PNC_WaveHi",
+                        animation = "Bob_EmoteWaveHi",
+                        nonCombat = true,
+                        timeline = {
+                            {
+                                id = "pause",
+                                type = "delay",
+                                startMs = 0,
+                                durationMs = 200,
+                            },
+                            {
+                                id = "wave",
+                                type = "animation",
+                                startMs = 200,
+                                durationMs = 400,
+                                track = {
+                                    bump = "PNC_WaveHi",
+                                    animation = "Bob_EmoteWaveHi",
+                                    nonCombat = true,
+                                },
+                            },
+                        },
+                    },
+                    npc_b = {
+                        bump = "PNC_WaveHi",
+                        animation = "Bob_EmoteWaveHi",
+                        nonCombat = true,
+                    },
+                },
+            },
+        },
+        playback = { defaultMode = "once", allowLoop = false, gapMs = 0 },
+    })
+T.truthy(timelineRegistered and timelineBlueprint,
+    "timeline blueprint could not be normalized")
+local timelineNodes = Opera.Blueprints.GetTimeline(
+    timelineBlueprint.beats[1],
+    "npc_a",
+    "nearby_live_npc"
+)
+T.equal(timelineNodes[1].type, "delay",
+    "timeline delay node was not preserved by normalization")
+T.equal(timelineNodes[2].track.bump, "PNC_WaveHi",
+    "timeline animation node did not normalize its track")
+local groupedRegistered, groupedReason = Opera.Blueprints.Register(
+    "rumors.grouped_timeline",
+    {
+        id = "rumors.grouped_timeline",
+        version = 1,
+        actors = {
+            npc_a = { kind = "nearby_live_npc", anchor = "left" },
+            npc_b = { kind = "nearby_live_npc", anchor = "right" },
+        },
+        anchorFrame = {
+            anchors = {
+                left = { right = -1, forward = 0, z = 0, faceTarget = "npc_b" },
+                right = { right = 1, forward = 0, z = 0, faceTarget = "npc_a" },
+            },
+        },
+        beats = {
+            {
+                id = "grouped",
+                durationMs = 900,
+                tracks = {
+                    npc_a = {
+                        bump = "PNC_WaveHi",
+                        animation = "Bob_EmoteWaveHi",
+                        timeline = {
+                            {
+                                id = "sequence",
+                                type = "sequence",
+                                children = {},
+                            },
+                        },
+                    },
+                    npc_b = {
+                        bump = "PNC_WaveHi",
+                        animation = "Bob_EmoteWaveHi",
+                    },
+                },
+            },
+        },
+    }
+)
+T.falsy(groupedRegistered,
+    "unsupported timeline groups were accepted without a runtime compiler")
+T.contains(groupedReason, "timeline_group_requires_compiler",
+    "unsupported timeline group did not expose its bounded failure reason")
+
+T.load(
+    "ProjectHoomans",
+    "server",
+    "PNC/Choreography/PNC_Choreography_NPCMovementAdapter.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "server",
+    "PNC/Choreography/PNC_Choreography_NPCAnimationAdapter.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "server",
+    "PNC/Choreography/PNC_Choreography_Authority.lua"
+)
+
+local Authority = Opera.Authority
+local accepted, session = Authority.HandleRequest(player, {
+    action = "start",
+    blueprintId = "rumors.dual_npc",
+    actors = {
+        npc_a = "npc-a",
+        npc_b = "npc-b",
+    },
+    loop = false,
+})
+T.truthy(accepted, "authority rejected a valid two-NPC scene")
+T.truthy(session.actors.npc_a and session.actors.npc_b,
+    "authority did not create both NPC actor slots")
+T.truthy(recordA.runtime.choreographyLease,
+    "first NPC did not receive a session lease")
+T.truthy(recordB.runtime.choreographyLease,
+    "second NPC did not receive a session lease")
+T.equal(Authority.ByActor["npc-a"], session,
+    "first NPC was not indexed as session-owned")
+T.equal(Authority.ByActor["npc-b"], session,
+    "second NPC was not indexed as session-owned")
+
+npcA.x = session.actors.npc_a.target.worldX
+npcA.y = session.actors.npc_a.target.worldY
+npcB.x = session.actors.npc_b.target.worldX
+npcB.y = session.actors.npc_b.target.worldY
+Authority.PumpSession(session, clock)
+T.equal(session.phase, Opera.Phases.FACING,
+    "two-NPC arrival barrier did not advance to facing")
+
+Authority.PumpSession(session, clock)
+T.equal(session.phase, Opera.Phases.READY,
+    "two-NPC facing barrier did not schedule the beat")
+
+clock = session.beatStartAt + 1
+Authority.PumpSession(session, clock)
+T.equal(session.phase, Opera.Phases.PLAYING,
+    "two-NPC beat did not enter playing")
+clock = session.beatStartAt + 1
+Authority.PumpSession(session, clock)
+T.truthy(session.closed, "two-NPC one-shot scene did not close")
+T.equal(Authority.LastSnapshots[session.ownerId].phase,
+    Opera.Phases.COMPLETED,
+    "two-NPC completed snapshot was not retained")
+T.falsy(recordA.runtime.choreographyLease,
+    "first NPC lease was not released")
+T.falsy(recordB.runtime.choreographyLease,
+    "second NPC lease was not released")
+T.falsy(Authority.ByActor["npc-a"],
+    "first NPC session index was not released")
+T.falsy(Authority.ByActor["npc-b"],
+    "second NPC session index was not released")
+T.truthy(#sent > 0, "two-NPC transport emitted no state")
+
+local timelineAccepted, timelineSession = Authority.HandleRequest(player, {
+    action = "start",
+    blueprintId = "rumors.timeline_npc",
+    actors = {
+        npc_a = "npc-a",
+        npc_b = "npc-b",
+    },
+    loop = false,
+})
+T.truthy(timelineAccepted, "authority rejected the timeline blueprint")
+npcA.x = timelineSession.actors.npc_a.target.worldX
+npcA.y = timelineSession.actors.npc_a.target.worldY
+npcB.x = timelineSession.actors.npc_b.target.worldX
+npcB.y = timelineSession.actors.npc_b.target.worldY
+Authority.PumpSession(timelineSession, clock)
+Authority.PumpSession(timelineSession, clock)
+T.equal(timelineSession.phase, Opera.Phases.READY,
+    "timeline blueprint did not pass the movement/facing barriers")
+clock = timelineSession.beatStartAt + 1
+Authority.PumpSession(timelineSession, clock)
+Authority.PumpSession(timelineSession, clock)
+T.equal(timelineSession.actors.npc_a.state, "animation_delay",
+    "timeline delay did not hold the first NPC animation")
+T.equal(timelineSession.actors.npc_a.timelineNodeID, "pause",
+    "timeline delay did not expose its active node")
+clock = timelineSession.beatStartAt + 201
+Authority.PumpSession(timelineSession, clock)
+T.equal(timelineSession.actors.npc_a.timelineNodeID, "wave",
+    "timeline cursor did not advance to the NPC animation node")
+T.truthy(timelineSession.closed,
+    "timeline NPC scene did not finish after its delayed animation")
+
+-- The scene-builder blueprint is deliberately kind-neutral. Exercise the
+-- same normalized definition with two NPC bindings so the server cannot
+-- accidentally rely on a fixed player slot while the editor supports the
+-- rumors/NPC-to-NPC use case.
+local neutralAccepted, neutralSession = Authority.HandleRequest(player, {
+    action = "start",
+    blueprintId = "social.kiss_test",
+    actors = {
+        actor_1 = "npc-a",
+        actor_2 = "npc-b",
+    },
+    loop = false,
+})
+T.truthy(neutralAccepted, "authority rejected a neutral two-NPC scene")
+T.equal(neutralSession.actors.actor_1.kind, "nearby_live_npc",
+    "neutral actor 1 did not resolve to the NPC route")
+T.equal(neutralSession.actors.actor_2.kind, "nearby_live_npc",
+    "neutral actor 2 did not resolve to the NPC route")
+npcA.x = neutralSession.actors.actor_1.target.worldX
+npcA.y = neutralSession.actors.actor_1.target.worldY
+npcB.x = neutralSession.actors.actor_2.target.worldX
+npcB.y = neutralSession.actors.actor_2.target.worldY
+Authority.PumpSession(neutralSession, clock)
+T.equal(neutralSession.phase, Opera.Phases.FACING,
+    "neutral two-NPC scene did not pass the arrival barrier")
+Authority.PumpSession(neutralSession, clock)
+T.equal(neutralSession.phase, Opera.Phases.READY,
+    "neutral two-NPC scene did not pass the facing barrier")
+clock = neutralSession.beatStartAt + 1
+Authority.PumpSession(neutralSession, clock)
+T.equal(neutralSession.phase, Opera.Phases.PLAYING,
+    "neutral two-NPC scene did not enter its beat")
+clock = neutralSession.beatStartAt + 1
+Authority.PumpSession(neutralSession, clock)
+T.truthy(neutralSession.closed,
+    "neutral two-NPC one-shot scene did not close")
+
+return T.finish("pnc_choreography_multi_actor_smoke")

@@ -24,7 +24,7 @@ local function ownerParts(owner)
     if type(owner) ~= "table" then return nil, nil end
     return owner.kind or owner.ownerKind,
         owner.sessionId or owner.ownerSessionId
-            or owner.puppetOperaSessionId
+            or owner.choreographySessionId
 end
 
 local function auditSeatedMove(
@@ -223,7 +223,7 @@ function MoveIntent.RequestMove(
             { reason = reason }
         )
         if accepted ~= true then
-            return false, "puppet_opera_writer_blocked:movement_intent"
+            return false, "choreography_writer_blocked:movement_intent"
         end
     end
     ownerKind, ownerSessionID = ownerParts(controlOwner)
@@ -298,7 +298,7 @@ function MoveIntent.RequestMove(
         and tonumber(navigation.targetWaterZ) or nil
     intent.ownerKind = ownerKind
     intent.ownerSessionId = ownerSessionID
-    intent.puppetOperaSessionId = ownerKind == "puppet_opera"
+    intent.choreographySessionId = ownerKind == "choreography"
         and ownerSessionID or nil
     intent.source = requestSource(options)
     intent.priority = requestPriority(options)
@@ -331,7 +331,7 @@ function MoveIntent.Hold(record, reason, owner)
             { reason = reason }
         )
         if accepted ~= true then
-            return false, "puppet_opera_writer_blocked:movement_hold"
+            return false, "choreography_writer_blocked:movement_hold"
         end
     end
     ownerKind, ownerSessionID = ownerParts(controlOwner)
@@ -377,7 +377,7 @@ function MoveIntent.Hold(record, reason, owner)
     intent.requestedOrder = requestedOrder
     intent.ownerKind = ownerKind
     intent.ownerSessionId = ownerSessionID
-    intent.puppetOperaSessionId = ownerKind == "puppet_opera"
+    intent.choreographySessionId = ownerKind == "choreography"
         and ownerSessionID or nil
     intent.source = nil
     intent.priority = 0

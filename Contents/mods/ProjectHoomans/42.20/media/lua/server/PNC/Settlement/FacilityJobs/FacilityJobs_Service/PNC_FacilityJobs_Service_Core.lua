@@ -35,7 +35,7 @@ function H.StopExistingActivity(record, reason)
             { reason = reason or "facility_stop" }
         )
         if allowed == false then
-            return false, ownerReason or "puppet_opera_owned"
+            return false, ownerReason or "choreography_owned"
         end
     end
     if taskLeaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands

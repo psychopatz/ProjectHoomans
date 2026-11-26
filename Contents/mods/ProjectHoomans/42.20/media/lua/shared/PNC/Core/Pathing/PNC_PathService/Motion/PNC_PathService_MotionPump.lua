@@ -205,7 +205,7 @@ function PathService.Pump(record, zombie, caller)
     end
     if puppetMovementBlocked(record) then
         recordPumpDiagnostics(record, zombie, caller)
-        return true, "puppet_opera_owned"
+        return true, "choreography_owned"
     end
     local lane = Internal.ensureMoveLane(record)
     local now = Internal.Core.Now()
@@ -278,7 +278,7 @@ function PathService.AdvanceScriptedPassage(record, zombie, caller)
         return false, "no_live_body"
     end
     if puppetMovementBlocked(record) then
-        return true, "puppet_opera_owned"
+        return true, "choreography_owned"
     end
     local lane = Internal.ensureMoveLane(record)
     local now = Internal.Core.Now()

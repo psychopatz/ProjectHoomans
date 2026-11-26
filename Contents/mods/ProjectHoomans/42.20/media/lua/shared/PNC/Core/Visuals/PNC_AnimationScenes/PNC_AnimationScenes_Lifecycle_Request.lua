@@ -122,7 +122,7 @@ function Scenes.Request(record, zombie, sceneId, options)
             { reason = options.reason or "animation_scene_request" }
         )
         if allowed == false then
-            return false, ownerReason or "puppet_opera_owned"
+            return false, ownerReason or "choreography_owned"
         end
     end
     if record.presenceState ~= Const.PRESENCE_LIVE or not zombie then

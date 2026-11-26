@@ -36,7 +36,7 @@ function Service.StartSleep(record, zombie, plan, candidate, at)
     local sleep = PNC.FacilityJobs and PNC.FacilityJobs.Sleep
     local reservations = PNC.FacilityReservations
     if not Service.CanWrite(record, "roam_ambient_sleep_start") then
-        return false, "puppet_opera_writer_blocked:roam_ambient_provider"
+        return false, "choreography_writer_blocked:roam_ambient_provider"
     end
     if not sleep or not sleep.PrepareSleepSurface
         or not sleep.ClearSleepSurface

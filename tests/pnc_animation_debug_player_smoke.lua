@@ -212,12 +212,12 @@ T.truthy(
     "debug pipeline must preserve the SP/MP body-mode contract"
 )
 ok, reason = player.PlayPipeline(entry, "npc-1", body, nil, {
-    sceneId = "PuppetOperaPreview:npc-1",
+    sceneId = "ChoreographyPreview:npc-1",
     nonCombat = true,
 })
 T.truthy(ok and reason == "bump_type_setter",
     "debug pipeline did not accept Puppet Opera preview options")
-T.equal(pipelineCalls[2].sceneId, "PuppetOperaPreview:npc-1",
+T.equal(pipelineCalls[2].sceneId, "ChoreographyPreview:npc-1",
     "Puppet Opera preview scene identity was not forwarded")
 T.truthy(pipelineCalls[2].nonCombat == true,
     "Puppet Opera preview did not mark the bump non-combat")

@@ -110,7 +110,7 @@ function Planner.Pump(record, body, source)
         and ActorControl.IsPuppetOwned(record)
         and not ActorControl.CanPump(record)
     then
-        return false, "puppet_opera_owned"
+        return false, "choreography_owned"
     end
     local now = Core and Core.Now and Core.Now() or 0
     source = tostring(source or "scheduled")

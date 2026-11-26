@@ -18,7 +18,7 @@ local function budgetExhausted(startedAt)
     return clockNow(startedAt) - startedAt >= budget
 end
 
-local function puppetOperaSuspends(lease)
+local function choreographySuspends(lease)
     local record
     if not lease or not ActorControl
         or not ActorControl.IsPuppetOwned
@@ -54,6 +54,6 @@ end
 
 H.PumpClockNow = clockNow
 H.PumpBudgetExhausted = budgetExhausted
-H.PumpPuppetOperaSuspends = puppetOperaSuspends
+H.PumpChoreographySuspends = choreographySuspends
 H.PumpPromoteMaterializedLease = promoteMaterializedLease
 

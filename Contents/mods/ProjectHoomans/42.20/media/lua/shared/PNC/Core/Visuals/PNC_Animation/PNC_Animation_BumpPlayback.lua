@@ -26,8 +26,8 @@ local function puppetBumpWriteAllowed(zombie, record, requestedBumpType,
     sessionID = ActorControl.GetSessionID(record)
     sceneID = tostring(options and options.sceneId or "")
     currentBump = modData and tostring(
-        modData.PNC_PuppetOperaAnimationBump or "") or ""
-    if sceneID == "PuppetOpera:" .. sessionID
+        modData.PNC_ChoreographyAnimationBump or "") or ""
+    if sceneID == "Choreography:" .. sessionID
         or currentBump == tostring(resolvedBumpType or "")
     then
         return true
@@ -46,7 +46,7 @@ local function puppetBumpWriteAllowed(zombie, record, requestedBumpType,
         ActorControl.NoteBlocked(
             record,
             "animation_bump",
-            "puppet_opera_writer_blocked:animation_bump"
+            "choreography_writer_blocked:animation_bump"
         )
     end
     return false
@@ -218,7 +218,7 @@ function Animation.PlayBump(zombie, record, bumpType, options)
         resolvedBumpType,
         options
     ) then
-        return false, "puppet_opera_writer_blocked:animation_bump"
+        return false, "choreography_writer_blocked:animation_bump"
     end
     if LiveBodyControl and LiveBodyControl.CheckBumpOwnership then
         local allowed

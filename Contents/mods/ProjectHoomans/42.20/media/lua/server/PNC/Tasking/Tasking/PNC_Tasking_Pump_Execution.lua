@@ -8,7 +8,7 @@ local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 local H = Tasking.Internal
 local Events = Tasking.Events
 local budgetExhausted = H.PumpBudgetExhausted
-local puppetOperaSuspends = H.PumpPuppetOperaSuspends
+local choreographySuspends = H.PumpChoreographySuspends
 local promoteMaterializedLease = H.PumpPromoteMaterializedLease
 
 local function execute(at, pumpStartedAt)
@@ -27,7 +27,7 @@ local function execute(at, pumpStartedAt)
             executorSteps = executorSteps + 1
             Tasking.ExecutorCursor = (Tasking.ExecutorCursor % #Leases.Active) + 1
             local lease = Leases.Get(Leases.Active[Tasking.ExecutorCursor])
-            local suspended = puppetOperaSuspends(lease)
+            local suspended = choreographySuspends(lease)
             local domainTimerName
             local domainTimerStart
             if ScalingDiagnostics and lease then

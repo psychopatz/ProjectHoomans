@@ -34,7 +34,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
             { reason = options.reason or "facility_start" }
         )
         if allowed == false then
-            return false, ownerReason or "puppet_opera_owned"
+            return false, ownerReason or "choreography_owned"
         end
     end
     if campPlacementLocked(record) then

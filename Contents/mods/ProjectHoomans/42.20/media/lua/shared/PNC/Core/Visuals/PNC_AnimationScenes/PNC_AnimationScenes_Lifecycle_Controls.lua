@@ -19,7 +19,7 @@ function Scenes.Stop(record, zombie, reason, owner)
             { reason = reason or "scene_stopped" }
         )
         if allowed == false then
-            return false, ownerReason or "puppet_opera_owned"
+            return false, ownerReason or "choreography_owned"
         end
     end
     return Internal.ClearScene(
@@ -78,7 +78,7 @@ function Scenes.Interrupt(record, zombie, reason, owner)
             { reason = reason or "externalBump" }
         )
         if allowed == false then
-            return false, ownerReason or "puppet_opera_owned"
+            return false, ownerReason or "choreography_owned"
         end
     end
     if definition.interrupts[interruptKey] == false then

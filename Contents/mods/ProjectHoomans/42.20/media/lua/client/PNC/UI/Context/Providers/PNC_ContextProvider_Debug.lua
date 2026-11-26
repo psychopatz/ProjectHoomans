@@ -66,59 +66,17 @@ local function addDebugActions(menu, entry)
         print('[PNC] ' .. snapshotText)
     end)
     menu:addOption(tr(
-        'UI_PNC_Debug_NPCPresentationLab', 'NPC Presentation Preview'
+        'UI_PNC_Debug_AnimationStudio', 'Animation Studio'
     ), nil, function()
-        -- Keep the 511-node generated catalog and its UI out of the normal
-        -- client startup path. Debuggers pay this load cost only on first use.
-        if not PNC.NPCPresentationDebug
-            or not PNC.NPCPresentationDebug.Open
+        -- Lazy-load the unified 3-tab Animation Studio (Clips, Scenes,
+        -- Props & Anchors) so clip catalogs stay off normal startup.
+        if not PNC.AnimationStudio
+            or not PNC.AnimationStudio.Open
         then
-            require 'PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug'
+            require 'PNC/UI/AnimationStudio/PNC_AnimationStudio'
         end
-        if PNC.NPCPresentationDebug
-            and PNC.NPCPresentationDebug.Open
-        then
-            PNC.NPCPresentationDebug.Open(entry)
-        end
-    end)
-    menu:addOption(tr(
-        'UI_PNC_Debug_PlayerAnimationLab', 'Player Animation Preview'
-    ), nil, function()
-        -- The player debugger owns a separate timed-action preview and must not
-        -- share the NPC presentation singleton or its selector state.
-        if not PNC.PlayerAnimationDebugUI
-            or not PNC.PlayerAnimationDebugUI.Open
-        then
-            require 'PNC/UI/PNC_PlayerAnimationDebugWindow'
-        end
-        if PNC.PlayerAnimationDebugUI
-            and PNC.PlayerAnimationDebugUI.Open
-        then
-            PNC.PlayerAnimationDebugUI.Open()
-        end
-    end)
-    menu:addOption(tr(
-        'UI_PNC_Debug_AnimationSceneLab', 'Animation Scene Builder'
-    ), nil, function()
-        if not PNC.AnimationSceneDebugWindow then
-            require 'PNC/UI/PNC_AnimationSceneDebugWindow'
-        end
-        if PNC.AnimationSceneDebugWindow
-            and PNC.AnimationSceneDebugWindow.Open
-        then
-            PNC.AnimationSceneDebugWindow.Open(entry)
-        end
-    end)
-    menu:addOption(tr('UI_PNC_Debug_PuppetOpera', 'Multi-Actor Animation'), nil, function()
-        if not PNC.PuppetOperaDebugWindow
-            or not PNC.PuppetOperaDebugWindow.Open
-        then
-            require 'PNC/UI/PuppetOpera/PNC_PuppetOperaDebugWindow'
-        end
-        if PNC.PuppetOperaDebugWindow
-            and PNC.PuppetOperaDebugWindow.Open
-        then
-            PNC.PuppetOperaDebugWindow.Open(entry)
+        if PNC.AnimationStudio and PNC.AnimationStudio.Open then
+            PNC.AnimationStudio.Open(entry)
         end
     end)
 end

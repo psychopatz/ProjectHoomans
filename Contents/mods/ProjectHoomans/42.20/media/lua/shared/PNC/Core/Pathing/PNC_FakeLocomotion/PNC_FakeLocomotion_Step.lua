@@ -87,10 +87,10 @@ function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
             ActorControl.NoteBlocked(
                 record,
                 "fake_locomotion",
-                "puppet_opera_writer_blocked:fake_locomotion"
+                "choreography_writer_blocked:fake_locomotion"
             )
         end
-        return false, "puppet_opera_native_required", 0
+        return false, "choreography_native_required", 0
     end
     -- Multiplayer movement is client-controlled; incremental position writes
     -- must never become a second transport owner.

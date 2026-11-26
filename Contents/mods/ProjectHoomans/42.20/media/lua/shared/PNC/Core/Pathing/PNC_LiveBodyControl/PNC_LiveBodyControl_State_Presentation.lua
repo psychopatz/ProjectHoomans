@@ -54,7 +54,7 @@ function LiveBodyControl.ReleasePresentationMovement(
             { reason = reason }
         )
         if accepted ~= true then
-            return false, "puppet_opera_writer_blocked:presentation_release"
+            return false, "choreography_writer_blocked:presentation_release"
         end
     end
     if PNC.PathService and PNC.PathService.Reset then

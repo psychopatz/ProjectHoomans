@@ -155,7 +155,7 @@ function Tasking.Commands.Reevaluate(npcId, cause, event)
         and not (ActorControl.IsLocomotiveCarrier
             and ActorControl.IsLocomotiveCarrier(record))
     then
-        diagnostics.lastReason = "DEFERRED_PUPPET_OPERA"
+        diagnostics.lastReason = "DEFERRED_CHOREOGRAPHY"
         return true, Leases.ForNPC(npcId)
     end
     local current, currentOK, currentReason = H.ReconcileCurrentLease(npcId)

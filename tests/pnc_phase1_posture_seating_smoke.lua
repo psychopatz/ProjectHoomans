@@ -279,7 +279,7 @@ PNC.BehaviorSystem = {
                     return true
                 end,
             },
-            puppetOperaOwnsBehavior = function() return false end,
+            choreographyOwnsBehavior = function() return false end,
         },
     },
 }

@@ -49,7 +49,7 @@ T.equal(#stopped, 0, "fresh work progress should not stop the lease")
 local resumed = {
     leaseId = "resumed", npcId = "resumed-npc", sourceDomain = "work",
     phase = "WORKING", startedAt = 0, lastProgressAt = 0,
-    puppetOperaResumeAt = 1000,
+    choreographyResumeAt = 1000,
 }
 handled, state = H.RecoverStalledLease(resumed, 60000)
 T.falsy(handled, "a restored task should receive a fresh watchdog window")
@@ -92,7 +92,7 @@ T.equal(Tasking.Diagnostics.counters.stallRecoveries, 1,
 handled, state = H.RecoverStalledLease(resumed, 61001)
 T.truthy(handled, "a task stalled after restore should still recover")
 T.equal(state, "RECOVERED", "restored task eventual recovery state")
-T.equal(resumed.puppetOperaResumeAt, 1000,
+T.equal(resumed.choreographyResumeAt, 1000,
     "resume baseline should remain until provider reports progress")
 
 local cleanupFailure = {
@@ -214,7 +214,7 @@ local recoverySource = T.read(ROOT
         .. "PNC/Tasking/Tasking/PNC_Tasking_Recovery_Stall.lua")
     .. T.read(ROOT
         .. "PNC/Tasking/Tasking/PNC_Tasking_Recovery_Executor.lua")
-T.contains(recoverySource, "puppetOperaResumeAt",
+T.contains(recoverySource, "choreographyResumeAt",
     "Puppet resume watchdog baseline")
 T.contains(provider, "RecordRecovery", "durable work recovery counter")
 T.contains(provider, "recoveryQuarantined", "quarantined work exclusion")

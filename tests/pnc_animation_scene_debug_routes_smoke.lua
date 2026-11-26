@@ -24,8 +24,12 @@ local context = T.read(
 )
 local window = T.read(
     ROOT
-        .. "client/PNC/UI/"
-        .. "PNC_AnimationSceneDebugWindow.lua"
+        .. "client/PNC/UI/AnimationStudio/"
+        .. "PNC_AnimationStudio_ScenesTab.lua"
+) .. T.read(
+    ROOT
+        .. "client/PNC/Debug/"
+        .. "PNC_AnimationSceneDebugModel.lua"
 )
 
 local actions = {
@@ -46,10 +50,10 @@ end
 
 T.truthy(string.find(
     context,
-    "Animation Scene Lab",
+    "UI_PNC_Debug_AnimationStudio",
     1,
     true
-), "NPC context menu does not expose scene lab")
+), "NPC context menu does not expose Animation Studio")
 T.truthy(string.find(
     window,
     "PNC.AnimationScenes.List()",

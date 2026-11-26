@@ -719,28 +719,28 @@ T.contains(settingsLayoutSource, "onResponsiveLayout",
 T.contains(settingsLayoutSource, "Layout.SetBounds(self.statusLabel",
     "settings feedback is not positioned in the footer")
 local animationSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug.lua")
+    "PNC/UI/AnimationStudio/PNC_AnimationStudio.lua")
 local animationTabSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug_AnimationTab.lua")
-T.contains(animationSource, "NPCPresentationDebug",
-    "NPC presentation debugger does not expose its canonical root")
-T.contains(animationSource, "ISPNCNPCPresentationDebugWindow",
-    "NPC presentation debugger does not expose its canonical window class")
+    "PNC/UI/AnimationStudio/PNC_AnimationStudio_NPCClipsPanel.lua")
+T.contains(animationSource, "AnimationStudio",
+    "Animation Studio does not expose its canonical root")
+T.contains(animationSource, "ISPNCAnimationStudioWindow",
+    "Animation Studio does not expose its canonical window class")
 T.contains(animationSource, "ISTabPanel",
-    "NPC presentation debugger hub is missing its tab container")
-T.contains(animationSource, 'addView("Animation"',
-    "NPC presentation debugger hub does not expose its animation tab")
+    "Animation Studio hub is missing its tab container")
+T.contains(animationSource, "self.clipsTab",
+    "Animation Studio hub does not expose its Clips tab")
 T.contains(animationTabSource, "ISPNCNPCPresentationDebugAnimationTab",
-    "NPC presentation debugger does not expose its canonical animation tab")
+    "Animation Studio does not expose its NPC clips panel")
 T.contains(animationTabSource, "Layout.SetBounds(self.search",
     "animation search field bypasses shared bounds")
 T.falsy(string.find(animationTabSource, "self.search:setX", 1, true),
     "animation search field still uses manual geometry")
 local animationSceneSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/PNC_AnimationSceneDebugWindow.lua")
-T.contains(animationSceneSource, "Layout.SetBounds(self.gapEntry",
+    "PNC/UI/AnimationStudio/PNC_AnimationStudio_ScenesTab.lua")
+T.contains(animationSceneSource, "Layout.SetBounds(p.gapEntry",
     "animation scene field bypasses shared bounds")
-T.falsy(string.find(animationSceneSource, "self.gapEntry:setX", 1, true),
+T.falsy(string.find(animationSceneSource, "p.gapEntry:setX", 1, true),
     "animation scene field still uses manual geometry")
 local provisionSettingsSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Provision/PNC_ProvisionSettingsWindow.lua")

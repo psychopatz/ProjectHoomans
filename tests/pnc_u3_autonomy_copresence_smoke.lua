@@ -459,7 +459,7 @@ T.truthy(PNC.AutonomyTaskProvider.Tick(roamLease) == true,
 PNC.BehaviorSystem = PNC.BehaviorSystem or { Internal = { TickOwnership = {} } }
 PNC.BehaviorSystem.Internal = PNC.BehaviorSystem.Internal or {}
 PNC.BehaviorSystem.Internal.TickOwnership = PNC.BehaviorSystem.Internal.TickOwnership or {}
-PNC.BehaviorSystem.Internal.TickOwnership.puppetOperaOwnsBehavior = function()
+PNC.BehaviorSystem.Internal.TickOwnership.choreographyOwnsBehavior = function()
     return false
 end
 T.load("ProjectHoomans", "shared",

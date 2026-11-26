@@ -10,9 +10,9 @@ PNC = PNC or {}
 PNC.ActorControl = PNC.ActorControl or {}
 
 local Control = PNC.ActorControl
-local OVERRIDE_KEY = "puppetOperaOverride"
-local LEASE_KEY = "puppetOperaLease"
-local MOVEMENT_KEY = "puppetOperaMovement"
+local OVERRIDE_KEY = "choreographyOverride"
+local LEASE_KEY = "choreographyLease"
+local MOVEMENT_KEY = "choreographyMovement"
 
 local function text(value)
     return tostring(value or "")
@@ -32,7 +32,7 @@ local function ownerParts(owner)
     if type(owner) == "table" then
         return text(owner.kind or owner.ownerKind), text(
             owner.sessionId or owner.ownerSessionId
-                or owner.puppetOperaSessionId
+                or owner.choreographySessionId
         )
     end
     return text(owner), ""
@@ -84,7 +84,7 @@ end
 
 function Control.MakeOwner(sessionID)
     return {
-        kind = "puppet_opera",
+        kind = "choreography",
         sessionId = text(sessionID),
     }
 end
@@ -96,9 +96,9 @@ function Control.ResolveOwner(owner, reason)
     if owner ~= nil then
         kind, sessionID = ownerParts(owner)
         if kind ~= "" then
-            if string.sub(kind, 1, 13) == "puppet_opera:" then
+            if string.sub(kind, 1, 13) == "choreography:" then
                 sessionID = string.sub(kind, 14)
-                kind = "puppet_opera"
+                kind = "choreography"
             end
             return {
                 kind = kind,
@@ -155,7 +155,7 @@ end
 
 local function ownerMatches(owner, sessionID)
     local kind, ownerSessionID = ownerParts(owner)
-    return kind == "puppet_opera"
+    return kind == "choreography"
         and ownerSessionID ~= ""
         and ownerSessionID == text(sessionID)
 end
@@ -167,24 +167,24 @@ function Control.CanPump(record)
     local intent = runtime and runtime.moveIntent or nil
     local sessionID = lease and text(lease.sessionId) or ""
     local intentSessionID = intent and text(
-        intent.puppetOperaSessionId or intent.ownerSessionId
+        intent.choreographySessionId or intent.ownerSessionId
     ) or ""
     if not lease or sessionID == "" then return true end
     if Control.IsLocomotiveCarrier(record) then return true end
     if not claim or text(claim.sessionId) ~= sessionID then return false end
     if not intent or intent.kind ~= "move" then return false end
     if intentSessionID ~= sessionID then return false end
-    return string.sub(text(intent.reason), 1, 13) == "puppet_opera:"
+    return string.sub(text(intent.reason), 1, 13) == "choreography:"
 end
 
 function Control.NoteBlocked(record, lane, reason)
     local runtime = runtimeOf(record)
     local diagnostics
     if not runtime then return end
-    diagnostics = runtime.puppetOperaDiagnostics
+    diagnostics = runtime.choreographyDiagnostics
     if not diagnostics then
         diagnostics = {}
-        runtime.puppetOperaDiagnostics = diagnostics
+        runtime.choreographyDiagnostics = diagnostics
     end
     diagnostics.lastBlockedLane = text(lane)
     diagnostics.lastBlockedReason = text(reason)
@@ -220,14 +220,14 @@ function Control.CanWrite(record, owner, lane, options)
             return true
         end
     end
-    reason = "puppet_opera_writer_blocked:" .. text(lane)
+    reason = "choreography_writer_blocked:" .. text(lane)
     Control.NoteBlocked(record, lane, reason)
     return false, reason
 end
 
 function Control.GetDiagnostics(record)
     local runtime = runtimeOf(record)
-    return runtime and runtime.puppetOperaDiagnostics or nil
+    return runtime and runtime.choreographyDiagnostics or nil
 end
 
 return Control

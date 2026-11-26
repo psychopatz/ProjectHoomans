@@ -77,10 +77,10 @@ end
 local function progressBaseline(lease, snapshot)
     local progressAt = tonumber(snapshot and snapshot.lastProgressAt)
         or tonumber(lease and lease.lastProgressAt)
-    local resumedAt = tonumber(lease and lease.puppetOperaResumeAt)
+    local resumedAt = tonumber(lease and lease.choreographyResumeAt)
     if resumedAt then
         if progressAt and progressAt >= resumedAt then
-            lease.puppetOperaResumeAt = nil
+            lease.choreographyResumeAt = nil
         else
             progressAt = resumedAt
         end

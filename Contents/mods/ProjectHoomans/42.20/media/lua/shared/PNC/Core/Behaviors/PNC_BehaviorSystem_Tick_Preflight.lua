@@ -16,8 +16,8 @@ local Incapacitated = H.Incapacitated
 local Companion = H.Companion
 local AnimationScenes = H.AnimationScenes
 local tickPendingSleepWake = H.tickPendingSleepWake
-local puppetOperaOwnsBehavior = H.puppetOperaOwnsBehavior
-local puppetOperaSafetyBoundary = H.puppetOperaSafetyBoundary
+local choreographyOwnsBehavior = H.choreographyOwnsBehavior
+local choreographySafetyBoundary = H.choreographySafetyBoundary
 local clearStaleFacilityState = H.clearStaleFacilityState
 local isAbstractFollowRecord = H.isAbstractFollowRecord
 
@@ -43,8 +43,8 @@ function H.Run(record, zombie, now)
 
     -- Puppet safety boundaries deliberately fall through so combat, vehicles,
     -- traversal, and grounded recovery can abort the scene and take control.
-    if puppetOperaOwnsBehavior(record)
-        and not puppetOperaSafetyBoundary(record, zombie, now)
+    if choreographyOwnsBehavior(record)
+        and not choreographySafetyBoundary(record, zombie, now)
     then
         return true
     end

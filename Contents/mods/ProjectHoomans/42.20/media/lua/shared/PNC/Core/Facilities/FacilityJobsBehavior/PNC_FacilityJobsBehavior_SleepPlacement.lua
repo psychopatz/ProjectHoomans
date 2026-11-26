@@ -222,7 +222,7 @@ function Internal.CommitSleepExit(record, zombie, runtime, candidate, options)
     if not candidate then return false, "SLEEP_EXIT_UNAVAILABLE" end
     if not isAuthority() then return false, "SLEEP_NOT_AUTHORITY" end
     if not canWrite(record, "sleep_exit_placement") then
-        return false, "puppet_opera_writer_blocked:sleep_placement"
+        return false, "choreography_writer_blocked:sleep_placement"
     end
     ok, reason = Internal.ValidateSleepSquare(
         candidate.x, candidate.y, candidate.z, zombie, options)
@@ -291,7 +291,7 @@ function Internal.TrySnapToSleep(record, zombie, runtime, order)
         zombie)
     if not valid then return false, reason end
     if not canWrite(record, "sleep_entry_placement") then
-        return false, "puppet_opera_writer_blocked:sleep_placement"
+        return false, "choreography_writer_blocked:sleep_placement"
     end
     if Internal.ResetPath then
         Internal.ResetPath(record, zombie, "sleep_entry_snap")

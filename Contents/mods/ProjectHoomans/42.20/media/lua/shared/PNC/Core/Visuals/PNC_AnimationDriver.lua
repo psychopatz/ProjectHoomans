@@ -1,9 +1,9 @@
 -- Unified low-level NPC animation playback driver shared by AnimationScenes,
--- AnimationPacks, and PuppetOpera.
+-- AnimationPacks, and Choreography.
 --
 -- Owns a single per-body ownership token (`PNC_AnimDriverOwner`) alongside
 -- BumpType and AnimVars playback so single-actor AI scenes and multi-actor
--- PuppetOpera choreography share one engine contract and never stomp each other.
+-- Choreography choreography share one engine contract and never stomp each other.
 PNC = PNC or {}
 PNC.AnimationDriver = PNC.AnimationDriver or {}
 
@@ -25,7 +25,7 @@ local function animService()
 end
 
 local function animVarAdapter()
-    return PNC.PuppetOpera and PNC.PuppetOpera.AnimVarAdapter or nil
+    return PNC.Choreography and PNC.Choreography.AnimVarAdapter or nil
 end
 
 local function nowMs()

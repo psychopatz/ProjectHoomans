@@ -200,7 +200,7 @@ PNC.BehaviorSystem = {
         TickOwnership = {
             ThreatGuard = { Tick = function() return threatActive end },
             Treatment = { Tick = function() selfTreatCalled = true return true end },
-            puppetOperaOwnsBehavior = function() return false end,
+            choreographyOwnsBehavior = function() return false end,
         },
     },
 }

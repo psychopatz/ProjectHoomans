@@ -140,7 +140,7 @@ T.equal(rifleWalk.walkType, "TacticalWalk", "tactical walkType applied")
 T.equal(Packs.ResolveLocomotion("walk", { weaponClass = "pistol" }), nil,
     "non-matching weaponClass falls back to base locomotion")
 
--- 5. Direct visualState prop override (for PuppetOpera beats).
+-- 5. Direct visualState prop override (for Choreography beats).
 local operaProp = ActionProps.Resolve({
     visualState = {
         propPrimary = "Base.Apple",
@@ -148,7 +148,7 @@ local operaProp = ActionProps.Resolve({
         sceneRevision = 42,
     },
 })
-T.truthy(operaProp, "PuppetOpera visual prop override resolves directly")
+T.truthy(operaProp, "Choreography visual prop override resolves directly")
 T.equal(operaProp.primaryFullType, "Base.Apple", "opera primary prop set")
 T.equal(operaProp.secondaryFullType, "Base.WaterBottleFull",
     "opera secondary prop set")

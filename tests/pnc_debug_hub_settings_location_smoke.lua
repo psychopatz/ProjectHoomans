@@ -57,7 +57,7 @@ T.load(FILE)
 local metadata = {
     { id = "pnc.conversations", name = "ConversationBlocks" },
     { id = "pnc.audio", name = "Audio" },
-    { id = "pnc.playerAnimation", name = "PlayerAnimation" },
+    { id = "pnc.animationStudio", name = "AnimationStudio" },
     { id = "pnc.npcMonitor", name = "NPCMonitor" },
     { id = "pnc.uniqueNPCs", name = "UniqueNPCRegistry" },
     { id = "pnc.uniqueNPCEditor", name = "UniqueNPCCreator" },

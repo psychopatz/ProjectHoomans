@@ -102,7 +102,7 @@ function Planner.PumpFrame(record, body)
         and ActorControl.IsPuppetOwned(record)
         and not ActorControl.CanPump(record)
     then
-        return false, "puppet_opera_owned"
+        return false, "choreography_owned"
     end
     local lane = record and record.runtime and record.runtime.pathing or nil
     if not lane or lane.phase ~= "active" then

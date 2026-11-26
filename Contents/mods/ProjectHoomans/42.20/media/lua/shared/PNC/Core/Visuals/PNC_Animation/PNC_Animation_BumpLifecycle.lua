@@ -78,7 +78,7 @@ function Animation.FinishBump(zombie, forceIdle, owner)
     record = PNC.Registry and PNC.Registry.FindRecordByZombie
         and PNC.Registry.FindRecordByZombie(zombie) or nil
     sessionID = modData and tostring(
-        modData.PNC_PuppetOperaAnimationSession or "") or ""
+        modData.PNC_ChoreographyAnimationSession or "") or ""
     ownerSessionID = type(owner) == "table" and tostring(
         owner.sessionId or owner.ownerSessionId or "") or ""
     if sessionID ~= "" and ownerSessionID ~= sessionID then
@@ -86,7 +86,7 @@ function Animation.FinishBump(zombie, forceIdle, owner)
             PNC.ActorControl.NoteBlocked(
                 record,
                 "animation_finish",
-                "puppet_opera_writer_blocked:animation_finish"
+                "choreography_writer_blocked:animation_finish"
             )
         end
         return false
