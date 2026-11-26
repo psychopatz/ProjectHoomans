@@ -46,6 +46,17 @@ local COMMAND_CASES = {
     -- GUARD commands
     { text = "guard here",                                     action = "GUARD" },
     { text = "okay guys, guard here",                          action = "GUARD" },
+
+    -- Casual / gamer slang + shorthand wrappers
+    { text = "aight yall, lets camp here",                     action = "CAMP" },
+    { text = "kk pls follow me",                               action = "FOLLOW" },
+    { text = "alr guys, guard here",                           action = "GUARD" },
+
+    -- Mid-combat distance-1 / transposition typos (VerbFrame typo recovery)
+    { text = "cmpp here",                                      action = "CAMP" },
+    { text = "fllow me",                                       action = "FOLLOW" },
+    { text = "gaurd here",                                     action = "GUARD" },
+    { text = "stya here",                                      action = "STAY" },
 }
 
 for i = 1, #COMMAND_CASES do
@@ -156,5 +167,61 @@ for i = 1, #diag.rows do
 end
 T.equal(sawPenaltyEvidence, true,
     "STAY fallback row records unconsumed_action_concept:CAMP penalty evidence")
+
+-- 7. Normalizer slang & PZ survival vocabulary expansion
+local normSlang = Semantic.Normalizer.Normalize("aight yall watch for zeds and grab grub", {})
+T.equal(normSlang.normalizedText, "alright you all watch for zombies and grab food",
+    "Normalizer expands casual & PZ survival slang tokens")
+
+-- 8. Registry inverted pattern index prunes irrelevant patterns while preserving matches
+local idxStats = Semantic.Registry.GetPatternIndexStats()
+assert(idxStats.totalPatterns > 20, "Registry has patterns loaded")
+assert(idxStats.anchoredCount > 0, "Registry inverted index anchored patterns")
+local campNorm = Semantic.Normalizer.Normalize("camp here", {})
+local campSyms = Semantic.ConceptMatcher.Build(campNorm, { enableFuzzy = false })
+local prunedPatterns = Semantic.Registry.GetCandidatePatterns(campSyms, campNorm)
+assert(#prunedPatterns < idxStats.totalPatterns,
+    "Inverted pattern index prunes irrelevant patterns for 'camp here'")
+
+-- 9. Pre-compiled pattern rules are cached on first match and reused
+local samplePattern = Semantic.Registry.GetPatterns()[1]
+Semantic.PatternMatcher.Match(samplePattern, campSyms, campNorm)
+assert(type(samplePattern._compiledRules) == "table",
+    "PatternMatcher caches compiled rules on the pattern")
+assert(type(samplePattern._minRequiredSymbols) == "number",
+    "PatternMatcher caches minimum required symbol count")
+
+-- 10. Tier-3 IntentClassifier slot extraction keeps spatial/source/quantity slots
+local slotNorm = Semantic.Normalizer.Normalize("hole up in that clinic", {})
+local campSlots = Semantic.IntentClassifier.ExtractImplicitSlots(slotNorm, "CAMP")
+T.equal(campSlots.destination and campSlots.destination.text, "clinic",
+    "CAMP-like Tier-3 result extracts destination slot")
+local fetchNorm = Semantic.Normalizer.Normalize("grab food from the kitchen", {})
+local fetchSlots = Semantic.IntentClassifier.ExtractImplicitSlots(fetchNorm, "FETCH")
+T.equal(fetchSlots.source and fetchSlots.source.text, "kitchen",
+    "FETCH-like Tier-3 result extracts source slot")
+
+-- 11. Caller-owned options table is never mutated by the parser
+local callerOpts = {}
+Parser.ResetCache()
+Parser.ParseCandidates("camp here", callerOpts)
+T.equal(callerOpts._preNormalized, nil, "Parser does not mutate caller options")
+
+-- 12. Missed-utterance telemetry is opt-in, bounded, and records only misses
+Parser.ResetMissedUtterances()
+Parser.SetTelemetryEnabled(false)
+Parser.ResetCache()
+Parser.ParseCandidates("xqzv blorp wibble", {})
+T.equal(#Parser.GetMissedUtterances(), 0, "Telemetry disabled records nothing")
+Parser.SetTelemetryEnabled(true)
+Parser.ResetCache()
+Parser.ParseCandidates("xqzv blorp wibble", {})
+Parser.ResetCache()
+Parser.ParseCandidates("camp here", {})
+local missed = Parser.GetMissedUtterances()
+T.equal(#missed, 1, "Telemetry records only the missed utterance")
+T.equal(missed[1].rawText, "xqzv blorp wibble", "Telemetry keeps raw missed text")
+Parser.SetTelemetryEnabled(false)
+Parser.ResetMissedUtterances()
 
 print("PASS: pnc_semantic_command_collision_smoke")
