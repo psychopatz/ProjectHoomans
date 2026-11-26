@@ -14,8 +14,13 @@ if type(registerPattern) ~= "function" then
 end
 
 local CAMP_COMMAND_PREFIX = {
+    { kind = "literal", value = "okay", optional = true },
+    { kind = "literal", value = "ok", optional = true },
+    { kind = "literal", value = "alright", optional = true },
     { kind = "literal", value = "let's", optional = true },
     { kind = "literal", value = "lets", optional = true },
+    { kind = "literal", value = "let", optional = true },
+    { kind = "literal", value = "us", optional = true },
     { kind = "literal", value = "we", optional = true },
     { kind = "literal", value = "should", optional = true },
     { kind = "literal", value = "can", optional = true },

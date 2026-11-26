@@ -21,6 +21,24 @@ Resolver.MAX_EVIDENCE = 8
 Resolver.MAX_CANDIDATES = 12
 Resolver.MAX_CONTEXT_BOOST = 0.16
 Resolver.MINIMUM_MARGIN = 0.015
+Resolver.UNCONSUMED_ACTION_PENALTY = 0.25
+
+local EXPLICIT_ACTION_CONCEPTS = {
+    CAMP = { CAMP = true },
+    FOLLOW = { FOLLOW = true, STOP = true, STAY = true },
+    FETCH = { FETCH = true, LOOT = true, SCAVENGE = true, GIVE = true },
+    LOOT = { LOOT = true, FETCH = true, SCAVENGE = true },
+    GIVE = { GIVE = true, TRADE = true, DROP = true },
+    HEAL = { HEAL = true, TREAT = true, USE_ITEM = true },
+    GUARD = { GUARD = true, PATROL = true, DEFEND = true },
+    STORE = { STORE = true, PUT = true, DEPOSIT = true },
+}
+
+local FALLBACK_PASSES = {
+    verb_frame = true,
+    intent_classifier = true,
+    followup = true,
+}
 
 local REPLY_ACTS = {
     ACCEPT = true,
@@ -148,15 +166,64 @@ local function mostRecentNPC(snapshot)
     return nil
 end
 
+local function candidateMetric(candidate, key)
+    local match = type(candidate and candidate.match) == "table"
+        and candidate.match or {}
+    return tonumber(match[key]) or 0
+end
+
+local function unconsumedActionConceptPenalty(candidate)
+    if type(candidate) ~= "table" then return 0, nil end
+    local pass = tostring(candidate.pass or "")
+    local unmatched = candidateMetric(candidate, "unmatchedCount")
+    if not FALLBACK_PASSES[pass] and unmatched <= 0 then
+        return 0, nil
+    end
+    local ir = type(candidate.ir) == "table" and candidate.ir or {}
+    local action = string.upper(tostring(ir.action or ""))
+    local analysis = type(ir.analysis) == "table" and ir.analysis or nil
+    local concepts = analysis and type(analysis.concepts) == "table" and analysis.concepts or nil
+    if not concepts and Semantic and Semantic.Parser
+        and type(Semantic.Parser.RecognizeConcepts) == "function"
+    then
+        local text = ir.normalizedText or ir.rawText
+        if type(text) == "string" and text ~= "" then
+            local ok, rec = pcall(Semantic.Parser.RecognizeConcepts, text, { enableFuzzy = false })
+            if ok and type(rec) == "table" and type(rec.concepts) == "table" then
+                concepts = rec.concepts
+            end
+        end
+    end
+    if type(concepts) ~= "table" then return 0, nil end
+    for i = 1, #concepts do
+        local entry = concepts[i]
+        local cid = string.upper(tostring(
+            type(entry) == "table" and (entry.id or entry.concept) or entry or ""
+        ))
+        local allowed = EXPLICIT_ACTION_CONCEPTS[cid]
+        if allowed and not allowed[action] then
+            return Resolver.UNCONSUMED_ACTION_PENALTY, cid
+        end
+    end
+    return 0, nil
+end
+
 local function contextualAdjustment(candidate, snapshot)
     local ir = candidate and candidate.ir or {}
     local evidence = {}
     local adjustment = 0
 
+    local penalty, unconsumedConcept = unconsumedActionConceptPenalty(candidate)
+    if penalty > 0 then
+        adjustment = adjustment - penalty
+        appendEvidence(evidence, "unconsumed_action_concept:" .. tostring(unconsumedConcept))
+    end
+
     -- Context can disambiguate conversation, but it never makes a gameplay
     -- mutation safer. Mutation admission remains C4 RiskPolicy authority.
     if ir.action ~= nil then
-        return 0, { "mutation_context_not_boosted" }
+        appendEvidence(evidence, "mutation_context_not_boosted")
+        return adjustment, evidence
     end
 
     local pending = pendingFor(snapshot)
@@ -299,12 +366,6 @@ local function noMatchIR(bundle, diagnostics)
     })
 end
 
-local function candidateMetric(candidate, key)
-    local match = type(candidate and candidate.match) == "table"
-        and candidate.match or {}
-    return tonumber(match[key]) or 0
-end
-
 local function sortRows(left, right)
     if math.abs(left.contextualScore - right.contextualScore) > 0.0001 then
         return left.contextualScore > right.contextualScore
@@ -368,9 +429,12 @@ function Resolver.Select(bundle, state, context, options, contextResolver)
             local adjustment, evidence = contextualAdjustment(
                 candidate, snapshot
             )
-            local contextualScore = math.min(
-                1,
-                (tonumber(candidate.confidence) or 0) + adjustment
+            local contextualScore = math.max(
+                0,
+                math.min(
+                    1,
+                    (tonumber(candidate.confidence) or 0) + adjustment
+                )
             )
             rows[#rows + 1] = {
                 candidate = candidate,
