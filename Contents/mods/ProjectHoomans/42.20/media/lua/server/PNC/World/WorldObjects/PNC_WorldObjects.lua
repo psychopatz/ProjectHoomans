@@ -14,10 +14,12 @@ local WorldObjects = PNC.WorldObjects
 local Registry = PNC.FacilityResources
     or require "PNC/Settlement/PNC_FacilityResources"
 local Scanner = require "PNC/World/WorldObjects/PNC_WorldObjectScanner"
+local ActivityHelpers = require "PNC/World/WorldObjects/PNC_WorldObjectActivityHelpers"
 
 WorldObjects.VERSION = 1
 WorldObjects.Registry = Registry
 WorldObjects.Scanner = Scanner
+WorldObjects.ActivityHelpers = ActivityHelpers
 
 -- Clean, capability-oriented public aliases over the canonical registry.
 function WorldObjects.Register(id, definition)

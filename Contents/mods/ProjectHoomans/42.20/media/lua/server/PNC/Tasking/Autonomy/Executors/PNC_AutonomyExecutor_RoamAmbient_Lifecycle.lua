@@ -26,8 +26,17 @@ function Service.CanWrite(record, reason)
     return true
 end
 
+local function activityHelpers()
+    return PNC.WorldObjects and PNC.WorldObjects.ActivityHelpers or nil
+end
+
 function Service.ResetPath(record, zombie, reason)
     local sleep = PNC.FacilityJobs and PNC.FacilityJobs.Sleep
+    local helpers = activityHelpers()
+    if helpers and helpers.ResetPath then
+        helpers.ResetPath(record, zombie, reason, sleep)
+        return
+    end
     if sleep and sleep.ResetPath then
         sleep.ResetPath(record, zombie, reason)
     elseif PNC.PathService and PNC.PathService.Reset then
@@ -36,6 +45,11 @@ function Service.ResetPath(record, zombie, reason)
 end
 
 local function releaseReservation(state, reason)
+    local helpers = activityHelpers()
+    if helpers and helpers.ReleaseReservation then
+        helpers.ReleaseReservation(state, reason or "roam_ambient_stopped")
+        return
+    end
     local reservations = PNC.FacilityReservations
     local id = tostring(state and state.reservationId or "")
     if id ~= "" and reservations and reservations.Release then
@@ -105,7 +119,12 @@ function Service.Stop(record, zombie, reason, interruptReason)
     then
         return false
     end
-    if scene and scene.id == state.sceneId
+    local helpers = activityHelpers()
+    if helpers and helpers.InterruptScene then
+        helpers.InterruptScene(
+            record, zombie, state,
+            interruptReason or "movement", "roam_ambient_stop")
+    elseif scene and scene.id == state.sceneId
         and scenes and scenes.Interrupt
     then
         scenes.Interrupt(record, zombie, interruptReason or "movement")

@@ -85,9 +85,20 @@ Tasking.Commands.MarkPuppetOperaResumed = Tasking.Internal.MarkPuppetOperaResume
 require "PNC/Tasking/Tasking/PNC_Tasking_Pump"
 require "PNC/Tasking/Tasking/PNC_Tasking_Queries"
 
-if Events and Events.OnTick and not Tasking.TickHookRegistered then
-    Events.OnTick.Add(function() Tasking.Commands.Pump() end)
-    Tasking.TickHookRegistered = true
+if not Tasking.TickHookRegistered then
+    local TickRegistry = PNC.Server and PNC.Server.TickRegistry
+        or require "PNC/Server/Server/PNC_Server_TickRegistry"
+    if TickRegistry and type(TickRegistry.Register) == "function" then
+        TickRegistry.Register("tasking", {
+            phase = "prepare",
+            priority = 20,
+            pump = function() Tasking.Commands.Pump() end,
+        })
+        Tasking.TickHookRegistered = true
+    elseif Events and Events.OnTick then
+        Events.OnTick.Add(function() Tasking.Commands.Pump() end)
+        Tasking.TickHookRegistered = true
+    end
 end
 
 require "PNC/Tasking/PNC_TaskExecutors"

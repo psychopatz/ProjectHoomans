@@ -17,9 +17,20 @@ function Service.Tick(at)
     return Internal.Tick(at)
 end
 
-if Events and Events.OnTick and not Service.TickHookRegistered then
-    Events.OnTick.Add(function() Service.Tick() end)
-    Service.TickHookRegistered = true
+if not Service.TickHookRegistered then
+    local TickRegistry = PNC.Server and PNC.Server.TickRegistry
+        or require "PNC/Server/Server/PNC_Server_TickRegistry"
+    if TickRegistry and type(TickRegistry.Register) == "function" then
+        TickRegistry.Register("work_service", {
+            phase = "prepare",
+            priority = 40,
+            pump = function(at) Service.Tick(at) end,
+        })
+        Service.TickHookRegistered = true
+    elseif Events and Events.OnTick then
+        Events.OnTick.Add(function() Service.Tick() end)
+        Service.TickHookRegistered = true
+    end
 end
 
 return Service

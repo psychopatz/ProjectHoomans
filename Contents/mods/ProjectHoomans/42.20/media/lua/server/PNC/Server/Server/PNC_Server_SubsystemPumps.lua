@@ -122,6 +122,16 @@ function H.PrepareTick(now)
         nil, now)
     safeOptional("server_prepare.camp_resources",
         PNC.CampResourceService, "Pump", nil, now)
+    if PNC.Server and PNC.Server.TickRegistry then
+        PNC.Server.TickRegistry.PumpPhase("prepare", now, function(stage, fn, at)
+            local tName, tStart
+            if H.TimingSample == true and ScalingDiagnostics then
+                tName, tStart = ScalingDiagnostics.BeginTiming(stage, H.TimingNow)
+            end
+            fn(at)
+            if tName then ScalingDiagnostics.EndTiming(tName, tStart) end
+        end)
+    end
     if CampMovement and (tonumber(CampMovement.PendingCount) or 0) > 0 then
         safeOptional("server_prepare.camp_movement",
             CampMovement, "Pump", nil, now)
@@ -277,6 +287,16 @@ function H.FinishTick(now)
     end
     if PNC.SocialGreeting and PNC.SocialGreeting.Pump then
         H.SafePhase("server_finish.social_greeting", pumpSocialGreeting)
+    end
+    if PNC.Server and PNC.Server.TickRegistry then
+        PNC.Server.TickRegistry.PumpPhase("finish", now, function(stage, fn, at)
+            local tName, tStart
+            if H.TimingSample == true and ScalingDiagnostics then
+                tName, tStart = ScalingDiagnostics.BeginTiming(stage, H.TimingNow)
+            end
+            fn(at)
+            if tName then ScalingDiagnostics.EndTiming(tName, tStart) end
+        end)
     end
     if timerName then
         ScalingDiagnostics.EndTiming(timerName, timerStart)

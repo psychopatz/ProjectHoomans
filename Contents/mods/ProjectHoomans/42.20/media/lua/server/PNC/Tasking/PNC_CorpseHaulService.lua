@@ -96,11 +96,20 @@ end
 local hasWorkReconciler = PNC.WorkService
     and PNC.WorkService.ReconcileHandlers
     and PNC.WorkService.ReconcileHandlers.CORPSE_HAUL ~= nil
-if Events and Events.OnTick and not Service.TickHookRegistered
-    and not hasWorkReconciler
-then
-    Events.OnTick.Add(function() Service.Pump() end)
-    Service.TickHookRegistered = true
+if not Service.TickHookRegistered and not hasWorkReconciler then
+    local TickRegistry = PNC.Server and PNC.Server.TickRegistry
+        or require "PNC/Server/Server/PNC_Server_TickRegistry"
+    if TickRegistry and type(TickRegistry.Register) == "function" then
+        TickRegistry.Register("corpse_haul", {
+            phase = "finish",
+            priority = 60,
+            pump = function() Service.Pump() end,
+        })
+        Service.TickHookRegistered = true
+    elseif Events and Events.OnTick then
+        Events.OnTick.Add(function() Service.Pump() end)
+        Service.TickHookRegistered = true
+    end
 end
 
 return Service

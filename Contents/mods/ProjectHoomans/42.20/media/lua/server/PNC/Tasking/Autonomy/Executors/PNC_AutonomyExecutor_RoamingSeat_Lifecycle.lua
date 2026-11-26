@@ -7,8 +7,17 @@ local Internal = Service.Internal or {}
 local facilityJobs = Internal.facilityJobs
 local facilityReservations = Internal.facilityReservations
 local currentTime = Internal.currentTime
+local function activityHelpers()
+    return PNC.WorldObjects and PNC.WorldObjects.ActivityHelpers or nil
+end
 
 local function release(state, reason)
+    local helpers = activityHelpers()
+    if helpers and helpers.ReleaseReservation then
+        helpers.ReleaseReservation(
+            state, reason or "roaming_seat_stopped", facilityReservations())
+        return
+    end
     local reservations = facilityReservations()
     local id = tostring(state and state.reservationId or "")
     if id ~= "" and reservations and reservations.Release then
@@ -57,11 +66,16 @@ local function finish(record, zombie, reason, preserveIdleDwell)
     if seating and seating.RestorePosition then
         seating.RestorePosition(record, zombie, state)
     end
-    if seating and seating.ResetPath then
+    local helpers = activityHelpers()
+    if helpers and helpers.ResetPath then
+        helpers.ResetPath(record, zombie, reason or "roaming_seat_stopped", seating)
+    elseif seating and seating.ResetPath then
         seating.ResetPath(record, zombie, reason or "roaming_seat_stopped")
     end
     release(state, reason)
-    if PNC.SeatingRuntime and PNC.SeatingRuntime.LiveObjects then
+    if helpers and helpers.ClearLiveObject then
+        helpers.ClearLiveObject(PNC.SeatingRuntime, record)
+    elseif PNC.SeatingRuntime and PNC.SeatingRuntime.LiveObjects then
         PNC.SeatingRuntime.LiveObjects[tostring(record.id)] = nil
     end
     runtime.roamingSeat = nil
@@ -72,19 +86,25 @@ end
 local function stop(record, zombie, reason)
     local runtime = record and record.runtime or nil
     local state = runtime and runtime.roamingSeat or nil
-    local scene = runtime and runtime.animationScene or nil
     if not state then return false end
     state.stopRequested = true
-    if scene and scene.id == state.sceneId
-        and PNC.AnimationScenes and PNC.AnimationScenes.Interrupt
-    then
-        PNC.AnimationScenes.Interrupt(record, zombie, "movement")
-        if runtime.animationScene
-            and PNC.AnimationScenes.ClearScene
+    local helpers = activityHelpers()
+    if helpers and helpers.InterruptScene then
+        helpers.InterruptScene(
+            record, zombie, state, "movement", "roaming_seat_stop")
+    else
+        local scene = runtime and runtime.animationScene or nil
+        if scene and scene.id == state.sceneId
+            and PNC.AnimationScenes and PNC.AnimationScenes.Interrupt
         then
-            PNC.AnimationScenes.ClearScene(
-                record, zombie, "roaming_seat_stop", true
-            )
+            PNC.AnimationScenes.Interrupt(record, zombie, "movement")
+            if runtime.animationScene
+                and PNC.AnimationScenes.ClearScene
+            then
+                PNC.AnimationScenes.ClearScene(
+                    record, zombie, "roaming_seat_stop", true
+                )
+            end
         end
     end
     return finish(record, zombie, reason or "roaming_seat_stopped")

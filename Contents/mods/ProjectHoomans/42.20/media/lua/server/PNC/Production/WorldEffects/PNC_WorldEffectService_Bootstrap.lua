@@ -64,7 +64,18 @@ if Events and Events.LoadGridsquare and not Service.LoadSquareHookRegistered the
     Service.LoadSquareHookRegistered = true
 end
 
-if Events and Events.OnTick and not Service.TickHookRegistered then
-    Events.OnTick.Add(function() Service.Pump() end)
-    Service.TickHookRegistered = true
+if not Service.TickHookRegistered then
+    local TickRegistry = PNC.Server and PNC.Server.TickRegistry
+        or require "PNC/Server/Server/PNC_Server_TickRegistry"
+    if TickRegistry and type(TickRegistry.Register) == "function" then
+        TickRegistry.Register("world_effects", {
+            phase = "finish",
+            priority = 70,
+            pump = function() Service.Pump() end,
+        })
+        Service.TickHookRegistered = true
+    elseif Events and Events.OnTick then
+        Events.OnTick.Add(function() Service.Pump() end)
+        Service.TickHookRegistered = true
+    end
 end

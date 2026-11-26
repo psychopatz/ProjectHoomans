@@ -16,6 +16,7 @@ then
     PNC.ServerDebugCommandHandler.ConfigureTeleport(Teleport)
 end
 
+require "PNC/Server/Server/PNC_Server_TickRegistry"
 require "PNC/Server/Server/PNC_Server_RecordProcessing"
 require "PNC/Server/Server/PNC_Server_SafePhase"
 require "PNC/Server/Server/PNC_Server_SubsystemPumps"
