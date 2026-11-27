@@ -25,8 +25,15 @@ local function clearRuntime(record, body, reason, intent)
     if Common and Common.HaltMovement then
         Common.HaltMovement(record, body, reason or "world_item_end")
     end
-    if PNC.AnimationScenes and PNC.AnimationScenes.Interrupt and record and body then
-        PNC.AnimationScenes.Interrupt(record, body, reason or "world_item_end")
+    if PNC.AnimationScenes and record and body then
+        if type(PNC.AnimationScenes.Stop) == "function" then
+            PNC.AnimationScenes.Stop(record, body, reason or "world_item_end")
+        elseif type(PNC.AnimationScenes.Interrupt) == "function" then
+            PNC.AnimationScenes.Interrupt(record, body, reason or "world_item_end")
+        end
+    end
+    if body and PNC.Animation and type(PNC.Animation.FinishBump) == "function" then
+        PNC.Animation.FinishBump(body, true)
     end
     if record then
         if record.runtime then record.runtime.worldItem = nil end

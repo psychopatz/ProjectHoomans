@@ -27,6 +27,7 @@ local directDebugActions = {
     clear_equipment = true,
     toggle_debug = true,
     force_share_item = true,
+    force_rip_clothing = true,
     trigger_suicide = true,
 }
 

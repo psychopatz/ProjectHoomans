@@ -12,7 +12,7 @@ local Zones = PNC.WorldItemContext.Zones
 local Common = PNC.BehaviorCommon
 
 local ACTION_SCENE = {
-    rip_bandage = { id = "scavenge.rip", bump = "Making", durationMs = 1450 },
+    rip_bandage = { id = "scavenge.rip", bump = "RipSheets", durationMs = 1600 },
     corpse = { id = "scavenge.loot_low", bump = "LootLow", durationMs = 650 },
     floor = { id = "scavenge.loot_low", bump = "LootLow", durationMs = 650 },
     container = { id = "scavenge.loot", bump = "Loot", durationMs = 650 },
@@ -116,50 +116,23 @@ function Internal.WithinInteractionRadius(record, body, cand)
     return dx * dx + dy * dy <= radius * radius
 end
 
-local function attachRipHandProp(intent, body, cand)
-    if not body or not body.setPrimaryHandItem then return false end
+local function resolveRipPropFullType(cand)
     local fullType = (cand and cand.itemCtx and cand.itemCtx.fullType)
         or (cand and cand.item and safeCall(cand.item, "getFullType"))
-        or "Base.RippedSheets"
-    local prop = nil
-    if type(instanceItem) == "function" then
-        local ok, created = pcall(instanceItem, tostring(fullType))
-        if ok and created then prop = created end
-        if not prop then
-            local okFallback, fallback = pcall(instanceItem, "Base.RippedSheets")
-            if okFallback and fallback then prop = fallback end
-        end
+        or ""
+    fullType = tostring(fullType or "")
+    if fullType == "" then
+        return "Base.BurlapPiece"
     end
-    if not prop then return false end
-    intent._savedHands = {
-        primary = safeCall(body, "getPrimaryHandItem"),
-        secondary = safeCall(body, "getSecondaryHandItem"),
-    }
-    pcall(body.setPrimaryHandItem, body, prop)
-    if body.setSecondaryHandItem then
-        pcall(body.setSecondaryHandItem, body, nil)
-    end
-    if body.resetEquippedHandsModels then
-        pcall(body.resetEquippedHandsModels, body)
-    end
-    return true
+    return fullType
 end
 
-function Internal.RestoreRipHandProp(intent, record, body)
-    local saved = intent and intent._savedHands or nil
-    if not saved then return false end
-    intent._savedHands = nil
-    if not body then return false end
-    if body.setPrimaryHandItem then
-        pcall(body.setPrimaryHandItem, body, saved.primary)
+function Internal.RestoreRipHandProp(intent, record, _body)
+    if intent then
+        intent._ripPropFullType = nil
     end
-    if body.setSecondaryHandItem then
-        pcall(body.setSecondaryHandItem, body, saved.secondary)
-    end
-    if PNC.Equipment and type(PNC.Equipment.RefreshLiveHands) == "function" then
-        pcall(PNC.Equipment.RefreshLiveHands, record, body)
-    elseif body.resetEquippedHandsModels then
-        pcall(body.resetEquippedHandsModels, body)
+    if record and record.runtime then
+        record.runtime.sceneActionProps = nil
     end
     return true
 end
@@ -176,16 +149,30 @@ function Internal.BeginInteract(intent, record, body, now)
             pcall(body.faceLocation, body, cand.x + 0.5, cand.y + 0.5)
         end
     end
-    if intent.action == "rip_bandage" then
-        attachRipHandProp(intent, body, cand)
-    end
     local spec = intent.action == "rip_bandage" and ACTION_SCENE.rip_bandage
         or ACTION_SCENE[cand.sourceType] or ACTION_SCENE.container
+    local requestOptions = { reason = "world_item_" .. intent.action }
+    if intent.action == "rip_bandage" then
+        local propType = resolveRipPropFullType(cand)
+        intent._ripPropFullType = propType
+        requestOptions.propSecondary = propType
+    end
     local scenes = PNC.AnimationScenes
     if scenes and scenes.Request then
-        scenes.Request(record, body, spec.id, { reason = "world_item_" .. intent.action })
+        scenes.Request(record, body, spec.id, requestOptions)
     elseif body and PNC.Animation and PNC.Animation.PlayBump then
         PNC.Animation.PlayBump(body, record, spec.bump, { leaseUntil = now + spec.durationMs })
+        if intent.action == "rip_bandage" and type(body.playSound) == "function" then
+            pcall(body.playSound, body, "ClothesRipping")
+        end
+    end
+    if intent.action == "rip_bandage" and record then
+        record.runtime = record.runtime or {}
+        if not record.runtime.sceneActionProps then
+            record.runtime.sceneActionProps = {
+                secondary = intent._ripPropFullType,
+            }
+        end
     end
     intent.phase = "INTERACTING"
     intent.actionStartedAt = now

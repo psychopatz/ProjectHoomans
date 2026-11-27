@@ -193,7 +193,7 @@ local function buildPlan(request, context)
                         targetID = "player",
                         dynamic = true,
                         mode = "walk",
-                        stopDistance = 1.25,
+                        stopDistance = 0.65,
                     },
                 },
             },

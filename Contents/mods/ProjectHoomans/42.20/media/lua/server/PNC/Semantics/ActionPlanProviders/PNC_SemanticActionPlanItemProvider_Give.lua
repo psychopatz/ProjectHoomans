@@ -105,10 +105,14 @@ function Provider.Give.Start(plan, step, record)
         pcall(scenes.Request, record, body, "social.item_share_give", {
             reason = "semantic_give_item",
             propPrimary = selection.fullType,
+            propSecondary = selection.fullType,
         })
     elseif selection.fullType then
         record.runtime = record.runtime or {}
-        record.runtime.sceneActionProps = { primary = selection.fullType }
+        record.runtime.sceneActionProps = {
+            primary = selection.fullType,
+            secondary = selection.fullType,
+        }
     end
 
     return { complete = true, result = {

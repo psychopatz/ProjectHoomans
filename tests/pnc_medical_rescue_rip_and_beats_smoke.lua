@@ -177,24 +177,24 @@ local noRagsPlan = hooks["medical_rescue.no_rags_notice"].evaluate("medical_resc
 T.equal(noRagsPlan.opening.role, "no_rags_notice", "no_rags_notice opening role mismatch")
 T.equal(noRagsPlan.replies[1].role, "no_rags_reply", "no_rags_notice reply role mismatch")
 
-instanceItem = function(fullType) return { _type = fullType } end
 PNC.WorldItemContext = { Zones = { IsRestrictedSquare = function() return false end } }
 PNC.AnimationScenes = {
     _requested = {},
-    Request = function(rec, body, sceneId)
+    _options = {},
+    Request = function(rec, body, sceneId, opts)
         PNC.AnimationScenes._requested[#PNC.AnimationScenes._requested + 1] = sceneId
+        PNC.AnimationScenes._options[#PNC.AnimationScenes._options + 1] = opts
     end,
 }
 T.load("ProjectHoomans", "server", "PNC/WorldItems/PNC_WorldItemExecutor_Actions.lua")
 
 local prevWeapon = { _type = "Base.Crowbar" }
-local handState = { primary = prevWeapon, secondary = nil, modelResets = 0 }
+local handState = { primary = prevWeapon, secondary = nil }
 local mockBody = {
     getPrimaryHandItem = function() return handState.primary end,
     getSecondaryHandItem = function() return handState.secondary end,
     setPrimaryHandItem = function(_, item) handState.primary = item end,
     setSecondaryHandItem = function(_, item) handState.secondary = item end,
-    resetEquippedHandsModels = function() handState.modelResets = handState.modelResets + 1 end,
     faceLocation = function() end,
 }
 local ripIntent = {
@@ -204,12 +204,13 @@ local ripIntent = {
     candidate = { x = 10, y = 10, z = 0, sourceType = "corpse", itemCtx = { fullType = "Base.Tshirt_DefaultTEXTURE" } },
 }
 PNC.WorldItemExecutor.Internal.BeginInteract(ripIntent, rescuer, mockBody, nowMs)
-T.equal(handState.primary._type, "Base.Tshirt_DefaultTEXTURE", "cloth item was not shown in NPC hand while ripping")
+local lastOpts = PNC.AnimationScenes._options[#PNC.AnimationScenes._options]
 T.equal(PNC.AnimationScenes._requested[#PNC.AnimationScenes._requested], "scavenge.rip", "scavenge.rip scene was not requested")
-T.truthy(handState.modelResets >= 1, "equipped hand models were not refreshed")
+T.equal(lastOpts and lastOpts.propSecondary, "Base.Tshirt_DefaultTEXTURE", "actual clothing item was not passed as secondary ActionProp while ripping")
+T.equal(handState.primary, prevWeapon, "persistent primary hand weapon should not be mutated by rip action prop")
 
 PNC.WorldItemExecutor.Internal.RestoreRipHandProp(ripIntent, rescuer, mockBody)
-T.equal(handState.primary, prevWeapon, "previous hand item was not restored after ripping")
+T.equal(rescuer.runtime and rescuer.runtime.sceneActionProps, nil, "sceneActionProps was not cleared after ripping")
 
 -- 5. Dedicated curtain & drawer beats + curtain removal via CommitAction + base-zone guard.
 local curtainBeat = hooks["medical_rescue.no_rags_notice"].evaluate("medical_rescue.no_rags_notice", {

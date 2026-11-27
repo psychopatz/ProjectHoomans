@@ -259,6 +259,30 @@ local function handleForceShareItem(record, _, command, args)
     return true, ok == true, res
 end
 
+local function handleForceRipClothing(record, _, command, args)
+    if command ~= "force_rip_clothing" then return false end
+    local service = PNC.WorldItemService
+    if not service or type(service.RequestBandageRip) ~= "function" then
+        return true, false, "world_item_service_unavailable"
+    end
+    local ok, reason, intent = service.RequestBandageRip(record, {
+        urgent = true,
+        force = true,
+        allowRestrictedZones = true,
+        radius = tonumber(type(args) == "table" and args.radius) or 14,
+    })
+    if Core and Core.LogInfo then
+        local cand = intent and intent.candidate or nil
+        local itemType = cand and cand.itemCtx and cand.itemCtx.fullType or ""
+        Core.LogInfo("debug_force_rip_clothing npc=" .. tostring(record.id)
+            .. " ok=" .. tostring(ok == true)
+            .. " reason=" .. tostring(reason or "")
+            .. " source=" .. tostring(cand and cand.sourceType or "")
+            .. " item=" .. tostring(itemType))
+    end
+    return true, ok == true, reason
+end
+
 local function handleTriggerSuicide(record, npcId, command, args)
     if command ~= "trigger_suicide" then return false end
     local suicide = PNC.BehaviorSuicide
@@ -287,6 +311,7 @@ local HANDLERS = {
     handleEquipment,
     handleDebugToggle,
     handleForceShareItem,
+    handleForceRipClothing,
     handleTriggerSuicide,
 }
 

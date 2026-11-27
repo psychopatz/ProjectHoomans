@@ -431,22 +431,30 @@ local function playHandoverScenes(donor, recipient, fullType)
     local donorBody = reg and type(reg.GetLiveZombie) == "function" and reg.GetLiveZombie(donor.id) or nil
     local recipBody = reg and type(reg.GetLiveZombie) == "function" and reg.GetLiveZombie(recipient.id) or nil
 
+    local medInternal = PNC.MedicalCareExecutor and PNC.MedicalCareExecutor.Internal or nil
+    if medInternal and type(medInternal.AlignCloseContact) == "function"
+        and donorBody and recipBody
+    then
+        medInternal.AlignCloseContact(donor, donorBody, recipient, recipBody, 0.60)
+    end
     faceEachOther(donorBody, donor, recipBody, recipient)
 
     if scenes and type(scenes.Request) == "function" then
         pcall(scenes.Request, donor, donorBody, "social.item_share_give", {
             reason = "group_item_share",
             propPrimary = fullType,
+            propSecondary = fullType,
         })
         pcall(scenes.Request, recipient, recipBody, "social.item_share_receive", {
             reason = "group_item_share",
             propPrimary = fullType,
+            propSecondary = fullType,
         })
     else
         donor.runtime = donor.runtime or {}
-        donor.runtime.sceneActionProps = { primary = fullType }
+        donor.runtime.sceneActionProps = { primary = fullType, secondary = fullType }
         recipient.runtime = recipient.runtime or {}
-        recipient.runtime.sceneActionProps = { primary = fullType }
+        recipient.runtime.sceneActionProps = { primary = fullType, secondary = fullType }
         if scenes and type(scenes.Start) == "function" then
             pcall(scenes.Start, donor, donorBody, "social.item_share_give")
             pcall(scenes.Start, recipient, recipBody, "social.item_share_receive")

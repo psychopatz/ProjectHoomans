@@ -81,6 +81,18 @@ local function applyItemState(item, state)
     end
 end
 
+local function ensureHandStaticModel(item)
+    if not item then return end
+    local staticModel = readItem(item, "getStaticModel")
+    if staticModel and tostring(staticModel) ~= "" then return end
+    local worldStaticModel = readItem(item, "getWorldStaticItem")
+    if not worldStaticModel or tostring(worldStaticModel) == "" then return end
+    local modData = readItem(item, "getModData")
+    if type(modData) == "table" then
+        modData.staticModel = tostring(worldStaticModel)
+    end
+end
+
 local function createItem(fullType, visual, state)
     local equipment = PNC.Equipment
     local item
@@ -93,6 +105,7 @@ local function createItem(fullType, visual, state)
     if not item then return nil, reason or "action_prop_item_create_failed" end
     applyItemVisualState(item, visual)
     applyItemState(item, state)
+    ensureHandStaticModel(item)
     return item
 end
 

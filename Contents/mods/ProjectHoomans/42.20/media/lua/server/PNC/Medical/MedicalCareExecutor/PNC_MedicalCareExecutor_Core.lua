@@ -313,13 +313,57 @@ end
 function Internal.InTreatmentRange(actor, actorBody, patient, patientBody)
     local ax, ay, az = Internal.Position(actor, actorBody)
     local px, py, pz = Internal.Position(patient, patientBody)
-    -- Medics must walk right up next to the patient before beginning bandage
-    -- animations (not bandage thin air from 3 tiles away).
-    local configured = tonumber(Const and Const.BANDAGE_RANGE) or 1.35
-    local range = math.min(1.35, configured)
+    -- Medics must walk right up into arm's reach of the patient before
+    -- beginning bandage animations.
+    local configured = tonumber(Const and Const.BANDAGE_RANGE) or 1.05
+    local range = math.min(1.05, configured)
     if math.abs(az - pz) >= 1 then return false end
     return (ax - px) * (ax - px) + (ay - py) * (ay - py)
         <= range * range
+end
+
+-- Gently seats the medic at arm's-reach close contact (~0.55 tiles, similar to
+-- paired handhold choreography) so their hands actually reach the patient
+-- without clipping through walls or fences.
+function Internal.AlignCloseContact(actor, actorBody, patient, patientBody, targetDist)
+    if not actor or not actorBody or not patientBody then return false end
+    local ax, ay, az = Internal.Position(actor, actorBody)
+    local px, py, pz = Internal.Position(patient, patientBody)
+    if math.abs(az - pz) >= 1 then return false end
+    local desired = tonumber(targetDist) or 0.55
+    local dx, dy = ax - px, ay - py
+    local dist = math.sqrt((dx * dx) + (dy * dy))
+    if dist <= desired + 0.04 and dist >= desired - 0.12 then
+        return true
+    end
+    if dist < 0.001 then
+        dx, dy = 1, 0
+    else
+        dx, dy = dx / dist, dy / dist
+    end
+    local tx = px + dx * desired
+    local ty = py + dy * desired
+    local cell = type(getCell) == "function" and getCell() or nil
+    if cell and type(cell.getGridSquare) == "function" then
+        local sq = cell:getGridSquare(math.floor(tx), math.floor(ty), math.floor(az))
+        if not sq then return false end
+        if type(sq.isSolidFloor) == "function" and sq:isSolidFloor() ~= true then return false end
+        if type(sq.isFree) == "function" and sq:isFree(false) ~= true then return false end
+        local curSq = type(actorBody.getCurrentSquare) == "function"
+            and actorBody:getCurrentSquare() or nil
+        if curSq and curSq ~= sq and type(curSq.isBlockedTo) == "function"
+            and curSq:isBlockedTo(sq) == true
+        then
+            return false
+        end
+    end
+    if type(actorBody.setX) == "function" then actorBody:setX(tx) end
+    if type(actorBody.setY) == "function" then actorBody:setY(ty) end
+    if type(actorBody.setNextX) == "function" then actorBody:setNextX(tx) end
+    if type(actorBody.setNextY) == "function" then actorBody:setNextY(ty) end
+    actor.x = tx
+    actor.y = ty
+    return true
 end
 
 function Internal.InActiveTreatmentRange(actor, actorBody, patient, patientBody)

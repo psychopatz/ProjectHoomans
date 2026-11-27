@@ -31,8 +31,20 @@ Scenes.Register("scavenge.rip", {
     repeatMode = "once",
     steps = {
         { id = "grab_cloth", bump = "LootLow", durationMs = 400 },
-        { id = "rip_cloth", bump = "Making", durationMs = 1050, loop = true },
+        {
+            id = "rip_cloth",
+            bump = "RipSheets",
+            durationMs = 1200,
+            props = { fallbackSecondary = "Base.BurlapPiece" },
+        },
     },
+    onStart = function(_record, zombie, _scene, step)
+        if step and step.id == "rip_cloth"
+            and zombie and type(zombie.playSound) == "function"
+        then
+            pcall(zombie.playSound, zombie, "ClothesRipping")
+        end
+    end,
     interrupts = interrupts(),
     weight = 1,
 })

@@ -14,14 +14,117 @@ local function audit(record, eventName, route, status, reason, actorId,
     end
 end
 
-local function returnDressing(actor, fullType)
-    local inventory = PNC.Inventory
-    if not fullType or not inventory or not inventory.AddItems then return end
-    local ok, _, ids = inventory.AddItems(actor, { { type = fullType, stack = 1 } }, "root", "removed_dressing")
-    if not ok or not ids or not ids[1] then return end
+local function isDirtyDressingType(fullType)
+    local lower = string.lower(tostring(fullType or ""))
+    return string.find(lower, "dirty", 1, true) ~= nil
+end
+
+local function isCorpseObject(obj)
+    if not obj then return false end
+    if type(instanceof) == "function" then
+        local ok, matched = pcall(instanceof, obj, "IsoDeadBody")
+        if ok and matched == true then return true end
+    end
+    if obj.isDeadBody == true then return true end
+    local nameFn = obj.getObjectName or obj.getName
+    if type(nameFn) == "function" then
+        local ok, name = pcall(nameFn, obj)
+        local lo = ok and string.lower(tostring(name or "")) or ""
+        return lo == "corpse" or lo == "isodeadbody"
+    end
+    return false
+end
+
+local function findNearbyCorpseContainer(actor, body, radius)
+    local cell = type(getCell) == "function" and getCell() or nil
+    if not cell or type(cell.getGridSquare) ~= "function" then return nil end
+    local ox = body and type(body.getX) == "function" and tonumber(body:getX()) or tonumber(actor and actor.x)
+    local oy = body and type(body.getY) == "function" and tonumber(body:getY()) or tonumber(actor and actor.y)
+    local oz = body and type(body.getZ) == "function" and tonumber(body:getZ()) or tonumber(actor and actor.z) or 0
+    if ox == nil or oy == nil then return nil end
+    local bx, by, bz = math.floor(ox), math.floor(oy), math.floor(oz)
+    local r = math.max(1, math.min(6, math.floor(tonumber(radius) or 4)))
+    local bestContainer, bestDistSq = nil, nil
+
+    local function checkList(list, dSq)
+        if not list then return end
+        local count = type(list.size) == "function" and list:size() or (type(list) == "table" and #list or 0)
+        local isJava = type(list.size) == "function" and type(list.get) == "function"
+        local startIdx = isJava and 0 or 1
+        local endIdx = isJava and (count - 1) or count
+        for i = startIdx, endIdx do
+            local obj = isJava and list:get(i) or list[i]
+            if isCorpseObject(obj) and type(obj.getContainer) == "function" then
+                local ok, cont = pcall(obj.getContainer, obj)
+                if ok and cont and type(cont.AddItem) == "function" then
+                    if not bestDistSq or dSq < bestDistSq then
+                        bestContainer, bestDistSq = cont, dSq
+                    end
+                    return
+                end
+            end
+        end
+    end
+
+    for dx = -r, r do
+        for dy = -r, r do
+            local dSq = dx * dx + dy * dy
+            if dSq <= r * r and (not bestDistSq or dSq < bestDistSq) then
+                local sq = cell:getGridSquare(bx + dx, by + dy, bz)
+                if sq then
+                    if type(sq.getStaticMovingObjects) == "function" then
+                        checkList(sq:getStaticMovingObjects(), dSq)
+                    end
+                    if not bestDistSq or dSq < bestDistSq then
+                        if type(sq.getObjects) == "function" then
+                            checkList(sq:getObjects(), dSq)
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return bestContainer
+end
+
+-- Unified removed-dressing handler (used by both bandage swaps and healed
+-- dressing removal): disposes dirty rags/bandages onto a nearby zombie corpse
+-- so PZ's corpse decay garbage-collects them automatically; falls back to NPC
+-- inventory for clean items or when no corpse is nearby.
+function Treatment.DisposeRemovedDressing(actor, fullType, body)
+    if not actor or not fullType or tostring(fullType) == ""
+        or tostring(fullType) == "PNC.AbstractMedical"
+    then
+        return false, "no_item"
+    end
     local registry = PNC.Registry
-    local body = registry and registry.GetLiveZombie and registry.GetLiveZombie(actor.id)
-    if body and inventory.MaterializeItem then inventory.MaterializeItem(actor, body, ids[1]) end
+    body = body or (registry and registry.GetLiveZombie and registry.GetLiveZombie(actor.id)) or nil
+    if isDirtyDressingType(fullType) then
+        local corpseCont = findNearbyCorpseContainer(actor, body, 4)
+        if corpseCont then
+            local okAdd, addedItem = pcall(corpseCont.AddItem, corpseCont, tostring(fullType))
+            if okAdd and addedItem ~= nil then
+                if type(isServer) == "function" and isServer() == true
+                    and type(sendAddItemToContainer) == "function"
+                then
+                    pcall(sendAddItemToContainer, corpseCont, addedItem)
+                end
+                return true, "disposed_on_corpse"
+            end
+        end
+    end
+    local inventory = PNC.Inventory
+    if not inventory or not inventory.AddItems then return false, "inventory_unavailable" end
+    local ok, _, ids = inventory.AddItems(actor, { { type = fullType, stack = 1 } }, "root", "removed_dressing")
+    if not ok or not ids or not ids[1] then return false, "add_failed" end
+    if body and inventory.MaterializeItem then
+        inventory.MaterializeItem(actor, body, ids[1])
+    end
+    return true, "returned_to_inventory"
+end
+
+local function returnDressing(actor, fullType)
+    return Treatment.DisposeRemovedDressing(actor, fullType, nil)
 end
 
 function Treatment.TryNPCMedicalTreatment(actorRecord, targetRecord,

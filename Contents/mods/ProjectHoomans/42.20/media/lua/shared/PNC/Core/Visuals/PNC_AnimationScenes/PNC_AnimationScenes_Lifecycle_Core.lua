@@ -215,6 +215,7 @@ function Scenes.ClearScene(record, zombie, reason, release, options)
         preservedOwner = preserveOwner,
     }
     runtime.animationScene = nil
+    runtime.sceneActionProps = nil
     Internal.ClearLocalSceneKey(zombie)
     if release == true
         and zombie

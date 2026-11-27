@@ -231,6 +231,9 @@ local function beginTreatment(lease, task, record, body, patient, patientBody, n
     record.activeBehavior = "MedicalCare"
     record.runtime.tacticalState = "medical_care"
     Common.HaltMovement(record, body, "medical_care_treating")
+    if Internal.AlignCloseContact then
+        Internal.AlignCloseContact(record, body, patient, patientBody, 0.55)
+    end
     holdPatientForTreatment(record, body, task, patient, patientBody, state.finishAt)
     Internal.Face(body, patientBody)
     if body and body.setVariable then
@@ -405,6 +408,9 @@ function Executor.Tick(lease)
             end
             Internal.Face(patientBody, body)
         end
+        if Internal.AlignCloseContact then
+            Internal.AlignCloseContact(record, body, patient, patientBody, 0.55)
+        end
         Internal.Face(body, patientBody)
         if now < (tonumber(state.finishAt) or 0) then
             if Animation and Animation.MaintainBump then
@@ -446,7 +452,7 @@ function Executor.Tick(lease)
     setLeasePhase(lease, "TRAVEL")
     moved, movement = Common.MoveRecord(record, body,
         patientBody:getX(), patientBody:getY(), patientBody:getZ(),
-        "walk", 0.85, "medical_care")
+        "walk", 0.55, "medical_care")
     if not moved then return false, movement or "medical_move_failed" end
     state.lastObservedAt = now
     local x, y, z = body:getX(), body:getY(), body:getZ()

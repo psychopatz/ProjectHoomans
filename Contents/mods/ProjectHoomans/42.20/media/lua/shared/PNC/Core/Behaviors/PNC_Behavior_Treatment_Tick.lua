@@ -23,6 +23,15 @@ local tickAbstract = H.tickAbstract
 local requiresMedicalItem = H.requiresMedicalItem
 
 local function returnRecoveredItems(record, zombie, itemsToAdd)
+    local treatment = PNC.Treatment
+    if treatment and type(treatment.DisposeRemovedDressing) == "function" then
+        for _, fullType in ipairs(itemsToAdd) do
+            if type(fullType) == "string" and fullType ~= "" and fullType ~= "PNC.AbstractMedical" then
+                treatment.DisposeRemovedDressing(record, fullType, zombie)
+            end
+        end
+        return
+    end
     local inventory = PNC.Inventory
     if not inventory or not inventory.AddItems then return end
     local specs = {}

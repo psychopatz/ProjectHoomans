@@ -289,6 +289,30 @@ Status.Register("combat", 90, function(record)
     end
 end)
 
+Status.Register("medical_care", 86, function(record)
+    local mc = record and record.runtime and record.runtime.medicalCare or nil
+    if type(mc) ~= "table" then return nil end
+    local phase = tostring(mc.phase or "")
+    if phase ~= "treating" and phase ~= "traveling" then return nil end
+    local patientName = "ally"
+    if mc.patientKind == "player" then
+        patientName = "player"
+    elseif mc.patientId ~= nil and PNC.Registry and PNC.Registry.Get then
+        local pat = PNC.Registry.Get(mc.patientId)
+        if type(pat) == "table" then
+            patientName = tostring(pat.displayName or pat.name or pat.fullName or "ally")
+        end
+    end
+    local label = phase == "treating"
+        and ("Bandaging " .. patientName)
+        or ("Going to bandage " .. patientName)
+    return activity("medical_care", nil, label, {
+        phase = phase == "traveling" and "TRAVELLING" or nil,
+        activityItemFullType = mc.bandageType,
+        activityItemLabel = mc.bandageName,
+    })
+end)
+
 Status.Register("treatment", 85, function(record)
     local treatment = PNC.BehaviorTreatment
         and PNC.BehaviorTreatment.BuildSnapshot
@@ -302,6 +326,22 @@ Status.Register("treatment", 85, function(record)
             activityItemLabel = treatment.bandageName,
         }
     end
+end)
+
+Status.Register("social_handover", 83, function(record)
+    local rt = record and record.runtime or nil
+    local scene = rt and rt.animationScene or nil
+    if type(scene) ~= "table" then return nil end
+    local sid = tostring(scene.id or "")
+    if sid ~= "social.item_share_give" and sid ~= "social.item_share_receive" then
+        return nil
+    end
+    local props = rt.sceneActionProps
+    local itemFT = type(props) == "table" and (props.secondary or props.primary) or nil
+    return activity("item_share", nil,
+        sid == "social.item_share_give" and "Giving Item" or "Receiving Item", {
+            activityItemFullType = itemFT,
+        })
 end)
 
 Status.Register("facility_activity", 80, function(record)
