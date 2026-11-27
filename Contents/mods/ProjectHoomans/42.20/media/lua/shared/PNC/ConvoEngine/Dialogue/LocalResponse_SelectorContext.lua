@@ -119,7 +119,35 @@ local function selectorContext(ir, state, context)
         isBitten = injury.isBitten,
         hasOpenWounds = injury.hasOpenWounds,
         relationshipAttitude = social.attitude,
-        socialStyle = context.socialStyle or social.style,
+        socialStyle = (function()
+            local base = context.socialStyle or social.style
+            local sc = type(ir) == "table" and type(ir.socialContext) == "table"
+                and ir.socialContext or nil
+            if not sc then return base end
+            local tone = tostring(sc.playerTone or "neutral")
+            if sc.selfDirected ~= true and (sc.playerRude == true or tone == "hostile") then
+                if base == nil or base == "neutral" or base == "warm" or base == "friendly" then
+                    return "guarded"
+                end
+            elseif sc.playerShouting == true or tone == "urgent" then
+                if base == nil or base == "neutral" then
+                    return "terse"
+                end
+            elseif sc.playerPolite == true then
+                if base == nil or base == "neutral" then
+                    return "warm"
+                end
+            end
+            return base
+        end)(),
+        playerTone = type(ir) == "table" and type(ir.socialContext) == "table"
+            and ir.socialContext.playerTone or nil,
+        playerRude = type(ir) == "table" and type(ir.socialContext) == "table"
+            and ir.socialContext.playerRude == true or false,
+        playerShouting = type(ir) == "table" and type(ir.socialContext) == "table"
+            and ir.socialContext.playerShouting == true or false,
+        playerPolite = type(ir) == "table" and type(ir.socialContext) == "table"
+            and ir.socialContext.playerPolite == true or false,
         hostilityCount = hostilityCount,
         insultCount = insultCount,
         lastSpeechAct = lastSpeechAct,

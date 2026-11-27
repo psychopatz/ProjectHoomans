@@ -97,6 +97,7 @@ function Lifecycle.Register()
             label = "UI_PNC_PBrainZ_TalkKey",
             tooltip = "UI_PNC_PBrainZ_TalkTooltip",
             defaultKey = resolveSlashKeyCode(),
+            deprecatedDefaultKey = (Keyboard and tonumber(Keyboard.KEY_V)) or 47,
             isEnabled = function()
                 if State.suppressReopenUntilRelease then
                     if isToggleKeyDown() then return false end

@@ -12,6 +12,7 @@ local Core = PNC.Core
 local Perception = PNC.Perception
 local Stealth = PNC.Stealth
 local BehaviorCombat = PNC.BehaviorCombat
+local TravelTactics = require "PNC/Core/Behaviors/PNC_Behavior_Travel_Tactics"
 local TRAVEL_NAVIGATION = {
     navigationPolicy = "travel",
 }
@@ -89,6 +90,36 @@ function Travel.Tick(record, zombie, _, _)
     )
     record.activeBehavior = "Travel:" .. tostring(state or journey.state)
     if state == "en_route" and target then
+        local tactics = TravelTactics and TravelTactics.Evaluate
+            and TravelTactics.Evaluate(record, zombie, target, now)
+            or { action = "proceed" }
+        if tactics.action == "engage" and tactics.combatTarget
+            and BehaviorCombat and BehaviorCombat.TickEngage
+        then
+            if Stealth and Stealth.SetTravelCombatActive then
+                Stealth.SetTravelCombatActive(record, zombie, true)
+            end
+            Common.SetCombatTarget(record, tactics.combatTarget, "travel_proactive_threat")
+            record.activeBehavior = "Travel:Combat:Proactive"
+            BehaviorCombat.TickEngage(record, zombie, tactics.combatTarget)
+            return true
+        elseif (tactics.action == "flank" or tactics.action == "flee")
+            and tactics.moveX and tactics.moveY
+        then
+            record.activeBehavior = tactics.action == "flee" and "Travel:Flee" or "Travel:Flank"
+            Common.MoveRecord(
+                record,
+                zombie,
+                tactics.moveX,
+                tactics.moveY,
+                tactics.moveZ or target.z,
+                tactics.mode or "run",
+                2.0,
+                "journey_" .. tactics.action .. ":" .. tostring(journey.journeyId),
+                TRAVEL_NAVIGATION
+            )
+            return true
+        end
         travelStealth = Stealth
             and Stealth.UpdateTravelState
             and Stealth.UpdateTravelState(record, zombie, now)

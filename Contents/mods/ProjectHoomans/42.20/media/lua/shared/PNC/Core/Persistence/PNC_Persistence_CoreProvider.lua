@@ -1819,12 +1819,24 @@ function Adapter.QueryPromotionCandidates(players, radius, now, core)
         end
     end
 
+    local auditDiag = PNC.PerformanceScalingDiagnostics
+    local auditEnabled = auditDiag
+        and type(auditDiag.IsPresenceTraversalAuditEnabled) == "function"
+        and auditDiag.IsPresenceTraversalAuditEnabled() == true
+        and type(auditDiag.LogPresenceTraversal) == "function"
+    local spatialHitsCount = 0
+    local worldGroupsCount = 0
+    local journeyGroupsCount = 0
+    local skippedDetails = nil
+    if auditEnabled then skippedDetails = {} end
+
     if type(reg.QueryNearPosition) == "function" then
         for _, player in ipairs(players) do
             if player and type(player.getX) == "function" then
                 local hits = reg:QueryNearPosition(
                     player:getX(), player:getY(), radius
                 )
+                spatialHitsCount = spatialHitsCount + #hits
                 for i = 1, #hits do
                     local hit = hits[i]
                     if not promotedData[hit.actorId] then
@@ -1839,43 +1851,81 @@ function Adapter.QueryPromotionCandidates(players, radius, now, core)
 
     local worldAuthority = PNC.CoreSurvivorWorldAuthority
     local worldRegistry = worldAuthority and worldAuthority.Registry or nil
+    local auditWorldHour = nil
     if worldRegistry and type(worldRegistry.ListGroups) == "function"
         and type(worldRegistry.ProjectGroupMemberPosition) == "function"
     then
+        -- ProjectGroupMemberPosition expects worldAgeHours, NOT real-time ms!
+        local worldHour = nil
+        if getGameTime and getGameTime() and getGameTime().getWorldAgeHours then
+            worldHour = tonumber(getGameTime():getWorldAgeHours())
+        end
+        if worldHour == nil and PNC.Travel and PNC.Travel.Service
+            and type(PNC.Travel.Service.WorldHour) == "function"
+        then
+            worldHour = tonumber(PNC.Travel.Service.WorldHour())
+        end
+        if worldHour == nil then
+            local n = tonumber(now) or 0
+            -- Guard against callers passing real-time milliseconds (> 1e9).
+            worldHour = n < 100000000 and n or 0
+        end
+        auditWorldHour = worldHour
         local groupRadiusSq = (radius + 24) * (radius + 24)
-        for _, group in ipairs(worldRegistry:ListGroups()) do
-            if type(group.journey) == "table"
-                and type(group.memberActorIDs) == "table"
-                and #group.memberActorIDs > 0
-            then
-                local nearAnyPlayer = false
-                for _, memberID in ipairs(group.memberActorIDs) do
-                    local id = tostring(memberID)
-                    if not promotedData[id] then
-                        local actor = reg.records and reg.records[id]
-                            or (type(reg.Get) == "function" and reg:Get(id))
-                        if actor then
-                            local projectedPos = worldRegistry:ProjectGroupMemberPosition(
-                                group.id, id, actor.world, now
-                            )
-                            if type(projectedPos) == "table"
-                                and tonumber(projectedPos.x)
-                                and tonumber(projectedPos.y)
-                            then
-                                for _, player in ipairs(players) do
-                                    local dx = tonumber(projectedPos.x) - player:getX()
-                                    local dy = tonumber(projectedPos.y) - player:getY()
-                                    local d2 = dx * dx + dy * dy
-                                    if d2 <= groupRadiusSq then
-                                        nearAnyPlayer = true
+        local listedGroups = worldRegistry:ListGroups()
+        worldGroupsCount = #listedGroups
+        for _, group in ipairs(listedGroups) do
+            if type(group.journey) == "table" then
+                journeyGroupsCount = journeyGroupsCount + 1
+                local members = type(group.memberActorIDs) == "table" and group.memberActorIDs or {}
+                if #members == 0 and skippedDetails and #skippedDetails < 6 then
+                    skippedDetails[#skippedDetails + 1] = tostring(group.id) .. ":no_members"
+                elseif #members > 0 then
+                    local nearAnyPlayer = false
+                    for _, memberID in ipairs(members) do
+                        local id = tostring(memberID)
+                        if not promotedData[id] then
+                            local actor = reg.records and reg.records[id]
+                                or (type(reg.Get) == "function" and reg:Get(id))
+                            if actor then
+                                local projectedPos = worldRegistry:ProjectGroupMemberPosition(
+                                    group.id, id, actor.world, worldHour
+                                )
+                                if type(projectedPos) == "table"
+                                    and tonumber(projectedPos.x)
+                                    and tonumber(projectedPos.y)
+                                then
+                                    local minD2 = math.huge
+                                    for _, player in ipairs(players) do
+                                        local dx = tonumber(projectedPos.x) - player:getX()
+                                        local dy = tonumber(projectedPos.y) - player:getY()
+                                        local d2 = dx * dx + dy * dy
+                                        if d2 < minD2 then minD2 = d2 end
+                                        if d2 <= groupRadiusSq then
+                                            nearAnyPlayer = true
+                                        end
+                                        if d2 <= radiusSq then
+                                            considerActor(actor, d2)
+                                            if byID[id] then
+                                                byID[id].projectedX = tonumber(projectedPos.x)
+                                                byID[id].projectedY = tonumber(projectedPos.y)
+                                                byID[id].projectedZ = tonumber(projectedPos.z) or 0
+                                            end
+                                        end
                                     end
-                                    if d2 <= radiusSq then
-                                        considerActor(actor, d2)
+                                    if not nearAnyPlayer then
+                                        if skippedDetails and #skippedDetails < 6 and minD2 <= (radius * 3) * (radius * 3) then
+                                            skippedDetails[#skippedDetails + 1] = tostring(group.id)
+                                                .. ":dist=" .. tostring(math.floor(math.sqrt(minD2)))
+                                                .. "@(" .. tostring(math.floor(projectedPos.x)) .. "," .. tostring(math.floor(projectedPos.y)) .. ")"
+                                        end
+                                        break
                                     end
+                                elseif skippedDetails and #skippedDetails < 6 then
+                                    skippedDetails[#skippedDetails + 1] = tostring(group.id) .. ":no_proj"
                                 end
-                                if not nearAnyPlayer then
-                                    break
-                                end
+                            elseif skippedDetails and #skippedDetails < 6 then
+                                skippedDetails[#skippedDetails + 1] = tostring(group.id) .. ":actor_missing(" .. id .. ")"
                             end
                         end
                     end
@@ -1894,6 +1944,22 @@ function Adapter.QueryPromotionCandidates(players, radius, now, core)
         end
         return left.distSq < right.distSq
     end)
+    if auditEnabled then
+        local nowMs = tonumber(now) or (PNC.Core and PNC.Core.Now and PNC.Core.Now()) or 0
+        if (nowMs - (tonumber(Adapter._lastPromoAuditAt) or 0)) >= 2000 or #ordered > 0 then
+            Adapter._lastPromoAuditAt = nowMs
+            auditDiag.LogPresenceTraversal("core_promotion_scan", {
+                "players=" .. tostring(#players),
+                "radius=" .. tostring(radius),
+                "worldHour=" .. tostring(auditWorldHour or "nil"),
+                "spatialHits=" .. tostring(spatialHitsCount),
+                "worldGroups=" .. tostring(worldGroupsCount),
+                "journeyGroups=" .. tostring(journeyGroupsCount),
+                "matched=" .. tostring(#ordered),
+                "skipped=" .. (skippedDetails and #skippedDetails > 0 and table.concat(skippedDetails, ",") or "none"),
+            })
+        end
+    end
     return ordered
 end
 

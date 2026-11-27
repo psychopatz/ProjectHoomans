@@ -62,24 +62,11 @@ function DebugMap.ToggleRawEntities()
     return DebugMap.ShowRawEntities
 end
 
-if Hub and type(Hub.RegisterTool) == "function" then
-    Hub.RegisterTool({
-        id = "pnc.map.raw_entities",
-        title = text("UI_PNC_DebugDiscoveryShowRaw",
-            "Hoomans Entity Overlays"),
-        description = text("UI_PNC_DebugDiscoveryRawHelp",
-            "Show or hide undiscovered Project Hoomans entities on the map."),
-        source = "Project Hoomans",
-        surface = "map",
-        menuTitle = menuTitle,
-        menuTooltip = function()
-            return text("UI_PNC_DebugDiscoveryRawHelp",
-                "Show or hide undiscovered Project Hoomans entities on the map.")
-        end,
-        order = 80,
-        available = canDebug,
-        action = function() return DebugMap.ToggleRawEntities() end,
-    })
+-- Core's "SURVIVOR OVERLAYS" button (psychopatz.map.actor_debug_presentation)
+-- is the single canonical toggle for debug map presentation. Remove any stale
+-- duplicate Hoomans button registration on reload.
+if Hub and type(Hub.UnregisterTool) == "function" then
+    Hub.UnregisterTool("pnc.map.raw_entities")
 end
 
 return DebugMap

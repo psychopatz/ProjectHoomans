@@ -54,7 +54,10 @@ function Groups.ImportMobileFaction(factionOrID, options)
             existing.ambientObjective = objective
             H.Touch(existing, "mobile_ambient_import")
         end
-        Groups.ReconcileMembers(existing, faction)
+        local _, reconcileReason = Groups.ReconcileMembers(existing, faction)
+        if reconcileReason == "dissolved_empty" then
+            return nil, "empty_mobile_faction"
+        end
         -- Relocation updates the faction site and member records first. Keep
         -- the abstract group anchor in sync as well, otherwise discovery can
         -- continue pointing at the previous site after a mobile move.
@@ -75,6 +78,9 @@ function Groups.ImportMobileFaction(factionOrID, options)
         return existing, "existing"
     end
     local ids = H.MemberIDs(faction)
+    if #ids == 0 then
+        return nil, "empty_mobile_faction"
+    end
     local group, createReason = Groups.Create({
         id = options.groupID
             or ("agroup_" .. tostring(faction.id)),

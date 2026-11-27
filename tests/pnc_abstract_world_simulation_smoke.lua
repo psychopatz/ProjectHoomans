@@ -113,8 +113,8 @@ local function npc(id, factionValue, role, weapon, health)
 end
 local function group(id, factionValue, groupType, location, resources, memberIds)
     return T.truthy(PNC.AbstractGroups.Create({ id = id, factionId = factionValue.id,
-        groupType = groupType, memberIds = memberIds or {}, mission = "SCAVENGE",
-        state = "IDLE", location = PNC.AbstractLocations.Ref(location),
+        groupType = groupType, memberIds = memberIds or {}, allowEmpty = #(memberIds or {}) == 0,
+        mission = "SCAVENGE", state = "IDLE", location = PNC.AbstractLocations.Ref(location),
         resources = resources or {}, morale = 0.65 }))
 end
 

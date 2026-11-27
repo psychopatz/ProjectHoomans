@@ -525,6 +525,17 @@ local bareNameDecision = Policy.Decide(bareNameIR, state, {
 T.equal(bareNameDecision.branch, "IDENTITY_CLAIM_RECEIVED",
     "bare name during pendingIdentityExchange routes to IDENTITY_CLAIM_RECEIVED")
 
+-- Tone-reactive SelectorContext nudges neutral style based on player tone:
+local LocalResponse = PNC.ConvoEngine.LocalResponse
+local selCtx = LocalResponse and LocalResponse.Internal and LocalResponse.Internal.SelectorContext
+T.truthy(type(selCtx) == "function", "SelectorContext is available")
+local politeCtx = selCtx({ socialContext = { playerTone = "polite", playerPolite = true } }, state, { npcID = "npc:jordan" })
+T.equal(politeCtx.socialStyle, "warm", "polite player tone nudges neutral style to warm")
+local shoutCtx = selCtx({ socialContext = { playerTone = "urgent", playerShouting = true } }, state, { npcID = "npc:jordan" })
+T.equal(shoutCtx.socialStyle, "terse", "shouting/urgent player tone nudges neutral style to terse")
+local rudeCtx = selCtx({ socialContext = { playerTone = "hostile", playerRude = true } }, state, { npcID = "npc:jordan" })
+T.equal(rudeCtx.socialStyle, "guarded", "rude player tone nudges neutral style to guarded")
+
 -- Negative-control guardrails: gibberish & unrelated chatter must NOT trigger actions or intents.
 local negativeControls = {
     "asdfghjkl qwerty",

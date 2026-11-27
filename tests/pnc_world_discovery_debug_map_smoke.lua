@@ -114,17 +114,11 @@ map.psychopatzMapToolsButton.onclick()
 local menu = PNC.MapHoomansMenu.instance
 T.falsy(menu and menu.entryButtons["ProjectHoomans:raw_entities"],
     "raw-overlay debug leaked into the shared map menu")
-local rawButton = T.truthy(debugTools["pnc.map.raw_entities"],
-    "Debug Hub did not receive the raw-overlay entry")
-T.equal(rawButton.surface, "map",
-    "raw-overlay entry was not scoped to the map debug surface")
+T.falsy(debugTools["pnc.map.raw_entities"],
+    "duplicate Hoomans raw-overlay button should not clutter the Core map debug menu")
 T.equal(PNC.MapRawEntityDebug.ShowRawEntities, false,
     "undiscovered debug overlays start hidden")
-T.equal(rawButton.menuTitle(), "HOOMANS ENTITY OVERLAYS: OFF",
-    "raw-overlay menu did not expose its OFF state")
-rawButton.action()
+PNC.MapRawEntityDebug.ToggleRawEntities()
 T.equal(PNC.MapRawEntityDebug.ShowRawEntities, true,
-    "raw overlays require an explicit shared-menu toggle")
-T.equal(rawButton.menuTitle(), "HOOMANS ENTITY OVERLAYS: ON",
-    "raw-overlay menu did not expose its ON state")
+    "compatibility toggle shim still enables raw entity overlays")
 T.finish("pnc_world_discovery_debug_map_smoke")

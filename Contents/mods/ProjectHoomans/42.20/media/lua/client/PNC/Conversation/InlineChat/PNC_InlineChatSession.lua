@@ -85,7 +85,12 @@ function InlineChat.Close(reason)
     State.recoveryDeadlineAt = nil
     State.nextRecoveryAt = nil
     State.focusAfterTriggerRelease = false
+    State.pendingInitialFocus = false
     State.triggerBinding = nil
+    if reason ~= "toggle_keybind" then
+        State.toggleKeyHeld = false
+        State.suppressReopenUntilRelease = false
+    end
     return true
 end
 

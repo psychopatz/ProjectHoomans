@@ -121,7 +121,7 @@ T.equal(group.mission, "SCAVENGE", "mission preserved during travel")
 T.truthy(group.stateEndsAt > worldHour, "travel timer assigned")
 
 local refugee = T.truthy(PNC.AbstractGroups.Create({ id = "agroup_refugee",
-    groupType = "REFUGEE", memberIds = {}, mission = "IDLE", state = "IDLE",
+    groupType = "REFUGEE", memberIds = {}, allowEmpty = true, mission = "IDLE", state = "IDLE",
     location = PNC.AbstractLocations.Ref(store), resources = {} }))
 T.equal(#PNC.AbstractLocations.GetGroupOccupants(store), 1,
     "occupancy registered")

@@ -238,6 +238,19 @@ function Extension.Encode(record, actor)
             record.ownerCharacterUUID, MAX_STRING_LEN
         ))
     end
+    if type(record.sosState) == "table" and record.sosState.active == true then
+        put("sosState", {
+            active = true,
+            x = tonumber(record.sosState.x) or 0,
+            y = tonumber(record.sosState.y) or 0,
+            z = tonumber(record.sosState.z) or 0,
+            refugeKind = boundedString(record.sosState.refugeKind, 24) or "area",
+            shelteredInBuilding = record.sosState.shelteredInBuilding == true,
+            at = tonumber(record.sosState.at) or 0,
+            cause = boundedString(record.sosState.cause, 48) or "off_camera_hazard",
+            itemsLost = math.max(0, math.floor(tonumber(record.sosState.itemsLost) or 0)),
+        })
+    end
 
     local isEphemeralOrder = type(record.orderSpec) == "table"
         and record.orderSpec.ephemeralDefault == true
@@ -471,6 +484,9 @@ function Extension.Apply(record, ext)
     end
     if type(ext.jobPriorities) == "table" then
         record.jobPriorities = deepCopy(ext.jobPriorities)
+    end
+    if type(ext.sosState) == "table" and ext.sosState.active == true then
+        record.sosState = deepCopy(ext.sosState)
     end
 
     if type(ext.progression) == "table" then

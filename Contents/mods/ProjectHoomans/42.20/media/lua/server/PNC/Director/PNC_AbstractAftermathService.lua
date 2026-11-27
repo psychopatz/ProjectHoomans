@@ -1,6 +1,6 @@
--- Server-authoritative off-camera aftermath/loot site registry and radio
--- broadcast publisher. Keeps outcomes hidden from the normal map while
--- airing immersive radio reports through PsychopatzCore.RadioBroadcasts.
+-- Server-authoritative off-camera aftermath/loot site adapter and radio
+-- broadcast publisher backed by the canonical PsychopatzCore.SurvivorWorld.Events
+-- ledger (persisted in Store.Registry.survivorWorldEvents for reload durability).
 
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode()
@@ -13,13 +13,14 @@ PNC.AbstractAftermathService = PNC.AbstractAftermathService or {}
 
 local Aftermath = PNC.AbstractAftermathService
 local Store = PNC.HoomansWorldView
+local WorldEvents = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldEvents"
 
 Aftermath.Sites = Aftermath.Sites or {}
 Aftermath.RecentBroadcasts = Aftermath.RecentBroadcasts or {}
 Aftermath.MAX_SITES = 16
 Aftermath.MAX_BROADCASTS = 24
 Aftermath.DEFAULT_TTL_HOURS = 48
-Aftermath._serial = Aftermath._serial or 0
 
 local function nowHours(at)
     if tonumber(at) then return tonumber(at) end
@@ -27,6 +28,58 @@ local function nowHours(at)
         return tonumber(Store.WorldAgeHours()) or 0
     end
     return 0
+end
+
+local function syncSitesCache()
+    local events = WorldEvents.List({ ownerMod = "ProjectHoomans" })
+    local list = {}
+    for i = 1, #events do
+        local ev = events[i]
+        local p = type(ev.payload) == "table" and ev.payload or {}
+        list[#list + 1] = {
+            id = ev.id,
+            kind = ev.kind,
+            x = ev.x,
+            y = ev.y,
+            z = ev.z or 0,
+            npcId = p.npcId,
+            npcName = p.npcName,
+            refugeKind = p.refugeKind,
+            cause = p.cause or "off_camera_encounter",
+            lootTier = p.lootTier or "standard",
+            lootClaimed = p.lootClaimed == true,
+            createdAt = ev.createdAt,
+            expiresAt = ev.expiresAt,
+            summary = ev.summary,
+        }
+    end
+    while #list > Aftermath.MAX_SITES do
+        table.remove(list, 1)
+    end
+    Aftermath.Sites = list
+    return list
+end
+
+function Aftermath.SyncToStore()
+    if Store and type(Store.Registry) == "table" then
+        Store.Registry.survivorWorldEvents = WorldEvents.ExportSnapshot()
+        if type(Store.Touch) == "function" then
+            Store.Touch("survivor_world_events_updated")
+        end
+        return true
+    end
+    return false
+end
+
+function Aftermath.RestoreFromStore(at)
+    local now = nowHours(at)
+    if Store and type(Store.Registry) == "table"
+        and type(Store.Registry.survivorWorldEvents) == "table"
+    then
+        WorldEvents.RestoreSnapshot(Store.Registry.survivorWorldEvents, now)
+    end
+    syncSitesCache()
+    return #Aftermath.Sites
 end
 
 local function approxCoordsLabel(x, y)
@@ -40,7 +93,8 @@ local function buildRadioText(event)
     local loc = approxCoordsLabel(event and event.x, event and event.y)
     if kind == "COLONIST_SOS" then
         local name = tostring(event.npcName or event.npcId or "A survivor")
-        return name .. " broadcast an SOS near " .. loc .. " after an ambush."
+        local refuge = tostring(event.refugeKind or "area")
+        return name .. " broadcast an SOS from a " .. refuge .. " near " .. loc .. "."
     elseif kind == "COLONIST_DEAD" then
         local name = tostring(event.npcName or event.npcId or "A survivor")
         return "Radio silence from " .. name .. " near " .. loc .. " — gear may still be out there."
@@ -52,17 +106,11 @@ end
 
 function Aftermath.PruneExpired(at)
     local now = nowHours(at)
-    local kept = {}
-    local removed = 0
-    for i = 1, #Aftermath.Sites do
-        local site = Aftermath.Sites[i]
-        if type(site) == "table" and (tonumber(site.expiresAt) or 0) > now and site.lootClaimed ~= true then
-            kept[#kept + 1] = site
-        else
-            removed = removed + 1
-        end
+    local removed = WorldEvents.PruneExpired(now)
+    syncSitesCache()
+    if removed > 0 then
+        Aftermath.SyncToStore()
     end
-    Aftermath.Sites = kept
     return removed
 end
 
@@ -72,29 +120,33 @@ function Aftermath.RegisterSite(spec, at)
     local y = tonumber(spec.y)
     if x == nil or y == nil then return nil, "coords_required" end
     local now = nowHours(at)
-    Aftermath.PruneExpired(now)
-    Aftermath._serial = Aftermath._serial + 1
     local ttl = math.max(1, tonumber(spec.ttlHours) or Aftermath.DEFAULT_TTL_HOURS)
-    local site = {
-        id = "aftermath_" .. tostring(Aftermath._serial),
+    local ev, err = WorldEvents.Publish({
         kind = tostring(spec.kind or "SKIRMISH"),
-        x = math.floor(x + 0.5),
-        y = math.floor(y + 0.5),
+        ownerMod = "ProjectHoomans",
+        x = x,
+        y = y,
         z = tonumber(spec.z) or 0,
-        npcId = spec.npcId,
-        npcName = spec.npcName,
-        cause = tostring(spec.cause or "off_camera_encounter"),
-        lootTier = tostring(spec.lootTier or "standard"),
-        lootClaimed = false,
-        createdAt = now,
-        expiresAt = now + ttl,
+        radius = tonumber(spec.radius) or 48,
+        ttlHours = ttl,
         summary = tostring(spec.summary or buildRadioText(spec)),
-    }
-    Aftermath.Sites[#Aftermath.Sites + 1] = site
-    while #Aftermath.Sites > Aftermath.MAX_SITES do
-        table.remove(Aftermath.Sites, 1)
-    end
-    return site
+        tags = {
+            aftermath = true,
+            refugeKind = spec.refugeKind,
+        },
+        payload = {
+            npcId = spec.npcId,
+            npcName = spec.npcName,
+            refugeKind = spec.refugeKind,
+            cause = tostring(spec.cause or "off_camera_encounter"),
+            lootTier = tostring(spec.lootTier or "standard"),
+            lootClaimed = false,
+        },
+    }, now)
+    if not ev then return nil, err end
+    syncSitesCache()
+    Aftermath.SyncToStore()
+    return ev
 end
 
 function Aftermath.BroadcastOutcome(event, at)
@@ -111,6 +163,7 @@ function Aftermath.BroadcastOutcome(event, at)
         z = tonumber(event.z) or 0,
         npcId = event.npcId,
         npcName = event.npcName,
+        refugeKind = event.refugeKind,
         at = now,
     }
     local aired = false
@@ -169,6 +222,7 @@ function Aftermath.OnOffCameraOutcome(event, at)
             z = event.z,
             npcId = event.npcId,
             npcName = event.npcName,
+            refugeKind = event.refugeKind,
             cause = event.cause,
             lootTier = kind == "COLONIST_DEAD" and "high" or "standard",
         }, now)
@@ -178,16 +232,15 @@ function Aftermath.OnOffCameraOutcome(event, at)
 end
 
 function Aftermath.GetDebugSnapshot()
-    local sites = {}
-    for i = 1, #Aftermath.Sites do
-        sites[i] = Aftermath.Sites[i]
-    end
+    local sites = syncSitesCache()
+    local copySites = {}
+    for i = 1, #sites do copySites[i] = sites[i] end
     local broadcasts = {}
     for i = 1, #Aftermath.RecentBroadcasts do
         broadcasts[i] = Aftermath.RecentBroadcasts[i]
     end
     return {
-        sites = sites,
+        sites = copySites,
         recentBroadcasts = broadcasts,
     }
 end

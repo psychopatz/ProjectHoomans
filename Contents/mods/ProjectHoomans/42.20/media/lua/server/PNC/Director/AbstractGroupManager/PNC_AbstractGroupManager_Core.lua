@@ -64,10 +64,25 @@ end
 
 function H.MemberIDs(faction)
     local output = {}
+    local coreReg = PsychopatzCore and PsychopatzCore.Actors
+        and PsychopatzCore.Actors.DefaultRegistry or nil
     for npcID, present in pairs(faction and faction.memberIDs or {}) do
-        local record = present == true and PNC.Registry
-            and PNC.Registry.Get(npcID) or nil
-        if record and record.alive ~= false then output[#output + 1] = npcID end
+        if present == true then
+            local record = PNC.Registry and PNC.Registry.Get(npcID) or nil
+            if record then
+                if record.alive ~= false then
+                    output[#output + 1] = npcID
+                end
+            elseif coreReg and type(coreReg.Get) == "function" then
+                local actor = coreReg:Get(npcID)
+                if type(actor) == "table" and actor.alive ~= false then
+                    local status = string.lower(tostring(actor.status or actor.state or "active"))
+                    if status ~= "dead" and status ~= "deceased" and status ~= "removed" then
+                        output[#output + 1] = npcID
+                    end
+                end
+            end
+        end
     end
     table.sort(output)
     return output
@@ -105,6 +120,12 @@ function Groups.Create(spec)
     Store.EnsureLoaded()
     local group = Types.NormalizeGroup(spec, spec and spec.id)
     if not group then return nil, "invalid_group" end
+    if spec and spec.allowEmpty ~= true
+        and group.homeCommunityId == nil
+        and #(group.memberIds or {}) == 0
+    then
+        return nil, "group_members_required"
+    end
     if Store.Registry.groupsByID[group.id] then
         return Store.Registry.groupsByID[group.id], "existing"
     end

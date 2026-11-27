@@ -75,7 +75,9 @@ end
 
 function H.GroupSummary(group, selected)
     local profile, cacheState
-    if selected then profile, cacheState = Combat.Get(group, false) end
+    if Combat and type(Combat.Get) == "function" then
+        profile, cacheState = Combat.Get(group, false)
+    end
     local needs = Groups.GetNeeds(group)
     local resourceNeeds = ResourceNeeds.Get(group)
     local behavior = Behavior.GetContext(group, profile or group.combatProfile)

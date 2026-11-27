@@ -387,8 +387,66 @@ local function attachGroupJourneyHandoff(record, body)
         if type(record.orderSpec) == "table" then
             record.orderSpec.ephemeralDefault = true
         end
+        local diag = PNC.PerformanceScalingDiagnostics
+        if diag and type(diag.IsPresenceTraversalAuditEnabled) == "function"
+            and diag.IsPresenceTraversalAuditEnabled() == true
+            and type(diag.LogPresenceTraversal) == "function"
+        then
+            diag.LogPresenceTraversal("group_journey_handoff_attached", {
+                "npc=" .. tostring(record.id),
+                "group=" .. tostring(group.id),
+                "waypoints=" .. tostring(#waypoints),
+                "dest=" .. tostring(math.floor(dest.x or 0)) .. "," .. tostring(math.floor(dest.y or 0)),
+            })
+        end
     end
     return started
+end
+
+local function attachScavengeBuildingGoal(record)
+    if not record or not record.id or record.recruited == true then
+        return false
+    end
+    if type(record.orderSpec) == "table" and record.orderSpec.ephemeralDefault ~= true then
+        return false
+    end
+    local groups = PNC.AbstractGroups
+    if not groups or type(groups.FindByMember) ~= "function" then
+        return false
+    end
+    local group = groups.FindByMember(record.id)
+    if type(group) ~= "table" or group.state == "TRAVELING" then
+        return false
+    end
+    if group.mission ~= "SCAVENGE" and group.groupType ~= "SCAVENGER"
+        and group.groupType ~= "LOOTER"
+    then
+        return false
+    end
+    local resolver = PNC.CommunitySiteResolver
+    if not resolver or type(resolver.FindAvailableNear) ~= "function" then
+        return false
+    end
+    local site = resolver.FindAvailableNear(
+        tonumber(record.x) or 0,
+        tonumber(record.y) or 0,
+        tonumber(record.z) or 0,
+        60
+    )
+    if type(site) ~= "table" or type(site.home) ~= "table" then
+        return false
+    end
+    record.orderSpec = {
+        kind = Const.ORDER_CAMP or "camp",
+        x = site.home.x,
+        y = site.home.y,
+        z = site.home.z or 0,
+        radius = math.max(8, tonumber(site.home.radius) or 12),
+        ambientVisit = true,
+        ephemeralDefault = true,
+        scavengeMission = true,
+    }
+    return true
 end
 
 function Service.OnMaterialized(record)
@@ -403,6 +461,7 @@ function Service.OnMaterialized(record)
         journey = attachGroupJourneyHandoff(record, body)
     end
     if not journey then
+        attachScavengeBuildingGoal(record)
         return
     end
     clearLiveStallState(journey)
@@ -428,6 +487,29 @@ function Service.OnAbstracted(record, body)
     local nowHour = Internal.WorldHour()
     if body then
         Service.SyncLivePosition(record, body, nowHour)
+    end
+    -- If a player colonist abstracted while actively fleeing an overwhelming
+    -- live threat, hand off cleanly to the off-camera SOS refuge policy now
+    -- that live zombies have stopped chasing them.
+    local wasFleeing = record.runtime and record.runtime.fleeingFromThreat == true
+    if record.runtime then
+        record.runtime.travelTactics = nil
+        record.runtime.fleeingFromThreat = nil
+    end
+    if wasFleeing and record.recruited == true
+        and PNC.AbstractHazardResolver
+        and type(PNC.AbstractHazardResolver.ApplyColonistLossPolicy) == "function"
+    then
+        local bx, by = liveBodyPosition(record, body)
+        PNC.AbstractHazardResolver.ApplyColonistLossPolicy(
+            record,
+            bx,
+            by,
+            nowHour,
+            "live_flee_escape",
+            tostring(record.id) .. ":flee_abstract"
+        )
+        return
     end
     if journey.ephemeralGroupHandoff == true then
         local bridge = PNC.CoreGroupTraversalBridge

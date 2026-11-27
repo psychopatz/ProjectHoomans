@@ -96,6 +96,20 @@ function Debug.PerformAction(args)
     elseif operation == "clear_population_log" then
         PNC.PopulationLog.Clear()
         ok, reason = true, "population_log_cleared"
+    elseif operation == "scan_corridor_collisions" then
+        local reports = Encounters and Encounters.ScanTravelingCollisions
+            and Encounters.ScanTravelingCollisions(Store.WorldAgeHours(), 8) or {}
+        ok, reason = true, "scanned_collisions_" .. tostring(#reports)
+    elseif operation == "run_hazard_tick" then
+        local checked = PNC.AbstractHazardResolver
+            and PNC.AbstractHazardResolver.Tick
+            and PNC.AbstractHazardResolver.Tick(Store.WorldAgeHours(), 16) or 0
+        ok, reason = true, "hazard_checked_" .. tostring(checked)
+    elseif operation == "prune_aftermath" then
+        local pruned = PNC.AbstractAftermathService
+            and PNC.AbstractAftermathService.PruneExpired
+            and PNC.AbstractAftermathService.PruneExpired(Store.WorldAgeHours()) or 0
+        ok, reason = true, "aftermath_pruned_" .. tostring(pruned)
     end
     return Debug.BuildSnapshot(args.groupID, args.locationID, {
         action = operation, ok = ok, reason = reason },

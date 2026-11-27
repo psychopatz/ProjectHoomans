@@ -17,14 +17,23 @@ local Store = PNC.HoomansWorldView
 local Groups = PNC.AbstractGroups
 local Profiles = PNC.AbstractCombatProfile
 local Config = PNC.DirectorConfig
+local CoreHazards = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldHazards"
 
-Hazard.ThreatProviders = Hazard.ThreatProviders or {}
 Hazard.RecentEvents = Hazard.RecentEvents or {}
 Hazard.Cooldowns = Hazard.Cooldowns or {}
 
 Hazard.MAX_RECENT_EVENTS = 32
 Hazard.CHECK_COOLDOWN_HOURS = 1.0
 Hazard.THREAT_THRESHOLD = 45
+
+local function cooldownStore()
+    if Store and type(Store.Registry) == "table" then
+        Store.Registry.hazardCooldowns = Store.Registry.hazardCooldowns or {}
+        return Store.Registry.hazardCooldowns
+    end
+    return Hazard.Cooldowns
+end
 
 local function getWorldSeed()
     local cg = PsychopatzCore and PsychopatzCore.SurvivorWorld
@@ -62,74 +71,23 @@ local function recordEvent(event)
 end
 
 function Hazard.RegisterThreatProvider(id, providerFn)
-    id = tostring(id or "")
-    if id == "" or type(providerFn) ~= "function" then return false end
-    Hazard.ThreatProviders[id] = providerFn
-    return true
+    return CoreHazards.RegisterThreatProvider(id, providerFn)
 end
 
 function Hazard.UnregisterThreatProvider(id)
-    id = tostring(id or "")
-    if id == "" or Hazard.ThreatProviders[id] == nil then return false end
-    Hazard.ThreatProviders[id] = nil
-    return true
+    return CoreHazards.UnregisterThreatProvider(id)
 end
 
--- O(1) in-memory IsoMetaChunk zombie intensity lookup (0..255). Never loads chunks.
 function Hazard.SampleMetaZombieIntensity(x, y)
-    x = tonumber(x)
-    y = tonumber(y)
-    if x == nil or y == nil then return 0 end
-    local world = getWorld and getWorld() or nil
-    local metaGrid = world and world.getMetaGrid and world:getMetaGrid() or nil
-    if not metaGrid then return 0 end
-    local chunkX = math.floor(x / 10)
-    local chunkY = math.floor(y / 10)
-    local ok, chunkData
-    if type(metaGrid.getChunkData) == "function" then
-        ok, chunkData = pcall(metaGrid.getChunkData, metaGrid, chunkX, chunkY)
-    end
-    if not ok or not chunkData then return 0 end
-    if type(chunkData.getZombieIntensity) == "function" then
-        local okI, val = pcall(chunkData.getZombieIntensity, chunkData)
-        if okI and tonumber(val) then
-            return math.max(0, tonumber(val))
-        end
-    end
-    return 0
+    return CoreHazards.SampleMetaZombieIntensity(x, y)
 end
 
 function Hazard.EvaluateThreatAt(x, y, at)
-    local metaIntensity = Hazard.SampleMetaZombieIntensity(x, y)
-    local providerTotal = 0
-    local sources = {}
-    if metaIntensity > 0 then
-        sources[#sources + 1] = { id = "metagrid_zombies", intensity = metaIntensity }
-    end
-    local ids = {}
-    for id in pairs(Hazard.ThreatProviders) do
-        ids[#ids + 1] = id
-    end
-    table.sort(ids)
-    for i = 1, #ids do
-        local id = ids[i]
-        local fn = Hazard.ThreatProviders[id]
-        local ok, val = pcall(fn, x, y, at)
-        local num = ok and math.max(0, tonumber(val) or 0) or 0
-        if num > 0 then
-            providerTotal = providerTotal + num
-            sources[#sources + 1] = { id = id, intensity = num }
-        end
-    end
-    return {
-        totalThreat = metaIntensity + providerTotal,
-        metaIntensity = metaIntensity,
-        providerThreat = providerTotal,
-        sources = sources,
-    }
+    return CoreHazards.EvaluateThreatAt(x, y, at)
 end
 
-local function findNearbyShelterBuilding(x, y)
+-- Refuge priority: nearby MetaGrid building -> nearby forest zone -> safe open area.
+local function findNearbyRefuge(x, y, salt)
     x = tonumber(x) or 0
     y = tonumber(y) or 0
     local world = getWorld and getWorld() or nil
@@ -164,11 +122,50 @@ local function findNearbyShelterBuilding(x, y)
                 end
             end
             if bestX and bestY then
-                return { x = bestX, y = bestY, z = 0, shelteredInBuilding = true }
+                return { x = bestX, y = bestY, z = 0, refugeKind = "building", shelteredInBuilding = true }
             end
         end
     end
-    return { x = math.floor(x + 0.5), y = math.floor(y + 0.5), z = 0, shelteredInBuilding = false }
+    if metaGrid and type(metaGrid.getZonesIntersecting) == "function" then
+        local okZ, zones = pcall(
+            metaGrid.getZonesIntersecting,
+            metaGrid,
+            math.floor(x - 80),
+            math.floor(y - 80),
+            0,
+            160,
+            160
+        )
+        if okZ and zones and type(zones.size) == "function" and zones:size() > 0 then
+            local limit = math.min(zones:size(), 24)
+            for i = 0, limit - 1 do
+                local z = zones:get(i)
+                local zType = z and type(z.getType) == "function" and tostring(z:getType() or "") or ""
+                if zType == "Forest" or zType == "DeepForest" or zType == "Vegitation" then
+                    local zx = tonumber(z.getX and z:getX()) or x
+                    local zy = tonumber(z.getY and z:getY()) or y
+                    local zw = tonumber(z.getWidth and z:getWidth()) or 10
+                    local zh = tonumber(z.getHeight and z:getHeight()) or 10
+                    return {
+                        x = math.floor(zx + zw * 0.5),
+                        y = math.floor(zy + zh * 0.5),
+                        z = 0,
+                        refugeKind = "forest",
+                        shelteredInBuilding = false,
+                    }
+                end
+            end
+        end
+    end
+    local angle = seededUnit(tostring(salt or "refuge") .. ":angle") * math.pi * 2
+    local dist = 24 + seededUnit(tostring(salt or "refuge") .. ":dist") * 32
+    return {
+        x = math.floor(x + math.cos(angle) * dist + 0.5),
+        y = math.floor(y + math.sin(angle) * dist + 0.5),
+        z = 0,
+        refugeKind = "area",
+        shelteredInBuilding = false,
+    }
 end
 
 local function applyItemLoss(record, lossPct, saltPrefix)
@@ -213,7 +210,7 @@ function Hazard.ApplyColonistLossPolicy(record, x, y, at, cause, salt)
     end
 
     if roll < sosChance then
-        local shelter = findNearbyShelterBuilding(x, y)
+        local shelter = findNearbyRefuge(x, y, tostring(salt or record.id) .. ":" .. tostring(math.floor(at * 60)))
         record.x = shelter.x
         record.y = shelter.y
         record.z = shelter.z or 0
@@ -226,6 +223,7 @@ function Hazard.ApplyColonistLossPolicy(record, x, y, at, cause, salt)
             x = shelter.x,
             y = shelter.y,
             z = shelter.z or 0,
+            refugeKind = tostring(shelter.refugeKind or "area"),
             shelteredInBuilding = shelter.shelteredInBuilding == true,
             at = at,
             cause = cause,
@@ -241,6 +239,7 @@ function Hazard.ApplyColonistLossPolicy(record, x, y, at, cause, salt)
             at = at,
             cause = cause,
             itemsLost = itemsLost,
+            refugeKind = tostring(shelter.refugeKind or "area"),
             shelteredInBuilding = shelter.shelteredInBuilding == true,
         })
         if Store and Store.Emit then
@@ -358,6 +357,11 @@ function Hazard.Tick(at, budget)
     budget = math.max(1, math.floor(tonumber(budget) or 8))
     local checked = 0
     local encounters = PNC.AbstractEncounters
+    local cds = cooldownStore()
+    for k, exp in pairs(cds) do
+        if (tonumber(exp) or 0) <= at then cds[k] = nil end
+    end
+    CoreHazards.PruneTemporaryPenalties(at)
 
     -- 1. Check abstracted traveling player colonists.
     if PNC.Registry and type(PNC.Registry.List) == "function" then
@@ -371,12 +375,12 @@ function Hazard.Tick(at, budget)
                 and record.travel.state == "en_route"
             then
                 local key = "npc:" .. tostring(record.id)
-                local cd = tonumber(Hazard.Cooldowns[key]) or 0
+                local cd = tonumber(cds[key]) or 0
                 if at >= cd then
                     local nearby = encounters and encounters.IsPlayerNearby
                         and encounters.IsPlayerNearby({ x = record.x, y = record.y })
                     if not nearby then
-                        Hazard.Cooldowns[key] = at + Hazard.CHECK_COOLDOWN_HOURS
+                        cds[key] = at + Hazard.CHECK_COOLDOWN_HOURS
                         Hazard.ResolveForParticipants(
                             { record },
                             record.x,
@@ -397,7 +401,7 @@ function Hazard.Tick(at, budget)
             if checked >= budget then break end
             if type(group) == "table" and group.state == "TRAVELING" and type(group.journey) == "table" then
                 local key = "group:" .. tostring(group.id)
-                local cd = tonumber(Hazard.Cooldowns[key]) or 0
+                local cd = tonumber(cds[key]) or 0
                 if at >= cd then
                     local gx = tonumber(group.journey.x) or (group.location and group.location.x)
                     local gy = tonumber(group.journey.y) or (group.location and group.location.y)
@@ -405,7 +409,7 @@ function Hazard.Tick(at, budget)
                         local nearby = encounters and encounters.IsPlayerNearby
                             and encounters.IsPlayerNearby({ x = gx, y = gy })
                         if not nearby then
-                            Hazard.Cooldowns[key] = at + Hazard.CHECK_COOLDOWN_HOURS
+                            cds[key] = at + Hazard.CHECK_COOLDOWN_HOURS
                             Hazard.ResolveForParticipants(
                                 group.memberIds or group.memberActorIDs or {},
                                 gx,
@@ -429,13 +433,12 @@ function Hazard.GetDebugSnapshot()
     for i = 1, #Hazard.RecentEvents do
         copy[i] = Hazard.RecentEvents[i]
     end
+    local summary = CoreHazards.GetDebugSummary()
     return {
         recentEvents = copy,
-        threatProviderCount = (function()
-            local n = 0
-            for _ in pairs(Hazard.ThreatProviders) do n = n + 1 end
-            return n
-        end)(),
+        threatProviderCount = summary.threatProviderCount,
+        corridorModifierCount = summary.corridorModifierCount,
+        temporaryPenaltyCount = summary.temporaryPenaltyCount,
     }
 end
 

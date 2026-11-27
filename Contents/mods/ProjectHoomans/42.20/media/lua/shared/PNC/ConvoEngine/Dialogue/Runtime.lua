@@ -1,8 +1,9 @@
 -- Shared runtime gate for the semantic dialogue feature.
 --
--- Production uses PsychopatzCore's persisted debug-settings registry. The
--- headless harness may provide a scenario override, but it still calls this
--- module and therefore exercises the same gate as the native client.
+-- Semantic dialogue is a core gameplay subsystem and is always enabled in
+-- production (never exposed as a DebugSettings toggle that "Disable All" could
+-- turn off). Headless test scenarios may still override availability via
+-- SetHarnessOverride().
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 PNC.ConvoEngine = PNC.ConvoEngine or {}
@@ -11,15 +12,8 @@ local Runtime = PNC.ConvoEngine.SemanticDialogueRuntime or {}
 PNC.ConvoEngine.SemanticDialogueRuntime = Runtime
 
 Runtime.VERSION = 1
-Runtime.SETTING_ID = "ProjectHoomans.SemanticDialogueEnabled"
-Runtime.Enabled = Runtime.Enabled ~= false
+Runtime.Enabled = true
 Runtime.HarnessOverride = nil
-
-local function settingsObject()
-    local core = PsychopatzCore or {}
-    if core.DebugSettings then return core.DebugSettings end
-    return require "PsychopatzCore/Debug/PsychopatzDebugSettings"
-end
 
 function Runtime.IsEnabled()
     if Runtime.HarnessOverride ~= nil then
@@ -40,25 +34,6 @@ function Runtime.SetHarnessOverride(enabled)
         Runtime.HarnessOverride = enabled == true
     end
     return Runtime.IsEnabled()
-end
-
-local settings = settingsObject()
-if settings and type(settings.Register) == "function" then
-    settings.Register({
-        id = Runtime.SETTING_ID,
-        source = "Project Hoomans",
-        order = 130,
-        title = "Semantic dialogue enabled",
-        description = "Enable Project Hoomans semantic dialogue and suggestions.",
-        defaultEnabled = true,
-        runtimeMutable = true,
-        apply = function(enabled)
-            Runtime.SetEnabled(enabled)
-        end,
-    })
-    if type(settings.IsEnabled) == "function" then
-        Runtime.SetEnabled(settings.IsEnabled(Runtime.SETTING_ID) == true)
-    end
 end
 
 return Runtime

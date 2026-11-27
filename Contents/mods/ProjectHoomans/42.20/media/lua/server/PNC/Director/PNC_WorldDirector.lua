@@ -90,11 +90,19 @@ function Director.Initialize(force)
     syncMobileGroups()
     local now = Store.WorldAgeHours()
     for _, group in ipairs(Groups.List()) do
-        group.activeEncounterId = nil
-        PNC.AbstractBehaviorProfile.Get(group, false)
-        Groups.RefreshLOD(group, now)
+        local _, reconcileReason = Groups.ReconcileMembers(group)
+        if reconcileReason ~= "dissolved_empty" then
+            group.activeEncounterId = nil
+            PNC.AbstractBehaviorProfile.Get(group, false)
+            Groups.RefreshLOD(group, now)
+        end
     end
     Locations.ReconcileOccupancy()
+    if PNC.AbstractAftermathService
+        and type(PNC.AbstractAftermathService.RestoreFromStore) == "function"
+    then
+        PNC.AbstractAftermathService.RestoreFromStore(now)
+    end
     if CommunityExcursionService
         and CommunityExcursionService.RegisterTravelHandlers
     then

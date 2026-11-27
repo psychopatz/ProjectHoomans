@@ -64,6 +64,31 @@ function Debug.BuildSnapshot(selectedGroupID, selectedLocationID, action,
             (tonumber(sector.settlementGenerationCooldownUntil) or 0)
                 - Store.WorldAgeHours())
     end
+    local corridorSnap = nil
+    local cg = PsychopatzCore and PsychopatzCore.SurvivorWorld
+        and PsychopatzCore.SurvivorWorld.CorridorGraph or nil
+    if cg and type(cg.GetDebugSnapshot) == "function" then
+        local raw = cg.GetDebugSnapshot()
+        if type(raw) == "table" then
+            local settlementCount = 0
+            for _, n in ipairs(raw.nodes or {}) do
+                if n.kind == "settlement" then settlementCount = settlementCount + 1 end
+            end
+            corridorSnap = {
+                worldSeed = raw.worldSeed,
+                sectorCount = raw.sectorCount or 0,
+                nodeCount = #(raw.nodes or {}),
+                settlementNodeCount = settlementCount,
+                edgeCount = #(raw.edges or {}),
+            }
+        end
+    end
+    local hazardSnap = PNC.AbstractHazardResolver
+        and type(PNC.AbstractHazardResolver.GetDebugSnapshot) == "function"
+        and H.Copy(PNC.AbstractHazardResolver.GetDebugSnapshot()) or nil
+    local aftermathSnap = PNC.AbstractAftermathService
+        and type(PNC.AbstractAftermathService.GetDebugSnapshot) == "function"
+        and H.Copy(PNC.AbstractAftermathService.GetDebugSnapshot()) or nil
     return {
         metrics = Director.GetMetrics(), groups = groups,
         mobileGroups = mobileGroups, mobileCounts = mobileCounts,
@@ -72,6 +97,9 @@ function Debug.BuildSnapshot(selectedGroupID, selectedLocationID, action,
         selectedLocationId = selectedLocation and selectedLocation.id,
         jobs = H.Copy(PNC.Scheduler.GetJobs()),
         recentEncounters = H.Copy(Store.Registry.encounters),
+        corridorGraph = corridorSnap,
+        hazardResolver = hazardSnap,
+        aftermath = aftermathSnap,
         generatedAt = Store.WorldAgeHours(), action = H.Copy(action),
         population = {
             metrics = PNC.PopulationDirector

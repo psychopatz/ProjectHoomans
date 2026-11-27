@@ -29,10 +29,23 @@ local function actorID(entry)
     ) or "")
 end
 
+local function clientSnapshots()
+    if PNC.Network and type(PNC.Network.ClientState) == "table"
+        and type(PNC.Network.ClientState.snapshots) == "table"
+    then
+        return PNC.Network.ClientState.snapshots
+    end
+    if PNC.ClientState and type(PNC.ClientState.snapshots) == "table" then
+        return PNC.ClientState.snapshots
+    end
+    return nil
+end
+
 local function findByCoreActorID(coreID)
     if coreID == "" then return nil, nil end
-    if PNC.ClientState and type(PNC.ClientState.snapshots) == "table" then
-        for _, snap in pairs(PNC.ClientState.snapshots) do
+    local snaps = clientSnapshots()
+    if snaps then
+        for _, snap in pairs(snaps) do
             if type(snap) == "table"
                 and tostring(snap.coreActorID or "") == coreID
             then
@@ -64,15 +77,13 @@ local function resolveHoomansContext(entry)
     local id = actorID(entry)
     if id == "" then return entry end
 
+    local snaps = clientSnapshots()
     local snapshot = entry.snapshot
-    if type(snapshot) ~= "table"
-        and PNC.ClientState
-        and type(PNC.ClientState.snapshots) == "table"
-    then
-        snapshot = PNC.ClientState.snapshots[id]
+    if type(snapshot) ~= "table" and snaps then
+        snapshot = snaps[id]
         if type(snapshot) ~= "table" and type(entry.aliases) == "table" then
             for _, alias in ipairs(entry.aliases) do
-                snapshot = PNC.ClientState.snapshots[tostring(alias or "")]
+                snapshot = snaps[tostring(alias or "")]
                 if type(snapshot) == "table" then break end
             end
         end
@@ -172,6 +183,24 @@ local function resolveHoomansContext(entry)
         end
         if enriched.ownerCharacterUUID == nil then
             enriched.ownerCharacterUUID = record.ownerCharacterUUID
+        end
+    end
+    -- Fallback: infer colonist ownership from Core ActorExtension or owner fields
+    -- so colonists never flash yellow before a roster snapshot arrives.
+    if enriched.recruited ~= true and enriched.colonyOwned ~= true then
+        local ext = type(entry.extensions) == "table"
+            and entry.extensions["ProjectHoomans.ActorExtension"] or nil
+        if type(ext) == "table" and ext.recruited == true then
+            enriched.recruited = true
+            enriched.colonyOwned = true
+            if enriched.orderKind == nil and type(ext.orderSpec) == "table" then
+                enriched.orderKind = ext.orderSpec.kind
+            end
+        elseif (enriched.ownerUsername ~= nil and tostring(enriched.ownerUsername) ~= "")
+            or (enriched.ownerCharacterUUID ~= nil and tostring(enriched.ownerCharacterUUID) ~= "")
+        then
+            enriched.recruited = true
+            enriched.colonyOwned = true
         end
     end
     return enriched

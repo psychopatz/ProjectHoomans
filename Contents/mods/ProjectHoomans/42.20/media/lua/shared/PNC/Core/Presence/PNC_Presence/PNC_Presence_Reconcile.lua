@@ -216,7 +216,19 @@ local function promoteNearbyCoreCandidates(
     local capLimit = math.min(globalMax, playerMax * math.max(1, #players))
     local headroom = math.max(0, capLimit - liveTotal - #ordered)
     local budget = math.min(maxPerRefresh, headroom)
+    local auditDiag = PNC.PerformanceScalingDiagnostics
+    local auditEnabled = auditDiag
+        and type(auditDiag.IsPresenceTraversalAuditEnabled) == "function"
+        and auditDiag.IsPresenceTraversalAuditEnabled() == true
+        and type(auditDiag.LogPresenceTraversal) == "function"
     if budget <= 0 then
+        if auditEnabled then
+            auditDiag.LogPresenceTraversal("core_promotion_budget_exhausted", {
+                "liveTotal=" .. tostring(liveTotal),
+                "ordered=" .. tostring(#ordered),
+                "capLimit=" .. tostring(capLimit),
+            })
+        end
         return 0
     end
 
@@ -232,12 +244,26 @@ local function promoteNearbyCoreCandidates(
         if promoted >= budget then break end
         local entry = candidates[i]
         if entry and entry.actorId and not seen[entry.actorId] then
-            local record = coreProvider.PromoteCoreActor(
+            local record, promoteReason = coreProvider.PromoteCoreActor(
                 entry.actorId,
                 PsychopatzCore,
                 { reason = "presence_interest" }
             )
             if record then
+                if tonumber(entry.projectedX) and tonumber(entry.projectedY) then
+                    record.x = tonumber(entry.projectedX)
+                    record.y = tonumber(entry.projectedY)
+                    record.z = tonumber(entry.projectedZ) or tonumber(record.z) or 0
+                end
+                if auditEnabled then
+                    auditDiag.LogPresenceTraversal("core_promotion_accepted", {
+                        "actor=" .. tostring(entry.actorId),
+                        "dist=" .. tostring(math.floor(math.sqrt(tonumber(entry.distSq) or 0))),
+                        "pos=" .. tostring(math.floor(tonumber(record.x) or 0)) .. "," .. tostring(math.floor(tonumber(record.y) or 0)),
+                        "projected=" .. tostring(tonumber(entry.projectedX) ~= nil),
+                        "reason=" .. tostring(promoteReason or "promoted"),
+                    })
+                end
                 local candidateEntry = {
                     record = record,
                     distSq = entry.distSq,
@@ -246,6 +272,12 @@ local function promoteNearbyCoreCandidates(
                 seen[record.id] = candidateEntry
                 ordered[#ordered + 1] = candidateEntry
                 promoted = promoted + 1
+            elseif auditEnabled then
+                auditDiag.LogPresenceTraversal("core_promotion_rejected", {
+                    "actor=" .. tostring(entry.actorId),
+                    "dist=" .. tostring(math.floor(math.sqrt(tonumber(entry.distSq) or 0))),
+                    "reason=" .. tostring(promoteReason or "promote_nil"),
+                })
             end
         end
     end

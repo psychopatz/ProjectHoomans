@@ -31,6 +31,25 @@ local function appendDirectorRows(rows, snapshot, metrics)
         metrics.abstractCombats or 0, metrics.abstractRetreats or 0,
         metrics.casualties or 0, metrics.profileInvalidations or 0,
         metrics.averageEncounterProcessingMS or 0))
+    local cg = snapshot and snapshot.corridorGraph or nil
+    if type(cg) == 'table' then
+        rows[#rows + 1] = row('Corridor graph', string.format(
+            'seed=%s sectors=%d nodes=%d settlements=%d edges=%d',
+            tostring(cg.worldSeed or 0), cg.sectorCount or 0,
+            cg.nodeCount or 0, cg.settlementNodeCount or 0, cg.edgeCount or 0))
+    end
+    local hz = snapshot and snapshot.hazardResolver or nil
+    if type(hz) == 'table' then
+        rows[#rows + 1] = row('Off-camera hazards', string.format(
+            'providers=%d recentEvents=%d',
+            hz.threatProviderCount or 0, #(hz.recentEvents or {})))
+    end
+    local af = snapshot and snapshot.aftermath or nil
+    if type(af) == 'table' then
+        rows[#rows + 1] = row('Aftermath & radio', string.format(
+            'activeSites=%d broadcasts=%d',
+            #(af.sites or {}), #(af.recentBroadcasts or {})))
+    end
 end
 
 local function appendPopulationSummaryRows(rows, population)

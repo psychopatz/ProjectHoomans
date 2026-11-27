@@ -411,9 +411,3 @@ PsychopatzCore.DebugHub.RegisterTool({
         PNC.UnifiedAIDebugUI.Toggle()
     end,
 })
-
--- Project Hoomans settings belong to the standard in-game settings registry.
--- Remove old debug-hub launchers as well when this file is hot-reloaded.
-PsychopatzCore.DebugHub.UnregisterTool("pnc.settings")
-PsychopatzCore.DebugHub.UnregisterTool("pnc.communityOverlay")
-PsychopatzCore.DebugHub.UnregisterTool("pnc.factionOverlay")

@@ -15,12 +15,41 @@ local Locations = PNC.AbstractLocations
 local Core = PNC.Core
 local Const = PNC.Const
 
+local function recoverMembersFromCoreActors(group)
+    local coreActors = PsychopatzCore and PsychopatzCore.Actors or nil
+    local coreReg = coreActors and coreActors.DefaultRegistry or nil
+    if not coreReg or type(coreReg.records) ~= "table" then
+        return {}
+    end
+    local recovered = {}
+    local targetGroupID = tostring(group and group.id or "")
+    local targetFactionID = tostring(group and group.factionId or "")
+    for actorID, actor in pairs(coreReg.records) do
+        if type(actor) == "table" and actor.alive ~= false then
+            local status = string.lower(tostring(actor.status or actor.state or "active"))
+            if status ~= "dead" and status ~= "deceased" and status ~= "removed" then
+                local sw = type(actor.extensions) == "table"
+                    and actor.extensions["PsychopatzCore.SurvivorWorld"] or nil
+                if type(sw) == "table" then
+                    local gMatch = targetGroupID ~= "" and tostring(sw.groupID or "") == targetGroupID
+                    local fMatch = targetFactionID ~= "" and tostring(sw.factionID or "") == targetFactionID
+                    if gMatch or fMatch then
+                        recovered[#recovered + 1] = tostring(actor.actorId or actorID)
+                    end
+                end
+            end
+        end
+    end
+    table.sort(recovered)
+    return recovered
+end
+
 function Groups.ReconcileMembers(groupOrID, faction)
     local group = type(groupOrID) == "table" and groupOrID
         or Groups.Get(groupOrID)
     faction = faction or group and group.factionId and PNC.Factions
         and PNC.Factions.Get(group.factionId) or nil
-    if not group or not faction then return false, "missing_group_or_faction" end
+    if not group then return false, "missing_group" end
     local ids
     if group.homeCommunityId then
         ids = {}
@@ -41,18 +70,49 @@ function Groups.ReconcileMembers(groupOrID, faction)
         end
         table.sort(ids)
     else
-        ids = H.MemberIDs(faction)
+        ids = faction and H.MemberIDs(faction) or {}
+        if #ids == 0 then
+            ids = recoverMembersFromCoreActors(group)
+        end
     end
     local signature = H.MemberSignature(ids)
     group.diagnostics = group.diagnostics or {}
-    if group.diagnostics.memberSignature == signature then
+    if group.diagnostics.memberSignature == signature
+        and #(group.memberIds or {}) == #ids
+    then
         return false, "unchanged"
     end
     group.memberIds = ids
-    group.leaderId = faction.leaderNPCID
+    group.memberActorIDs = ids
+    group.leaderId = faction and faction.leaderNPCID or group.leaderId
     group.diagnostics.memberSignature = signature
+    -- Event-driven dissolution: if a non-community group has 0 living members
+    -- in both Hoomans and Core, dissolve it immediately instead of keeping an
+    -- empty ghost group alive.
+    if #ids == 0 and group.homeCommunityId == nil then
+        if Locations and type(Locations.Depart) == "function" then
+            pcall(Locations.Depart, group, Store and Store.WorldAgeHours and Store.WorldAgeHours() or 0)
+        end
+        if PNC.CoreSurvivorWorldAdapter
+            and type(PNC.CoreSurvivorWorldAdapter.RemoveGroup) == "function"
+        then
+            pcall(PNC.CoreSurvivorWorldAdapter.RemoveGroup, group.id, "dissolved_empty_group")
+        end
+        if Store and Store.Registry and type(Store.Registry.groupsByID) == "table" then
+            Store.Registry.groupsByID[group.id] = nil
+            if type(Store.Touch) == "function" then
+                Store.Touch("group_dissolved_empty")
+            end
+        end
+        return true, "dissolved_empty"
+    end
     Groups.MarkCombatProfileDirty(group, "membership_changed")
     H.Touch(group, "group_members_reconciled")
+    if PNC.CoreSurvivorWorldAdapter
+        and type(PNC.CoreSurvivorWorldAdapter.CommitGroup) == "function"
+    then
+        pcall(PNC.CoreSurvivorWorldAdapter.CommitGroup, group, "group_members_reconciled")
+    end
     return true, "reconciled"
 end
 

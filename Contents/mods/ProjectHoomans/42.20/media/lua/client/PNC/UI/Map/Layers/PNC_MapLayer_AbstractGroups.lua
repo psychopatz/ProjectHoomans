@@ -25,17 +25,30 @@ GroupLayer.positionScratch = GroupLayer.positionScratch or {}
 
 local COLORS = {
     LOOTER = { r = 1.00, g = 0.22, b = 0.16 },
-    REFUGEE = { r = 0.20, g = 0.72, b = 1.00 },
-    SCAVENGER = { r = 0.95, g = 0.72, b = 0.18 },
+    RAIDER = { r = 1.00, g = 0.22, b = 0.16 },
+    TRADER = { r = 1.00, g = 0.78, b = 0.18 },
+    CARAVAN = { r = 1.00, g = 0.78, b = 0.18 },
+    SCAVENGER = { r = 0.95, g = 0.55, b = 0.15 },
+    REFUGEE = { r = 0.25, g = 0.75, b = 1.00 },
     WANDERER = { r = 0.72, g = 0.72, b = 0.72 },
 }
 
-local MOBILE_COLORS = {
-    road_roaming = { r = 0.25, g = 0.95, b = 0.45 },
-    street_roaming = { r = 0.72, g = 0.88, b = 0.72 },
-    en_route = { r = 1.00, g = 0.60, b = 0.12 },
-    arrival_pending = { r = 1.00, g = 0.20, b = 0.82 },
-}
+local function markerColor(group)
+    local gType = string.upper(tostring(group and group.groupType or ""))
+    if COLORS[gType] then return COLORS[gType] end
+    local arch = string.upper(tostring(group and group.mobile and group.mobile.archetypeID or ""))
+    if string.find(arch, "LOOTER", 1, true) or string.find(arch, "RAIDER", 1, true)
+        or string.find(arch, "BANDIT", 1, true)
+    then
+        return COLORS.LOOTER
+    end
+    if string.find(arch, "TRADER", 1, true) or string.find(arch, "CARAVAN", 1, true) then
+        return COLORS.TRADER
+    end
+    if string.find(arch, "SCAV", 1, true) then return COLORS.SCAVENGER end
+    if string.find(arch, "REFUGEE", 1, true) then return COLORS.REFUGEE end
+    return COLORS.WANDERER
+end
 
 local function isVisible()
     return PNC.MapDisplay and PNC.MapDisplay.AreBasesVisible
@@ -60,23 +73,53 @@ function GroupLayer.Update(force)
         snapshot.population and snapshot.population.selectedSectorId)
 end
 
-local function markerColor(group)
-    if group and group.mobile then
-        return MOBILE_COLORS[MobileModel.State(
-            group.mobile, group)] or COLORS.WANDERER
+-- Core's PsychopatzSurvivorWorldActorMap is the canonical route renderer for
+-- groups with a Core journey. Only draw a fallback route here if a group has
+-- no Core journey yet (prevents duplicate/overlapping lines of different colors).
+local function shouldDrawFallbackRoute(group)
+    if type(group) ~= "table" then return false end
+    if type(group.journey) == "table" and group.journey.state == "en_route" then
+        return false
     end
-    return COLORS[tostring(group and group.groupType or "")]
-        or COLORS.WANDERER
+    return group.mobile ~= nil or group.state == "TRAVELING"
 end
 
 local function drawRoute(map, group, color)
+    if not map.javaObject or not map.javaObject.DrawLine then
+        return
+    end
+    local route = group and type(group.journey) == "table"
+        and type(group.journey.route) == "table"
+        and group.journey.route or nil
+    local points = route and route.points or nil
+    if type(points) == "table" and #points >= 2 then
+        for i = 1, #points - 1 do
+            local a = points[i]
+            local b = points[i + 1]
+            if a and b and a.x and a.y and b.x and b.y then
+                local x1 = map.mapAPI:worldToUIX(a.x, a.y)
+                local y1 = map.mapAPI:worldToUIY(a.x, a.y)
+                local x2 = map.mapAPI:worldToUIX(b.x, b.y)
+                local y2 = map.mapAPI:worldToUIY(b.x, b.y)
+                map.javaObject:DrawLine(nil, x1, y1, x2, y2, 2,
+                    color.r, color.g, color.b, 0.70)
+            end
+        end
+        local last = points[#points]
+        if last and last.x and last.y then
+            local lx = map.mapAPI:worldToUIX(last.x, last.y)
+            local ly = map.mapAPI:worldToUIY(last.x, last.y)
+            local size = 7
+            map:drawRectBorder(lx - size / 2, ly - size / 2,
+                size, size, 1, color.r, color.g, color.b)
+        end
+        return
+    end
     local location = group and group.location
     local target = group and group.mobile
         and MobileModel.Target(group.mobile, group)
         or group and group.targetLocation
-    if not location or not target or not target.x or not target.y
-        or not map.javaObject or not map.javaObject.DrawLine
-    then
+    if not location or not target or not target.x or not target.y then
         return
     end
     local x1 = map.mapAPI:worldToUIX(location.x, location.y)
@@ -90,10 +133,11 @@ local function drawRoute(map, group, color)
         size, size, 1, color.r, color.g, color.b)
 end
 
-local function drawHover(map, group, x, y, color)
+function GroupLayer.FormatHoverLines(group)
     local members = #(group.memberIds or {})
     local lines = {
-        tostring(group.groupType or "SURVIVOR GROUP"),
+        tostring(group.groupType or "SURVIVOR GROUP")
+            .. " [" .. tostring(group.id or "?") .. "]",
         "Members: " .. tostring(members),
         tostring(group.mission or "IDLE") .. " / "
             .. tostring(group.state or "IDLE"),
@@ -107,7 +151,53 @@ local function drawHover(map, group, x, y, color)
         lines[#lines + 1] = "Destination: "
             .. MobileModel.TargetText(group.mobile, group)
     end
-    local width, height = 290, 74 + (group.mobile and 32 or 0)
+    local cp = type(group.combatProfile) == "table" and group.combatProfile or nil
+    if cp then
+        lines[#lines + 1] = string.format(
+            "Power: %.2f (Man:%.2f Mor:%.2f Cond:%d%%)",
+            tonumber(cp.overallPower) or 0,
+            tonumber(cp.manpower) or 0,
+            tonumber(cp.morale) or 0,
+            math.floor((tonumber(cp.condition) or 0) * 100 + 0.5)
+        )
+        lines[#lines + 1] = string.format(
+            "Offense: Melee %.2f | Ranged %.2f (Ammo:%d %s)",
+            tonumber(cp.meleePower) or 0,
+            tonumber(cp.rangedPower) or 0,
+            math.floor(tonumber(cp.ammoState) or 0),
+            tostring(cp.ammoLabel or "EMPTY")
+        )
+        lines[#lines + 1] = string.format(
+            "Defense: %.2f (Armor:%.2f) | Mob:%.2f | Med:%.2f",
+            tonumber(cp.defense) or 0,
+            tonumber(cp.armorRating) or 0,
+            tonumber(cp.mobility) or 0,
+            tonumber(cp.medical) or 0
+        )
+    else
+        lines[#lines + 1] = "Power: (uncomputed)"
+    end
+    local j = type(group.journey) == "table" and group.journey or nil
+    if j and j.state == "en_route" then
+        local pts = type(j.route) == "table" and type(j.route.points) == "table"
+            and #j.route.points or 0
+        local prov = type(j.route) == "table" and tostring(j.route.provider or "corridor") or "direct"
+        lines[#lines + 1] = string.format(
+            "Route: %s (%d pts) %d%% | ETA %.1fh (%.0ft)",
+            prov,
+            pts,
+            math.floor((tonumber(j.progress) or 0) * 100 + 0.5),
+            tonumber(j.eta) or 0,
+            tonumber(j.distanceTotal) or 0
+        )
+    end
+    return lines
+end
+
+local function drawHover(map, group, x, y, color)
+    local lines = GroupLayer.FormatHoverLines(group)
+    local width = 345
+    local height = 12 + (#lines * 16)
     x = math.min((map.width or 0) - width - 5, x + 12)
     y = math.min((map.height or 0) - height - 5, y + 12)
     x, y = math.max(5, x), math.max(5, y)
@@ -115,10 +205,16 @@ local function drawHover(map, group, x, y, color)
     map:drawRectBorder(x, y, width, height, 1,
         color.r, color.g, color.b)
     for index, line in ipairs(lines) do
+        local r, g, b = 0.88, 0.88, 0.88
+        if index == 1 then
+            r, g, b = color.r, color.g, color.b
+        elseif string.sub(line, 1, 6) == "Power:" then
+            r, g, b = 1.0, 0.88, 0.35
+        elseif string.sub(line, 1, 6) == "Route:" then
+            r, g, b = 0.45, 0.90, 1.0
+        end
         map:drawText(line, x + 8, y + 5 + (index - 1) * 16,
-            index == 1 and color.r or 0.88,
-            index == 1 and color.g or 0.88,
-            index == 1 and color.b or 0.88, 1, UIFont.Small)
+            r, g, b, 1, UIFont.Small)
     end
 end
 
@@ -220,7 +316,9 @@ function GroupLayer.Render(map)
             local x = map.mapAPI:worldToUIX(px, py)
             local y = map.mapAPI:worldToUIY(px, py)
             local color = markerColor(group)
-            if group.mobile then drawRoute(map, group, color) end
+            if shouldDrawFallbackRoute(group) then
+                drawRoute(map, group, color)
+            end
             local dx, dy = mouseX - x, mouseY - y
             local isHovered = dx * dx + dy * dy <= 64
             local size = isHovered and 10 or 7

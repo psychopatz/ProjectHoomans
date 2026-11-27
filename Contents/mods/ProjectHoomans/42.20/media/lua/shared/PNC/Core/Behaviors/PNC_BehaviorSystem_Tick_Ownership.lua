@@ -211,10 +211,23 @@ function H.Run(record, zombie, now)
             local okP, p = pcall(getSpecificPlayer, 0)
             if okP and p then ownerPlayer = p end
         end
+        local lootRadius = nil
+        if record.recruited ~= true and PNC.AbstractGroups
+            and type(PNC.AbstractGroups.FindByMember) == "function"
+        then
+            local grp = PNC.AbstractGroups.FindByMember(record.id)
+            if type(grp) == "table" and (grp.mission == "SCAVENGE"
+                or grp.groupType == "SCAVENGER"
+                or grp.groupType == "LOOTER")
+            then
+                lootRadius = 18
+            end
+        end
         local activeLoot = behaviorLoot.Tick(record, now, {
             leader = leader,
             ownerPlayer = ownerPlayer,
             maxLeashDist = 8,
+            radius = lootRadius,
         })
         if activeLoot then
             return true
