@@ -91,6 +91,26 @@ function Provider.addOptions(menu, entry)
         end
     end
 
+    local record = target(entry)
+    if record and record.id ~= nil then
+        local npcLootOn = record.opportunisticLootEnabled ~= false
+        local npcOpt = scavengingMenu:addOption(npcLootOn
+            and tr("UI_PNC_Scavenge_NpcLootOn", "This Follower Auto-Loot: ON")
+            or tr("UI_PNC_Scavenge_NpcLootOff", "This Follower Auto-Loot: OFF"), nil, function()
+                if client and client.SetNpcOpportunisticLoot then
+                    client.SetNpcOpportunisticLoot(record.id, not npcLootOn)
+                end
+            end)
+        if npcOpt then
+            ContextHub.ApplyOptionPresentation(npcOpt, {
+                color = npcLootOn and "good" or "bad",
+            })
+            if scavengingMenu.setOptionChecked then
+                scavengingMenu:setOptionChecked(npcOpt, npcLootOn)
+            end
+        end
+    end
+
     local catDefs = PNC.WorldItemCategories and PNC.WorldItemCategories.List
         and PNC.WorldItemCategories.List() or {
             { id = "food", labelKey = "UI_PNC_ScavengeCategory_Food", label = "Food" },
@@ -129,12 +149,35 @@ function Provider.addOptions(menu, entry)
                     containers = prefs.containers ~= false,
                     floorItems = prefs.floorItems ~= false,
                     corpses = prefs.corpses ~= false,
+                    allowStealing = prefs.allowStealing == true,
                 }
                 nextPrefs[src.key] = not checked
                 client.SetScavengePreferences(nextPrefs)
             end
         end)
         markChecked(sourcesMenu, opt, checked)
+    end
+
+    local stealChecked = prefs.allowStealing == true
+    local stealOpt = scavengingMenu:addOption(stealChecked
+        and tr("UI_PNC_Scavenge_AllowStealingOn", "Allow Stealing in Settlements: ON")
+        or tr("UI_PNC_Scavenge_AllowStealingOff", "Allow Stealing in Settlements: OFF"), nil, function()
+            if client and client.SetScavengePreferences then
+                client.SetScavengePreferences({
+                    containers = prefs.containers ~= false,
+                    floorItems = prefs.floorItems ~= false,
+                    corpses = prefs.corpses ~= false,
+                    allowStealing = not stealChecked,
+                })
+            end
+        end)
+    if stealOpt then
+        ContextHub.ApplyOptionPresentation(stealOpt, {
+            color = stealChecked and "bad" or "good",
+        })
+        if scavengingMenu.setOptionChecked then
+            scavengingMenu:setOptionChecked(stealOpt, stealChecked)
+        end
     end
 
     scavengingMenu:addOption(tr("UI_PNC_Scavenge_Clear", "Clear Categories"), nil, function()

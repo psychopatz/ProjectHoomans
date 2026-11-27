@@ -43,14 +43,17 @@ local function canWriteNativeControl(zombie, now, priority, intent)
     return true, "ProjectHoomans", nil
 end
 
-function Effects.ShouldRefreshPath(zombie, targetX, targetY, now)
+function Effects.ShouldRefreshPath(zombie, targetX, targetY, now, targetZ)
     local modData = zombie.getModData
         and zombie:getModData() or nil
+    local policy = PNC.ZombieAggro and PNC.ZombieAggro.PathPolicy or nil
     local pathAtKey = "PNC_ClientAggroPathAt"
     local pathXKey = "PNC_ClientAggroPathX"
     local pathYKey = "PNC_ClientAggroPathY"
+    local pathZKey = "PNC_ClientAggroPathZ"
     local x = tonumber(targetX) or zombie:getX()
     local y = tonumber(targetY) or zombie:getY()
+    local z = tonumber(targetZ) or zombie:getZ()
     if not isMultiplayerMode() then
         -- Singleplayer shared pursuit and this client hook control the same
         -- zombie. Share their path timestamp so they cannot reset one route
@@ -58,28 +61,60 @@ function Effects.ShouldRefreshPath(zombie, targetX, targetY, now)
         pathAtKey = "PNC_AggroPathAt"
         pathXKey = "PNC_AggroPathX"
         pathYKey = "PNC_AggroPathY"
+        pathZKey = "PNC_AggroPathZ"
     end
-    local lastX = modData
-        and tonumber(modData[pathXKey]) or nil
-    local lastY = modData
-        and tonumber(modData[pathYKey]) or nil
+    local stalled = policy and policy.UpdateProgress
+        and policy.UpdateProgress(zombie, modData, now) or false
+    local lastX = modData and tonumber(modData[pathXKey]) or nil
+    local lastY = modData and tonumber(modData[pathYKey]) or nil
+    local lastZ = modData and tonumber(modData[pathZKey]) or nil
+    local levelChanged = lastZ ~= nil and math.floor(lastZ) ~= math.floor(z)
+    if not stalled and not levelChanged
+        and policy and policy.IsFinderNearGoal
+        and policy.IsFinderNearGoal(zombie, x, y, z)
+    then
+        return false
+    end
+    local action = zombie.getActionStateName
+        and string.lower(tostring(zombie:getActionStateName() or "")) or ""
+    local stateLost = action == "turnalerted"
+        or action == "lunge"
+        or action == "lunge-network"
     local dx = lastX and x - lastX or math.huge
     local dy = lastY and y - lastY or math.huge
-    local lastAt = modData
-        and tonumber(modData[pathAtKey]) or nil
+    local lastAt = modData and tonumber(modData[pathAtKey]) or nil
     local elapsed = lastAt and now - lastAt or math.huge
     local movedSq = (dx * dx) + (dy * dy)
-    if modData and lastAt and (
-        elapsed < PATH_REFRESH_MS
-        or (movedSq < PATH_REFRESH_DISTANCE * PATH_REFRESH_DISTANCE
-            and elapsed < PATH_STABLE_RETRY_MS)
+    local backoffMs = modData and tonumber(modData.PNC_AggroBackoffMs) or 0
+    local effectiveRefreshMs = stateLost and 150 or math.max(PATH_REFRESH_MS, backoffMs)
+    local effectiveStableMs = math.max(PATH_STABLE_RETRY_MS, backoffMs)
+    if modData and lastAt and not levelChanged and (
+        elapsed < effectiveRefreshMs
+        or (not stateLost
+            and movedSq < PATH_REFRESH_DISTANCE * PATH_REFRESH_DISTANCE
+            and elapsed < effectiveStableMs)
     ) then
+        return false
+    end
+    local sameFloor = math.floor(zombie:getZ()) == math.floor(z)
+    local distSq = (x - zombie:getX()) ^ 2 + (y - zombie:getY()) ^ 2
+    local closeWalkFast = sameFloor and distSq <= 36
+        and (action == "walktoward" or action == "walktoward-network")
+    if not closeWalkFast and policy and policy.CanAdmitAStar
+        and not policy.CanAdmitAStar(
+            zombie, now, levelChanged, sameFloor and distSq <= 36
+        )
+    then
         return false
     end
     if modData then
         modData[pathAtKey] = now
         modData[pathXKey] = x
         modData[pathYKey] = y
+        modData[pathZKey] = z
+        if policy and policy.ComputeRepathCooldown then
+            policy.ComputeRepathCooldown(modData, stalled, levelChanged)
+        end
     end
     return true
 end
@@ -96,7 +131,7 @@ function Effects.RequestCoordinatePath(zombie, targetX, targetY, targetZ)
     end
     if zombie.pathToLocationF then
         zombie:pathToLocationF(targetX, targetY, targetZ)
-        return true
+        return true, "pathToLocationF"
     end
     return false
 end
@@ -242,6 +277,13 @@ function Effects.ApplySingleplayerAggro(
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", true)
     end
+    local policy = PNC.ZombieAggro and PNC.ZombieAggro.PathPolicy or nil
+    if policy and policy.UpdateLungeVisual then
+        local spZDist = math.abs(
+            (tonumber(body:getZ()) or 0) - (tonumber(zombie:getZ()) or 0)
+        )
+        policy.UpdateLungeVisual(zombie, spZDist < 0.35 and distanceSq <= 12.25)
+    end
     return true
 end
 
@@ -323,7 +365,7 @@ function Effects.ApplyCoordinateDirective(
         or ((approach == true or actionState == "staggerback")
             and actionState ~= "bumped")
     then
-        refreshed = Effects.ShouldRefreshPath(zombie, x, y, now)
+        refreshed = Effects.ShouldRefreshPath(zombie, x, y, now, z)
         if refreshed then
             requested, requestReason = Effects.RequestCoordinatePath(
                 zombie, x, y, z
@@ -371,6 +413,10 @@ function Effects.ApplyCoordinateDirective(
     end
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", true)
+    end
+    local policy = PNC.ZombieAggro and PNC.ZombieAggro.PathPolicy or nil
+    if policy and policy.UpdateLungeVisual then
+        policy.UpdateLungeVisual(zombie, zDistance < 0.35 and distanceSq <= 12.25)
     end
     return true
 end
@@ -425,6 +471,7 @@ function Effects.ReleaseCoordinateDirective(zombie, intent)
     end
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", false)
+        zombie:setVariable("PNCZombieLunge", false)
     end
     if intent == "native_player_handoff" and modData then
         modData.PNC_NativeCombatHandoffApplied = true
@@ -470,6 +517,7 @@ function Effects.ApplyPlayerTarget(zombie, player)
     end
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", false)
+        zombie:setVariable("PNCZombieLunge", false)
     end
 end
 
@@ -491,6 +539,7 @@ function Effects.HandoffToNativePlayer(zombie, player, now, hasDirective)
     end
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", false)
+        zombie:setVariable("PNCZombieLunge", false)
     end
     return true
 end

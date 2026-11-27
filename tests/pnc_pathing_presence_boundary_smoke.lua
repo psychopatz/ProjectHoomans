@@ -188,6 +188,7 @@ local enginePlannerCalls = capture(
 )
 local expectedEnginePlannerCalls = {
     "PNC/Core/Pathing/PNC_EnginePathPlanner/PNC_EnginePathPlanner_Passage",
+    "PNC/Core/Pathing/PNC_EnginePathPlanner/PNC_EnginePathPlanner_FloorAssist",
     "PNC/Core/Pathing/PNC_EnginePathPlanner/PNC_EnginePathPlanner_Request",
     "PNC/Core/Pathing/PNC_EnginePathPlanner/PNC_EnginePathPlanner_Steering",
     "PNC/Core/Pathing/PNC_EnginePathPlanner/PNC_EnginePathPlanner_PumpTraversal",

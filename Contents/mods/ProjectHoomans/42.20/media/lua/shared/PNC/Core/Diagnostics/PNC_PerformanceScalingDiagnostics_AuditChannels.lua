@@ -219,3 +219,23 @@ function Diagnostics.LogSuicideAudit(eventName, fields)
     end
     return true
 end
+
+-- World loot & safe-zone stealing audit channel. Callers guard on
+-- Diagnostics.WorldLootAuditEnabled before assembling fields so the disabled
+-- path stays a single boolean check.
+function Diagnostics.LogWorldLootAudit(eventName, fields)
+    local output
+    local message
+    if Diagnostics.WorldLootAuditEnabled ~= true then return false end
+    output = { "world_loot_audit", "event=" .. tostring(eventName or "unknown") }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end

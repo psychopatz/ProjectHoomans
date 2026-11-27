@@ -83,6 +83,29 @@ function Internal.CheckTargetReadiness(record, body, finalTarget, navigation)
     if not target then
         return false, "target_chunk_unloaded"
     end
+    if type(Internal.IsGoalRefused) == "function" then
+        local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+        local refused, refuseReason = Internal.IsGoalRefused(record, finalTarget, now)
+        if refused then
+            return false, refuseReason or "target_goal_refused"
+        end
+    end
+    if type(Internal.SnapToStandableGoal) == "function" then
+        local snapped, snapStatus = Internal.SnapToStandableGoal(finalTarget)
+        if snapped == nil then
+            if type(Internal.RefuseGoal) == "function" then
+                local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+                Internal.RefuseGoal(
+                    record,
+                    finalTarget,
+                    now,
+                    Internal.DEFAULT_NO_FLOOR_REFUSAL_MS or 10000,
+                    snapStatus or "target_no_solid_floor"
+                )
+            end
+            return false, snapStatus or "target_no_solid_floor"
+        end
+    end
     if navigation and navigation.targetValidation == "shoreline_pair" then
         if navigation.targetWaterX == nil
             or navigation.targetWaterY == nil

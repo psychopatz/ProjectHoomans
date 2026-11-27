@@ -1,0 +1,122 @@
+# Unified semantic dialogue for opportunistic looting:
+#   * "Just found" discovery variants driven by MarketSense price, quality/condition,
+#     treat/comfort food tags, item category, and container/location source (`{slot.source}`).
+#   * Stealth/bold stealing lines when a looter steals unseen from a protected zone.
+#   * Witnessed safe-zone theft confrontations using ActorReference pronouns & name gating.
+#   * Pack-full callouts and looted sustenance consumption.
+language EN
+namespace hoomans
+
+dialogue semantic.social.world_loot
+  # --- JUST FOUND: Treat / Comfort food (ice cream, chocolate, candy, soda) ---
+  say [role=loot_found_treat, actor.social_style=warm|friendly|protective] as found_treat_warm:
+    "OMG—{slot.item} {slot.source}?! No way, I'm grabbing this!"
+    "Yo, {slot.item} {slot.source}! Haven't seen that since before the outbreak!"
+  say [role=loot_found_treat, actor.social_style=hostile|guarded|withdrawn] as found_treat_guarded:
+    "Huh... {slot.item} {slot.source}. Don't mind if I do."
+    "Well look at that—{slot.item} {slot.source}. Mine now."
+  say [role=loot_found_treat] as found_treat_default:
+    "Whoa—{slot.item} {slot.source}! What a find!"
+    "OMG, {slot.item} {slot.source}! Definitely taking that."
+
+  # --- JUST FOUND: High-value / Jackpot item (via MarketSense price) ---
+  say [role=loot_found_jackpot, actor.social_style=warm|friendly|protective] as found_jackpot_warm:
+    "Jackpot! Look what I found {slot.source}—{slot.item}! That's worth a fortune now!"
+    "Whoa, {slot.item} {slot.source}! That's a serious score!"
+  say [role=loot_found_jackpot, actor.social_style=hostile|guarded|withdrawn] as found_jackpot_guarded:
+    "Now we're talking—{slot.item} {slot.source}. Worth its weight in gold."
+    "Prime gear—{slot.item} {slot.source}. Not leaving this behind."
+  say [role=loot_found_jackpot] as found_jackpot_default:
+    "Jackpot—found {slot.item} {slot.source}! Huge find!"
+    "Score! {slot.item} {slot.source}—that's rare stuff!"
+
+  # --- JUST FOUND: Pristine / High-quality gear ---
+  say [role=loot_found_pristine] as found_pristine_default:
+    "Mint condition {slot.item} {slot.source}—barely even scratched!"
+    "Clean {slot.item} {slot.source}! Still in great shape."
+
+  # --- JUST FOUND: Worn / Beat-up item ---
+  say [role=loot_found_worn] as found_worn_default:
+    "Found a beat-up {slot.item} {slot.source}... rough shape, still better than nothing."
+    "This {slot.item} {slot.source} has seen better days, but I'll take it."
+
+  # --- JUST FOUND: Category-aware standard finds ---
+  say [role=loot_found_food, actor.social_style=warm|friendly|protective] as found_food_warm:
+    "Yo, I found some {slot.item} {slot.source}! That'll keep us going."
+    "Hey—{slot.item} {slot.source}! Tucking it into my pack."
+  say [role=loot_found_food, actor.social_style=hostile|guarded|withdrawn] as found_food_guarded:
+    "Got {slot.item} {slot.source}. Better in my pack than rotting."
+    "Taking this {slot.item} {slot.source} before someone else does."
+  say [role=loot_found_food] as found_food_default:
+    "Yo, found some {slot.item} {slot.source}—never pass up food."
+    "Picked up {slot.item} {slot.source}."
+
+  say [role=loot_found_water, actor.social_style=warm|friendly|protective] as found_water_warm:
+    "Nice—found {slot.item} {slot.source}. Always need clean water."
+  say [role=loot_found_water] as found_water_default:
+    "Grabbed {slot.item} {slot.source}—can't run dry out here."
+    "Found {slot.item} {slot.source}, stashing it in my pack."
+
+  say [role=loot_found_medical, actor.social_style=warm|friendly|protective] as found_med_warm:
+    "Good find—{slot.item} {slot.source}. Hope we don't need it, glad we have it."
+  say [role=loot_found_medical] as found_med_default:
+    "Picked up {slot.item} {slot.source}. Medical supplies are gold."
+    "Found {slot.item} {slot.source}—could save a life."
+
+  say [role=loot_found_ammo, actor.social_style=hostile|guarded|withdrawn] as found_ammo_guarded:
+    "Found {slot.item} {slot.source}. Never enough rounds."
+  say [role=loot_found_ammo] as found_ammo_default:
+    "Yo, found {slot.item} {slot.source}—stashing it."
+    "Picked up {slot.item} {slot.source}."
+
+  say [role=loot_found_general] as found_general_default:
+    "Hey, found {slot.item} {slot.source}—could come in handy."
+    "Grabbing {slot.item} {slot.source}."
+
+  # --- STEALING: Looter unseen inside a protected safe zone ---
+  say [role=loot_steal_high_value] as steal_high_value_default:
+    "Heh... {slot.item} {slot.source}, right out of their stash. Easy money."
+    "Jackpot—lifting this {slot.item} {slot.source} before they even know it's gone."
+  say [role=loot_steal_sneaky, actor.social_style=hostile|guarded|withdrawn] as steal_sneaky_guarded:
+    "Suckers left {slot.item} sitting {slot.source}. Mine now."
+    "Quick—grabbing this {slot.item} {slot.source} while nobody's looking."
+  say [role=loot_steal_sneaky] as steal_sneaky_default:
+    "Nobody's watching... taking this {slot.item} {slot.source}."
+    "Swiping {slot.item} {slot.source}—they won't miss one."
+
+  # --- STEALING: Safe-zone witness confrontation (knowledge-gated name + pronouns) ---
+  say [role=theft_witness_challenge, actor.social_style=hostile|guarded|withdrawn] as theft_challenge_guarded:
+    "Hey, {addressee.name}! Drop that {slot.item} right now! Stop {thief.obj}—{thief.subj}'s raiding our stash!"
+    "Get your hands off our {slot.item}, {addressee.name}! {thief.Subj}'s stealing from {slot.source}!"
+  say [role=theft_witness_challenge, actor.social_style=warm|friendly|protective] as theft_challenge_warm:
+    "Hold on, {addressee.name}—that {slot.item} belongs to us! Somebody stop {thief.obj} before {thief.subj} cleans us out!"
+    "Hey! {thief.Subj}'s taking our {slot.item} from {slot.source}! Put it back, {addressee.name}!"
+  say [role=theft_witness_challenge] as theft_challenge_default:
+    "Thief! {addressee.name}, drop that {slot.item}! Stop {thief.obj}—{thief.subj}'s stealing our supplies!"
+    "Hey! {thief.name} is looting our safe zone—don't let {thief.obj} get away with {thief.poss} haul!"
+
+  # Looter/raider defiant reply when caught stealing inside a safe zone
+  say [role=theft_looter_reply, actor.social_style=hostile|guarded|withdrawn] as theft_reply_guarded:
+    "Finders keepers—try and take this {slot.item} back!"
+    "Back off! We need this {slot.item} more than you do!"
+  say [role=theft_looter_reply] as theft_reply_default:
+    "Too slow—this {slot.item} is mine now!"
+    "Stay out of my way if you know what's good for you!"
+
+  # --- PACK FULL ---
+  say [role=loot_pack_full, actor.social_style=warm|friendly|protective] as pack_full_warm:
+    "Hey {addressee.name}, my pack's full—I can't carry any more!"
+    "I'm loaded down, {addressee.name}. No more room in my bag."
+  say [role=loot_pack_full, actor.social_style=hostile|guarded|withdrawn] as pack_full_guarded:
+    "Pack's maxed out. Not hauling another ounce."
+  say [role=loot_pack_full] as pack_full_default:
+    "My pack's full—can't grab any more."
+    "Out of bag space here."
+
+  # --- SUSTENANCE CONSUMPTION ---
+  say [role=sustenance_eat] as sustain_eat_default:
+    "Finally—time to eat this {slot.item}."
+    "Grabbing a quick bite of {slot.item}."
+  say [role=sustenance_drink] as sustain_drink_default:
+    "Taking a swig of {slot.item}—throat's parched."
+    "Drinking some {slot.item}."

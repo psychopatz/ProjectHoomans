@@ -33,6 +33,8 @@ local BEHAVIOR_SCRIPT_AUDIT_SETTING_ID =
     "ProjectHoomans.BehaviorScriptAudit"
 local SUICIDE_AUDIT_SETTING_ID =
     "ProjectHoomans.SuicideAudit"
+local WORLD_LOOT_AUDIT_SETTING_ID =
+    "ProjectHoomans.WorldLootAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -267,6 +269,18 @@ local function initializeCentralDebugSettings()
             Diagnostics.SuicideAuditEnabled = enabled == true
         end,
     })
+    settings.Register({
+        id = WORLD_LOOT_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 155,
+        title = "World loot & stealing audit",
+        description = "Logs opportunistic loot scans, safe-zone blocks, pickups, MarketSense roles, sustenance consumption, and safe-zone theft alerts.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.WorldLootAuditEnabled = enabled == true
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
@@ -309,6 +323,8 @@ local function initializeCentralDebugSettings()
         BEHAVIOR_SCRIPT_AUDIT_SETTING_ID) == true
     Diagnostics.SuicideAuditEnabled = settings.IsEnabled(
         SUICIDE_AUDIT_SETTING_ID) == true
+    Diagnostics.WorldLootAuditEnabled = settings.IsEnabled(
+        WORLD_LOOT_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()

@@ -16,6 +16,20 @@ PNC.WorldLoot = PNC.WorldLoot or {}
 
 local WorldLoot = PNC.WorldLoot
 
+function WorldLoot.IsAuditEnabled()
+    local diag = PNC.PerformanceScalingDiagnostics
+    return diag ~= nil and diag.WorldLootAuditEnabled == true
+end
+
+function WorldLoot.Audit(eventName, fields)
+    local diag = PNC.PerformanceScalingDiagnostics
+    if not diag or diag.WorldLootAuditEnabled ~= true then return false end
+    if type(diag.LogWorldLootAudit) == "function" then
+        return diag.LogWorldLootAudit(eventName, fields)
+    end
+    return false
+end
+
 local LOOTER_ROLES = {
     looter = true,
     raider = true,
@@ -156,20 +170,39 @@ function WorldLoot.IsInProtectedSafeZone(x, y, z)
     return false, nil, nil
 end
 
--- Enforces safe-zone protection for BOTH player followers and AI NPCs,
--- unless the policy or NPC carries the looter/raider theft override.
+local function isOwnSettlement(record, zoneKind, zoneId)
+    if type(record) ~= "table" then return false end
+    if (zoneKind == "player_settlement" or zoneKind == "safehouse") and isOwnedColonist(record) then
+        return true
+    end
+    if zoneKind == "npc_settlement" and zoneId ~= nil then
+        local ownCid = record.communityID or record.homeCommunityId
+            or (record.affiliation and (record.affiliation.communityID or record.affiliation.homeCommunityId))
+        if ownCid ~= nil and tostring(ownCid) == tostring(zoneId) then
+            return true
+        end
+    end
+    return false
+end
+
+-- Enforces safe-zone protection for BOTH player followers and AI NPCs.
+-- Smart self-protection: an NPC NEVER steals from its own home settlement/colony
+-- even when `allowProtectedZoneTheft` / `allowStealing` is enabled.
 function WorldLoot.CanLootAt(record, x, y, z, policy)
+    local protected, zoneKind, zoneId = WorldLoot.IsInProtectedSafeZone(x, y, z)
+    if not protected then
+        return true, nil
+    end
+    if isOwnSettlement(record, zoneKind, zoneId) then
+        return false, "own_settlement", zoneId
+    end
     if type(policy) == "table" and policy.allowProtectedZoneTheft == true then
         return true, nil
     end
     if WorldLoot.IsLooterVariant(record) then
         return true, nil
     end
-    local protected, zoneKind, zoneId = WorldLoot.IsInProtectedSafeZone(x, y, z)
-    if protected then
-        return false, zoneKind, zoneId
-    end
-    return true, nil
+    return false, zoneKind, zoneId
 end
 
 -- Resolves a unified loot policy for ANY actor (player follower OR AI-owned NPC).
@@ -202,16 +235,17 @@ function WorldLoot.ResolvePolicy(record, ownerPlayer)
         end
         local enabled = (record.opportunisticLootEnabled == true)
             or (snap ~= nil and snap.enabled == true)
+        local prefs = (snap and snap.preferences) or {
+            containers = true, floorItems = true, corpses = true, allowStealing = false,
+        }
         return {
             enabled = enabled,
-            preferences = (snap and snap.preferences) or {
-                containers = true, floorItems = true, corpses = true,
-            },
+            preferences = prefs,
             categories = (snap and snap.categories) or {
                 food = true, water = true, medical = true, ammo = true,
             },
             autoGrab = (snap and snap.autoGrab) or {},
-            allowProtectedZoneTheft = theftAllowed,
+            allowProtectedZoneTheft = theftAllowed or (prefs.allowStealing == true),
             actorKind = "colonist",
         }
     end

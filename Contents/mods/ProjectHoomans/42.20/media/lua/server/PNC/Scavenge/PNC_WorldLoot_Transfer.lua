@@ -39,12 +39,19 @@ local function buildCompactDescriptor(item, category)
         or (type(item) == "table" and item.thirstChange)) or 0
     return {
         id = "loot_" .. tostring(nextLootSeq) .. "_" .. ft,
+        type = ft,
         fullType = ft,
+        count = 1,
         category = category,
         weight = math.max(0.05, weight),
         calories = calories ~= 0 and calories or nil,
         hungerChange = hungerChange ~= 0 and hungerChange or nil,
         thirstChange = thirstChange ~= 0 and thirstChange or nil,
+        state = {
+            calories = calories ~= 0 and calories or nil,
+            hungerChange = hungerChange ~= 0 and hungerChange or nil,
+            thirstChange = thirstChange ~= 0 and thirstChange or nil,
+        },
         container = "root",
         looted = true,
     }
@@ -134,6 +141,75 @@ local function addDescriptorToUnifiedInventory(record, desc)
     return true, desc
 end
 
+local THEFT_WITNESS_RADIUS_SQ = 144 -- 12 tiles
+
+local function playPickupCue(record, nowMs)
+    local perf = PNC.Semantics and PNC.Semantics.SpeechPerformance or nil
+    if perf and type(perf.Perform) == "function" then
+        pcall(perf.Perform, record, {
+            anim = "PNC_Anim_Loot",
+            durationMs = 900,
+            reason = "world_loot_pickup",
+        }, nowMs)
+    end
+end
+
+local function emitSafeZoneTheftAlert(thief, target, desc, nowMs)
+    local protected, zoneKind, zoneId = WorldLoot.IsInProtectedSafeZone(target.x, target.y, target.z)
+    if not protected then return false, 0 end
+
+    local payload = {
+        thiefId = tostring(thief.id or ""),
+        zoneKind = tostring(zoneKind or ""),
+        zoneId = tostring(zoneId or ""),
+        x = target.x,
+        y = target.y,
+        z = target.z,
+        fullType = desc and desc.fullType or target.fullType,
+        at = nowMs,
+    }
+    local bus = PsychopatzCore and PsychopatzCore.Events or nil
+    if bus and type(bus.emit) == "function" then
+        pcall(bus.emit, "WORLD_LOOT_PROTECTED_THEFT", payload)
+    end
+
+    local witnesses = 0
+    local registry = PNC.Registry
+    if registry and type(registry.ForEach) == "function" then
+        registry.ForEach(function(obs)
+            if type(obs) == "table" and obs.alive ~= false
+                and tostring(obs.id or "") ~= payload.thiefId
+            then
+                local dx = (tonumber(obs.x) or 0) - (tonumber(target.x) or 0)
+                local dy = (tonumber(obs.y) or 0) - (tonumber(target.y) or 0)
+                local dz = math.abs((tonumber(obs.z) or 0) - (tonumber(target.z) or 0))
+                local sameSide = (zoneKind == "player_settlement" and obs.recruited == true)
+                    or (zoneKind == "npc_settlement" and tostring(obs.communityID or obs.homeCommunityId or "") == payload.zoneId)
+                if sameSide and dz < 1 and (dx * dx + dy * dy) <= THEFT_WITNESS_RADIUS_SQ then
+                    witnesses = witnesses + 1
+                    obs.runtime = type(obs.runtime) == "table" and obs.runtime or {}
+                    obs.runtime.theftAlertTargetId = payload.thiefId
+                    obs.runtime.theftAlertAt = nowMs
+                    if PNC.Relationships and type(PNC.Relationships.ApplyConversationEffect) == "function" then
+                        pcall(PNC.Relationships.ApplyConversationEffect, obs.id, "npc:" .. payload.thiefId, {
+                            trustDelta = -12,
+                            affectionDelta = -8,
+                            reason = "protected_zone_theft",
+                        })
+                    end
+                    if witnesses == 1 then
+                        local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+                        if beats and type(beats.EmitWorldLootTheft) == "function" then
+                            pcall(beats.EmitWorldLootTheft, obs, thief, payload.fullType, nowMs, target)
+                        end
+                    end
+                end
+            end
+        end)
+    end
+    return true, witnesses
+end
+
 -- Executes the physical pickup -> unified PNC.Inventory transfer.
 function WorldLoot.CollectTarget(record, target, nowMs, policy)
     if type(record) ~= "table" or type(target) ~= "table" or not target.item then
@@ -142,6 +218,14 @@ function WorldLoot.CollectTarget(record, target, nowMs, policy)
     local okZone, zoneKind = WorldLoot.CanLootAt(record, target.x, target.y, target.z, policy)
     if not okZone then
         WorldLoot.ReleaseClaim(target.targetKey, record.id)
+        if WorldLoot.IsAuditEnabled() then
+            WorldLoot.Audit("blocked_zone", {
+                "npc=" .. tostring(record.id),
+                "reason=" .. tostring(zoneKind),
+                "item=" .. tostring(target.fullType),
+                string.format("pos=%d,%d,%d", tonumber(target.x) or 0, tonumber(target.y) or 0, tonumber(target.z) or 0),
+            })
+        end
         return false, "protected_zone:" .. tostring(zoneKind)
     end
     local remCap = WorldLoot.GetRemainingCapacity(record)
@@ -162,13 +246,46 @@ function WorldLoot.CollectTarget(record, target, nowMs, policy)
         return false, "inventory_add_failed"
     end
 
+    playPickupCue(record, nowMs)
+    local isProtectedTheft, witnessCount = emitSafeZoneTheftAlert(record, target, desc, nowMs)
+    if WorldLoot.IsAuditEnabled() then
+        WorldLoot.Audit(isProtectedTheft and "theft_collected" or "collected", {
+            "npc=" .. tostring(record.id),
+            "item=" .. tostring(desc.fullType),
+            "cat=" .. tostring(desc.category),
+            "stolen=" .. tostring(isProtectedTheft == true),
+            "witnesses=" .. tostring(witnessCount or 0),
+            string.format("pos=%d,%d,%d", tonumber(target.x) or 0, tonumber(target.y) or 0, tonumber(target.z) or 0),
+        })
+    end
+    local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if isProtectedTheft then
+        if (witnessCount or 0) == 0 and beats and type(beats.EmitWorldLootStealSolo) == "function" then
+            pcall(beats.EmitWorldLootStealSolo, record, desc, nowMs, target)
+        end
+    elseif beats and type(beats.EmitWorldLootPickup) == "function" then
+        pcall(beats.EmitWorldLootPickup, record, desc, nowMs, target)
+    end
+
     -- If this NPC is hungry/thirsty right now and just looted food/water, allow immediate consumption
     local wn = PNC.WorldHourNeeds
     if wn and type(wn.ConsumePersonalSustenance) == "function" then
         if desc.category == "food" and wn.GetPseudoNeed(record, "hunger") >= 0.70 then
-            wn.ConsumePersonalSustenance(record, "hunger")
+            local ate, ateType = wn.ConsumePersonalSustenance(record, "hunger")
+            if ate then
+                local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+                if beats and type(beats.EmitWorldLootSustenance) == "function" then
+                    pcall(beats.EmitWorldLootSustenance, record, "hunger", ateType, nowMs)
+                end
+            end
         elseif desc.category == "water" and wn.GetPseudoNeed(record, "thirst") >= 0.70 then
-            wn.ConsumePersonalSustenance(record, "thirst")
+            local drank, drankType = wn.ConsumePersonalSustenance(record, "thirst")
+            if drank then
+                local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+                if beats and type(beats.EmitWorldLootSustenance) == "function" then
+                    pcall(beats.EmitWorldLootSustenance, record, "thirst", drankType, nowMs)
+                end
+            end
         end
     end
 

@@ -15,6 +15,29 @@ local beginMovementLease = Controller.BeginMovementLease
 local logState = Controller.LogState
 local describeBody = Controller.DescribeBody
 
+local function canSeamlessRetarget(body, state, behavior)
+    if state.owned ~= true or state.failed == true or not behavior then
+        return false
+    end
+    if type(behavior.hasStartedMoving) ~= "function"
+        or behavior:hasStartedMoving() ~= true
+    then
+        return false
+    end
+    if type(behavior.getIsCancelled) == "function"
+        and behavior:getIsCancelled() == true
+    then
+        return false
+    end
+    if body.getCurrentState and ZombieIdleState
+        and type(ZombieIdleState.instance) == "function"
+        and body:getCurrentState() == ZombieIdleState.instance()
+    then
+        return false
+    end
+    return true
+end
+
 local function submitPathRequest(
     snapshot,
     body,
@@ -33,7 +56,8 @@ local function submitPathRequest(
     if not shouldRequest then
         return false
     end
-    if state.owned == true then
+    local seamless = canSeamlessRetarget(body, state, behavior)
+    if state.owned == true and not seamless then
         if behavior.cancel then
             behavior:cancel()
         end
@@ -41,9 +65,25 @@ local function submitPathRequest(
             behavior:reset()
         end
     end
-    -- The character wrapper enters PathFindState, the sole owner of
-    -- PathFindBehavior2.update() and native passage traversal.
-    body:pathToLocationF(goal.x, goal.y, goal.z)
+    -- Prefer direct Behavior2 + PathFindState when available so MP goal
+    -- updates bypass IsoZombie.allowRepathDelay and retarget seamlessly
+    -- without cancelling mid-stride. Fall back to body:pathToLocationF when
+    -- PathFindState or behavior.pathToLocationF is unavailable.
+    local pathState = PathFindState and type(PathFindState.instance) == "function"
+        and PathFindState.instance() or nil
+    if behavior and type(behavior.pathToLocationF) == "function"
+        and pathState ~= nil and type(body.changeState) == "function"
+    then
+        behavior:pathToLocationF(goal.x, goal.y, goal.z)
+        if body.setVariable then
+            body:setVariable("bPathfind", true)
+        end
+        if not (body.getCurrentState and body:getCurrentState() == pathState) then
+            body:changeState(pathState)
+        end
+    else
+        body:pathToLocationF(goal.x, goal.y, goal.z)
+    end
     if state.requestKey ~= key then
         state.retries = 0
     else

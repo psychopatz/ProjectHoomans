@@ -78,6 +78,12 @@ function BehaviorLoot.Tick(record, nowMs, opts)
             bypassBudget = opts.bypassBudget,
         })
         if not scanned then
+            if reason == "inventory_full" then
+                local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+                if beats and type(beats.EmitWorldLootPackFull) == "function" then
+                    pcall(beats.EmitWorldLootPackFull, record, opts.ownerPlayer or opts.leader, nowMs)
+                end
+            end
             return false, reason or "no_target"
         end
         scanned.startedAt = nowMs

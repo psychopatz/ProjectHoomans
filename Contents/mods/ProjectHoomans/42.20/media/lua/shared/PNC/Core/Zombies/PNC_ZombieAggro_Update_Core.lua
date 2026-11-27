@@ -197,38 +197,44 @@ local function isPursuitActionLocked(zombie)
     return PURSUIT_ACTION_LOCKS[actionStateName(zombie)] == true
 end
 
--- Use the vanilla coordinate-goal API without ever creating an NPC character
--- goal. When a zombie is already in PathFindState, calling the character
--- wrapper can be ignored by IsoZombie's allowRepathDelay guard. PathFindState
--- already owns Behavior2:update(), so update its location goal directly in
--- that state. In all other states the public wrapper remains responsible for
--- entering the normal pathfind/movement animation contract.
+-- Use direct PathFindBehavior2 + PathFindState for zombie-vs-NPC pursuit.
+-- Verified against Build 42 Java (WalkTowardState.java:68 vs PathFindState.java:46):
+-- WalkTowardState.execute() immediately overwrites PathFindBehavior2 with
+-- pathToCharacter(zomb.target) whenever vanilla spottedNew() sets target=player,
+-- whereas PathFindState.execute() only pumps PathFindBehavior2.update() and
+-- never hijacks the route onto zomb.target. Updating Behavior2:pathToLocationF
+-- directly also bypasses IsoZombie.allowRepathDelay, uses exact float coords
+-- (avoiding integer tile-center deadlocks), and handles stairs/multi-floor.
 function ZombieAggro.RequestCoordinatePath(zombie, targetX, targetY, targetZ)
     local behavior
     local state
     local pathState
     local currentState
+    local policy = ZombieAggro.PathPolicy
+    local now = Core and Core.Now and Core.Now() or 0
     if not zombie then
         return false, "missing_zombie"
     end
-    behavior = zombie.getPathFindBehavior2
-        and zombie:getPathFindBehavior2() or nil
     state = actionStateName(zombie)
     if isPursuitActionLocked(zombie) then
         incrementDiagnostic("ZombieAggro.PathRequestsDeferred")
         return false, "action_state_locked:" .. state
     end
+    behavior = zombie.getPathFindBehavior2
+        and zombie:getPathFindBehavior2() or nil
     if not behavior or not behavior.pathToLocationF then
         return false, "behavior2_unavailable"
+    end
+
+    local nativeTarget = zombie.getTarget and zombie:getTarget() or nil
+    if nativeTarget ~= nil and not isForeignOwnedBody(nativeTarget) then
+        if zombie.setTarget then zombie:setTarget(nil) end
+        if zombie.clearAggroList then zombie:clearAggroList() end
     end
 
     pathState = PathFindState and PathFindState.instance
         and PathFindState.instance() or nil
     currentState = zombie.getCurrentState and zombie:getCurrentState() or nil
-    -- IsoZombie:pathToLocationF() is guarded by allowRepathDelay while it is
-    -- in PathFind/WalkToward states. Use the same direct Behavior2 + state
-    -- transition sequence that Project A-Life uses for its owned shells in
-    -- every state, so the goal update cannot be silently discarded.
     if pathState and currentState ~= pathState then
         if behavior.cancel then behavior:cancel() end
         if behavior.reset then behavior:reset() end
@@ -241,6 +247,9 @@ function ZombieAggro.RequestCoordinatePath(zombie, targetX, targetY, targetZ)
     end
     if pathState and currentState ~= pathState and zombie.changeState then
         zombie:changeState(pathState)
+    end
+    if policy and policy.NotePathIssued then
+        policy.NotePathIssued(zombie, now, true)
     end
     incrementDiagnostic("ZombieAggro.Behavior2PathRequests")
     return true, "behavior2_pathfind_state"

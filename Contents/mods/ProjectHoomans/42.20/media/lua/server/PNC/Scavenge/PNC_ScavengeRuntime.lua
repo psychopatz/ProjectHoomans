@@ -7,6 +7,7 @@ require "PNC/Scavenge/PNC_WorldLoot_Policy"
 require "PNC/Scavenge/PNC_WorldLoot_Scanner"
 require "PNC/Scavenge/PNC_WorldLoot_Transfer"
 require "PNC/Scavenge/PNC_Behavior_Loot"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_WorldLoot"
 
 PNC = PNC or {}
 PNC.ScavengeRuntime = PNC.ScavengeRuntime or {}

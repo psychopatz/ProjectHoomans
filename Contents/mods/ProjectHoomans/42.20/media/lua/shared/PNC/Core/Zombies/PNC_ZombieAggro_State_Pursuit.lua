@@ -18,13 +18,18 @@ local DEFAULT_PURSUIT_PRIORITIES = {
 -- the NPC coordinate-pursuit lane.
 local NATIVE_PLAYER_HANDOFF_OWNER = "VanillaPlayer"
 local NATIVE_PLAYER_HANDOFF_TTL_MS = 750
+local PLAYER_PROVOKE_WINDOW_MS = 5000
+-- Only genuine player-combat states claim the vanilla attack lane.
+-- "turnalerted" is a sight/sound turning state (triggered whenever a zombie
+-- hears pathToSound or glances at a distant player) and must not abort an
+-- active NPC pursuit.
 local NATIVE_PLAYER_ATTACK_STATES = {
     attack = true,
     ["attack-network"] = true,
     lunge = true,
     ["lunge-network"] = true,
-    turnalerted = true,
 }
+local NATIVE_PLAYER_LUNGE_YIELD_DIST_SQ = 6.25 -- 2.5 tiles
 
 local function pursuitPriority(owner, requested)
     local value = tonumber(requested)
@@ -82,15 +87,17 @@ local function nativePlayerTarget(zombie)
         and zombie:getTarget() or nil
     local attackedBy = zombie and zombie.getAttackedBy
         and zombie:getAttackedBy() or nil
-    if isIsoPlayer(target)
-        and not (target.isDead and target:isDead())
-    then
-        return target, "target"
-    end
+    -- Check attackedBy first so an actual player hit/shove is always
+    -- distinguished from passive vision targeting (target).
     if isIsoPlayer(attackedBy)
         and not (attackedBy.isDead and attackedBy:isDead())
     then
         return attackedBy, "attackedBy"
+    end
+    if isIsoPlayer(target)
+        and not (target.isDead and target:isDead())
+    then
+        return target, "target"
     end
     return nil, nil
 end
@@ -143,7 +150,64 @@ function Internal.ShouldYieldToNativePlayerAttack(zombie, now)
     modData = pursuitModData(zombie)
     target, source = nativePlayerTarget(zombie)
     action = nativePlayerActionState(zombie)
+    local npcProvoked = modData
+        and (tonumber(modData.PNC_AggroProvokedUntil) or 0) > now
+    local playerProvoked = modData
+        and (tonumber(modData.PNC_PlayerProvokedUntil) or 0) > now
+    local npcLeased = modData
+        and modData.PNC_ZombiePursuitOwner == PURSUIT_OWNER
+        and (tonumber(modData.PNC_ZombiePursuitUntil) or 0) > now
+
+    -- Organic hit-to-distract: if the player actually hit or shoved the zombie
+    -- (attackedBy == player), immediately yield to the player and clear any
+    -- prior NPC retaliation lock so the zombie turns on the player.
+    if target and source == "attackedBy" then
+        if modData then
+            modData.PNC_AggroProvokedUntil = nil
+            modData.PNC_PlayerProvokedUntil = now + PLAYER_PROVOKE_WINDOW_MS
+            modData.PNC_NativeCombatOwner = NATIVE_PLAYER_HANDOFF_OWNER
+            modData.PNC_NativeCombatTarget = target.getOnlineID
+                and tonumber(target:getOnlineID()) or nil
+            modData.PNC_NativeCombatUntil = now + NATIVE_PLAYER_HANDOFF_TTL_MS
+            modData.PNC_NativeCombatReason = "player_provoked_hit"
+        end
+        return true, target, source, action
+    end
+
+    -- While the player's recent hit provocation is active (and no NPC has hit
+    -- the zombie back), keep the zombie committed to the player.
+    if target and playerProvoked and not npcProvoked then
+        return true, target, "player_provoked", action
+    end
+
     if target and NATIVE_PLAYER_ATTACK_STATES[action] == true then
+        local isLunge = action == "lunge" or action == "lunge-network"
+        -- If an NPC just hit/provoked this zombie, let it retaliate against
+        -- the NPC instead of being pulled back to the player by a lunge.
+        if isLunge and npcProvoked then
+            return false, nil, nil, action
+        end
+        -- When a zombie is already committed to attacking/chasing an NPC,
+        -- merely walking near it must not steal it onto the player; the player
+        -- must attack/shove it (attackedBy) to draw aggro organically.
+        if isLunge and npcLeased
+            and (action == "lunge"
+                or (zombie.getX and zombie.getY and target.getX and target.getY))
+        then
+            return false, nil, nil, action
+        end
+        -- For unleased zombies, Build 42 enters LungeState from up to ~12 tiles
+        -- away while chasing a player. Ignore distant lunges (> 2.5 tiles) so
+        -- acquireNearestTarget can compare distances fairly with closer NPCs.
+        if isLunge
+            and zombie.getX and zombie.getY and target.getX and target.getY
+        then
+            local dx = (tonumber(target:getX()) or 0) - (tonumber(zombie:getX()) or 0)
+            local dy = (tonumber(target:getY()) or 0) - (tonumber(zombie:getY()) or 0)
+            if (dx * dx) + (dy * dy) > NATIVE_PLAYER_LUNGE_YIELD_DIST_SQ then
+                return false, nil, nil, action
+            end
+        end
         if modData then
             modData.PNC_NativeCombatOwner = NATIVE_PLAYER_HANDOFF_OWNER
             modData.PNC_NativeCombatTarget = target.getOnlineID

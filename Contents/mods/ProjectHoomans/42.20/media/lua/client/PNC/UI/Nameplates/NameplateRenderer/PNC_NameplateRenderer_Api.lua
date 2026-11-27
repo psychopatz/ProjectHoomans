@@ -59,6 +59,9 @@ function Renderer.Render(manager, settings)
                 drawCombatDebug(manager, entry, settings, combatRenderState)
             end
         end
+        if type(Renderer.RenderCombatZombieThoughts) == "function" then
+            Renderer.RenderCombatZombieThoughts(manager, settings, combatRenderState)
+        end
     end
     if settings.showZombieDebug then
         local drawnZombieDebug = {}

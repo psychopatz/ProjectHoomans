@@ -302,6 +302,16 @@ function WorldLoot.ScanNearbyTarget(record, nowMs, opts)
 
     if best then
         WorldLoot.ClaimTarget(best.targetKey, npcId, nowMs)
+        if WorldLoot.IsAuditEnabled() then
+            WorldLoot.Audit("target_claimed", {
+                "npc=" .. npcId,
+                "kind=" .. tostring(best.kind),
+                "item=" .. tostring(best.fullType),
+                "cat=" .. tostring(best.category),
+                string.format("pos=%d,%d,%d", best.x, best.y, best.z),
+                string.format("remCap=%.1f", remCap),
+            })
+        end
         return best
     end
     return nil, "no_target"

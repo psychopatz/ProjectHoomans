@@ -13,7 +13,7 @@ local function ensureLocalPolicy()
         return {
             enabled = true,
             categories = cats and cats.Defaults and cats.Defaults(false) or {},
-            preferences = { containers = true, floorItems = true, corpses = true },
+            preferences = { containers = true, floorItems = true, corpses = true, allowStealing = false },
         }
     end
     if not state.scavengePolicy then
@@ -21,7 +21,7 @@ local function ensureLocalPolicy()
         state.scavengePolicy = {
             enabled = true,
             categories = cats and cats.Defaults and cats.Defaults(false) or {},
-            preferences = { containers = true, floorItems = true, corpses = true },
+            preferences = { containers = true, floorItems = true, corpses = true, allowStealing = false },
         }
     end
     return state.scavengePolicy
@@ -62,6 +62,16 @@ function Client.SetScavengeEnabled(enabled)
     local policy = ensureLocalPolicy()
     policy.enabled = enabled == true
     return Client.SendScavengeRequest("set_enabled", { enabled = enabled == true })
+end
+
+function Client.SetNpcOpportunisticLoot(npcId, enabled)
+    if npcId == nil or tostring(npcId) == "" then
+        return false, "npc_id_required"
+    end
+    return Client.SendScavengeRequest("set_npc_loot_enabled", {
+        npcId = tostring(npcId),
+        enabled = enabled == true,
+    })
 end
 
 function Client.SetScavengeCategory(categoryId, enabled)

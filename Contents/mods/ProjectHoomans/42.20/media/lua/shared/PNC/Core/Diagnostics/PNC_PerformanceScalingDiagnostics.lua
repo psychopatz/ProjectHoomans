@@ -84,6 +84,7 @@ Diagnostics.BodyIdentityAuditEnabled = false
 -- and delivery outcomes so silent beat drops can be pinpointed in console.txt.
 Diagnostics.BeatsAuditEnabled = false
 Diagnostics.SuicideAuditEnabled = false
+Diagnostics.WorldLootAuditEnabled = false
 Diagnostics.BuildTraceSequence = tonumber(Diagnostics.BuildTraceSequence) or 0
 Diagnostics.BuildTraceSentAt = Diagnostics.BuildTraceSentAt or {}
 Diagnostics.BuildTraceReceivedAt = Diagnostics.BuildTraceReceivedAt or {}
@@ -390,6 +391,15 @@ end
 
 function Diagnostics.IsSuicideAuditEnabled()
     return Diagnostics.SuicideAuditEnabled == true
+end
+
+function Diagnostics.SetWorldLootAuditEnabled(enabled)
+    Diagnostics.WorldLootAuditEnabled = enabled == true
+    return Diagnostics.WorldLootAuditEnabled
+end
+
+function Diagnostics.IsWorldLootAuditEnabled()
+    return Diagnostics.WorldLootAuditEnabled == true
 end
 
 function Diagnostics.SetInventoryAuditEnabled(enabled)

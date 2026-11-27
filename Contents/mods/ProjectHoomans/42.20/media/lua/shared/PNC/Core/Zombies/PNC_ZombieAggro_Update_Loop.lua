@@ -230,15 +230,20 @@ local function processZombie(zombie, now, foreignChecked)
             npcBody, closeBlocked == true
     end
     record, npcBody = acquireNearestTarget(zombie)
+    if record and npcBody then
+        pursued, closeBlocked = pursueNPCRecord(
+            zombie, record, npcBody, now, hitSettling, modData
+        )
+        if pursued then
+            return closeOrHitCooldown(zombie, npcBody, hitSettling, closeBlocked),
+                npcBody, closeBlocked == true
+        end
+        return 0, npcBody, false
+    end
     if isMultiplayerServer() then
         -- Clear a stale directive when this zombie no longer has an eligible
         -- NPC target; active directives are refreshed by pursueForcedTarget.
-        if not record or not npcBody then
-            clearMPTargetDirective(zombie, now)
-        end
-    end
-    if record and npcBody then
-        return 0, npcBody, false
+        clearMPTargetDirective(zombie, now)
     end
     return idleInterval, nil, false
 end

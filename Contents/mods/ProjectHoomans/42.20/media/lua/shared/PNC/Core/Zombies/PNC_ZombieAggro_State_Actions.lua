@@ -44,6 +44,18 @@ function Internal.forceAggro(zombie, npcBody)
         modData.PNC_AggroNPCId = npcId
         modData.PNC_AggroNPCUntil = npcId
             and (now + Const.ZOMBIE_NPC_AGGRO_LEASE_MS) or nil
+        if npcId then
+            -- Clear any prior vanilla player handoff / player provocation so an
+            -- NPC hit or closer NPC acquisition immediately re-engages the
+            -- zombie onto the NPC.
+            modData.PNC_NativeCombatOwner = nil
+            modData.PNC_NativeCombatTarget = nil
+            modData.PNC_NativeCombatUntil = nil
+            modData.PNC_NativeCombatReason = nil
+            modData.PNC_NativeCombatHandoffApplied = nil
+            modData.PNC_PlayerProvokedUntil = nil
+            modData.PNC_AggroProvokedUntil = now + 5000
+        end
     end
     if npcId and not Internal.AcquirePursuitLease(
         zombie,

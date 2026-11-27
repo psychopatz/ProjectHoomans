@@ -121,8 +121,8 @@ local looter = {
 }
 
 local okFolPlayer, zKind1 = WorldLoot.CanLootAt(follower, 52, 52, 0)
-T.equal(okFolPlayer, false, "follower cannot loot inside player settlement safe zone")
-T.equal(zKind1, "player_settlement", "zoneKind identifies player_settlement")
+T.equal(okFolPlayer, false, "follower cannot loot inside own player settlement safe zone")
+T.equal(zKind1, "own_settlement", "zoneKind identifies own_settlement for player follower in player colony")
 
 local okAiNpc, zKind2 = WorldLoot.CanLootAt(aiScav, 205, 205, 0)
 T.equal(okAiNpc, false, "AI scavenger cannot loot inside NPC settlement safe zone")
@@ -133,6 +133,15 @@ T.equal(okLooter, true, "looter variant override allows stealing inside protecte
 
 local okWild = WorldLoot.CanLootAt(follower, 500, 500, 0)
 T.equal(okWild, true, "looting outside safe zones is allowed")
+
+-- Smart stealing guard: even with allowProtectedZoneTheft=true, a follower can steal
+-- from a rival NPC settlement but NEVER from their own player colony!
+local stealPolicy = { enabled = true, allowProtectedZoneTheft = true }
+local okStealOwn, ownReason = WorldLoot.CanLootAt(follower, 52, 52, 0, stealPolicy)
+T.equal(okStealOwn, false, "follower with allowStealing=ON must NEVER steal from own player colony")
+T.equal(ownReason, "own_settlement", "own-colony block reports own_settlement")
+local okStealRival = WorldLoot.CanLootAt(follower, 205, 205, 0, stealPolicy)
+T.equal(okStealRival, true, "follower with allowStealing=ON CAN steal from rival NPC settlement")
 
 -- 6. End-to-end physical removal -> unified PNC.Inventory -> eating consumes the item!
 WorldLoot.ResetScannerRuntime()
@@ -208,5 +217,111 @@ wildScav.inventory.items = {
 local foldedFood = WorldLoot.CompactGroupLootOnAbstract(wildScav, compGroup, 1)
 T.equal(foldedFood, 2, "excess looted food descriptors fold into group provisions")
 T.equal(compGroup.resources.food, 2, "group.resources.food receives folded provision points")
+
+-- 9. Safe-zone theft witness alert, pickup cue, ConvoDSL reload & ActorReference pronouns
+local ConvoDSL = require "PNC/ConvoEngine/ConvoDSL/ConvoDSL"
+local Catalog = require "PNC/ConvoEngine/Dialogue/ResponseCatalog"
+local diag = ConvoDSL.Reload("EN")
+T.equal(#(diag.errors or {}), 0,
+    "EN ConvoBlocks including world_loot.convo must load with zero errors: " .. table.concat(diag.errors or {}, "; "))
+local lootPool = Catalog.Get("semantic.social.world_loot")
+T.truthy(lootPool and type(lootPool.variants) == "table" and #lootPool.variants >= 16,
+    "semantic.social.world_loot pool must contain pickup, pack_full, sustenance, and theft lines")
+
+local theftEvents = {}
+local perfCues = {}
+local emittedDialogueBeats = {}
+PsychopatzCore = PsychopatzCore or {}
+PsychopatzCore.Events = {
+    emit = function(ev, p) theftEvents[#theftEvents + 1] = { event = ev, payload = p } end,
+}
+PNC.Semantics = {
+    SpeechPerformance = {
+        Perform = function(rec, spec) perfCues[#perfCues + 1] = { id = rec.id, anim = spec.anim } end,
+    },
+    DialogueBeats = {
+        RegisterHook = function() end,
+        Emit = function(ev, payload)
+            emittedDialogueBeats[#emittedDialogueBeats + 1] = { eventName = ev, payload = payload }
+            return true
+        end,
+    },
+}
+T.load(T.path("ProjectHoomans", "shared", "PNC/Semantics/PNC_ActorReference.lua"))
+T.load(T.path("ProjectHoomans", "server", "PNC/Semantics/Beats/PNC_SemanticBeats_WorldLoot.lua"))
+
+looter.name = "Vex Morgan"
+looter.isFemale = true
+local guardColonist = {
+    id = "guard_1", name = "Marcus", alive = true, recruited = true, x = 54, y = 52, z = 0,
+}
+PNC.Registry.ForEach = function(fn) fn(guardColonist) end
+local stolenItem = { fullType = "Base.WaterBottleFull", category = "water", weight = 0.7 }
+local baseContainer = { _items = { stolenItem }, getItems = function(self) return self._items end }
+local okSteal = WorldLoot.CollectTarget(looter, {
+    kind = "container", x = 52, y = 52, z = 0,
+    item = stolenItem, container = baseContainer,
+    fullType = stolenItem.fullType, category = "water", weight = 0.7,
+    targetKey = "cont:52:52:0:1:1",
+}, nowMs)
+T.equal(okSteal, true, "looter steals item from inside player settlement")
+T.equal(#theftEvents, 1, "safe-zone theft emits WORLD_LOOT_PROTECTED_THEFT event")
+T.equal(theftEvents[1].event, "WORLD_LOOT_PROTECTED_THEFT", "theft event name matches")
+T.equal(guardColonist.runtime and guardColonist.runtime.theftAlertTargetId, "raider_1",
+    "nearby settlement guard witnesses theft and flags thief")
+T.truthy(#perfCues >= 1 and perfCues[#perfCues].anim == "PNC_Anim_Loot",
+    "pickup triggers PNC_Anim_Loot performance cue")
+T.truthy(#emittedDialogueBeats >= 1 and emittedDialogueBeats[1].eventName == "ambient.world_loot_theft",
+    "safe-zone theft emits semantic ambient.world_loot_theft beat")
+local theftTokens = emittedDialogueBeats[1].payload.tokens
+T.equal(theftTokens["addressee.name"], "thief", "unknown looter does not bleed proper name")
+T.equal(theftTokens["thief.subj"], "she", "ActorReference resolves female subject pronoun")
+T.equal(theftTokens["thief.obj"], "her", "ActorReference resolves female object pronoun")
+T.equal(theftTokens["thief.poss"], "her", "ActorReference resolves female possessive pronoun")
+T.equal(theftTokens["slot.item"], "water bottle full", "item name is humanized for dialogue")
+
+-- 10. MarketSense-aware "just found" variants (treat, high-value jackpot, quality, container source)
+local Beats = PNC.Semantics.DialogueBeats
+local iceCtx = Beats.DescribeLootContext(
+    { fullType = "Base.Icecream", displayName = "Ice Cream", category = "food", price = 18 },
+    { fullType = "Base.Icecream", category = "food" },
+    { kind = "container", container = { type = "freezer" } }
+)
+T.equal(iceCtx.role, "loot_found_treat", "ice cream selects excited treat discovery role")
+T.equal(iceCtx.tokens["slot.item"], "ice cream", "display name preserved for treat")
+T.equal(iceCtx.tokens["slot.source"], "in the freezer", "container type maps to natural source phrase")
+
+local jackpotCtx = Beats.DescribeLootContext(
+    { fullType = "Base.Katana", displayName = "Katana", category = "weapons", price = 250, condition = 0.95 },
+    { fullType = "Base.Katana", category = "weapons" },
+    { kind = "container", container = { type = "shelves" } }
+)
+T.equal(jackpotCtx.role, "loot_found_jackpot", "MarketSense high price selects jackpot discovery role")
+T.equal(jackpotCtx.tokens["slot.source"], "on the shelf", "shelves map to 'on the shelf'")
+
+local wornCtx = Beats.DescribeLootContext(
+    { fullType = "Base.BaseballBat", displayName = "Baseball Bat", category = "weapons", price = 25, condition = 0.20 },
+    { fullType = "Base.BaseballBat", category = "weapons" },
+    { kind = "floor" }
+)
+T.equal(wornCtx.role, "loot_found_worn", "low-condition weapon selects worn discovery role")
+T.equal(wornCtx.tokens["slot.source"], "on the floor", "floor target maps to 'on the floor'")
+
+-- 11. Unseen looter stealing inside protected safe zone emits ambient.world_loot_steal_solo
+PNC.Registry.ForEach = function() end -- no witnesses nearby
+local soloBefore = #emittedDialogueBeats
+local soloItem = { fullType = "Base.CannedCorn", displayName = "Canned Corn", category = "food", price = 20, weight = 0.6 }
+local soloCont = { _items = { soloItem }, type = "shelves", getItems = function(self) return self._items end }
+local okSoloSteal = WorldLoot.CollectTarget(looter, {
+    kind = "container", x = 52, y = 52, z = 0,
+    item = soloItem, container = soloCont,
+    fullType = soloItem.fullType, category = "food", weight = 0.6,
+    targetKey = "cont:52:52:0:2:1",
+}, nowMs)
+T.equal(okSoloSteal, true, "unseen looter steals inside player settlement")
+T.equal(emittedDialogueBeats[soloBefore + 1].eventName, "ambient.world_loot_steal_solo",
+    "unseen safe-zone theft emits ambient.world_loot_steal_solo")
+T.equal(emittedDialogueBeats[soloBefore + 1].payload.openRole, "loot_steal_sneaky",
+    "normal-value unseen theft uses loot_steal_sneaky role")
 
 T.finish("pnc_world_loot_and_survival_smoke")

@@ -153,6 +153,7 @@ Profiles.RegisterProvider(function(fullType)
 end, 1)
 
 function Internal.getItemWeight(fullType)
+    if type(fullType) ~= "string" or fullType == "" then return 0.1 end
     local cached = Internal.ItemWeightCache[fullType]
     local item
     if cached ~= nil then return cached end

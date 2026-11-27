@@ -27,6 +27,7 @@ local function normalizePreferences(value)
         containers = value.containers ~= false,
         floorItems = value.floorItems ~= false,
         corpses = value.corpses ~= false,
+        allowStealing = value.allowStealing == true,
     }
 end
 

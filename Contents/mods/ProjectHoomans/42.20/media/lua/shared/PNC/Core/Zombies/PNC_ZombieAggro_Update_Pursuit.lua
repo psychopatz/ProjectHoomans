@@ -167,12 +167,11 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling, mod
                     end
                 end
             elseif zombie.faceThisObject then
-                -- Keep the pursuit alive while the zombie turns. The old
-                -- branch only faced the NPC and left SP with no movement
-                -- retry when the first arrival was not aligned enough for a
-                -- bite. refreshPursuitPath remains throttled and bounded.
+                -- Keep facing the NPC to trigger the bite cleanly. Only
+                -- repath if still more than 0.75 tiles away; repathing when
+                -- already touching can spin the zombie away from the NPC.
                 approach = true
-                repathClose = true
+                repathClose = dist > 0.75
                 zombie:faceThisObject(npcBody)
                 if isPursuitAuditEnabled and isPursuitAuditEnabled() then
                     logPursuitDiagnostic(
@@ -233,6 +232,14 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling, mod
             end
             refreshPursuitPath(zombie, npcBody, now, record.id, closeBlocked, modData)
         end
+    end
+    local policy = ZombieAggro.PathPolicy
+    if policy and policy.UpdateLungeVisual and not isMultiplayerServer() then
+        local wantsLunge = zDistance < 0.35
+            and distSq <= 12.25
+            and closeBlocked ~= true
+            and not hitSettling
+        policy.UpdateLungeVisual(zombie, wantsLunge)
     end
     if isMultiplayerServer() then
         publishMPTargetDirective(

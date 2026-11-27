@@ -44,6 +44,39 @@ function Planner.GetSteeringTarget(record, body, finalTarget, owner)
     local navigation = Internal.EnsureNavigation(record)
     navigation.body = body
     local now = Core and Core.Now and Core.Now() or 0
+    local effectiveTarget = finalTarget
+    if type(Internal.SnapToStandableGoal) == "function" then
+        local snapped, snapStatus = Internal.SnapToStandableGoal(effectiveTarget)
+        if snapped == nil then
+            if type(Internal.RefuseGoal) == "function" then
+                Internal.RefuseGoal(
+                    record,
+                    finalTarget,
+                    now,
+                    Internal.DEFAULT_NO_FLOOR_REFUSAL_MS or 10000,
+                    snapStatus or "target_no_solid_floor"
+                )
+            end
+            navigation.lastPlanReason = snapStatus or "target_no_solid_floor"
+            navigation.steeringKind = "final_native_deferred"
+            return finalTarget
+        end
+        effectiveTarget = snapped
+    end
+    local stairStage = nil
+    if type(Internal.ResolveFloorTransitionTarget) == "function" then
+        effectiveTarget, stairStage = Internal.ResolveFloorTransitionTarget(
+            record, body, effectiveTarget, now
+        )
+    end
+    if type(Internal.IsGoalRefused) == "function" then
+        local refused, refuseReason = Internal.IsGoalRefused(record, effectiveTarget, now)
+        if refused then
+            navigation.lastPlanReason = refuseReason or "target_goal_refused"
+            navigation.steeringKind = "final_native_deferred"
+            return finalTarget
+        end
+    end
     local nativeSafe
     local unsafeReason
     nativeSafe, unsafeReason = Planner.CanUseNativePath(body)
@@ -76,13 +109,13 @@ function Planner.GetSteeringTarget(record, body, finalTarget, owner)
         stillNeeded, routeReason = Internal.RouteNeed(
             record,
             body,
-            finalTarget
+            effectiveTarget
         )
         if not stillNeeded then
             Internal.ClearEngineRequest(body, navigation)
             navigation.lastPlanReason = routeReason
             navigation.steeringKind = "final_direct"
-            return finalTarget
+            return effectiveTarget
         end
         local replanDistance = math.max(
             0.5,
@@ -90,10 +123,10 @@ function Planner.GetSteeringTarget(record, body, finalTarget, owner)
         )
         local levelChanged = math.floor(
             tonumber(navigation.requestZ) or body:getZ()
-        ) ~= math.floor(tonumber(finalTarget.z) or body:getZ())
+        ) ~= math.floor(tonumber(effectiveTarget.z) or body:getZ())
         local targetMoved = targetDriftSquared(
             navigation,
-            finalTarget
+            effectiveTarget
         ) >= (replanDistance * replanDistance)
         if (levelChanged or targetMoved)
             and now - (tonumber(navigation.plannedAt) or 0) >= replanMs
@@ -105,12 +138,13 @@ function Planner.GetSteeringTarget(record, body, finalTarget, owner)
                 if Diagnostics then Diagnostics.Increment("Pathing.Replans") end
                 Internal.BeginRequest(
                     body,
-                    finalTarget,
+                    effectiveTarget,
                     navigation,
                     now,
-                    levelChanged
-                        and "moving_target_level_replan"
-                        or "moving_target_replan"
+                    stairStage
+                        or (levelChanged
+                            and "moving_target_level_replan"
+                            or "moving_target_replan")
                 )
             else
                 navigation.lastPlanReason = "native_replan_budget_deferred"
@@ -122,19 +156,19 @@ function Planner.GetSteeringTarget(record, body, finalTarget, owner)
             == "behavior2_move"
             and "engine_native_behavior2"
             or "engine_native_client"
-        return finalTarget
+        return effectiveTarget
     end
-    local needed, reason = Internal.RouteNeed(record, body, finalTarget)
+    local needed, reason = Internal.RouteNeed(record, body, effectiveTarget)
     if not needed then
         navigation.lastPlanReason = reason
         navigation.steeringKind = "final_direct"
-        return finalTarget
+        return effectiveTarget
     end
     lane = record.runtime and record.runtime.pathing or nil
     if not lane or lane.phase ~= "active" then
         navigation.lastPlanReason = "native_waiting_for_move_lane"
         navigation.steeringKind = "final_native_deferred"
-        return finalTarget
+        return effectiveTarget
     end
     local retryDelayMs = replanMs * math.max(
         1,
@@ -145,7 +179,7 @@ function Planner.GetSteeringTarget(record, body, finalTarget, owner)
     then
         navigation.lastPlanReason = "native_replan_cooldown"
         navigation.steeringKind = "final_native_deferred"
-        return finalTarget
+        return effectiveTarget
     end
     if not Internal.IsMultiplayerAuthority()
         and not Internal.ConsumeRequestBudget(now)
@@ -154,11 +188,13 @@ function Planner.GetSteeringTarget(record, body, finalTarget, owner)
         navigation.steeringKind = "final_native_deferred"
         navigation.deferredPlans =
             (tonumber(navigation.deferredPlans) or 0) + 1
-        return finalTarget
+        return effectiveTarget
     end
     if Diagnostics and (tonumber(navigation.planFailures) or 0) > 0 then
         Diagnostics.Increment("Pathing.Retries")
     end
-    Internal.BeginRequest(body, finalTarget, navigation, now, reason)
-    return finalTarget
+    Internal.BeginRequest(
+        body, effectiveTarget, navigation, now, stairStage or reason
+    )
+    return effectiveTarget
 end

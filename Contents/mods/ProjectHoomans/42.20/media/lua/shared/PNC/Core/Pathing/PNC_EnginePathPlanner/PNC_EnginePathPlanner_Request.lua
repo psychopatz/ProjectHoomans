@@ -130,21 +130,36 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
             (tonumber(navigation.planFailures) or 0) + 1
         return false
     end
-    Internal.ClearEngineRequest(body, navigation)
+    local x = tonumber(finalTarget.x) or body:getX()
+    local y = tonumber(finalTarget.y) or body:getY()
+    local z = tonumber(finalTarget.z) or body:getZ()
+    local behavior = not multiplayerAuthority
+        and Internal.GetPathBehavior(body) or nil
+    local seamlessRetarget = not multiplayerAuthority
+        and navigation.nativeActive == true
+        and (tonumber(navigation.planFailures) or 0) == 0
+        and behavior ~= nil
+        and type(behavior.hasStartedMoving) == "function"
+        and behavior:hasStartedMoving() == true
+        and not (type(behavior.getIsCancelled) == "function"
+            and behavior:getIsCancelled() == true)
+    if not seamlessRetarget then
+        Internal.ClearEngineRequest(body, navigation)
+    end
     Internal.EnsureNativeMovementOwner(
         body,
-        "begin_request",
+        seamlessRetarget and "seamless_retarget" or "begin_request",
         navigation and navigation.record or nil
     )
     if Diagnostics then
         Diagnostics.Increment("Pathing.EnginePathRequests")
     end
-    local x = tonumber(finalTarget.x) or body:getX()
-    local y = tonumber(finalTarget.y) or body:getY()
-    local z = tonumber(finalTarget.z) or body:getZ()
-    if not multiplayerAuthority then
-        local behavior = Internal.GetPathBehavior(body)
-        behavior:pathToLocation(x, y, z)
+    if not multiplayerAuthority and behavior then
+        if type(behavior.pathToLocationF) == "function" then
+            behavior:pathToLocationF(x, y, z)
+        else
+            behavior:pathToLocation(x, y, z)
+        end
         -- PathFindBehavior2 may re-enter the vanilla WalkTowardState while
         -- publishing path2.  The request owner is PNC's Behavior2 pump, so
         -- release that stale state after the request as well as before it.

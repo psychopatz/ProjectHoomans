@@ -94,8 +94,8 @@ local menu = newMenu()
 provider.addOptions(menu, follower, player)
 T.equal(#menu.options, 1, "scavenging uses a single submenu")
 local submenu = menu.options[1].submenu
--- 1 toggle + 8 categories + 1 Sources submenu + 1 Clear = 11 options
-T.equal(#submenu.options, 11, "submenu provides auto toggle, 8 categories, sources, and clear")
+-- 1 toggle + 8 categories + 1 Sources submenu + 1 Allow Stealing toggle + 1 Clear = 12 options
+T.equal(#submenu.options, 12, "submenu provides auto toggle, 8 categories, sources, allow stealing, and clear")
 
 submenu.options[1].callback()
 T.equal(policyState.enabled, false, "first option toggles auto-scavenge enabled flag")
@@ -112,8 +112,12 @@ T.equal(#sourcesSub.options, 3, "sources submenu exposes containers, floor, corp
 sourcesSub.options[1].callback()
 T.equal(policyState.preferences.containers, false, "containers source preference toggled off")
 
--- Clear Categories (option 11)
+-- Allow Stealing in Settlements toggle (option 11)
 submenu.options[11].callback()
+T.equal(policyState.preferences.allowStealing, true, "allow stealing checkbox toggles settlement stealing on")
+
+-- Clear Categories (option 12)
+submenu.options[12].callback()
 T.equal(policyState.categories.food, false, "clear resets food category")
 T.equal(policyState.categories.medical, false, "clear resets medical category")
 
