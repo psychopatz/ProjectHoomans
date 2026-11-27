@@ -26,6 +26,17 @@ lexicon thirst.request_ask
   [default]: "Mind if I grab a quick drink?" | "Can I stop for a drink?"
 
 extend semantic.companion.moodle_suggest
+  say [role=suggest_drink, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as suggest_drink_critical_guarded:
+    "You're severely dehydrated, {term.address}—drink water right now before you drop!"
+  say [role=suggest_drink, need.urgency=critical] as suggest_drink_critical:
+    "{term.address}, your lips are cracked and you look dizzy—stop and drink some water right now!"
+    "Hey {term.address}, dehydration's no joke—you need water immediately!"
+  say [role=suggest_drink, need.urgency=medium] as suggest_drink_medium:
+    "{thirst.observe}, {term.address}. {thirst.suggest}"
+    "{opener.casual} {term.address}, {thirst.suggest}"
+  say [role=suggest_drink, need.urgency=light] as suggest_drink_light:
+    "Might want to take a sip of water when you get a second, {term.address}."
+    "Hey {term.address}, don't forget to stay hydrated out here."
   say [role=suggest_drink] as suggest_drink_composed_a:
     "{thirst.observe}, {term.address}. {thirst.suggest}"
     "{opener.casual} {term.address}, {thirst.suggest}"
@@ -33,9 +44,50 @@ extend semantic.companion.moodle_suggest
     "{thirst.ack}"
 
 extend semantic.companion.need_request
+  say [role=request_drink, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as req_drink_critical_guarded:
+    "{term.address}, I'm dehydrating fast—my head's pounding! I need water right now!"
+  say [role=request_drink, need.urgency=critical] as req_drink_critical:
+    "{term.address}, please—my throat feels like sandpaper and I'm dizzy. I have to drink water right now!"
+    "I can barely swallow, {term.address}—I'm severely dehydrated. Can I stop for water right now?"
+  say [role=request_drink, need.urgency=medium] as req_drink_medium:
+    "{term.address}, {thirst.request_need}. {thirst.request_ask}"
+    "{opener.casual} {term.address}, {thirst.request_need}. {thirst.request_ask}"
+  say [role=request_drink, need.urgency=light] as req_drink_light:
+    "Hey {term.address}, mouth's getting a little dry. Mind if I take a quick sip when we pause?"
+    "{term.address}, starting to feel a bit thirsty—could use a quick drink soon."
   say [role=request_drink] as req_drink_composed_a:
     "{term.address}, {thirst.request_need}. {thirst.request_ask}"
     "{opener.casual} {term.address}, {thirst.request_need}. {thirst.request_ask}"
+
+  say [role=self_drink, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as self_drink_critical_guarded:
+    "Throat's completely parched... head's pounding, I need water."
+  say [role=self_drink, need.urgency=critical] as self_drink_critical:
+    "My throat feels like sandpaper... I can barely swallow, I'm so thirsty..."
+    "I feel dizzy... my mouth is bone dry, I desperately need water..."
+  say [role=self_drink, need.urgency=medium] as self_drink_medium:
+    "My throat's dry as dust... really need to find something to drink soon."
+    "Getting pretty thirsty out here—I need to get some water in me."
+  say [role=self_drink, need.urgency=light] as self_drink_light:
+    "Mouth's getting a little dry... could go for a sip of water in a bit."
+    "Starting to feel slightly thirsty."
+  say [role=self_drink] as self_drink_default:
+    "I'm thirsty... could really use some water soon."
+
+  say [role=reassure_drink, need.urgency=critical, actor.social_style=warm|friendly|protective] as reassure_drink_critical_warm:
+    "Hang in there, {addressee.name}—we'll find clean water for you soon, just stay steady."
+    "Take slow breaths, {addressee.name}. We're going to get you a drink as soon as we can."
+  say [role=reassure_drink, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as reassure_drink_critical_guarded:
+    "Keep going a little further, {addressee.name}—we'll check the next sink or tap for water."
+  say [role=reassure_drink, need.urgency=critical] as reassure_drink_critical:
+    "Hang in there, {addressee.name}—we'll get you some water soon."
+    "Stay with us, {addressee.name}, we'll find something to drink for ya right away."
+  say [role=reassure_drink, need.urgency=medium] as reassure_drink_medium:
+    "Hold on, {addressee.name}—we'll look for water at the next stop."
+    "Hang in there, {addressee.name}, we'll get everyone topped up on water soon."
+  say [role=reassure_drink, need.urgency=light] as reassure_drink_light:
+    "We'll grab a drink once we catch a breather, {addressee.name}."
+  say [role=reassure_drink] as reassure_drink_default:
+    "Hang in there, {addressee.name}—we'll find some water soon."
 
 extend semantic.question.needs.offer
   say [need.type=thirst, need.urgency=moderate|severe|emergency|critical] as thirst:

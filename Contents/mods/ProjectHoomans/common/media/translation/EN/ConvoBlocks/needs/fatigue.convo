@@ -26,6 +26,14 @@ lexicon fatigue.request_ask
   [default]: "Mind if I sit down for a minute?" | "Can we sit down for a bit?"
 
 extend semantic.companion.moodle_suggest
+  say [role=suggest_sit, need.urgency=critical] as suggest_sit_critical:
+    "{term.address}, you're completely spent—stop right now and sit down before your legs buckle!"
+    "Hey {term.address}, you can barely breathe! Sit down right now and catch your wind!"
+  say [role=suggest_sit, need.urgency=medium] as suggest_sit_medium:
+    "{fatigue.observe}, {term.address}. {fatigue.suggest}"
+    "{opener.casual} {term.address}, {fatigue.observe}. {fatigue.suggest}"
+  say [role=suggest_sit, need.urgency=light] as suggest_sit_light:
+    "Getting a little winded, {term.address}? We can take a quick breather whenever you want."
   say [role=suggest_sit] as suggest_sit_composed_a:
     "{fatigue.observe}, {term.address}. {fatigue.suggest}"
     "{opener.casual} {term.address}, {fatigue.observe}. {fatigue.suggest}"
@@ -33,9 +41,41 @@ extend semantic.companion.moodle_suggest
     "{fatigue.ack}"
 
 extend semantic.companion.need_request
+  say [role=request_sit, need.urgency=critical] as req_sit_critical:
+    "{term.address}, I'm completely gassed—my legs are shaking! I need to sit down right now!"
+    "Can't take another step, {term.address}—I'm totally spent. Let me sit for a second!"
+  say [role=request_sit, need.urgency=medium] as req_sit_medium:
+    "{opener.casual} {term.address}, {fatigue.request_need}. {fatigue.request_ask}"
+    "{term.address}, {fatigue.request_need}. {fatigue.request_ask}"
+  say [role=request_sit, need.urgency=light] as req_sit_light:
+    "Hey {term.address}, feeling a little winded. Mind if we take a short breather soon?"
   say [role=request_sit] as req_sit_composed_a:
     "{opener.casual} {term.address}, {fatigue.request_need}. {fatigue.request_ask}"
     "{term.address}, {fatigue.request_need}. {fatigue.request_ask}"
+
+  say [role=self_sit, need.urgency=critical] as self_sit_critical:
+    "My legs are shaking... I can barely breathe, I'm completely spent..."
+    "I can't feel my legs anymore... I have to sit down before I collapse..."
+  say [role=self_sit, need.urgency=medium] as self_sit_medium:
+    "Whew... I'm getting pretty exhausted. Could really use a quick sit-down."
+    "My legs are burning... need to catch my breath soon."
+  say [role=self_sit, need.urgency=light] as self_sit_light:
+    "Starting to feel a bit winded... a short breather wouldn't hurt."
+  say [role=self_sit] as self_sit_default:
+    "Could use a minute to catch my breath."
+
+  say [role=reassure_sit, need.urgency=critical, actor.social_style=warm|friendly|protective] as reassure_sit_critical_warm:
+    "Easy, {addressee.name}—take a breath, we've got your back while you rest your legs."
+  say [role=reassure_sit, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as reassure_sit_critical_guarded:
+    "Pace yourself, {addressee.name}. Catch your wind—just stay sharp."
+  say [role=reassure_sit, need.urgency=critical] as reassure_sit_critical:
+    "Hang in there, {addressee.name}—take it slow, we'll let you catch your breath."
+  say [role=reassure_sit, need.urgency=medium] as reassure_sit_medium:
+    "Take it easy, {addressee.name}—we'll grab a breather as soon as we can."
+  say [role=reassure_sit, need.urgency=light] as reassure_sit_light:
+    "We can slow down for a minute when things are clear, {addressee.name}."
+  say [role=reassure_sit] as reassure_sit_default:
+    "Catch your breath when you need to, {addressee.name}."
 
 extend semantic.question.needs.offer
   say [need.type=fatigue, need.urgency=moderate|severe|emergency|critical] as fatigue:

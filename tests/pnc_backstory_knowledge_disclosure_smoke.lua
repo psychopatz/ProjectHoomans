@@ -310,4 +310,61 @@ T.equal(suspectedRows[1].rows[1].label, "Dating trabaho",
 T.equal(suspectedRows[1].rows[1].value, "Possibly Muldraugh",
     "suspected backstory dossier status was not rendered as uncertain")
 
+local familyDescriptor = "history.backstory.family_background"
+for _, entry in ipairs({
+    { id = "backstory.shared.family_background.only_child", value = "only_child" },
+    { id = "backstory.shared.family_background.siblings", value = "grew_up_with_siblings" },
+}) do
+    entry.kind = "family_background"
+    entry.class = "shared"
+    Memory.RegisterBackstory(entry)
+end
+local metadata = Memory.EnsureBackstoryMetadata(npc)
+metadata.selections.family_background = "backstory.shared.family_background.only_child"
+T.equal(Memory.GetBackstory(npc, "family_background").value, "only_child",
+    "only-child stories remain valid without starting sibling metadata")
+T.truthy(Knowledge.Disclose("char_a", npc.id, familyDescriptor, {}),
+    "seed a previously learned only-child fact")
+for _, kind in ipairs({ "brother", "sister" }) do
+    npc.generation = { source = "starting_companion_trait", relationshipKind = kind }
+    T.equal(Memory.GetBackstory(npc, "family_background").value, "grew_up_with_siblings",
+        "starting sibling overrides the contradictory background")
+    T.equal(Memory.GetBackstoryProfile(npc).facts.family_background.value,
+        "grew_up_with_siblings", "full backstory profile agrees with the family fact")
+    local learned = Knowledge.BuildPlayerSnapshot("char_a", npc.id)
+    T.equal(Presentation.GetKnownValue(learned, familyDescriptor), "grew_up_with_siblings",
+        "previously learned only-child fact displays the corrected background")
+    local unlearned = Knowledge.BuildPlayerSnapshot("char_b", npc.id)
+    T.equal(Presentation.GetFact(unlearned, familyDescriptor), nil,
+        "family correction does not discover facts for another player")
+end
+
+local relativeDead = false
+PNC.PlayerContext = {
+    Resolve = function(player) return { characterUUID = player.characterUUID } end,
+}
+PNC.PlayerCharacters.GetRegistryRecord = function(uuid)
+    if uuid == "char_a" then return { forename = "Robin", surname = "Sage" } end
+end
+PNC.PlayerCharacters.IsCharacterDead = function(uuid)
+    return uuid == "char_a" and relativeDead
+end
+npc.generation.playerCharacterUUID = "char_a"
+local originalRelative = { characterUUID = "char_a" }
+local stranger = { characterUUID = "char_b" }
+local livingProfile = Knowledge.BuildPlayerSnapshotForPlayer(originalRelative, npc.id)
+T.equal(livingProfile.startingFamily.kind, "Sibling", "reciprocal starting relationship")
+T.equal(livingProfile.startingFamily.name, "Robin Sage", "family uses the original character's name")
+T.equal(livingProfile.startingFamily.deceased, false, "living relative shown without death status")
+T.equal(Knowledge.BuildPlayerSnapshotForPlayer(stranger, npc.id).startingFamily, nil,
+    "an undiscovered relationship does not expose the relative")
+T.truthy(Knowledge.RecordEvidence({ characterUUID = "char_b", npcID = npc.id,
+    descriptorID = "history.relationship", sourceType = "direct_disclosure",
+    strength = 1, reliability = 1, payload = { observedValue = "sister" },
+}), "second character learns the starting relationship")
+relativeDead = true
+local bereaved = Knowledge.BuildPlayerSnapshotForPlayer(stranger, npc.id)
+T.equal(bereaved.startingFamily.name, "Robin Sage", "relative stays named after death")
+T.equal(bereaved.startingFamily.deceased, true, "saved death updates the family row")
+
 T.finish("pnc_backstory_knowledge_disclosure_smoke")

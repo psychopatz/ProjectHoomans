@@ -15,8 +15,48 @@ lexicon encumbrance.ack
   [default]: "Much better, {term.address}. We'll move faster like that." | "Good call dropping the extra weight."
 
 extend semantic.companion.moodle_suggest
+  say [role=suggest_drop_load, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as suggest_drop_load_critical_guarded:
+    "You're practically crawling under all that weight, {term.address}—drop some gear right now before it gets us killed!"
+  say [role=suggest_drop_load, need.urgency=critical] as suggest_drop_load_critical:
+    "{term.address}, you're way overloaded—you're going to hurt your back! Drop some of that weight right now!"
+    "Hey {term.address}, you can barely move with all that gear—shed some weight immediately!"
+  say [role=suggest_drop_load, need.urgency=medium] as suggest_drop_load_medium:
+    "{encumbrance.observe}, {term.address}. {encumbrance.suggest}"
+    "{opener.casual} {term.address}, {encumbrance.observe}. {encumbrance.suggest}"
+  say [role=suggest_drop_load, need.urgency=light] as suggest_drop_load_light:
+    "Pack's getting a little heavy, {term.address}? Might want to offload a few things when we get a chance."
   say [role=suggest_drop_load] as suggest_drop_load_composed_a:
     "{encumbrance.observe}, {term.address}. {encumbrance.suggest}"
     "{opener.casual} {term.address}, {encumbrance.observe}. {encumbrance.suggest}"
   say [role=ack_drop_load] as ack_drop_load_composed:
     "{encumbrance.ack}"
+
+extend semantic.companion.need_request
+  say [role=request_drop_load, need.urgency=critical] as req_drop_load_critical:
+    "{term.address}, my back's giving out under all this gear—I can barely walk! Can I drop some of this right now?"
+  say [role=request_drop_load, need.urgency=medium] as req_drop_load_medium:
+    "{term.address}, this pack is weighing me down hard. Mind if I offload some weight?"
+  say [role=request_drop_load, need.urgency=light] as req_drop_load_light:
+    "Hey {term.address}, my bag's getting a bit heavy—mind if I sort through it when we pause?"
+  say [role=request_drop_load] as req_drop_load_default:
+    "{term.address}, I'm carrying way too much. Mind if I lighten my load?"
+
+  say [role=self_drop_load, need.urgency=critical] as self_drop_load_critical:
+    "Ugh... my shoulders are screaming, this pack is crushing me... I can barely put one foot in front of the other..."
+  say [role=self_drop_load, need.urgency=medium] as self_drop_load_medium:
+    "Man, this gear is heavy... really slowing me down."
+  say [role=self_drop_load, need.urgency=light] as self_drop_load_light:
+    "Pack's starting to feel a bit heavy... might need to drop a few extra things soon."
+  say [role=self_drop_load] as self_drop_load_default:
+    "Carrying way too much weight right now."
+
+  say [role=reassure_drop_load, need.urgency=critical, actor.social_style=warm|friendly|protective] as reassure_drop_load_critical_warm:
+    "Hang in there, {addressee.name}—don't wreck your back, we'll stop and split that gear up soon."
+  say [role=reassure_drop_load, need.urgency=critical] as reassure_drop_load_critical:
+    "Easy, {addressee.name}—drop the junk you don't need, no gear is worth getting caught slow."
+  say [role=reassure_drop_load, need.urgency=medium] as reassure_drop_load_medium:
+    "Hold on, {addressee.name}—we'll stash the extra loot as soon as we hit a safe spot."
+  say [role=reassure_drop_load, need.urgency=light] as reassure_drop_load_light:
+    "We can sort packs once things quiet down, {addressee.name}."
+  say [role=reassure_drop_load] as reassure_drop_load_default:
+    "We'll lighten that load soon, {addressee.name}."

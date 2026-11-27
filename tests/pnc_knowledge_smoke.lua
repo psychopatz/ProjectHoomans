@@ -198,6 +198,25 @@ T.equal(#fullProfile, 2, "debug profile includes skill and trait categories")
 T.equal(fullProfile[1].rows[1].value, "0.00", "debug profile keeps zero values")
 T.equal(fullProfile[2].rows[1].value, "No", "debug profile keeps false values")
 T.equal(#fullProfile[2].rows, 1, "debug profile displays authoritative data only")
+local personalityBars = PNC.KnowledgePresentation.BuildDossierRows({
+    categories = { { id = "personality", descriptors = {
+        { descriptorID = "personality.aggression", category = "personality",
+            valueType = "band", value = "low", status = "suspected", confidence = .4 },
+        { descriptorID = "personality.bravery", category = "personality",
+            valueType = "band", value = "high", status = "confirmed" },
+        { descriptorID = "personality.social_style", category = "personality",
+            valueType = "categorical", value = "friendly" },
+    } } },
+})[1].rows
+T.equal(personalityBars[1].bar, .25, "low personality band maps to a short bar")
+T.truthy(personalityBars[1].qualifier, "suspected bar preserves uncertainty")
+T.equal(personalityBars[2].bar, .75, "high personality band maps to a longer bar")
+T.equal(personalityBars[3].bar, nil, "categorical personality stays textual")
+local exactBar = PNC.KnowledgePresentation.BuildFullProfileRows({ rows = {
+    { descriptorID = "personality.aggression", category = "personality",
+        valueType = "band", truth = .38 },
+} })[1].rows[1]
+T.equal(exactBar.bar, .38, "debug personality bar uses the authoritative scalar")
 local learned = PNC.KnowledgePresentation.GetNewFacts(
     { categories = {} },
     { categories = { {

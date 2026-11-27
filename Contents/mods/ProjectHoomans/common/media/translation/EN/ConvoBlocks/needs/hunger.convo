@@ -26,6 +26,18 @@ lexicon hunger.request_ask
   [default]: "Mind if I stop for a second to grab a bite?" | "Mind if I eat something?"
 
 extend semantic.companion.moodle_suggest
+  say [role=suggest_eat, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as suggest_eat_critical_guarded:
+    "You're literally starving, {term.address}—eat something right now before you collapse on us!"
+    "Quit pushing it, {term.address}. You're skin and bones—eat before you drop dead!"
+  say [role=suggest_eat, need.urgency=critical] as suggest_eat_critical:
+    "{term.address}, you look pale and shaky—you're starving! Stop and eat something right now!"
+    "Hey {term.address}, you can't keep going on an empty stomach like that—please eat something before you pass out!"
+  say [role=suggest_eat, need.urgency=medium] as suggest_eat_medium:
+    "{hunger.observe}, {term.address}. {hunger.suggest}"
+    "{opener.casual} {term.address}, {hunger.observe}. {hunger.suggest}"
+  say [role=suggest_eat, need.urgency=light] as suggest_eat_light:
+    "Getting a little hungry, {term.address}? Might be a good time to grab a quick bite."
+    "Hey {term.address}, might want to top up on food when we get a quiet minute."
   say [role=suggest_eat] as suggest_eat_composed_a:
     "{hunger.observe}, {term.address}. {hunger.suggest}"
     "{opener.casual} {term.address}, {hunger.observe}. {hunger.suggest}"
@@ -33,9 +45,59 @@ extend semantic.companion.moodle_suggest
     "{hunger.ack}"
 
 extend semantic.companion.need_request
+  say [role=request_eat, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as req_eat_critical_guarded:
+    "{term.address}, I'm starving—my legs are giving out! I need to eat right now!"
+    "Listen to me, {term.address}—I'm fainting from hunger here. Stop and let me eat!"
+  say [role=request_eat, need.urgency=critical] as req_eat_critical:
+    "{term.address}, please—I'm starving! My stomach's in knots and I'm getting dizzy, I have to eat now!"
+    "I can't hold out any longer, {term.address}—I'm starving to death here. Can I stop and eat right now?"
+  say [role=request_eat, need.urgency=medium] as req_eat_medium:
+    "{term.address}, {hunger.request_need}. {hunger.request_ask}"
+    "{opener.casual} {term.address}, {hunger.request_need}. {hunger.request_ask}"
+  say [role=request_eat, need.urgency=light] as req_eat_light:
+    "Hey {term.address}, I'm starting to feel a bit peckish. Mind if I grab a quick snack when we pause?"
+    "{term.address}, stomach's starting to grumble a little—think I could grab a light bite soon?"
   say [role=request_eat] as req_eat_composed_a:
     "{term.address}, {hunger.request_need}. {hunger.request_ask}"
     "{opener.casual} {term.address}, {hunger.request_need}. {hunger.request_ask}"
+
+  say [role=self_eat, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as self_eat_critical_guarded:
+    "I feel lightheaded... dammit, I'm so hungry my hands won't stop shaking."
+    "Vision's going blurry... running on an empty gut is catching up to me."
+  say [role=self_eat, need.urgency=critical] as self_eat_critical:
+    "I feel lightheaded... I'm so hungry..."
+    "My stomach's twisting in knots... I'm getting dizzy, I really need food..."
+    "I'm starving... my legs feel weak and my head's spinning..."
+  say [role=self_eat, need.urgency=medium] as self_eat_medium:
+    "My stomach's been growling nonstop... I really need something to eat soon."
+    "Getting pretty hungry out here—I could really use a proper meal before long."
+  say [role=self_eat, need.urgency=light] as self_eat_light:
+    "Starting to feel a little hungry... could use a quick bite when we get a minute."
+    "Stomach's starting to grumble a bit."
+  say [role=self_eat] as self_eat_default:
+    "I'm getting hungry... could really use something to eat."
+
+  say [role=reassure_eat, need.urgency=critical, actor.social_style=warm|friendly|protective] as reassure_eat_critical_warm:
+    "Hang in there, {addressee.name}—we'll find food for you soon, I promise."
+    "Stay with me, {addressee.name}. Don't push yourself—we're going to get you something to eat."
+  say [role=reassure_eat, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as reassure_eat_critical_guarded:
+    "Don't pass out on me, {addressee.name}. Keep your head up—we'll scavenge some rations soon."
+    "Hold it together, {addressee.name}. Next kitchen we pass, we're getting you food."
+  say [role=reassure_eat, need.urgency=critical] as reassure_eat_critical:
+    "Hang in there, {addressee.name}—we'll find food for ya soon."
+    "Easy, {addressee.name}, take it slow. We'll get something in your stomach as soon as we can."
+  say [role=reassure_eat, need.urgency=medium, actor.social_style=warm|friendly|protective] as reassure_eat_medium_warm:
+    "I know, {addressee.name}—we'll keep an eye out for food as soon as we clear the area."
+  say [role=reassure_eat, need.urgency=medium, actor.social_style=hostile|guarded|withdrawn] as reassure_eat_medium_guarded:
+    "Hang on a bit longer, {addressee.name}. We'll check the next house for supplies."
+  say [role=reassure_eat, need.urgency=medium] as reassure_eat_medium:
+    "Hang in there, {addressee.name}—we'll track down something to eat soon."
+    "Same here, {addressee.name}. Let's keep our eyes open for a kitchen or pantry."
+  say [role=reassure_eat, need.urgency=light] as reassure_eat_light:
+    "We'll grab a bite as soon as things quiet down, {addressee.name}."
+    "Yeah, a quick snack sounds good once we get a breather, {addressee.name}."
+  say [role=reassure_eat] as reassure_eat_default:
+    "Hang in there, {addressee.name}—we'll find some food soon."
 
 extend semantic.question.needs.offer
   say [need.type=hunger, need.urgency=moderate|severe|emergency|critical] as hunger:

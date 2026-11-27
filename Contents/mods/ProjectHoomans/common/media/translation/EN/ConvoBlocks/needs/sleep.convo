@@ -32,6 +32,15 @@ lexicon sleep.request_ask
   [default]: "Mind if I get some sleep for a bit?" | "Can we stop somewhere safe so I can crash?"
 
 extend semantic.companion.moodle_suggest
+  say [role=suggest_sleep, need.urgency=critical] as suggest_sleep_critical:
+    "{term.address}, you're practically sleepwalking—we have to find a bed right now before you pass out!"
+    "Hey {term.address}, your eyes are closing on you! Stop and get some sleep immediately!"
+  say [role=suggest_sleep, need.urgency=medium, environment.night_or_dusk] as suggest_sleep_medium_night:
+    "{opener.casual}, {term.address}—{sleep.observe}. {sleep.suggest} {?sleep.risk}"
+  say [role=suggest_sleep, need.urgency=medium] as suggest_sleep_medium:
+    "{sleep.observe}, {term.address}. {sleep.suggest} {?sleep.risk}"
+  say [role=suggest_sleep, need.urgency=light] as suggest_sleep_light:
+    "Looking a little drowsy, {term.address}. Might want to turn in soon when we find a safe spot."
   say [role=suggest_sleep, environment.night_or_dusk] as suggest_sleep_night:
     "{opener.casual}, {term.address}—{sleep.observe}. {sleep.suggest} {?sleep.risk}"
   say [role=suggest_sleep, place.in_settlement] as suggest_sleep_settlement:
@@ -43,8 +52,41 @@ extend semantic.companion.moodle_suggest
     "{sleep.ack}"
 
 extend semantic.companion.need_request
+  say [role=request_sleep, need.urgency=critical] as req_sleep_critical:
+    "{term.address}, I'm about to pass out on my feet—I can't keep my eyes open! I need to sleep right now!"
+    "I'm seeing double from exhaustion, {term.address}—please, we have to stop so I can sleep!"
+  say [role=request_sleep, need.urgency=medium, environment.night_or_dusk] as req_sleep_medium_night:
+    "{term.address}, {sleep.request_need}. {sleep.request_ask}"
+  say [role=request_sleep, need.urgency=medium] as req_sleep_medium:
+    "{opener.casual} {term.address}, {sleep.request_need}. {sleep.request_ask}"
+  say [role=request_sleep, need.urgency=light] as req_sleep_light:
+    "Hey {term.address}, starting to get sleepy. Think we can find somewhere to rest before long?"
   say [role=request_sleep, environment.night_or_dusk] as req_sleep_night:
     "{term.address}, {sleep.request_need}. {sleep.request_ask}"
   say [role=request_sleep] as req_sleep_composed_a:
     "{opener.casual} {term.address}, {sleep.request_need}. {sleep.request_ask}"
     "{sleep.request_need}, {term.address}. {sleep.request_ask}"
+
+  say [role=self_sleep, need.urgency=critical] as self_sleep_critical:
+    "My eyes won't stay open... I'm so tired I'm about to drop where I stand..."
+    "Everything's blurring together... I can't stay awake much longer..."
+  say [role=self_sleep, need.urgency=medium] as self_sleep_medium:
+    "Man, I'm wiped out... really need to find a bunk and get some shut-eye soon."
+    "Running on fumes here—could really use a few hours of sleep."
+  say [role=self_sleep, need.urgency=light] as self_sleep_light:
+    "Starting to feel a bit drowsy... could use some sleep before too long."
+  say [role=self_sleep] as self_sleep_default:
+    "Could really use some sleep soon."
+
+  say [role=reassure_sleep, need.urgency=critical, actor.social_style=warm|friendly|protective] as reassure_sleep_critical_warm:
+    "Hang in there, {addressee.name}—we'll find a safe spot for you to crash, I'll keep watch."
+  say [role=reassure_sleep, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as reassure_sleep_critical_guarded:
+    "Stay awake a little longer, {addressee.name}—we'll hole up soon and you can get some shut-eye."
+  say [role=reassure_sleep, need.urgency=critical] as reassure_sleep_critical:
+    "Hang in there, {addressee.name}—we'll get you somewhere safe to sleep soon."
+  say [role=reassure_sleep, need.urgency=medium] as reassure_sleep_medium:
+    "Hold on a bit longer, {addressee.name}—we'll turn in as soon as we're somewhere safe."
+  say [role=reassure_sleep, need.urgency=light] as reassure_sleep_light:
+    "We'll get some rest once things settle down, {addressee.name}."
+  say [role=reassure_sleep] as reassure_sleep_default:
+    "Hang in there, {addressee.name}—we'll get you some sleep soon."

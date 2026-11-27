@@ -34,8 +34,13 @@ local VOICE_CUES = {
     pain       = { male = "VoiceMalePainFromScratch",   female = "VoiceFemalePainFromScratch" },
     surrender  = { male = "VoiceMaleShoutHey",          female = "VoiceFemaleShoutHey" },
     attack     = { male = "VoiceMaleMeleeAttack",       female = "VoiceFemaleMeleeAttack" },
-    cough      = { male = "VoiceMaleCough",             female = "VoiceFemaleCough" },
-    sneeze     = { male = "VoiceMaleSneezeLight",       female = "VoiceFemaleSneezeLight" },
+    cough         = { male = "VoiceMaleCough",             female = "VoiceFemaleCough" },
+    cough_muffled = { male = "VoiceMaleMuffledCough",      female = "VoiceFemaleMuffledCough" },
+    sneeze        = { male = "VoiceMaleSneezeLight",       female = "VoiceFemaleSneezeLight" },
+    sneeze_heavy  = { male = "VoiceMaleSneezeHeavy",       female = "VoiceFemaleSneezeHeavy" },
+    pain_severe   = { male = "VoiceMalePainFromBite",      female = "VoiceFemalePainFromBite" },
+    zombie_growl  = { male = "MaleZombieVoiceA",           female = "FemaleZombieVoiceA" },
+    zombie_snarl  = { male = "MaleZombieVoiceB",           female = "FemaleZombieVoiceB" },
 }
 
 local activeAnims = {}

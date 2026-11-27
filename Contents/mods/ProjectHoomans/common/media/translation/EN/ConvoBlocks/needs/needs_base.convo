@@ -38,6 +38,12 @@ dialogue semantic.companion.need_request
   say [role=requester_denied] as req_denied_default:
     "Okay, {term.address}. I'll hang on a bit longer."
 
+  say [role=reassure_chime, need.urgency=critical] as reassure_chime_critical:
+    "We've got your back—just keep putting one foot in front of the other."
+    "Don't worry, we're not leaving anyone behind. We'll get this sorted."
+  say [role=reassure_chime] as reassure_chime_default:
+    "Yeah, hang in there—we'll look out for each other."
+
   say [default] as default:
     "Could use a quick break when we get a chance, {term.address}."
 

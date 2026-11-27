@@ -366,7 +366,18 @@ function Memory.EnsureBackstoryMetadata(record)
     return metadata, changed
 end
 
+function Memory.HasStartingSibling(record)
+    local generation = type(record) == "table" and record.generation
+    return type(generation) == "table" and generation.source == "starting_companion_trait"
+        and (generation.relationshipKind == "brother" or generation.relationshipKind == "sister")
+end
+
 local function resolveBackstory(entry, record)
+    if entry and entry.kind == "family_background" and entry.value == "only_child"
+        and Memory.HasStartingSibling(record)
+    then
+        entry = Data.backstoryByID["backstory.shared.family_background.siblings"]
+    end
     if not entry then
         return nil
     end

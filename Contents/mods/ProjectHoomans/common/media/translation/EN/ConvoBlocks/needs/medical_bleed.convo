@@ -1,0 +1,38 @@
+# Subject: MEDICAL BLEEDING / WOUNDS (first-person intensity stages + teammate reassurance).
+language EN
+namespace hoomans
+
+extend semantic.companion.need_request
+  say [role=request_bleed, need.urgency=critical] as req_bleed_critical:
+    "{term.address}, I'm bleeding out—I'm getting dizzy! Stop and help me bandage this right now!"
+  say [role=request_bleed, need.urgency=medium] as req_bleed_medium:
+    "{term.address}, this cut won't stop bleeding. Mind if I stop to wrap it up?"
+  say [role=request_bleed, need.urgency=light] as req_bleed_light:
+    "Hey {term.address}, got a small scrape bleeding a bit—might want to put a clean rag on it."
+  say [role=request_bleed] as req_bleed_default:
+    "{term.address}, I'm bleeding—I need a second to bandage up."
+
+  say [role=self_bleed, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as self_bleed_critical_guarded:
+    "Dammit... too much blood... head's spinning, I need a bandage now!"
+  say [role=self_bleed, need.urgency=critical] as self_bleed_critical:
+    "I'm losing too much blood... everything's going cold and blurry... I need bandages right now!"
+    "My hands are soaked... I can't stop the bleeding, I feel lightheaded..."
+  say [role=self_bleed, need.urgency=medium] as self_bleed_medium:
+    "Ugh, this wound's still bleeding through... I really need a clean bandage soon."
+  say [role=self_bleed, need.urgency=light] as self_bleed_light:
+    "Stings a bit... just a light cut, I should clean it when I get a chance."
+  say [role=self_bleed] as self_bleed_default:
+    "I'm bleeding... need to get this wrapped up soon."
+
+  say [role=reassure_bleed, need.urgency=critical, actor.social_style=warm|friendly|protective] as reassure_bleed_critical_warm:
+    "Hold pressure on it, {addressee.name}! Stay with me—we're getting you bandaged right now!"
+  say [role=reassure_bleed, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as reassure_bleed_critical_guarded:
+    "Keep pressure on the wound, {addressee.name}—don't black out on me! We'll get a rag on it!"
+  say [role=reassure_bleed, need.urgency=critical] as reassure_bleed_critical:
+    "Hang in there, {addressee.name}—press down on it, we'll get bandages for you right away!"
+  say [role=reassure_bleed, need.urgency=medium] as reassure_bleed_medium:
+    "Don't let that bleed too long, {addressee.name}—let's get a clean dressing on it soon."
+  say [role=reassure_bleed, need.urgency=light] as reassure_bleed_light:
+    "Keep an eye on that scratch, {addressee.name}, we'll clean it up when we stop."
+  say [role=reassure_bleed] as reassure_bleed_default:
+    "Hang in there, {addressee.name}—we'll get that patched up."

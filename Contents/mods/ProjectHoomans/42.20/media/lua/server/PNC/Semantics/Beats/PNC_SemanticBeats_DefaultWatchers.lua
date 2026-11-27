@@ -187,6 +187,18 @@ Beats.RegisterStateWatcher("actor.wound_healed", {
     },
 })
 
+local function readActorNeed(actor, key)
+    if type(actor) ~= "table" then return 0 end
+    if PNC.IndividualNeeds and type(PNC.IndividualNeeds.Get) == "function" then
+        local v = tonumber(PNC.IndividualNeeds.Get(actor, key))
+        if v ~= nil then return v end
+    end
+    local needs = type(actor.needs) == "table" and actor.needs or {}
+    if tonumber(needs[key]) ~= nil then return tonumber(needs[key]) end
+    local c = type(actor.conditionStats) == "table" and actor.conditionStats or {}
+    return tonumber(c[key]) or 0
+end
+
 -- 7. Actor fed & hydrated (actor-scoped, actor-agnostic)
 Beats.RegisterStateWatcher("actor.fed_hydrated", {
     scope = "actor",
@@ -196,10 +208,8 @@ Beats.RegisterStateWatcher("actor.fed_hydrated", {
     remediateCooldownMs = 180000,
     sample = function(ctx)
         local a = ctx.actor or {}
-        local needs = type(a.needs) == "table" and a.needs or {}
-        local c = type(a.conditionStats) == "table" and a.conditionStats or {}
-        local hunger = tonumber(needs.hunger) or tonumber(c.hunger) or 0
-        local thirst = tonumber(needs.thirst) or tonumber(c.thirst) or 0
+        local hunger = readActorNeed(a, "hunger")
+        local thirst = readActorNeed(a, "thirst")
         local hungryOrThirsty = hunger >= 0.55 or thirst >= 0.55
         return hungryOrThirsty, "fed_hydrated", hungryOrThirsty and "hungry_or_thirsty" or "fed_hydrated"
     end,
@@ -227,9 +237,7 @@ Beats.RegisterStateWatcher("actor.rested", {
     sample = function(ctx)
         local a = ctx.actor or {}
         local st = ctx.stats or {}
-        local needs = type(a.needs) == "table" and a.needs or {}
-        local c = type(a.conditionStats) == "table" and a.conditionStats or {}
-        local fatigue = tonumber(needs.fatigue) or tonumber(c.fatigue) or 0
+        local fatigue = readActorNeed(a, "fatigue")
         local tired = fatigue >= 0.65 or st.isExhausted == true
         return tired, "rested", tired and "fatigued" or "rested"
     end,

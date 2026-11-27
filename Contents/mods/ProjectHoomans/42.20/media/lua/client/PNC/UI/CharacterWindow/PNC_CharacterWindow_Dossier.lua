@@ -11,6 +11,7 @@ local Layout = UI.Layout
 local Presentation = PNC.KnowledgePresentation
 local ClientState = PNC.Network.ClientState
 local requestSequence = 0
+local FAMILY_REFRESH_MS = 5000
 
 local function text(key, fallback)
     return PNC.Translation.GetKey("UI_PNC_Character_Dossier_" .. key, fallback)
@@ -65,6 +66,7 @@ function Tabs.SetDossierContext(view)
     if view.dossierNPC ~= view.npcId then
         clearDebug(view)
         view.dossierNPC = view.npcId
+        view.nextFamilyRefresh = nil
         view:setYScroll(0)
     end
 end
@@ -91,6 +93,25 @@ function Tabs.RenderDossier(view, _, _, topY)
     local snapshot = ClientState.npcKnowledge and ClientState.npcKnowledge[view.npcId] or nil
     local sections = full and Presentation.BuildFullProfileRows(view.debugProfileSnapshot)
         or Presentation.BuildDossierRows(snapshot)
+    local family = snapshot and snapshot.startingFamily
+    if family then
+        local value = family.name
+        if family.deceased then
+            value = PNC.Translation.TrFormat("UI_PNC_Character_Dossier_FamilyDeceased",
+                "%1 (deceased)", value)
+        elseif PNC.Client and PNC.Client.RequestNPCKnowledge then
+            local now = PNC.Core.Now()
+            view.nextFamilyRefresh = view.nextFamilyRefresh or (now + FAMILY_REFRESH_MS)
+            if now >= view.nextFamilyRefresh then
+                view.nextFamilyRefresh = now + FAMILY_REFRESH_MS
+                PNC.Client.RequestNPCKnowledge(view.npcId)
+            end
+        end
+        table.insert(sections, 1, {
+            title = text("Family", "Family"),
+            rows = { { label = text("Family" .. family.kind, family.kind), value = value } },
+        })
+    end
     local pad = Layout.Pixels(12, view.uiScale)
     local inset = Layout.Pixels(10, view.uiScale)
     local scrollWidth = view.vscroll and view.vscroll:getWidth() or 0
@@ -128,8 +149,24 @@ function Tabs.RenderDossier(view, _, _, topY)
         for _, row in ipairs(section.rows) do
             view:drawText(Layout.Ellipsize(row.label, font, valueX - labelX - inset),
                 labelX, y, muted.r, muted.g, muted.b, muted.a, font)
-            view:drawText(Layout.Ellipsize(row.value, font, pad + contentWidth - valueX),
-                valueX, y, color.r, color.g, color.b, color.a, font)
+            local availableWidth = pad + contentWidth - valueX
+            if row.bar then
+                local barWidth = math.min(Layout.Pixels(170, view.uiScale), math.floor(availableWidth * .65))
+                local barHeight = Layout.Pixels(10, view.uiScale)
+                local barY = y + math.floor((getTextManager():getFontHeight(font) - barHeight) / 2)
+                view:drawRect(valueX, barY, barWidth, barHeight, .65, .12, .15, .17)
+                view:drawRect(valueX + 1, barY + 1, math.floor((barWidth - 2) * row.bar),
+                    barHeight - 2, row.qualifier and .55 or .95, .38, .66, .69)
+                view:drawRectBorder(valueX, barY, barWidth, barHeight, .7, .39, .47, .51)
+                if row.qualifier then
+                    local gap = Layout.Pixels(8, view.uiScale)
+                    view:drawText(Layout.Ellipsize(row.qualifier, font, availableWidth - barWidth - gap),
+                        valueX + barWidth + gap, y, muted.r, muted.g, muted.b, muted.a, font)
+                end
+            else
+                view:drawText(Layout.Ellipsize(row.value, font, availableWidth),
+                    valueX, y, color.r, color.g, color.b, color.a, font)
+            end
             y = y + rowHeight
         end
         y = y + pad

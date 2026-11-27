@@ -95,6 +95,13 @@ local function preferredName(category)
     return best and (best > 10 and best - 10 or best)
 end
 
+local function personalityBar(fact, value)
+    if fact.valueType ~= "band" or fact.category ~= "personality" then return nil end
+    if value == "low" then return .25 end
+    if value == "high" then return .75 end
+    if type(value) == "number" then return math.max(0, math.min(1, value)) end
+end
+
 function Presentation.BuildDossierRows(snapshot)
     local rows = {}
     for _, category in ipairs(snapshot and snapshot.categories or {}) do
@@ -110,12 +117,19 @@ function Presentation.BuildDossierRows(snapshot)
                 local rank = nameRank[id]
                 local duplicate = id == "identity.archetype" or id == "faction.identity"
                     or (rank and rank ~= nameChoice)
+                    or (snapshot.startingFamily and snapshot.startingFamily.kind == "Sibling"
+                        and id == "history.backstory.family_background"
+                        and descriptor.value == "grew_up_with_siblings")
+                    or (snapshot.startingFamily and id == "history.relationship")
                     or (descriptor.presentation and descriptor.presentation.topicID == "traits")
                 if not duplicate then
                     section.rows[#section.rows + 1] = {
                         descriptorID = descriptor.descriptorID,
                         label = Presentation.GetFactLabel(descriptor),
                         value = Presentation.FormatFact(descriptor, true),
+                        bar = personalityBar(descriptor, descriptor.value),
+                        qualifier = descriptor.status == "suspected"
+                            and confidenceBand(descriptor.confidence) or nil,
                         confidence = tonumber(descriptor.confidence) or 0,
                         status = descriptor.status,
                         sourceSummary = descriptor.primarySource,
@@ -146,6 +160,7 @@ function Presentation.BuildFullProfileRows(snapshot)
             end
             section.rows[#section.rows + 1] = {
                 label = Presentation.GetFactLabel(fact),
+                bar = personalityBar(fact, fact.truth),
                 value = Presentation.FormatFact({
                     descriptorID = fact.descriptorID,
                     value = fact.truth,

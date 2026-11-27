@@ -1,0 +1,73 @@
+# Subject: KNOX VIRUS PROGRESSION (staged first-person symptoms, teammate reactions, and 3-stance branching).
+language EN
+namespace hoomans
+
+extend semantic.companion.need_request
+  # Stage 1 (light): Early queasiness, lightheadedness, frequent sneezing/chills
+  say [role=self_knox_light, actor.social_style=hostile|guarded|withdrawn] as self_knox_light_guarded:
+    "*achoo!* Dammit... I feel lightheaded. Probably just a bad fever—leave me alone."
+    "Ugh... stomach's turning and I can't stop sneezing. Don't look at me like that."
+  say [role=self_knox_light] as self_knox_light_default:
+    "I feel lightheaded... *achoo!* Why am I burning up like this...?"
+    "Ugh, my head's spinning and I can't stop sneezing... I don't feel right at all..."
+    "Something's wrong... I'm sweating cold and feeling queasy..."
+
+  # Stage 2 (medium): Wheezing for breath, heavy coughing/sneezing, rising fever & dread
+  say [role=self_knox_medium, actor.social_style=hostile|guarded|withdrawn] as self_knox_medium_guarded:
+    "*wheeze*... can't catch my breath... *cough!* Stay back—I'm burning up!"
+    "My chest feels like it's caving in... *hack!* It's the fever, isn't it...?"
+  say [role=self_knox_medium] as self_knox_medium_default:
+    "*wheeze*... I can barely breathe... *cough!* My skin's on fire, I think it's taking hold..."
+    "I feel lightheaded... *achoo!* Everything's spinning and my lungs are burning... I'm so scared..."
+    "*wheeze*... can't stop shaking and coughing... please tell me I'm not turning..."
+
+  # Stage 3 (critical): Terminal delirium, zombie-like urges, growling SFX
+  say [role=self_knox_critical, actor.social_style=hostile|guarded|withdrawn] as self_knox_critical_guarded:
+    "*grrrgh*... {addressee.name}... why do you smell so good...?! Get away from me before I snap!"
+    "My head's screaming... *snarl*... don't come any closer, I can't control myself!"
+  say [role=self_knox_critical] as self_knox_critical_default:
+    "{addressee.name}... you look... tasty... OMG I'm losing it! Stay back, please!"
+    "*grrrgh*... I can't think straight... {addressee.name}, you smell... no, NO—get away from me, I'm losing my mind!"
+    "My teeth ache... *hrrgh*... I'm so hungry for... oh god, I'm turning—run!"
+
+  # Nearby NPC reactions per stage (3 distinct social-style / stance branches)
+  say [role=react_knox_light, actor.social_style=warm|friendly|protective] as react_knox_light_warm:
+    "Hey, {addressee.name}, take it easy—maybe it's just a normal cold. We'll keep an eye on you."
+  say [role=react_knox_light, actor.social_style=hostile|guarded|withdrawn] as react_knox_light_guarded:
+    "Wait a second, {addressee.name}... did you get scratched? Don't lie to us."
+  say [role=react_knox_light] as react_knox_light_default:
+    "You don't look great, {addressee.name}... let's hope that's just a bug and not the Knox."
+
+  say [role=react_knox_medium, actor.social_style=warm|friendly|protective] as react_knox_medium_warm:
+    "Hang in there, {addressee.name}... breathe slow, I'm right here—we won't abandon you."
+  say [role=react_knox_medium, actor.social_style=hostile|guarded|withdrawn] as react_knox_medium_guarded:
+    "Back up, {addressee.name}! You're wheezing and burning up—keep your distance from the group!"
+  say [role=react_knox_medium] as react_knox_medium_default:
+    "Oh man, {addressee.name}... that cough sounds bad. Give us a little space while we figure out what to do."
+
+  say [role=react_knox_critical, actor.social_style=warm|friendly|protective] as react_knox_critical_warm:
+    "{addressee.name}, fight it—look at me! Stay with us, don't let it take you!"
+  say [role=react_knox_critical, actor.social_style=hostile|guarded|withdrawn] as react_knox_critical_guarded:
+    "Shit! {addressee.name}'s turning! Keep your weapons ready and stay back!"
+  say [role=react_knox_critical] as react_knox_critical_default:
+    "Whoa—easy, {addressee.name}! Step back right now, you're scaring everyone!"
+
+  say [role=react_knox_chime] as react_knox_chime_default:
+    "God... stay alert everybody, watch their hands!"
+    "Don't crowd them—give them space right now!"
+
+  # Infected NPC's reply to the 3-stance branching dialogue choice (player or NPC)
+  say [role=knox_reply_comfort, need.urgency=critical] as knox_reply_comfort_critical:
+    "Thank you, {term.address}... *wheeze*... just promise me if I lose myself, you won't let me hurt anyone..."
+  say [role=knox_reply_comfort] as knox_reply_comfort_default:
+    "Thanks, {term.address}... *cough*... it means everything knowing I'm not alone in this."
+
+  say [role=knox_reply_distance, need.urgency=critical] as knox_reply_distance_critical:
+    "You're right... *grrrgh*... I'll stay back, {term.address}. Don't let me get close..."
+  say [role=knox_reply_distance] as knox_reply_distance_default:
+    "I understand, {term.address}... I'll keep my distance so nobody else gets sick."
+
+  say [role=knox_reply_confront, need.urgency=critical] as knox_reply_confront_critical:
+    "I'm trying to hold on, {term.address}—*snarl*—just stay back, I didn't ask for this!"
+  say [role=knox_reply_confront] as knox_reply_confront_default:
+    "Don't talk to me like I'm already dead, {term.address}... I'm still human!"

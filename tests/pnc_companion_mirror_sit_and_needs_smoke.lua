@@ -6,6 +6,7 @@ local T = require "support.test"
 
 local simNow = 200000
 local spoken = {}
+local spokenMeta = {}
 local relEffects = {}
 local startedScenes = {}
 local stoppedScenes = {}
@@ -136,6 +137,14 @@ _G.PNC = {
         },
         SpeechTransport = {
             ResolveLine = function(speaker, spec)
+                local urgency = spec.context and spec.context.needUrgency or ""
+                spokenMeta[#spokenMeta + 1] = {
+                    speakerId = tostring(speaker.id),
+                    poolID = tostring(spec.poolID),
+                    role = tostring(spec.role),
+                    needUrgency = tostring(urgency),
+                    addressee = tostring(spec.tokens["addressee.name"]),
+                }
                 return tostring(speaker.id) .. ":" .. tostring(spec.poolID) .. ":" .. tostring(spec.role) .. ":" .. tostring(spec.tokens["addressee.name"]), { poolID = spec.poolID }
             end,
             Deliver = function(_, _, opts)
@@ -225,5 +234,131 @@ end
 T.equal(sawReq, true, "NPC follower asked NPC group leader")
 T.equal(sawLeaderApprove, true, "NPC group leader autonomously replied Yes")
 T.equal(sawGruntApproved, true, "NPC follower reacted to NPC leader approval")
+
+-- 5) Intensity classification (light / medium / critical)
+T.equal(Beats.ClassifyNeedIntensity("hunger", 0.30), "light", "hunger 0.30 classifies as light")
+T.equal(Beats.ClassifyNeedIntensity("hunger", 0.55), "medium", "hunger 0.55 classifies as medium")
+T.equal(Beats.ClassifyNeedIntensity("hunger", 1.00), "critical", "hunger 1.00 classifies as critical")
+T.equal(Beats.ClassifyNeedIntensity("hunger", 0.20, 0.50), "critical", "starvation ailment forces critical")
+T.equal(Beats.ClassifyNeedIntensity("cold", 0, 0.20), "light", "cold 0.20 classifies as light")
+T.equal(Beats.ClassifyNeedIntensity("cold", 0, 0.50), "medium", "cold 0.50 classifies as medium")
+T.equal(Beats.ClassifyNeedIntensity("cold", 0, 1.00), "critical", "cold 1.00 classifies as critical")
+
+-- 6) Standalone starving + injured colonist (no follow order, no leader) voices critical self_eat
+--    AND nearby calm NPC reassures them with reassure_eat!
+_G.getSpecificPlayer = function() return player end
+local starvingColonist = {
+    id = "npc_sam", name = "Sam", alive = true, presenceState = "live",
+    x = 12, y = 10, z = 0,
+    health = {
+        state = "injured",
+        body = {
+            wholeBodyAilments = {
+                starvation = { severity = 1.0 },
+                cold = { severity = 1.0 },
+            },
+        },
+    },
+    needs = { fatigue = 0.1, hunger = 1.0, thirst = 0.1 },
+    runtime = {},
+}
+allRecords[#allRecords + 1] = starvingColonist
+npcSquadMember.needs.fatigue = 0.1
+simNow = simNow + 20000
+local beforeSam = #spokenMeta
+local acted4 = Beats.CheckCompanionNeeds(simNow)
+T.equal(acted4, true, "standalone starving+injured colonist voices self_eat need")
+T.equal(spokenMeta[beforeSam + 1].speakerId, "npc_sam", "Sam spoke his first-person need")
+T.equal(spokenMeta[beforeSam + 1].role, "self_eat", "standalone colonist uses self_eat role")
+T.equal(spokenMeta[beforeSam + 1].needUrgency, "critical", "100% starvation routes to critical intensity")
+T.truthy(spokenMeta[beforeSam + 2] ~= nil, "nearby NPC responded with reassurance")
+T.equal(spokenMeta[beforeSam + 2].speakerId, "npc_follower_1", "nearby teammate Daryl reassured Sam")
+T.equal(spokenMeta[beforeSam + 2].role, "reassure_eat", "reassurance uses reassure_eat role")
+T.equal(spokenMeta[beforeSam + 2].needUrgency, "critical", "reassurance matches critical intensity")
+T.equal(spokenMeta[beforeSam + 2].addressee, "Sam", "reassurance addresses Sam")
+
+-- 7) Escalation from light -> critical bypasses lower-tier cooldown
+local escalatingNpc = {
+    id = "npc_esc", name = "Glenn", alive = true, presenceState = "live",
+    x = 12, y = 11, z = 0,
+    needs = { fatigue = 0.1, hunger = 0.30, thirst = 0.1 },
+    runtime = {},
+}
+starvingColonist.needs.hunger = 0.0
+starvingColonist.health.body.wholeBodyAilments = {}
+allRecords[#allRecords + 1] = escalatingNpc
+simNow = simNow + 20000
+local beforeLight = #spokenMeta
+local actedLight = Beats.CheckCompanionNeeds(simNow)
+T.equal(actedLight, true, "light hunger triggers self_eat")
+T.equal(spokenMeta[beforeLight + 1].speakerId, "npc_esc", "Glenn spoke light hunger")
+T.equal(spokenMeta[beforeLight + 1].needUrgency, "light", "first trigger is light intensity")
+
+escalatingNpc.needs.hunger = 0.95
+simNow = simNow + 15000 -- still inside 150s light cooldown, but escalated to critical!
+local beforeCrit = #spokenMeta
+local actedCrit = Beats.CheckCompanionNeeds(simNow)
+T.equal(actedCrit, true, "escalation from light to critical bypasses lower-tier cooldown")
+T.equal(spokenMeta[beforeCrit + 1].speakerId, "npc_esc", "Glenn spoke critical hunger")
+T.equal(spokenMeta[beforeCrit + 1].needUrgency, "critical", "escalated trigger is critical intensity")
+
+-- 8) Third-person companion -> player (and NPC -> NPC) suggest_* still works with zero conflict
+escalatingNpc.needs.hunger = 0.0
+playerMoodles = { HUNGRY = 4 }
+simNow = simNow + 20000
+local beforePlayerSuggest = #spokenMeta
+local actedPlayerCrit = Beats.CheckCompanionNeeds(simNow)
+T.equal(actedPlayerCrit, true, "companion still performs third-person check on critically hungry player")
+T.equal(spokenMeta[beforePlayerSuggest + 1].poolID, "semantic.companion.moodle_suggest", "uses third-person moodle_suggest pool")
+T.equal(spokenMeta[beforePlayerSuggest + 1].role, "suggest_eat", "uses third-person suggest_eat role")
+T.equal(spokenMeta[beforePlayerSuggest + 1].needUrgency, "critical", "level-4 HUNGRY maps to critical third-person suggest")
+T.equal(spokenMeta[beforePlayerSuggest + 1].addressee, "Rick", "addresses player Rick")
+
+-- 9) Knox Virus staged progression, frequent sneeze/growl SFX+anim, teammate reaction, and 3-stance branching
+local performedFX = {}
+PNC.Semantics.SpeechPerformance = {
+    Perform = function(rec, spec)
+        performedFX[#performedFX + 1] = { id = rec.id, anim = spec.anim, voice = spec.voice }
+        return true
+    end,
+}
+playerMoodles = {}
+simNow = simNow + 100000 -- expire prior player eat suggestion watch
+local knoxNpc = {
+    id = "npc_jim", name = "Jim", alive = true, presenceState = "live",
+    x = 12, y = 12, z = 0,
+    health = {
+        state = "injured",
+        body = {
+            infection = { active = true, stage = "terminal", progress = 0.92 },
+            wholeBodyAilments = { knox_fever = { severity = 0.92 } },
+        },
+    },
+    needs = { fatigue = 0.1, hunger = 0.1, thirst = 0.1 },
+    runtime = {},
+}
+allRecords[#allRecords + 1] = knoxNpc
+simNow = simNow + 20000
+local beforeKnox = #spokenMeta
+local actedKnox = Beats.CheckCompanionNeeds(simNow)
+T.equal(actedKnox, true, "terminal Knox NPC triggers staged distress + reaction")
+T.truthy(#performedFX >= 1 and (performedFX[#performedFX].voice == "zombie_growl" or performedFX[#performedFX].voice == "zombie_snarl"),
+    "terminal Knox plays zombie growl/snarl SFX + anim via SpeechPerformance")
+T.equal(spokenMeta[beforeKnox + 1].speakerId, "npc_jim", "Jim spoke critical Knox distress")
+T.equal(spokenMeta[beforeKnox + 1].role, "self_knox_critical", "terminal Knox uses self_knox_critical role")
+T.truthy(spokenMeta[beforeKnox + 2] ~= nil and spokenMeta[beforeKnox + 2].role == "react_knox_critical",
+    "nearby NPC reacts to terminal Knox with react_knox_critical")
+
+local knoxChoices = Beats.BuildPlayerNeedRequestChoices(player, knoxNpc.id, simNow)
+T.truthy(type(knoxChoices) == "table" and #knoxChoices == 3, "exposes 3-stance Knox branching dialogue choices for player")
+T.equal(knoxChoices[1].stance, "stance_positive", "first Knox choice is positive/comfort")
+T.equal(knoxChoices[2].stance, "stance_neutral", "second Knox choice is neutral/distance")
+T.equal(knoxChoices[3].stance, "stance_negative", "third Knox choice is negative/confront")
+
+local okKnoxReply, resKnoxReply = Beats.TryResolvePlayerNeedReply(player, knoxNpc.id, "comfort", simNow + 1000)
+T.equal(okKnoxReply, true, "player comfort reply resolves pending Knox branch")
+T.equal(resKnoxReply.stance, "comfort", "resolved stance is comfort")
+T.equal(spokenMeta[#spokenMeta].role, "knox_reply_comfort", "infected NPC replies with knox_reply_comfort")
+T.truthy(relEffects[#relEffects].approval > 0, "comforting infected NPC applies positive approval delta")
 
 print("pnc_companion_mirror_sit_and_needs_smoke: OK")

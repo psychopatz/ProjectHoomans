@@ -48,6 +48,15 @@ local ROLE_CUES = {
     toll_refused_reply         = { anim = "no",       animDurationMs = 2200, voice = "shout" },
     flee_last_standing_open    = { voice = "shout" },
     flee_spared_open           = { anim = "wavebye",  animDurationMs = 1800 },
+    self_eat                   = { anim = "PNC_Anim_PainStomach1", animDurationMs = 2400, voice = "sigh" },
+    self_drink                 = { anim = "PNC_Anim_Cough",        animDurationMs = 2000, voice = "cough_muffled" },
+    self_cold                  = { anim = "PNC_Anim_Cough",        animDurationMs = 2200, voice = "shiver" },
+    self_rest                  = { anim = "PNC_Anim_PainTorso",    animDurationMs = 2400, voice = "pain" },
+    self_bleed                 = { anim = "PNC_Anim_PainTorso",    animDurationMs = 2600, voice = "pain_severe" },
+    self_knox_light            = { anim = "PNC_Anim_Sneeze",       animDurationMs = 2200, voice = "sneeze" },
+    self_knox_medium           = { anim = "PNC_Anim_Cough",        animDurationMs = 2600, voice = "sneeze_heavy" },
+    self_knox_critical         = { anim = "PNC_Anim_PainHead",     animDurationMs = 3000, voice = "zombie_growl" },
+    self_knox                  = { anim = "PNC_Anim_Sneeze",       animDurationMs = 2200, voice = "sneeze" },
 }
 
 -- Pool-level cues (second priority; excludes any `compat` pools automatically)

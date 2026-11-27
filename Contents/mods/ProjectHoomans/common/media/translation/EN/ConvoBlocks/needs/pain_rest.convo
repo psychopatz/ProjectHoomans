@@ -15,8 +15,52 @@ lexicon rest.ack
   [default]: "Good call taking it easy, {term.address}. I've got your back." | "Smart move—rest up for a minute."
 
 extend semantic.companion.moodle_suggest
+  say [role=suggest_rest, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as suggest_rest_critical_guarded:
+    "You're in bad shape, {term.address}—stop pushing through it and patch up or rest right now!"
+  say [role=suggest_rest, need.urgency=critical] as suggest_rest_critical:
+    "{term.address}, you look like you're in agony—stop right now and let yourself rest before you collapse!"
+    "Hey {term.address}, you're hurting bad—please slow down and take care of yourself right now!"
+  say [role=suggest_rest, need.urgency=medium] as suggest_rest_medium:
+    "{rest.observe}, {term.address}. {rest.suggest}"
+    "{opener.casual} {term.address}, {rest.observe}. {rest.suggest}"
+  say [role=suggest_rest, need.urgency=light] as suggest_rest_light:
+    "Feeling a little sore, {term.address}? Take it easy if you need a minute."
   say [role=suggest_rest] as suggest_rest_composed_a:
     "{rest.observe}, {term.address}. {rest.suggest}"
     "{opener.casual} {term.address}, {rest.observe}. {rest.suggest}"
   say [role=ack_rest] as ack_rest_composed:
     "{rest.ack}"
+
+extend semantic.companion.need_request
+  say [role=request_rest, need.urgency=critical] as req_rest_critical:
+    "{term.address}, everything hurts so bad I can't think straight—I need to stop and rest right now!"
+  say [role=request_rest, need.urgency=medium] as req_rest_medium:
+    "{term.address}, I'm hurting pretty bad here. Mind if we take a minute so I can catch my breath?"
+  say [role=request_rest, need.urgency=light] as req_rest_light:
+    "Hey {term.address}, feeling a bit sore and rough—might need to take it easy for a second."
+  say [role=request_rest] as req_rest_default:
+    "{term.address}, I'm not feeling great—could use a quick rest."
+
+  say [role=self_rest, need.urgency=critical] as self_rest_critical:
+    "Ugh... it hurts to even breathe... I feel sick to my stomach, I can't keep pushing like this..."
+    "Everything's throbbing... I'm in way too much pain to stay sharp..."
+  say [role=self_rest, need.urgency=medium] as self_rest_medium:
+    "Man, I'm aching all over... really need to sit still and recover for a bit."
+    "Feeling pretty rough and queasy right now..."
+  say [role=self_rest, need.urgency=light] as self_rest_light:
+    "Feeling a little sore... hope it doesn't get worse."
+  say [role=self_rest] as self_rest_default:
+    "I'm hurting... could really use a minute to rest."
+
+  say [role=reassure_rest, need.urgency=critical, actor.social_style=warm|friendly|protective] as reassure_rest_critical_warm:
+    "Hang in there, {addressee.name}—take it slow, we'll find painkillers and a safe place to rest."
+  say [role=reassure_rest, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as reassure_rest_critical_guarded:
+    "Grit your teeth, {addressee.name}—don't fold on us now. We'll patch you up when we're clear."
+  say [role=reassure_rest, need.urgency=critical] as reassure_rest_critical:
+    "Hang in there, {addressee.name}—we'll get you somewhere safe to rest right away."
+  say [role=reassure_rest, need.urgency=medium] as reassure_rest_medium:
+    "Take it easy, {addressee.name}—let's keep our pace steady until we can stop."
+  say [role=reassure_rest, need.urgency=light] as reassure_rest_light:
+    "Let us know if it starts hurting worse, {addressee.name}."
+  say [role=reassure_rest] as reassure_rest_default:
+    "Hang in there, {addressee.name}—we'll get you some rest soon."

@@ -28,12 +28,22 @@ function Knowledge.BuildPlayerSnapshot(characterUUID, npcID)
         firstMetAt = note and note.firstMetAt or nil, lastInteractionAt = note and note.lastInteractionAt or nil,
         giftPreferences = {} }
     if not note then return output end
+    local memory = PNC.Conversation and PNC.Conversation.Memory
     for descriptorID, fact in pairs(note.discovered) do
         local descriptor = Definitions.Get(descriptorID)
         if descriptor then
             local category = output.categories[descriptor.category] or { id = descriptor.category, descriptors = {} }
+            local value = fact.value
+            if descriptorID == "history.backstory.family_background" and value == "only_child"
+                and memory and memory.HasStartingSibling and Registry and Registry.Get
+            then
+                local record = Registry.Get(output.npcID)
+                if memory.HasStartingSibling(record) then
+                    value = Providers.GetTruth(record, descriptor)
+                end
+            end
             category.descriptors[#category.descriptors + 1] = { descriptorID = descriptorID, category = descriptor.category, valueType = descriptor.valueType,
-                presentation = deepCopy(descriptor.presentation), status = fact.status, value = deepCopy(fact.value), confidence = fact.confidence,
+                presentation = deepCopy(descriptor.presentation), status = fact.status, value = deepCopy(value), confidence = fact.confidence,
                 primarySource = fact.primarySource, evidenceCount = fact.evidenceCount }
             output.categories[descriptor.category] = category
         end
@@ -56,6 +66,37 @@ function Knowledge.BuildPlayerSnapshot(characterUUID, npcID)
         end
     end
     return output
+end
+
+local reciprocalFamilyKind = {
+    brother = "Sibling",
+    sister = "Sibling",
+    mother = "Child",
+    father = "Child",
+    lover = "Spouse",
+}
+
+local function knownStartingFamily(record, characterUUID)
+    local generation = record and record.generation
+    if type(generation) ~= "table" or generation.source ~= "starting_companion_trait" then return nil end
+    local kind = reciprocalFamilyKind[generation.relationshipKind]
+    local relativeID = generation.playerCharacterUUID
+    if not kind or not relativeID or not PlayerCharacters or not PlayerCharacters.GetRegistryRecord then
+        return nil
+    end
+    if characterUUID ~= relativeID then
+        local fact = Knowledge.GetDescriptor(characterUUID, record.id, "history.relationship")
+        if not fact or fact.status ~= "confirmed" or fact.value ~= generation.relationshipKind then
+            return nil
+        end
+    end
+    local relative = PlayerCharacters.GetRegistryRecord(relativeID)
+    if not relative then return nil end
+    local name = (tostring(relative.forename or "") .. " " .. tostring(relative.surname or ""))
+        :gsub("^%s+", ""):gsub("%s+$", "")
+    if name == "" then return nil end
+    local deceased = PlayerCharacters.IsCharacterDead and PlayerCharacters.IsCharacterDead(relativeID)
+    return { kind = kind, name = name, deceased = deceased == true }
 end
 
 function Knowledge.BuildPlayerSnapshotForPlayer(player, npcID)
@@ -138,6 +179,7 @@ function Knowledge.BuildPlayerSnapshotForPlayer(player, npcID)
     else
         snapshot.lifecycleStatus = "LIVE"
     end
+    snapshot.startingFamily = knownStartingFamily(record, characterUUID)
     snapshot.portrait = (record and PNC.Identity and PNC.Identity.BuildPortraitSummary
         and PNC.Identity.BuildPortraitSummary(record))
         or (deathMarker and deathMarker.portrait) or nil

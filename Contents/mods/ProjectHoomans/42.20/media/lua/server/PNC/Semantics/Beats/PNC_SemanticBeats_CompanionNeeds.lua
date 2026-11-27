@@ -13,21 +13,41 @@ PNC.Semantics.DialogueBeats = Beats
 local CHECK_COOLDOWN_MS = 10000
 local SUGGEST_COOLDOWN_MS = 180000
 local NEED_REQUEST_COOLDOWN_MS = 180000
+local NEED_CRITICAL_COOLDOWN_MS = 90000
+local SELF_NEED_COOLDOWN_MS = 150000
+local SELF_NEED_CRITICAL_COOLDOWN_MS = 75000
 local SUGGEST_WATCH_TTL_MS = 90000
 local NEED_REQUEST_TTL_MS = 60000
+local KNOX_BRANCH_TTL_MS = 75000
+local KNOX_FX_COOLDOWN_MS = { light = 30000, medium = 18000, critical = 12000 }
 local BREAK_SIT_DURATION_MS = 25000
 local MAX_TRACKED_KEYS = 32
+
+local INTENSITY_RANK = {
+    light = 1,
+    medium = 2,
+    critical = 3,
+}
 
 local lastCheckAt = 0
 local suggestCooldowns, suggestOrder = {}, {}
 local requestCooldowns, requestOrder = {}, {}
+local selfNeedCooldowns, selfNeedOrder = {}, {}
+local knoxFxCooldowns, knoxFxOrder = {}, {}
 local pendingSuggestions = {} -- leaderKey -> { advisorId, need, initialSeverity, suggestedAt, expiresAt }
-local pendingNeedRequests = {} -- leaderKey -> { requestId, requesterId, leaderKind, leaderKey, leaderId, need, severity, createdAt, expiresAt }
+local pendingNeedRequests = {} -- leaderKey -> { requestId, requesterId, leaderKind, leaderKey, leaderId, need, severity, intensity, createdAt, expiresAt }
+local pendingKnoxBranches = {} -- listenerKey -> { branchId, infectedId, stage, listenerKind, listenerKey, listenerName, createdAt, expiresAt }
 local requestSeq = 0
 
 local NEED_REQUEST_FRONTIER = {
     { id = "need_req_yes", speechAct = "ACCEPT", decision = "yes", stance = "stance_positive", priority = 14 },
     { id = "need_req_no",  speechAct = "REFUSE", decision = "no",  stance = "stance_negative", priority = 10 },
+}
+
+local KNOX_BRANCH_FRONTIER = {
+    { id = "knox_comfort",  speechAct = "ACCEPT",  decision = "comfort",  stance = "stance_positive", priority = 15 },
+    { id = "knox_distance", speechAct = "CLARIFY", decision = "distance", stance = "stance_neutral",  priority = 13 },
+    { id = "knox_confront", speechAct = "REFUSE",  decision = "confront", stance = "stance_negative", priority = 11 },
 }
 
 local function nowMs(at)
@@ -84,7 +104,10 @@ local function isCalmNPC(rec, now)
     if type(rec) ~= "table" or rec.id == nil or rec.alive == false then return false end
     local live = tostring(PNC.Const and PNC.Const.PRESENCE_LIVE or "live")
     if rec.presenceState ~= nil and tostring(rec.presenceState) ~= live then return false end
-    if rec.health and tostring(rec.health.state or "normal") ~= "normal" then return false end
+    local hState = rec.health and string.lower(tostring(rec.health.state or "normal")) or "normal"
+    if hState == "downed" or hState == "unconscious" or hState == "dead" or hState == "incapacitated" then
+        return false
+    end
     local rt = type(rec.runtime) == "table" and rec.runtime or nil
     if rt and (rt.target ~= nil or rt.attackAction ~= nil or rt.combatTarget ~= nil
         or now < (tonumber(rt.inCombatUntil) or 0))
@@ -168,7 +191,174 @@ local function readNPCNeed(record, key)
         if v ~= nil then return v end
     end
     local needs = type(record.needs) == "table" and record.needs or nil
-    return needs and tonumber(needs[key]) or 0
+    if needs and tonumber(needs[key]) ~= nil then
+        return tonumber(needs[key])
+    end
+    local cond = type(record.conditionStats) == "table" and record.conditionStats or nil
+    return cond and tonumber(cond[key]) or 0
+end
+
+local function readNPCAilmentSeverity(record, ailmentId)
+    if type(record) ~= "table" then return 0 end
+    local wb = PNC.NPCWounds and PNC.NPCWounds.WholeBody or nil
+    if wb and type(wb.GetSeverity) == "function" then
+        local ok, v = pcall(wb.GetSeverity, record, ailmentId)
+        if ok and tonumber(v) ~= nil then return tonumber(v) end
+    end
+    local ailments = record.health and record.health.body and record.health.body.wholeBodyAilments
+        or (record.bodyHealth and record.bodyHealth.wholeBodyAilments)
+        or nil
+    if type(ailments) ~= "table" then return 0 end
+    local entry = ailments[ailmentId]
+    if type(entry) == "table" then
+        return tonumber(entry.severity) or (entry.active == true and 1 or 0)
+    end
+    return tonumber(entry) or 0
+end
+
+local function intensityFromPlayerMoodle(level)
+    level = tonumber(level) or 0
+    if level >= 4 then return "critical" end
+    if level >= 3 then return "medium" end
+    if level >= 2 then return "light" end
+    return nil
+end
+
+local function cooldownAllows(map, key, intensity, now)
+    local entry = map[key]
+    if entry == nil then return true end
+    if type(entry) == "number" then
+        return now >= entry
+    end
+    local untilAt = tonumber(entry.untilAt) or 0
+    if now >= untilAt then return true end
+    local prevRank = INTENSITY_RANK[tostring(entry.intensity or "light")] or 1
+    local curRank = INTENSITY_RANK[tostring(intensity or "light")] or 1
+    return curRank > prevRank
+end
+
+local function setIntensityCooldown(map, order, key, untilAt, intensity)
+    lruPut(map, order, key, {
+        untilAt = untilAt,
+        intensity = tostring(intensity or "light"),
+    })
+end
+
+function Beats.ClassifyNeedIntensity(needKind, value, ailmentSeverity)
+    local v = tonumber(value) or 0
+    local a = tonumber(ailmentSeverity) or 0
+    if needKind == "eat" or needKind == "hunger" then
+        if v >= 0.70 or a >= 0.01 then return "critical" end
+        if v >= 0.45 then return "medium" end
+        if v >= 0.25 then return "light" end
+        return nil
+    elseif needKind == "drink" or needKind == "thirst" then
+        if v >= 0.84 or a >= 0.01 then return "critical" end
+        if v >= 0.55 then return "medium" end
+        if v >= 0.25 then return "light" end
+        return nil
+    elseif needKind == "sleep" then
+        if v >= 0.85 then return "critical" end
+        if v >= 0.72 then return "medium" end
+        return nil
+    elseif needKind == "sit" or needKind == "fatigue" then
+        if v >= 0.85 then return "critical" end
+        if v >= 0.60 then return "medium" end
+        if v >= 0.45 then return "light" end
+        return nil
+    elseif needKind == "cold" then
+        local c = math.max(v, a)
+        if c >= 0.70 then return "critical" end
+        if c >= 0.35 then return "medium" end
+        if c >= 0.15 then return "light" end
+        return nil
+    elseif needKind == "drop_load" or needKind == "encumbrance" then
+        if v >= 0.90 then return "critical" end
+        if v >= 0.75 then return "medium" end
+        if v >= 0.60 then return "light" end
+        return nil
+    elseif needKind == "rest" or needKind == "pain" or needKind == "sickness" then
+        local p = math.max(v, a)
+        if p >= 0.70 then return "critical" end
+        if p >= 0.40 then return "medium" end
+        if p >= 0.20 then return "light" end
+        return nil
+    elseif needKind == "bleed" or needKind == "bleeding" then
+        local b = math.max(v, a)
+        if b >= 0.65 then return "critical" end
+        if b >= 0.30 then return "medium" end
+        if b >= 0.05 then return "light" end
+        return nil
+    elseif needKind == "knox" then
+        local k = math.max(v, a)
+        if k >= 0.85 then return "critical" end
+        if k >= 0.45 then return "medium" end
+        if k >= 0.20 then return "light" end
+        return nil
+    end
+    return nil
+end
+
+local function readNPCKnoxStage(record)
+    if type(record) ~= "table" then return nil, 0 end
+    local body = record.health and record.health.body or record.bodyHealth or nil
+    local inf = type(body) == "table" and type(body.infection) == "table" and body.infection or nil
+    local knoxFever = readNPCAilmentSeverity(record, "knox_fever")
+    if inf and inf.active == true then
+        local stage = string.lower(tostring(inf.stage or ""))
+        local prog = tonumber(inf.progress) or 0
+        if stage == "terminal" or prog >= 0.85 or knoxFever >= 0.75 then
+            return "critical", math.max(prog, knoxFever, 0.90)
+        elseif stage == "fever" or stage == "nauseous" or prog >= 0.45 or knoxFever >= 0.30 then
+            return "medium", math.max(prog, knoxFever, 0.55)
+        elseif stage == "queasy" or prog >= 0.20 or knoxFever >= 0.05 then
+            return "light", math.max(prog, knoxFever, 0.25)
+        end
+    elseif knoxFever >= 0.05 then
+        local tier = knoxFever >= 0.75 and "critical" or (knoxFever >= 0.30 and "medium" or "light")
+        return tier, knoxFever
+    end
+    return nil, 0
+end
+
+local function pumpKnoxSymptomFX(record, intensity, now)
+    if type(record) ~= "table" or record.id == nil or not intensity then return false end
+    local Perf = PNC.Semantics and PNC.Semantics.SpeechPerformance or nil
+    if not Perf or type(Perf.Perform) ~= "function" then return false end
+    local cdMs = KNOX_FX_COOLDOWN_MS[intensity] or 25000
+    local key = tostring(record.id)
+    local nextAt = tonumber(knoxFxCooldowns[key]) or 0
+    if now < nextAt then return false end
+    local spec
+    if intensity == "critical" then
+        local useSnarl = (math.floor(now / 1000) % 2) == 1
+        spec = {
+            anim = useSnarl and "PNC_Anim_PainHead" or "PNC_Anim_Sneeze",
+            animDurationMs = 2800,
+            voice = useSnarl and "zombie_snarl" or "zombie_growl",
+            reason = "knox_symptom_critical",
+        }
+    elseif intensity == "medium" then
+        local useSneeze = (math.floor(now / 1000) % 2) == 0
+        spec = {
+            anim = useSneeze and "PNC_Anim_Sneeze" or "PNC_Anim_Cough",
+            animDurationMs = 2400,
+            voice = useSneeze and "sneeze_heavy" or "cough",
+            reason = "knox_symptom_medium",
+        }
+    else
+        spec = {
+            anim = "PNC_Anim_Sneeze",
+            animDurationMs = 2000,
+            voice = "sneeze",
+            reason = "knox_symptom_light",
+        }
+    end
+    local ok = Perf.Perform(record, spec, now)
+    if ok then
+        lruPut(knoxFxCooldowns, knoxFxOrder, key, now + cdMs)
+    end
+    return ok == true
 end
 
 -- Inspects either a player's PZ moodles or an NPC leader's canonical IndividualNeeds ([0,1]).
@@ -176,41 +366,59 @@ end
 function Beats.InspectLeaderMoodles(leader)
     if type(leader) ~= "table" or not leader.actor then return nil end
     local best = nil
-    local function consider(need, moodle, severity)
-        if severity <= 0 then return end
+    local function consider(need, moodle, severity, intensity)
+        if severity <= 0 or not intensity then return end
         if not best or severity > best.severity then
-            best = { need = need, moodle = moodle, severity = severity }
+            best = { need = need, moodle = moodle, severity = severity, intensity = intensity }
         end
     end
     if leader.kind == "player" then
         local p = leader.actor
         local endur = readPlayerMoodleLevel(p, "ENDURANCE")
-        if endur >= 2 then consider("sit", "exhausted", endur + 0.5) end
+        if endur >= 2 then consider("sit", "exhausted", endur + 0.5, intensityFromPlayerMoodle(endur)) end
         local tired = readPlayerMoodleLevel(p, "TIRED")
-        if tired >= 2 then consider("sleep", "tired", tired + 0.3) end
+        if tired >= 2 then consider("sleep", "tired", tired + 0.3, intensityFromPlayerMoodle(tired)) end
         local hungry = readPlayerMoodleLevel(p, "HUNGRY")
-        if hungry >= 2 then consider("eat", "hungry", hungry) end
+        if hungry >= 2 then consider("eat", "hungry", hungry, intensityFromPlayerMoodle(hungry)) end
         local thirst = readPlayerMoodleLevel(p, "THIRST")
-        if thirst >= 2 then consider("drink", "thirsty", thirst + 0.2) end
+        if thirst >= 2 then consider("drink", "thirsty", thirst + 0.2, intensityFromPlayerMoodle(thirst)) end
         local heavy = readPlayerMoodleLevel(p, "HEAVY_LOAD")
-        if heavy >= 2 then consider("drop_load", "overencumbered", heavy - 0.2) end
+        if heavy >= 2 then consider("drop_load", "overencumbered", heavy - 0.2, intensityFromPlayerMoodle(heavy)) end
         local pain = readPlayerMoodleLevel(p, "PAIN")
         local sick = readPlayerMoodleLevel(p, "SICK")
         if pain >= 2 or sick >= 2 then
-            consider("rest", pain >= sick and "in_pain" or "sick", math.max(pain, sick) + 0.1)
+            local peak = math.max(pain, sick)
+            consider("rest", pain >= sick and "in_pain" or "sick", peak + 0.1, intensityFromPlayerMoodle(peak))
         end
         return best
     end
     local fatigue = readNPCNeed(leader.actor, "fatigue")
     local hunger = readNPCNeed(leader.actor, "hunger")
     local thirst = readNPCNeed(leader.actor, "thirst")
-    if fatigue >= 0.72 then
-        consider("sleep", "tired", 3)
-    elseif fatigue >= 0.50 then
-        consider("sit", "exhausted", 2)
+    local starv = readNPCAilmentSeverity(leader.actor, "starvation")
+    local dehyd = readNPCAilmentSeverity(leader.actor, "dehydration")
+    local cold = readNPCAilmentSeverity(leader.actor, "cold")
+    local sleepTier = Beats.ClassifyNeedIntensity("sleep", fatigue)
+    if sleepTier then
+        consider("sleep", "tired", (INTENSITY_RANK[sleepTier] or 2) + fatigue, sleepTier)
+    else
+        local sitTier = Beats.ClassifyNeedIntensity("sit", fatigue)
+        if sitTier then
+            consider("sit", "exhausted", (INTENSITY_RANK[sitTier] or 1) + fatigue, sitTier)
+        end
     end
-    if thirst >= 0.70 then consider("drink", "thirsty", 2.5) end
-    if hunger >= 0.70 then consider("eat", "hungry", 2.2) end
+    local thirstTier = Beats.ClassifyNeedIntensity("drink", thirst, dehyd)
+    if thirstTier then
+        consider("drink", "thirsty", (INTENSITY_RANK[thirstTier] or 1) + thirst + 0.2, thirstTier)
+    end
+    local hungerTier = Beats.ClassifyNeedIntensity("eat", hunger, starv)
+    if hungerTier then
+        consider("eat", "hungry", (INTENSITY_RANK[hungerTier] or 1) + hunger + 0.1, hungerTier)
+    end
+    local coldTier = Beats.ClassifyNeedIntensity("cold", 0, cold)
+    if coldTier then
+        consider("cold", "cold", (INTENSITY_RANK[coldTier] or 1) + cold, coldTier)
+    end
     return best
 end
 
@@ -219,20 +427,198 @@ local function inspectSelfNeed(record)
     local fatigue = readNPCNeed(record, "fatigue")
     local hunger = readNPCNeed(record, "hunger")
     local thirst = readNPCNeed(record, "thirst")
+    local starv = readNPCAilmentSeverity(record, "starvation")
+    local dehyd = readNPCAilmentSeverity(record, "dehydration")
+    local cold = readNPCAilmentSeverity(record, "cold")
+    local knoxTier, knoxProg = readNPCKnoxStage(record)
+    local cond = type(record.conditionStats) == "table" and record.conditionStats or {}
+    local health = type(record.health) == "table" and record.health or {}
+    local bleedRate = tonumber(health.bleedingRate) or (health.bleeding == true and 0.5 or 0)
+    local painVal = math.max(tonumber(cond.pain) or 0, tonumber(health.pain) or 0, tonumber(cond.sickness) or 0)
+    local encVal = tonumber(cond.encumbrance) or tonumber(record.encumbranceRatio)
+        or (cond.overencumbered == true and 0.80 or 0)
+
     local best = nil
-    local function consider(need, severity)
+    local function consider(need, needType, severity, intensity)
+        if not intensity then return end
         if not best or severity > best.severity then
-            best = { need = need, severity = severity }
+            best = { need = need, needType = needType, severity = severity, intensity = intensity }
         end
     end
-    if fatigue >= 0.72 then
-        consider("sleep", 3.0)
-    elseif fatigue >= 0.48 then
-        consider("sit", 2.0)
+    if knoxTier then
+        consider("knox", "knox", (INTENSITY_RANK[knoxTier] or 1) * 1.35 + knoxProg, knoxTier)
     end
-    if thirst >= 0.68 then consider("drink", thirst * 3.5) end
-    if hunger >= 0.68 then consider("eat", hunger * 3.2) end
+    local bleedTier = Beats.ClassifyNeedIntensity("bleed", bleedRate)
+    if bleedTier then
+        consider("bleed", "bleed", (INTENSITY_RANK[bleedTier] or 1) * 1.25 + bleedRate, bleedTier)
+    end
+    local sleepTier = Beats.ClassifyNeedIntensity("sleep", fatigue)
+    if sleepTier then
+        consider("sleep", "fatigue", (INTENSITY_RANK[sleepTier] or 2) * 1.1 + fatigue, sleepTier)
+    else
+        local sitTier = Beats.ClassifyNeedIntensity("sit", fatigue)
+        if sitTier then
+            consider("sit", "fatigue", (INTENSITY_RANK[sitTier] or 1) * 1.0 + fatigue, sitTier)
+        end
+    end
+    local thirstTier = Beats.ClassifyNeedIntensity("drink", thirst, dehyd)
+    if thirstTier then
+        consider("drink", "thirst", (INTENSITY_RANK[thirstTier] or 1) * 1.15 + math.max(thirst, dehyd), thirstTier)
+    end
+    local hungerTier = Beats.ClassifyNeedIntensity("eat", hunger, starv)
+    if hungerTier then
+        consider("eat", "hunger", (INTENSITY_RANK[hungerTier] or 1) * 1.12 + math.max(hunger, starv), hungerTier)
+    end
+    local coldTier = Beats.ClassifyNeedIntensity("cold", 0, cold)
+    if coldTier then
+        consider("cold", "cold", (INTENSITY_RANK[coldTier] or 1) * 1.08 + cold, coldTier)
+    end
+    local restTier = Beats.ClassifyNeedIntensity("rest", painVal)
+    if restTier then
+        consider("rest", "pain", (INTENSITY_RANK[restTier] or 1) * 1.05 + painVal, restTier)
+    end
+    local encTier = Beats.ClassifyNeedIntensity("drop_load", encVal)
+    if encTier then
+        consider("drop_load", "encumbrance", (INTENSITY_RANK[encTier] or 1) * 0.95 + encVal, encTier)
+    end
     return best
+end
+
+local function findNearbyListener(rec)
+    local best = nil
+    local bestDistSq = (12 * 12) + 1
+    local rz = tonumber(rec.z) or 0
+    local function considerPlayer(p)
+        if not p or safeCall(p, "isDead") == true then return end
+        local pz = tonumber(safeCall(p, "getZ")) or 0
+        if math.abs(rz - pz) >= 1 then return end
+        local px = tonumber(safeCall(p, "getX")) or 0
+        local py = tonumber(safeCall(p, "getY")) or 0
+        local dSq = distanceSq(rec.x, rec.y, px, py)
+        if dSq <= (12 * 12) and dSq < bestDistSq then
+            bestDistSq = dSq
+            best = {
+                kind = "player",
+                actor = p,
+                key = playerEntityKey(p),
+                name = playerDisplayName(p),
+            }
+        end
+    end
+    if type(getOnlinePlayers) == "function" then
+        local ok, players = pcall(getOnlinePlayers)
+        if ok and players and type(players.size) == "function" then
+            local n = tonumber(players:size()) or 0
+            for i = 0, n - 1 do
+                considerPlayer(players:get(i))
+            end
+        end
+    end
+    if not best and type(getSpecificPlayer) == "function" then
+        local ok, p = pcall(getSpecificPlayer, 0)
+        if ok and p then considerPlayer(p) end
+    end
+    if not best and PNC.BehaviorCommon and type(PNC.BehaviorCommon.GetOwner) == "function" then
+        local owner = PNC.BehaviorCommon.GetOwner(rec)
+        if owner then considerPlayer(owner) end
+    end
+    return best
+end
+
+local function isSameTeam(a, b)
+    if type(a) ~= "table" or type(b) ~= "table" then return false end
+    if a.factionId ~= nil and b.factionId ~= nil and tostring(a.factionId) == tostring(b.factionId) then
+        return true
+    end
+    if a.groupId ~= nil and b.groupId ~= nil and tostring(a.groupId) == tostring(b.groupId) then
+        return true
+    end
+    if a.settlementId ~= nil and b.settlementId ~= nil and tostring(a.settlementId) == tostring(b.settlementId) then
+        return true
+    end
+    if a.recruited == true and b.recruited == true then
+        return true
+    end
+    return false
+end
+
+local function isHostilePair(a, b)
+    if type(b) ~= "table" then return false end
+    local role = string.lower(tostring(b.role or b.archetype or ""))
+    if role == "bandit" or role == "raider" or role == "hostile" then
+        return not isSameTeam(a, b)
+    end
+    return false
+end
+
+local function findNearbyReassurancePartners(rec, now)
+    local reg = PNC.Registry
+    if not reg or type(reg.ForEach) ~= "function" then return nil, nil end
+    local rz = tonumber(rec.z) or 0
+    local primary, primaryScore = nil, -1
+    local secondary, secondaryScore = nil, -1
+    reg.ForEach(function(other)
+        if type(other) ~= "table" or other.id == nil or tostring(other.id) == tostring(rec.id) then
+            return
+        end
+        if not isCalmNPC(other, now) or isHostilePair(rec, other) then return end
+        if math.abs((tonumber(other.z) or 0) - rz) >= 1 then return end
+        local dSq = distanceSq(rec.x, rec.y, other.x, other.y)
+        if dSq > (12 * 12) then return end
+        local score = (isSameTeam(rec, other) and 1000 or 100) - dSq
+        if score > primaryScore then
+            secondary, secondaryScore = primary, primaryScore
+            primary, primaryScore = other, score
+        elseif score > secondaryScore then
+            secondary, secondaryScore = other, score
+        end
+    end)
+    return primary, secondary
+end
+
+if type(Beats.RegisterHook) == "function" then
+    Beats.RegisterHook("npc.self_need_distress", {
+        eventTypes = { "npc.self_need_distress" },
+        priority = 54,
+        cooldownMs = 0,
+        evaluate = function(_, payload)
+            if type(Beats.BuildWorldThread) ~= "function" then return nil end
+            local a = payload and payload.speaker or nil
+            if type(a) ~= "table" or a.alive == false then return nil end
+            local need = tostring(payload.need or "eat")
+            local intensity = tostring(payload.intensity or "medium")
+            local isKnox = need == "knox"
+            local openRole = isKnox and ("self_knox_" .. intensity) or ("self_" .. need)
+            local replyRole = isKnox and ("react_knox_" .. intensity) or ("reassure_" .. need)
+            local b = payload.partner
+            local c = intensity == "critical" and payload.third or nil
+            return Beats.BuildWorldThread(a, b, {
+                refPrefix = "self_need:" .. need .. ":" .. intensity,
+                family = "npc_self_need_" .. need,
+                poolID = "semantic.companion.need_request",
+                eventType = isKnox and "npc_knox_distress_beat" or "npc_self_need_beat",
+                domain = isKnox and "medical" or "social",
+                channel = isKnox and "medical" or "social",
+                topic = isKnox and "knox_distress" or "companion_need_request",
+                openAct = "INFORM",
+                openRole = openRole,
+                replyAct = isKnox and "REACT" or "REASSURE",
+                replyRole = replyRole,
+                chimeAct = isKnox and "REACT" or "REASSURE",
+                chimeRole = isKnox and "react_knox_chime" or "reassure_chime",
+                third = c,
+                delayMs = 1350,
+                priority = intensity == "critical" and 64 or 52,
+                tokens = {
+                    ["slot.need"] = need,
+                },
+                context = {
+                    needType = payload.needType or need,
+                    needUrgency = intensity,
+                },
+            })
+        end,
+    })
 end
 
 local function speakCompanionLine(speaker, addressee, poolID, role, act, topic, leaderName, now, opts)
@@ -251,6 +637,8 @@ local function speakCompanionLine(speaker, addressee, poolID, role, act, topic, 
         companionNeedRole = role,
         topic = topic,
         inCombat = false,
+        needType = opts.needType or opts.need,
+        needUrgency = opts.intensity or opts.needUrgency,
     }
     local text, res = Transport.ResolveLine(speaker, {
         eventType = opts.eventType or "companion_need_beat",
@@ -380,9 +768,135 @@ function Beats.GetPendingCompanionNeedRequest(leaderKey, at)
     return req
 end
 
+function Beats.GetPendingKnoxBranch(listenerKey, at)
+    if not listenerKey then return nil end
+    local now = nowMs(at)
+    local br = pendingKnoxBranches[tostring(listenerKey)]
+    if not br then return nil end
+    if now > (tonumber(br.expiresAt) or 0) then
+        pendingKnoxBranches[tostring(listenerKey)] = nil
+        return nil
+    end
+    return br
+end
+
+function Beats.BuildPlayerKnoxBranchChoices(listenerKeyOrActor, npcId, at)
+    local key = type(listenerKeyOrActor) == "string" and listenerKeyOrActor or playerEntityKey(listenerKeyOrActor)
+    if not key then return nil end
+    local br = Beats.GetPendingKnoxBranch(key, at)
+    if not br then return nil end
+    if npcId ~= nil and tostring(br.infectedId) ~= tostring(npcId) then
+        return nil
+    end
+    local comfortLabel = (type(getTextOrNull) == "function" and getTextOrNull("IGUI_PNC_Knox_Comfort")) or "Hang in there, I'm staying with you"
+    local distanceLabel = (type(getTextOrNull) == "function" and getTextOrNull("IGUI_PNC_Knox_Distance")) or "Keep your distance, stay back"
+    local confrontLabel = (type(getTextOrNull) == "function" and getTextOrNull("IGUI_PNC_Knox_Confront")) or "You're turning — get away from us!"
+    return {
+        {
+            id = "knox_comfort:" .. tostring(br.branchId),
+            label = comfortLabel,
+            text = "comfort",
+            utterance = "comfort",
+            intent = "ACCEPT",
+            speechAct = "ACCEPT",
+            stance = "stance_positive",
+            topic = "knox_distress",
+            priority = 99,
+            source = "knox_distress_branch",
+        },
+        {
+            id = "knox_distance:" .. tostring(br.branchId),
+            label = distanceLabel,
+            text = "distance",
+            utterance = "distance",
+            intent = "CLARIFY",
+            speechAct = "CLARIFY",
+            stance = "stance_neutral",
+            topic = "knox_distress",
+            priority = 97,
+            source = "knox_distress_branch",
+        },
+        {
+            id = "knox_confront:" .. tostring(br.branchId),
+            label = confrontLabel,
+            text = "confront",
+            utterance = "confront",
+            intent = "REFUSE",
+            speechAct = "REFUSE",
+            stance = "stance_negative",
+            topic = "knox_distress",
+            priority = 95,
+            source = "knox_distress_branch",
+        },
+    }
+end
+
+function Beats.ResolveKnoxBranchChoice(listenerKey, decision, opts)
+    opts = type(opts) == "table" and opts or {}
+    local now = nowMs(opts.now)
+    local br = Beats.GetPendingKnoxBranch(listenerKey, now)
+    if not br then return false, "no_pending_knox_branch" end
+    pendingKnoxBranches[tostring(listenerKey)] = nil
+
+    local norm = string.lower(tostring(decision or ""))
+    local stance = "distance"
+    if norm == "comfort" or norm == "yes" or norm == "accept" or norm == "stance_positive" or norm == "reassure" then
+        stance = "comfort"
+    elseif norm == "confront" or norm == "no" or norm == "refuse" or norm == "stance_negative" or norm == "back_off" then
+        stance = "confront"
+    end
+
+    local reg = PNC.Registry
+    local infected = reg and type(reg.Get) == "function" and reg.Get(br.infectedId) or nil
+    if not infected or infected.alive == false then
+        return false, "infected_unavailable"
+    end
+
+    local _, replyText = speakCompanionLine(
+        infected,
+        br.listenerKind == "npc" and br.listenerActor or nil,
+        "semantic.companion.need_request",
+        "knox_reply_" .. stance,
+        stance == "comfort" and "THANK" or "REACT",
+        "knox_distress",
+        br.listenerName or "friend",
+        now,
+        {
+            family = "knox_branch_outcome",
+            need = "knox",
+            needType = "knox",
+            intensity = br.stage or "medium",
+            priority = 62,
+        }
+    )
+
+    local dApp = stance == "comfort" and 2 or (stance == "confront" and -2 or 0)
+    local dRep = stance == "comfort" and 1 or (stance == "confront" and -1 or 0)
+    if dApp ~= 0 or dRep ~= 0 then
+        applyPairRelationshipDelta(
+            infected,
+            { kind = br.listenerKind, key = br.listenerKey, id = br.listenerId or br.listenerKey },
+            dApp,
+            dRep,
+            "knox_distress_" .. stance,
+            now
+        )
+    end
+    return true, {
+        stance = stance,
+        stage = br.stage,
+        infectedId = br.infectedId,
+        replyText = replyText,
+    }
+end
+
 function Beats.TryResolvePlayerNeedReply(leaderKeyOrActor, npcId, decision, at)
     local key = type(leaderKeyOrActor) == "string" and leaderKeyOrActor or playerEntityKey(leaderKeyOrActor)
     if not key then return false, nil end
+    local knoxBr = Beats.GetPendingKnoxBranch(key, at)
+    if knoxBr and (npcId == nil or tostring(knoxBr.infectedId) == tostring(npcId)) then
+        return Beats.ResolveKnoxBranchChoice(key, decision, { now = at })
+    end
     local req = Beats.GetPendingCompanionNeedRequest(key, at)
     if not req then return false, nil end
     if npcId ~= nil and tostring(req.requesterId) ~= tostring(npcId) then
@@ -392,6 +906,8 @@ function Beats.TryResolvePlayerNeedReply(leaderKeyOrActor, npcId, decision, at)
 end
 
 function Beats.BuildPlayerNeedRequestChoices(leaderKeyOrActor, npcId, at)
+    local knoxChoices = Beats.BuildPlayerKnoxBranchChoices(leaderKeyOrActor, npcId, at)
+    if knoxChoices then return knoxChoices end
     local key = type(leaderKeyOrActor) == "string" and leaderKeyOrActor or playerEntityKey(leaderKeyOrActor)
     if not key then return nil end
     local req = Beats.GetPendingCompanionNeedRequest(key, at)
@@ -569,101 +1085,271 @@ function Beats.CheckCompanionNeeds(at)
 
     local acted = false
     reg.ForEach(function(rec)
-        if acted or not isCalmNPC(rec, now) then return end
+        if not isCalmNPC(rec, now) then return end
+        -- Frequent Knox symptom SFX/animations (sneeze -> heavy sneeze/cough -> zombie growl)
+        local knoxTier = readNPCKnoxStage(rec)
+        if knoxTier then
+            pumpKnoxSymptomFX(rec, knoxTier, now)
+        end
+        if acted then return end
         local leader = Beats.ResolveLeaderForCompanion(rec)
-        if not leader or not leader.key then return end
-        if math.abs((tonumber(rec.z) or 0) - (tonumber(leader.z) or 0)) >= 1 then return end
-        if distanceSq(rec.x, rec.y, leader.x, leader.y) > (12 * 12) then return end
-
-        -- 1) Check if leader followed through on a previous companion suggestion
-        if checkWatchedPlayerMoodles(leader, now) then
-            acted = true
-            return
-        end
-
-        -- 2) Companion observes leader's moodles & suggests an action
-        if not pendingSuggestions[leader.key] then
-            local moodleHit = Beats.InspectLeaderMoodles(leader)
-            if moodleHit then
-                local cdKey = tostring(rec.id) .. ":" .. leader.key .. ":" .. moodleHit.need
-                if now >= (tonumber(suggestCooldowns[cdKey]) or 0) then
-                    local ok = speakCompanionLine(
-                        rec,
-                        leader.kind == "npc" and leader.actor or nil,
-                        "semantic.companion.moodle_suggest",
-                        "suggest_" .. moodleHit.need,
-                        "SUGGEST",
-                        "companion_moodle_care",
-                        leader.name,
-                        now,
-                        { family = "companion_moodle_suggest", need = moodleHit.need, priority = 52 }
-                    )
-                    if ok then
-                        lruPut(suggestCooldowns, suggestOrder, cdKey, now + SUGGEST_COOLDOWN_MS)
-                        pendingSuggestions[leader.key] = {
-                            advisorId = rec.id,
-                            leaderName = leader.name,
-                            need = moodleHit.need,
-                            initialSeverity = moodleHit.severity,
-                            suggestedAt = now,
-                            expiresAt = now + SUGGEST_WATCH_TTL_MS,
-                        }
-                        acted = true
-                        return
-                    end
+        if leader and leader.key then
+            if math.abs((tonumber(rec.z) or 0) - (tonumber(leader.z) or 0)) < 1
+                and distanceSq(rec.x, rec.y, leader.x, leader.y) <= (12 * 12)
+            then
+                -- 1) Check if leader followed through on a previous companion suggestion
+                if checkWatchedPlayerMoodles(leader, now) then
+                    acted = true
+                    return
                 end
-            end
-        end
 
-        -- 3) Companion has their own need -> requests permission from leader (Yes / No branching)
-        if not pendingNeedRequests[leader.key] then
-            local selfNeed = inspectSelfNeed(rec)
-            if selfNeed then
-                local rCdKey = tostring(rec.id) .. ":" .. selfNeed.need
-                if now >= (tonumber(requestCooldowns[rCdKey]) or 0) then
-                    local ok = speakCompanionLine(
-                        rec,
-                        leader.kind == "npc" and leader.actor or nil,
-                        "semantic.companion.need_request",
-                        "request_" .. selfNeed.need,
-                        "REQUEST",
-                        "companion_need_request",
-                        leader.name,
-                        now,
-                        { family = "companion_need_request", need = selfNeed.need, priority = 55 }
-                    )
-                    if ok then
-                        requestSeq = requestSeq + 1
-                        local reqId = "comp_req:" .. tostring(rec.id) .. ":" .. tostring(requestSeq)
-                        lruPut(requestCooldowns, requestOrder, rCdKey, now + NEED_REQUEST_COOLDOWN_MS)
-                        pendingNeedRequests[leader.key] = {
-                            requestId = reqId,
-                            requesterId = rec.id,
-                            leaderKind = leader.kind,
-                            leaderKey = leader.key,
-                            leaderId = leader.id,
-                            leaderName = leader.name,
-                            need = selfNeed.need,
-                            severity = selfNeed.severity,
-                            createdAt = now,
-                            expiresAt = now + NEED_REQUEST_TTL_MS,
-                            frontier = NEED_REQUEST_FRONTIER,
-                        }
-                        -- If leader is an NPC, evaluate the Yes/No frontier autonomously!
-                        if leader.kind == "npc" and leader.actor then
-                            local chosen = Dir and type(Dir.SelectSuggestionForNPC) == "function"
-                                and Dir.SelectSuggestionForNPC(leader.actor, rec, NEED_REQUEST_FRONTIER, {
-                                    now = now,
-                                    sceneTension = 0,
-                                }) or NEED_REQUEST_FRONTIER[1]
-                            local decision = chosen and chosen.decision or "yes"
-                            Beats.ResolveCompanionNeedRequest(leader.key, decision, { now = now + 1200 })
+                -- 2) Companion observes leader's moodles & suggests an action
+                if not pendingSuggestions[leader.key] then
+                    local moodleHit = Beats.InspectLeaderMoodles(leader)
+                    if moodleHit then
+                        local cdKey = tostring(rec.id) .. ":" .. leader.key .. ":" .. moodleHit.need
+                        if cooldownAllows(suggestCooldowns, cdKey, moodleHit.intensity, now) then
+                            local ok = speakCompanionLine(
+                                rec,
+                                leader.kind == "npc" and leader.actor or nil,
+                                "semantic.companion.moodle_suggest",
+                                "suggest_" .. moodleHit.need,
+                                "SUGGEST",
+                                "companion_moodle_care",
+                                leader.name,
+                                now,
+                                {
+                                    family = "companion_moodle_suggest",
+                                    need = moodleHit.need,
+                                    intensity = moodleHit.intensity,
+                                    priority = moodleHit.intensity == "critical" and 58 or 52,
+                                }
+                            )
+                            if ok then
+                                local cd = moodleHit.intensity == "critical" and NEED_CRITICAL_COOLDOWN_MS or SUGGEST_COOLDOWN_MS
+                                setIntensityCooldown(suggestCooldowns, suggestOrder, cdKey, now + cd, moodleHit.intensity)
+                                if leader.kind == "npc" and leader.id ~= nil then
+                                    setIntensityCooldown(
+                                        selfNeedCooldowns, selfNeedOrder,
+                                        tostring(leader.id) .. ":" .. moodleHit.need,
+                                        now + cd, moodleHit.intensity
+                                    )
+                                end
+                                pendingSuggestions[leader.key] = {
+                                    advisorId = rec.id,
+                                    leaderName = leader.name,
+                                    need = moodleHit.need,
+                                    initialSeverity = moodleHit.severity,
+                                    intensity = moodleHit.intensity,
+                                    suggestedAt = now,
+                                    expiresAt = now + SUGGEST_WATCH_TTL_MS,
+                                }
+                                if type(Beats.AuditLog) == "function" then
+                                    Beats.AuditLog("companion_need_suggest", {
+                                        "speaker=" .. tostring(rec.id),
+                                        "leader=" .. tostring(leader.key),
+                                        "need=" .. tostring(moodleHit.need),
+                                        "intensity=" .. tostring(moodleHit.intensity),
+                                    })
+                                end
+                                acted = true
+                                return
+                            end
                         end
-                        acted = true
-                        return
+                    end
+                end
+
+                -- 3) Companion has their own need -> requests permission from leader (Yes / No branching)
+                if not pendingNeedRequests[leader.key] then
+                    local selfNeed = inspectSelfNeed(rec)
+                    if selfNeed and selfNeed.need ~= "knox" then
+                        local rCdKey = tostring(rec.id) .. ":" .. selfNeed.need
+                        if cooldownAllows(requestCooldowns, rCdKey, selfNeed.intensity, now) then
+                            local ok = speakCompanionLine(
+                                rec,
+                                leader.kind == "npc" and leader.actor or nil,
+                                "semantic.companion.need_request",
+                                "request_" .. selfNeed.need,
+                                "REQUEST",
+                                "companion_need_request",
+                                leader.name,
+                                now,
+                                {
+                                    family = "companion_need_request",
+                                    need = selfNeed.need,
+                                    needType = selfNeed.needType,
+                                    intensity = selfNeed.intensity,
+                                    priority = selfNeed.intensity == "critical" and 62 or 55,
+                                }
+                            )
+                            if ok then
+                                requestSeq = requestSeq + 1
+                                local reqId = "comp_req:" .. tostring(rec.id) .. ":" .. tostring(requestSeq)
+                                local cd = selfNeed.intensity == "critical" and NEED_CRITICAL_COOLDOWN_MS or NEED_REQUEST_COOLDOWN_MS
+                                setIntensityCooldown(requestCooldowns, requestOrder, rCdKey, now + cd, selfNeed.intensity)
+                                pendingNeedRequests[leader.key] = {
+                                    requestId = reqId,
+                                    requesterId = rec.id,
+                                    leaderKind = leader.kind,
+                                    leaderKey = leader.key,
+                                    leaderId = leader.id,
+                                    leaderName = leader.name,
+                                    need = selfNeed.need,
+                                    severity = selfNeed.severity,
+                                    intensity = selfNeed.intensity,
+                                    createdAt = now,
+                                    expiresAt = now + NEED_REQUEST_TTL_MS,
+                                    frontier = NEED_REQUEST_FRONTIER,
+                                }
+                                if type(Beats.AuditLog) == "function" then
+                                    Beats.AuditLog("companion_need_request", {
+                                        "speaker=" .. tostring(rec.id),
+                                        "leader=" .. tostring(leader.key),
+                                        "need=" .. tostring(selfNeed.need),
+                                        "intensity=" .. tostring(selfNeed.intensity),
+                                    })
+                                end
+                                -- If leader is an NPC, evaluate the Yes/No frontier autonomously!
+                                if leader.kind == "npc" and leader.actor then
+                                    local chosen = Dir and type(Dir.SelectSuggestionForNPC) == "function"
+                                        and Dir.SelectSuggestionForNPC(leader.actor, rec, NEED_REQUEST_FRONTIER, {
+                                            now = now,
+                                            sceneTension = 0,
+                                        }) or NEED_REQUEST_FRONTIER[1]
+                                    local decision = chosen and chosen.decision or "yes"
+                                    Beats.ResolveCompanionNeedRequest(leader.key, decision, { now = now + 1200 })
+                                end
+                                acted = true
+                                return
+                            end
+                        end
                     end
                 end
             end
+            if not knoxTier then return end
+        end
+
+        -- 4) First-person NPC need distress + nearby NPC reassurance (works for colonists,
+        -- faction members, group leaders, and any nearby survivor)
+        local selfNeed = inspectSelfNeed(rec)
+        if not selfNeed then return end
+        local listener = findNearbyListener(rec)
+        local partner, third = findNearbyReassurancePartners(rec, now)
+        if not listener and not partner then return end
+        local sCdKey = tostring(rec.id) .. ":" .. selfNeed.need
+        if not cooldownAllows(selfNeedCooldowns, sCdKey, selfNeed.intensity, now) then return end
+        local ok = false
+        local isKnox = selfNeed.need == "knox"
+        local openRole = isKnox and ("self_knox_" .. selfNeed.intensity) or ("self_" .. selfNeed.need)
+        local replyRole = isKnox and ("react_knox_" .. selfNeed.intensity) or ("reassure_" .. selfNeed.need)
+        if type(Beats.Emit) == "function" and type(Beats.BuildWorldThread) == "function" then
+            ok = Beats.Emit("npc.self_need_distress", {
+                speaker = rec,
+                partner = partner,
+                third = third,
+                need = selfNeed.need,
+                needType = selfNeed.needType,
+                intensity = selfNeed.intensity,
+            }, now) == true
+        else
+            local addresseeName = (partner and tostring(partner.name or partner.fullName or ""))
+                or (listener and listener.name) or "friend"
+            ok = speakCompanionLine(
+                rec,
+                partner,
+                "semantic.companion.need_request",
+                openRole,
+                "INFORM",
+                isKnox and "knox_distress" or "companion_need_request",
+                addresseeName,
+                now,
+                {
+                    family = isKnox and "npc_knox_distress" or "npc_self_need",
+                    need = selfNeed.need,
+                    needType = selfNeed.needType,
+                    intensity = selfNeed.intensity,
+                    priority = selfNeed.intensity == "critical" and 64 or 52,
+                }
+            )
+            if ok and partner then
+                speakCompanionLine(
+                    partner,
+                    rec,
+                    "semantic.companion.need_request",
+                    replyRole,
+                    isKnox and "REACT" or "REASSURE",
+                    isKnox and "knox_distress" or "companion_need_request",
+                    tostring(rec.name or rec.fullName or "friend"),
+                    now + 1350,
+                    {
+                        family = isKnox and "npc_knox_react" or "npc_self_need_reassure",
+                        need = selfNeed.need,
+                        needType = selfNeed.needType,
+                        intensity = selfNeed.intensity,
+                        priority = selfNeed.intensity == "critical" and 62 or 48,
+                    }
+                )
+            end
+        end
+        if ok then
+            local cd = selfNeed.intensity == "critical" and SELF_NEED_CRITICAL_COOLDOWN_MS or SELF_NEED_COOLDOWN_MS
+            setIntensityCooldown(selfNeedCooldowns, selfNeedOrder, sCdKey, now + cd, selfNeed.intensity)
+            if isKnox then
+                requestSeq = requestSeq + 1
+                local brId = "knox_br:" .. tostring(rec.id) .. ":" .. tostring(requestSeq)
+                if listener and listener.key then
+                    pendingKnoxBranches[listener.key] = {
+                        branchId = brId,
+                        infectedId = rec.id,
+                        stage = selfNeed.intensity,
+                        listenerKind = "player",
+                        listenerKey = listener.key,
+                        listenerId = listener.key,
+                        listenerName = listener.name,
+                        createdAt = now,
+                        expiresAt = now + KNOX_BRANCH_TTL_MS,
+                        frontier = KNOX_BRANCH_FRONTIER,
+                    }
+                elseif partner and partner.id ~= nil then
+                    local pKey = "npc:" .. tostring(partner.id)
+                    pendingKnoxBranches[pKey] = {
+                        branchId = brId,
+                        infectedId = rec.id,
+                        stage = selfNeed.intensity,
+                        listenerKind = "npc",
+                        listenerKey = pKey,
+                        listenerId = tostring(partner.id),
+                        listenerActor = partner,
+                        listenerName = tostring(partner.name or partner.fullName or "friend"),
+                        createdAt = now,
+                        expiresAt = now + KNOX_BRANCH_TTL_MS,
+                        frontier = KNOX_BRANCH_FRONTIER,
+                    }
+                    local chosen = Dir and type(Dir.SelectSuggestionForNPC) == "function"
+                        and Dir.SelectSuggestionForNPC(partner, rec, KNOX_BRANCH_FRONTIER, {
+                            now = now,
+                            sceneTension = selfNeed.intensity == "critical" and 0.8 or 0.4,
+                        }) or KNOX_BRANCH_FRONTIER[1]
+                    Beats.ResolveKnoxBranchChoice(pKey, chosen and chosen.decision or "distance", { now = now + 2600 })
+                end
+            end
+            if partner and partner.id ~= nil then
+                setIntensityCooldown(
+                    suggestCooldowns, suggestOrder,
+                    tostring(partner.id) .. ":npc:" .. tostring(rec.id) .. ":" .. selfNeed.need,
+                    now + cd, selfNeed.intensity
+                )
+            end
+            if type(Beats.AuditLog) == "function" then
+                Beats.AuditLog("npc_self_need", {
+                    "speaker=" .. tostring(rec.id),
+                    "partner=" .. tostring(partner and partner.id or "none"),
+                    "listener=" .. tostring(listener and listener.key or "none"),
+                    "need=" .. tostring(selfNeed.need),
+                    "intensity=" .. tostring(selfNeed.intensity),
+                })
+            end
+            acted = true
         end
     end)
     return acted
@@ -673,8 +1359,11 @@ function Beats.ResetCompanionNeedsRuntime()
     lastCheckAt = 0
     suggestCooldowns, suggestOrder = {}, {}
     requestCooldowns, requestOrder = {}, {}
+    selfNeedCooldowns, selfNeedOrder = {}, {}
+    knoxFxCooldowns, knoxFxOrder = {}, {}
     pendingSuggestions = {}
     pendingNeedRequests = {}
+    pendingKnoxBranches = {}
     requestSeq = 0
 end
 
@@ -682,6 +1371,7 @@ local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
 if Dir and type(Dir.RegisterTopicAxis) == "function" then
     Dir.RegisterTopicAxis("companion_moodle_care", "compassion")
     Dir.RegisterTopicAxis("companion_need_request", "compassion")
+    Dir.RegisterTopicAxis("knox_distress", "compassion")
 end
 
 return Beats

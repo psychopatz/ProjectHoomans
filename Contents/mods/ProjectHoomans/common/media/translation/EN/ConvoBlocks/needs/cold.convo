@@ -1,0 +1,66 @@
+# Subject: COLD / HYPOTHERMIA / ILLNESS (intensity-scaled suggestions, requests, and self-expressions).
+language EN
+namespace hoomans
+
+extend semantic.companion.moodle_suggest
+  say [role=suggest_cold, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as suggest_cold_critical_guarded:
+    "You're shivering violently, {term.address}—get somewhere warm right now before hypothermia finishes you!"
+  say [role=suggest_cold, need.urgency=critical] as suggest_cold_critical:
+    "{term.address}, you're freezing and coughing bad—we need to get you indoors and warm up right now!"
+    "Hey {term.address}, that cold is wrecking you—let's get heat and shelter immediately!"
+  say [role=suggest_cold, need.urgency=medium] as suggest_cold_medium:
+    "You look chilled to the bone, {term.address}. Let's get somewhere warm when we can."
+    "That cold's getting worse, {term.address}—you should warm up and rest soon."
+  say [role=suggest_cold, need.urgency=light] as suggest_cold_light:
+    "Sounds like you're catching a slight chill, {term.address}. Try to stay warm."
+  say [role=suggest_cold] as suggest_cold_default:
+    "You look pretty cold, {term.address}—let's find somewhere warm soon."
+
+extend semantic.companion.need_request
+  say [role=request_cold, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as req_cold_critical_guarded:
+    "{term.address}, I'm freezing to death out here—can't feel my fingers! We need shelter and heat right now!"
+  say [role=request_cold, need.urgency=critical] as req_cold_critical:
+    "{term.address}, please—I'm shivering uncontrollably and this cold is tearing me up! Can we get indoors and warm up now?"
+    "I can't stop shaking, {term.address}—I'm freezing out here! We have to warm up right now!"
+  say [role=request_cold, need.urgency=medium] as req_cold_medium:
+    "{term.address}, I'm really shivering and my chest feels tight. Mind if we duck indoors to warm up?"
+    "This cold's hitting me pretty hard, {term.address}—can we find somewhere warm for a bit?"
+  say [role=request_cold, need.urgency=light] as req_cold_light:
+    "Hey {term.address}, I'm starting to feel a bit chilly. Might want to warm up when we get a chance."
+  say [role=request_cold] as req_cold_default:
+    "{term.address}, I'm freezing out here—can we get somewhere warm?"
+
+  say [role=self_cold, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as self_cold_critical_guarded:
+    "I can't feel my arms... dammit, it's so cold out here..."
+    "Fingers are completely numb... can't even grip straight in this cold."
+  say [role=self_cold, need.urgency=critical] as self_cold_critical:
+    "I can't feel my arms... it's so cold..."
+    "My whole body's shaking... I'm freezing, I can't feel my fingers anymore..."
+    "Brrr... teeth won't stop chattering... I'm so cold it hurts..."
+  say [role=self_cold, need.urgency=medium] as self_cold_medium:
+    "I'm shivering bad... this cold is cutting right through me."
+    "Man, I'm freezing... really need to get indoors and warm up soon."
+  say [role=self_cold, need.urgency=light] as self_cold_light:
+    "Starting to feel a bit chilly... hope I'm not catching a cold."
+    "Brrr... getting a little cold out here."
+  say [role=self_cold] as self_cold_default:
+    "I'm freezing... really need to warm up soon."
+
+  say [role=reassure_cold, need.urgency=critical, actor.social_style=warm|friendly|protective] as reassure_cold_critical_warm:
+    "Hang in there, {addressee.name}—keep your arms moving, we'll get you somewhere warm right away."
+    "Stay close to us, {addressee.name}. Don't stop moving—we're finding shelter and heat for you."
+  say [role=reassure_cold, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as reassure_cold_critical_guarded:
+    "Keep your blood moving, {addressee.name}—don't freeze up on us. We'll get you indoors soon."
+  say [role=reassure_cold, need.urgency=critical] as reassure_cold_critical:
+    "Hang in there, {addressee.name}—we'll find a warm spot for ya soon."
+    "Keep flexing your hands, {addressee.name}, we'll get you out of this cold as fast as we can."
+  say [role=reassure_cold, need.urgency=medium, actor.social_style=warm|friendly|protective] as reassure_cold_medium_warm:
+    "Hold on, {addressee.name}—we'll duck inside and warm up as soon as we can."
+  say [role=reassure_cold, need.urgency=medium] as reassure_cold_medium:
+    "Hang in there, {addressee.name}—let's find somewhere out of the chill soon."
+    "I hear you, {addressee.name}. Next solid building we see, we'll warm up."
+  say [role=reassure_cold, need.urgency=light] as reassure_cold_light:
+    "Try to keep moving, {addressee.name}, it'll keep the chill off."
+    "We'll get somewhere warmer before long, {addressee.name}."
+  say [role=reassure_cold] as reassure_cold_default:
+    "Hang in there, {addressee.name}—we'll get you warmed up soon."
