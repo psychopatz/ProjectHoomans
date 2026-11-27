@@ -119,6 +119,260 @@ function I.FindNearbyInjuryObservers(rec, radius)
     return list
 end
 
+-- Actor-agnostic threat counter over the already-bounded ZombieAggro.ActiveSet
+-- (zero getCell():getZombieList() world scans). Works identically for players,
+-- companion NPCs, and autonomous AI NPCs.
+function I.CountThreatsOnActor(actor, isPlayer, now)
+    if not actor then return 0 end
+    now = I.SituationNow(now)
+    local count = 0
+    local seen = {}
+    local aggro = PNC.ZombieAggro
+    local activeSet = aggro and aggro.ActiveSet or nil
+    local order = activeSet and activeSet.order or nil
+    local byID = activeSet and activeSet.byID or nil
+    local npcKey = (not isPlayer and type(actor) == "table" and actor.id ~= nil)
+        and tostring(actor.id) or nil
+
+    if type(order) == "table" and type(byID) == "table" then
+        for i = 1, #order do
+            local zid = order[i]
+            local entry = zid and byID[zid] or nil
+            local z = entry and entry.zombie or nil
+            if z and not (z.isDead and z:isDead()) then
+                if isPlayer then
+                    local tgt = z.getTarget and z:getTarget() or nil
+                    local atk = z.getAttackedBy and z:getAttackedBy() or nil
+                    if tgt == actor or atk == actor then
+                        seen[z] = true
+                        count = count + 1
+                    end
+                elseif npcKey then
+                    local md = z.getModData and z:getModData() or nil
+                    if md then
+                        local leaseTgt = md.PNC_ZombiePursuitTarget
+                        local leaseUntil = tonumber(md.PNC_ZombiePursuitUntil) or 0
+                        local forcedId = md.PNC_AggroNPCId
+                        local forcedUntil = tonumber(md.PNC_AggroNPCUntil) or 0
+                        if (leaseTgt ~= nil and tostring(leaseTgt) == npcKey and leaseUntil > now)
+                            or (forcedId ~= nil and tostring(forcedId) == npcKey and forcedUntil > now)
+                        then
+                            seen[z] = true
+                            count = count + 1
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    if npcKey then
+        local bites = aggro and aggro.State and aggro.State.bites or nil
+        if type(bites) == "table" then
+            for _, b in pairs(bites) do
+                if b and tostring(b.npcId or "") == npcKey
+                    and b.phase ~= "finished" and b.phase ~= "release"
+                    and (not b.zombie or not seen[b.zombie])
+                then
+                    if b.zombie then seen[b.zombie] = true end
+                    count = count + 1
+                end
+            end
+        end
+        local rt = actor.runtime
+        if count == 0 and type(rt) == "table" and type(rt.zombieAttackers) == "table" then
+            for _, info in pairs(rt.zombieAttackers) do
+                if type(info) == "table" and (tonumber(info.seenAt) or 0) + 4000 >= now then
+                    count = count + 1
+                end
+            end
+        end
+    end
+    return count
+end
+
+-- Unified actor-agnostic helper selector: evaluates nearby allied players AND
+-- nearby allied NPCs together, picking whoever has the fewest zombies on their
+-- tail (breaking ties by closest distance).
+function I.FindLeastThreatenedHelper(speaker, radius, now)
+    if type(speaker) ~= "table" then return nil end
+    now = I.SituationNow(now)
+    radius = tonumber(radius) or 16
+    local rSq = radius * radius
+    local sx, sy, sz = tonumber(speaker.x) or 0, tonumber(speaker.y) or 0, tonumber(speaker.z) or 0
+    local best = nil
+
+    local function consider(candidate)
+        if not best
+            or candidate.threatCount < best.threatCount
+            or (candidate.threatCount == best.threatCount and candidate.distSq < best.distSq)
+        then
+            best = candidate
+        end
+    end
+
+    local core = PNC.Core
+    if core and type(core.ForEachPlayer) == "function" then
+        core.ForEachPlayer(function(p)
+            if not p or (type(p.isDead) == "function" and p:isDead()) then return end
+            local px = type(p.getX) == "function" and tonumber(p:getX()) or nil
+            local py = type(p.getY) == "function" and tonumber(p:getY()) or nil
+            local pz = type(p.getZ) == "function" and tonumber(p:getZ()) or 0
+            if px == nil or py == nil or math.abs(pz - sz) >= 1 then return end
+            local d = distSq(sx, sy, px, py)
+            if d <= rSq then
+                local desc = type(p.getDescriptor) == "function" and p:getDescriptor() or nil
+                local fore = desc and type(desc.getForename) == "function" and tostring(desc:getForename() or "") or ""
+                local uname = type(p.getUsername) == "function" and tostring(p:getUsername() or "") or ""
+                local pname = (fore ~= "" and fore) or (uname ~= "" and uname) or "partner"
+                local pid = (type(p.getUsername) == "function" and uname ~= "" and ("player:" .. uname)) or "player"
+                consider({
+                    id = "player",
+                    relKey = pid,
+                    name = pname,
+                    isPlayer = true,
+                    player = p,
+                    threatCount = I.CountThreatsOnActor(p, true, now),
+                    distSq = d,
+                })
+            end
+        end)
+    end
+
+    local allies = I.FindSquadmates(speaker, radius)
+    for i = 1, #allies do
+        local ally = allies[i]
+        if type(ally) == "table" and ally.alive ~= false
+            and math.abs((tonumber(ally.z) or sz) - sz) < 1
+        then
+            local d = distSq(sx, sy, tonumber(ally.x) or sx, tonumber(ally.y) or sy)
+            if d <= rSq then
+                consider({
+                    id = ally.id,
+                    relKey = "npc:" .. tostring(ally.id),
+                    name = tostring(ally.displayName or ally.name or ally.fullName or ally.id),
+                    isPlayer = false,
+                    record = ally,
+                    threatCount = I.CountThreatsOnActor(ally, false, now),
+                    distSq = d,
+                })
+            end
+        end
+    end
+
+    return best
+end
+
+function I.IsActorActivelyFighting(actor, isPlayer, threatCount, now)
+    if (tonumber(threatCount) or 0) > 0 then return true end
+    if not actor then return false end
+    if isPlayer then
+        if type(actor.isAttacking) == "function" and actor:isAttacking() == true then return true end
+        if type(actor.isAiming) == "function" and actor:isAiming() == true then return true end
+        if type(actor.isDoShove) == "function" and actor:isDoShove() == true then return true end
+        return false
+    end
+    if type(actor) ~= "table" then return false end
+    local rt = type(actor.runtime) == "table" and actor.runtime or nil
+    if rt then
+        if rt.inCombat == true or rt.combatTargetId ~= nil then return true end
+        if (tonumber(rt.grappleHoldUntil) or 0) > (tonumber(now) or 0) then return true end
+    end
+    local beh = tostring(actor.behavior or actor.state or ""):lower()
+    if beh == "combat" or beh == "engage" or beh == "engaging" or beh == "fighting" then
+        return true
+    end
+    return false
+end
+
+-- Actor-agnostic idle bystander finder: when at least 2 allied members are
+-- actively fighting, finds the closest nearby ally/player who has 0 threats
+-- and is NOT actively fighting/helping (e.g. 3 total, 2 fighting, 1 watching).
+function I.FindIdleBystanderHelper(speaker, radius, now)
+    if type(speaker) ~= "table" then return nil, 0 end
+    now = I.SituationNow(now)
+    radius = tonumber(radius) or 16
+    local rSq = radius * radius
+    local sx, sy, sz = tonumber(speaker.x) or 0, tonumber(speaker.y) or 0, tonumber(speaker.z) or 0
+
+    local speakerThreats = I.CountThreatsOnActor(speaker, false, now)
+    if not I.IsActorActivelyFighting(speaker, false, speakerThreats, now) then
+        return nil, 0
+    end
+
+    local activeFighters = 1
+    local best = nil
+    local function considerBystander(candidate)
+        if not best or candidate.distSq < best.distSq then
+            best = candidate
+        end
+    end
+
+    local core = PNC.Core
+    if core and type(core.ForEachPlayer) == "function" then
+        core.ForEachPlayer(function(p)
+            if not p or (type(p.isDead) == "function" and p:isDead()) then return end
+            local px = type(p.getX) == "function" and tonumber(p:getX()) or nil
+            local py = type(p.getY) == "function" and tonumber(p:getY()) or nil
+            local pz = type(p.getZ) == "function" and tonumber(p:getZ()) or 0
+            if px == nil or py == nil or math.abs(pz - sz) >= 1 then return end
+            local d = distSq(sx, sy, px, py)
+            if d <= rSq then
+                local pThreats = I.CountThreatsOnActor(p, true, now)
+                if I.IsActorActivelyFighting(p, true, pThreats, now) then
+                    activeFighters = activeFighters + 1
+                else
+                    local desc = type(p.getDescriptor) == "function" and p:getDescriptor() or nil
+                    local fore = desc and type(desc.getForename) == "function" and tostring(desc:getForename() or "") or ""
+                    local uname = type(p.getUsername) == "function" and tostring(p:getUsername() or "") or ""
+                    local pname = (fore ~= "" and fore) or (uname ~= "" and uname) or "partner"
+                    local pid = (uname ~= "" and ("player:" .. uname)) or "player"
+                    considerBystander({
+                        id = "player",
+                        relKey = pid,
+                        name = pname,
+                        isPlayer = true,
+                        player = p,
+                        threatCount = 0,
+                        distSq = d,
+                    })
+                end
+            end
+        end)
+    end
+
+    local allies = I.FindSquadmates(speaker, radius)
+    for i = 1, #allies do
+        local ally = allies[i]
+        if type(ally) == "table" and ally.alive ~= false
+            and math.abs((tonumber(ally.z) or sz) - sz) < 1
+        then
+            local d = distSq(sx, sy, tonumber(ally.x) or sx, tonumber(ally.y) or sy)
+            if d <= rSq then
+                local aThreats = I.CountThreatsOnActor(ally, false, now)
+                if I.IsActorActivelyFighting(ally, false, aThreats, now) then
+                    activeFighters = activeFighters + 1
+                else
+                    considerBystander({
+                        id = ally.id,
+                        relKey = "npc:" .. tostring(ally.id),
+                        name = tostring(ally.displayName or ally.name or ally.fullName or ally.id),
+                        isPlayer = false,
+                        record = ally,
+                        threatCount = 0,
+                        distSq = d,
+                    })
+                end
+            end
+        end
+    end
+
+    if activeFighters < 2 then
+        return nil, activeFighters
+    end
+    return best, activeFighters
+end
+
 I.FindInjuryEncounterNeighbors = injuryNeighbors
 
 return S

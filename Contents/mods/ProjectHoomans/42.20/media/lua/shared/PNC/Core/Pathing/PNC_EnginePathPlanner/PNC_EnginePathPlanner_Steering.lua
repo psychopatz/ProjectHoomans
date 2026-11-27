@@ -44,6 +44,13 @@ function Planner.GetSteeringTarget(record, body, finalTarget, owner)
     local navigation = Internal.EnsureNavigation(record)
     navigation.body = body
     local now = Core and Core.Now and Core.Now() or 0
+    if record.runtime
+        and (tonumber(record.runtime.grappleHoldUntil) or 0) > now
+    then
+        navigation.lastPlanReason = "zombie_grapple_hold"
+        navigation.steeringKind = "final_native_deferred"
+        return finalTarget
+    end
     local effectiveTarget = finalTarget
     if type(Internal.SnapToStandableGoal) == "function" then
         local snapped, snapStatus = Internal.SnapToStandableGoal(effectiveTarget)

@@ -89,8 +89,10 @@ PNC = {
         end,
     },
     Animation = {
-        PlayBump = function(_, _, requestedBumpType)
-            playedAnimations[#playedAnimations + 1] = requestedBumpType
+        PlayBump = function(body, _, requestedBumpType)
+            if body == zombie then
+                playedAnimations[#playedAnimations + 1] = requestedBumpType
+            end
             return true, "test"
         end,
     },

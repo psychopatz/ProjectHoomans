@@ -6,6 +6,7 @@ PNC.ZombieAggro.BiteInternal = PNC.ZombieAggro.BiteInternal or {}
 
 require "PNC/Core/Zombies/PNC_ZombieAggro_Bite/PNC_ZombieAggro_Bite_Lane"
 require "PNC/Core/Zombies/PNC_ZombieAggro_Bite/PNC_ZombieAggro_Bite_Diagnostics"
+require "PNC/Core/Zombies/PNC_ZombieAggro_Bite/PNC_ZombieAggro_Bite_Grapple"
 require "PNC/Core/Zombies/PNC_ZombieAggro_Bite/PNC_ZombieAggro_Bite_Release"
 require "PNC/Core/Zombies/PNC_ZombieAggro_Bite/PNC_ZombieAggro_Bite_Start"
 require "PNC/Core/Zombies/PNC_ZombieAggro_Bite/PNC_ZombieAggro_Bite_Damage"

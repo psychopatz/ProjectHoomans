@@ -119,7 +119,7 @@ local function announceBite(entry, record)
     if PNC.Network and PNC.Network.BroadcastZombieBite then
         PNC.Network.BroadcastZombieBite(
             entry.zombie, entry.npcBody, record.id,
-            "start", entry.bumpType
+            "start", entry.bumpType, nil, entry.npcStruggleBump
         )
     end
     Core.LogRecordDebug(
@@ -193,6 +193,9 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
         configureAttack(zombie, npcBody, bumpType), now
     )
     State.bites[zombieId] = entry
+    if BiteInternal.BeginGrapple then
+        BiteInternal.BeginGrapple(entry, record, zombie, npcBody, now)
+    end
     BiteInternal.SetBiteDiagnostic(record, entry, "started")
     announceBite(entry, record)
     return true

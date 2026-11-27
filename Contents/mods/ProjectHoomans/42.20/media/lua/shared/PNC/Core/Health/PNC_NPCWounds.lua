@@ -15,6 +15,7 @@ require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Mutation"
 require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_ZombieAttack"
 require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Debug"
 require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Treatment"
+require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_BloodDrops"
 require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Update"
 require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Snapshot"
 

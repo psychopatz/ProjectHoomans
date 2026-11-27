@@ -46,6 +46,14 @@ function S.OnTargetChanged(event, record)
         })
     end
     local ref = I.TargetEventID(event, record, target)
+    if I.CountThreatsOnActor and S.TryEmitSwarmHelpCall
+        and I.CountThreatsOnActor(record, false, now) >= 3
+    then
+        if S.TryEmitSwarmHelpCall(record, wr and wr.descriptor or nil, now, ref) then
+            return true, { eventRef = ref, swarmHelp = true, warning = wr }
+        end
+        return false, "speaker_swarmed_cooldown"
+    end
     if wr and wr.emitted == false and wr.reason == "skirmish_active" and S.HandleSkirmishActive then
         return S.HandleSkirmishActive(record, wr, now, ref)
     end

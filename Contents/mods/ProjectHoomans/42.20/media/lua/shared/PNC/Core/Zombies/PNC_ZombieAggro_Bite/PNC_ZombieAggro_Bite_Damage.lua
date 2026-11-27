@@ -205,6 +205,14 @@ function BiteInternal.ApplyBiteDamage(entry, record, zombie, npcBody, now)
     copyDefenseOutcome(entry, result, defense)
     if applied then
         playImpactAnimation(entry, record, result, zombie, now)
+    end
+    local outcomePhase, npcOutcomeBump = nil, nil
+    if BiteInternal.ResolveGrappleOutcome then
+        outcomePhase, npcOutcomeBump = BiteInternal.ResolveGrappleOutcome(
+            entry, record, zombie, npcBody, applied, avoided, now
+        )
+    end
+    if applied then
         if PNC.Network and PNC.Network.BroadcastZombieBite then
             PNC.Network.BroadcastZombieBite(
                 zombie,
@@ -212,9 +220,22 @@ function BiteInternal.ApplyBiteDamage(entry, record, zombie, npcBody, now)
                 entry.npcId,
                 "impact",
                 entry.visualBumpType,
-                entry.woundType or "bite"
+                entry.woundType or "bite",
+                npcOutcomeBump
             )
         end
+    elseif outcomePhase == "defended"
+        and PNC.Network and PNC.Network.BroadcastZombieBite
+    then
+        PNC.Network.BroadcastZombieBite(
+            zombie,
+            npcBody,
+            entry.npcId,
+            "defended",
+            entry.bumpType,
+            nil,
+            npcOutcomeBump
+        )
     end
     playImpactSound(zombie, entry, result, applied, avoided)
     if isServer and isServer() then

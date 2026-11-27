@@ -229,6 +229,23 @@ local function applyZombieBite(args)
     if targetNPCBody and attackerZombie.faceThisObject then
         attackerZombie:faceThisObject(targetNPCBody)
     end
+    if targetNPCBody and targetNPCBody.faceThisObject then
+        targetNPCBody:faceThisObject(attackerZombie)
+    end
+    if targetNPCBody and args.npcBumpType
+        and PNC.Animation and type(PNC.Animation.PlayBump) == "function"
+    then
+        pcall(
+            PNC.Animation.PlayBump,
+            targetNPCBody,
+            nil,
+            tostring(args.npcBumpType),
+            {
+                leaseUntil = now + 550,
+                allowInCombat = true,
+            }
+        )
+    end
     if targetNPCBody and attackerZombie.setBumpedChr then
         attackerZombie:setBumpedChr(targetNPCBody)
     end
@@ -239,6 +256,14 @@ local function applyZombieBite(args)
         attackerZombie:setVariable("PNCZombieBitingNPC", true)
         attackerZombie:setVariable("BumpDone", false)
         attackerZombie:setVariable("BumpAnimFinished", false)
+    end
+    if args.phase == "defended" then
+        state.phase = "release"
+        state.releaseAt = now
+        state.releaseDeadline = now + 350
+        signalBiteRelease(attackerZombie)
+        state.applied = true
+        return true
     end
     if args.phase == "impact" then
         if state.impactApplied == true then

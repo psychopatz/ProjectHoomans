@@ -97,6 +97,17 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling, mod
             distSq
         )
     end
+    local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil
+    if callouts and record and record.runtime
+        and now >= (tonumber(record.runtime.nextSwarmBeatCheckAt) or 0)
+    then
+        record.runtime.nextSwarmBeatCheckAt = now + 1500
+        if record.runtime.swarmHelpRequest and callouts.CheckSwarmHelpResolution then
+            callouts.CheckSwarmHelpResolution(record, now)
+        elseif callouts.TryEmitSwarmHelpCall then
+            callouts.TryEmitSwarmHelpCall(record, nil, now)
+        end
+    end
     if isMultiplayerServer() or not (isClient and isClient() == true) then
         -- The server selects the target in MP. The owning client follows this
         -- bounded coordinate directive; a location-only WorldSound can send
@@ -252,6 +263,21 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling, mod
     -- singleplayer and multiplayer safety.
     if PNC.Perception and PNC.Perception.PublishZombieGroupAlert then
         PNC.Perception.PublishZombieGroupAlert(record, zombie, now)
+    end
+    local callouts = PNC.Semantics and PNC.Semantics.CombatTargetCallouts or nil
+    if callouts and record and record.runtime then
+        local lastSwarmCheck = tonumber(record.runtime.lastPursuitSwarmCheckAt) or 0
+        if (now - lastSwarmCheck) >= 1500 then
+            record.runtime.lastPursuitSwarmCheckAt = now
+            if callouts.CheckSwarmHelpResolution then
+                callouts.CheckSwarmHelpResolution(record, now)
+            end
+            local spokeSwarm = callouts.TryEmitSwarmHelpCall
+                and callouts.TryEmitSwarmHelpCall(record, nil, now, nil)
+            if not spokeSwarm and callouts.TryEmitBystanderHelpCall then
+                callouts.TryEmitBystanderHelpCall(record, nil, now, nil)
+            end
+        end
     end
     return true, closeBlocked
 end

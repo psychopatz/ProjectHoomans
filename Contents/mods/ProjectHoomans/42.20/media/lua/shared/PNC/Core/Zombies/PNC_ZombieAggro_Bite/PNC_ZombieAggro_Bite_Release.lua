@@ -32,6 +32,9 @@ function BiteInternal.FinalizeRelease(zombieId, entry, now, reason)
         BiteInternal.SetBiteDiagnostic(record, entry, entry.releaseReason)
     end
     State.bites[zombieId] = nil
+    if BiteInternal.ReleaseGrappleHold then
+        BiteInternal.ReleaseGrappleHold(record, entry)
+    end
 end
 
 function BiteInternal.BeginRelease(zombieId, npcBody, reason, now)
@@ -59,6 +62,9 @@ function BiteInternal.BeginRelease(zombieId, npcBody, reason, now)
         )
     end
     record = Registry.Get(entry.npcId)
+    if BiteInternal.ReleaseGrappleHold then
+        BiteInternal.ReleaseGrappleHold(record, entry)
+    end
     BiteInternal.SetBiteDiagnostic(record, entry, entry.releaseReason)
     return true
 end

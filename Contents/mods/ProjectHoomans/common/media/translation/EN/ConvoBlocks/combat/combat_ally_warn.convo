@@ -7,6 +7,59 @@ dialogue semantic.combat.ally_warn.callout.zombie
     "Watch your feet! Got {target.name} dragging {scene.location}!"
   say [role=blindside] as blindside:
     "Look out, {addressee.name}! Got {target.name} right behind you!"
+  say [role=swarm_overwhelmed, combat.style=shaken] as swarm_overwhelmed_shaken:
+    "Shit! Shit, {addressee.name}, they're all over me! Help me!"
+    "Oh fuck, {addressee.name}, I can't hold 'em! Get these bastards off me!"
+    "Goddammit, {addressee.name}, I'm getting torn apart over here!"
+  say [role=swarm_overwhelmed, combat.style=hostile] as swarm_overwhelmed_hostile:
+    "Fuck! {addressee.name}, get over here! I'm buried in these sons of bitches!"
+    "Damn it, {addressee.name}, pull 'em off me before they drag me down!"
+  say [role=swarm_overwhelmed, combat.style=tactical] as swarm_overwhelmed_tactical:
+    "Damn it, {addressee.name}, position overrun—need immediate backup on me!"
+    "{addressee.name}, I'm pinned down by a whole pack! Pull aggro now!"
+  say [role=swarm_overwhelmed] as swarm_overwhelmed_default:
+    "Shit, {addressee.name}, I'm completely swarmed! Help me out!"
+    "Fuck, {addressee.name}, too many on me! Get 'em off!"
+    "Damn it, {addressee.name}, I can't shake this swarm—need you right now!"
+  say [role=swarm_help, combat.style=shaken] as swarm_help_shaken:
+    "Shit, {addressee.name}, there's a pack on me! Give me a hand!"
+    "Oh crap, {addressee.name}, I'm getting swarmed here! Help!"
+    "{addressee.name}! Too many of 'em—pull a couple off me!"
+  say [role=swarm_help, combat.style=hostile] as swarm_help_hostile:
+    "Damn it, {addressee.name}, quit standing there and help me clear this pack!"
+    "Hell, {addressee.name}, got a whole swarm on my ass—lend a hand!"
+  say [role=swarm_help, combat.style=aggressive] as swarm_help_aggressive:
+    "Shit, {addressee.name}, these fuckers are piling on me! Come smash a few!"
+    "Hey {addressee.name}, got a swarm crowding me—help me thin 'em out!"
+  say [role=swarm_help, combat.style=tactical] as swarm_help_tactical:
+    "{addressee.name}, I've got a swarm on my position—need flank support!"
+    "Getting boxed in here, {addressee.name}, draw a few off me!"
+  say [role=swarm_help] as swarm_help_default:
+    "Shit, {addressee.name}, I'm swarmed! Need a hand over here!"
+    "Damn it, {addressee.name}, got a pack on me—help me clear 'em!"
+    "{addressee.name}, I'm getting surrounded! Pull some of 'em off me!"
+  say [role=swarm_bystander_help, combat.style=shaken] as swarm_bystander_help_shaken:
+    "Hey {addressee.name}, don't just stand there! Help us!!"
+    "{addressee.name}, please—don't just watch! Give us a hand!"
+    "Shit, {addressee.name}, we're fighting for our lives here—help us!"
+  say [role=swarm_bystander_help, combat.style=hostile] as swarm_bystander_help_hostile:
+    "Hey {addressee.name}, what the hell are you doing?! Don't just stand there—help us!!"
+    "Quit watching, {addressee.name}! Grab a weapon and get your ass in here!"
+    "Damn it, {addressee.name}, stop standing around and help us fight!"
+  say [role=swarm_bystander_help, combat.style=aggressive] as swarm_bystander_help_aggressive:
+    "Hey {addressee.name}! Quit watching the show and help us smash these fuckers!"
+    "Seriously, {addressee.name}?! Don't just stand there—jump in!"
+  say [role=swarm_bystander_help, combat.style=tactical] as swarm_bystander_help_tactical:
+    "{addressee.name}, we're engaged here—get in the fight and cover our flank!"
+    "Hey {addressee.name}, don't hang back—we need your weapon in this fight!"
+  say [role=swarm_bystander_help] as swarm_bystander_help_default:
+    "Hey {addressee.name}, don't just stand there! Help us!!"
+    "{addressee.name}! Quit watching and help us out here!"
+    "Damn it, {addressee.name}, we could really use a hand right now—jump in!"
+  say [role=swarm_rescue_thanks] as swarm_rescue_thanks:
+    "Damn, thanks {addressee.name}—thought they had me for a second!"
+    "Appreciate the save, {addressee.name}! Owe you one!"
+    "Whew—good timing, {addressee.name}, thanks for pulling 'em off!"
   say [role=last_one] as last_one:
     "Just this last one left! Put {target.name} down!"
   say [role=bandaging_self] as bandaging_self:
@@ -36,6 +89,59 @@ dialogue semantic.combat.ally_warn.callout.hostile
     "Watch your feet! Got {target.name} dragging {scene.location}!"
   say [role=blindside] as blindside:
     "Look out, {addressee.name}! Got {target.name} right behind you!"
+  say [role=swarm_overwhelmed, combat.style=shaken] as swarm_overwhelmed_shaken:
+    "Shit! Shit, {addressee.name}, they're all over me! Help me!"
+    "Oh fuck, {addressee.name}, I can't hold 'em! Get these bastards off me!"
+    "Goddammit, {addressee.name}, I'm getting torn apart over here!"
+  say [role=swarm_overwhelmed, combat.style=hostile] as swarm_overwhelmed_hostile:
+    "Fuck! {addressee.name}, get over here! I'm buried in these sons of bitches!"
+    "Damn it, {addressee.name}, pull 'em off me before they drag me down!"
+  say [role=swarm_overwhelmed, combat.style=tactical] as swarm_overwhelmed_tactical:
+    "Damn it, {addressee.name}, position overrun—need immediate backup on me!"
+    "{addressee.name}, I'm pinned down by a whole pack! Pull aggro now!"
+  say [role=swarm_overwhelmed] as swarm_overwhelmed_default:
+    "Shit, {addressee.name}, I'm completely swarmed! Help me out!"
+    "Fuck, {addressee.name}, too many on me! Get 'em off!"
+    "Damn it, {addressee.name}, I can't shake this swarm—need you right now!"
+  say [role=swarm_help, combat.style=shaken] as swarm_help_shaken:
+    "Shit, {addressee.name}, there's a pack on me! Give me a hand!"
+    "Oh crap, {addressee.name}, I'm getting swarmed here! Help!"
+    "{addressee.name}! Too many of 'em—pull a couple off me!"
+  say [role=swarm_help, combat.style=hostile] as swarm_help_hostile:
+    "Damn it, {addressee.name}, quit standing there and help me clear this pack!"
+    "Hell, {addressee.name}, got a whole swarm on my ass—lend a hand!"
+  say [role=swarm_help, combat.style=aggressive] as swarm_help_aggressive:
+    "Shit, {addressee.name}, these fuckers are piling on me! Come smash a few!"
+    "Hey {addressee.name}, got a swarm crowding me—help me thin 'em out!"
+  say [role=swarm_help, combat.style=tactical] as swarm_help_tactical:
+    "{addressee.name}, I've got a swarm on my position—need flank support!"
+    "Getting boxed in here, {addressee.name}, draw a few off me!"
+  say [role=swarm_help] as swarm_help_default:
+    "Shit, {addressee.name}, I'm swarmed! Need a hand over here!"
+    "Damn it, {addressee.name}, got a pack on me—help me clear 'em!"
+    "{addressee.name}, I'm getting surrounded! Pull some of 'em off me!"
+  say [role=swarm_bystander_help, combat.style=shaken] as swarm_bystander_help_shaken:
+    "Hey {addressee.name}, don't just stand there! Help us!!"
+    "{addressee.name}, please—don't just watch! Give us a hand!"
+    "Shit, {addressee.name}, we're fighting for our lives here—help us!"
+  say [role=swarm_bystander_help, combat.style=hostile] as swarm_bystander_help_hostile:
+    "Hey {addressee.name}, what the hell are you doing?! Don't just stand there—help us!!"
+    "Quit watching, {addressee.name}! Grab a weapon and get your ass in here!"
+    "Damn it, {addressee.name}, stop standing around and help us fight!"
+  say [role=swarm_bystander_help, combat.style=aggressive] as swarm_bystander_help_aggressive:
+    "Hey {addressee.name}! Quit watching the show and help us smash these fuckers!"
+    "Seriously, {addressee.name}?! Don't just stand there—jump in!"
+  say [role=swarm_bystander_help, combat.style=tactical] as swarm_bystander_help_tactical:
+    "{addressee.name}, we're engaged here—get in the fight and cover our flank!"
+    "Hey {addressee.name}, don't hang back—we need your weapon in this fight!"
+  say [role=swarm_bystander_help] as swarm_bystander_help_default:
+    "Hey {addressee.name}, don't just stand there! Help us!!"
+    "{addressee.name}! Quit watching and help us out here!"
+    "Damn it, {addressee.name}, we could really use a hand right now—jump in!"
+  say [role=swarm_rescue_thanks] as swarm_rescue_thanks:
+    "Damn, thanks {addressee.name}—thought they had me for a second!"
+    "Appreciate the save, {addressee.name}! Owe you one!"
+    "Whew—good timing, {addressee.name}, thanks for pulling 'em off!"
   say [role=last_one] as last_one:
     "Just this last one left! Put {target.name} down!"
   say [role=bandaging_self] as bandaging_self:
@@ -128,6 +234,14 @@ dialogue semantic.combat.ally_warn.reply.alerted
 dialogue semantic.combat.ally_warn.reply.defensive
   say [role=blindside_reply] as blindside_reply:
     "Whoa, good catch, {addressee.name}! I'm on it!"
+  say [role=swarm_help_reply] as swarm_help_reply:
+    "Hang on, {addressee.name}, I'm coming to pull 'em off!"
+    "Hold 'em off, {addressee.name}—I'm on my way!"
+    "Shit, hold tight {addressee.name}, I've got your back!"
+  say [role=swarm_bystander_help_reply] as swarm_bystander_help_reply:
+    "Alright, alright, {addressee.name}—I'm moving in!"
+    "Shit, sorry {addressee.name}, coming to help right now!"
+    "I'm on it, {addressee.name}! Hold tight!"
   say [role=last_one_reply] as last_one_reply:
     "Finish it off, {addressee.name}, I've got your back!"
   say [role=cover_bandage] as cover_bandage_reply:

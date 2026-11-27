@@ -194,6 +194,9 @@ function Wounds.Update(record, zombie, now)
         end
     end
     if applyBleeding(record, zombie, body, health, now) then microChanged = true end
+    if type(Wounds.TryDropBleedingBlood) == "function" then
+        Wounds.TryDropBleedingBlood(record, zombie, body, health, now)
+    end
     return discreteChanged or microChanged
 end
 

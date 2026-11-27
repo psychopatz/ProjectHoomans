@@ -133,8 +133,16 @@ function Animation.SyncLocomotion(zombie, record)
         isCrawling = path and path.isCrawling == true or false,
     }, moving, animSpeed)
     Internal.applyWalkType(zombie, engineWalkType, animSpeed)
+    -- Never set native running/sprinting flags on IsoZombie NPC shells:
+    -- Build 42's ClimbOverFenceState.enter() checks owner.get(RUN/SPRINT) and
+    -- calls shouldFallAfterVaultOver(), which dereferences getBodyDamage()
+    -- (null on IsoZombie) and throws a NullPointerException. Visual pace and
+    -- speed are already driven via setLocomotionVars + applyWalkType above.
     if zombie.setRunning then
-        zombie:setRunning(path and path.isRunning == true)
+        zombie:setRunning(false)
+    end
+    if zombie.setSprinting then
+        zombie:setSprinting(false)
     end
     if LiveBodyControl and LiveBodyControl.SyncLocomotionState then
         LiveBodyControl.SyncLocomotionState(zombie, moving)

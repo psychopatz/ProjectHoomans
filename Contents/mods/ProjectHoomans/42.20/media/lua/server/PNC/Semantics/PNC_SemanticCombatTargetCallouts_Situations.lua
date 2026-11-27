@@ -17,6 +17,8 @@ local SIT_BARK_OPTS = I.SituationBarkOpts
 function I.EmitSituationCallout(speaker, addr, desc, role, now, ref, extraTokens)
     local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
     local dirTopic = role == "blindside" and "combat_blindside"
+        or (role == "swarm_help" or role == "swarm_overwhelmed" or role == "swarm_bystander_help") and "combat_swarm_help"
+        or role == "swarm_rescue_thanks" and "combat_swarm_rescue"
         or role == "stamina_exhausted" and "combat_exhausted"
         or "combat_situation"
     local dirScope = "sit:" .. tostring(speaker and speaker.id or "nil") .. ":" .. tostring(role or "generic")
@@ -47,7 +49,10 @@ function I.EmitSituationCallout(speaker, addr, desc, role, now, ref, extraTokens
         act = "WARN", family = SIT_BARK_OPTS.family, cooldownMs = SIT_BARK_OPTS.cooldownMs,
         familyCooldownMs = SIT_BARK_OPTS.familyCooldownMs, priority = SIT_BARK_OPTS.priority,
         priorityHoldMs = SIT_BARK_OPTS.priorityHoldMs, ttlMs = SIT_BARK_OPTS.ttlMs,
-        interrupt = role == "blindside",
+        interrupt = role == "blindside"
+            or role == "swarm_help"
+            or role == "swarm_overwhelmed"
+            or role == "swarm_bystander_help",
         clientCooldowns = SIT_BARK_OPTS.clientCooldowns, threadID = ref,
         streamKey = "ally-warn-sit:" .. tostring(speaker.id),
         eventRef = ref, text = text, presentationClass = res and res.presentationClass or "BARK",
@@ -71,9 +76,218 @@ local function turnToward(ally, tx, ty, now)
     if sec and sec.RequestGaze then sec.RequestGaze(ally, tx, ty, 3500, now) end
 end
 
+local SWARM_THRESHOLD = 3
+local SWARM_OVERWHELMED_THRESHOLD = 5
+local SWARM_HELP_COOLDOWN_MS = 10000
+local BYSTANDER_HELP_COOLDOWN_MS = 15000
+local BYSTANDER_IDLE_GRACE_MS = 3000
+local SWARM_RESCUE_WINDOW_MS = 25000
+
+local function applySwarmRescueRelationship(record, req, now)
+    local relationships = PNC.Relationships
+    if not relationships or type(relationships.ApplyConversationEffect) ~= "function" then
+        return false
+    end
+    local gameTime = type(getGameTime) == "function" and getGameTime() or nil
+    local worldAge = gameTime and type(gameTime.getWorldAgeHours) == "function"
+        and gameTime:getWorldAgeHours() or 0
+    local relKey = req.relKey or (req.isPlayer and "player" or ("npc:" .. tostring(req.helperId)))
+    relationships.ApplyConversationEffect(tostring(record.id), relKey, {
+        interactionType = "swarm_rescue",
+        memoryType = "swarm_rescue",
+        approval = 4,
+        familiarity = 2,
+        decayPerDay = 0.12,
+        tags = { combat = true, rescue = true, aid = true },
+    }, {
+        eventID = "swarm-rescue:" .. tostring(req.ref or now),
+        worldAgeHours = worldAge,
+    })
+    return true
+end
+
+function S.TryEmitSwarmHelpCall(record, desc, now, ref)
+    if type(record) ~= "table" or record.alive == false then return false end
+    now = I.SituationNow(now)
+    record.runtime = record.runtime or {}
+    local lastAt = tonumber(record.runtime.lastSwarmHelpAt) or 0
+    if now >= lastAt and (now - lastAt) < SWARM_HELP_COOLDOWN_MS then
+        return false
+    end
+    local threatCount = I.CountThreatsOnActor
+        and I.CountThreatsOnActor(record, false, now) or 0
+    if threatCount < SWARM_THRESHOLD then
+        return false
+    end
+    local helper = I.FindLeastThreatenedHelper
+        and I.FindLeastThreatenedHelper(record, 16, now) or nil
+    if not helper then
+        return false
+    end
+    local grappled = (tonumber(record.runtime.grappleHoldUntil) or 0) > now
+    local lowHealth = record.health and tonumber(record.health.current)
+        and tonumber(record.health.max)
+        and (record.health.current / math.max(1, record.health.max)) < 0.45
+    local role = (threatCount >= SWARM_OVERWHELMED_THRESHOLD or grappled or lowHealth)
+        and "swarm_overwhelmed" or "swarm_help"
+    local callDesc = type(desc) == "table" and desc or {
+        semanticClass = "zombie",
+        enemyCount = threatCount,
+        x = record.x,
+        y = record.y,
+        z = record.z,
+    }
+    ref = tostring(ref or ("swarm:" .. tostring(record.id) .. ":" .. tostring(now)))
+    local addrObj = helper.isPlayer
+        and { id = "player", name = helper.name, isPlayer = true }
+        or helper.record
+    local spoke = I.EmitSituationCallout(record, addrObj, callDesc, role, now, ref, {
+        ["swarm.count"] = tostring(threatCount),
+    })
+    if not spoke then return false end
+    record.runtime.lastSwarmHelpAt = now
+    record.runtime.swarmHelpRequest = {
+        relKey = helper.relKey,
+        helperId = helper.id,
+        helperName = helper.name,
+        isPlayer = helper.isPlayer == true,
+        helperRecord = helper.record,
+        at = now,
+        initialCount = threatCount,
+        ref = ref,
+    }
+    if not helper.isPlayer and helper.record and S.EnqueueCustomReply then
+        S.EnqueueCustomReply({
+            speaker = helper.record,
+            addressee = record,
+            desc = callDesc,
+            role = "swarm_help_reply",
+            eventType = "combat_ally_warn_reply_defensive",
+            now = now,
+            delayMs = 550,
+            eventRef = ref .. ":s_reply",
+            threadID = ref,
+            barkOpts = SIT_BARK_OPTS,
+        })
+    end
+    return true
+end
+
+function S.TryEmitBystanderHelpCall(record, desc, now, ref)
+    if type(record) ~= "table" or record.alive == false then return false end
+    now = I.SituationNow(now)
+    record.runtime = record.runtime or {}
+    local lastAt = tonumber(record.runtime.lastBystanderHelpAt) or 0
+    if now >= lastAt and (now - lastAt) < BYSTANDER_HELP_COOLDOWN_MS then
+        return false
+    end
+    if not I.FindIdleBystanderHelper then return false end
+    local bystander, activeFighters = I.FindIdleBystanderHelper(record, 16, now)
+    if not bystander or (tonumber(activeFighters) or 0) < 2 then
+        record.runtime.bystanderIdleKey = nil
+        record.runtime.bystanderIdleSince = nil
+        return false
+    end
+    local key = tostring(bystander.relKey or bystander.id or "")
+    if record.runtime.bystanderIdleKey ~= key then
+        record.runtime.bystanderIdleKey = key
+        record.runtime.bystanderIdleSince = now
+        return false
+    end
+    if (now - (tonumber(record.runtime.bystanderIdleSince) or now)) < BYSTANDER_IDLE_GRACE_MS then
+        return false
+    end
+    local threatCount = I.CountThreatsOnActor and I.CountThreatsOnActor(record, false, now) or 1
+    local callDesc = type(desc) == "table" and desc or {
+        semanticClass = "zombie",
+        enemyCount = math.max(1, threatCount),
+        x = record.x,
+        y = record.y,
+        z = record.z,
+    }
+    ref = tostring(ref or ("bystander:" .. tostring(record.id) .. ":" .. tostring(now)))
+    local addrObj = bystander.isPlayer
+        and { id = "player", name = bystander.name, isPlayer = true }
+        or bystander.record
+    local spoke = I.EmitSituationCallout(record, addrObj, callDesc, "swarm_bystander_help", now, ref, {
+        ["swarm.fighters"] = tostring(activeFighters),
+    })
+    if not spoke then return false end
+    record.runtime.lastBystanderHelpAt = now
+    record.runtime.bystanderIdleKey = nil
+    record.runtime.bystanderIdleSince = nil
+    if not record.runtime.swarmHelpRequest then
+        record.runtime.swarmHelpRequest = {
+            relKey = bystander.relKey,
+            helperId = bystander.id,
+            helperName = bystander.name,
+            isPlayer = bystander.isPlayer == true,
+            helperRecord = bystander.record,
+            at = now,
+            initialCount = math.max(2, threatCount),
+            ref = ref,
+        }
+    end
+    if not bystander.isPlayer and bystander.record and S.EnqueueCustomReply then
+        S.EnqueueCustomReply({
+            speaker = bystander.record,
+            addressee = record,
+            desc = callDesc,
+            role = "swarm_bystander_help_reply",
+            eventType = "combat_ally_warn_reply_defensive",
+            now = now,
+            delayMs = 550,
+            eventRef = ref .. ":by_reply",
+            threadID = ref,
+            barkOpts = SIT_BARK_OPTS,
+        })
+    end
+    return true
+end
+
+function S.CheckSwarmHelpResolution(record, now)
+    local req = type(record) == "table" and record.runtime
+        and record.runtime.swarmHelpRequest or nil
+    if type(req) ~= "table" then return false end
+    now = I.SituationNow(now)
+    if (now - (tonumber(req.at) or 0)) > SWARM_RESCUE_WINDOW_MS then
+        record.runtime.swarmHelpRequest = nil
+        return false
+    end
+    if (now - (tonumber(req.at) or 0)) < 1500 then
+        return false
+    end
+    local currentCount = I.CountThreatsOnActor
+        and I.CountThreatsOnActor(record, false, now) or 0
+    if currentCount > math.max(1, (tonumber(req.initialCount) or SWARM_THRESHOLD) - 2) then
+        return false
+    end
+    record.runtime.swarmHelpRequest = nil
+    applySwarmRescueRelationship(record, req, now)
+    local addrObj = req.isPlayer
+        and { id = "player", name = req.helperName, isPlayer = true }
+        or req.helperRecord
+    if addrObj then
+        I.EmitSituationCallout(
+            record,
+            addrObj,
+            { semanticClass = "zombie", enemyCount = currentCount, x = record.x, y = record.y, z = record.z },
+            "swarm_rescue_thanks",
+            now,
+            tostring(req.ref or "swarm") .. ":thanks"
+        )
+    end
+    return true
+end
+
 function S.TryEmitBlindsideWarning(caller, ally, desc, now, ref)
     if type(caller) ~= "table" or type(ally) ~= "table" or type(desc) ~= "table" then return false end
     now = I.SituationNow(now)
+    -- If the speaker themselves is being swarmed (>= 3 zombies), call for help
+    -- to the least-threatened ally/player instead of warning someone else!
+    if I.CountThreatsOnActor and I.CountThreatsOnActor(caller, false, now) >= SWARM_THRESHOLD then
+        return S.TryEmitSwarmHelpCall(caller, desc, now, ref)
+    end
     local perc = PNC.Perception
     local teamKey = perc and perc.GetTeamKey and perc.GetTeamKey(caller) or nil
     local sk = perc and perc.GetActiveSkirmish and perc.GetActiveSkirmish(teamKey, now) or nil
@@ -115,6 +329,16 @@ function S.TryEmitLastStragglerBeat(caller, ally, desc, now, ref)
 end
 
 function S.HandleSkirmishActive(record, warningResult, now, ref)
+    if S.CheckSwarmHelpResolution then
+        S.CheckSwarmHelpResolution(record, now)
+    end
+    if I.CountThreatsOnActor and I.CountThreatsOnActor(record, false, now) >= SWARM_THRESHOLD then
+        local okSwarm = S.TryEmitSwarmHelpCall(record, warningResult and warningResult.descriptor or nil, now, ref)
+        if okSwarm then return true, "swarm_help" end
+    elseif S.TryEmitBystanderHelpCall then
+        local okBy = S.TryEmitBystanderHelpCall(record, warningResult and warningResult.descriptor or nil, now, ref)
+        if okBy then return true, "swarm_bystander_help" end
+    end
     if warningResult.blindsideAlly then
         local ok = S.TryEmitBlindsideWarning(record, warningResult.blindsideAlly, warningResult.descriptor, now, ref)
         return ok, ok and "blindside_warning" or "skirmish_already_active"

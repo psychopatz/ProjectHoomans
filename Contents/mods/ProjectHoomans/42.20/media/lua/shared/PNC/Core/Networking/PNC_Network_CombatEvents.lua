@@ -136,7 +136,8 @@ function Network.BroadcastZombieBite(
     npcId,
     phase,
     bumpType,
-    woundType
+    woundType,
+    npcBumpType
 )
     local attackerOnlineID
     local targetOnlineID
@@ -154,7 +155,9 @@ function Network.BroadcastZombieBite(
     end
     targetOnlineID = Network.GetZombieOnlineID(targetNPCBody)
     phaseName = phase == "clear" and "clear"
-        or phase == "impact" and "impact" or "start"
+        or phase == "impact" and "impact"
+        or phase == "defended" and "defended"
+        or "start"
     local payload = {
         attackerOnlineID = attackerOnlineID,
         targetOnlineID = targetOnlineID,
@@ -163,6 +166,7 @@ function Network.BroadcastZombieBite(
         bumpType = bumpType and tostring(bumpType) or "Bite",
         woundType = phaseName == "impact" and woundType
             and tostring(woundType) or nil,
+        npcBumpType = npcBumpType and tostring(npcBumpType) or nil,
     }
     return sendToInterestedNPC(npcId, Const.CMD_ZOMBIE_BITE, payload) > 0
 end

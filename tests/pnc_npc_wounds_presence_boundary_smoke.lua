@@ -26,6 +26,7 @@ local expected = {
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_ZombieAttack",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Debug",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Treatment",
+    "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_BloodDrops",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Update",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Snapshot",
 }
