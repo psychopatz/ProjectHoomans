@@ -54,10 +54,11 @@ local function randomUnit(options)
 end
 
 function Resolution.GetRangedCooldown(record, baseCooldown, modifiers, options)
-    local base = math.max(250, number(baseCooldown, 1800))
+    local base = math.max(120, number(baseCooldown, 1800))
     local rate = number(modifiers and modifiers.fireRateMultiplier, 1) or 1
     local actionDuration = number(options and options.actionDurationMs, 620)
-    local minimum = math.max(250, actionDuration + 40)
+    local pad = actionDuration < 300 and 20 or 40
+    local minimum = math.max(120, actionDuration + pad)
     return clamp(base / clamp(rate, 0.50, 3.00), minimum, 10000)
 end
 

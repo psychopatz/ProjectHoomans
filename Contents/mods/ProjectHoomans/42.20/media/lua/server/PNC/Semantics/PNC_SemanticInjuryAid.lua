@@ -72,7 +72,7 @@ local function inTreatmentRange(helper, injured)
     local ix, iy, iz = position(injured, injuredBody)
     if hx == nil or ix == nil then return false, "position_unavailable" end
     if math.abs(hz - iz) >= 1 then return false, "different_floor" end
-    local range = tonumber(PNC.Const and PNC.Const.BANDAGE_RANGE) or 3
+    local range = math.min(1.35, tonumber(PNC.Const and PNC.Const.BANDAGE_RANGE) or 1.35)
     local distanceSq = PNC.Core and type(PNC.Core.DistanceSq) == "function"
         and PNC.Core.DistanceSq(hx, hy, ix, iy)
         or ((hx - ix) * (hx - ix) + (hy - iy) * (hy - iy))
@@ -239,6 +239,15 @@ local function inspect(helper, injured, options)
         requestID = nil,
     }
     local wounds = PNC.NPCWounds
+    local executorInternal = PNC.MedicalCareExecutor and PNC.MedicalCareExecutor.Internal or nil
+    if executorInternal and type(executorInternal.IsPatientAlreadyBeingTreated) == "function" then
+        local busy, busyReason = executorInternal.IsPatientAlreadyBeingTreated(helper, injured, "npc")
+        if busy then
+            result.reason = busyReason or "patient_already_treating"
+            return result
+        end
+    end
+
     local treatment = PNC.Treatment
     local bandagePlan
     local partID
@@ -452,6 +461,14 @@ function Aid.Execute(helper, injured, offer, options)
             inspection = current,
             transfer = details,
         }
+    end
+
+    local executorInternal = PNC.MedicalCareExecutor and PNC.MedicalCareExecutor.Internal or nil
+    if executorInternal and type(executorInternal.IsPatientAlreadyBeingTreated) == "function" then
+        local busy, busyReason = executorInternal.IsPatientAlreadyBeingTreated(helper, injured, "npc")
+        if busy then
+            return false, busyReason or "patient_already_treating", { inspection = current }
+        end
     end
 
     local treatment = PNC.Treatment

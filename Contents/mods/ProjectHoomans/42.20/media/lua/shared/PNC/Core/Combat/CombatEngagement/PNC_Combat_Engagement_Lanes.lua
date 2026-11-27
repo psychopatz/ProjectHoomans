@@ -248,8 +248,10 @@ local function handleRanged(context, debugMode, stopFactor)
         return true
     end
     -- Fire/aim arbitration comes first. Spacing is a cooldown recovery action,
-    -- not a reason to replace every valid shot with another retreat path.
+    -- not a reason to replace every rapid-fire shot with a 650ms retreat lock
+    -- while the target is still at safe shooting distance.
     if reason == "cooldown_active"
+        and (tonumber(context.distance) or 0) < 3.4
         and maintainRangedSpacing(context)
     then
         return true

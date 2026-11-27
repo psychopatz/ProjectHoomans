@@ -264,6 +264,16 @@ Status.Register("combat", 90, function(record)
     local attackActive = runtime.attackAction ~= nil
         and Core.Now() < (tonumber(runtime.attackAction.finishAt) or 0)
     if attackActive then
+        if tostring(runtime.attackAction.attackType or "") == "reload" then
+            local act = runtime.attackAction
+            return activity("reloading", "UI_PNC_Activity_Reloading", "Reloading", {
+                reloadCurrent = tonumber(act.reloadCurrentCount) or 0,
+                reloadTarget = tonumber(act.reloadTargetCount) or tonumber(act.magazineCapacity) or 0,
+                reloadCapacity = tonumber(act.magazineCapacity) or 0,
+                reloadProgress = tonumber(act.reloadProgress) or 0,
+                reloadIncremental = act.reloadIncremental == true,
+            })
+        end
         return activity("combat", "UI_PNC_Activity_Fighting", "Fighting")
     end
     -- A selected target, a recent damage lease, or a threat-guard scan is

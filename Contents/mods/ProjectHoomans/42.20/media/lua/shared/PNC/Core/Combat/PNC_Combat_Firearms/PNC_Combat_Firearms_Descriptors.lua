@@ -142,7 +142,8 @@ local function resolveReloadDuration(record, scriptItem, reloadFamily)
     if not reloadMs or reloadMs <= 0 then
         reloadMs = RELOAD_DURATIONS_MS[reloadFamily] or 1850
     end
-    return math.max(800, math.floor(reloadMs * (1.0 - (reloadLevel * 0.03))))
+    reloadMs = math.min(2800, reloadMs)
+    return math.max(750, math.floor(reloadMs * (1.0 - (reloadLevel * 0.03))))
 end
 
 local function normalizeItemType(value)

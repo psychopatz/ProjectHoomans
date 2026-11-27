@@ -31,6 +31,12 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
     end
     record.runtime = record.runtime or {}
     attackMode = attackMode == true
+    if not attackMode and force ~= true
+        and PNC.CombatStance and PNC.CombatStance.IsArmed
+        and PNC.CombatStance.IsArmed(record) == true
+    then
+        attackMode = true
+    end
     workPresentation = Equipment.ResolveWorkPresentation
         and Equipment.ResolveWorkPresentation(record) or nil
     workHeld = workPresentation and workPresentation.held == true
@@ -48,11 +54,21 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
         descriptor,
         primaryHeld
     )
+    local bodyModData = type(zombie.getModData) == "function"
+        and zombie:getModData() or nil
+    local modeApplied = record.runtime.equipmentAttackModeApplied
+    local revApplied = record.runtime.equipmentPresentationRevision
+    if modeApplied == nil and type(bodyModData) == "table" then
+        modeApplied = bodyModData.PNC_LastAttackModeApplied
+        revApplied = bodyModData.PNC_LastPresentationRevision
+    end
     if force ~= true
-        and record.runtime.equipmentAttackModeApplied == attackMode
-        and record.runtime.equipmentPresentationRevision == Equipment.PRESENTATION_REVISION
+        and modeApplied == attackMode
+        and revApplied == Equipment.PRESENTATION_REVISION
         and handStateCurrent ~= false
     then
+        record.runtime.equipmentAttackModeApplied = attackMode
+        record.runtime.equipmentPresentationRevision = Equipment.PRESENTATION_REVISION
         return true, "unchanged"
     end
 
@@ -60,6 +76,10 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
     ok, attachedReason, handsReason = Internal.applyCombatPresentation(
         zombie, record, equipment, descriptor, primaryHeld
     )
+    if type(bodyModData) == "table" then
+        bodyModData.PNC_LastAttackModeApplied = attackMode
+        bodyModData.PNC_LastPresentationRevision = Equipment.PRESENTATION_REVISION
+    end
     Visuals.RefreshModel(zombie)
     return ok, tostring(attachedReason) .. "|" .. tostring(handsReason)
 end

@@ -50,6 +50,11 @@ local function removeFromWorldSource(cand)
         return false, "floor_remove_failed"
     end
     local container, item = cand.container, cand.item
+    if cand.sourceType == "corpse" and cand.object then
+        if type(cand.object.removeWornItem) == "function" then
+            pcall(cand.object.removeWornItem, cand.object, item)
+        end
+    end
     local removed = false
     if container.DoRemoveItem then
         container:DoRemoveItem(item)

@@ -18,7 +18,7 @@ local AnimationScenes = H.AnimationScenes
 local Treatment = H.Treatment
 local choreographyOwnsBehavior = H.choreographyOwnsBehavior
 
-local function holdForIncomingMedicalCare(record, now)
+local function holdForIncomingMedicalCare(record, zombie, now)
     local runtime = record and record.runtime or nil
     local medicId = runtime and runtime.receivingMedicalCareBy or nil
     if medicId == nil then return false end
@@ -32,7 +32,18 @@ local function holdForIncomingMedicalCare(record, now)
         if mState and mState.phase == "treating"
             and tostring(mState.patientId or "") == tostring(record.id or "")
         then
-            active = true
+            -- Mutual deadlock breaker: if both NPCs somehow entered treating on
+            -- each other on the same tick, the lower ID keeps treating and the
+            -- other releases its incoming hold.
+            local selfMed = runtime.medicalCare
+            if type(selfMed) == "table" and selfMed.phase == "treating"
+                and tostring(selfMed.patientId or "") == tostring(medicId)
+                and tostring(record.id or "") < tostring(medicId)
+            then
+                active = false
+            else
+                active = true
+            end
         end
     end
     if not active then
@@ -92,7 +103,7 @@ function H.Run(record, zombie, now)
         return true
     end
 
-    if holdForIncomingMedicalCare(record, now) then
+    if holdForIncomingMedicalCare(record, zombie, now) then
         return true
     end
 

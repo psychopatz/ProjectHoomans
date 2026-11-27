@@ -209,6 +209,12 @@ function Scenes.Request(record, zombie, sceneId, options)
     end
     scene = buildScene(runtime, definition, options, now)
     runtime.animationScene = scene
+    if options.propPrimary ~= nil or options.propSecondary ~= nil then
+        runtime.sceneActionProps = {
+            primary = options.propPrimary,
+            secondary = options.propSecondary,
+        }
+    end
     started, result = Internal.ActivateStep(
         record,
         zombie,

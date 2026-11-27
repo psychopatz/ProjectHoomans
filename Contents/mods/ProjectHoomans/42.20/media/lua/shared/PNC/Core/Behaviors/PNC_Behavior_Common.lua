@@ -197,8 +197,12 @@ function Common.ClearCombatTarget(record, reason, zombie)
     if not zombie and PNC.Registry and PNC.Registry.GetLiveZombie then
         zombie = PNC.Registry.GetLiveZombie(record.id)
     end
+    local keepArmed = committedAttack == true
+        or (PNC.CombatStance and PNC.CombatStance.IsArmed
+            and PNC.CombatStance.IsArmed(record) == true)
+        or false
     if Equipment.ApplyCombatState and zombie then
-        Equipment.ApplyCombatState(zombie, record, committedAttack)
+        Equipment.ApplyCombatState(zombie, record, keepArmed)
     end
     equipmentInfo = Equipment.Describe(record)
     Common.SetCombatDebug(

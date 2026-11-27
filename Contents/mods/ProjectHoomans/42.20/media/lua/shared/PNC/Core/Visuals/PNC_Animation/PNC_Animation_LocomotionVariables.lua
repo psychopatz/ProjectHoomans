@@ -121,6 +121,27 @@ function Internal.setLocomotionVars(zombie, profile, moving, animSpeed)
     end
 end
 
+function Internal.resolveContinuousRangedAim(zombie, record, engineWalkType, isCrawling)
+    local walk = tostring(engineWalkType or "")
+    local primaryType = zombie and zombie.getVariableString
+        and tostring(zombie:getVariableString("PNCPrimaryType") or "")
+        or ""
+    local isFirearm = primaryType == "handgun" or primaryType == "rifle"
+    local runtime = type(record) == "table" and record.runtime or nil
+    local stance = PNC and PNC.CombatStance or nil
+    local armed = (runtime and runtime.combatStance == true)
+        or (stance and type(stance.IsArmed) == "function" and stance.IsArmed(record) == true)
+        or false
+    local aiming = isFirearm and armed and isCrawling ~= true
+    if zombie and zombie.setVariable then
+        zombie:setVariable("PNCRangedAiming", aiming)
+    end
+    if aiming and (walk == "" or walk == "Walk" or walk == "SneakWalk" or walk == "Limp") then
+        return "WalkAim", true
+    end
+    return walk, aiming
+end
+
 function Internal.applyWalkType(zombie, engineWalkType, animSpeedValue)
     if not zombie then
         return

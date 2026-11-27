@@ -54,19 +54,42 @@ local function logFirearmAudit(eventName, record, target, ...)
     return Diagnostics.LogFirearmAudit(eventName, fields)
 end
 
-local function resolveFirearmTiming(record, profile)
+local function resolveFirearmTiming(record, profile, descriptor)
     local modifiers = TraitEffects
         and TraitEffects.ResolveFirearmModifiers
         and TraitEffects.ResolveFirearmModifiers(record) or {}
+    local defaultTimings = Internal.ATTACK_TIMINGS and Internal.ATTACK_TIMINGS.ranged
+        or { hitDelay = 180, duration = 620 }
+    local hitDelayMs = (descriptor and tonumber(descriptor.shotHitDelayMs))
+        or defaultTimings.hitDelay
+    local durationMs = (descriptor and tonumber(descriptor.shotDurationMs))
+        or defaultTimings.duration
+    local baseCooldown = (descriptor and tonumber(descriptor.fireCooldownMs))
+        or tonumber(profile.rangedCooldownMs)
+        or 1800
+    local aiming = Skills and Skills.GetLevel
+        and math.max(0, math.min(10, tonumber(Skills.GetLevel(record, "Aiming")) or 0))
+        or 0
+    if descriptor and tonumber(descriptor.fireCooldownMs) then
+        baseCooldown = math.floor(baseCooldown * (1 - aiming * 0.015))
+    end
     local cooldown = Resolution and Resolution.GetRangedCooldown
         and Resolution.GetRangedCooldown(
             record,
-            profile.rangedCooldownMs,
+            baseCooldown,
             modifiers,
-            { actionDurationMs = Internal.ATTACK_TIMINGS.ranged.duration }
+            { actionDurationMs = durationMs }
         )
-        or tonumber(profile.rangedCooldownMs) or 1800
-    return modifiers, cooldown
+        or baseCooldown
+    local burstSize = descriptor and tonumber(descriptor.burstSize) or 0
+    local burstPauseMs = descriptor and tonumber(descriptor.burstPauseMs) or 0
+    local runtime = record and record.runtime or nil
+    if burstSize > 0 and burstPauseMs > 0 and runtime
+        and (tonumber(runtime.firearmBurstCount) or 0) >= burstSize
+    then
+        cooldown = cooldown + burstPauseMs
+    end
+    return modifiers, cooldown, hitDelayMs, durationMs
 end
 
 local function buildShotProfile(record, target, modifiers, distance)
@@ -149,7 +172,13 @@ function Combat.TryRanged(record, zombie, target)
             return false, "out_of_ammo"
         end
     end
-    firearmModifiers, cooldownMs = resolveFirearmTiming(record, profile)
+    local firearmDescriptor = (magazine and magazine.descriptor)
+        or (Firearms and Firearms.Describe and Firearms.Describe(record, weaponItem, zombie))
+        or nil
+    local shotHitDelayMs
+    local shotDurationMs
+    firearmModifiers, cooldownMs, shotHitDelayMs, shotDurationMs =
+        resolveFirearmTiming(record, profile, firearmDescriptor)
     if not Internal.canAttack(record, now, cooldownMs) then
         return false, "cooldown_active"
     end
@@ -199,7 +228,14 @@ function Combat.TryRanged(record, zombie, target)
     end
     record.runtime.lastAttackAt = now
     record.runtime.inCombatUntil = now + Const.DEBUG_COMBAT_HOLD_MS
-    Internal.faceTarget(zombie, target, record, Internal.ATTACK_TIMINGS.ranged.duration, "ranged_windup")
+    local burstSize = firearmDescriptor and tonumber(firearmDescriptor.burstSize) or 0
+    if burstSize > 0 then
+        local prevBurst = tonumber(record.runtime.firearmBurstCount) or 0
+        record.runtime.firearmBurstCount = (prevBurst >= burstSize) and 1 or (prevBurst + 1)
+    else
+        record.runtime.firearmBurstCount = 0
+    end
+    Internal.faceTarget(zombie, target, record, shotDurationMs, "ranged_windup")
     if zombie then
         anim = Internal.triggerRangedWeaponAnim(zombie, record, equipmentInfo)
     end
@@ -212,15 +248,18 @@ function Combat.TryRanged(record, zombie, target)
         damage,
         skillID,
         {
+            hitDelayMs = shotHitDelayMs,
+            durationMs = shotDurationMs,
             ammoConsumed = ammoReady == true,
             weaponFullType = magazine and magazine.descriptor and magazine.descriptor.fullType or nil,
+            cadenceClass = firearmDescriptor and firearmDescriptor.cadenceClass or nil,
             effectiveCooldownMs = cooldownMs,
             firearmModifiers = firearmModifiers,
             rangedShotProfile = shotProfile,
         }
     )
     if Tactics and Tactics.MarkRangedShot then
-        Tactics.MarkRangedShot(record)
+        Tactics.MarkRangedShot(record, firearmDescriptor and firearmDescriptor.followUpAimScale or nil)
     end
     logFirearmAudit("ranged_attack_started", record, target,
         "animation=" .. tostring(anim or "PNC_AttackPistol"),

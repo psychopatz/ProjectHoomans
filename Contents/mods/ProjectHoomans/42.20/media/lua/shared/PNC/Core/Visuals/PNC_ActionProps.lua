@@ -159,9 +159,13 @@ function ActionProps.Resolve(snapshot)
     local fullType = text(action, "activityItemFullType")
     local itemID = value(action, "activityItemID")
 
-    if snapshot and snapshot.attackMode == true
-        or visual and visual.attackActive == true
-    then
+    if visual and visual.attackActive == true then
+        return nil
+    end
+
+    local hasExplicitVisualProp = type(visual) == "table"
+        and (visual.propPrimary ~= nil or visual.propSecondary ~= nil)
+    if snapshot and snapshot.attackMode == true and not hasExplicitVisualProp then
         return nil
     end
 

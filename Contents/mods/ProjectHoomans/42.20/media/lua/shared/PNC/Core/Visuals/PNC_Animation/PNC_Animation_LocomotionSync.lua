@@ -125,12 +125,18 @@ function Animation.SyncLocomotion(zombie, record)
         or zombie.getVariableString and zombie:getVariableString("WalkType")
         or ""
     animSpeed = path and path.animSpeed or zombie.getVariableFloat and zombie:getVariableFloat("PNCAnimSpeed", 1.0) or 1.0
+    local isCrawlingNow = path and path.isCrawling == true or false
+    if Internal.resolveContinuousRangedAim then
+        engineWalkType = Internal.resolveContinuousRangedAim(
+            zombie, record, engineWalkType, isCrawlingNow
+        )
+    end
     Internal.setLocomotionVars(zombie, profile or {
         moveAnim = moveAnim ~= "" and moveAnim or "Walk",
         walkType = walkType or "",
         engineWalkType = engineWalkType or "",
         isRunning = path and path.isRunning == true or false,
-        isCrawling = path and path.isCrawling == true or false,
+        isCrawling = isCrawlingNow,
     }, moving, animSpeed)
     Internal.applyWalkType(zombie, engineWalkType, animSpeed)
     -- Never set native running/sprinting flags on IsoZombie NPC shells:

@@ -47,8 +47,12 @@ function Tactics.CanTakeRangedShot(record, target)
             > moveTolerance * moveTolerance
         or state.targetX == nil
         or Core.DistanceSq(state.targetX, state.targetY, target.x, target.y)
-            > (moveTolerance * 1.5) ^ 2
+            > (moveTolerance * 2.5) ^ 2
     then
+        if state.targetKey ~= targetKey then
+            state.followUpShot = false
+            state.followUpAimScale = nil
+        end
         state.targetKey = targetKey
         state.startedAt = now
         state.shooterX = record.x
@@ -78,6 +82,10 @@ function Tactics.CanTakeRangedShot(record, target)
         0.50,
         2.00
     )
+    if state.followUpShot == true then
+        local followScale = clamp(tonumber(state.followUpAimScale) or 0.30, 0.12, 0.75)
+        settleMs = math.max(50, math.floor(settleMs * followScale))
+    end
     state.readyAt = (tonumber(state.startedAt) or now) + settleMs
     progress = math.max(0, math.min(
         1,
@@ -97,18 +105,28 @@ function Tactics.CanTakeRangedShot(record, target)
         0.75
     )
     state.requiredConfidence = requiredConfidence
-    if now < state.readyAt or state.confidence < requiredConfidence then
+    if now < state.readyAt then
+        return false, "aiming"
+    end
+    -- Once settle time has elapsed (progress == 1), allow the shot even under
+    -- heavy zombie pressure or low aiming skill so gunners never deadlock in
+    -- "Engaging" forever (their lower confidence still reduces hitChance).
+    if progress < 1 and state.confidence < requiredConfidence then
         return false, "aiming"
     end
     return true, "aim_confident"
 end
 
-function Tactics.MarkRangedShot(record)
+function Tactics.MarkRangedShot(record, followUpAimScale)
     local state = record and record.runtime and record.runtime.combatAim or nil
     if not state then return end
     state.startedAt = Core.Now()
     state.shooterX = record.x
     state.shooterY = record.y
+    state.followUpShot = true
+    if followUpAimScale ~= nil then
+        state.followUpAimScale = tonumber(followUpAimScale)
+    end
     state.confidence = 0
 end
 

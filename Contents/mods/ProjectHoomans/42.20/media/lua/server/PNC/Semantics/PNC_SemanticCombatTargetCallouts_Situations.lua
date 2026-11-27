@@ -18,6 +18,7 @@ function I.EmitSituationCallout(speaker, addr, desc, role, now, ref, extraTokens
     local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
     local dirTopic = role == "blindside" and "combat_blindside"
         or (role == "swarm_help" or role == "swarm_overwhelmed" or role == "swarm_bystander_help") and "combat_swarm_help"
+        or (role == "reloading_cover" or role == "reloading_panic") and "combat_reloading"
         or role == "swarm_rescue_thanks" and "combat_swarm_rescue"
         or role == "stamina_exhausted" and "combat_exhausted"
         or "combat_situation"
@@ -52,7 +53,8 @@ function I.EmitSituationCallout(speaker, addr, desc, role, now, ref, extraTokens
         interrupt = role == "blindside"
             or role == "swarm_help"
             or role == "swarm_overwhelmed"
-            or role == "swarm_bystander_help",
+            or role == "swarm_bystander_help"
+            or role == "reloading_panic",
         clientCooldowns = SIT_BARK_OPTS.clientCooldowns, threadID = ref,
         streamKey = "ally-warn-sit:" .. tostring(speaker.id),
         eventRef = ref, text = text, presentationClass = res and res.presentationClass or "BARK",
@@ -280,9 +282,76 @@ function S.CheckSwarmHelpResolution(record, now)
     return true
 end
 
+local RELOAD_CALLOUT_COOLDOWN_MS = 6500
+
+function S.TryEmitReloadCallout(record, target, now, ref)
+    if type(record) ~= "table" or record.alive == false then return false end
+    now = I.SituationNow(now)
+    record.runtime = record.runtime or {}
+    local lastAt = tonumber(record.runtime.lastReloadCalloutAt) or 0
+    if now >= lastAt and (now - lastAt) < RELOAD_CALLOUT_COOLDOWN_MS then
+        return false
+    end
+    local threatCount = I.CountThreatsOnActor
+        and I.CountThreatsOnActor(record, false, now) or 0
+    local distSq = type(target) == "table" and tonumber(target.distSq) or nil
+    if distSq == nil and type(target) == "table" and target.x ~= nil and target.y ~= nil then
+        distSq = I.DistSq(record.x, record.y, target.x, target.y)
+    end
+    local closeThreat = distSq ~= nil and distSq <= 16 -- <= 4 tiles
+    local lowHealth = record.health and tonumber(record.health.current)
+        and tonumber(record.health.max)
+        and (record.health.current / math.max(1, record.health.max)) < 0.45
+    local highStakes = threatCount >= 2 or closeThreat or lowHealth
+    local role = highStakes and "reloading_panic" or "reloading_cover"
+
+    local helper = I.FindLeastThreatenedHelper
+        and I.FindLeastThreatenedHelper(record, 16, now) or nil
+    local addrObj = helper and (
+        helper.isPlayer
+            and { id = "player", name = helper.name, isPlayer = true }
+            or helper.record
+    ) or { id = "self", name = "everyone", isPlayer = false }
+    local tCls = (type(target) == "table" and tostring(target.kind or "") ~= "zombie"
+        and tostring(target.threatClass or "") ~= "zombie") and "human_hostile" or "zombie"
+    local callDesc = {
+        semanticClass = tCls,
+        enemyCount = math.max(1, threatCount),
+        x = (type(target) == "table" and target.x) or record.x,
+        y = (type(target) == "table" and target.y) or record.y,
+        z = (type(target) == "table" and target.z) or record.z,
+    }
+    ref = tostring(ref or ("reload:" .. tostring(record.id) .. ":" .. tostring(now)))
+    local spoke = I.EmitSituationCallout(record, addrObj, callDesc, role, now, ref)
+    if not spoke then return false end
+    record.runtime.lastReloadCalloutAt = now
+    if helper and not helper.isPlayer and helper.record and S.EnqueueCustomReply then
+        S.EnqueueCustomReply({
+            speaker = helper.record,
+            addressee = record,
+            desc = callDesc,
+            role = "reloading_cover_reply",
+            eventType = "combat_ally_warn_reply_defensive",
+            now = now,
+            delayMs = 550,
+            eventRef = ref .. ":rl_reply",
+            threadID = ref,
+            barkOpts = SIT_BARK_OPTS,
+        })
+    end
+    return true
+end
+
 function S.TryEmitBlindsideWarning(caller, ally, desc, now, ref)
     if type(caller) ~= "table" or type(ally) ~= "table" or type(desc) ~= "table" then return false end
     now = I.SituationNow(now)
+    -- If the speaker is currently reloading, suppress generic ally warnings.
+    local act = caller.runtime and caller.runtime.attackAction or nil
+    if act and tostring(act.attackType or "") == "reload"
+        and now < (tonumber(act.finishAt) or 0)
+    then
+        return false
+    end
     -- If the speaker themselves is being swarmed (>= 3 zombies), call for help
     -- to the least-threatened ally/player instead of warning someone else!
     if I.CountThreatsOnActor and I.CountThreatsOnActor(caller, false, now) >= SWARM_THRESHOLD then

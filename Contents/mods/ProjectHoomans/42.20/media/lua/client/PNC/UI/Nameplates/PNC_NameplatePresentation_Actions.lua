@@ -281,6 +281,20 @@ function Presentation.ActivityActionStatus(snapshot)
     end
     local fallback = tostring(info.fallback or info.activityId or "")
     local text = activityLabel(info, fallback)
+    if info.activityId == "reloading" and (tonumber(info.reloadCapacity) or 0) > 0 then
+        local cur = math.max(0, math.floor(tonumber(info.reloadCurrent) or 0))
+        local cap = math.max(1, math.floor(tonumber(info.reloadCapacity) or 1))
+        if info.reloadIncremental == true then
+            text = text .. " (" .. tostring(cur) .. "/" .. tostring(cap) .. ")"
+        else
+            local pct = math.max(0, math.min(100, math.floor(((tonumber(info.reloadProgress) or 0) * 100) + 0.5)))
+            if pct > 0 and pct < 100 then
+                text = text .. " (" .. tostring(cur) .. "/" .. tostring(cap) .. " " .. tostring(pct) .. "%)"
+            else
+                text = text .. " (" .. tostring(cur) .. "/" .. tostring(cap) .. ")"
+            end
+        end
+    end
     if info.facilityDefinitionId then
         text = text .. " - " .. facilityName(info)
     end

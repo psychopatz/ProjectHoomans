@@ -433,11 +433,6 @@ local function playHandoverScenes(donor, recipient, fullType)
 
     faceEachOther(donorBody, donor, recipBody, recipient)
 
-    donor.runtime = donor.runtime or {}
-    donor.runtime.sceneActionProps = { primary = fullType }
-    recipient.runtime = recipient.runtime or {}
-    recipient.runtime.sceneActionProps = { primary = fullType }
-
     if scenes and type(scenes.Request) == "function" then
         pcall(scenes.Request, donor, donorBody, "social.item_share_give", {
             reason = "group_item_share",
@@ -447,9 +442,15 @@ local function playHandoverScenes(donor, recipient, fullType)
             reason = "group_item_share",
             propPrimary = fullType,
         })
-    elseif scenes and type(scenes.Start) == "function" then
-        pcall(scenes.Start, donor, donorBody, "social.item_share_give")
-        pcall(scenes.Start, recipient, recipBody, "social.item_share_receive")
+    else
+        donor.runtime = donor.runtime or {}
+        donor.runtime.sceneActionProps = { primary = fullType }
+        recipient.runtime = recipient.runtime or {}
+        recipient.runtime.sceneActionProps = { primary = fullType }
+        if scenes and type(scenes.Start) == "function" then
+            pcall(scenes.Start, donor, donorBody, "social.item_share_give")
+            pcall(scenes.Start, recipient, recipBody, "social.item_share_receive")
+        end
     end
 end
 

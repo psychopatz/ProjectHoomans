@@ -221,22 +221,53 @@ Internal.CurrentPart = Executor.CurrentPart
 
 local function isPatientAlreadyBeingTreated(actor, patient, pKind)
     if pKind ~= "npc" or type(patient) ~= "table" then return false, nil end
+    local actorKey = tostring(actor and actor.id or "")
+    local patientKey = tostring(patient.id or "")
     local runtime = patient.runtime
-    if type(runtime) ~= "table" then return false, nil end
-    if type(runtime.selfTreatment) == "table"
-        and runtime.selfTreatment.phase == "bandaging"
-    then
-        return true, "patient_self_bandaging"
-    end
-    local medicId = runtime.receivingMedicalCareBy
-    if medicId ~= nil and tostring(medicId) ~= tostring(actor and actor.id or "") then
-        local medic = Registry and Registry.Get and Registry.Get(medicId) or nil
-        local mState = medic and medic.alive ~= false
-            and medic.runtime and medic.runtime.medicalCare or nil
-        if mState and mState.phase == "treating"
-            and tostring(mState.patientId or "") == tostring(patient.id or "")
+    if type(runtime) == "table" then
+        if type(runtime.selfTreatment) == "table"
+            and runtime.selfTreatment.phase == "bandaging"
         then
-            return true, "patient_treated_by_other_medic"
+            return true, "patient_self_bandaging"
+        end
+        if type(runtime.medicalCare) == "table"
+            and runtime.medicalCare.phase == "treating"
+        then
+            return true, "patient_currently_treating_other"
+        end
+        local medicId = runtime.receivingMedicalCareBy
+        if medicId ~= nil and tostring(medicId) ~= actorKey then
+            local medic = Registry and Registry.Get and Registry.Get(medicId) or nil
+            local mState = medic and medic.alive ~= false
+                and medic.runtime and medic.runtime.medicalCare or nil
+            if mState
+                and (mState.phase == "treating" or mState.phase == "traveling")
+                and tostring(mState.patientId or "") == patientKey
+            then
+                return true, "patient_treated_by_other_medic"
+            end
+        end
+    end
+    -- Single-doctor authority check across all active medical care tasks so
+    -- multiple medics can never claim or travel to bandage the same patient
+    -- simultaneously.
+    local svc = Service or (PNC and PNC.MedicalCareService)
+    if svc and type(svc.List) == "function" then
+        local activeTasks = svc.List(false) or {}
+        for i = 1, #activeTasks do
+            local t = activeTasks[i]
+            if type(t) == "table"
+                and tostring(t.patientKind or "npc") == pKind
+                and tostring(t.patientId or "") == patientKey
+                and t.actorId ~= nil
+                and tostring(t.actorId) ~= ""
+                and tostring(t.actorId) ~= actorKey
+            then
+                local otherMedic = Registry and Registry.Get and Registry.Get(t.actorId) or nil
+                if not otherMedic or otherMedic.alive ~= false then
+                    return true, "patient_claimed_by_other_medic"
+                end
+            end
         end
     end
     return false, nil
@@ -251,6 +282,11 @@ function Internal.CanTreat(actor, task)
     end
     local allowed, denyReason = Internal.CanAssistPatient(actor, patient, pKind)
     if not allowed then return false, denyReason end
+    if actor and type(actor.runtime) == "table"
+        and actor.runtime.receivingMedicalCareBy ~= nil
+    then
+        return false, "actor_receiving_medical_care"
+    end
     if task and task.actorId and tostring(task.actorId) ~= tostring(actor.id) then
         return false, "claimed_by_other_doctor"
     end
@@ -277,7 +313,19 @@ end
 function Internal.InTreatmentRange(actor, actorBody, patient, patientBody)
     local ax, ay, az = Internal.Position(actor, actorBody)
     local px, py, pz = Internal.Position(patient, patientBody)
-    local range = tonumber(Const and Const.BANDAGE_RANGE) or 3
+    -- Medics must walk right up next to the patient before beginning bandage
+    -- animations (not bandage thin air from 3 tiles away).
+    local configured = tonumber(Const and Const.BANDAGE_RANGE) or 1.35
+    local range = math.min(1.35, configured)
+    if math.abs(az - pz) >= 1 then return false end
+    return (ax - px) * (ax - px) + (ay - py) * (ay - py)
+        <= range * range
+end
+
+function Internal.InActiveTreatmentRange(actor, actorBody, patient, patientBody)
+    local ax, ay, az = Internal.Position(actor, actorBody)
+    local px, py, pz = Internal.Position(patient, patientBody)
+    local range = math.max(2.2, math.min(3.0, tonumber(Const and Const.BANDAGE_RANGE) or 2.2))
     if math.abs(az - pz) >= 1 then return false end
     return (ax - px) * (ax - px) + (ay - py) * (ay - py)
         <= range * range

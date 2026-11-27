@@ -97,11 +97,14 @@ local function inspectSource(source, npcId, filter, options, distSq, now)
     local raw = collectRawEntries(source)
     local limit = math.min(#raw, math.max(1, tonumber(options.maxItems) or 256))
     local best = nil
+    local inspectOpts = source.sourceType == "corpse"
+        and { sourceType = "corpse", allowEquipped = true }
+        or options
     for i = 1, limit do
         local entry = raw[i]
         local key = Claims.MakeKey(source.sourceType, source.x, source.y, source.z, entry.item)
         if not Claims.IsClaimedByOther(key, npcId, now) then
-            local ctx = Classifier.InspectItem(entry.item, options)
+            local ctx = Classifier.InspectItem(entry.item, inspectOpts)
             local ok, score = Classifier.MatchesFilter(ctx, filter, options)
             if ok then
                 local rank = (score * 100) - distSq

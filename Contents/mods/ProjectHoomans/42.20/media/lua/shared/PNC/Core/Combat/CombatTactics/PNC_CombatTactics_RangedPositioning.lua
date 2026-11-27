@@ -144,4 +144,96 @@ function Tactics.MaintainRangedSpacing(record, zombie, target)
     )
 end
 
+local RELOAD_KITE_ANGLES = { 0, 0.785398, -0.785398, 1.570796, -1.570796 }
+
+local function canStepTo(zombie, nx, ny, nz)
+    local cell = type(getCell) == "function" and getCell() or nil
+    if not cell or type(cell.getGridSquare) ~= "function" then
+        return true
+    end
+    local nextSq = cell:getGridSquare(math.floor(nx), math.floor(ny), math.floor(nz))
+    if not nextSq then return false end
+    if type(nextSq.isSolidFloor) == "function" and nextSq:isSolidFloor() ~= true then
+        return false
+    end
+    if type(nextSq.isFree) == "function" and nextSq:isFree(false) ~= true then
+        return false
+    end
+    local curSq = zombie and type(zombie.getCurrentSquare) == "function"
+        and zombie:getCurrentSquare() or nil
+    if curSq and curSq ~= nextSq
+        and type(curSq.isBlockedTo) == "function"
+        and curSq:isBlockedTo(nextSq) == true
+    then
+        return false
+    end
+    return true
+end
+
+-- Collision-safe backpedal step while a reload bump animation is playing.
+-- Moves the body away from nearby threats without switching Java action states
+-- into PathFindState, so the reload animation continues uninterrupted.
+function Tactics.StepReloadKite(record, zombie, target, now)
+    if not record or not zombie or not target then return false, nil end
+    now = tonumber(now) or (Core and Core.Now and Core.Now()) or 0
+    record.runtime = record.runtime or {}
+    if (tonumber(record.runtime.grappleHoldUntil) or 0) > now then
+        return false, "grappled"
+    end
+    local rx = type(zombie.getX) == "function" and tonumber(zombie:getX()) or tonumber(record.x)
+    local ry = type(zombie.getY) == "function" and tonumber(zombie:getY()) or tonumber(record.y)
+    local rz = type(zombie.getZ) == "function" and tonumber(zombie:getZ()) or tonumber(record.z) or 0
+    if rx == nil or ry == nil then return false, nil end
+
+    local dist = math.sqrt(tonumber(target.distSq or 0) or 0)
+    local preferredMin = tonumber(Const and Const.RANGED_PREFERRED_MIN_DISTANCE) or 5.0
+    local report = Internal.AssessThreat and Internal.AssessThreat(record, target) or nil
+    local pressure = report and (tonumber(report.pressureCount) or 0) >= 1
+    if dist >= preferredMin and not pressure then
+        record.runtime.lastReloadKiteAt = now
+        return false, nil
+    end
+
+    local threatX, threatY = tonumber(target.x), tonumber(target.y)
+    if pressure and Internal.BuildZombieThreatCentroid then
+        local cx, cy = Internal.BuildZombieThreatCentroid(
+            record, tonumber(Const and Const.COMBAT_HORDE_RADIUS) or 6
+        )
+        if cx ~= nil and cy ~= nil then
+            threatX, threatY = cx, cy
+        end
+    end
+    if threatX == nil or threatY == nil then return false, nil end
+
+    local dx, dy = rx - threatX, ry - threatY
+    local len = math.sqrt((dx * dx) + (dy * dy))
+    if len < 0.001 then
+        dx, dy = 1, 0
+    else
+        dx, dy = dx / len, dy / len
+    end
+
+    local lastAt = tonumber(record.runtime.lastReloadKiteAt) or (now - 100)
+    local dt = math.max(0.04, math.min(0.25, (now - lastAt) / 1000))
+    record.runtime.lastReloadKiteAt = now
+    local step = math.min(0.34, 1.65 * dt)
+
+    local baseAngle = math.atan2(dy, dx)
+    for i = 1, #RELOAD_KITE_ANGLES do
+        local ang = baseAngle + RELOAD_KITE_ANGLES[i]
+        local nx = rx + math.cos(ang) * step
+        local ny = ry + math.sin(ang) * step
+        if canStepTo(zombie, nx, ny, rz) then
+            if type(zombie.setX) == "function" then zombie:setX(nx) end
+            if type(zombie.setY) == "function" then zombie:setY(ny) end
+            if type(zombie.setNextX) == "function" then zombie:setNextX(nx) end
+            if type(zombie.setNextY) == "function" then zombie:setNextY(ny) end
+            record.x = nx
+            record.y = ny
+            return true, "reloading_kiting"
+        end
+    end
+    return false, "reload_kite_blocked"
+end
+
 return Tactics

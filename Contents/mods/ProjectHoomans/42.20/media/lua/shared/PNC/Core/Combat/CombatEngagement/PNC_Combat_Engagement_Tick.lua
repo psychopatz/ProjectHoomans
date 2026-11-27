@@ -120,6 +120,18 @@ function Engagement.Tick(record, zombie, target)
         actionActive, actionReason =
             Combat.PumpAttackAction(record, zombie)
         if actionActive then
+            if actionReason == "reloading"
+                and Tactics
+                and type(Tactics.StepReloadKite) == "function"
+            then
+                local kited, kiteReason = Tactics.StepReloadKite(
+                    record, zombie, target, Core and Core.Now and Core.Now() or 0
+                )
+                if kited then
+                    setDebug(context, kiteReason or "reloading_kiting")
+                    return true
+                end
+            end
             haltForAttack(context, "committed_attack")
             setDebug(
                 context,

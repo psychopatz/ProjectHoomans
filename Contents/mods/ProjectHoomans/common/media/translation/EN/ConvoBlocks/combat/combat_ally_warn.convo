@@ -60,6 +60,30 @@ dialogue semantic.combat.ally_warn.callout.zombie
     "Damn, thanks {addressee.name}—thought they had me for a second!"
     "Appreciate the save, {addressee.name}! Owe you one!"
     "Whew—good timing, {addressee.name}, thanks for pulling 'em off!"
+  say [role=reloading_panic, combat.style=shaken] as reloading_panic_shaken:
+    "Fuckk, get in there dammit! Reloading—{addressee.name}, cover me!"
+    "Shit, shit—come on, load already! Keep 'em off me, {addressee.name}!"
+    "Oh goddammit, mag won't seat! Cover me, {addressee.name}!"
+  say [role=reloading_panic, combat.style=hostile] as reloading_panic_hostile:
+    "Fuck, get inserted dammit! {addressee.name}, keep these bastards back while I reload!"
+    "Goddammit, I'm dry! Cover my ass, {addressee.name}!"
+  say [role=reloading_panic, combat.style=aggressive] as reloading_panic_aggressive:
+    "Shit, ran dry! Get in there, you piece of crap—cover me, {addressee.name}!"
+    "Fuckk, reloading right in their faces—{addressee.name}, smash 'em back!"
+  say [role=reloading_panic, combat.style=tactical] as reloading_panic_tactical:
+    "Damn it, mag's dry under pressure! {addressee.name}, suppress 'em while I reload!"
+    "Reloading hot—{addressee.name}, hold that lane!"
+  say [role=reloading_panic] as reloading_panic_default:
+    "Fuckk, get inserted dammit! Reloading, {addressee.name}, cover me!"
+    "Shit—come on, come on! {addressee.name}, keep 'em off me while I load!"
+    "Damn it, I'm dry right here! Cover me, {addressee.name}!"
+  say [role=reloading_cover, combat.style=tactical] as reloading_cover_tactical:
+    "Reloading! {addressee.name}, cover my sector!"
+    "Mag out, reloading—watch my front, {addressee.name}!"
+  say [role=reloading_cover] as reloading_cover_default:
+    "Reloading! Cover me, {addressee.name}!"
+    "I'm dry—swapping mags, {addressee.name}, watch my back!"
+    "Reloading here, {addressee.name}, give me a second!"
   say [role=last_one] as last_one:
     "Just this last one left! Put {target.name} down!"
   say [role=bandaging_self] as bandaging_self:
@@ -142,6 +166,30 @@ dialogue semantic.combat.ally_warn.callout.hostile
     "Damn, thanks {addressee.name}—thought they had me for a second!"
     "Appreciate the save, {addressee.name}! Owe you one!"
     "Whew—good timing, {addressee.name}, thanks for pulling 'em off!"
+  say [role=reloading_panic, combat.style=shaken] as reloading_panic_shaken:
+    "Fuckk, get in there dammit! Reloading—{addressee.name}, cover me!"
+    "Shit, shit—come on, load already! Keep 'em off me, {addressee.name}!"
+    "Oh goddammit, mag won't seat! Cover me, {addressee.name}!"
+  say [role=reloading_panic, combat.style=hostile] as reloading_panic_hostile:
+    "Fuck, get inserted dammit! {addressee.name}, keep these bastards back while I reload!"
+    "Goddammit, I'm dry! Cover my ass, {addressee.name}!"
+  say [role=reloading_panic, combat.style=aggressive] as reloading_panic_aggressive:
+    "Shit, ran dry! Get in there, you piece of crap—cover me, {addressee.name}!"
+    "Fuckk, reloading right in their faces—{addressee.name}, smash 'em back!"
+  say [role=reloading_panic, combat.style=tactical] as reloading_panic_tactical:
+    "Damn it, mag's dry under pressure! {addressee.name}, suppress 'em while I reload!"
+    "Reloading hot—{addressee.name}, hold that lane!"
+  say [role=reloading_panic] as reloading_panic_default:
+    "Fuckk, get inserted dammit! Reloading, {addressee.name}, cover me!"
+    "Shit—come on, come on! {addressee.name}, keep 'em off me while I load!"
+    "Damn it, I'm dry right here! Cover me, {addressee.name}!"
+  say [role=reloading_cover, combat.style=tactical] as reloading_cover_tactical:
+    "Reloading! {addressee.name}, cover my sector!"
+    "Mag out, reloading—watch my front, {addressee.name}!"
+  say [role=reloading_cover] as reloading_cover_default:
+    "Reloading! Cover me, {addressee.name}!"
+    "I'm dry—swapping mags, {addressee.name}, watch my back!"
+    "Reloading here, {addressee.name}, give me a second!"
   say [role=last_one] as last_one:
     "Just this last one left! Put {target.name} down!"
   say [role=bandaging_self] as bandaging_self:
@@ -242,6 +290,10 @@ dialogue semantic.combat.ally_warn.reply.defensive
     "Alright, alright, {addressee.name}—I'm moving in!"
     "Shit, sorry {addressee.name}, coming to help right now!"
     "I'm on it, {addressee.name}! Hold tight!"
+  say [role=reloading_cover_reply] as reloading_cover_reply:
+    "Got you covered, {addressee.name}! Load it up!"
+    "Take your time, {addressee.name}, I'll keep 'em off you!"
+    "Covering you, {addressee.name}—hurry up with that mag!"
   say [role=last_one_reply] as last_one_reply:
     "Finish it off, {addressee.name}, I've got your back!"
   say [role=cover_bandage] as cover_bandage_reply:

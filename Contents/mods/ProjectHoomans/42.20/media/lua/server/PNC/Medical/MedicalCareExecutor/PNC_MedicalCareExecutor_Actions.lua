@@ -387,7 +387,10 @@ function Executor.Tick(lease)
                 drifted = true
             end
         end
-        if drifted or not Internal.InTreatmentRange(record, body, patient, patientBody) then
+        local inActiveRange = Internal.InActiveTreatmentRange
+            and Internal.InActiveTreatmentRange(record, body, patient, patientBody)
+            or Internal.InTreatmentRange(record, body, patient, patientBody)
+        if drifted or not inActiveRange then
             local partId = state.partId
             Executor.Cancel(lease, "patient_moved_away")
             if PNC.Tasking and PNC.Tasking.Commands and PNC.Tasking.Commands.CancelForNPC then
@@ -411,21 +414,21 @@ function Executor.Tick(lease)
         end
         return finishLiveTreatment(lease, task, record, body)
     end
-    if Internal.InTreatmentRange(record, body, patient, patientBody) then
-        if Internal.IsPatientAlreadyBeingTreated then
-            local busy, busyReason = Internal.IsPatientAlreadyBeingTreated(
-                record, patient, task.patientKind)
-            if busy then
-                Executor.Cancel(lease, busyReason or "patient_already_treating")
-                if PNC.Tasking and PNC.Tasking.Commands
-                    and PNC.Tasking.Commands.CancelForNPC
-                then
-                    PNC.Tasking.Commands.CancelForNPC(
-                        lease.npcId, "PATIENT_ALREADY_TREATING")
-                end
-                return false, busyReason or "patient_already_treating"
+    if Internal.IsPatientAlreadyBeingTreated then
+        local busy, busyReason = Internal.IsPatientAlreadyBeingTreated(
+            record, patient, task.patientKind)
+        if busy then
+            Executor.Cancel(lease, busyReason or "patient_already_treating")
+            if PNC.Tasking and PNC.Tasking.Commands
+                and PNC.Tasking.Commands.CancelForNPC
+            then
+                PNC.Tasking.Commands.CancelForNPC(
+                    lease.npcId, "PATIENT_ALREADY_TREATING")
             end
+            return false, busyReason or "patient_already_treating"
         end
+    end
+    if Internal.InTreatmentRange(record, body, patient, patientBody) then
         Service.SetPhase(task.id, Status.AT_PATIENT, { actorId = lease.npcId })
         started, startReason = beginTreatment(
             lease, task, record, body, patient, patientBody, now)
@@ -443,7 +446,7 @@ function Executor.Tick(lease)
     setLeasePhase(lease, "TRAVEL")
     moved, movement = Common.MoveRecord(record, body,
         patientBody:getX(), patientBody:getY(), patientBody:getZ(),
-        "walk", 1.2, "medical_care")
+        "walk", 0.85, "medical_care")
     if not moved then return false, movement or "medical_move_failed" end
     state.lastObservedAt = now
     local x, y, z = body:getX(), body:getY(), body:getZ()

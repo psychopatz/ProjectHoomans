@@ -64,6 +64,15 @@ function Combat.PumpAttackAction(record, zombie)
         if target then
             Internal.faceTarget(zombie, target, record, 120, "reload_followthrough")
         end
+        if Firearms and type(Firearms.StepReload) == "function" then
+            local finishedEarly, earlyReason = Firearms.StepReload(record, zombie, action, target, now)
+            if finishedEarly then
+                action.lastResult = true
+                action.lastReason = earlyReason or "reload_finished"
+                Internal.finishAttackAction(record, zombie)
+                return false, action.lastReason
+            end
+        end
         if now >= (tonumber(action.finishAt) or 0) then
             if Firearms and Firearms.CompleteReload then
                 action.lastResult, action.lastReason = Firearms.CompleteReload(record, zombie, action)

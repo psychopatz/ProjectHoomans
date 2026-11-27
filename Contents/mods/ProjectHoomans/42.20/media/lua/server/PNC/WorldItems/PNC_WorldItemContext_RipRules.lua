@@ -46,11 +46,13 @@ local function isClothingObject(item, categoryStr)
         or categoryStr == "clothing"
 end
 
-function RipRules.InspectRippable(item, fullType, categoryStr)
+function RipRules.InspectRippable(item, fullType, categoryStr, options)
     local favorite = safeCall(item, "isFavorite") == true
         or (type(item) == "table" and item.favorite == true)
     if favorite then return nil end
-    if safeCall(item, "isEquipped") == true then return nil end
+    local allowEquipped = type(options) == "table"
+        and (options.allowEquipped == true or options.sourceType == "corpse")
+    if not allowEquipped and safeCall(item, "isEquipped") == true then return nil end
 
     local fabricRaw = safeCall(item, "getFabricType")
         or (type(item) == "table" and item.fabricType) or nil

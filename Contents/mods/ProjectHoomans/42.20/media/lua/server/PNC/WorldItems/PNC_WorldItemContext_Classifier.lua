@@ -98,7 +98,7 @@ local function classifyCategories(item, fullType, cat, util, food, isMed, rip)
     return cats
 end
 
-function Classifier.InspectItem(item)
+function Classifier.InspectItem(item, options)
     if not item then return nil end
     local fullType = tostring(safeCall(item, "getFullType")
         or (type(item) == "table" and (item.fullType or item.type)) or "")
@@ -112,7 +112,7 @@ function Classifier.InspectItem(item)
         and PNC.ItemUtility.DescribeItem(item, 1) or nil
 
     local rip = RipRules and RipRules.InspectRippable
-        and RipRules.InspectRippable(item, fullType, cat) or nil
+        and RipRules.InspectRippable(item, fullType, cat, options) or nil
     local food = classifyFood(item, cat, util)
     local isMed, isBandage = isMedicalType(fullType, cat, util)
     return {

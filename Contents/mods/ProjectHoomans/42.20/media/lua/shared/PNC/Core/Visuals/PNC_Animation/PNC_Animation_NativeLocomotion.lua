@@ -99,6 +99,14 @@ function Animation.SyncNativeLocomotionStyle(zombie, record)
                 and zombie:getPath2() ~= nil
                 and progressFresh
         )
+    local isCrawlingNow = (profile and profile.isCrawling == true)
+        or (path and path.isCrawling == true)
+        or false
+    if Internal.resolveContinuousRangedAim then
+        engineWalkType = Internal.resolveContinuousRangedAim(
+            zombie, record, engineWalkType, isCrawlingNow
+        )
+    end
     Internal.setPNCStateVars(
         zombie,
         record,

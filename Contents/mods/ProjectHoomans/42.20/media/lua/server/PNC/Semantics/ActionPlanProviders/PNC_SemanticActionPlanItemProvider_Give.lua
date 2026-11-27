@@ -87,6 +87,30 @@ function Provider.Give.Start(plan, step, record)
     if transferred ~= true then
         return { blocked = true, reason = transferReason or "item_transfer_failed" }
     end
+
+    -- Play the 1-handed handover animation with the actual item prop visible
+    -- in the NPC's hand (via ActionProps -> ClientActionProps).
+    local reg = PNC and PNC.Registry or nil
+    local scenes = PNC and PNC.AnimationScenes or nil
+    local body = reg and type(reg.GetLiveZombie) == "function"
+        and reg.GetLiveZombie(record.id) or nil
+    if body and player and type(body.faceThisObject) == "function" then
+        pcall(body.faceThisObject, body, player)
+    elseif body and player and type(body.faceLocation) == "function"
+        and type(player.getX) == "function" and type(player.getY) == "function"
+    then
+        pcall(body.faceLocation, body, player:getX(), player:getY())
+    end
+    if scenes and type(scenes.Request) == "function" and selection.fullType then
+        pcall(scenes.Request, record, body, "social.item_share_give", {
+            reason = "semantic_give_item",
+            propPrimary = selection.fullType,
+        })
+    elseif selection.fullType then
+        record.runtime = record.runtime or {}
+        record.runtime.sceneActionProps = { primary = selection.fullType }
+    end
+
     return { complete = true, result = {
         itemID = selection.itemID,
         fullType = selection.fullType,
