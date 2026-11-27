@@ -22,6 +22,16 @@ function H.RunBatch(at, budget, cursorName, predicate)
         Traversal[cursorName] = (Traversal[cursorName] % #groups) + 1
         local group = groups[Traversal[cursorName]]
         if predicate(group) then
+            if group.state == "TRAVELING" then
+                if type(Traversal.EvaluateWeatherShelter) == "function" then
+                    Traversal.EvaluateWeatherShelter(group, at)
+                end
+                if PNC.AbstractAftermathService
+                    and type(PNC.AbstractAftermathService.MaybePublishSighting) == "function"
+                then
+                    PNC.AbstractAftermathService.MaybePublishSighting(group, at)
+                end
+            end
             Traversal.Advance(group, at)
             processed = processed + 1
         end

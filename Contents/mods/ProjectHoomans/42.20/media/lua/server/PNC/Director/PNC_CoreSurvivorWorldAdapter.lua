@@ -254,8 +254,14 @@ function Adapter.CommitGroup(group, reason)
     if not current then return nil, failure end
     current, failure = ensureFactionDependency(current, group, "group")
     if not current then return nil, failure end
+    local payload = group
+    if reason == "group_members_reconciled" or reason == "dissolved_empty_group" then
+        payload = {}
+        for k, v in pairs(group) do payload[k] = v end
+        payload.allowEmptyMembers = true
+    end
     local canonical
-    canonical, failure = current:UpsertGroup(group)
+    canonical, failure = current:UpsertGroup(payload)
     if not canonical then return nil, failure end
     local ok
     ok, failure = dirty(reason or "pnc_group_mutation")

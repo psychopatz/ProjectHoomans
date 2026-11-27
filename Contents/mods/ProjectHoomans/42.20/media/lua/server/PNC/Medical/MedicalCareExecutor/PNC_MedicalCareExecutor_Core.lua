@@ -196,12 +196,22 @@ function Internal.Patient(task)
     return Registry and Registry.Get and Registry.Get(task.patientId) or nil
 end
 
-function Internal.Treatable(patient, task)
+function Internal.IsPatientAvailable(patient, task)
+    if not patient then return false end
     if task and task.patientKind == "player" then
+        return not (patient.isDead and patient:isDead() == true)
+    end
+    return type(patient) == "table" and patient.alive ~= false
+end
+
+function Internal.Treatable(patient, task)
+    if (task and task.patientKind == "player")
+        or (patient and type(patient) ~= "table" and patient.getBodyDamage)
+    then
         local info = Internal.FindTreatablePlayerPart and Internal.FindTreatablePlayerPart(patient) or nil
         return info and { info } or {}
     end
-    if not patient or not Wounds
+    if type(patient) ~= "table" or not Wounds
         or not Wounds.GetTreatableWounds
     then
         return {}
@@ -210,11 +220,13 @@ function Internal.Treatable(patient, task)
 end
 
 function Executor.CurrentPart(patient, task)
-    if task and task.patientKind == "player" then
+    if (task and task.patientKind == "player")
+        or (patient and type(patient) ~= "table" and patient.getBodyDamage)
+    then
         local info = Internal.FindTreatablePlayerPart and Internal.FindTreatablePlayerPart(patient) or nil
         return info and info.partId or nil, info
     end
-    local entries = Internal.Treatable(patient)
+    local entries = Internal.Treatable(patient, task)
     return entries[1] and tostring(entries[1].partId) or nil, entries[1]
 end
 Internal.CurrentPart = Executor.CurrentPart

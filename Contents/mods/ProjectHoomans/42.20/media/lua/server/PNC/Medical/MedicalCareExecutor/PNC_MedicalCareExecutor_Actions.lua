@@ -171,7 +171,7 @@ end
 
 local function treatAbstract(lease, task, record)
     local patient = Internal.Patient(task)
-    local partId = Internal.CurrentPart(patient)
+    local partId = Internal.CurrentPart(patient, task)
     local applied, reason
     if not partId then
         Service.Complete(task.id, "patient_wound_resolved")

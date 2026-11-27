@@ -403,6 +403,46 @@ function Test.contains(value, fragment, label)
     end
 end
 
+local rawType = rawget(_G, "__pncRawType") or type
+local javaTypeShimInstalled = false
+
+local function installJavaObjectTypeShim()
+    if javaTypeShimInstalled then return end
+    javaTypeShimInstalled = true
+    rawset(_G, "__pncRawType", rawType)
+    _G.type = function(value)
+        if rawType(value) == "table" then
+            local mt = getmetatable(value)
+            if rawType(mt) == "table" and mt.__pncJavaUserdata == true then
+                return "userdata"
+            end
+        end
+        return rawType(value)
+    end
+end
+
+-- Simulates a Kahlua2 Java userdata object (e.g. IsoPlayer, IsoZombie, BodyPart):
+-- type(obj) == "userdata", unknown reads return nil, any field write throws
+-- "attempted index of non-table", and pairs(obj) fails like userdata.
+function Test.javaObject(methods, label)
+    installJavaObjectTypeShim()
+    local className = tostring(label or "JavaObject")
+    local members = rawType(methods) == "table" and methods or {}
+    return setmetatable({}, {
+        __pncJavaUserdata = true,
+        __index = members,
+        __newindex = function(_, key)
+            error("attempted index of non-table (" .. className .. "." .. tostring(key) .. ")", 2)
+        end,
+        __pairs = function()
+            error("bad argument #1 to 'pairs' (table expected, got userdata: " .. className .. ")", 2)
+        end,
+        __tostring = function()
+            return className .. ":userdata"
+        end,
+    })
+end
+
 function Test.finish(name)
     if os.getenv("PZ_TEST_VERBOSE") == "1" then
         print(tostring(name or "test") .. ": ok")

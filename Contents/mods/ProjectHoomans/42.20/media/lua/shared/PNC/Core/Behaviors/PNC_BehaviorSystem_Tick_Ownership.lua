@@ -195,10 +195,20 @@ function H.Run(record, zombie, now)
 
     local behaviorLoot = PNC.BehaviorLoot
     if behaviorLoot and type(behaviorLoot.Tick) == "function" then
-        local leader = nil
-        local ownerPlayer = nil
         local isFollowing = type(record.orderSpec) == "table"
             and tostring(record.orderSpec.kind or "") == "follow"
+        -- Distance-based live AI LOD: throttle non-combat looting by ~2.5x
+        -- for edge-of-screen NPCs (> 20 tiles from nearest player).
+        local nearestDistSq = tonumber(record.runtime and record.runtime.nearestPlayerDistSq)
+        if not isFollowing and nearestDistSq and nearestDistSq > 400 then
+            local nextAllowed = tonumber(record.runtime and record.runtime.nextEdgeLootAt) or 0
+            if now < nextAllowed then
+                return false
+            end
+            record.runtime.nextEdgeLootAt = now + 2500
+        end
+        local leader = nil
+        local ownerPlayer = nil
         if isFollowing and type(getSpecificPlayer) == "function" then
             local okP, p = pcall(getSpecificPlayer, 0)
             if okP and p then

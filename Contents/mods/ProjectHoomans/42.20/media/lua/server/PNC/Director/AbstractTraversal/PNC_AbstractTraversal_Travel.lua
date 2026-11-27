@@ -12,6 +12,8 @@ local ResourceNeeds = PNC.AbstractResourceNeeds
 local Config = PNC.DirectorConfig
 local CoreGroupTravel = require
     "PNC/Core/Director/PNC_CoreGroupTraversalBridge"
+local TravelConditions = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldTravelConditions"
 
 function Traversal.CalculateTravelHours(group, target)
     local dx, dy = target.x - group.location.x, target.y - group.location.y
@@ -21,9 +23,55 @@ function Traversal.CalculateTravelHours(group, target)
         tonumber(needs.fatigue) or 0
     ))
     local fatigueModifier = 1 - fatigue * 0.35
-    local speed = Config.TRAVEL_SPEED_TILES_PER_HOUR * fatigueModifier
+    local cond = TravelConditions and TravelConditions.Evaluate
+        and TravelConditions.Evaluate() or nil
+    local envModifier = cond and tonumber(cond.speedMultiplier) or 1.0
+    local speed = Config.TRAVEL_SPEED_TILES_PER_HOUR * fatigueModifier * envModifier
     return math.max(Config.MIN_TRAVEL_HOURS,
         math.min(Config.MAX_TRAVEL_HOURS, distance / math.max(1, speed))), distance
+end
+
+-- Opportunistically pause a traveling group in a nearby MetaGrid building
+-- during heavy storms or rainy nights so players encounter sheltering travelers.
+function Traversal.EvaluateWeatherShelter(group, at, envOverride)
+    if type(group) ~= "table" or group.state ~= "TRAVELING"
+        or type(group.journey) ~= "table" or group.journey.state ~= "en_route"
+    then
+        return false, "not_en_route"
+    end
+    local cond = TravelConditions and TravelConditions.Evaluate
+        and TravelConditions.Evaluate(envOverride) or nil
+    if not cond or cond.shouldSeekShelter ~= true then
+        group.shelteringForWeather = nil
+        return false, "weather_clear"
+    end
+    if group.shelteringForWeather == true then
+        return false, "already_sheltered"
+    end
+    local gx = tonumber(group.journey.x) or (group.location and tonumber(group.location.x)) or 0
+    local gy = tonumber(group.journey.y) or (group.location and tonumber(group.location.y)) or 0
+    local shelterPos = nil
+    local resolver = PNC.CommunitySiteResolver
+    if resolver and type(resolver.FindAvailableNear) == "function" then
+        local site = resolver.FindAvailableNear(gx, gy, 0, 50)
+        if type(site) == "table" and type(site.home) == "table" then
+            shelterPos = site.home
+        end
+    end
+    group.journey.state = "waiting"
+    group.journey.waitRemainingHours = 1.5
+    if shelterPos then
+        group.journey.x = shelterPos.x
+        group.journey.y = shelterPos.y
+    end
+    group.shelteringForWeather = true
+    group.diagnostics = group.diagnostics or {}
+    group.diagnostics.weatherShelter = {
+        at = tonumber(at) or 0,
+        reason = cond.reason,
+        inBuilding = shelterPos ~= nil,
+    }
+    return true, cond.reason
 end
 
 function Traversal.Begin(groupOrID, targetOrID, at)

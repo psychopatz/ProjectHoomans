@@ -25,26 +25,40 @@ function Executor.NotifyBandageSupportState(task, state)
     return sendSupplyState(task, state)
 end
 
+local function isPatientAvailable(patient, task)
+    if Internal.IsPatientAvailable then
+        return Internal.IsPatientAvailable(patient, task)
+    end
+    if not patient then return false end
+    if task and task.patientKind == "player" then
+        return not (patient.isDead and patient:isDead() == true)
+    end
+    return type(patient) == "table" and patient.alive ~= false
+end
+
 local function tryShareBandage(task)
     local patient = Internal.Patient(task)
     local requester = task and Registry and Registry.Get
         and Registry.Get(task.supplyRequesterId) or nil
     local donors
-    if not patient or patient.alive == false or not requester
+    if not isPatientAvailable(patient, task) or not requester
         or requester.alive == false or combatActive(requester)
     then
         return false, "medical_bandage_share_unavailable"
     end
     donors = {}
     if Registry and type(Registry.ForEach) == "function" then
+        local isPlayerPatient = task and task.patientKind == "player"
+        local patientKey = not isPlayerPatient and type(patient) == "table"
+            and tostring(patient.id or "") or ""
         Registry.ForEach(function(record)
             if record and record.alive ~= false
                 and tostring(record.id or "") ~= tostring(requester.id)
-                and tostring(record.id or "") ~= tostring(patient.id)
+                and (isPlayerPatient or tostring(record.id or "") ~= patientKey)
                 and not (record.health
                     and record.health.state == "incapacitated")
                 and not combatActive(record)
-                and Internal.SameCareGroup(record, patient)
+                and Internal.SameCareGroup(record, isPlayerPatient and requester or patient)
             then
                 donors[#donors + 1] = record
             end
@@ -127,10 +141,10 @@ function Executor.RequestBandageSupport(taskID)
         return false, "medical_supply_request_inactive"
     end
     patient = Internal.Patient(task)
-    if not patient or patient.alive == false then
+    if not isPatientAvailable(patient, task) then
         return false, "medical_patient_unavailable"
     end
-    if not Internal.CurrentPart(patient) then
+    if not Internal.CurrentPart(patient, task) then
         Service.Complete(task.id, "patient_wound_resolved")
         return false, "patient_wound_resolved"
     end
@@ -190,7 +204,8 @@ function Executor.RequestBandageSupport(taskID)
                         patient = patient,
                         taskId = task.id,
                         sourceType = ripIntent and ripIntent.candidate and ripIntent.candidate.sourceType or nil,
-                        incapacitated = patient.health and patient.health.state == "incapacitated",
+                        incapacitated = type(patient) == "table" and patient.health
+                            and patient.health.state == "incapacitated" or false,
                         now = at,
                     }, at)
                 end

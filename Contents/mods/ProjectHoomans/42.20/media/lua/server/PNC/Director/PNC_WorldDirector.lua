@@ -251,6 +251,9 @@ function Director.Initialize(force)
             if PNC.AbstractAftermathService and PNC.AbstractAftermathService.PruneExpired then
                 PNC.AbstractAftermathService.PruneExpired(at)
             end
+            if PNC.AbstractAftermathMaterializer and PNC.AbstractAftermathMaterializer.Pump then
+                PNC.AbstractAftermathMaterializer.Pump(at, 2)
+            end
             return advanced
         end,
         { budget = Config.DIRECTOR_JOB_BUDGET,

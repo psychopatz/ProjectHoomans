@@ -52,6 +52,17 @@ local function requesterForTask(task, doctors)
     return doctors[1]
 end
 
+local function isPatientAvailable(patient, task)
+    if Internal.IsPatientAvailable then
+        return Internal.IsPatientAvailable(patient, task)
+    end
+    if not patient then return false end
+    if task and task.patientKind == "player" then
+        return not (patient.isDead and patient:isDead() == true)
+    end
+    return type(patient) == "table" and patient.alive ~= false
+end
+
 local function preflightMissingSupply(task, at)
     local patient
     local doctors
@@ -70,7 +81,9 @@ local function preflightMissingSupply(task, at)
     if last ~= nil and at - last < SUPPLY_PREFLIGHT_MS then return nil end
     lastSupplyPreflightAt[key] = at
     patient = Internal.Patient(task)
-    if not patient or patient.alive == false or not Internal.CurrentPart(patient) then
+    if not isPatientAvailable(patient, task)
+        or not Internal.CurrentPart(patient, task)
+    then
         return nil
     end
     doctors = groupDoctors(task, patient)
@@ -197,7 +210,8 @@ local function sendSupplyState(task, state)
             medicalSupplyRequestID = requestID,
             medicalSupplyTaskID = tostring(task.id),
             medicalSupplyRequesterID = tostring(requester.id),
-            victimNPCID = tostring(patient.id),
+            victimNPCID = tostring(task.patientId
+                or (type(patient) == "table" and patient.id) or ""),
             downedNeed = state == "needed" and "rescue" or nil,
             socialRole = role,
             npcType = role,

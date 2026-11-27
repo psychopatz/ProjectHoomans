@@ -16,6 +16,76 @@ Tactics.FLANK_DISTANCE = 14
 Tactics.FLEE_DISTANCE = 18
 Tactics.OVERWHELMING_COUNT = 10
 Tactics.MEDIUM_COUNT = 4
+Tactics.CALLOUT_COOLDOWN_MS = 15000
+Tactics.GroupCache = Tactics.GroupCache or {}
+Tactics.MAX_GROUP_CACHE = 32
+
+local CALLOUT_LINES = {
+    flank = "Dead ahead — flanking around!",
+    flee = "Too many! Break contact!",
+    engage = "Watch out — clearing one!",
+}
+
+local function emitTacticalCallout(record, zombie, prevAction, nextAction, now)
+    local line = CALLOUT_LINES[nextAction]
+    if not line or prevAction == nextAction then return false end
+    record.runtime = record.runtime or {}
+    local lastAt = tonumber(record.runtime.lastTacticalCalloutAt) or 0
+    if (now - lastAt) < Tactics.CALLOUT_COOLDOWN_MS then return false end
+    record.runtime.lastTacticalCalloutAt = now
+    if PNC.Speech and type(PNC.Speech.Say) == "function" then
+        pcall(PNC.Speech.Say, record, zombie, line)
+        return true
+    elseif zombie and type(zombie.Say) == "function" then
+        pcall(zombie.Say, zombie, line)
+        return true
+    end
+    return false
+end
+
+local FORMATION_OFFSETS = {
+    { x = 0, y = 0 },
+    { x = 2, y = 1 },
+    { x = -2, y = 1 },
+    { x = 1, y = -2 },
+    { x = -1, y = -2 },
+}
+
+local function resolveSquadContext(record)
+    local travel = type(record and record.travel) == "table" and record.travel or nil
+    local groupID = (travel and travel.handoffGroupId) or (record and record.groupID) or nil
+    if not groupID and PNC.AbstractGroups and type(PNC.AbstractGroups.FindByMember) == "function"
+        and record and record.id
+    then
+        local grp = PNC.AbstractGroups.FindByMember(record.id)
+        if type(grp) == "table" and grp.id then
+            groupID = grp.id
+        end
+    end
+    if not groupID then return nil, 1 end
+    local slot = 1
+    local idStr = tostring(record and record.id or "")
+    local hash = 0
+    for i = 1, #idStr do
+        hash = (hash * 31 + string.byte(idStr, i)) % 997
+    end
+    slot = (hash % #FORMATION_OFFSETS) + 1
+    return tostring(groupID), slot
+end
+
+local function applyFormationOffset(decision, slot)
+    if type(decision) ~= "table" or not decision.moveX or not decision.moveY then
+        return decision
+    end
+    local off = FORMATION_OFFSETS[slot] or FORMATION_OFFSETS[1]
+    if off.x == 0 and off.y == 0 then return decision end
+    local out = {}
+    for k, v in pairs(decision) do out[k] = v end
+    out.moveX = decision.moveX + off.x
+    out.moveY = decision.moveY + off.y
+    out.squadShared = true
+    return out
+end
 
 local function bodyPosition(record, zombie)
     local x = zombie and zombie.getX and tonumber(zombie:getX()) or tonumber(record and record.x) or 0
@@ -133,6 +203,29 @@ function Tactics.Evaluate(record, zombie, target, now)
         return cache.lastDecision
     end
 
+    -- Squad-shared tactics cache: 1 SpatialIndex scan per traveling group instead of N.
+    local groupID, formationSlot = resolveSquadContext(record)
+    if groupID then
+        local gEntry = Tactics.GroupCache[groupID]
+        if type(gEntry) == "table"
+            and gEntry.lastScanAt ~= nil
+            and (now - gEntry.lastScanAt) < Tactics.SCAN_INTERVAL_MS
+            and type(gEntry.lastDecision) == "table"
+        then
+            local shared = applyFormationOffset(gEntry.lastDecision, formationSlot)
+            if shared.action == "flee" then
+                record.runtime.fleeingFromThreat = true
+            else
+                record.runtime.fleeingFromThreat = nil
+            end
+            record.runtime.travelTactics = {
+                lastScanAt = now,
+                lastDecision = shared,
+            }
+            return shared
+        end
+    end
+
     local threats = scanNearbyThreats(record, zombie, target, Tactics.SCAN_RADIUS)
     local bx, by, bz = bodyPosition(record, zombie)
     local decision = { action = "proceed", threatCount = threats.count }
@@ -217,6 +310,23 @@ function Tactics.Evaluate(record, zombie, target, now)
         record.runtime.fleeingFromThreat = nil
     end
 
+    if groupID then
+        local count = 0
+        for _ in pairs(Tactics.GroupCache) do count = count + 1 end
+        if count >= Tactics.MAX_GROUP_CACHE then
+            Tactics.GroupCache = {}
+        end
+        Tactics.GroupCache[groupID] = {
+            lastScanAt = now,
+            lastDecision = decision,
+        }
+        decision = applyFormationOffset(decision, formationSlot)
+    end
+    local prevAction = type(cache) == "table" and type(cache.lastDecision) == "table"
+        and cache.lastDecision.action or "proceed"
+    if decision.action ~= "proceed" then
+        emitTacticalCallout(record, zombie, prevAction, decision.action, now)
+    end
     record.runtime.travelTactics = {
         lastScanAt = now,
         lastDecision = decision,

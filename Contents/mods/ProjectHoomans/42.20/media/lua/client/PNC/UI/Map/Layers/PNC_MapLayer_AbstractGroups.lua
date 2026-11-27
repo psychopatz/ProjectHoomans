@@ -73,65 +73,8 @@ function GroupLayer.Update(force)
         snapshot.population and snapshot.population.selectedSectorId)
 end
 
--- Core's PsychopatzSurvivorWorldActorMap is the canonical route renderer for
--- groups with a Core journey. Only draw a fallback route here if a group has
--- no Core journey yet (prevents duplicate/overlapping lines of different colors).
-local function shouldDrawFallbackRoute(group)
-    if type(group) ~= "table" then return false end
-    if type(group.journey) == "table" and group.journey.state == "en_route" then
-        return false
-    end
-    return group.mobile ~= nil or group.state == "TRAVELING"
-end
-
-local function drawRoute(map, group, color)
-    if not map.javaObject or not map.javaObject.DrawLine then
-        return
-    end
-    local route = group and type(group.journey) == "table"
-        and type(group.journey.route) == "table"
-        and group.journey.route or nil
-    local points = route and route.points or nil
-    if type(points) == "table" and #points >= 2 then
-        for i = 1, #points - 1 do
-            local a = points[i]
-            local b = points[i + 1]
-            if a and b and a.x and a.y and b.x and b.y then
-                local x1 = map.mapAPI:worldToUIX(a.x, a.y)
-                local y1 = map.mapAPI:worldToUIY(a.x, a.y)
-                local x2 = map.mapAPI:worldToUIX(b.x, b.y)
-                local y2 = map.mapAPI:worldToUIY(b.x, b.y)
-                map.javaObject:DrawLine(nil, x1, y1, x2, y2, 2,
-                    color.r, color.g, color.b, 0.70)
-            end
-        end
-        local last = points[#points]
-        if last and last.x and last.y then
-            local lx = map.mapAPI:worldToUIX(last.x, last.y)
-            local ly = map.mapAPI:worldToUIY(last.x, last.y)
-            local size = 7
-            map:drawRectBorder(lx - size / 2, ly - size / 2,
-                size, size, 1, color.r, color.g, color.b)
-        end
-        return
-    end
-    local location = group and group.location
-    local target = group and group.mobile
-        and MobileModel.Target(group.mobile, group)
-        or group and group.targetLocation
-    if not location or not target or not target.x or not target.y then
-        return
-    end
-    local x1 = map.mapAPI:worldToUIX(location.x, location.y)
-    local y1 = map.mapAPI:worldToUIY(location.x, location.y)
-    local x2 = map.mapAPI:worldToUIX(target.x, target.y)
-    local y2 = map.mapAPI:worldToUIY(target.x, target.y)
-    map.javaObject:DrawLine(nil, x1, y1, x2, y2, 2,
-        color.r, color.g, color.b, 0.62)
-    local size = 7
-    map:drawRectBorder(x2 - size / 2, y2 - size / 2,
-        size, size, 1, color.r, color.g, color.b)
-end
+-- Route polylines are owned exclusively by PsychopatzCore.SurvivorWorldActorMap.
+-- This layer renders only abstract group dots and the combat-math hover box.
 
 function GroupLayer.FormatHoverLines(group)
     local members = #(group.memberIds or {})
@@ -316,9 +259,6 @@ function GroupLayer.Render(map)
             local x = map.mapAPI:worldToUIX(px, py)
             local y = map.mapAPI:worldToUIY(px, py)
             local color = markerColor(group)
-            if shouldDrawFallbackRoute(group) then
-                drawRoute(map, group, color)
-            end
             local dx, dy = mouseX - x, mouseY - y
             local isHovered = dx * dx + dy * dy <= 64
             local size = isHovered and 10 or 7

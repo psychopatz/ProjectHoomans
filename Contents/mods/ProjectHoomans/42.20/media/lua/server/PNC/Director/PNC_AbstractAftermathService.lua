@@ -15,6 +15,8 @@ local Aftermath = PNC.AbstractAftermathService
 local Store = PNC.HoomansWorldView
 local WorldEvents = require
     "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldEvents"
+local TownCatalog = require
+    "PNC/ConvoEngine/Dialogue/WorldMapTownCatalog"
 
 Aftermath.Sites = Aftermath.Sites or {}
 Aftermath.RecentBroadcasts = Aftermath.RecentBroadcasts or {}
@@ -82,26 +84,75 @@ function Aftermath.RestoreFromStore(at)
     return #Aftermath.Sites
 end
 
-local function approxCoordsLabel(x, y)
-    local gx = math.floor((tonumber(x) or 0) / 100) * 100
-    local gy = math.floor((tonumber(y) or 0) / 100) * 100
-    return string.format("sector %d, %d", gx, gy)
+local function cardinalDirection(dx, dy)
+    local angle = math.atan2(dy, dx)
+    local deg = angle * (180 / math.pi)
+    if deg < 0 then deg = deg + 360 end
+    -- PZ world coords: +x = east, +y = south, -y = north, -x = west.
+    if deg >= 337.5 or deg < 22.5 then return "east" end
+    if deg < 67.5 then return "southeast" end
+    if deg < 112.5 then return "south" end
+    if deg < 157.5 then return "southwest" end
+    if deg < 202.5 then return "west" end
+    if deg < 247.5 then return "northwest" end
+    if deg < 292.5 then return "north" end
+    return "northeast"
+end
+
+local function describeLocation(x, y)
+    x = tonumber(x) or 0
+    y = tonumber(y) or 0
+    if TownCatalog and type(TownCatalog.ResolveTownAt) == "function" then
+        local exact = TownCatalog.ResolveTownAt(x, y)
+        if exact and exact ~= "" then
+            return "in " .. tostring(exact)
+        end
+    end
+    if TownCatalog and type(TownCatalog.GetTowns) == "function" then
+        local towns = TownCatalog.GetTowns() or {}
+        local bestTown, bestDistSq = nil, 3500 * 3500
+        local bestCx, bestCy = 0, 0
+        for i = 1, #towns do
+            local t = towns[i]
+            if t and t.x1 and t.x2 and t.y1 and t.y2 and t.name then
+                local cx = (t.x1 + t.x2) * 0.5
+                local cy = (t.y1 + t.y2) * 0.5
+                local dx, dy = x - cx, y - cy
+                local d2 = dx * dx + dy * dy
+                if d2 < bestDistSq then
+                    bestDistSq = d2
+                    bestTown = t.name
+                    bestCx, bestCy = cx, cy
+                end
+            end
+        end
+        if bestTown then
+            return cardinalDirection(x - bestCx, y - bestCy) .. " of " .. tostring(bestTown)
+        end
+    end
+    local gx = math.floor(x / 100) * 100
+    local gy = math.floor(y / 100) * 100
+    return string.format("near sector %d, %d", gx, gy)
 end
 
 local function buildRadioText(event)
     local kind = tostring(event and event.kind or "SKIRMISH")
-    local loc = approxCoordsLabel(event and event.x, event and event.y)
+    local loc = describeLocation(event and event.x, event and event.y)
     if kind == "COLONIST_SOS" then
         local name = tostring(event.npcName or event.npcId or "A survivor")
         local refuge = tostring(event.refugeKind or "area")
-        return name .. " broadcast an SOS from a " .. refuge .. " near " .. loc .. "."
+        return name .. " broadcast an SOS from a " .. refuge .. " " .. loc .. "."
     elseif kind == "COLONIST_DEAD" then
         local name = tostring(event.npcName or event.npcId or "A survivor")
-        return "Radio silence from " .. name .. " near " .. loc .. " — gear may still be out there."
+        return "Radio silence from " .. name .. " " .. loc .. " — gear may still be out there."
     elseif kind == "HAZARD_OVERWHELMED" then
-        return "Heavy gunfire and screams heard near " .. loc .. " before the signal cut out."
+        return "Heavy gunfire and screams heard " .. loc .. " before the signal cut out."
+    elseif kind == "CARAVAN_SIGHTING" then
+        return "Trader caravan spotted moving " .. loc .. "."
+    elseif kind == "LOOTER_ACTIVITY" then
+        return "Armed looters reported moving " .. loc .. "."
     end
-    return "Skirmish reported along the road near " .. loc .. "."
+    return "Skirmish reported along the road " .. loc .. "."
 end
 
 function Aftermath.PruneExpired(at)
@@ -229,6 +280,68 @@ function Aftermath.OnOffCameraOutcome(event, at)
     end
     Aftermath.BroadcastOutcome(event, now)
     return site
+end
+
+Aftermath.SIGHTING_GROUP_COOLDOWN_HOURS = 12
+Aftermath.SIGHTING_GLOBAL_COOLDOWN_HOURS = 6
+Aftermath._lastSightingGlobalAt = Aftermath._lastSightingGlobalAt or -100
+Aftermath._sightingGroupCooldowns = Aftermath._sightingGroupCooldowns or {}
+
+-- Lightweight, cooldown-gated radio sightings for passing traders and looters.
+function Aftermath.MaybePublishSighting(group, at)
+    if type(group) ~= "table" or group.state ~= "TRAVELING"
+        or type(group.journey) ~= "table" or group.journey.state ~= "en_route"
+    then
+        return false, "not_traveling"
+    end
+    local gType = string.upper(tostring(group.groupType or ""))
+    local kind = nil
+    if gType == "TRADER" or gType == "CARAVAN" then
+        kind = "CARAVAN_SIGHTING"
+    elseif gType == "LOOTER" or gType == "RAIDER" then
+        kind = "LOOTER_ACTIVITY"
+    else
+        return false, "unsupported_type"
+    end
+    local now = nowHours(at)
+    if (now - (tonumber(Aftermath._lastSightingGlobalAt) or -100)) < Aftermath.SIGHTING_GLOBAL_COOLDOWN_HOURS then
+        return false, "global_cooldown"
+    end
+    local gid = tostring(group.id or "")
+    local nextAllowed = tonumber(Aftermath._sightingGroupCooldowns[gid]) or 0
+    if now < nextAllowed then
+        return false, "group_cooldown"
+    end
+    local gx = tonumber(group.journey.x) or (group.location and tonumber(group.location.x))
+    local gy = tonumber(group.journey.y) or (group.location and tonumber(group.location.y))
+    if not gx or not gy then return false, "no_coords" end
+
+    Aftermath._lastSightingGlobalAt = now
+    Aftermath._sightingGroupCooldowns[gid] = now + Aftermath.SIGHTING_GROUP_COOLDOWN_HOURS
+
+    local ev = {
+        kind = kind,
+        x = gx,
+        y = gy,
+        z = 0,
+        groupId = gid,
+        groupType = gType,
+        at = now,
+    }
+    WorldEvents.Publish({
+        kind = kind,
+        ownerMod = "ProjectHoomans",
+        x = gx,
+        y = gy,
+        z = 0,
+        radius = 40,
+        ttlHours = 6,
+        summary = buildRadioText(ev),
+        tags = { sighting = true, groupType = gType },
+        payload = { groupId = gid, groupType = gType, materialized = true },
+    }, now)
+    Aftermath.BroadcastOutcome(ev, now)
+    return true, kind
 end
 
 function Aftermath.GetDebugSnapshot()

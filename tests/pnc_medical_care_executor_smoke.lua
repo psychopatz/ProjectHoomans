@@ -172,6 +172,14 @@ PNC.MedicalCareService.SetPhase = function(id, phase, options)
     if options.actorId ~= nil then task.actorId = tostring(options.actorId) end
     if options.clearActor then task.actorId = nil end
     if options.clearReservation then task.reservationId = nil end
+    if options.supplyRequesterId ~= nil then
+        task.supplyRequesterId = tostring(options.supplyRequesterId)
+    end
+    if options.supplyRequestId ~= nil then
+        task.supplyRequestId = tostring(options.supplyRequestId)
+    elseif phase == Status.WAITING_FOR_SUPPLY and not task.supplyRequestId then
+        task.supplyRequestId = "medical-bandage:" .. tostring(task.id) .. ":1"
+    end
     task.blockedReason = options.blockedReason or task.blockedReason
     task.lastProgressAt = now
     return true
@@ -349,5 +357,63 @@ local searchesBeforeRetry = donorSearches
 T.truthy(Executor.RequestBandageSupport(supplyTask.id))
 T.equal(donorSearches - searchesBeforeRetry, 3,
     "expired throttle allows another donor scan")
+
+-- Regression: player-patient supply preflight and RequestBandageSupport must
+-- route through player wound inspection rather than NPCWounds.GetTreatableWounds.
+local playerPart = T.javaObject({
+    getIndex = function() return 0 end,
+    getType = function() return "ForeArm_L" end,
+    bandaged = function() return false end,
+    isBandageDirty = function() return false end,
+    bleeding = function() return true end,
+    getBleedingTime = function() return 5 end,
+    bitten = function() return false end,
+    isCut = function() return true end,
+    scratched = function() return false end,
+    isDeepWounded = function() return false end,
+    getBurnTime = function() return 0 end,
+}, "BodyPart")
+local mockPlayer = T.javaObject({
+    isDead = function() return false end,
+    getOnlineID = function() return 7 end,
+    getUsername = function() return "tester" end,
+    getBodyDamage = function()
+        return T.javaObject({
+            getBodyParts = function()
+                return T.javaObject({
+                    size = function() return 1 end,
+                    get = function(_, idx) return idx == 0 and playerPart or nil end,
+                }, "ArrayList")
+            end,
+        }, "BodyDamage")
+    end,
+}, "IsoPlayer")
+T.equal(type(mockPlayer), "userdata", "Kahlua Java mock reports userdata type")
+local writeOk = pcall(function() mockPlayer.health = {} end)
+T.falsy(writeOk, "Kahlua Java mock rejects field writes like IsoPlayer")
+PNC.Core.ForEachPlayer = function(fn) fn(mockPlayer) end
+local origGetTreatableWounds = PNC.NPCWounds.GetTreatableWounds
+PNC.NPCWounds.GetTreatableWounds = function(target)
+    T.truthy(target ~= mockPlayer,
+        "player patient must never be passed to NPCWounds.GetTreatableWounds")
+    return origGetTreatableWounds(target)
+end
+doctor.inventory.items.bandage.stack = 0
+local playerTask = {
+    id = "medical:player_supply", patientKind = "player", patientId = "player:7",
+    status = Status.QUEUED, phase = Status.QUEUED,
+    priority = 60, retryAt = 0, revision = 1, createdAt = now,
+    lastProgressAt = now, policy = { requireItem = true },
+}
+tasks = { [playerTask.id] = playerTask }
+now = now + 5000
+local playerCandidates = Executor.GetCandidates(doctor.id)
+T.equal(#playerCandidates, 0, "doctor without bandages does not claim player task")
+T.equal(playerTask.status, Status.WAITING_FOR_SUPPLY,
+    "player task transitions to WAITING_FOR_SUPPLY via preflight")
+local playerWaiting, playerSupplyReason = Executor.RequestBandageSupport(playerTask.id)
+T.truthy(playerWaiting, "player supply support succeeds without NPC wound lookup")
+T.equal(playerSupplyReason, "waiting_for_supply")
+PNC.NPCWounds.GetTreatableWounds = origGetTreatableWounds
 
 T.finish("pnc_medical_care_executor_smoke")

@@ -191,6 +191,18 @@ function Presence.Abstract(record, reason)
             worldAgeHours()
         )
     end
+    if PNC.AbstractCombatContinuity
+        and type(PNC.AbstractCombatContinuity.OnLiveCombatAbstracted) == "function"
+    then
+        pcall(
+            PNC.AbstractCombatContinuity.OnLiveCombatAbstracted,
+            record,
+            zombie,
+            reason,
+            worldAgeHours(),
+            Core.Now()
+        )
+    end
     clearLiveRuntime(record)
     if zombie then
         released = removeLiveBody(record, zombie, reason)

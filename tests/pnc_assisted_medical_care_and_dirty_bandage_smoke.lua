@@ -42,36 +42,37 @@ local function makeBody(x, y, z)
     return b
 end
 
-local playerObj = {
-    _x = 12, _y = 10, _z = 0, _dead = false,
-    _parts = {},
-    getX = function(self) return self._x end,
-    getY = function(self) return self._y end,
-    getZ = function(self) return self._z end,
-    isDead = function(self) return self._dead end,
+local playerState = { x = 12, y = 10, z = 0, dead = false, parts = {}, partStates = {} }
+local playerObj = T.javaObject({
+    getX = function() return playerState.x end,
+    getY = function() return playerState.y end,
+    getZ = function() return playerState.z end,
+    isDead = function() return playerState.dead end,
     getOnlineID = function() return 11 end,
     getUsername = function() return "SurvivorOne" end,
-    getDescriptor = function() return { getForename = function() return "Morgan" end } end,
-    getBodyDamage = function(self)
-        return {
+    getDescriptor = function()
+        return T.javaObject({ getForename = function() return "Morgan" end }, "SurvivorDesc")
+    end,
+    getBodyDamage = function()
+        return T.javaObject({
             getBodyParts = function()
-                return {
-                    size = function() return #self._parts end,
-                    get = function(_, i) return self._parts[i + 1] end,
-                }
+                return T.javaObject({
+                    size = function() return #playerState.parts end,
+                    get = function(_, i) return playerState.parts[i + 1] end,
+                }, "ArrayList")
             end,
             SetBandaged = function(_, idx, bandaged, life, sterile, bType)
-                local p = self._parts[idx + 1]
-                p._bandaged = bandaged
-                p._dirty = false
-                p._life = life
-                p._sterile = sterile
-                p._bType = bType
+                local ps = playerState.partStates[idx + 1]
+                ps.bandaged = bandaged
+                ps.dirty = false
+                ps.life = life
+                ps.sterile = sterile
+                ps.bType = bType
                 appliedPlayerBandages[#appliedPlayerBandages + 1] = { idx = idx, life = life, bType = bType }
             end,
-        }
+        }, "BodyDamage")
     end,
-}
+}, "IsoPlayer")
 
 PNC = {
     Const = {
@@ -287,11 +288,12 @@ end
 
 -- 3. Player dirty/open wound detection + live walk + animation + SetBandaged + EN/TL speech.
 do
-    local dirtyPlayerPart = {
+    local dirtyPartState = { bandaged = true, dirty = true }
+    local dirtyPlayerPart = T.javaObject({
         getIndex = function() return 0 end,
         getType = function() return "ForeArm_L" end,
-        bandaged = function(s) return s._bandaged == true end,
-        isBandageDirty = function(s) return s._dirty ~= false end,
+        bandaged = function() return dirtyPartState.bandaged == true end,
+        isBandageDirty = function() return dirtyPartState.dirty ~= false end,
         getBandageType = function() return "Base.Bandage" end,
         bleeding = function() return false end,
         scratched = function() return false end,
@@ -299,10 +301,9 @@ do
         bitten = function() return false end,
         isDeepWounded = function() return false end,
         getBurnTime = function() return 0 end,
-        _bandaged = true,
-        _dirty = true,
-    }
-    playerObj._parts = { dirtyPlayerPart }
+    }, "BodyPart")
+    playerState.parts = { dirtyPlayerPart }
+    playerState.partStates = { dirtyPartState }
 
     local medic = {
         id = "medic-fa3", name = "Claire", alive = true, tacticalClass = "colonist",
@@ -339,7 +340,7 @@ do
     Executor.Tick(lease)
     T.truthy(#appliedPlayerBandages == 1, "applies clean bandage via Build 42 SetBandaged")
     T.truthy(#syncBodyPartCalls == 1, "syncs player bodyPart in MP")
-    T.equal(dirtyPlayerPart._dirty, false, "player bandage is now clean")
+    T.equal(dirtyPartState.dirty, false, "player bandage is now clean")
     T.truthy(#deliveredSpeech >= 2, "medic speaks completion line for player dirty-bandage swap")
     T.contains(deliveredSpeech[2].speechEventID, "complete_change_dirty", "selects complete_change_dirty variant")
 
