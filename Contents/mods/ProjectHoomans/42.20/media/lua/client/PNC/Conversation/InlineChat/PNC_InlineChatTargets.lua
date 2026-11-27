@@ -144,7 +144,9 @@ end
 function Targets.ResolveRecipients(player, options)
     options = options or {}
     if not player or not Resolver then return nil end
-    local mode = Resolver.NormalizeMode(options.mode or State.mode or Config.MODE_NEAREST)
+    local mode = Resolver.NormalizeMode(
+        options.mode or State.mode or Config.DEFAULT_MODE or Config.MODE_NEARBY
+    )
     local scope = Resolver.NormalizeScope(options.scope or State.scope or Config.SCOPE_COLONISTS)
     local resolved
     if options.cycleNearest and mode == Config.MODE_NEAREST then

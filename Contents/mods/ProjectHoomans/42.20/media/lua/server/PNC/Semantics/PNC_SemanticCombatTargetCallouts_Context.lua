@@ -112,7 +112,8 @@ function S.BuildRichSpeechTokens(speaker, caller, desc, now, tone, opts)
     local pos, et = desc.enemyPosture, tostring(desc.enemyType or "hostile")
     local kSg, kPl = kindLabel(et, false, pos), kindLabel(et, true, pos)
     local cRaw = (caller and (caller.name or caller.fullName)) or desc.callerName
-    local cName = S.FirstTokenName(cRaw) or tr("UI_PNC_AllyWarn_FallbackCaller", "friend")
+    local cName = S.FirstTokenName(cRaw)
+        or (caller ~= nil and tr("UI_PNC_AllyWarn_FallbackCaller", "friend") or "")
     local dName, facName = S.FirstTokenName(desc.displayName) or cleanText(desc.displayName), cleanText(desc.factionName)
     local tLabel
     if dName then

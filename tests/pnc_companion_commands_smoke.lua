@@ -611,6 +611,24 @@ T.equal(affected, 0, "group attack type was accepted")
 T.equal(reason, "personalized_command",
     "group attack type rejection reason")
 affected, reason = PNC.CompanionCommands.Execute(player, {
+    commandID = "attack_none",
+    scope = "group",
+})
+T.equal(affected, 2, "group attack_none applies to all nearby companions")
+T.equal(records.owned.attackType, "none", "group attack_none updated closest companion")
+T.equal(records.owned_second.attackType, "none", "group attack_none updated second companion")
+records.owned.attackType = "auto"
+records.owned_second.attackType = "auto"
+records.owned.orderSpec = { kind = "follow" }
+records.owned_second.orderSpec = { kind = "follow" }
+affected, reason = PNC.CompanionCommands.Execute(player, {
+    commandID = "attack_none",
+    scope = "closest",
+})
+T.equal(affected, 2, "closest attack_none cascades to whole following squad")
+T.equal(records.owned.attackType, "none", "squad follower effect updated primary follower")
+T.equal(records.owned_second.attackType, "none", "squad follower effect updated second follower")
+affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
     commandID = "scavenge_nearby",
 })

@@ -18,12 +18,66 @@ return {
         ["kind"] = "pattern",
         ["source"] = "patterns/common/weather_needs.json",
     },
+    ["pnc.dataset.greeting.glad_to_meet_you"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.glad_to_meet_you",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.glad_to_see_you"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.glad_to_see_you",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
     ["pnc.dataset.greeting.glad_to_see_you_again"] = {
         ["domain"] = "common",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
         },
         ["id"] = "pnc.dataset.greeting.glad_to_see_you_again",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.glad_to_see_you_too"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.glad_to_see_you_too",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.good_to_meet_you"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.good_to_meet_you",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.good_to_meet_you_too"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.good_to_meet_you_too",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.good_to_see_you"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.good_to_see_you",
         ["kind"] = "pattern",
         ["source"] = "patterns/common/greeting_whats_up.json",
     },
@@ -36,6 +90,42 @@ return {
         ["kind"] = "pattern",
         ["source"] = "patterns/common/greeting_whats_up.json",
     },
+    ["pnc.dataset.greeting.good_to_see_you_too"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.good_to_see_you_too",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.great_to_meet_you"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.great_to_meet_you",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.great_to_see_you"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.great_to_see_you",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.happy_to_see_you"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.happy_to_see_you",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
     ["pnc.dataset.greeting.long_time_no_see"] = {
         ["domain"] = "common",
         ["generated"] = {
@@ -45,12 +135,75 @@ return {
         ["kind"] = "pattern",
         ["source"] = "patterns/common/greeting_whats_up.json",
     },
+    ["pnc.dataset.greeting.nice_meeting_you"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.nice_meeting_you",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.nice_to_meet_you"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.nice_to_meet_you",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.nice_to_meet_you_too"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.nice_to_meet_you_too",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.nice_to_see_you"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.nice_to_see_you",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
     ["pnc.dataset.greeting.nice_to_see_you_again"] = {
         ["domain"] = "common",
         ["generated"] = {
             "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
         },
         ["id"] = "pnc.dataset.greeting.nice_to_see_you_again",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.nice_to_see_you_too"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.nice_to_see_you_too",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.pleased_to_meet_you"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.pleased_to_meet_you",
+        ["kind"] = "pattern",
+        ["source"] = "patterns/common/greeting_whats_up.json",
+    },
+    ["pnc.dataset.greeting.pleased_to_meet_you_too"] = {
+        ["domain"] = "common",
+        ["generated"] = {
+            "PsychopatzCore/ConvoEngine/Patterns/Common/GreetingWhatsUp",
+        },
+        ["id"] = "pnc.dataset.greeting.pleased_to_meet_you_too",
         ["kind"] = "pattern",
         ["source"] = "patterns/common/greeting_whats_up.json",
     },

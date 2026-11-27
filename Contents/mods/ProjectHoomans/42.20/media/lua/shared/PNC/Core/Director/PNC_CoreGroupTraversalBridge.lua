@@ -226,6 +226,129 @@ function Bridge.ProjectMember(group, actorID, actorWorld, at)
     )
 end
 
+-- Extract remaining road-corridor waypoints from a traveling group's canonical
+-- journey so a materialized member can seamlessly continue walking on-screen.
+function Bridge.ExtractRemainingWaypoints(group, fromX, fromY, fromZ)
+    if type(group) ~= "table" or type(group.journey) ~= "table" then
+        return nil
+    end
+    local journey = group.journey
+    if journey.state ~= "en_route" then
+        return nil
+    end
+    local route = type(journey.route) == "table" and journey.route or nil
+    local points = route and route.points or nil
+    if type(points) ~= "table" or #points < 2 then
+        return nil
+    end
+    local startIdx = math.max(2, math.min(#points, (tonumber(journey.segmentIndex) or 1) + 1))
+    local out = {}
+    local fx = tonumber(fromX)
+    local fy = tonumber(fromY)
+    local fz = tonumber(fromZ) or 0
+    for i = startIdx, #points do
+        local pt = points[i]
+        if type(pt) == "table" and tonumber(pt.x) and tonumber(pt.y) then
+            local skip = false
+            if i == startIdx and fx ~= nil and fy ~= nil then
+                local dx = pt.x - fx
+                local dy = pt.y - fy
+                if (dx * dx + dy * dy) < 4 then
+                    skip = true
+                end
+            end
+            if not skip then
+                out[#out + 1] = {
+                    x = pt.x,
+                    y = pt.y,
+                    z = tonumber(pt.z) or fz,
+                    tag = pt.tag or (i == #points and "destination" or "corridor"),
+                }
+            end
+        end
+    end
+    if #out == 0 then
+        local last = points[#points]
+        if type(last) == "table" and tonumber(last.x) and tonumber(last.y) then
+            out[1] = {
+                x = last.x,
+                y = last.y,
+                z = tonumber(last.z) or fz,
+                tag = "destination",
+            }
+        end
+    end
+    return #out > 0 and out or nil
+end
+
+-- Sync a materialized group member's live world position back onto the group's
+-- canonical journey when abstracting, only advancing forward along the corridor.
+function Bridge.SyncMemberLivePosition(group, x, y, z, at)
+    if type(group) ~= "table" or type(group.journey) ~= "table" then
+        return false, "group_journey_missing"
+    end
+    local journey = group.journey
+    if journey.state ~= "en_route" then
+        return false, "not_en_route"
+    end
+    x = tonumber(x)
+    y = tonumber(y)
+    if x == nil or y == nil then
+        return false, "invalid_position"
+    end
+    local route = type(journey.route) == "table" and journey.route or nil
+    local points = route and route.points or nil
+    local cumulative = route and route.cumulative or nil
+    if type(points) ~= "table" or #points < 2 or type(cumulative) ~= "table" then
+        return false, "route_missing"
+    end
+    local bestDistSq = math.huge
+    local bestTravelled = nil
+    for i = 1, #points - 1 do
+        local a = points[i]
+        local b = points[i + 1]
+        local abx = b.x - a.x
+        local aby = b.y - a.y
+        local abLenSq = abx * abx + aby * aby
+        local t = 0
+        if abLenSq > 0.0001 then
+            t = ((x - a.x) * abx + (y - a.y) * aby) / abLenSq
+            if t < 0 then t = 0 elseif t > 1 then t = 1 end
+        end
+        local px = a.x + abx * t
+        local py = a.y + aby * t
+        local dx = x - px
+        local dy = y - py
+        local dSq = dx * dx + dy * dy
+        if dSq < bestDistSq then
+            bestDistSq = dSq
+            local segStart = tonumber(cumulative[i]) or 0
+            local segEnd = tonumber(cumulative[i + 1]) or segStart
+            bestTravelled = segStart + (segEnd - segStart) * t
+        end
+    end
+    -- Only snap forward if the body stayed reasonably near the corridor (<= 64 tiles).
+    if bestTravelled == nil or bestDistSq > (64 * 64) then
+        return false, "off_corridor"
+    end
+    local currentTravelled = tonumber(journey.distanceTravelled) or 0
+    if bestTravelled <= currentTravelled then
+        return false, "not_advanced"
+    end
+    local total = math.max(0, tonumber(journey.distanceTotal) or 0)
+    journey.distanceTravelled = math.min(total, bestTravelled)
+    journey.progress = total > 0 and (journey.distanceTravelled / total) or 1
+    journey.x = x
+    journey.y = y
+    journey.z = tonumber(z) or tonumber(journey.z) or 0
+    journey.lastAdvancedAt = finite(at, journey.lastAdvancedAt)
+    local speed = math.max(0.001, tonumber(journey.speed) or 1)
+    journey.eta = journey.lastAdvancedAt + math.max(0, total - journey.distanceTravelled) / speed
+    journey.revision = (tonumber(journey.revision) or 1) + 1
+    syncCompatibility(group, journey)
+    return true, "synced"
+end
+
 Bridge.Journey = Journey
 Bridge.Traversal = CoreTraversal
 

@@ -628,7 +628,7 @@ return {
         ["domain"] = "common",
         ["kind"] = "pattern",
         ["module"] = "PNC/ConvoEngine/Index/Pattern/Common",
-        ["recordCount"] = 49,
+        ["recordCount"] = 66,
     },
     {
         ["domain"] = "grounded_personal",

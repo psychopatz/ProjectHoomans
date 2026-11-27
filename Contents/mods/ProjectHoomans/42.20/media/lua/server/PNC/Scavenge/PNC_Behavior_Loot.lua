@@ -114,10 +114,19 @@ function BehaviorLoot.Tick(record, nowMs, opts)
     if type(opts.moveFn) == "function" then
         opts.moveFn(record, target.x, target.y, target.z)
     elseif PNC.BehaviorCommon and type(PNC.BehaviorCommon.MoveRecord) == "function" then
-        pcall(PNC.BehaviorCommon.MoveRecord, record, target.x, target.y, target.z, {
-            reason = "opportunistic_loot",
-            walk = true,
-        })
+        local zombie = PNC.Registry and type(PNC.Registry.GetLiveZombie) == "function"
+            and PNC.Registry.GetLiveZombie(record.id) or nil
+        pcall(
+            PNC.BehaviorCommon.MoveRecord,
+            record,
+            zombie,
+            target.x,
+            target.y,
+            target.z or 0,
+            "walk",
+            1.2,
+            "opportunistic_loot"
+        )
     end
     return true, "moving", target
 end

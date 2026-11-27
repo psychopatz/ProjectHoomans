@@ -207,7 +207,9 @@ function InlineChat.Open(binding)
     local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
     if not player then return reject("player_unavailable") end
     if not Resolver then return reject("target_resolver_unavailable") end
-    State.mode = Resolver.NormalizeMode(State.mode or Config.MODE_NEAREST)
+    State.mode = Resolver.NormalizeMode(
+        State.mode or Config.DEFAULT_MODE or Config.MODE_NEARBY
+    )
     State.scope = Resolver.NormalizeScope(State.scope or Config.SCOPE_COLONISTS)
     local resolved = Targets.ResolveRecipients(player)
     local candidate = resolved and resolved.primary
@@ -326,6 +328,8 @@ function InlineChat.Open(binding)
     part:setReveal(1)
     if part.setAlwaysOnTop then part:setAlwaysOnTop(true) end
     State.part = part
+    State.toggleKeyHeld = binding ~= nil
+    State.suppressReopenUntilRelease = false
     part:refreshControls()
     Targets.RefreshHighlights(0)
     Targets.Position(0, player)

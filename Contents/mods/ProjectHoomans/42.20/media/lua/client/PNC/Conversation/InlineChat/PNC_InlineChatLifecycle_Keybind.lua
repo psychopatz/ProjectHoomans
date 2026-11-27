@@ -28,14 +28,83 @@ local function closeOnEscape(key)
     end
 end
 
+local KEYBIND_ID = "ProjectHoomans.PBrainZChat"
+
+local function isToggleKeyDown()
+    if not Keybinds or not Keybinds.IsDown then return false end
+    return Keybinds.IsDown(KEYBIND_ID) == true
+end
+
+local function eatToggleKey()
+    if not GameKeyboard or not GameKeyboard.eatKeyPress then return end
+    local code = Keybinds and Keybinds.GetKeyCode
+        and tonumber(Keybinds.GetKeyCode(KEYBIND_ID)) or 0
+    if code and code > 0 then
+        pcall(GameKeyboard.eatKeyPress, code)
+    end
+end
+
+local function closeViaToggleKeybind()
+    State.toggleKeyHeld = true
+    State.suppressReopenUntilRelease = true
+    eatToggleKey()
+    InlineChat.Close("toggle_keybind")
+    return true
+end
+
+function Lifecycle.PollToggleClose()
+    local keyDown = isToggleKeyDown()
+    if not State.part then
+        if not keyDown then
+            State.toggleKeyHeld = false
+            State.suppressReopenUntilRelease = false
+        end
+        return false
+    end
+    if keyDown then
+        if State.toggleKeyHeld ~= true then
+            return closeViaToggleKeybind()
+        end
+        return false
+    end
+    State.toggleKeyHeld = false
+    return false
+end
+
+function Lifecycle.OnKeybindTrigger(binding)
+    if State.suppressReopenUntilRelease then
+        if isToggleKeyDown() then return false end
+        State.suppressReopenUntilRelease = false
+    end
+    if State.part then
+        return closeViaToggleKeybind()
+    end
+    return InlineChat.Open(binding)
+end
+
+local function resolveSlashKeyCode()
+    local code = Keyboard and tonumber(Keyboard.KEY_SLASH) or nil
+    if code and code > 0 then return code end
+    code = getKeyCode and tonumber(getKeyCode("SLASH")) or nil
+    if code and code > 0 then return code end
+    return 53
+end
+
 function Lifecycle.Register()
     if Keybinds and Keybinds.RegisterPress then
         local binding = Keybinds.RegisterPress({
-            id = "ProjectHoomans.PBrainZChat",
+            id = KEYBIND_ID,
             label = "UI_PNC_PBrainZ_TalkKey",
             tooltip = "UI_PNC_PBrainZ_TalkTooltip",
-            defaultKey = getKeyCode and (tonumber(getKeyCode("V")) or 47) or 47,
+            defaultKey = resolveSlashKeyCode(),
             isEnabled = function()
+                if State.suppressReopenUntilRelease then
+                    if isToggleKeyDown() then return false end
+                    State.suppressReopenUntilRelease = false
+                end
+                if State.part then
+                    return true
+                end
                 local pbrainz = PNC.PBrainZ
                 local pending = pbrainz and pbrainz.GetPending and pbrainz.GetPending() or nil
                 if pending then
@@ -50,7 +119,7 @@ function Lifecycle.Register()
                 end
                 return true
             end,
-            onTrigger = InlineChat.Open,
+            onTrigger = Lifecycle.OnKeybindTrigger,
         })
         if PNC.Core and PNC.Core.LogInfo then
             PNC.Core.LogInfo("inline_keybind_registered id=ProjectHoomans.PBrainZChat registered="

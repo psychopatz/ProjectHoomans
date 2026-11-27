@@ -59,7 +59,9 @@ function Hosts.Rebuild(player, resolved, requestedMode)
     local oldHosts, newHosts, createdHosts, entries = {}, {}, {}, {}
     local targets = resolved and resolved.targets or {}
     local primaryTarget = resolved and (resolved.primary or resolved.target) or nil
-    local mode = Resolver.NormalizeMode(requestedMode or State.mode or Config.MODE_NEAREST)
+    local mode = Resolver.NormalizeMode(
+        requestedMode or State.mode or Config.DEFAULT_MODE or Config.MODE_NEARBY
+    )
     local primaryID = tostring(primaryTarget and primaryTarget.id or "")
     local primaryIndex
     if not primaryTarget then return false, "no_primary_target" end

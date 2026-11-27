@@ -91,6 +91,108 @@ function Internal.RegisterSocialSpeechActs()
         75
     )
 
+    -- Compositional social pleasantries: covers hundreds of natural greeting
+    -- combinations ("so glad to see you", "it's really nice meeting you too")
+    -- without flat phrase duplication.
+    registerPattern(
+        "pnc.social.greet.compositional_infinitive",
+        {
+            { kind = "literal", value = "it", optional = true },
+            { kind = "literal", value = "is", optional = true },
+            { kind = "concept", id = "INTENSIFIER", optional = true },
+            { kind = "concept", id = "PLEASANTRY_ADJ" },
+            { kind = "literal", value = "to" },
+            { kind = "concept", id = "PLEASANTRY_VERB_YOU" },
+            { kind = "concept", id = "RECIPROCAL_TAIL", optional = true },
+        },
+        { intent = "GREET", speechAct = "GREET" },
+        0.97,
+        78
+    )
+
+    registerPattern(
+        "pnc.social.greet.compositional_compliment_infinitive",
+        {
+            { kind = "literal", value = "it", optional = true },
+            { kind = "literal", value = "is", optional = true },
+            { kind = "concept", id = "INTENSIFIER", optional = true },
+            { kind = "concept", id = "COMPLIMENT_ADJECTIVE" },
+            { kind = "literal", value = "to" },
+            { kind = "concept", id = "PLEASANTRY_VERB_YOU" },
+            { kind = "concept", id = "RECIPROCAL_TAIL", optional = true },
+        },
+        { intent = "GREET", speechAct = "GREET" },
+        0.97,
+        78
+    )
+
+    registerPattern(
+        "pnc.social.greet.compositional_gerund",
+        {
+            { kind = "literal", value = "it", optional = true },
+            { kind = "literal", value = "is", optional = true },
+            { kind = "concept", id = "INTENSIFIER", optional = true },
+            { kind = "concept", id = "PLEASANTRY_ADJ" },
+            { kind = "concept", id = "PLEASANTRY_GERUND_YOU" },
+            { kind = "concept", id = "RECIPROCAL_TAIL", optional = true },
+        },
+        { intent = "GREET", speechAct = "GREET" },
+        0.96,
+        78
+    )
+
+    registerPattern(
+        "pnc.social.greet.compositional_compliment_gerund",
+        {
+            { kind = "literal", value = "it", optional = true },
+            { kind = "literal", value = "is", optional = true },
+            { kind = "concept", id = "INTENSIFIER", optional = true },
+            { kind = "concept", id = "COMPLIMENT_ADJECTIVE" },
+            { kind = "concept", id = "PLEASANTRY_GERUND_YOU" },
+            { kind = "concept", id = "RECIPROCAL_TAIL", optional = true },
+        },
+        { intent = "GREET", speechAct = "GREET" },
+        0.96,
+        78
+    )
+
+    registerPattern(
+        "pnc.social.thank.compositional_much",
+        {
+            { kind = "concept", id = "THANK" },
+            { kind = "concept", id = "INTENSIFIER", optional = true },
+            { kind = "literal", value = "much" },
+        },
+        { intent = "THANK", speechAct = "THANK" },
+        0.96,
+        76
+    )
+
+    registerPattern(
+        "pnc.social.thank.compositional_amount",
+        {
+            { kind = "concept", id = "THANK" },
+            { kind = "literal", value = "a" },
+            { kind = "concept", id = "THANK_AMOUNT" },
+        },
+        { intent = "THANK", speechAct = "THANK" },
+        0.96,
+        76
+    )
+
+    registerPattern(
+        "pnc.social.apologize.compositional",
+        {
+            { kind = "concept", id = "INTENSIFIER", optional = true },
+            { kind = "concept", id = "APOLOGIZE" },
+            { kind = "literal", value = "about", optional = true },
+            { kind = "literal", value = "that", optional = true },
+        },
+        { intent = "APOLOGIZE", speechAct = "APOLOGIZE" },
+        0.95,
+        76
+    )
+
     registerPattern(
         "pnc.social.farewell",
         { "@FAREWELL" },

@@ -407,4 +407,135 @@ identityContext:RecordNPCResponse({
 T.equal(identityContext.pendingIdentityExchange.kind, "PLAYER_NAME",
     "an NPC reply leaves a pending identity exchange available for the next player turn")
 
+-- Social greeting pleasantries with & without trailing vocatives (e.g. post-introduction).
+local jordanParticipants = {
+    { id = "npc:jordan", fullName = "Jordan Bennett", name = "Jordan Bennett", firstName = "Jordan" },
+}
+local pleasantries = {
+    "nice to see you jordan",
+    "nice to see you, jordan",
+    "nice to see you jordan bennett",
+    "nice to meet you jordan",
+    "nice to meet you too",
+    "good to see you jordan",
+    "glad to see you jordan",
+    "pleased to meet you jordan",
+    "it's nice to see you jordan",
+}
+for _, phrase in ipairs(pleasantries) do
+    local greetIR = PsychopatzCore.Semantics.Parser.Parse(phrase, { groupParticipants = jordanParticipants })
+    T.equal(greetIR.intent, "GREET", "pleasantry parses as GREET: " .. phrase)
+    local greetDecision = Policy.Decide(greetIR, state, {
+        llmEnabled = false,
+        npcID = "npc:jordan",
+        socialStyle = "neutral",
+    })
+    T.equal(greetDecision.route, "deterministic",
+        "pleasantry routes deterministically without LLM: " .. phrase)
+    T.equal(greetDecision.branch, "GREET_ACKNOWLEDGED",
+        "pleasantry selects GREET_ACKNOWLEDGED: " .. phrase)
+end
+
+-- 1-on-1 context projection exposes a known NPC's name from npcPresentations for vocative parsing.
+local ContextProjection = require "PNC/ConvoEngine/Dialogue/Input_ContextProjection"
+PNC.Network = PNC.Network or {}
+PNC.Network.ClientState = PNC.Network.ClientState or {}
+PNC.Network.ClientState.npcPresentations = PNC.Network.ClientState.npcPresentations or {}
+local prevPresentation = PNC.Network.ClientState.npcPresentations["npc:jordan"]
+PNC.Network.ClientState.npcPresentations["npc:jordan"] = {
+    state = "known",
+    displayName = "Jordan Bennett",
+}
+local projected = ContextProjection.Build({
+    spec = {
+        npcID = "npc:jordan",
+        context = { npcName = "Stranger" },
+    },
+}, function() return { ready = false, status = "unavailable" } end)
+PNC.Network.ClientState.npcPresentations["npc:jordan"] = prevPresentation
+T.truthy(type(projected.groupParticipants) == "table" and #projected.groupParticipants == 1,
+    "1-on-1 projection populates groupParticipants for a known NPC")
+T.equal(projected.groupParticipants[1].fullName, "Jordan Bennett",
+    "1-on-1 projection carries the known presentation displayName")
+local oneOnOneGreet = PsychopatzCore.Semantics.Parser.Parse("nice to see you jordan", {
+    groupParticipants = projected.groupParticipants,
+})
+T.equal(oneOnOneGreet.intent, "GREET",
+    "1-on-1 projected participant enables trailing-vocative GREET parsing")
+
+-- Generic vocatives, chat shorthand, and Tier-3 social intent paraphrases:
+T.load("ProjectHoomans", "shared", "PNC/ConvoEngine/Intents/IntentDataset_EN.lua")
+local casualExpectations = {
+    { text = "nice to see you buddy", intent = "GREET" },
+    { text = "gm", intent = "GREET" },
+    { text = "cya", intent = "FAREWELL" },
+    { text = "thanks man", intent = "THANK" },
+    { text = "appreciate ya", intent = "THANK" },
+    { text = "sorry about that", intent = "APOLOGIZE" },
+    { text = "my bad", intent = "APOLOGIZE" },
+    { text = "stay safe out there", intent = "FAREWELL" },
+    { text = "lovely to meet you", intent = "GREET" },
+    -- Compositional social phrase grammars:
+    { text = "so glad to see you", intent = "GREET" },
+    { text = "it's really nice to meet you too", intent = "GREET" },
+    { text = "very pleased to meet you", intent = "GREET" },
+    { text = "really great seeing you again", intent = "GREET" },
+    { text = "thank you so much", intent = "THANK" },
+    { text = "thanks a bunch", intent = "THANK" },
+    { text = "so sorry about that", intent = "APOLOGIZE" },
+}
+for _, row in ipairs(casualExpectations) do
+    local res = PsychopatzCore.Semantics.Parser.Parse(row.text)
+    T.equal(res.intent, row.intent, "casual NLP parses '" .. row.text .. "' as " .. row.intent)
+end
+
+-- Multi-clause social + obligation compound turn with trailing vocative:
+local DialogueTurn = T.load("PsychopatzCore", "common", "PsychopatzCore/ConvoEngine/DialogueTurn.lua")
+local compoundTurn, compoundReason = DialogueTurn.Parse(
+    "thanks jordan, nice to see you jordan",
+    function(clause, opts) return PsychopatzCore.Semantics.Parser.ParseCandidates(clause, opts) end,
+    { groupParticipants = jordanParticipants }
+)
+T.equal(compoundReason, "compound", "social + vocative comma turn splits into compound clauses")
+T.equal(#compoundTurn.parts, 2, "compound turn has 2 parts")
+T.equal(compoundTurn.parts[1].candidates.selected.ir.intent, "THANK", "part 1 is THANK")
+T.equal(compoundTurn.parts[2].candidates.selected.ir.intent, "GREET", "part 2 is GREET")
+
+local periodCompound, periodCompoundReason = DialogueTurn.Parse(
+    "im psycho. nice to meet you jordan",
+    function(clause, opts) return PsychopatzCore.Semantics.Parser.ParseCandidates(clause, opts) end,
+    { groupParticipants = jordanParticipants }
+)
+T.equal(periodCompoundReason, "compound", "identity + pleasantry period turn splits into compound clauses")
+T.equal(#periodCompound.parts, 2, "period compound turn has 2 parts")
+T.equal(periodCompound.parts[1].candidates.selected.ir.intent, "INFORM", "part 1 is identity INFORM")
+T.equal(periodCompound.parts[2].candidates.selected.ir.intent, "GREET", "part 2 is GREET")
+
+-- Bare name answer during pendingIdentityExchange routes to IDENTITY_CLAIM_RECEIVED:
+local bareNameIR = PsychopatzCore.Semantics.Parser.Parse("Psycho", {
+    context = { pendingIdentityExchange = { kind = "PLAYER_NAME" } },
+})
+T.equal(bareNameIR.intent, "INFORM", "bare name during pendingIdentityExchange parses as INFORM")
+T.equal(bareNameIR.subject, "IDENTITY", "bare name subject is IDENTITY")
+local bareNameDecision = Policy.Decide(bareNameIR, state, {
+    llmEnabled = false,
+    npcID = "npc:jordan",
+    pendingIdentityExchange = { kind = "PLAYER_NAME" },
+})
+T.equal(bareNameDecision.branch, "IDENTITY_CLAIM_RECEIVED",
+    "bare name during pendingIdentityExchange routes to IDENTITY_CLAIM_RECEIVED")
+
+-- Negative-control guardrails: gibberish & unrelated chatter must NOT trigger actions or intents.
+local negativeControls = {
+    "asdfghjkl qwerty",
+    "purple elephant toaster",
+    "the sky is made of cheese",
+    "zxvbnm plmokn",
+}
+for _, junk in ipairs(negativeControls) do
+    local res = PsychopatzCore.Semantics.Parser.Parse(junk)
+    T.equal(res.action, nil, "negative control triggers no action: " .. junk)
+    T.equal(res.intent, nil, "negative control triggers no intent: " .. junk)
+end
+
 T.finish("pnc_semantic_social_chat_smoke")

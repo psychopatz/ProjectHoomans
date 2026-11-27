@@ -136,17 +136,38 @@ local function isLongPress(binding)
         and tostring(binding.type or "") == tostring(longPressType)
 end
 
+local function isEntryFocused(part)
+    local entry = part and part.entry or nil
+    if not entry then return false end
+    if type(entry.isFocused) == "function" then
+        local ok, focused = pcall(entry.isFocused, entry)
+        if ok then return focused == true end
+    end
+    return false
+end
+
 function Diagnostics.FocusWhenReady()
-    if not State.part or not State.focusAfterTriggerRelease then return false end
-    local binding = State.triggerBinding
-    if binding and Keybinds and Keybinds.IsDown and Keybinds.IsDown(binding) then
+    if not State.part then return false end
+    if State.focusAfterTriggerRelease then
+        local binding = State.triggerBinding
+        if binding and Keybinds and Keybinds.IsDown and Keybinds.IsDown(binding) then
+            return false
+        end
+        State.focusAfterTriggerRelease = false
+        State.triggerBinding = nil
+        State.pendingInitialFocus = false
+        if State.part.focusInput then
+            State.part:focusInput(false)
+            return true
+        end
         return false
     end
-    State.focusAfterTriggerRelease = false
-    State.triggerBinding = nil
-    if State.part.focusInput then
-        State.part:focusInput()
-        return true
+    if State.pendingInitialFocus then
+        State.pendingInitialFocus = false
+        if not isEntryFocused(State.part) and State.part.focusInput then
+            State.part:focusInput(false)
+            return true
+        end
     end
     return false
 end
@@ -154,9 +175,13 @@ end
 function Diagnostics.PrepareFocus(binding)
     State.triggerBinding = isLongPress(binding) and binding or nil
     State.focusAfterTriggerRelease = State.triggerBinding ~= nil
-    if State.focusAfterTriggerRelease then return Diagnostics.FocusWhenReady() end
+    if State.focusAfterTriggerRelease then
+        State.pendingInitialFocus = false
+        return Diagnostics.FocusWhenReady()
+    end
+    State.pendingInitialFocus = true
     if State.part and State.part.focusInput then
-        State.part:focusInput()
+        State.part:focusInput(binding ~= nil)
         return true
     end
     return false

@@ -48,6 +48,27 @@ function Resolver.DescribeAt(x, y, z, options)
     if not x or not y then return nil, "invalid_position" end
     local square = H.GetSquare(x, y, z)
     if not square then
+        if options.allowMetaGrid ~= false then
+            local world = getWorld and getWorld() or nil
+            local metaGrid = world
+                and H.InvokeObject(world, "getMetaGrid") or nil
+            local okDef, definition = false, nil
+            if metaGrid and metaGrid.getBuildingAt then
+                okDef, definition = pcall(
+                    metaGrid.getBuildingAt,
+                    metaGrid,
+                    math.floor(x),
+                    math.floor(y)
+                )
+            end
+            if okDef and definition then
+                local metaSite, metaReason =
+                    Resolver.DescribeBuildingDefinition(definition, z, options)
+                if metaSite then
+                    return metaSite, metaReason
+                end
+            end
+        end
         if options.siteSpec then
             local normalized = Types.NormalizeSite(
                 options.siteSpec,

@@ -86,6 +86,7 @@ function S.OnTargetChanged(event, record)
         local aud = audSvc and type(audSvc.Resolve) == "function"
             and audSvc.Resolve(record, listeners, {
                 includeNearbyPlayer = true,
+                requireAlly = true,
                 playerRadius = S.WITNESS_RADIUS or 12,
                 targetCount = desc and desc.enemyCount or 1,
             }) or nil

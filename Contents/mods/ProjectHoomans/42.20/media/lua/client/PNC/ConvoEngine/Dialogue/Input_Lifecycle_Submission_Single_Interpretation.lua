@@ -91,6 +91,10 @@ function Internal.InterpretSingleSubmission(view, prepared)
     end
     local options = {
         timestamp = Internal.Now(),
+        groupParticipants = type(context) == "table"
+            and type(context.groupParticipants) == "table"
+            and #context.groupParticipants > 0
+            and context.groupParticipants or nil,
     }
     local preview
     if semanticFrame then

@@ -27,13 +27,116 @@ local function firstTokenName(raw)
     return (first and first ~= "") and first or nil
 end
 
-local function isHostileToPlayer(speaker)
+local function playerKeyFor(p)
+    if not p then return "player" end
+    local uname = type(p.getUsername) == "function" and tostring(p:getUsername() or "") or ""
+    if uname ~= "" then return "player:" .. uname end
+    return "player"
+end
+
+local function isHostileToPlayer(speaker, player)
     if type(speaker) ~= "table" then return false end
     if speaker.isHostile == true then return true end
     local tc = tostring(speaker.tacticalClass or "")
     if tc == "hostile" then return true end
+    if PNC.Types and type(PNC.Types.ResolveTacticalClass) == "function" then
+        local resolved = tostring(PNC.Types.ResolveTacticalClass(speaker) or "")
+        if resolved == "hostile" then return true end
+    end
     local beh = tostring(speaker.activeBehavior or speaker.behavior or "")
     if beh == "hostile" then return true end
+    if type(speaker.hostility) == "table" then
+        if tostring(speaker.hostility.mode or "") == "hostile"
+            or speaker.hostility.attackPlayers == true
+        then
+            return true
+        end
+    end
+    local rt = type(speaker.runtime) == "table" and speaker.runtime or nil
+    if rt then
+        if rt.hostileToPlayer == true then return true end
+        if type(rt.target) == "table" and tostring(rt.target.kind or "") == "player" then
+            return true
+        end
+    end
+    local pKey = playerKeyFor(player)
+    local rels = PNC.Relationships
+    if rels and type(rels.Get) == "function" and speaker.id ~= nil then
+        local rel = rels.Get(speaker.id, pKey)
+        if type(rel) == "table" then
+            local st = string.lower(tostring(rel.state or ""))
+            if st == "enemy" or st == "hostile" or st == "rival" then return true end
+            if tonumber(rel.approval) and tonumber(rel.approval) <= -25 then return true end
+        end
+    end
+    local isOwnedByPlayer = speaker.recruited == true
+        or speaker.isCompanion == true
+        or speaker.ownerUsername ~= nil
+        or speaker.ownerOnlineID ~= nil
+    if not isOwnedByPlayer then
+        local aff = type(speaker.affiliation) == "table" and speaker.affiliation or nil
+        local fid = (aff and aff.factionID) or speaker.factionID
+        if fid ~= nil and PNC.FactionArchetypes
+            and type(PNC.FactionArchetypes.IsHostileToOutsiders) == "function"
+            and PNC.FactionArchetypes.IsHostileToOutsiders(fid) == true
+        then
+            return true
+        end
+    end
+    return false
+end
+
+Audience.IsHostileToPlayer = isHostileToPlayer
+
+function Audience.CanAddressPlayerAsAlly(speaker, player, opts)
+    if type(speaker) ~= "table" then return false end
+    if isHostileToPlayer(speaker, player) then return false end
+    if not (type(opts) == "table" and opts.requireAlly == true) then
+        return true
+    end
+    -- Combat/team callouts require an actual ally/teammate relationship with the player.
+    if speaker.recruited == true
+        or speaker.isCompanion == true
+        or speaker.isColonist == true
+    then
+        return true
+    end
+    local role = string.lower(tostring(speaker.role or speaker.tacticalRole or ""))
+    if role == "companion" or role == "colonist" then return true end
+    local order = type(speaker.orderSpec) == "table" and speaker.orderSpec or nil
+    local ownerUser = speaker.ownerUsername or (order and order.ownerUsername)
+    local ownerOID = speaker.ownerOnlineID or (order and order.ownerOnlineID)
+    if ownerUser ~= nil and tostring(ownerUser) ~= "" then
+        if not player or type(player.getUsername) ~= "function"
+            or tostring(player:getUsername() or "") == ""
+            or tostring(player:getUsername()) == tostring(ownerUser)
+        then
+            return true
+        end
+    end
+    if ownerOID ~= nil then
+        if not player or type(player.getOnlineID) ~= "function"
+            or tostring(player:getOnlineID()) == tostring(ownerOID)
+        then
+            return true
+        end
+    end
+    local pKey = playerKeyFor(player)
+    local rels = PNC.Relationships
+    if rels and type(rels.Get) == "function" and speaker.id ~= nil then
+        local rel = rels.Get(speaker.id, pKey)
+        if type(rel) == "table" then
+            local st = string.lower(tostring(rel.state or ""))
+            if st == "friend" or st == "ally" or st == "lover"
+                or st == "family" or st == "companion"
+            then
+                return true
+            end
+            if tonumber(rel.approval) and tonumber(rel.approval) >= 10 then
+                return true
+            end
+        end
+    end
     return false
 end
 
@@ -73,8 +176,8 @@ local function resolvePlayerEntry(p, speaker, maxRadius)
     }
 end
 
-function Audience.FindNearbyAlliedPlayer(speaker, maxRadius)
-    if isHostileToPlayer(speaker) then return nil end
+function Audience.FindNearbyAlliedPlayer(speaker, maxRadius, opts)
+    if isHostileToPlayer(speaker, nil) then return nil end
     local core = PNC.Core
     if not core or type(core.ForEachPlayer) ~= "function" then return nil end
     local best = nil
@@ -82,6 +185,7 @@ function Audience.FindNearbyAlliedPlayer(speaker, maxRadius)
     local sx = tonumber(speaker and speaker.x)
     local sy = tonumber(speaker and speaker.y)
     core.ForEachPlayer(function(p)
+        if not Audience.CanAddressPlayerAsAlly(speaker, p, opts) then return end
         local entry = resolvePlayerEntry(p, speaker, maxRadius or 14)
         if not entry then return end
         local dSq = 0
@@ -111,6 +215,9 @@ function Audience.Resolve(speaker, listeners, opts)
 
     local function addListener(entry)
         if type(entry) ~= "table" then return end
+        if entry.isPlayer == true and not Audience.CanAddressPlayerAsAlly(speaker, entry.player, opts) then
+            return
+        end
         local eid = tostring(entry.id or "")
         if eid ~= "" and eid == spId then return end
         local key = entry.isPlayer == true and "player" or (eid ~= "" and eid or tostring(entry.name or ""))
@@ -141,7 +248,7 @@ function Audience.Resolve(speaker, listeners, opts)
     end
 
     if opts.includeNearbyPlayer ~= false and not includesPlayer then
-        local pEntry = Audience.FindNearbyAlliedPlayer(speaker, tonumber(opts.playerRadius) or 14)
+        local pEntry = Audience.FindNearbyAlliedPlayer(speaker, tonumber(opts.playerRadius) or 14, opts)
         if pEntry then addListener(pEntry) end
     end
 
@@ -150,7 +257,7 @@ function Audience.Resolve(speaker, listeners, opts)
     seq = seq + 1
     local label
     if count == 0 then
-        label = opts.fallbackName or "friend"
+        label = opts.fallbackName or ""
     elseif count == 1 then
         label = names[1]
     elseif count == 2 then

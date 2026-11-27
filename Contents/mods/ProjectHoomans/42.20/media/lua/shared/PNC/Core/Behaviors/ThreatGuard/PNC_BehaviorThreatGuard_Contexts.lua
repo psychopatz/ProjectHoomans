@@ -324,6 +324,11 @@ function Internal.ResolveContext(record)
     if kind == tostring(Const.ORDER_FOLLOW or "follow")
         and not isHostileRecord(record)
     then
+        if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
+            == tostring(Const.ATTACK_TYPE_NONE or "none")
+        then
+            return nil
+        end
         return followContext(record, order)
     end
     if isIdleKind(record, kind) then

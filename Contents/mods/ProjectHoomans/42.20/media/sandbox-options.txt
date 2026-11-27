@@ -538,3 +538,23 @@ option ProjectHoomans.ChatterDensity
     page = ProjectHoomans,
     translation = ProjectHoomans.ChatterDensity,
 }
+
+option ProjectHoomans.OffCameraColonistSOSChance
+{
+    type = double,
+    default = 70.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.OffCameraColonistSOSChance,
+}
+
+option ProjectHoomans.OffCameraColonistSOSItemLossPercent
+{
+    type = double,
+    default = 50.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.OffCameraColonistSOSItemLossPercent,
+}

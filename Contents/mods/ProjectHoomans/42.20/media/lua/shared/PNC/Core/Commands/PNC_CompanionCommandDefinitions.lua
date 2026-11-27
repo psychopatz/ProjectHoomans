@@ -487,6 +487,8 @@ Commands.Register({
     emote = "no",
     icon = "media/ui/Emotes/PNC_EmoteAttackNone.png",
     attackType = Const.ATTACK_TYPE_NONE or "none",
+    allowGroupScope = true,
+    squadFollowerEffect = true,
 })
 
 return Commands

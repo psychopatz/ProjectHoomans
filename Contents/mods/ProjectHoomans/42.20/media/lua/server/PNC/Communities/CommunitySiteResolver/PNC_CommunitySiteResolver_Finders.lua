@@ -50,6 +50,79 @@ function Resolver.FindRandomHouse(options)
     ], "random_house_found"
 end
 
+local function findNearMetaBuilding(centerX, centerY, z, maximum, options, seen)
+    if options.allowMetaGrid == false then
+        return nil
+    end
+    local world = getWorld and getWorld() or nil
+    local metaGrid = world
+        and H.InvokeObject(world, "getMetaGrid") or nil
+    if not metaGrid or not metaGrid.getBuildingsIntersecting
+        or not ArrayList or not ArrayList.new
+    then
+        return nil
+    end
+    local definitions = ArrayList.new()
+    local ok = pcall(
+        metaGrid.getBuildingsIntersecting,
+        metaGrid,
+        centerX - maximum,
+        centerY - maximum,
+        centerX + maximum,
+        centerY + maximum,
+        definitions
+    )
+    if not ok then
+        return nil
+    end
+    local count = definitions.size and tonumber(definitions:size()) or 0
+    if count <= 0 then
+        return nil
+    end
+    local inspectionCap = math.min(
+        count,
+        math.max(1, math.floor(tonumber(options.metaInspectionLimit) or 64))
+    )
+    local bestSite = nil
+    local bestDistSq = math.huge
+    local maxDistSq = (maximum + 16) * (maximum + 16)
+    for index = 0, inspectionCap - 1 do
+        local definition = definitions.get and definitions:get(index) or nil
+        if definition then
+            local candidate = Resolver.DescribeBuildingDefinition(
+                definition,
+                z,
+                options
+            )
+            if candidate
+                and candidate.kind == "building"
+                and not seen[candidate.id]
+            then
+                seen[candidate.id] = true
+                if H.SiteIsAvailable(candidate)
+                    and (
+                        type(options.siteFilter) ~= "function"
+                        or options.siteFilter(candidate) == true
+                    )
+                then
+                    local hx = tonumber(candidate.home and candidate.home.x)
+                    local hy = tonumber(candidate.home and candidate.home.y)
+                    if hx and hy then
+                        local dx = hx - centerX
+                        local dy = hy - centerY
+                        local distSq = dx * dx + dy * dy
+                        if distSq <= maxDistSq and distSq < bestDistSq then
+                            bestDistSq = distSq
+                            bestSite = candidate
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return bestSite
+end
+
 function Resolver.FindAvailableNear(x, y, z, options)
     options = type(options) == "table" and options or {}
     local origin, originReason = Resolver.DescribeAt(
@@ -85,6 +158,17 @@ function Resolver.FindAvailableNear(x, y, z, options)
     local centerY = math.floor(tonumber(y) or 0)
     local seen = {}
     if origin then seen[origin.id] = true end
+    local metaCandidate = findNearMetaBuilding(
+        centerX,
+        centerY,
+        z,
+        maximum,
+        options,
+        seen
+    )
+    if metaCandidate then
+        return metaCandidate, "nearby_meta_building_found"
+    end
     local radius
     local offset
     local candidate

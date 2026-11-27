@@ -3,6 +3,7 @@
     "UI_PNC_CommandAttackAuto": "Auto",
     "UI_PNC_CommandAttackMelee": "Melee",
     "UI_PNC_CommandAttackNone": "Don't Attack",
+    "UI_PNC_SquadAttackDisabledIndicator": "SQUAD: DON'T ATTACK",
     "UI_PNC_CommandAttackRanged": "Ranged",
     "UI_PNC_CommandAttackType": "Attack Type",
     "UI_PNC_CommandCamp": "Camp Here",

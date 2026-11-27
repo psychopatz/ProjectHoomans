@@ -32,6 +32,44 @@ local function distSq(x1, y1, x2, y2)
 end
 I.DistSq = distSq
 
+local function isHostileToPlayer(speaker, player)
+    if type(speaker) ~= "table" then return false end
+    local aud = PNC.Semantics and PNC.Semantics.AudienceContext or nil
+    if aud and type(aud.IsHostileToPlayer) == "function" then
+        return aud.IsHostileToPlayer(speaker, player) == true
+    end
+    if speaker.isHostile == true
+        or tostring(speaker.tacticalClass or "") == "hostile"
+        or tostring(speaker.activeBehavior or speaker.behavior or "") == "hostile"
+        or (type(speaker.hostility) == "table"
+            and (tostring(speaker.hostility.mode or "") == "hostile"
+                or speaker.hostility.attackPlayers == true))
+    then
+        return true
+    end
+    local rt = type(speaker.runtime) == "table" and speaker.runtime or nil
+    if rt and (rt.hostileToPlayer == true
+        or (type(rt.target) == "table" and tostring(rt.target.kind or "") == "player"))
+    then
+        return true
+    end
+    return false
+end
+
+local function canAddressPlayerAsAlly(speaker, player)
+    if type(speaker) ~= "table" then return false end
+    local aud = PNC.Semantics and PNC.Semantics.AudienceContext or nil
+    if aud and type(aud.CanAddressPlayerAsAlly) == "function" then
+        return aud.CanAddressPlayerAsAlly(speaker, player, { requireAlly = true }) == true
+    end
+    if isHostileToPlayer(speaker, player) then return false end
+    return speaker.recruited == true
+        or speaker.isCompanion == true
+        or speaker.isColonist == true
+        or speaker.ownerUsername ~= nil
+        or speaker.ownerOnlineID ~= nil
+end
+
 function I.FindNearbyPlayerAddressee(rec, radius)
     local core = PNC.Core
     if not (core and type(core.ForEachPlayer) == "function") then return nil end
@@ -39,6 +77,7 @@ function I.FindNearbyPlayerAddressee(rec, radius)
     local rSq, found, bestDist = radius * radius, nil, nil
     core.ForEachPlayer(function(p)
         if not p or (type(p.isDead) == "function" and p:isDead()) then return end
+        if isHostileToPlayer(rec, p) then return end
         local px = type(p.getX) == "function" and tonumber(p:getX()) or nil
         local py = type(p.getY) == "function" and tonumber(p:getY()) or nil
         local pz = type(p.getZ) == "function" and tonumber(p:getZ()) or 0
@@ -215,6 +254,7 @@ function I.FindLeastThreatenedHelper(speaker, radius, now)
     if core and type(core.ForEachPlayer) == "function" then
         core.ForEachPlayer(function(p)
             if not p or (type(p.isDead) == "function" and p:isDead()) then return end
+            if not canAddressPlayerAsAlly(speaker, p) then return end
             local px = type(p.getX) == "function" and tonumber(p:getX()) or nil
             local py = type(p.getY) == "function" and tonumber(p:getY()) or nil
             local pz = type(p.getZ) == "function" and tonumber(p:getZ()) or 0
@@ -312,6 +352,7 @@ function I.FindIdleBystanderHelper(speaker, radius, now)
     if core and type(core.ForEachPlayer) == "function" then
         core.ForEachPlayer(function(p)
             if not p or (type(p.isDead) == "function" and p:isDead()) then return end
+            if not canAddressPlayerAsAlly(speaker, p) then return end
             local px = type(p.getX) == "function" and tonumber(p:getX()) or nil
             local py = type(p.getY) == "function" and tonumber(p:getY()) or nil
             local pz = type(p.getZ) == "function" and tonumber(p:getZ()) or 0

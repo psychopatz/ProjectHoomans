@@ -334,12 +334,75 @@ function Service.GetCurrentTarget(recordOrID)
     }
 end
 
+local function resolveTravelingGroupForRecord(record)
+    if not record or not record.id or record.recruited == true then
+        return nil
+    end
+    local groups = PNC.AbstractGroups
+    if not groups or type(groups.FindByMember) ~= "function" then
+        return nil
+    end
+    local group = groups.FindByMember(record.id)
+    if type(group) ~= "table" or group.state ~= "TRAVELING" then
+        return nil
+    end
+    if type(group.journey) ~= "table" or group.journey.state ~= "en_route" then
+        return nil
+    end
+    return group
+end
+
+local function attachGroupJourneyHandoff(record, body)
+    local bridge = PNC.CoreGroupTraversalBridge
+    if not bridge or type(bridge.ExtractRemainingWaypoints) ~= "function" then
+        return nil
+    end
+    local group = resolveTravelingGroupForRecord(record)
+    if not group then
+        return nil
+    end
+    local bx, by, bz = liveBodyPosition(record, body)
+    local waypoints = bridge.ExtractRemainingWaypoints(group, bx, by, bz)
+    if type(waypoints) ~= "table" or #waypoints == 0 then
+        return nil
+    end
+    local dest = waypoints[#waypoints]
+    local routePoints = {
+        { x = bx, y = by, z = bz, tag = "origin" },
+    }
+    for i = 1, #waypoints do
+        routePoints[#routePoints + 1] = waypoints[i]
+    end
+    local started = Service.Start and Service.Start(record, {
+        origin = { x = bx, y = by, z = bz },
+        destination = dest,
+        route = routePoints,
+        routeProvider = "corridor",
+        ownerRef = "group_journey_handoff",
+        speedProfile = "walk",
+    }) or nil
+    if type(started) == "table" then
+        started.ephemeralGroupHandoff = true
+        started.handoffGroupId = group.id
+        if type(record.orderSpec) == "table" then
+            record.orderSpec.ephemeralDefault = true
+        end
+    end
+    return started
+end
+
 function Service.OnMaterialized(record)
     local journey = record and record.travel or nil
     local body
-    if not journey
-        or (Service.IsFollowOwned and Service.IsFollowOwned(record))
-    then
+    if Service.IsFollowOwned and Service.IsFollowOwned(record) then
+        return
+    end
+    body = PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record and record.id) or nil
+    if not journey then
+        journey = attachGroupJourneyHandoff(record, body)
+    end
+    if not journey then
         return
     end
     clearLiveStallState(journey)
@@ -347,8 +410,6 @@ function Service.OnMaterialized(record)
     -- Symmetric with OnAbstracted: the fresh body is the source of truth for
     -- route progress, so a body that spawned away from the linear projection
     -- cannot leave the live lane targeting a segment it never reached.
-    body = PNC.Registry and PNC.Registry.GetLiveZombie
-        and PNC.Registry.GetLiveZombie(record.id) or nil
     if body then
         Service.SyncLivePosition(record, body, Internal.WorldHour())
     end
@@ -364,13 +425,34 @@ function Service.OnAbstracted(record, body)
     then
         return
     end
+    local nowHour = Internal.WorldHour()
     if body then
-        Service.SyncLivePosition(record, body, Internal.WorldHour())
+        Service.SyncLivePosition(record, body, nowHour)
+    end
+    if journey.ephemeralGroupHandoff == true then
+        local bridge = PNC.CoreGroupTraversalBridge
+        local groups = PNC.AbstractGroups
+        local group = journey.handoffGroupId
+            and groups and type(groups.Get) == "function"
+            and groups.Get(journey.handoffGroupId) or nil
+        if group and bridge and type(bridge.SyncMemberLivePosition) == "function" then
+            local bx, by, bz = liveBodyPosition(record, body)
+            bridge.SyncMemberLivePosition(group, bx, by, bz, nowHour)
+        end
+        record.travel = nil
+        if type(record.orderSpec) == "table"
+            and tostring(record.orderSpec.kind or "") == tostring(Const.ORDER_TRAVEL or "travel")
+            and record.orderSpec.ephemeralDefault == true
+        then
+            record.orderSpec = nil
+        end
+        Service.Emit("abstracted", record, journey, "group_journey_handoff_released")
+        return
     end
     clearLiveStallState(journey)
     journey.controller = "abstract"
     journey.handoffForced = nil
     journey.handoffReason = nil
-    journey.lastAdvancedWorldHour = Internal.WorldHour()
+    journey.lastAdvancedWorldHour = nowHour
     Service.Emit("abstracted", record, journey, "presence_abstract")
 end

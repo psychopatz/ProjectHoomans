@@ -20,6 +20,7 @@ Config.RECOVERY_INTERVAL_MS = Config.RECOVERY_INTERVAL_MS or 250
 Config.RECOVERY_GRACE_MS = Config.RECOVERY_GRACE_MS or 4000
 Config.MODE_NEAREST = "nearest"
 Config.MODE_NEARBY = "nearby"
+Config.DEFAULT_MODE = Config.MODE_NEARBY
 Config.SCOPE_COLONISTS = "colonists"
 Config.SCOPE_OTHER = "other"
 Config.SCOPE_SOCIAL = "social"

@@ -233,7 +233,9 @@ end
 function Registry.FindRecordByZombie(zombie)
     local modData
     local uuid
-    if not zombie then
+    if (type(zombie) ~= "table" and type(zombie) ~= "userdata")
+        or type(zombie.getModData) ~= "function"
+    then
         return nil
     end
     modData = zombie:getModData()

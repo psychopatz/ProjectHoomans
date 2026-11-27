@@ -10,6 +10,43 @@ local Core = PNC.Core
 local Registry = PNC.Registry
 if type(Commands) ~= "table" then return false end
 
+local function isGroupAttackAllowed(definition)
+    return definition
+        and (definition.allowGroupScope == true
+            or definition.squadFollowerEffect == true)
+end
+
+local function isFollowingOrder(record)
+    local order = record and record.orderSpec or nil
+    return order ~= nil
+        and tostring(order.kind or "") == tostring(Const.ORDER_FOLLOW or "follow")
+end
+
+local function applyToSquadFollowers(
+    player,
+    commandID,
+    radius,
+    args,
+    excludeID,
+    affectedTargets
+)
+    local count = 0
+    local applied
+    Registry.ForEach(function(record)
+        if not record or tostring(record.id or "") == tostring(excludeID or "") then
+            return
+        end
+        if not isFollowingOrder(record) then return end
+        if not Commands.CanPlayerCommand(record, player, radius) then return end
+        applied = Commands.Apply(record, player, commandID, radius, args)
+        if applied then
+            count = count + 1
+            affectedTargets[#affectedTargets + 1] = tostring(record.id)
+        end
+    end)
+    return count
+end
+
 function Commands.Execute(player, args)
     local commandID = tostring(args and args.commandID or "")
     local targetID = args and args.id or nil
@@ -33,7 +70,9 @@ function Commands.Execute(player, args)
     if commandID == "" or not definition then
         return 0, "unknown_command"
     end
-    if scope == "group" and definition.attackType ~= nil then
+    if scope == "group" and definition.attackType ~= nil
+        and not isGroupAttackAllowed(definition)
+    then
         return 0, "personalized_command"
     end
     if scope == "group" and definition.personalized == true then
@@ -67,9 +106,20 @@ function Commands.Execute(player, args)
             args
         )
         if applied then
+            affected = 1
             affectedTargets[1] = tostring(closestRecord.id)
+            if definition.squadFollowerEffect == true then
+                affected = affected + applyToSquadFollowers(
+                    player,
+                    commandID,
+                    radius,
+                    args,
+                    closestRecord.id,
+                    affectedTargets
+                )
+            end
         end
-        return applied and 1 or 0, reason, affectedTargets, details
+        return affected, reason, affectedTargets, details
     end
     if targetID ~= nil then
         applied, reason, details = Commands.Apply(
@@ -79,10 +129,23 @@ function Commands.Execute(player, args)
             radius,
             args
         )
-        if applied then affectedTargets[1] = tostring(targetID) end
-        return applied and 1 or 0, reason, affectedTargets, details
+        if applied then
+            affected = 1
+            affectedTargets[1] = tostring(targetID)
+            if definition.squadFollowerEffect == true then
+                affected = affected + applyToSquadFollowers(
+                    player,
+                    commandID,
+                    radius,
+                    args,
+                    targetID,
+                    affectedTargets
+                )
+            end
+        end
+        return affected, reason, affectedTargets, details
     end
-    if definition.attackType ~= nil then
+    if definition.attackType ~= nil and not isGroupAttackAllowed(definition) then
         return 0, "personalized_command"
     end
     Registry.ForEach(function(record)

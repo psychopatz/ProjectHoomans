@@ -118,6 +118,64 @@ local function tryAvoidThreat(record, zombie, options, forced)
     return false
 end
 
+local function isNoAttackMode(record)
+    return tostring(record and record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
+        == tostring(Const.ATTACK_TYPE_NONE or "none")
+end
+
+local function targetDistSq(record, target)
+    if target and tonumber(target.distSq) ~= nil then
+        return tonumber(target.distSq)
+    end
+    if not record or not target or target.x == nil or target.y == nil then
+        return math.huge
+    end
+    local dx = (tonumber(target.x) or 0) - (tonumber(record.x) or 0)
+    local dy = (tonumber(target.y) or 0) - (tonumber(record.y) or 0)
+    return (dx * dx) + (dy * dy)
+end
+
+function Internal.TryPushNearbyThreat(record, zombie, now)
+    local timestamp = now or (PNC.Core and PNC.Core.Now and PNC.Core.Now()) or 0
+    local shoveRange = tonumber(Const.COMBAT_SHOVE_RANGE) or 1.35
+    local shoveRangeSq = shoveRange * shoveRange
+    local target = Perception and Perception.ResolveRecentAttacker
+        and Perception.ResolveRecentAttacker(record, timestamp) or nil
+    if target and target.kind ~= "zombie" then
+        target = nil
+    end
+    if not target and Perception and Perception.FindImmediateZombieThreat then
+        target = Perception.FindImmediateZombieThreat(record)
+    end
+    if not target or target.kind ~= "zombie" then
+        return false
+    end
+    if targetDistSq(record, target) > shoveRangeSq then
+        return false
+    end
+    if not PNC.Combat or type(PNC.Combat.TryShove) ~= "function" then
+        return false
+    end
+    local shoved = PNC.Combat.TryShove(
+        record,
+        zombie,
+        target,
+        "follow_no_attack_shove"
+    )
+    if shoved == true then
+        record.activeBehavior = "FollowOwner:push_threat"
+        Common.SetCombatDebug(
+            record,
+            target,
+            "follow_no_attack_shove",
+            "none",
+            "shove"
+        )
+        return true
+    end
+    return false
+end
+
 function Internal.TryRespondToThreat(record, zombie, constraint, options)
     local encounterIntent
     if EncounterIntent
@@ -140,25 +198,26 @@ function Internal.TryRespondToThreat(record, zombie, constraint, options)
         Common.ClearCombatTarget(record, "encounter_" .. encounterIntent, zombie)
         return false
     end
-    if tryAvoidThreat(record, zombie, options, false) then return true end
+    if isNoAttackMode(record) then
+        Common.ClearCombatTarget(record, "attack_disabled", zombie)
+        return Internal.TryPushNearbyThreat(record, zombie)
+    end
     return tryEngageTarget(record, zombie, constraint, options)
 end
 
 function Internal.TryRespondToImmediateThreat(record, zombie)
+    local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    if isNoAttackMode(record) then
+        Common.ClearCombatTarget(record, "attack_disabled", zombie)
+        return Internal.TryPushNearbyThreat(record, zombie, now)
+    end
     local target = Perception and Perception.ResolveRecentAttacker
-        and Perception.ResolveRecentAttacker(record, PNC.Core.Now()) or nil
+        and Perception.ResolveRecentAttacker(record, now) or nil
     if not target and Perception and Perception.FindImmediateZombieThreat then
         target = Perception.FindImmediateZombieThreat(record)
     end
     if not target then return false end
     target.immediateSelfDefense = true
-    if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
-        == tostring(Const.ATTACK_TYPE_NONE or "none")
-    then
-        local moved = CombatTactics and CombatTactics.AvoidThreat
-            and CombatTactics.AvoidThreat(record, zombie, target)
-        return moved == true
-    end
     return Internal.EngageResolvedTarget(record, zombie, target, nil)
 end
 

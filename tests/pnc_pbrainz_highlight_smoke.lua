@@ -30,7 +30,7 @@ PNC = {
     CompanionTargetResolver = { SCOPE_SOCIAL = "social" },
 }
 UIFont = { Small = "Small", Medium = "Medium" }
-getKeyCode = function(name) return name == "V" and 47 or 0 end
+getKeyCode = function(name) return name == "SLASH" and 53 or 0 end
 
 package.preload["PsychopatzCore/Input/PsychopatzKeybinds"] = function() return keybinds end
 package.preload["PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationLLMInput"] = function()
@@ -47,7 +47,8 @@ local InlineChat = PNC.Conversation.InlineChat
 function LLMInput:new(_, _, _, _, options) return options end
 
 T.equal(registeredPress.type, keybinds.TYPE_PRESS, "inline talk action uses a single press")
-T.equal(registeredPress.defaultKey, 47, "inline talk key defaults to V")
+T.equal(registeredPress.defaultKey, 53, "inline talk key defaults to /")
+T.equal(InlineChat.Internal.Config.DEFAULT_MODE, "nearby", "inline chat defaults to multi-selection mode")
 
 local targetPlayer = {
     getX = function() return 100 end,
@@ -107,6 +108,23 @@ T.equal(focusPart.focusCount, 0, "the held trigger cannot send its key into the 
 keyDown = false
 T.truthy(InlineChat.FocusInputWhenReady(), "long-press input focuses after the trigger is released")
 T.equal(focusPart.focusCount, 1, "released trigger focuses the input once")
+
+-- Pressing the configured keybind again while open auto-closes the inline panel.
+local lifecycle = InlineChat.Internal.Lifecycle
+InlineChat.State.part = focusPart
+InlineChat.State.toggleKeyHeld = true
+InlineChat.State.suppressReopenUntilRelease = false
+keyDown = true
+T.falsy(lifecycle.PollToggleClose(), "held opening key does not immediately close inline chat")
+T.truthy(InlineChat.State.part ~= nil, "inline chat stays open while opening key is still held")
+keyDown = false
+T.falsy(lifecycle.PollToggleClose(), "releasing opening key arms toggle-close")
+keyDown = true
+T.truthy(lifecycle.PollToggleClose(), "pressing configured keybind again closes inline chat")
+T.equal(InlineChat.State.part, nil, "toggle-close cleared active inline panel")
+T.falsy(registeredPress.isEnabled(), "reopen is suppressed until toggle key is released")
+keyDown = false
+T.truthy(registeredPress.isEnabled(), "keybind re-enables once toggle key is released")
 
 local inputOptions = InlineChat.CreateInputPart({ x = 0, y = 0, width = 320, height = 108 })
 local readyState = inputOptions.getState({

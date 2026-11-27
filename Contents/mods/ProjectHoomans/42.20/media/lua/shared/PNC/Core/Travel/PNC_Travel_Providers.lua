@@ -67,7 +67,7 @@ function Providers.ResolveRoute(record, request)
         y = request.y,
         z = request.z,
     }
-    local providerID = tostring(request.routeProvider or "direct")
+    local providerID = tostring(request.routeProvider or "corridor")
     local provider = Providers.RouteProviders[providerID]
     local supplied
     local ok
@@ -123,6 +123,21 @@ end
 
 Providers.RegisterRouteProvider("direct", function(_, request)
     return request and request.route or nil
+end)
+Providers.RegisterRouteProvider("corridor", function(_, request, origin, destination)
+    local sw = PsychopatzCore and PsychopatzCore.SurvivorWorld or nil
+    local planner = sw and sw.RoutePlanner or nil
+    if not planner or type(planner.PlanRoute) ~= "function" then
+        return nil
+    end
+    local planned, reason = planner.PlanRoute(origin, destination, {
+        seed = request and request.seed or nil,
+        maxWaypoints = request and request.maxWaypoints or nil,
+    })
+    if type(planned) == "table" and reason == "corridor_planned" then
+        return planned
+    end
+    return nil
 end)
 Providers.RegisterSpeedProfile("walk", {
     tilesPerWorldHour = tonumber(Const.TRAVEL_SPEED_WALK_TILES_PER_HOUR) or 300,

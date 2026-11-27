@@ -38,8 +38,19 @@ local function orderKind(record)
         and record.orderSpec.kind or "")
 end
 
+local function isAmbientVisitCampOrder(record)
+    local order = record and record.orderSpec or nil
+    return orderKind(record) == tostring(Const.ORDER_CAMP or "camp")
+        and order ~= nil
+        and order.ambientVisit == true
+        and PNC.AmbientVisitService ~= nil
+        and type(PNC.AmbientVisitService.CanUseAmbient) == "function"
+        and PNC.AmbientVisitService.CanUseAmbient(record) == true
+end
+
 local function isRoamOrder(record)
     return orderKind(record) == tostring(Const.ORDER_ROAM or "roam")
+        or isAmbientVisitCampOrder(record)
 end
 
 local function isGuardOrder(record)
@@ -102,9 +113,13 @@ local function canAttempt(record, zombie, roaming, at)
     local runtime = record and record.runtime or nil
     local target = runtime and runtime.target or nil
     local core = PNC.Core or Core
+    local ambientVisit = isAmbientVisitCampOrder(record)
+    local roamIdle = roaming and (
+        roaming.phase == "idle" or roaming.phase == "sheltered"
+    ) or false
     if (core and core.IsAuthority and not core.IsAuthority()) or not record or not zombie
         or record.alive == false or not isRoamOrder(record)
-        or not roaming or roaming.phase ~= "idle"
+        or (not ambientVisit and not roamIdle)
     then
         return false
     end
@@ -113,10 +128,10 @@ local function canAttempt(record, zombie, roaming, at)
     then
         return false
     end
-    if at < (tonumber(roaming.idleSince) or at) + Service.MIN_IDLE_MS then
+    if roaming and at < (tonumber(roaming.idleSince) or at) + Service.MIN_IDLE_MS then
         return false
     end
-    if at < (tonumber(roaming.seatCooldownUntil) or 0) then
+    if roaming and at < (tonumber(roaming.seatCooldownUntil) or 0) then
         return false
     end
     if runtime and (runtime.facilityActivity or runtime.workOrderId

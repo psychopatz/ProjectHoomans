@@ -239,4 +239,12 @@ function Settings.CanZombieTargetRecord(record, now)
         or Settings.ZombiesTargetDownedNPC()
 end
 
+function Settings.OffCameraColonistSOSChance()
+    return Settings.GetNumber("OffCameraColonistSOSChance", 70.0, 0.0, 100.0)
+end
+
+function Settings.OffCameraColonistSOSItemLossPercent()
+    return Settings.GetNumber("OffCameraColonistSOSItemLossPercent", 50.0, 0.0, 100.0)
+end
+
 require "PNC/Core/Base/PNC_Sandbox_Health"

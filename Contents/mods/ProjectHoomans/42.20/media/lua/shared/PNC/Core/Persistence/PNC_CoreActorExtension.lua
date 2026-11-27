@@ -239,7 +239,10 @@ function Extension.Encode(record, actor)
         ))
     end
 
-    local serializedOrder = trimOrder(CompanionRecordRepository.SerializeOrder(record))
+    local isEphemeralOrder = type(record.orderSpec) == "table"
+        and record.orderSpec.ephemeralDefault == true
+    local serializedOrder = not isEphemeralOrder
+        and trimOrder(CompanionRecordRepository.SerializeOrder(record)) or nil
     if serializedOrder then
         put("orderSpec", serializedOrder)
         local isPatrol = tostring(serializedOrder.kind or "") == "patrol"

@@ -233,7 +233,17 @@ function Director.Initialize(force)
     Scheduler.RegisterJob("AbstractTraversal", Config.TRAVERSAL_INTERVAL_HOURS,
         function(at, budget)
             if Director.Paused then return 0 end
-            return Traversal.AdvanceTravelBatch(at, budget)
+            local advanced = Traversal.AdvanceTravelBatch(at, budget)
+            if PNC.AbstractEncounters and PNC.AbstractEncounters.ScanTravelingCollisions then
+                PNC.AbstractEncounters.ScanTravelingCollisions(at, 4)
+            end
+            if PNC.AbstractHazardResolver and PNC.AbstractHazardResolver.Tick then
+                PNC.AbstractHazardResolver.Tick(at, math.min(8, tonumber(budget) or 8))
+            end
+            if PNC.AbstractAftermathService and PNC.AbstractAftermathService.PruneExpired then
+                PNC.AbstractAftermathService.PruneExpired(at)
+            end
+            return advanced
         end,
         { budget = Config.DIRECTOR_JOB_BUDGET,
             startAt = now + Config.TRAVERSAL_INTERVAL_HOURS })

@@ -82,14 +82,14 @@ function Input.SubmitSemanticFrame(view, frame, options)
     end
     if group and type(group.Submit) == "function" then
         Internal.RecordSemanticChoiceEnvelope(view, frame)
-        return group:Submit(Suggestions.ResolveFrameText(frame), {
+        return group:Submit(Suggestions.ResolveFrameText(frame, view), {
             semanticFrame = frame,
         })
     end
     Internal.RecordSemanticChoiceEnvelope(view, frame)
     return Internal.SubmitSingle(
         view,
-        Suggestions.ResolveFrameText(frame),
+        Suggestions.ResolveFrameText(frame, view),
         {
             semanticFrame = frame,
             semanticTransientSurface = type(options) == "table"

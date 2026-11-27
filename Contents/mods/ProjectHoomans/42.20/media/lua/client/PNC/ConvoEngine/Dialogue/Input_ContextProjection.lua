@@ -218,6 +218,55 @@ function Projection.Build(view, getProviderStatus)
         -- itself has no local identityState field.
         output.identityState = "known"
         output.identityKnown = true
+        if type(presentation.displayName) == "string"
+            and presentation.displayName ~= ""
+        then
+            output.npcDisplayName = presentation.displayName
+        end
+    end
+    if (type(output.groupParticipants) ~= "table" or #output.groupParticipants == 0)
+        and (output.identityKnown == true or output.identityState == "known")
+        and output.npcID ~= nil
+    then
+        local function knownName(candidate)
+            if type(candidate) ~= "string" then return nil end
+            local trimmed = (candidate:gsub("^%s+", ""):gsub("%s+$", ""))
+            if trimmed == "" then return nil end
+            local lower = string.lower(trimmed)
+            if lower == "stranger" or lower == "unknown" or lower == "survivor" then
+                return nil
+            end
+            return trimmed
+        end
+        local entryRecord = type(output.entry) == "table"
+            and (output.entry.record or output.entry.snapshot or output.entry) or nil
+        local entryIdentity = type(entryRecord) == "table"
+            and type(entryRecord.identity) == "table" and entryRecord.identity or nil
+        local fullName = knownName(output.npcDisplayName)
+            or knownName(output.npcFullName)
+            or knownName(entryIdentity and entryIdentity.fullName)
+            or knownName(entryRecord and entryRecord.fullName)
+        local name = knownName(output.npcName)
+            or fullName
+            or knownName(entryRecord and entryRecord.name)
+        local firstName = knownName(output.npcFirstName)
+            or knownName(entryIdentity and (entryIdentity.forename or entryIdentity.firstName))
+            or knownName(entryRecord and (entryRecord.forename or entryRecord.firstName))
+        local nickname = knownName(output.npcNickname)
+            or knownName(entryIdentity and entryIdentity.nickname)
+            or knownName(entryRecord and entryRecord.nickname)
+        if fullName or name or firstName or nickname then
+            output.groupParticipants = {
+                {
+                    id = output.npcID,
+                    fullName = fullName,
+                    name = name,
+                    firstName = firstName,
+                    forename = firstName,
+                    nickname = nickname,
+                },
+            }
+        end
     end
     local speechPresentation = PNC.SemanticSpeechPresentation
     if speechPresentation

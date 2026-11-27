@@ -683,6 +683,132 @@ function Adapter.CanPromoteCoreActor(actorOrID, core)
     return false, "not_survivor_world_actor"
 end
 
+local AI_BUILDING_CACHE_TTL_MS = 300000
+local AI_BUILDING_CACHE_MAX = 32
+
+local function isPlayerOwnedRecord(record)
+    if type(record) ~= "table" then return false end
+    return record.recruited == true
+        or record.colonyOwned == true
+        or record.ownerUsername ~= nil
+        or record.ownerOnlineID ~= nil
+        or record.ownerCharacterUUID ~= nil
+end
+
+local function aiBuildingCacheKey(record, actor, x, y, z)
+    local sw = type(actor) == "table"
+        and type(actor.extensions) == "table"
+        and actor.extensions[AFFILIATION_EXTENSION] or nil
+    local communityID = (type(sw) == "table" and sw.communityID)
+        or record.communityID
+    if communityID ~= nil and tostring(communityID) ~= "" then
+        return "community:" .. tostring(communityID)
+    end
+    local groupID = (type(sw) == "table" and sw.groupID) or record.groupID
+    if groupID ~= nil and tostring(groupID) ~= "" then
+        return "group:" .. tostring(groupID)
+    end
+    return "cell:"
+        .. tostring(math.floor((tonumber(x) or 0) / 32)) .. ":"
+        .. tostring(math.floor((tonumber(y) or 0) / 32)) .. ":"
+        .. tostring(math.floor(tonumber(z) or 0))
+end
+
+local function resolveCachedAIShelterSite(cacheKey, x, y, z, nowMs)
+    local resolver = PNC.CommunitySiteResolver
+    if not resolver or type(resolver.FindAvailableNear) ~= "function" then
+        return nil
+    end
+    Adapter._aiBuildingOrderCache = Adapter._aiBuildingOrderCache or {}
+    local cache = Adapter._aiBuildingOrderCache
+    local cached = cache[cacheKey]
+    if cached and (nowMs - (tonumber(cached.at) or 0)) < AI_BUILDING_CACHE_TTL_MS then
+        return cached.site
+    end
+    local count = 0
+    for _ in pairs(cache) do count = count + 1 end
+    if count >= AI_BUILDING_CACHE_MAX then
+        Adapter._aiBuildingOrderCache = {}
+        cache = Adapter._aiBuildingOrderCache
+    end
+    local siteFilter = nil
+    local mobileInternal = PNC.MobileGroupDirectorInternal
+    if mobileInternal
+        and type(mobileInternal.PlayerOwnershipSnapshot) == "function"
+        and type(mobileInternal.ShelterFilter) == "function"
+    then
+        local okSnap, snap = pcall(mobileInternal.PlayerOwnershipSnapshot)
+        if okSnap and snap then
+            local okFilter, filter = pcall(mobileInternal.ShelterFilter, snap)
+            if okFilter and type(filter) == "function" then
+                siteFilter = filter
+            end
+        end
+    end
+    local ok, site = pcall(resolver.FindAvailableNear, x, y, z, {
+        searchRadius = 64,
+        searchStep = 8,
+        siteFilter = siteFilter,
+    })
+    local chosen = (ok and type(site) == "table" and site.kind == "building"
+        and type(site.home) == "table") and site or nil
+    cache[cacheKey] = {
+        site = chosen,
+        at = nowMs,
+    }
+    return chosen
+end
+
+-- Core-bootstrapped AI community/group actors arrive without a Hoomans
+-- orderSpec. Without one, JobSystem defaults to GuardAnchor on a single
+-- outdoor tile. Assign a standard roam/shelter order so they path into
+-- nearby buildings (both abstracted via MetaGrid and materialized) and
+-- participate in AmbientVisitService + RoamAmbient + RoamingSeat.
+local function assignDefaultAIOrder(record, actor, nowMs)
+    if type(record) ~= "table" or record.orderSpec ~= nil
+        or isPlayerOwnedRecord(record)
+    then
+        return false
+    end
+    local x = tonumber(record.x) or tonumber(record.anchorX)
+    local y = tonumber(record.y) or tonumber(record.anchorY)
+    local z = tonumber(record.z) or tonumber(record.anchorZ) or 0
+    if not x or not y then return false end
+    local Const = PNC.Const or {}
+    local cacheKey = aiBuildingCacheKey(record, actor, x, y, z)
+    local site = resolveCachedAIShelterSite(cacheKey, x, y, z, nowMs)
+    if site and site.home then
+        record.orderSpec = {
+            kind = Const.ORDER_ROAM or "roam",
+            roamMode = Const.ROAM_MODE_SHELTER or "shelter",
+            ambientMobile = true,
+            ambientObjective = "shelter",
+            ambientSourceID = cacheKey,
+            shelterSiteID = site.id,
+            shelterBounds = site.bounds and cloneTable(site.bounds) or nil,
+            x = tonumber(site.home.x) or x,
+            y = tonumber(site.home.y) or y,
+            z = tonumber(site.home.z) or z,
+            radius = math.max(4, tonumber(site.home.radius) or 10),
+            reachedDistance = 3,
+            moveMode = "walk",
+            ephemeralDefault = true,
+        }
+        return true
+    end
+    record.orderSpec = {
+        kind = Const.ORDER_ROAM or "roam",
+        roamMode = Const.ROAM_MODE_AREA or "area",
+        x = x,
+        y = y,
+        z = z,
+        radius = tonumber(Const.ROAM_DEFAULT_RADIUS) or 16,
+        moveMode = "walk",
+        ephemeralDefault = true,
+    }
+    return true
+end
+
 function Adapter.PromoteCoreActor(actorOrID, core, options)
     core = core or PsychopatzCore
     options = type(options) == "table" and options or {}
@@ -784,6 +910,8 @@ function Adapter.PromoteCoreActor(actorOrID, core, options)
     local nowMs = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
     record.runtime.promotedAt = nowMs
     record.runtime.promotionReason = tostring(options.reason or "demand")
+
+    assignDefaultAIOrder(record, actor, nowMs)
 
     if not PNC.Registry.AddRecord(record) then
         return nil, "pnc_core_actor_record_add_failed"
@@ -1121,6 +1249,59 @@ local function mirrorLeaseRuntime(record, actor)
     end
 end
 
+local function buildSyncedWorldPositionPatch(actor, record)
+    if type(actor) ~= "table" or type(record) ~= "table" then
+        return nil
+    end
+    local rx = tonumber(record.x)
+    local ry = tonumber(record.y)
+    local rz = tonumber(record.z) or 0
+    if rx == nil or ry == nil or rx ~= rx or ry ~= ry then
+        return nil
+    end
+    local curPos = position(actor)
+    if math.abs(rx - curPos.x) <= 0.001
+        and math.abs(ry - curPos.y) <= 0.001
+        and math.abs(rz - curPos.z) <= 0.001
+    then
+        return nil
+    end
+    local nextWorld = cloneTable(
+        type(actor.world) == "table" and actor.world or {}
+    )
+    nextWorld.location = type(nextWorld.location) == "table"
+        and nextWorld.location or {}
+    nextWorld.location.position = { x = rx, y = ry, z = rz }
+    return nextWorld
+end
+
+local function syncWorldPositionToCore(reg, actorID, actor, record, core)
+    if not reg or type(reg.Commit) ~= "function" then
+        return actor, false
+    end
+    local nextWorld = buildSyncedWorldPositionPatch(actor, record)
+    if not nextWorld then
+        return actor, false
+    end
+    local committed = reg:Commit(
+        actorID,
+        { world = nextWorld },
+        actor.revision,
+        { returnClone = false }
+    )
+    if not committed then
+        return actor, false
+    end
+    if tonumber(committed.revision) ~= nil then
+        record.coreRevision = tonumber(committed.revision)
+    end
+    if PNC.Registry then
+        PNC.Registry.CoreStoreDirty = true
+    end
+    markProjectionDirty(core, "core_actor_position_sync")
+    return committed, true
+end
+
 --- Synchronizes Project Hoomans' live/abstract presence state into
 --- PsychopatzCore's canonical `actor.providerLease` so SurvivorWorld map
 --- projections, hover cards, diagnostics, and startup restore stay in sync.
@@ -1173,6 +1354,7 @@ function Adapter.SyncPresenceLease(record, zombie, core, options)
             if lease.provider == "ProjectHoomans" then
                 if tostring(lease.bodyID or "") == tostring(idValue) then
                     mirrorLeaseRuntime(record, actor)
+                    syncWorldPositionToCore(reg, actorID, actor, record, core)
                     return true, "already_materialized"
                 end
                 if type(reg.DematerializeProvider) == "function" then
@@ -1246,6 +1428,7 @@ function Adapter.SyncPresenceLease(record, zombie, core, options)
             return false, matErr or "core_materialize_failed"
         end
         mirrorLeaseRuntime(record, committed)
+        syncWorldPositionToCore(reg, actorID, committed, record, core)
         markProjectionDirty(core, "presence_materialize")
         return true, "materialized"
     end
@@ -1267,11 +1450,13 @@ function Adapter.SyncPresenceLease(record, zombie, core, options)
             return false, dematErr or "core_dematerialize_failed"
         end
         mirrorLeaseRuntime(record, committed)
+        syncWorldPositionToCore(reg, actorID, committed, record, core)
         markProjectionDirty(core, "presence_abstract")
         return true, "abstract"
     end
 
     mirrorLeaseRuntime(record, actor)
+    syncWorldPositionToCore(reg, actorID, actor, record, core)
     return true, "already_abstract"
 end
 
@@ -1371,22 +1556,10 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
     local patch = {}
     local hasPatch = false
 
-    local curPos = position(actor)
-    local rx = tonumber(record.x)
-    local ry = tonumber(record.y)
-    local rz = tonumber(record.z) or 0
-    if rx ~= nil and ry ~= nil and rx == rx and ry == ry then
-        if math.abs(rx - curPos.x) > 0.001
-            or math.abs(ry - curPos.y) > 0.001
-            or math.abs(rz - curPos.z) > 0.001
-        then
-            local nextWorld = cloneTable(type(actor.world) == "table" and actor.world or {})
-            nextWorld.location = type(nextWorld.location) == "table"
-                and nextWorld.location or {}
-            nextWorld.location.position = { x = rx, y = ry, z = rz }
-            patch.world = nextWorld
-            hasPatch = true
-        end
+    local nextWorld = buildSyncedWorldPositionPatch(actor, record)
+    if nextWorld then
+        patch.world = nextWorld
+        hasPatch = true
     end
 
     local syncedInvRev = nil
@@ -1475,7 +1648,7 @@ function Adapter.SyncPromotedCoreActorToCore(record, core, options)
             PNC.Registry.CoreStoreDirty = true
         end
         if patch.appearance ~= nil or patch.identity ~= nil
-            or patch.personalInventory ~= nil
+            or patch.personalInventory ~= nil or patch.world ~= nil
         then
             markProjectionDirty(core, "core_actor_presentation_sync")
         end

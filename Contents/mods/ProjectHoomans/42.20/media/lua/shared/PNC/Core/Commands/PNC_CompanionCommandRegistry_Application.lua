@@ -42,12 +42,20 @@ local function applyAttackType(record, definition)
         elseif record.runtime then
             record.runtime.attackAction = nil
         end
+        if PNC.CombatTactics and PNC.CombatTactics.ClearRetreatState then
+            PNC.CombatTactics.ClearRetreatState(record)
+        end
         if PNC.BehaviorCommon and PNC.BehaviorCommon.ClearCombatTarget then
             PNC.BehaviorCommon.ClearCombatTarget(
                 record,
                 "attack_type_none",
                 zombie
             )
+        end
+        if record.runtime then
+            record.runtime.threatGuard = nil
+            record.runtime.recentThreat = nil
+            record.runtime.zombieAttacker = nil
         end
     end
     refreshEquipmentState(record)

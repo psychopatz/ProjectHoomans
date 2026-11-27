@@ -38,7 +38,9 @@ function Diagnostics.AssertModeState(event)
     local part = State.part
     local targets = PNC.CompanionTargetResolver
     if not part or not targets then return true end
-    local committed = targets.NormalizeMode(State.mode or Config.MODE_NEAREST)
+    local committed = targets.NormalizeMode(
+        State.mode or Config.DEFAULT_MODE or Config.MODE_NEARBY
+    )
     local uiMode = part.inputMode and targets.NormalizeMode(part.inputMode) or nil
     local selectedMode, selectedCount, modeButtonCount = nil, 0, 0
     local buttonsOK, allModeButtonsEnabled = true, true

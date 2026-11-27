@@ -33,6 +33,28 @@ function H.TryHandle(
     local hordeHandled
     local leashHandled
 
+    if tostring(record and record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
+        == tostring(Const.ATTACK_TYPE_NONE or "none")
+    then
+        if PNC.CombatTactics and PNC.CombatTactics.ClearRetreatState then
+            PNC.CombatTactics.ClearRetreatState(record)
+        end
+        if PNC.BehaviorCommon and PNC.BehaviorCommon.ClearCombatTarget then
+            PNC.BehaviorCommon.ClearCombatTarget(
+                record,
+                "attack_disabled",
+                zombie
+            )
+        end
+        if Internal.TryPushNearbyThreat
+            and Internal.TryPushNearbyThreat(record, zombie, now)
+        then
+            Internal.SetFollowMode(record, "combat_self_defense")
+            return true
+        end
+        return false
+    end
+
     -- Combat retreat owns movement once it has started. The provider keeps
     -- the retreat lease ahead of formation and horde-steering movement.
     if RetreatHandoff and RetreatHandoff.TryHandle then

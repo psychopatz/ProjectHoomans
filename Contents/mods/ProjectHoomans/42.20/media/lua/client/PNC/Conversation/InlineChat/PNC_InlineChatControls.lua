@@ -31,7 +31,9 @@ local function hasPendingLLM()
 end
 
 function InlineChat.SetMode(_, mode, part)
-    local previousMode = Resolver.NormalizeMode(State.mode or Config.MODE_NEAREST)
+    local previousMode = Resolver.NormalizeMode(
+        State.mode or Config.DEFAULT_MODE or Config.MODE_NEARBY
+    )
     local requestedMode = Resolver.NormalizeMode(mode)
     Diagnostics.LogMode("mode_click", requestedMode, previousMode, "callback_begin")
     if part and part ~= State.part then
@@ -73,6 +75,7 @@ function InlineChat.SetMode(_, mode, part)
     State.part.owner = State.host
     if State.part.refreshControls then State.part:refreshControls() end
     Targets.Position(0, player)
+    if State.part.focusInput then State.part:focusInput(false) end
     Diagnostics.LogMode("mode_transaction_accepted", requestedMode, State.mode, nil)
     return true
 end
@@ -98,6 +101,7 @@ function InlineChat.SetScope(_, value, part)
     State.part.owner = State.host
     if State.part.refreshControls then State.part:refreshControls() end
     Targets.Position(0, player)
+    if State.part.focusInput then State.part:focusInput(false) end
     return true
 end
 

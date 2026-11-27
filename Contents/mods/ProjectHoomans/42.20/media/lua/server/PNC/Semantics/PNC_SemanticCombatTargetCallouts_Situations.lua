@@ -311,7 +311,7 @@ function S.TryEmitReloadCallout(record, target, now, ref)
         helper.isPlayer
             and { id = "player", name = helper.name, isPlayer = true }
             or helper.record
-    ) or { id = "self", name = "everyone", isPlayer = false }
+    ) or nil
     local tCls = (type(target) == "table" and tostring(target.kind or "") ~= "zombie"
         and tostring(target.threatClass or "") ~= "zombie") and "human_hostile" or "zombie"
     local callDesc = {

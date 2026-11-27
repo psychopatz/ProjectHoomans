@@ -97,7 +97,9 @@ function Emotes.BuildMenuDefinition(scope, target, nestedMenus)
         definition = definitions[i]
         if definition.contextOnly ~= true
             and definition.semanticOnly ~= true
-            and not (scope == "group" and (definition.attackType ~= nil
+            and not (scope == "group" and ((definition.attackType ~= nil
+                and definition.allowGroupScope ~= true
+                and definition.squadFollowerEffect ~= true)
                 or definition.personalized == true))
         then
             groupID = tostring(definition.group or "")

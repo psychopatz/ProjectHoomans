@@ -36,12 +36,78 @@ local function responseCatalog()
     return nil
 end
 
-function Suggestions.ResolveFrameText(frame)
+local function tokenFormatter()
+    local tf = PNC.ConvoEngine and PNC.ConvoEngine.TokenFormatter or nil
+    if type(tf) == "table" and type(tf.Format) == "function" then
+        return tf
+    end
+    local ok, loaded = pcall(require, "PNC/ConvoEngine/TokenFormatter")
+    if ok and type(loaded) == "table" and type(loaded.Format) == "function" then
+        return loaded
+    end
+    return nil
+end
+
+local function suggestionTokenMap(viewOrContext, frame)
+    local ctx = type(viewOrContext) == "table" and viewOrContext or {}
+    if type(ctx.spec) == "table" and type(ctx.spec.context) == "table" then
+        ctx = ctx.spec.context
+    end
+    local playerName = ctx.playerFirstName or ctx.playerName or ctx.playerFullName
+    if (type(playerName) ~= "string" or playerName == "")
+        and type(getSpecificPlayer) == "function"
+    then
+        local okP, p = pcall(getSpecificPlayer, 0)
+        if okP and p then
+            local desc = type(p.getDescriptor) == "function" and p:getDescriptor() or nil
+            local fore = desc and type(desc.getForename) == "function" and desc:getForename() or nil
+            if type(fore) == "string" and fore ~= "" then
+                playerName = fore
+            elseif type(p.getDisplayName) == "function" then
+                playerName = p:getDisplayName()
+            elseif type(p.getUsername) == "function" then
+                playerName = p:getUsername()
+            end
+        end
+    end
+    local npcName = nil
+    if ctx.identityKnown == true or ctx.identityState == "known" then
+        npcName = ctx.npcFirstName or ctx.npcDisplayName or ctx.npcName or ctx.npcFullName
+    end
+    local claimedName = type(frame) == "table"
+        and type(frame.slots) == "table"
+        and type(frame.slots.identityClaim) == "table"
+        and frame.slots.identityClaim.name or nil
+    local speakerName = claimedName or playerName
+    local tokens = {}
+    if type(speakerName) == "string" and speakerName ~= "" then
+        tokens["speaker.name"] = speakerName
+        tokens["player.name"] = speakerName
+        tokens["claimed.name"] = speakerName
+    end
+    if type(npcName) == "string" and npcName ~= "" then
+        tokens["addressee.name"] = npcName
+        tokens["npc.name"] = npcName
+    end
+    return tokens
+end
+
+local function formatTemplateIfNeeded(text, viewOrContext, frame)
+    if type(text) ~= "string" or not string.find(text, "{", 1, true) then
+        return text
+    end
+    local tf = tokenFormatter()
+    if not tf then return text end
+    return tf.Format(text, suggestionTokenMap(viewOrContext, frame))
+end
+
+function Suggestions.ResolveFrameText(frame, viewOrContext)
     frame = type(frame) == "table" and frame or {}
-    return resolvedText(
+    local raw = resolvedText(
         frame.textKey,
         frame.textFallback or frame.utteranceFallback or frame.utterance
     )
+    return formatTemplateIfNeeded(raw, viewOrContext, frame)
 end
 
 local function sameBranchOrigin(frame, origin)
@@ -170,12 +236,15 @@ local function branchOfferIR(offer, origin, frame, view)
             ref = source.target,
         }
     end
+    local formattedRaw = formatTemplateIfNeeded(
+        resolvedText(offer.utteranceKey, offer.utteranceFallback),
+        view,
+        frame
+    )
     local ir = IR.New({
         kind = "semantic_suggestion_frame",
-        rawText = resolvedText(
-            offer.utteranceKey, offer.utteranceFallback
-        ),
-        normalizedText = normalizedText(offer.utteranceFallback),
+        rawText = formattedRaw,
+        normalizedText = normalizedText(formattedRaw),
         -- Event follow-up offers are executable semantic questions. Preserve
         -- the authored frame's explicit intent when present; the existing
         -- context-reference contract supplies QUESTION when the offer only
@@ -250,15 +319,12 @@ function Suggestions.FrameToIR(frame, view)
     then
         return nil, "suggestion_frame_invalid"
     end
-    local branchOffer, branchOrigin = branchOfferForFrame(frame, view)
-    if branchOffer then
-        return branchOfferIR(branchOffer, branchOrigin, frame, view)
-    end
-
     -- Generic registered providers resolve through the current bounded
-    -- projection. This keeps click-time identity/revision checks on the
-    -- existing lane instead of allowing a provider to become an action
-    -- dispatcher or a second parser.
+    -- projection BEFORE raw branch-offer lookup. A provider candidate (such as
+    -- StaticProvider_Identity's identity.choice.real_name) already carries
+    -- grounded slots and realized player-name text; letting a same-ID raw
+    -- .convo branch offer intercept it first would drop slots and leak raw
+    -- template variables such as "{speaker.name}".
     local providerID = frame.providerID
     local extensions = type(frame.extensions) == "table"
         and frame.extensions or {}
@@ -279,16 +345,14 @@ function Suggestions.FrameToIR(frame, view)
                 if sourceExtensions.topic == nil and source.topic ~= nil then
                     sourceExtensions.topic = copyValue(source.topic)
                 end
-                local rawText = Suggestions.ResolveFrameText(source)
+                local rawText = Suggestions.ResolveFrameText(source, view)
                 if rawText == "" then
                     return nil, "initiating_say_required"
                 end
                 return IR.New({
                     kind = "semantic_suggestion_frame",
                     rawText = rawText,
-                    normalizedText = normalizedText(
-                        source.textFallback or source.utteranceFallback
-                    ),
+                    normalizedText = normalizedText(rawText),
                     intent = source.intent,
                     speechAct = source.speechAct,
                     action = source.action,
@@ -310,6 +374,11 @@ function Suggestions.FrameToIR(frame, view)
             end
         end
         return nil, "suggestion_provider_candidate_unknown"
+    end
+
+    local branchOffer, branchOrigin = branchOfferForFrame(frame, view)
+    if branchOffer then
+        return branchOfferIR(branchOffer, branchOrigin, frame, view)
     end
 
     local definition = definitionFor(frame.candidateID)

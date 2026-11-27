@@ -43,7 +43,17 @@ function Internal.PrepareSingleSubmission(view, value, part)
         and not compoundPart
         and type(Internal.ParseTurn) == "function"
     then
-        local turn = Internal.ParseTurn(value, nil, view)
+        local turnOptions = nil
+        if type(Internal.ShallowContext) == "function" then
+            local ctx = Internal.ShallowContext(view)
+            if type(ctx) == "table"
+                and type(ctx.groupParticipants) == "table"
+                and #ctx.groupParticipants > 0
+            then
+                turnOptions = { groupParticipants = ctx.groupParticipants }
+            end
+        end
+        local turn = Internal.ParseTurn(value, turnOptions, view)
         if type(turn) == "table" and turn.compound == true then
             return {
                 value = value,

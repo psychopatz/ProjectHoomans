@@ -119,6 +119,7 @@ function InlineChat.Update()
         return
     end
     if State.pendingTargetEntry then Session.OpenQueuedFallback("conversation_handoff") end
+    if Lifecycle.PollToggleClose and Lifecycle.PollToggleClose() then return end
     if not State.part then return end
     local current = nowMs()
     local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
@@ -158,7 +159,8 @@ function InlineChat.Update()
     State.part.owner = State.host
     State.part.title = Config.TITLE
     if State.part.inputMode
-        and Resolver.NormalizeMode(State.part.inputMode) ~= Resolver.NormalizeMode(State.mode or Config.MODE_NEAREST)
+        and Resolver.NormalizeMode(State.part.inputMode)
+            ~= Resolver.NormalizeMode(State.mode or Config.DEFAULT_MODE or Config.MODE_NEARBY)
     then
         Diagnostics.LogMode("mode_desync", State.part.inputMode, State.mode, "adapter_sync")
     end

@@ -169,6 +169,16 @@ local function addBranchOfferCandidate(
 
     local frame = branchOfferFrame(offer, revision, origin)
     local source = sourceRecord(kind, revision, reason)
+    local rawLabel = resolvedText(offer.labelKey, offer.labelFallback)
+    local rawUtterance = resolvedText(offer.utteranceKey, offer.utteranceFallback)
+    if type(Suggestions.ResolveFrameText) == "function" then
+        if type(rawLabel) == "string" and string.find(rawLabel, "{", 1, true) then
+            rawLabel = Suggestions.ResolveFrameText({ textFallback = rawLabel }, context)
+        end
+        if type(rawUtterance) == "string" and string.find(rawUtterance, "{", 1, true) then
+            rawUtterance = Suggestions.ResolveFrameText({ textFallback = rawUtterance }, context)
+        end
+    end
     local candidate = {
         id = offer.id,
         topic = canonicalTopic(origin and origin.topic),
@@ -180,12 +190,10 @@ local function addBranchOfferCandidate(
         display = {
             labelKey = offer.labelKey,
             labelFallback = offer.labelFallback,
-            label = resolvedText(offer.labelKey, offer.labelFallback),
+            label = rawLabel,
             utteranceKey = offer.utteranceKey,
             utteranceFallback = offer.utteranceFallback,
-            utterance = resolvedText(
-                offer.utteranceKey, offer.utteranceFallback
-            ),
+            utterance = rawUtterance,
         },
         visibility = "player",
         eligibility = eligibility,

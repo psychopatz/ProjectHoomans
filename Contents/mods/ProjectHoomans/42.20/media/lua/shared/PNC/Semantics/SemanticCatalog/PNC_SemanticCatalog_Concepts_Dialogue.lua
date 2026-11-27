@@ -60,7 +60,24 @@ function Internal.RegisterDialogueConcepts()
     registerConcept("GREET", {
         "hello", "hello there", "hi", "hi there", "hey", "hey there",
         "good morning", "good afternoon", "good evening",
+        "it's nice to see you", "its nice to see you", "it is nice to see you",
+        "it's good to see you", "its good to see you", "it is good to see you",
+        "it's nice to meet you", "its nice to meet you", "it is nice to meet you",
+        "good meeting you", "happy to meet you",
     })
+    -- Closed-set compositional vocabulary for social pleasantries so natural
+    -- variations ("so glad to see you", "really nice meeting you too") match
+    -- deterministically without enumerating every flat combination.
+    registerConcept("INTENSIFIER", {
+        "so", "really", "very", "truly", "pretty", "super",
+    }, 1)
+    registerConcept("PLEASANTRY_ADJ", {
+        "good", "glad", "happy", "pleased",
+    }, 1)
+    registerConcept("PLEASANTRY_VERB_YOU", { "see you", "meet you" }, -1)
+    registerConcept("PLEASANTRY_GERUND_YOU", { "seeing you", "meeting you" }, -1)
+    registerConcept("RECIPROCAL_TAIL", { "again", "too" }, 1)
+    registerConcept("THANK_AMOUNT", { "lot", "ton", "bunch" }, 1)
     registerConcept("FAREWELL", {
         "bye", "goodbye", "good bye", "see you", "see ya",
         "see you later", "see you around", "see you soon",
