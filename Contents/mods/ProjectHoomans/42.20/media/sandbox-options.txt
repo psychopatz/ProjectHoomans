@@ -418,6 +418,24 @@ option ProjectHoomans.NPCWeaponConditionLoss
     translation = ProjectHoomans.NPCWeaponConditionLoss,
 }
 
+option ProjectHoomans.NPCCorpseLowDurabilityLoot
+{
+    type = boolean,
+    default = true,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCCorpseLowDurabilityLoot,
+}
+
+option ProjectHoomans.NPCCorpseLootMaxDurabilityPercent
+{
+    type = integer,
+    default = 5,
+    min = 1,
+    max = 100,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.NPCCorpseLootMaxDurabilityPercent,
+}
+
 option ProjectHoomans.NPCSupplyTransactionLogging
 {
     type = boolean,

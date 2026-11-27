@@ -96,6 +96,14 @@ function Settings.NPCWeaponConditionLossEnabled()
     return Settings.GetBoolean("NPCWeaponConditionLoss", false)
 end
 
+function Settings.NPCCorpseLowDurabilityLootEnabled()
+    return Settings.GetBoolean("NPCCorpseLowDurabilityLoot", true)
+end
+
+function Settings.NPCCorpseLootMaxDurabilityPercent()
+    return Settings.GetNumber("NPCCorpseLootMaxDurabilityPercent", 5, 1, 100)
+end
+
 function Settings.NPCSupplyTransactionLoggingEnabled()
     return Settings.GetBoolean("NPCSupplyTransactionLogging", false)
 end

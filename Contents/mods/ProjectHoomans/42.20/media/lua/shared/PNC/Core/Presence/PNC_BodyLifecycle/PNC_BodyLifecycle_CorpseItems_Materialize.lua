@@ -46,10 +46,13 @@ function Internal.prepareCorpseItems(record, zombie)
     local container = zombie and zombie.getInventory and zombie:getInventory() or nil
     local pool = {}
     local allItems = {}
+    local equippedItems = {}
+    local equippedSeen = {}
     local seen = {}
     local claimed = {}
     local appearanceUsed = {}
     local wornItems = zombie and zombie.getWornItems and zombie:getWornItems() or nil
+    local attachedItems = zombie and zombie.getAttachedItems and zombie:getAttachedItems() or nil
     local itemVisuals = zombie and zombie.getItemVisuals and zombie:getItemVisuals() or nil
     local inventoryItems = container and container.getItems and container:getItems() or nil
     local appearance = Identity and Identity.RollAppearance
@@ -184,6 +187,12 @@ function Internal.prepareCorpseItems(record, zombie)
         return created
     end
 
+    local function markEquipped(candidate)
+        if not candidate or equippedSeen[candidate] then return end
+        equippedSeen[candidate] = true
+        equippedItems[#equippedItems + 1] = candidate
+    end
+
     if inventoryItems then
         for i = 0, inventoryItems:size() - 1 do
             remember(inventoryItems:get(i))
@@ -192,11 +201,25 @@ function Internal.prepareCorpseItems(record, zombie)
     if wornItems then
         for i = 0, wornItems:size() - 1 do
             local entry = wornItems:get(i)
-            remember(entry and entry.getItem and entry:getItem() or nil)
+            local wornItem = entry and entry.getItem and entry:getItem() or nil
+            remember(wornItem)
+            markEquipped(wornItem)
         end
     end
-    remember(zombie.getPrimaryHandItem and zombie:getPrimaryHandItem() or nil)
-    remember(zombie.getSecondaryHandItem and zombie:getSecondaryHandItem() or nil)
+    if attachedItems and attachedItems.size then
+        for i = 0, attachedItems:size() - 1 do
+            local entry = attachedItems:get(i)
+            local attachedItem = entry and entry.getItem and entry:getItem() or nil
+            remember(attachedItem)
+            markEquipped(attachedItem)
+        end
+    end
+    local livePrimary = zombie.getPrimaryHandItem and zombie:getPrimaryHandItem() or nil
+    local liveSecondary = zombie.getSecondaryHandItem and zombie:getSecondaryHandItem() or nil
+    remember(livePrimary)
+    markEquipped(livePrimary)
+    remember(liveSecondary)
+    markEquipped(liveSecondary)
 
     -- Materialize the canonical logical inventory first. Live NPC rendering can
     -- use ItemVisuals, but IsoDeadBody only retains real InventoryItem objects.
@@ -216,10 +239,19 @@ function Internal.prepareCorpseItems(record, zombie)
                         PNC.Core.ProtectClothingFromFall(item)
                     end
                     applyWornItemSafe(zombie, descriptor.wornSlot, item)
+                    markEquipped(item)
                 elseif item and descriptor.equipSlot == "primary" and zombie.setPrimaryHandItem then
                     zombie:setPrimaryHandItem(item)
+                    markEquipped(item)
                 elseif item and descriptor.equipSlot == "secondary" and zombie.setSecondaryHandItem then
                     zombie:setSecondaryHandItem(item)
+                    markEquipped(item)
+                elseif item and (descriptor.wornSlot ~= nil
+                    or descriptor.equipSlot == "primary"
+                    or descriptor.equipSlot == "secondary"
+                    or descriptor.attachedSlot ~= nil)
+                then
+                    markEquipped(item)
                 end
             end
         end
@@ -240,6 +272,7 @@ function Internal.prepareCorpseItems(record, zombie)
                             PNC.Core.ProtectClothingFromFall(item)
                         end
                         applyWornItemSafe(zombie, bodyLocation, item)
+                        markEquipped(item)
                     end
                 end
             end
@@ -257,8 +290,12 @@ function Internal.prepareCorpseItems(record, zombie)
                     PNC.Core.ProtectClothingFromFall(item)
                 end
                 applyWornItemSafe(zombie, bodyLocation, item)
+                markEquipped(item)
             end
         end
+    end
+    if Internal.applyCorpseDropDurability then
+        Internal.applyCorpseDropDurability(record, equippedItems)
     end
     -- Every remembered or created item is already inserted through the shared
     -- corpse-item service. Calling addItemsToItemContainer() again produces
