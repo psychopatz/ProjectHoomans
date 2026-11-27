@@ -195,6 +195,8 @@ function Presentation.ResolveClaim(
                     or request.args.token,
                 origin = "semantic_identity_claim",
                 verifiedIdentityClaim = true,
+                traderConversation = tostring(request.args.origin or "")
+                    == "trader_conversation",
             })
             disclosureSucceeded = type(disclosure) == "table"
                 and disclosure.accepted == true
@@ -211,6 +213,9 @@ function Presentation.ResolveClaim(
                 else
                     disclosedName = tostring(identity.nickname
                         or npcNickname(record) or "")
+                    if disclosedName == "" then
+                        disclosedName = firstName(npcName(record))
+                    end
                 end
                 local commands = PNC.PlayerKnowledgeCommands
                 local internal = commands and commands.Internal or nil

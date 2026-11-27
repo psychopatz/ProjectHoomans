@@ -109,7 +109,14 @@ function Alias.Generate(source, options)
     )
 end
 
+local CoreExchange = PsychopatzCore and PsychopatzCore.ActorIdentityExchange
+    or (pcall(require, "PsychopatzCore/Actors/PsychopatzActorIdentityExchange")
+        and PsychopatzCore and PsychopatzCore.ActorIdentityExchange) or nil
+
 function Alias.MatchesCanonical(value, canonical)
+    if CoreExchange and type(CoreExchange.ClaimMatchesName) == "function" then
+        return CoreExchange.ClaimMatchesName(value, canonical)
+    end
     return claimMatchesName(value, canonical)
 end
 

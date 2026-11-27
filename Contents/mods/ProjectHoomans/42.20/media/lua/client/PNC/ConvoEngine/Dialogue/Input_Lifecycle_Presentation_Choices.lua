@@ -135,13 +135,17 @@ local function buildCoreChoices(view, projection, authoredChoices)
     end
 
     local rootGroupID = projection.rootGroupID
-    local navigation = selectedGroup and selectedGroup.navigation or {}
-    if #navigation == 0
+    local hideBackout = projection.allowBack == false
+        or projection.hideBackout == true
+        or (selectedGroup and (selectedGroup.allowBack == false
+            or selectedGroup.hideBackout == true))
+    local navigation = not hideBackout and selectedGroup
+        and selectedGroup.navigation or {}
+    if not hideBackout
+        and #navigation == 0
         and selectedGroup
         and rootGroupID
         and selectedGroup.id ~= rootGroupID
-        and projection.allowBack ~= false
-        and selectedGroup.allowBack ~= false
         and Suggestions.BuildBackFrame
     then
         -- Compatibility for projections produced before shared navigation was
@@ -166,9 +170,6 @@ local function buildCoreChoices(view, projection, authoredChoices)
                 },
             }}
         end
-    end
-    for _, row in ipairs(navigation) do
-        append(row, true)
     end
 
     local candidates = selectedGroup and selectedGroup.candidates
@@ -198,6 +199,13 @@ local function buildCoreChoices(view, projection, authoredChoices)
                 end
                 break
             end
+        end
+    end
+    -- Place backout ("Let's talk something else") below the beat's suggestions
+    -- unless explicitly suppressed via allowBack=false / hideBackout=true.
+    if not hideBackout then
+        for _, row in ipairs(navigation) do
+            append(row, true)
         end
     end
     if view then view.semanticSuggestionRows = rows end

@@ -299,6 +299,8 @@ local function identityChoiceCandidates(context, Provider, IdentityAlias)
             alias = tostring(generated)
         end
     end
+    -- Lie button intentionally omitted per design: players who want to lie can
+    -- type a false name in the input box, which still triggers the lie guard.
     local specs = {
         {
             id = "identity.choice.real_name",
@@ -323,18 +325,6 @@ local function identityChoiceCandidates(context, Provider, IdentityAlias)
             labelKey = "convo.ui.suggestion.identity.rude.affordance.label",
             fallbackLabel = "Don't tell your name",
             rank = 20,
-        },
-        {
-            id = "identity.choice.lie_name",
-            familyID = "ui.suggestion.identity.lie",
-            intent = "INFORM",
-            choice = "lie_name",
-            claimMode = "generated",
-            claimedName = alias,
-            responseStyle = nil,
-            labelKey = "convo.ui.suggestion.identity.lie.affordance.label",
-            fallbackLabel = "Lie about your name",
-            rank = 30,
         },
     }
     local candidates = {}

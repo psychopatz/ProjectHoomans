@@ -19,7 +19,13 @@ local PREVIOUS_DEFAULT_PAUSE_MIN_MS = 5000
 local PREVIOUS_DEFAULT_PAUSE_MAX_MS = 12000
 
 local function randomFraction()
-    return ZombRandFloat(0, 10000) / 10000
+    if type(ZombRandFloat) == "function" then
+        return ZombRandFloat(0, 10000) / 10000
+    end
+    if type(ZombRand) == "function" then
+        return ZombRand(10000) / 10000
+    end
+    return math.random()
 end
 
 local function chooseAreaGoal(record, order, state)

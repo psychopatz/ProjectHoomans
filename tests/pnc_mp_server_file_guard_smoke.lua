@@ -202,7 +202,7 @@ listing:close()
 -- PNC_WorldItemContext_Objects and PNC_WorldItemContext_Approach add unified
 -- object discovery and walkable approach helpers onto the shared WorldItemContext
 -- bucket cache (1106 files).
-T.equal(#serverOnlyFiles, 1143,
+T.equal(#serverOnlyFiles, 1154,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

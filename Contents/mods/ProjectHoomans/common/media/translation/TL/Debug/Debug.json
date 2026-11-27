@@ -255,6 +255,7 @@
   "UI_PNC_Conversation_Telemetry_SentenceLabel": "Pangungusap na hindi naintindihan ng sistema:",
   "UI_PNC_Conversation_Telemetry_Title": "Semantic na telemetry",
   "UI_PNC_Debug": "I-debug",
+  "UI_PNC_Debug_TriggerSuicide": "I-trigger ang Suicide Pipeline",
   "UI_PNC_DebugBandage": "Debug Bandage (Walang Item)",
   "UI_PNC_DebugBandageAll": "Debug Bandage Lahat (Libre)",
   "UI_PNC_DebugBandageAlmostDirty": "Gawing Halos Madumi ang Bandage",

@@ -160,5 +160,9 @@
     "Sandbox_ProjectHoomans.ChatterDensity_tooltip": "Kinokontrol kung gaano kadalas nagsisimula ang Conversation Director ng ambient banter at hindi apurahang reaksyon. Nananatiling aktibo ang mga babala sa labanan.",
     "Sandbox_ProjectHoomans.ChatterDensity_option1": "Tahimik",
     "Sandbox_ProjectHoomans.ChatterDensity_option2": "Sinematiko",
-    "Sandbox_ProjectHoomans.ChatterDensity_option3": "Masigla"
+    "Sandbox_ProjectHoomans.ChatterDensity_option3": "Masigla",
+    "Sandbox_ProjectHoomans.OffCameraColonistSOSChance": "Tsansa ng Off-Camera Colonist SOS (%%)",
+    "Sandbox_ProjectHoomans.OffCameraColonistSOSChance_tooltip": "Porsyento ng tsansa na ang isang kolonista sa panganib sa labas ng kamera ay magpadala ng SOS para sa pagsagip sa halip na mamatay agad.",
+    "Sandbox_ProjectHoomans.OffCameraColonistSOSItemLossPercent": "Pagkawala ng Item sa Off-Camera SOS (%%)",
+    "Sandbox_ProjectHoomans.OffCameraColonistSOSItemLossPercent_tooltip": "Porsyento ng dalang gamit na mawawala kapag nakatakas ang kolonista sa panganib sa labas ng kamera sa pamamagitan ng SOS."
 }

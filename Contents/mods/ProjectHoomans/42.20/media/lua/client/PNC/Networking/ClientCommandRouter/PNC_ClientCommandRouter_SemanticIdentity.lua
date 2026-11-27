@@ -69,18 +69,19 @@ local function auditIdentityResultApplied(args, npcID, disclosedName)
 end
 
 local function activeViewFor(npcID)
+    local key = tostring(npcID or "")
+    local function matches(view)
+        if not view or not view.spec then return false end
+        return tostring(view.spec.npcID or "") == key
+            or tostring(view.spec.sourceActorID or "") == key
+    end
     local active = DialogueSession.GetActiveView()
-    if active and active.session
-        and tostring(active.spec and active.spec.npcID or "")
-            == tostring(npcID or "")
-    then
+    if active and active.session and matches(active) then
         return active
     end
     local conversation = PsychopatzCore and PsychopatzCore.Conversation
     local view = conversation and conversation.instance or nil
-    if not view or tostring(view.spec and view.spec.npcID or "")
-        ~= tostring(npcID or "")
-    then
+    if not matches(view) then
         return nil
     end
     return view

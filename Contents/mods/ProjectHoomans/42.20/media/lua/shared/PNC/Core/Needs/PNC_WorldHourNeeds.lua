@@ -235,7 +235,8 @@ function WorldNeeds.HasSettlementBacking(record, needType)
     if not cid then return false, nil end
     local cat = (needType == "thirst" or needType == "water") and "water" or "food"
     if PNC.Communities and type(PNC.Communities.GetSupply) == "function" then
-        local amount = tonumber(PNC.Communities.GetSupply(cid, cat))
+        local supply = PNC.Communities.GetSupply(cid, cat)
+        local amount = tonumber(supply)
         if amount ~= nil then
             return amount > 0, cid
         end

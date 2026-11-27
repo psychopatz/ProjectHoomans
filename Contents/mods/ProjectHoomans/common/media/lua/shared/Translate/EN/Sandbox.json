@@ -160,5 +160,9 @@
     "Sandbox_ProjectHoomans.ChatterDensity_tooltip": "Controls how frequently the Conversation Director initiates ambient banter and non-urgent reactions. Urgent combat and world warnings remain active.",
     "Sandbox_ProjectHoomans.ChatterDensity_option1": "Quiet",
     "Sandbox_ProjectHoomans.ChatterDensity_option2": "Cinematic",
-    "Sandbox_ProjectHoomans.ChatterDensity_option3": "Lively"
+    "Sandbox_ProjectHoomans.ChatterDensity_option3": "Lively",
+    "Sandbox_ProjectHoomans.OffCameraColonistSOSChance": "Off-Camera Colonist SOS Chance (%%)",
+    "Sandbox_ProjectHoomans.OffCameraColonistSOSChance_tooltip": "Percentage chance that a colonist in off-camera danger triggers a rescue SOS instead of dying off-screen.",
+    "Sandbox_ProjectHoomans.OffCameraColonistSOSItemLossPercent": "Off-Camera SOS Item Loss (%%)",
+    "Sandbox_ProjectHoomans.OffCameraColonistSOSItemLossPercent_tooltip": "Percentage of carried items lost when a colonist escapes off-camera danger via SOS."
 }

@@ -86,6 +86,45 @@ local function requestKnowledge(actorID)
     return client.RequestNPCKnowledge(actorID)
 end
 
+local function submitIdentityClaim(actorID, options)
+    local client = PNC.Client
+    if not client or type(client.SubmitSemanticIdentity) ~= "function" then
+        return false, "pnc_identity_submit_unavailable"
+    end
+    options = type(options) == "table" and options or {}
+    local targetID = tostring(options.sourceActorID or actorID or "")
+    if targetID == "" then return false, "invalid_npc_id" end
+    return client.SubmitSemanticIdentity(targetID, options)
+end
+
+local function requestDisclosure(actorID, topicID, options)
+    local client = PNC.Client
+    if not client or type(client.RequestNPCKnowledgeTopic) ~= "function" then
+        return false, "pnc_disclosure_unavailable"
+    end
+    options = type(options) == "table" and options or {}
+    local targetID = tostring(options.sourceActorID or actorID or "")
+    if targetID == "" then return false, "invalid_npc_id" end
+    return client.RequestNPCKnowledgeTopic(targetID, topicID, options)
+end
+
+local function generateAlias(source)
+    local aliasMod = PNC.IdentityAlias
+        or (PNC.ConvoEngine and PNC.ConvoEngine.IdentityAlias)
+        or nil
+    if not aliasMod then
+        local ok, loaded = pcall(require, "PNC/Core/Identity/PNC_IdentityAlias")
+        if ok and type(loaded) == "table" then aliasMod = loaded end
+    end
+    if aliasMod and type(aliasMod.Generate) == "function" then
+        local ok, value = pcall(aliasMod.Generate, source)
+        if ok and type(value) == "string" and value ~= "" then
+            return value
+        end
+    end
+    return nil
+end
+
 local function context(entry)
     local actorID = actorIDFor(entry)
     local presentation = PNC.FactionPresentation
@@ -114,6 +153,9 @@ local Adapter = {
     getContext = context,
     get = knowledge,
     request = requestKnowledge,
+    submitIdentityClaim = submitIdentityClaim,
+    requestDisclosure = requestDisclosure,
+    generateAlias = generateAlias,
 }
 
 if SurvivorWorldClient
@@ -131,6 +173,30 @@ end
 
 if Hover and type(Hover.RegisterProvider) == "function" then
     Hover.RegisterProvider("ProjectHoomans", Adapter)
+end
+
+-- Mirror Core-confirmed actor knowledge snapshots into PNC client presentation
+-- state so world nametags, portraits, and dossiers stay synchronized.
+local coreKnowledgeClient = PsychopatzCore and PsychopatzCore.ActorKnowledgeClient
+if coreKnowledgeClient and type(coreKnowledgeClient.Subscribe) == "function"
+    and not Adapter._coreKnowledgeSubscribed
+then
+    Adapter._coreKnowledgeSubscribed = true
+    coreKnowledgeClient.Subscribe(function(actorID, snapshot, sourceActorID)
+        if type(snapshot) ~= "table" or snapshot.nameKnown ~= true then return end
+        local key = tostring(sourceActorID or actorID or "")
+        if key == "" then return end
+        local state = PNC.Network and PNC.Network.ClientState or nil
+        if not state then return end
+        state.npcPresentations = state.npcPresentations or {}
+        local pres = state.npcPresentations[key] or { npcID = key }
+        pres.state = "known"
+        pres.displayName = snapshot.knownName or pres.displayName
+        pres.canAskName = false
+        pres.knowledgePending = false
+        pres.knowledgeRevision = tonumber(snapshot.revision) or pres.knowledgeRevision or 1
+        state.npcPresentations[key] = pres
+    end)
 end
 
 return Adapter

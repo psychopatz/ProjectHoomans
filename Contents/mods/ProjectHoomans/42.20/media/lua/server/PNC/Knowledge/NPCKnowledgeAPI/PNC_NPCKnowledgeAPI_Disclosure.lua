@@ -54,7 +54,17 @@ local function authorizeDisclosure(player, npcID, options)
     end
 
     local token = safeID(options.conversationToken or options.token)
-    if not token then return nil, nil, "conversation_token_required" end
+    if not token then
+        if options.traderConversation == true
+            or origin == "trader_conversation"
+        then
+            if record.alive == false then
+                return nil, nil, "npc_unavailable"
+            end
+            return context, record
+        end
+        return nil, nil, "conversation_token_required"
+    end
     local valid, leaseReason, lease = validateConversation(
         player, record, token
     )

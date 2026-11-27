@@ -90,6 +90,8 @@ local optionAccessors = {
     RadioAmbientChance = "RadioAmbientChance",
     ChatterDensity = "ChatterDensity",
     NPCCarryCapacityMultiplier = "NPCCarryCapacityMultiplier",
+    OffCameraColonistSOSChance = "OffCameraColonistSOSChance",
+    OffCameraColonistSOSItemLossPercent = "OffCameraColonistSOSItemLossPercent",
 }
 
 for i = 1, #knownOptions do

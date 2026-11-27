@@ -28,6 +28,8 @@ API.ORIGINS = API.ORIGINS or {
 API.ORIGINS.semantic_dialogue = API.ORIGINS.semantic_dialogue ~= false
 API.ORIGINS.semantic_identity_claim =
     API.ORIGINS.semantic_identity_claim ~= false
+API.ORIGINS.trader_conversation =
+    API.ORIGINS.trader_conversation ~= false
 
 local function safeID(value)
     value = tostring(value or "")

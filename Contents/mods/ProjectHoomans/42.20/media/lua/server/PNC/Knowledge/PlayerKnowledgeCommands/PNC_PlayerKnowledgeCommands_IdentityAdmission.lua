@@ -39,17 +39,35 @@ function Admission.Resolve(player, args)
         and PNC.Registry.Get(npcID) or nil
     if not record then return nil, "npc_not_found" end
 
-    local authority = PNC.Conversation
-        and PNC.Conversation.Authority
-    local validator = authority and authority.Internal
-        and authority.Internal.ValidateLease
-    if type(validator) ~= "function" then
-        return nil, "conversation_authority_unavailable"
+    local token = args.conversationToken or args.token
+    local lease = nil
+    if token ~= nil and tostring(token) ~= "" then
+        local authority = PNC.Conversation
+            and PNC.Conversation.Authority
+        local validator = authority and authority.Internal
+            and authority.Internal.ValidateLease
+        if type(validator) ~= "function" then
+            return nil, "conversation_authority_unavailable"
+        end
+        local valid, reason
+        valid, reason, lease = validator(player, record, token)
+        if valid ~= true then return nil, reason end
+    elseif tostring(args.origin or "") == "trader_conversation" then
+        if record.alive == false then
+            return nil, "npc_unavailable"
+        end
+    else
+        local authority = PNC.Conversation
+            and PNC.Conversation.Authority
+        local validator = authority and authority.Internal
+            and authority.Internal.ValidateLease
+        if type(validator) ~= "function" then
+            return nil, "conversation_authority_unavailable"
+        end
+        local valid, reason
+        valid, reason, lease = validator(player, record, token)
+        if valid ~= true then return nil, reason end
     end
-    local valid, reason, lease = validator(
-        player, record, args.conversationToken or args.token
-    )
-    if valid ~= true then return nil, reason end
 
     local context
     context, reason = H.ContextFor(player, "semantic_identity")

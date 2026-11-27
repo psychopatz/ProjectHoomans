@@ -153,7 +153,8 @@ function Conversation.ReceiveDisclosureResult(result)
         })
     end
     if not view or not result
-        or tostring(result.npcID) ~= tostring(view.spec and view.spec.npcID)
+        or (tostring(result.npcID) ~= tostring(view.spec and view.spec.npcID)
+            and tostring(result.npcID) ~= tostring(view.spec and view.spec.sourceActorID))
     then return false end
     local function deliverNpcPayload(payload)
         if not view or not view.session then return end

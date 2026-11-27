@@ -18,7 +18,14 @@ PNC.Const.CMD_SEMANTIC_IDENTITY_REQUEST =
 PNC.Const.CMD_SEMANTIC_IDENTITY_RESULT =
     PNC.Const.CMD_SEMANTIC_IDENTITY_RESULT or "SemanticIdentityResult"
 
+local CoreExchange = PsychopatzCore and PsychopatzCore.ActorIdentityExchange
+    or (pcall(require, "PsychopatzCore/Actors/PsychopatzActorIdentityExchange")
+        and PsychopatzCore and PsychopatzCore.ActorIdentityExchange) or nil
+
 function Identity.NormalizeName(value)
+    if CoreExchange and type(CoreExchange.NormalizeName) == "function" then
+        return CoreExchange.NormalizeName(value)
+    end
     value = tostring(value or "")
     value = string.gsub(value, "^%s+", "")
     value = string.gsub(value, "%s+$", "")
@@ -28,6 +35,9 @@ function Identity.NormalizeName(value)
 end
 
 function Identity.NamesEqual(left, right)
+    if CoreExchange and type(CoreExchange.NamesEqual) == "function" then
+        return CoreExchange.NamesEqual(left, right)
+    end
     local normalizedLeft = Identity.NormalizeName(left)
     local normalizedRight = Identity.NormalizeName(right)
     return normalizedLeft ~= "" and normalizedLeft == normalizedRight
@@ -39,6 +49,9 @@ end
 -- complete canonical name or one complete canonical component, but never a
 -- prefix/fuzzy match.
 function Identity.ClaimMatchesName(claimed, canonical)
+    if CoreExchange and type(CoreExchange.ClaimMatchesName) == "function" then
+        return CoreExchange.ClaimMatchesName(claimed, canonical)
+    end
     local normalizedClaim = Identity.NormalizeName(claimed)
     local normalizedCanonical = Identity.NormalizeName(canonical)
     if normalizedClaim == "" or normalizedCanonical == "" then return false end
