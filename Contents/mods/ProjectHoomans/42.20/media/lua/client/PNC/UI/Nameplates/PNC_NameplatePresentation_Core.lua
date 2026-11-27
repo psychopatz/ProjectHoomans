@@ -146,6 +146,20 @@ local function treatmentPartLabel(partId)
     return tostring(part and part.label or partId or "Wound")
 end
 
+local function treatmentBandageLabel(dressing)
+    local itemType = dressing.bandageType
+    local resolveName = PNC.Treatment and PNC.Treatment.GetBandageDisplayName
+    local label = itemType and resolveName and resolveName(itemType)
+    if label and label ~= "" and label ~= itemType then
+        return label
+    end
+    label = dressing.bandageName
+    if label and label ~= "" and label ~= itemType then
+        return label
+    end
+    return itemType and tr("ContextMenu_Bandage", "Bandage") or "Ripped Sheets"
+end
+
 function Presentation.TreatmentStatus(snapshot)
     local state = snapshot and snapshot.treatmentState or nil
     local phase = tostring(state and state.phase or "idle")
@@ -154,7 +168,7 @@ function Presentation.TreatmentStatus(snapshot)
     local wound
     if phase == "bandaging" then
         return "Bandaging " .. treatmentPartLabel(state.partId)
-            .. " - " .. tostring(state.bandageName or state.bandageType or "Ripped Sheets"),
+            .. " - " .. treatmentBandageLabel(state),
             TREATMENT_COLORS.applying,
             true
     end
@@ -164,7 +178,7 @@ function Presentation.TreatmentStatus(snapshot)
     for candidateId, candidate in pairs(body and body.wounds or {}) do
         if candidate and candidate.bandaged == true and candidate.bandageDirty == true then
             return "Dirty bandage: " .. treatmentPartLabel(candidateId)
-                .. " (" .. tostring(candidate.bandageName or candidate.bandageType or "Ripped Sheets") .. ")",
+                .. " (" .. treatmentBandageLabel(candidate) .. ")",
                 TREATMENT_COLORS.dirty,
                 false
         end

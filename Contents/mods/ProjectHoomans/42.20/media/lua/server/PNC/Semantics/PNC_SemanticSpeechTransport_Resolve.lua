@@ -171,7 +171,10 @@ function Transport.ResolveLine(rec, opts)
     end
     if mergedTokens["addressee.name"] == nil or cleanText(mergedTokens["addressee.name"]) == nil then
         local addr = type(opts.addressee) == "table" and opts.addressee or nil
-        local addrAllowed = addr == nil or (addr.identityKnown ~= false and addr.isUnknown ~= true)
+        local ref = PNC.ActorReference or (PNC.Semantics and PNC.Semantics.ActorReference)
+        local addrAllowed = addr == nil
+            or (addr.identityKnown ~= false and addr.isUnknown ~= true
+                and (not ref or type(ref.KnowsName) ~= "function" or ref.KnowsName(rec, addr) == true))
         local rawAddressee = addrAllowed and addr
             and (addr.name or addr.fullName or addr.displayName) or nil
         if rawAddressee == nil then

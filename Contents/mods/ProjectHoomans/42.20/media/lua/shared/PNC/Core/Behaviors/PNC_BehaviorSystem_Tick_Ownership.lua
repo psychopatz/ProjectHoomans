@@ -182,6 +182,34 @@ function H.Run(record, zombie, now)
         return true
     end
 
+    local behaviorLoot = PNC.BehaviorLoot
+    if behaviorLoot and type(behaviorLoot.Tick) == "function" then
+        local leader = nil
+        local ownerPlayer = nil
+        local isFollowing = type(record.orderSpec) == "table"
+            and tostring(record.orderSpec.kind or "") == "follow"
+        if isFollowing and type(getSpecificPlayer) == "function" then
+            local okP, p = pcall(getSpecificPlayer, 0)
+            if okP and p then
+                ownerPlayer = p
+                if type(p.getX) == "function" and type(p.getY) == "function" then
+                    leader = { x = p:getX(), y = p:getY() }
+                end
+            end
+        elseif record.recruited == true and type(getSpecificPlayer) == "function" then
+            local okP, p = pcall(getSpecificPlayer, 0)
+            if okP and p then ownerPlayer = p end
+        end
+        local activeLoot = behaviorLoot.Tick(record, now, {
+            leader = leader,
+            ownerPlayer = ownerPlayer,
+            maxLeashDist = 8,
+        })
+        if activeLoot then
+            return true
+        end
+    end
+
     return false
 end
 

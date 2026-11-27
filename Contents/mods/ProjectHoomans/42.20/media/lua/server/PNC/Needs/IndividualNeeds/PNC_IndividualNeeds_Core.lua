@@ -96,6 +96,16 @@ function Needs.Ensure(record, initial)
     end
     local entry = PNC.NeedsRepository and PNC.NeedsRepository.Get(record, true)
     if not entry then return nil, "repository_unavailable" end
+    -- Seamlessly promote non-colonist pseudoNeeds on recruitment
+    if type(record) == "table" and type(record.pseudoNeeds) == "table"
+        and PNC.WorldHourNeeds and type(PNC.WorldHourNeeds.GetPseudoNeed) == "function"
+    then
+        entry.needs.hunger = Definitions.Clamp("hunger",
+            PNC.WorldHourNeeds.GetPseudoNeed(record, "hunger"))
+        entry.needs.thirst = Definitions.Clamp("thirst",
+            PNC.WorldHourNeeds.GetPseudoNeed(record, "thirst"))
+        record.pseudoNeeds = nil
+    end
     if type(initial) == "table" then
         for _, needType in ipairs(Definitions.TYPES) do
             if initial[needType] ~= nil then
@@ -154,8 +164,36 @@ function Needs.EnsureNutrition(record)
 end
 
 function Needs.Get(record, needType)
+    local key = tostring(needType or "")
+    if not H.Owned(record) then
+        local wn = PNC.WorldHourNeeds
+        if wn and type(wn.GetPseudoNeed) == "function" then
+            return wn.GetPseudoNeed(record, key)
+        end
+        return nil
+    end
     local state = Needs.Ensure(record)
-    return state and state[tostring(needType or "")]
+    return state and state[key]
+end
+
+-- Actor-agnostic satisfaction entry point (works for both colonists and roamers).
+function Needs.Satisfy(record, needType, reliefOrSpec, source)
+    local key = tostring(needType or "")
+    if not H.Owned(record) then
+        local wn = PNC.WorldHourNeeds
+        if wn and type(wn.SatisfyPseudoNeed) == "function" then
+            return wn.SatisfyPseudoNeed(record, key, reliefOrSpec)
+        end
+        return false
+    end
+    local delta = type(reliefOrSpec) == "table"
+        and (tonumber(reliefOrSpec.hungerChange) or tonumber(reliefOrSpec.thirstChange) or 0)
+        or -math.abs(tonumber(reliefOrSpec) or 0)
+    if delta > 0 then delta = -delta end
+    if Needs.Adjust then
+        return Needs.Adjust(record, key, delta, source or "satisfy")
+    end
+    return false
 end
 
 local function setStateValue(record, state, needType, value, reason, markDirty)

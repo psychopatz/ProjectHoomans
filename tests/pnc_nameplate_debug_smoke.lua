@@ -13,6 +13,7 @@ PNC = {
 }
 UIFont = { Small = "Small", Medium = "Medium" }
 
+T.load("ProjectHoomans", "shared", "PNC/Core/Health/PNC_Treatment/PNC_Treatment_Policy.lua")
 T.load(ROOT .. "PNC/UI/Nameplates/PNC_NameplateDebug.lua")
 T.load(ROOT .. "PNC/UI/Nameplates/PNC_NameplatePresentation.lua")
 
@@ -273,12 +274,12 @@ snapshot.bodyHealth.wounds = {
     Hand_L = {
         bandaged = true,
         bandageDirty = true,
-        bandageName = "Bandage",
+        bandageType = "Base.Bandage",
     },
 }
 treatmentText = PNC.NameplatePresentation.TreatmentStatus(snapshot)
 T.contains(treatmentText, "Dirty bandage", "dirty treatment marker")
-T.contains(treatmentText, "Bandage", "dirty treatment material")
+T.equal(treatmentText, "Dirty bandage: Left Hand (Bandage)", "dirty dressing uses the item display name")
 
 PNC.FacilityDefinitions = { Get = function(id)
     return id == "barracks" and {

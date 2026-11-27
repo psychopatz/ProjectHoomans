@@ -1,0 +1,146 @@
+# Emergent cross-faction stranger encounters: wary firearm standoffs,
+# 3-stance de-escalation/defiance, re-encounter reunions, and grounded
+# world-knowledge road warnings.
+language EN
+namespace hoomans
+
+dialogue semantic.social.stranger.encounter
+  # Wary armed challenge (speaker draws & aims pistol/rifle at unfamiliar stranger)
+  say [role=standoff_challenge_armed, actor.social_style=hostile|guarded|withdrawn] as standoff_armed_guarded:
+    "Freeze, {addressee.name}! Hands where I can see 'em—one wrong move and this {slot.weapon} talks!"
+    "Hold it right there, {addressee.name}. Don't take another step—who are you with?!"
+  say [role=standoff_challenge_armed, actor.social_style=warm|friendly|protective] as standoff_armed_protective:
+    "Easy now, {addressee.name}—keep your hands visible! I don't want trouble, just tell me who you are!"
+    "Whoa—hold up, {addressee.name}! Keep back a pace until I know you're not hostile!"
+  say [role=standoff_challenge_armed] as standoff_armed_default:
+    "Stop right there, {addressee.name}! Hands up—state your business!"
+    "Easy, {addressee.name}—don't reach for anything. Who are you and what do you want?"
+
+  # 3-stance autonomous responses to an armed standoff
+  say [role=standoff_reply_comply, actor.social_style=warm|friendly|protective] as standoff_comply_warm:
+    "Whoa, easy—hands are up! I'm {claimed.name}, I'm not looking for a fight. We're on the same side against the dead."
+    "Take it easy! Name's {claimed.name}—just another survivor trying to make it through the day."
+  say [role=standoff_reply_comply] as standoff_comply_default:
+    "Alright, alright—hands up! I'm {claimed.name}, no trouble here."
+    "Easy with that {slot.weapon}—I'm {claimed.name}. Just passing through, no hostility."
+
+  say [role=standoff_reply_cautious] as standoff_cautious_default:
+    "Lower your barrel and I'll keep walking. Not here to fight, not here to make friends."
+    "Hands are clear, alright? I'm just moving through—let's both keep our distance."
+
+  say [role=standoff_reply_defiant, actor.social_style=hostile|guarded|withdrawn] as standoff_defiant_guarded:
+    "Point that {slot.weapon} somewhere else before you regret it. You're not the only one armed out here."
+    "Back off—we've got enough problems without you waving a {slot.weapon} in my face."
+  say [role=standoff_reply_defiant] as standoff_defiant_default:
+    "Hey—watch where you aim that {slot.weapon}! I'm not one of the dead!"
+
+  # Challenger resolution after seeing stranger's stance
+  say [role=standoff_resolve_peaceful, actor.social_style=warm|friendly|protective] as standoff_peaceful_warm:
+    "Alright, {claimed.name}—sorry about the scare. I'm {speaker.name}. Can't be too careful out here."
+    "Good enough for me, {claimed.name}. Name's {speaker.name}—lowering my {slot.weapon}."
+  say [role=standoff_resolve_peaceful] as standoff_peaceful_default:
+    "Fair enough, {claimed.name}. I'm {speaker.name}—we're cool."
+
+  say [role=standoff_resolve_tense] as standoff_tense_default:
+    "Keep moving then. Don't give me a reason to raise it again."
+    "Alright, keep your distance and we won't have a problem."
+
+  say [role=standoff_resolve_cold] as standoff_cold_default:
+    "Smartest thing you can do is keep walking. Stay out of our way."
+    "Fine. Walk away before somebody gets hurt."
+
+  # Re-encounter / Reunion when two acquainted NPCs from different factions cross paths again
+  say [role=reunion_open, actor.social_style=warm|friendly|protective] as reunion_open_warm:
+    "Hey, {addressee.name}! Glad to see you're still breathing on this side of town!"
+    "{addressee.name}! Didn't expect to run into you again—how're you holding up?"
+  say [role=reunion_open, actor.social_style=hostile|guarded|withdrawn] as reunion_open_guarded:
+    "Look who's still kicking—{addressee.name}. Road treating you any better?"
+    "{addressee.name}. Surprised you're still in one piece."
+  say [role=reunion_open] as reunion_open_default:
+    "Hey, {addressee.name}—good seeing a familiar face out here."
+    "Well hey, {addressee.name}. Still hanging in there?"
+
+  say [role=reunion_reply, actor.social_style=warm|friendly|protective] as reunion_reply_warm:
+    "Good to see you too, {addressee.name}! Still alive—that counts as a win these days."
+  say [role=reunion_reply, actor.social_style=hostile|guarded|withdrawn] as reunion_reply_guarded:
+    "Still breathing, {addressee.name}. Barely. Watch the corners around here."
+  say [role=reunion_reply] as reunion_reply_default:
+    "Same to you, {addressee.name}. Taking it one block at a time."
+
+  # Grounded WorldKnowledge rumor / road warning swap between travelers
+  say [role=rumor_warn_open] as rumor_warn_open_default:
+    "Heads up, {addressee.name}—{slot.rumor}."
+    "Word of advice before you head out, {addressee.name}: {slot.rumor}."
+  say [role=rumor_warn_reply] as rumor_warn_reply_default:
+    "Appreciate the heads-up, {addressee.name}. We'll keep our eyes open."
+    "Good to know, {addressee.name}—thanks for the warning."
+
+  # Bonded-loss grief suicide resolve lines (plugged into PNC.BehaviorSuicide grief_loss cause)
+  say [role=grief_suicide_resolve, actor.social_style=warm|friendly|protective] as grief_suicide_resolve_warm:
+    "{addressee.name}... {lost.name} is gone. I can't keep walking through this dead world without {lost.obj}..."
+    "I'm sorry, {addressee.name}... losing {lost.name} broke whatever was left in me. I just want it to stop..."
+  say [role=grief_suicide_resolve] as grief_suicide_resolve_default:
+    "{lost.name} is gone, {addressee.name}... there's nothing left for me out here anymore..."
+    "I can't do this without {lost.name}, {addressee.name}... I'm done running..."
+  say [role=grief_suicide_resolve_solo] as grief_suicide_resolve_solo_default:
+    "{lost.name}... I'm sorry I couldn't save you. Wait for me..."
+    "Nothing left to live for without {lost.name}... I'm coming..."
+
+  # Territory / Camp boundary challenge (actor-agnostic: NPC <-> NPC or NPC <-> Player)
+  say [role=territory_challenge_open, actor.social_style=hostile|guarded|withdrawn] as territory_open_guarded:
+    "Hold up, {addressee.name}—you're standing right on our doorstep. State your business or keep walking."
+    "This camp is spoken for, {addressee.name}. What are you doing snooping around here?"
+  say [role=territory_challenge_open, actor.social_style=warm|friendly|protective] as territory_open_warm:
+    "Hey there, {addressee.name}—you're near our camp. Everything alright? Just checking who's coming through."
+  say [role=territory_challenge_open] as territory_open_default:
+    "Easy, {addressee.name}—you're close to our camp. Passing through, or looking for something?"
+
+  say [role=territory_reply_peaceful] as territory_reply_peaceful_default:
+    "No trouble—I'm {claimed.name}. Just trying to catch my breath somewhere safe."
+    "Easy, I'm {claimed.name}. Not here to take anything, just passing by."
+  say [role=territory_reply_passing] as territory_reply_passing_default:
+    "Just passing through—won't linger near your perimeter."
+    "Relax, I'm moving on down the road."
+  say [role=territory_reply_defiant] as territory_reply_defiant_default:
+    "Didn't see your name painted on the street. I'll walk where I please."
+    "Don't get territorial with me—there's enough dead to worry about."
+
+  say [role=territory_resolve_welcome] as territory_resolve_welcome_default:
+    "Alright, {claimed.name}—I'm {speaker.name}. Keep your hands clean and you're fine here."
+  say [role=territory_resolve_cautious] as territory_resolve_cautious_default:
+    "Good. Keep moving and we'll stay out of each other's way."
+  say [role=territory_resolve_cold] as territory_resolve_cold_default:
+    "Then walk fast. Don't come back around here."
+
+  # Mercy / Micro-Aid request from a hurt, hungry, or thirsty stranger (actor-agnostic)
+  say [role=aid_request_open, actor.social_style=hostile|guarded|withdrawn] as aid_open_guarded:
+    "Look, {addressee.name}... I hate asking, but I'm in rough shape. You got {slot.need} to spare?"
+  say [role=aid_request_open, actor.social_style=warm|friendly|protective] as aid_open_warm:
+    "Please, {addressee.name}... I wouldn't bother you if I wasn't desperate—could you spare {slot.need}?"
+  say [role=aid_request_open] as aid_open_default:
+    "Hey, {addressee.name}... rough stretch out here. Any chance you can spare {slot.need}?"
+
+  say [role=aid_reply_help, actor.social_style=warm|friendly|protective] as aid_help_warm:
+    "Here, take what I can spare—I'm {claimed.name}. We've got to look out for each other out here."
+  say [role=aid_reply_help] as aid_help_default:
+    "Alright, I can help a little. Name's {claimed.name}—just pay it forward if you make it."
+  say [role=aid_reply_none] as aid_none_default:
+    "Sorry, {addressee.name}—I'm running on fumes myself. Wish I had extra."
+  say [role=aid_reply_refuse] as aid_refuse_default:
+    "Not my problem. Everybody's scraping by—find your own."
+
+  say [role=aid_resolve_grateful] as aid_resolve_grateful_default:
+    "Thank you, {claimed.name}... I'm {speaker.name}. I won't forget this."
+  say [role=aid_resolve_understand] as aid_resolve_understand_default:
+    "I get it... thanks anyway. Stay safe out there."
+  say [role=aid_resolve_bitter] as aid_resolve_bitter_default:
+    "Figures... shouldn't have bothered asking."
+
+  # Passing stranger witnessing someone mourning a fallen survivor
+  say [role=mourning_witness, actor.social_style=warm|friendly|protective] as mourning_witness_warm:
+    "I'm so sorry for your loss, {addressee.name}... this world takes the best of us."
+    "Take a moment if you need it, {addressee.name}... I'll watch the street while you say goodbye."
+  say [role=mourning_witness, actor.social_style=hostile|guarded|withdrawn] as mourning_witness_guarded:
+    "Don't linger over the dead, {addressee.name}. That noise is gonna bring walkers."
+  say [role=mourning_witness] as mourning_witness_default:
+    "Rough way to lose someone, {addressee.name}... sorry you had to go through that."

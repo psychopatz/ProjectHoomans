@@ -6,25 +6,19 @@ PNC.NPCNutrition = PNC.NPCNutrition or {}
 
 local Model = PNC.NPCNutrition
 local Definitions = PNC.NeedsDefinitions
+local Stat = PNC.DeterministicStat or require "PNC/Core/Needs/PNC_DeterministicStat"
 local tuning = Definitions.NUTRITION
 
--- Coefficients taken from zombie.characters.BodyDamage.Nutrition. The NPC
--- service advances these in world seconds, so catch-up and live ticking use
--- the same math without attaching an engine Nutrition object to each NPC.
-Model.METABOLIC_RATES = {
-    idle = 0.016,
-    sleeping = 0.003,
-    walking = 0.13 * 0.60,
-    traveling = 0.13 * 0.60,
-    working = 0.13 * 0.60,
-    resting = 0.016,
-    running = 0.13,
-    fighting = 0.13,
-}
-Model.MACRO_DRAIN = {
-    carbohydrates = 0.0035,
-    lipids = 0.00113,
-    proteins = 0.00086,
+-- Activity burn multipliers (hours of fuel burned per elapsed world hour).
+Model.ACTIVITY_BURN_MULTIPLIERS = {
+    idle = 0.70,
+    sleeping = 0.25,
+    resting = 0.55,
+    walking = 1.15,
+    traveling = 1.15,
+    working = 1.25,
+    running = 1.80,
+    fighting = 2.00,
 }
 
 local function clamp(value, minimum, maximum)
@@ -41,27 +35,6 @@ function Model.WeightCategory(weight)
     return "NORMAL"
 end
 
-local function gainThreshold(weight, hasWeightGain)
-    local threshold = hasWeightGain and weight < 90 and 700 or 1000
-    return threshold + (weight - 80) * 40
-end
-
-local function lossThreshold(weight, hasWeightLoss)
-    local threshold = hasWeightLoss and weight > 70 and -1800 or -1000
-    -- Heavier bodies need a larger deficit before losing weight. Keep the
-    -- threshold at or below zero, as in the player implementation.
-    return math.min(0, threshold + (weight - 70) * 30)
-end
-
-local function macroWeightFactor(nutrition)
-    local carbohydrates = tonumber(nutrition.carbohydrates) or 0
-    local lipids = tonumber(nutrition.lipids) or 0
-    local highest = math.max(carbohydrates, lipids)
-    if highest > 700 then return 3 end
-    if highest > 400 then return 2 end
-    return 1
-end
-
 function Model.Update(nutrition, elapsedWorldSeconds, activity,
     hasWeightGain, hasWeightLoss, actionModifier, coldEnergyModifier)
     if type(nutrition) ~= "table" then return nil, nil, false end
@@ -70,41 +43,35 @@ function Model.Update(nutrition, elapsedWorldSeconds, activity,
         local category = Model.WeightCategory(nutrition.weight)
         return category, category, false
     end
+    local elapsedHours = seconds / 3600
     local oldCategory = Model.WeightCategory(nutrition.weight)
     local weight = clamp(nutrition.weight, tuning.minimumWeight,
         tuning.maximumWeight)
     local mode = tostring(activity or "idle")
-    local burnRate = Model.METABOLIC_RATES[mode] or Model.METABOLIC_RATES.idle
+    local burnMult = Model.ACTIVITY_BURN_MULTIPLIERS[mode] or 1.0
     local modifier = math.max(0, tonumber(actionModifier) or 1)
         * math.max(0, tonumber(coldEnergyModifier) or 1)
-    local calorieBurn = burnRate * seconds * (weight / 80) * modifier
 
-    nutrition.calories = clamp((tonumber(nutrition.calories)
-        or tuning.defaultCalories) - calorieBurn,
+    local currentCalories = tonumber(nutrition.calories) or tuning.defaultCalories
+    local fuelHours = tonumber(nutrition.fuelHours)
+        or (currentCalories / Stat.KCAL_PER_HOUR)
+    local burnedHours = elapsedHours * burnMult * (weight / 80) * modifier
+    fuelHours = clamp(fuelHours - burnedHours,
+        Stat.MIN_FUEL_DEFICIT_HOURS, Stat.MAX_FUEL_BANK_HOURS)
+
+    nutrition.fuelHours = fuelHours
+    nutrition.calories = clamp(Stat.FuelHoursToCalories(fuelHours),
         tuning.minimumCalories, tuning.maximumCalories)
     nutrition.calorieOverflow = 0
-    nutrition.carbohydrates = clamp((tonumber(nutrition.carbohydrates)
-        or tuning.defaultCarbohydrates)
-        - Model.MACRO_DRAIN.carbohydrates * seconds,
-        tuning.minimumMacro, tuning.maximumMacro)
-    nutrition.lipids = clamp((tonumber(nutrition.lipids)
-        or tuning.defaultLipids) - Model.MACRO_DRAIN.lipids * seconds,
-        tuning.minimumMacro, tuning.maximumMacro)
-    nutrition.proteins = clamp((tonumber(nutrition.proteins)
-        or tuning.defaultProteins) - Model.MACRO_DRAIN.proteins * seconds,
-        tuning.minimumMacro, tuning.maximumMacro)
+    nutrition.carbohydrates = 0
+    nutrition.lipids = 0
+    nutrition.proteins = 0
 
-    local calories = tonumber(nutrition.calories) or 0
-    local weightDelta = 0
-    if calories > gainThreshold(weight, hasWeightGain == true) then
-        local delta = math.min(1, calories / 4000)
-        weightDelta = 1.3e-5 * delta * macroWeightFactor(nutrition) * seconds
-    elseif calories < lossThreshold(weight, hasWeightLoss == true) then
-        local delta = math.min(1, math.abs(calories) / 2500)
-        weightDelta = -8.5e-6 * delta * seconds
-    end
-    nutrition.weight = clamp(weight + weightDelta,
-        tuning.minimumWeight, tuning.maximumWeight)
+    nutrition.weight = Stat.EvaluateWeightFromFuelHours(
+        weight, fuelHours, elapsedHours,
+        hasWeightGain == true, hasWeightLoss == true,
+        tuning.minimumWeight, tuning.maximumWeight
+    )
     local newCategory = Model.WeightCategory(nutrition.weight)
     return oldCategory, newCategory, oldCategory ~= newCategory
 end

@@ -132,11 +132,21 @@ local function isFemaleRecord(record, liveZombie)
     return false
 end
 
-function Suicide.BuildPronounTokens(record, liveZombie)
+function Suicide.BuildPronounTokens(record, liveZombie, observer)
+    local ref = PNC.ActorReference or (PNC.Semantics and PNC.Semantics.ActorReference)
+    if ref and type(ref.BuildTokens) == "function" then
+        -- When no explicit observer is passed (e.g. unit test inspecting raw pronouns),
+        -- pass record itself as observer so pronouns + own name resolve cleanly.
+        return ref.BuildTokens(observer or record, record, "victim", {
+            liveBody = liveZombie,
+            role = "reference",
+            unknownReference = "stranger",
+        })
+    end
     local female = isFemaleRecord(record, liveZombie)
     local name = tostring(
         (type(record) == "table" and (record.name or record.fullName or record.displayName))
-            or "them"
+            or "stranger"
     )
     return {
         ["victim.name"] = name,
@@ -147,6 +157,30 @@ function Suicide.BuildPronounTokens(record, liveZombie)
         ["victim.refl"] = female and "herself" or "himself",
         ["victim.gender"] = female and "female" or "male",
     }
+end
+
+local function buildSpeakerTokens(speaker, addressee, victimSnapshot, firearmLabel, extraTokens)
+    local ref = PNC.ActorReference or (PNC.Semantics and PNC.Semantics.ActorReference)
+    local tokens = Suicide.BuildPronounTokens(victimSnapshot, nil, speaker)
+    tokens["slot.weapon"] = firearmLabel or "gun"
+    if addressee then
+        if ref and type(ref.NameFor) == "function" then
+            tokens["addressee.name"] = ref.NameFor(speaker, addressee, {
+                role = "vocative",
+                unknownAddress = "friend",
+            })
+        else
+            tokens["addressee.name"] = tostring(addressee.name or addressee.fullName or "friend")
+        end
+    else
+        tokens["addressee.name"] = "everyone"
+    end
+    if type(extraTokens) == "table" then
+        for k, v in pairs(extraTokens) do
+            tokens[k] = v
+        end
+    end
+    return tokens
 end
 
 local function isCalmNPC(rec, now)
@@ -678,6 +712,15 @@ end
 local function attachWitness(witness, roleKind, state, now)
     if type(witness) ~= "table" or witness.alive == false then return end
     witness.runtime = witness.runtime or {}
+    -- Build tokens from THIS witness's epistemic perspective so they only use
+    -- the victim's proper name if they actually know them!
+    local witnessTokens = buildSpeakerTokens(
+        witness,
+        state.victimSnapshot,
+        state.victimSnapshot,
+        state.firearm and state.firearm.weaponLabel or "gun",
+        state.extraTokens
+    )
     witness.runtime.suicideWitness = {
         victimId = state.victimId,
         causeId = state.causeId,
@@ -685,7 +728,7 @@ local function attachWitness(witness, roleKind, state, now)
         phase = "watching",
         mournAt = 0,
         expiresAt = now + WITNESS_HARD_TIMEOUT_MS,
-        tokens = state.tokens,
+        tokens = witnessTokens,
         threadID = state.threadID,
     }
 end
@@ -990,20 +1033,30 @@ function Suicide.TryTrigger(record, zombie, causeId, opts)
         end
     end
 
-    local tokens = Suicide.BuildPronounTokens(record, body)
-    tokens["slot.weapon"] = firearm.weaponLabel or "gun"
-    tokens["addressee.name"] = (witness and tostring(witness.name or witness.fullName or "friend")) or "everyone"
-    if type(opts.extraTokens) == "table" then
-        for k, v in pairs(opts.extraTokens) do
-            tokens[k] = v
-        end
-    end
+    -- Lightweight victim snapshot preserved for witnesses after victim retires
+    local victimSnapshot = {
+        id = record.id,
+        name = record.name,
+        fullName = record.fullName,
+        displayName = record.displayName,
+        isFemale = isFemaleRecord(record, body),
+        groupId = record.groupId,
+        factionID = (record.affiliation and record.affiliation.factionID) or record.factionID,
+        colonyOwned = record.colonyOwned,
+        recruited = record.recruited,
+        ownerUsername = record.ownerUsername,
+        ownerOnlineID = record.ownerOnlineID,
+        familyId = record.familyId,
+    }
+
+    local tokens = buildSpeakerTokens(record, witness, victimSnapshot, firearm.weaponLabel, opts.extraTokens)
 
     local sceneId, shotDelayMs = pickSceneForFirearm(firearm, now)
     local threadID = "suicide:" .. cause.id .. ":" .. tostring(record.id) .. ":" .. tostring(math.floor(now))
 
     local state = {
         victimId = record.id,
+        victimSnapshot = victimSnapshot,
         causeId = cause.id,
         firearm = firearm,
         sceneId = sceneId,
@@ -1013,6 +1066,7 @@ function Suicide.TryTrigger(record, zombie, causeId, opts)
         secondWitnessId = secondWitness and secondWitness.id or nil,
         secondWitnessRef = secondWitness,
         tokens = tokens,
+        extraTokens = opts.extraTokens,
         threadID = threadID,
         startedAt = now,
         phase = witness and "intervene" or "execute",
@@ -1080,7 +1134,9 @@ local function tickVictimState(record, zombie, state, now)
 
     if state.phase == "intervene" then
         if witness and isCalmNPC(witness, now) then
-            speakLine(witness, record, cause, "intervene", "STOP", state.tokens, now, state.threadID)
+            local wTokens = (witness.runtime and witness.runtime.suicideWitness and witness.runtime.suicideWitness.tokens)
+                or buildSpeakerTokens(witness, state.victimSnapshot, state.victimSnapshot, state.firearm and state.firearm.weaponLabel, state.extraTokens)
+            speakLine(witness, record, cause, "intervene", "STOP", wTokens, now, state.threadID)
             state.phase = "insist"
             state.nextAt = now + DELAY_INSIST_MS
         else
@@ -1100,7 +1156,9 @@ local function tickVictimState(record, zombie, state, now)
         return true
     elseif state.phase == "comply" then
         if witness and isCalmNPC(witness, now) then
-            speakLine(witness, record, cause, "comply", "ACCEPT", state.tokens, now, state.threadID)
+            local wTokens = (witness.runtime and witness.runtime.suicideWitness and witness.runtime.suicideWitness.tokens)
+                or buildSpeakerTokens(witness, state.victimSnapshot, state.victimSnapshot, state.firearm and state.firearm.weaponLabel, state.extraTokens)
+            speakLine(witness, record, cause, "comply", "ACCEPT", wTokens, now, state.threadID)
             state.phase = "execute"
             state.nextAt = now + DELAY_EXECUTE_AFTER_COMPLY_MS
         else
@@ -1235,5 +1293,95 @@ Suicide.RegisterCause("knox_critical", {
         end
     end,
 })
+
+-- Built-in cause #2: Deeply bonded / family member loss (event-driven, no polling).
+Suicide.RegisterCause("grief_loss", {
+    priority = 85,
+    baseChance = 0.15,
+    poolID = "semantic.social.stranger.encounter",
+    topic = "grief_loss",
+    deathReason = "grief_suicide",
+    roles = {
+        resolve = "grief_suicide_resolve",
+        resolveSolo = "grief_suicide_resolve_solo",
+        intervene = "suicide_intervene",
+        insist = "suicide_insist",
+        comply = "suicide_comply",
+        mourn = "suicide_mourn",
+        mournChime = "suicide_mourn_chime",
+    },
+})
+
+local function hasDeepBond(survivor, deceased)
+    if type(survivor) ~= "table" or type(deceased) ~= "table" then return false end
+    if survivor.familyId ~= nil and deceased.familyId ~= nil and survivor.familyId == deceased.familyId then
+        return true
+    end
+    local relSvc = PNC.Relationships or PNC.RelationshipService
+    if relSvc and survivor.id ~= nil and deceased.id ~= nil then
+        local targetKey = "npc:" .. tostring(deceased.id)
+        if type(relSvc.GetDurableBond) == "function" then
+            local ok, bond = pcall(relSvc.GetDurableBond, tostring(survivor.id), targetKey)
+            if ok and bond ~= nil and bond ~= false then return true end
+        end
+        if type(relSvc.GetFamiliarity) == "function" and type(relSvc.GetApproval) == "function" then
+            local okF, fam = pcall(relSvc.GetFamiliarity, tostring(survivor.id), targetKey)
+            local okA, app = pcall(relSvc.GetApproval, tostring(survivor.id), targetKey)
+            if okF and okA and (tonumber(fam) or 0) >= 40 and (tonumber(app) or 0) >= 35 then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+-- Event-driven death hook: checks nearby deeply bonded living NPCs (within 16 tiles)
+-- for grief stress and optional grief_loss suicide trigger.
+function Suicide.OnBondedNPCDeath(deceasedRecord, at, opts)
+    if type(deceasedRecord) ~= "table" or deceasedRecord.id == nil then return false end
+    if PNC.Core and type(PNC.Core.IsAuthority) == "function" and PNC.Core.IsAuthority() ~= true then
+        return false
+    end
+    local reg = PNC.Registry
+    if not reg or type(reg.ForEach) ~= "function" then return false end
+    local now = nowMs(at)
+    opts = type(opts) == "table" and opts or {}
+    local dz = tonumber(deceasedRecord.z) or 0
+    local ref = PNC.ActorReference or (PNC.Semantics and PNC.Semantics.ActorReference)
+    local triggered = false
+
+    reg.ForEach(function(other)
+        if triggered then return end
+        if type(other) ~= "table" or other.id == nil or tostring(other.id) == tostring(deceasedRecord.id) then
+            return
+        end
+        if not isCalmNPC(other, now) then return end
+        if math.abs((tonumber(other.z) or 0) - dz) >= 1 then return end
+        if distanceSq(other.x, other.y, deceasedRecord.x, deceasedRecord.y) > (16 * 16) then return end
+        if not hasDeepBond(other, deceasedRecord) then return end
+
+        applyWitnessGrief(other)
+        local lostName = (ref and type(ref.NameFor) == "function"
+            and ref.NameFor(other, deceasedRecord, { role = "reference" }))
+            or tostring(deceasedRecord.name or "them")
+        local lostPronouns = (ref and type(ref.Pronouns) == "function" and ref.Pronouns(deceasedRecord))
+            or { obj = "them", subj = "they", poss = "their" }
+
+        local ok = Suicide.TryTrigger(other, liveBodyFor(other), "grief_loss", {
+            now = now,
+            urgency = 0.65,
+            rollFn = opts.rollFn,
+            force = opts.force,
+            extraTokens = {
+                ["lost.name"] = lostName,
+                ["lost.obj"] = lostPronouns.obj,
+                ["lost.subj"] = lostPronouns.subj,
+                ["lost.poss"] = lostPronouns.poss,
+            },
+        })
+        if ok then triggered = true end
+    end)
+    return triggered
+end
 
 return Suicide

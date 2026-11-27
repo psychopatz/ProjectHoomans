@@ -2,6 +2,7 @@ PNC = PNC or {}
 PNC.FacilityJobsBehaviorInternal = PNC.FacilityJobsBehaviorInternal or {}
 
 local Internal = PNC.FacilityJobsBehaviorInternal
+local SquareRules = require "PsychopatzCore/World/PsychopatzSquareRules"
 local AuditSleep = Internal.AuditSleep
 local ClearFurnitureOccupancy = Internal.ClearFurnitureOccupancy
 

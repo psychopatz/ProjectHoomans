@@ -333,7 +333,7 @@ local function pumpKnoxSymptomFX(record, intensity, now)
     if intensity == "critical" then
         local useSnarl = (math.floor(now / 1000) % 2) == 1
         spec = {
-            anim = useSnarl and "PNC_Anim_PainHead" or "PNC_Anim_Sneeze",
+            anim = useSnarl and "PNC_PainHead" or "PNC_Sneeze",
             animDurationMs = 2800,
             voice = useSnarl and "zombie_snarl" or "zombie_growl",
             reason = "knox_symptom_critical",
@@ -341,14 +341,14 @@ local function pumpKnoxSymptomFX(record, intensity, now)
     elseif intensity == "medium" then
         local useSneeze = (math.floor(now / 1000) % 2) == 0
         spec = {
-            anim = useSneeze and "PNC_Anim_Sneeze" or "PNC_Anim_Cough",
+            anim = useSneeze and "PNC_Sneeze" or "PNC_Cough",
             animDurationMs = 2400,
             voice = useSneeze and "sneeze_heavy" or "cough",
             reason = "knox_symptom_medium",
         }
     else
         spec = {
-            anim = "PNC_Anim_Sneeze",
+            anim = "PNC_Sneeze",
             animDurationMs = 2000,
             voice = "sneeze",
             reason = "knox_symptom_light",

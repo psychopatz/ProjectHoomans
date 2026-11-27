@@ -134,6 +134,14 @@ function Scavenge.Apply(group, location, action)
                 (result.yields[category] or 0) * scale, "abstract_scavenge")
         end
     end
+    if PNC.WorldHourNeeds and type(PNC.WorldHourNeeds.ResetStarvingHorizons) == "function" then
+        local gotFood = (tonumber(result.yields.food) or 0) > 0
+        local gotWater = (tonumber(result.yields.water) or 0) > 0
+        if gotFood or gotWater then
+            PNC.WorldHourNeeds.ResetStarvingHorizons(group, gotFood, gotWater,
+                tonumber(action and (action.completedAt or action.startedAt)) or nil)
+        end
+    end
     group.diagnostics = group.diagnostics or {}
     group.diagnostics.lastScavenge = result
 

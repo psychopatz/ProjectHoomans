@@ -116,7 +116,16 @@ function Audience.Resolve(speaker, listeners, opts)
         local key = entry.isPlayer == true and "player" or (eid ~= "" and eid or tostring(entry.name or ""))
         if key == "" or seen[key] then return end
         seen[key] = true
-        local n = firstTokenName(entry.name or entry.fullName or entry.displayName)
+        local ref = PNC.ActorReference or (PNC.Semantics and PNC.Semantics.ActorReference)
+        local n
+        if ref and type(ref.NameFor) == "function" and type(speaker) == "table" then
+            n = ref.NameFor(speaker, entry, {
+                role = "vocative",
+                unknownAddress = entry.isPlayer == true and "friend" or "stranger",
+            })
+        else
+            n = firstTokenName(entry.name or entry.fullName or entry.displayName)
+        end
         if entry.isPlayer == true then
             includesPlayer = true
             playerName = n or "friend"

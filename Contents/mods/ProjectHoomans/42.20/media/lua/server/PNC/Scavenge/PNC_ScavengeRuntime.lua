@@ -3,6 +3,10 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
 require "PNC/Scavenge/PNC_ScavengePolicy"
+require "PNC/Scavenge/PNC_WorldLoot_Policy"
+require "PNC/Scavenge/PNC_WorldLoot_Scanner"
+require "PNC/Scavenge/PNC_WorldLoot_Transfer"
+require "PNC/Scavenge/PNC_Behavior_Loot"
 
 PNC = PNC or {}
 PNC.ScavengeRuntime = PNC.ScavengeRuntime or {}
@@ -38,6 +42,18 @@ function Runtime.HandleRequest(player, args)
             action == "set_auto_grab" and args.enabled == true)
         if not ok then return false, reason end
         return true, "auto_grab_updated", Policy.Snapshot(player)
+    elseif action == "set_npc_loot_enabled" then
+        local npcId = tostring(args.npcId or "")
+        local rec = npcId ~= "" and PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(npcId) or nil
+        if not rec then return false, "npc_not_found" end
+        rec.opportunisticLootEnabled = args.enabled == true
+        if PNC.Registry.MarkDirty then
+            pcall(PNC.Registry.MarkDirty, npcId, "opportunistic_loot_toggle")
+        end
+        return true, "npc_loot_toggle_updated", {
+            npcId = npcId,
+            opportunisticLootEnabled = rec.opportunisticLootEnabled,
+        }
     end
     return false, "scavenge_action_invalid"
 end

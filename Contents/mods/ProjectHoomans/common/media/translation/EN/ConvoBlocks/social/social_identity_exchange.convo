@@ -59,3 +59,40 @@ dialogue semantic.social.identity.ask_name_proactive
     "Alright, {claimed.name}. Fair enough—I'm {speaker.name}."
   say [role=ask_name_react_refuse_name] as react_refuse_name:
     "Fair enough, can't blame you for being careful these days."
+
+  # Autonomous NPC-to-NPC stranger introduction (3-stance self-driven exchange)
+  say [role=ask_name_meet_stranger, actor.social_style=warm|friendly|protective] as meet_stranger_warm:
+    "Hey there—I don't think we've met. I'm {speaker.name}. What do people call you?"
+    "Nice to see another friendly face out here. Name's {speaker.name}—and you are?"
+  say [role=ask_name_meet_stranger, actor.social_style=hostile|guarded|withdrawn] as meet_stranger_guarded:
+    "Hold up, stranger. Don't recognize you—what's your name?"
+    "You're not from our crew. I'm {speaker.name}—who are you?"
+  say [role=ask_name_meet_stranger] as meet_stranger_default:
+    "Hey, don't think I caught your name before. I'm {speaker.name}."
+    "Looks like we're sharing the same road—I'm {speaker.name}. What's your name?"
+
+  say [role=answer_meet_real_name, actor.social_style=warm|friendly|protective] as answer_meet_warm:
+    "Good to meet you, {addressee.name}—I'm {claimed.name}. Always glad to meet someone still alive."
+    "I'm {claimed.name}. Nice meeting you, {addressee.name}—stay safe out here."
+  say [role=answer_meet_real_name] as answer_meet_real_default:
+    "Name's {claimed.name}. Good to meet you, {addressee.name}."
+    "Call me {claimed.name}. Glad you're not one of the dead, {addressee.name}."
+
+  say [role=answer_meet_cautious] as answer_meet_cautious_default:
+    "You can call me {claimed.name}. Just passing through, same as everyone else."
+    "{claimed.name}. That's all you need to know for now."
+
+  say [role=answer_meet_refuse] as answer_meet_refuse_default:
+    "Nothing personal, I don't hand out my name to people I just met."
+    "Let's keep names out of it for now. Easier that way."
+
+  say [role=react_meet_real_name, actor.social_style=warm|friendly|protective] as react_meet_warm:
+    "Alright, {claimed.name}—good to put a name to a face. Watch your back out there."
+    "Pleasure, {claimed.name}. Stick close if things get loud."
+  say [role=react_meet_real_name] as react_meet_default:
+    "Got it, {claimed.name}. Good to know who's standing next to me."
+    "Alright, {claimed.name}. Keep your head on a swivel."
+
+  say [role=react_meet_refuse] as react_meet_refuse_default:
+    "Fair enough—smart to be careful these days."
+    "Suit yourself. Just don't get in my line of fire."

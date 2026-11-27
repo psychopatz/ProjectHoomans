@@ -19,8 +19,219 @@ local MAX_TRACKED_GROUPS = 32
 local groupCooldowns = {}
 local groupOrder = {}
 local lastTopicByGroup = {}
+local introPairCooldowns = {}
+local introPairOrder = {}
 local globalBanterCooldownUntil = 0
 local banterSeq = 0
+
+local INTRO_RADIUS_SQ = 10 * 10
+local INTRO_PAIR_COOLDOWN_MS = 180000
+local INTRO_REPLY_FRONTIER = {
+    { id = "intro_warm",    speechAct = "ACCEPT",  stance = "stance_positive", priority = 14 },
+    { id = "intro_caution", speechAct = "CLARIFY", stance = "stance_neutral",  priority = 12 },
+    { id = "intro_refuse",  speechAct = "REFUSE",  stance = "stance_negative", priority = 10 },
+}
+
+local function pairKey(idA, idB)
+    local a, b = tostring(idA or ""), tostring(idB or "")
+    if a < b then return a .. "|" .. b end
+    return b .. "|" .. a
+end
+
+local function markIntroCooldown(key, untilAt)
+    if introPairCooldowns[key] == nil then
+        while #introPairOrder >= MAX_TRACKED_GROUPS do
+            local oldest = table.remove(introPairOrder, 1)
+            introPairCooldowns[oldest] = nil
+        end
+        introPairOrder[#introPairOrder + 1] = key
+    end
+    introPairCooldowns[key] = untilAt
+end
+
+local function isHostilePair(a, b)
+    if type(a) ~= "table" or type(b) ~= "table" then return false end
+    local h = PNC.Hostility
+    if h and type(h.IsHostile) == "function" then
+        local ok, res = pcall(h.IsHostile, a, b)
+        if ok and res == true then return true end
+    end
+    local ma = string.lower(tostring(a.hostility and a.hostility.mode or ""))
+    local mb = string.lower(tostring(b.hostility and b.hostility.mode or ""))
+    return ma == "hostile" or mb == "hostile"
+end
+
+local function firstNameOf(rec)
+    local raw = type(rec) == "table" and (rec.name or rec.fullName or rec.displayName) or nil
+    if not raw then return "friend" end
+    local s = string.gsub(tostring(raw), "^%s+", "")
+    return string.match(s, "^([^%s]+)") or "friend"
+end
+
+if type(Beats.RegisterHook) == "function" then
+    Beats.RegisterHook("ambient.npc_introduction", {
+        eventTypes = { "ambient.npc_introduction" },
+        priority = 56,
+        cooldownMs = 0,
+        evaluate = function(_, payload)
+            if type(Beats.BuildWorldThread) ~= "function" then return nil end
+            local a = payload and payload.anchor or nil
+            local b = payload and payload.partner or nil
+            if type(a) ~= "table" or type(b) ~= "table" then return nil end
+            return Beats.BuildWorldThread(a, b, {
+                refPrefix = "npc_intro:" .. pairKey(a.id, b.id),
+                family = "npc_identity_exchange",
+                poolID = "semantic.social.identity.ask_name_proactive",
+                eventType = "ambient_npc_introduction",
+                domain = "social",
+                channel = "social",
+                topic = "identity_exchange",
+                openAct = "GREET",
+                openRole = "ask_name_meet_stranger",
+                replyAct = tostring(payload.replyAct or "ACCEPT"),
+                replyRole = tostring(payload.replyRole or "answer_meet_real_name"),
+                chimeAct = tostring(payload.reactAct or "CHAT"),
+                chimeRole = tostring(payload.reactRole or "react_meet_real_name"),
+                third = a,
+                delayMs = 1750,
+                priority = 56,
+                tokens = payload.tokens,
+                context = {
+                    topic = "identity_exchange",
+                },
+            })
+        end,
+    })
+end
+
+local function applyIntroductionRelationship(a, b, act, now)
+    local relSvc = PNC.Relationships or PNC.RelationshipService
+    if not relSvc or type(relSvc.ApplyConversationEffect) ~= "function" then return false end
+    local worldHours = PNC.Core and type(PNC.Core.NowWorldAgeHours) == "function"
+        and PNC.Core.NowWorldAgeHours() or 0
+    local isRefuse = act == "REFUSE"
+    local famDelta = isRefuse and 1 or (act == "ACCEPT" and 6 or 5)
+    local appDelta = isRefuse and 0 or (act == "ACCEPT" and 2 or 1)
+    local resDelta = isRefuse and 0 or 1
+    pcall(relSvc.ApplyConversationEffect, tostring(a.id), "npc:" .. tostring(b.id), {
+        familiarityDelta = famDelta,
+        approvalDelta = appDelta,
+        respectDelta = resDelta,
+        memoryType = isRefuse and "introduction_declined" or "introduced",
+        worldHours = worldHours,
+        at = now,
+    })
+    pcall(relSvc.ApplyConversationEffect, tostring(b.id), "npc:" .. tostring(a.id), {
+        familiarityDelta = famDelta,
+        approvalDelta = appDelta,
+        respectDelta = resDelta,
+        memoryType = isRefuse and "introduction_declined" or "introduced",
+        worldHours = worldHours,
+        at = now,
+    })
+    return true
+end
+
+local function tryCrossFactionIntroduction(groups, now, density, audit)
+    local ref = PNC.ActorReference or (PNC.Semantics and PNC.Semantics.ActorReference)
+    if not ref or type(ref.KnowsName) ~= "function" then return false end
+    local Dir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
+
+    -- Flatten already-gathered calm NPCs from groups (zero extra world scan)
+    local actors = {}
+    local seen = {}
+    for gi = 1, #groups do
+        local members = groups[gi] and groups[gi].members or nil
+        if type(members) == "table" then
+            for mi = 1, #members do
+                local m = members[mi]
+                if type(m) == "table" and m.id ~= nil and not seen[tostring(m.id)] then
+                    seen[tostring(m.id)] = true
+                    actors[#actors + 1] = m
+                end
+            end
+        end
+    end
+    if #actors < 2 then return false end
+
+    for i = 1, #actors - 1 do
+        local a = actors[i]
+        for j = i + 1, #actors do
+            local b = actors[j]
+            if not isHostilePair(a, b) and not ref.KnowsName(a, b) then
+                local az, bz = tonumber(a.z) or 0, tonumber(b.z) or 0
+                local dx = (tonumber(a.x) or 0) - (tonumber(b.x) or 0)
+                local dy = (tonumber(a.y) or 0) - (tonumber(b.y) or 0)
+                local pKey = pairKey(a.id, b.id)
+                if math.abs(az - bz) < 1 and (dx * dx + dy * dy) <= INTRO_RADIUS_SQ
+                    and now >= (tonumber(introPairCooldowns[pKey]) or 0)
+                then
+                    local admitted = true
+                    if Dir and type(Dir.EvaluateCandidate) == "function" then
+                        admitted = Dir.EvaluateCandidate({
+                            speaker = a,
+                            scopeKey = "intro:" .. pKey,
+                            groupKey = "intro:" .. pKey,
+                            topic = "identity_exchange",
+                            tier = 2,
+                            urgency = 36,
+                            salience = 62,
+                            saturationWindowMs = 45000,
+                            silenceThreshold = 38,
+                            markOnAdmit = false,
+                            now = now,
+                        })
+                    end
+                    if admitted then
+                        local chosen = Dir and type(Dir.SelectSuggestionForNPC) == "function"
+                            and Dir.SelectSuggestionForNPC(b, a, INTRO_REPLY_FRONTIER, {
+                                now = now,
+                                sceneTension = 10,
+                            }) or INTRO_REPLY_FRONTIER[1]
+                        local act = tostring(chosen and chosen.speechAct or "ACCEPT")
+                        local replyRole = act == "REFUSE" and "answer_meet_refuse"
+                            or (act == "CLARIFY" and "answer_meet_cautious" or "answer_meet_real_name")
+                        local reactRole = act == "REFUSE" and "react_meet_refuse" or "react_meet_real_name"
+                        local tokens = {
+                            ["speaker.name"] = firstNameOf(a),
+                            ["claimed.name"] = firstNameOf(b),
+                            ["addressee.name"] = firstNameOf(a),
+                        }
+                        local ok, res = Beats.Emit("ambient.npc_introduction", {
+                            anchor = a,
+                            partner = b,
+                            replyAct = act,
+                            replyRole = replyRole,
+                            reactAct = act == "REFUSE" and "ACCEPT" or "GREET",
+                            reactRole = reactRole,
+                            tokens = tokens,
+                        }, now)
+                        if ok then
+                            local cdScale = tonumber(density and density.cooldownScale) or 1.0
+                            markIntroCooldown(pKey, now + math.floor(INTRO_PAIR_COOLDOWN_MS * cdScale))
+                            globalBanterCooldownUntil = now + math.floor(GLOBAL_BANTER_COOLDOWN_MS * cdScale)
+                            applyIntroductionRelationship(a, b, act, now)
+                            if Dir and type(Dir.MarkSpoken) == "function" then
+                                Dir.MarkSpoken("intro:" .. pKey, "identity_exchange", 2, now, a.id)
+                            end
+                            if audit then
+                                Beats.AuditLog("npc_introduction", {
+                                    "speaker=" .. tostring(a.id),
+                                    "partner=" .. tostring(b.id),
+                                    "act=" .. act,
+                                    "exchanged=" .. tostring(act ~= "REFUSE"),
+                                    "threadID=" .. tostring(res or "nil"),
+                                })
+                            end
+                            return true, res
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return false
+end
 
 local function nowMs(at)
     if at ~= nil then return tonumber(at) or 0 end
@@ -221,6 +432,17 @@ function Beats.CheckGroupBanter(at, frame)
     local density = Dir and type(Dir.GetDensityProfile) == "function"
         and Dir.GetDensityProfile() or { cooldownScale = 1.0 }
     local audit = type(Beats.IsAuditEnabled) == "function" and Beats.IsAuditEnabled() == true
+    if type(Beats.TryCrossFactionEncounter) == "function" then
+        local encOk, encRes = Beats.TryCrossFactionEncounter(groups, now, density, audit)
+        if encOk then
+            globalBanterCooldownUntil = now + math.floor(GLOBAL_BANTER_COOLDOWN_MS * (tonumber(density.cooldownScale) or 1.0))
+            return true, encRes
+        end
+    end
+    local introOk, introRes = tryCrossFactionIntroduction(groups, now, density, audit)
+    if introOk then
+        return true, introRes
+    end
     for i = 1, #groups do
         local g = groups[i]
         local members = g.members
@@ -385,8 +607,15 @@ function Beats.ResetGroupBanterRuntime()
     groupCooldowns = {}
     groupOrder = {}
     lastTopicByGroup = {}
+    introPairCooldowns = {}
+    introPairOrder = {}
     globalBanterCooldownUntil = 0
     banterSeq = 0
+end
+
+local IntroDir = PNC.Semantics and PNC.Semantics.ConversationDirector or nil
+if IntroDir and type(IntroDir.RegisterTopicAxis) == "function" then
+    IntroDir.RegisterTopicAxis("identity_exchange", "social")
 end
 
 return Beats

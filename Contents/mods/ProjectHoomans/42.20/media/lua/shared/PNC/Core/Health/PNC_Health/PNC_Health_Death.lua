@@ -65,6 +65,11 @@ local function notifyDeathSystems(record)
     then
         PNC.MedicalCareService.OnNPCDeath(record.id)
     end
+    if PNC.BehaviorSuicide
+        and type(PNC.BehaviorSuicide.OnBondedNPCDeath) == "function"
+    then
+        PNC.BehaviorSuicide.OnBondedNPCDeath(record, Core.Now())
+    end
     if not PNC.SocialEventHooks then return end
     if PNC.SocialEventHooks.DiscardRescueContributions then
         PNC.SocialEventHooks.DiscardRescueContributions(record)

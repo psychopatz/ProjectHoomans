@@ -45,14 +45,16 @@ local modelOldCategory, modelNewCategory = PNC.NPCNutrition.Update(
     modelNutrition, 3600, "idle", false, false, 1, 1)
 T.equal(modelOldCategory, "NORMAL", "realism starts at the normal weight band")
 T.equal(modelNewCategory, "NORMAL", "one hour of idle metabolism keeps weight band")
-T.near(modelNutrition.calories, 742.4, 0.000001,
-    "realism uses the player idle calorie coefficient")
-T.near(modelNutrition.carbohydrates, -12.6, 0.000001,
-    "realism drains carbohydrates in world seconds")
-T.near(modelNutrition.proteins, -3.096, 0.000001,
-    "realism drains proteins in world seconds")
-T.near(modelNutrition.lipids, -4.068, 0.000001,
-    "realism drains lipids in world seconds")
+T.near(modelNutrition.calories, 742, 2,
+    "world-hour realism burns idle fuel at ~57.6 kcal/h")
+T.truthy(type(modelNutrition.fuelHours) == "number" and modelNutrition.fuelHours < 9.6,
+    "world-hour realism tracks fuelHours directly")
+T.equal(modelNutrition.carbohydrates, 0,
+    "V3 world-hour nutrition eliminates per-second carbohydrate tracking")
+T.equal(modelNutrition.proteins, 0,
+    "V3 world-hour nutrition eliminates per-second protein tracking")
+T.equal(modelNutrition.lipids, 0,
+    "V3 world-hour nutrition eliminates per-second lipid tracking")
 T.equal(PNC.NPCNutrition.WeightCategory(50), "EMACIATED",
     "realism mirrors the player emaciated threshold")
 T.equal(PNC.NPCNutrition.WeightCategory(85), "OVERWEIGHT",
@@ -86,8 +88,8 @@ T.equal(overflowNutrition.calorieOverflow, 0,
     "realism uses the player calorie cap without overflow")
 local overflowPackedBeforeBurn = PNC.NeedsStateCodec.Encode(
     PNC.NeedsRepository.Records, age)
-T.equal(overflowPackedBeforeBurn.n.overflow[11], 1,
-    "realism nutrition presence is persisted")
+T.equal(overflowPackedBeforeBurn.n.overflow[8], 1,
+    "realism nutrition presence is persisted in V3 slot 8")
 local overflowDecoded = PNC.NeedsStateCodec.Decode(overflowPackedBeforeBurn)
 T.equal(overflowDecoded.overflow.nutrition.calorieOverflow, 0,
     "legacy overflow is not retained outside player calorie bounds")
@@ -104,18 +106,18 @@ T.equal(overflowNutrition.calories,
 T.equal(npc.needs, nil, "needs are not stored in the NPC registry record")
 
 local packed = PNC.NeedsStateCodec.Encode(PNC.NeedsRepository.Records, age)
-T.equal(packed.v, 2, "compact codec version")
+T.equal(packed.v, 3, "compact V3 codec version")
 T.equal(packed.at, age, "one shared timestamp")
 T.truthy(#packed.n.owned >= 5, "compact NPC tuple")
 T.equal(packed.n.owned[1], 1000, "pressure stored as permille")
-T.equal(packed.n.owned[4], 1400, "calories stored as integer")
+T.equal(packed.n.owned[4], 168, "fuelHours stored as tenths of world-hours (1400 kcal = 16.8h)")
 local decoded, decodedAt = PNC.NeedsStateCodec.Decode(packed)
 T.equal(decodedAt, age, "shared timestamp round trip")
 T.equal(decoded.owned.needs.hunger, 1, "need round trip")
 local overflowPacked = PNC.NeedsStateCodec.Encode(
     PNC.NeedsRepository.Records, age)
-T.equal(overflowPacked.n.overflow[8], 0,
-    "zero carbohydrate balance is compactly represented")
+T.equal(overflowPacked.n.overflow[8], 1,
+    "V3 nutrition presence flag is stored in slot 8")
 local unsupportedDecoded, unsupportedAt, unsupportedReason = PNC.NeedsStateCodec.Decode({
     v = 1, at = age, n = { legacy = { 0, 0, 0, 3700, 800, nil, nil, 500 } },
 })
@@ -145,9 +147,9 @@ end
 
 T.equal(PNC.NeedsRepository.Save(), true, "dirty compact state saves")
 local persisted = ModData.values[PNC.NeedsRepository.MODDATA_KEY]
-T.equal(persisted.v, 2, "repository writes v2")
+T.equal(persisted.v, 3, "repository writes v3")
 T.equal(persisted.at, age, "repository writes one timestamp")
-T.equal(persisted.n.owned[4], 1400, "repository persists nutrition")
+T.equal(persisted.n.owned[4], 168, "repository persists V3 fuelHours")
 
 SandboxVars.ProjectHoomans.PlayerOwnedNPCNutritionMode = 1
 local simpleNPC = { id = "simple", recruited = true, alive = true,

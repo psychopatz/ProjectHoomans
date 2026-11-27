@@ -718,6 +718,7 @@ function Beats.ResetRuntime()
     if type(Beats.ResetTelevisionRuntime) == "function" then Beats.ResetTelevisionRuntime() end
     if type(Beats.ResetCombatAssistRuntime) == "function" then Beats.ResetCombatAssistRuntime() end
     if type(Beats.ResetGroupBanterRuntime) == "function" then Beats.ResetGroupBanterRuntime() end
+    if type(Beats.ResetStrangerEncountersRuntime) == "function" then Beats.ResetStrangerEncountersRuntime() end
     if type(Beats.ResetCompanionNeedsRuntime) == "function" then Beats.ResetCompanionNeedsRuntime() end
     if type(Beats.ResetFinalKillRuntime) == "function" then Beats.ResetFinalKillRuntime() end
     if type(Beats.ResetWeatherExposureRuntime) == "function" then Beats.ResetWeatherExposureRuntime() end
@@ -741,6 +742,7 @@ require "PNC/Semantics/Beats/PNC_SemanticBeats_CombatAssist"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_NightCamp"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_MedicalRescue"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_GroupBanter"
+require "PNC/Semantics/Beats/PNC_SemanticBeats_StrangerEncounters"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_CompanionNeeds"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_GroupItemShare"
 require "PNC/Semantics/Beats/PNC_SemanticBeats_FinalKill"

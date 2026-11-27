@@ -4,17 +4,14 @@ PNC.NeedsStateCodec = PNC.NeedsStateCodec or {}
 local Codec = PNC.NeedsStateCodec
 local Definitions = PNC.NeedsDefinitions
 
--- V2 keeps the tuple compact while adding player Nutrition values and the
--- persistent hunger-relief reserve.
--- Nutrition presence is explicit so SIMPLE-mode records do not allocate or
--- rehydrate a detailed nutrition state when they are loaded.
-Codec.VERSION = 2
+-- V3 replaces per-macro (carbs/proteins/lipids) storage with compact
+-- world-hour fuel + weight tuples (9 slots instead of 12).
+Codec.VERSION = 3
 
+local Stat = PNC.DeterministicStat or require "PNC/Core/Needs/PNC_DeterministicStat"
 local tuning = Definitions and Definitions.NUTRITION or {}
 local MIN_CALORIES = tonumber(tuning.minimumCalories) or -2200
 local MAX_CALORIES = tonumber(tuning.maximumCalories) or 3700
-local MIN_MACRO = tonumber(tuning.minimumMacro) or -500
-local MAX_MACRO = tonumber(tuning.maximumMacro) or 1000
 local MIN_WEIGHT = tonumber(tuning.minimumWeight) or 35
 local MAX_WEIGHT = tonumber(tuning.maximumWeight) or 200
 local MAX_HUNGER_OVERFLOW = tonumber(Definitions.HUNGER_OVERFLOW
@@ -31,18 +28,16 @@ local function roundSigned(value)
 end
 
 local function decodeNutrition(packed)
-    local calories = tonumber(packed[4])
-        or (tonumber(tuning.defaultCalories) or 800)
+    local fuelHours = (tonumber(packed[4]) or 0) / 10
+    local calories = Stat.FuelHoursToCalories(fuelHours)
     local weight = clamp(packed[5], 0, 2000) / 10
     return {
+        fuelHours = fuelHours,
         calories = math.floor(clamp(calories, MIN_CALORIES, MAX_CALORIES)),
         calorieOverflow = 0,
-        carbohydrates = math.floor(clamp(packed[8] or 0,
-            MIN_MACRO, MAX_MACRO)),
-        proteins = math.floor(clamp(packed[9] or 0,
-            MIN_MACRO, MAX_MACRO)),
-        lipids = math.floor(clamp(packed[10] or 0,
-            MIN_MACRO, MAX_MACRO)),
+        carbohydrates = 0,
+        proteins = 0,
+        lipids = 0,
         weight = math.max(MIN_WEIGHT, math.min(MAX_WEIGHT,
             weight > 0 and weight or (tonumber(tuning.defaultWeight) or 80))),
     }
@@ -68,24 +63,19 @@ function Codec.Encode(records, at)
         local needs = state.needs or state
         local nutrition = type(state.nutrition) == "table"
             and state.nutrition or nil
-        -- Fixed slots avoid sparse ModData arrays. The marker is the only
-        -- source of truth for whether the optional runtime state is active.
+        local fuelHours = nutrition
+            and (tonumber(nutrition.fuelHours)
+                or (clamp(nutrition.calories or 0, MIN_CALORIES, MAX_CALORIES) / Stat.KCAL_PER_HOUR))
+            or 0
         local packed = {
             math.floor(clamp(needs.hunger, 0, 1) * 1000 + 0.5),
             math.floor(clamp(needs.thirst, 0, 1) * 1000 + 0.5),
             math.floor(clamp(needs.fatigue, 0, 1) * 1000 + 0.5),
-            math.floor(clamp(nutrition and nutrition.calories or 0,
-                MIN_CALORIES, MAX_CALORIES)),
+            math.floor(fuelHours * 10 + (fuelHours >= 0 and 0.5 or -0.5)),
             math.floor(clamp(nutrition and nutrition.weight or 0, 0, 1000)
                 * 10 + 0.5),
             nil,
             nil,
-            math.floor(clamp(nutrition and nutrition.carbohydrates or 0,
-                MIN_MACRO, MAX_MACRO)),
-            math.floor(clamp(nutrition and nutrition.proteins or 0,
-                MIN_MACRO, MAX_MACRO)),
-            math.floor(clamp(nutrition and nutrition.lipids or 0,
-                MIN_MACRO, MAX_MACRO)),
             nutrition and 1 or 0,
             math.floor(clamp(state.hungerOverflow, 0, MAX_HUNGER_OVERFLOW)
                 * 1000 + 0.5),
@@ -123,13 +113,8 @@ function Codec.Decode(raw)
     local output = {}
     for id, packed in pairs(raw.n) do
         if type(packed) == "table" then
-            local hasNutrition = packed[11] == 1
-            -- Accept populated slots when the same-version marker is absent.
-            -- This is a shape guard, not cross-version migration.
-            if not hasNutrition
-                and (packed[4] ~= 0 or packed[5] ~= 0
-                    or packed[8] ~= 0 or packed[9] ~= 0 or packed[10] ~= 0)
-            then
+            local hasNutrition = packed[8] == 1
+            if not hasNutrition and (packed[4] ~= 0 or packed[5] ~= 0) then
                 hasNutrition = true
             end
             output[tostring(id)] = {
@@ -141,7 +126,7 @@ function Codec.Decode(raw)
                 nutrition = hasNutrition
                     and decodeNutrition(packed) or nil,
                 morale = decodeMorale(packed),
-                hungerOverflow = clamp(packed[12], 0,
+                hungerOverflow = clamp(packed[9], 0,
                     MAX_HUNGER_OVERFLOW * 1000) / 1000,
             }
         end

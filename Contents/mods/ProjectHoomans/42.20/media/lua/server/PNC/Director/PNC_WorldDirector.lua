@@ -300,6 +300,38 @@ function Director.Initialize(force)
         end,
         { budget = Config.CHRONOLOGY_PUMP_BUDGET or 8,
             startAt = now + (Config.CHRONOLOGY_INTERVAL_HOURS or 6) })
+    Scheduler.RegisterJob("MobileGroupSurvival",
+        Config.MOBILE_SURVIVAL_INTERVAL_HOURS or 6,
+        function(at, budget)
+            if Director.Paused then return 0 end
+            local wn = PNC.WorldHourNeeds
+            if not wn or type(wn.EvaluateSurvival) ~= "function" then return 0 end
+            local groups = Groups.List()
+            local limit = math.max(1, math.floor(tonumber(budget)
+                or Config.DIRECTOR_JOB_BUDGET or 8))
+            local processed = 0
+            local worldLoot = PNC.WorldLoot
+            local compactFn = worldLoot and type(worldLoot.CompactGroupLootOnAbstract) == "function"
+                and worldLoot.CompactGroupLootOnAbstract or nil
+            local registry = PNC.Registry
+            for _, group in ipairs(groups) do
+                if processed >= limit then break end
+                local isAbstract = group.simulation and group.simulation.lod == "ABSTRACT"
+                for _, npcID in ipairs(group.memberIds or {}) do
+                    local rec = registry and registry.Get and registry.Get(npcID) or nil
+                    if rec and rec.alive ~= false then
+                        if isAbstract and compactFn then
+                            compactFn(rec, group)
+                        end
+                        wn.EvaluateSurvival(rec, at, { group = group, applyDeath = true })
+                    end
+                end
+                processed = processed + 1
+            end
+            return processed
+        end,
+        { budget = Config.DIRECTOR_JOB_BUDGET or 8,
+            startAt = now + (Config.MOBILE_SURVIVAL_INTERVAL_HOURS or 6) })
     Director.Initialized = true
     return true, "initialized"
 end
