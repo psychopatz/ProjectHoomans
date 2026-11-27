@@ -887,6 +887,8 @@ function Beats.ResolveKnoxBranchChoice(listenerKey, decision, opts)
         stage = br.stage,
         infectedId = br.infectedId,
         replyText = replyText,
+        role = "knox_reply_" .. stance,
+        topic = "knox_distress",
     }
 end
 

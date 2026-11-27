@@ -8,10 +8,10 @@ PNC = {}
 T.load(CATALOG_FILE)
 
 local catalog = PNC.AnimationDebugCatalog
-T.truthy(catalog.generatedCount == 535, "catalog must include every zombie XML node")
-T.truthy(#catalog.entries == 535, "catalog entry count mismatch")
+T.truthy(catalog.generatedCount == 834, "catalog must include every zombie XML node")
+T.truthy(#catalog.entries == 834, "catalog entry count mismatch")
 T.truthy(catalog.stateCounts.hitreaction == 41, "nested hitreaction nodes missing")
-T.truthy(catalog.stateCounts.bumped == 237, "bumped node inventory mismatch")
+T.truthy(catalog.stateCounts.bumped == 245, "bumped node inventory mismatch")
 
 local attack
 local inheritedStagger
@@ -121,6 +121,23 @@ for _, entry in ipairs({
         "ground seating loops must not finish the bump at clip end")
 end
 
-T.finish("pnc_animation_debug_catalog_smoke")
+local suicideExpected = {
+    ["bumped/PNC_Anim_SuicideHandgun.xml"] = "Bob_Suicide_Handgun",
+    ["bumped/PNC_Anim_SuicideHandgun02.xml"] = "Bob_Suicide_Handgun02",
+    ["bumped/PNC_Anim_SuicideHandgun03.xml"] = "Bob_Suicide_Handgun03",
+    ["bumped/PNC_Anim_SuicideRifle.xml"] = "Bob_Suicide_Rifle",
+}
+for key, expectedAnim in pairs(suicideExpected) do
+    local found
+    for _, entry in ipairs(catalog.entries) do
+        if (entry.folder .. "/" .. entry.file) == key then
+            found = entry
+            break
+        end
+    end
+    T.truthy(found, "suicide NPC catalog entry missing: " .. key)
+    T.equal(found.anim, expectedAnim, "suicide NPC clip mismatch: " .. key)
+    T.truthy(found.playable == true, "suicide NPC entry must be playable: " .. key)
+end
 
 T.finish("pnc_animation_debug_catalog_smoke")

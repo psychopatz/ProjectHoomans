@@ -525,8 +525,8 @@ function Response.Resolve(ir, state, context, branch)
                     return {
                         text = res and res.replyText or nil,
                         poolID = "semantic.companion.need_request",
-                        role = "requester_approved",
-                        topic = "companion_need_request",
+                        role = res and res.role or "requester_approved",
+                        topic = res and res.topic or "companion_need_request",
                         resolvedNeedRequest = true,
                     }
                 end
@@ -536,6 +536,23 @@ function Response.Resolve(ir, state, context, branch)
                     and state.pendingRequest.action,
                 topic = state and state.currentTopic,
             })
+        end
+        if ir.intent == "CLARIFY" then
+            local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+            local pKey = context and (context.playerKey or context.speakerKey or context.player) or nil
+            local npcId = context and (context.npcID or context.npcId or (context.npc and context.npc.id)) or nil
+            if beats and type(beats.TryResolvePlayerNeedReply) == "function" and pKey then
+                local resolved, res = beats.TryResolvePlayerNeedReply(pKey, npcId, "distance")
+                if resolved then
+                    return {
+                        text = res and res.replyText or nil,
+                        poolID = "semantic.companion.need_request",
+                        role = res and res.role or "knox_reply_distance",
+                        topic = res and res.topic or "knox_distress",
+                        resolvedNeedRequest = true,
+                    }
+                end
+            end
         end
         if ir.intent == "REFUSE" or ir.intent == "DISAGREE" then
             local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
@@ -547,8 +564,8 @@ function Response.Resolve(ir, state, context, branch)
                     return {
                         text = res and res.replyText or nil,
                         poolID = "semantic.companion.need_request",
-                        role = "requester_denied",
-                        topic = "companion_need_request",
+                        role = res and res.role or "requester_denied",
+                        topic = res and res.topic or "companion_need_request",
                         resolvedNeedRequest = true,
                     }
                 end

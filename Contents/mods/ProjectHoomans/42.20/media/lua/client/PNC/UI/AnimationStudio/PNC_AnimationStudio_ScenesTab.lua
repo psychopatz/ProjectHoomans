@@ -59,6 +59,8 @@ local PROP_PRESETS = {
     { label = "Prop: Base.Axe", data = "Base.Axe" },
     { label = "Prop: Base.Book", data = "Base.Book" },
     { label = "Prop: Base.KitchenKnife", data = "Base.KitchenKnife" },
+    { label = "Prop: Base.Pistol", data = "Base.Pistol" },
+    { label = "Prop: Base.HuntingRifle", data = "Base.HuntingRifle" },
     { label = "Prop: Base.Bowl", data = "Base.Bowl" },
     { label = "Prop: Base.Flashlight", data = "Base.Flashlight" },
 }

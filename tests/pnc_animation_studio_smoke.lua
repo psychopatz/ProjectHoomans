@@ -44,14 +44,33 @@ for _, path in ipairs({
     assert(fn ~= nil, "Failed to parse " .. path .. ": " .. tostring(err))
 end
 
--- Verify ScenesTab includes Base.Cigarettes preset for testing smoke scenes.
+-- Verify ScenesTab includes Base.Cigarettes and firearm presets.
 local scenesSource = assert(io.open(
     T.path("ProjectHoomans", "client", "PNC/UI/AnimationStudio/PNC_AnimationStudio_ScenesTab.lua"),
     "r"
 )):read("*a")
 T.truthy(scenesSource:find("Base.Cigarettes", 1, true),
     "Single-NPC scenes tab should include Base.Cigarettes prop preset")
+T.truthy(scenesSource:find("Base.Pistol", 1, true),
+    "Single-NPC scenes tab should include Base.Pistol prop preset")
+T.truthy(scenesSource:find("Base.HuntingRifle", 1, true),
+    "Single-NPC scenes tab should include Base.HuntingRifle prop preset")
 T.truthy(scenesSource:find("removeView", 1, true),
     "Multi-Actor scenes scope should remove duplicate clip browser tabs")
+
+-- Verify Immersive Suicide scenes are registered in base scene definitions.
+local baseScenesSource = assert(io.open(
+    T.path("ProjectHoomans", "shared", "PNC/Core/Visuals/PNC_AnimationSceneDefinitions_Base.lua"),
+    "r"
+)):read("*a")
+for _, sceneId in ipairs({
+    "suicide.handgun",
+    "suicide.handgun_02",
+    "suicide.handgun_03",
+    "suicide.rifle",
+}) do
+    T.truthy(baseScenesSource:find(sceneId, 1, true),
+        "Base animation scene definitions must register " .. sceneId)
+end
 
 print("PASS: Animation Studio Phase 1 smoke test")

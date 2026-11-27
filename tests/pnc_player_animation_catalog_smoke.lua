@@ -14,9 +14,9 @@ T.truthy(catalog.generatedCount > 0,
     "player catalog is empty")
 T.equal(catalog.sourceCounts.player_native, 443,
     "native player catalog count changed unexpectedly")
-T.equal(catalog.sourceCounts.player_mod, 3,
+T.equal(catalog.sourceCounts.player_mod, 244,
     "mod player catalog count mismatch")
-T.equal(catalog.sourceCounts.zombie, 466,
+T.equal(catalog.sourceCounts.zombie, 473,
     "zombie catalog count mismatch")
 T.truthy(catalog.bridgeCount > 0, "player bridge catalog is empty")
 
@@ -114,13 +114,13 @@ T.truthy(zombiePathfind.playable,
 
 T.truthy(zombieUnsupported,
     "catalog has no explicit no-clip zombie audit row")
-T.equal(catalog.dedupe.zombieRowsRemoved, 73,
+T.equal(catalog.dedupe.zombieRowsRemoved, 361,
     "resolved player/zombie duplicate row count changed unexpectedly")
-T.equal(catalog.dedupe.zombieClipsRemoved, 60,
+T.equal(catalog.dedupe.zombieClipsRemoved, 108,
     "resolved player/zombie duplicate clip count changed unexpectedly")
-T.equal(catalog.bridgeCount, 462,
+T.equal(catalog.bridgeCount, 710,
     "non-duplicate resolved player/zombie clips should have bridges")
-T.equal(catalog.fullBodyBridgeCount, 25,
+T.equal(catalog.fullBodyBridgeCount, 29,
     "full-body zombie bridge count changed unexpectedly")
 
 T.truthy(nativeSatChair, "native chair-sit animation is missing")
@@ -209,5 +209,25 @@ T.contains(chairBridgeSource, "<m_AnimName>Bob_SatChair</m_AnimName>",
     "chair-sit bridge clip mismatch")
 T.falsy(string.find(chairBridgeSource, "SatChairStarted", 1, true),
     "chair-sit bridge leaked the furniture-state condition")
+
+for nodeName, expectedAnim in pairs({
+    PNC_Anim_SuicideHandgun = "Bob_Suicide_Handgun",
+    PNC_Anim_SuicideHandgun02 = "Bob_Suicide_Handgun02",
+    PNC_Anim_SuicideHandgun03 = "Bob_Suicide_Handgun03",
+    PNC_Anim_SuicideRifle = "Bob_Suicide_Rifle",
+}) do
+    local entry
+    for _, candidate in ipairs(catalog.entries) do
+        if candidate.source == "zombie" and candidate.node == nodeName then
+            entry = candidate
+            break
+        end
+    end
+    T.truthy(entry, "suicide player catalog entry missing: " .. nodeName)
+    T.equal(entry.anim, expectedAnim, "suicide player clip mismatch: " .. nodeName)
+    T.equal(entry.route, "player_emote_bridge",
+        "suicide player preview should use full-body emote bridge: " .. nodeName)
+    T.truthy(entry.playable == true, "suicide player entry must be playable: " .. nodeName)
+end
 
 T.finish("pnc_player_animation_catalog_smoke")

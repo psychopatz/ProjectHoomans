@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode>
+	<m_Name>PNC_PH_CarryHandhold_PassengerWalk_SLOWID</m_Name>
+	<m_AnimName>PNC_CarriedHandholdWalk</m_AnimName>
+	<m_Priority>110</m_Priority>
+	<m_ConditionPriority>1000</m_ConditionPriority>
+	<m_SyncTrackingEnabled>false</m_SyncTrackingEnabled>
+	<m_useDeferredMovement>false</m_useDeferredMovement>
+	<m_Looped>true</m_Looped>
+	<m_SpeedScale>1.0</m_SpeedScale>
+	<m_BlendTime>0.12</m_BlendTime>
+	<m_Conditions>
+		<m_Name>PerformingAction</m_Name>
+		<m_Type>STRING</m_Type>
+		<m_Value>PNC_PH_CarryHandhold_PassengerWalk_SLOWID</m_Value>
+	</m_Conditions>
+</animNode>
