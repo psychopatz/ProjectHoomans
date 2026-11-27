@@ -20,6 +20,7 @@ require "PNC/Core/Behaviors/PNC_Behavior_Lumber"
 require "PNC/Core/Behaviors/PNC_Behavior_Fishing"
 require "PNC/Core/Behaviors/PNC_Behavior_Incapacitated"
 require "PNC/Core/Behaviors/PNC_Behavior_FireSafety"
+require "PNC/Core/Behaviors/PNC_Behavior_Suicide"
 require "PNC/Core/Behaviors/PNC_Behavior_Treatment"
 require "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion"
 require "PNC/Core/Behaviors/ThreatGuard/PNC_BehaviorThreatGuard"
@@ -38,6 +39,7 @@ local OrderSystem = PNC.OrderSystem
 local Registry = PNC.BehaviorRegistry
 local Incapacitated = PNC.BehaviorIncapacitated
 local FireSafety = PNC.BehaviorFireSafety
+local Suicide = PNC.BehaviorSuicide
 local Treatment = PNC.BehaviorTreatment
 local Companion = PNC.BehaviorCompanion
 local Hostile = PNC.BehaviorHostile
@@ -255,6 +257,7 @@ require "PNC/Core/Behaviors/PNC_BehaviorSystem_Tick_Dispatch"
 Behavior.Internal.TickOwnership = {
     LiveBodyControl = LiveBodyControl,
     FireSafety = FireSafety,
+    Suicide = Suicide,
     Combat = Combat,
     ThreatGuard = ThreatGuard,
     AnimationScenes = AnimationScenes,

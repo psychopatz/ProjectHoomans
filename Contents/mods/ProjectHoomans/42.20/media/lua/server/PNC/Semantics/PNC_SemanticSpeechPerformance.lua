@@ -184,6 +184,15 @@ function Perf.Perform(record, spec, at)
         return false, safeReason
     end
 
+    -- Never clobber an active sitting/sleeping/scene or suicide posture with a
+    -- transient speech/symptom bump (voice cue above still plays cleanly).
+    local rt = type(record.runtime) == "table" and record.runtime or nil
+    if rt and (rt.animationScene ~= nil or rt.roamingSeat ~= nil
+        or rt.roamAmbient ~= nil or rt.suicideState ~= nil)
+    then
+        return voiceOK, voiceOK and ("voice:" .. tostring(voiceRes)) or "posture_scene_active"
+    end
+
     local npcID = tostring(record.id or "")
     if npcID == "" then return false, "missing_npc_id" end
     if activeAnims[npcID] ~= nil then

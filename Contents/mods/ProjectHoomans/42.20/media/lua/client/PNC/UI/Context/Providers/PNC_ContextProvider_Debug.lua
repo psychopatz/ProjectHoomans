@@ -65,6 +65,12 @@ local function addDebugActions(menu, entry)
             or tostring(snapshot and snapshot.aiState or 'No snapshot')
         print('[PNC] ' .. snapshotText)
     end)
+    menu:addOption(tr('UI_PNC_Debug_ForceShareItem', 'Force Share Item to Nearby NPC'), nil, function()
+        sendDebug('force_share_item', { id = entry.id })
+    end)
+    menu:addOption(tr('UI_PNC_Debug_TriggerSuicide', 'Trigger Suicide Pipeline'), nil, function()
+        sendDebug('trigger_suicide', { id = entry.id, cause = 'knox_critical' })
+    end)
     menu:addOption(tr(
         'UI_PNC_Debug_AnimationStudio', 'Animation Studio'
     ), nil, function()

@@ -249,6 +249,36 @@ local function handleDebugToggle(record, _, command)
     return true, true
 end
 
+local function handleForceShareItem(record, _, command, args)
+    if command ~= "force_share_item" then return false end
+    local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if not beats or type(beats.ForceShareItemFromDonor) ~= "function" then
+        return true, false, "item_share_unavailable"
+    end
+    local ok, res = beats.ForceShareItemFromDonor(record, args)
+    return true, ok == true, res
+end
+
+local function handleTriggerSuicide(record, npcId, command, args)
+    if command ~= "trigger_suicide" then return false end
+    local suicide = PNC.BehaviorSuicide
+    if not suicide or type(suicide.TryTrigger) ~= "function" then
+        return true, false, "suicide_behavior_unavailable"
+    end
+    local causeId = tostring((type(args) == "table" and args.cause) or "knox_critical")
+    local zombie = Registry.GetLiveZombie and Registry.GetLiveZombie(npcId) or nil
+    local ok, res = suicide.TryTrigger(record, zombie, causeId, {
+        force = true,
+    })
+    if Core and Core.LogInfo then
+        Core.LogInfo("debug_trigger_suicide npc=" .. tostring(record.id)
+            .. " cause=" .. causeId
+            .. " ok=" .. tostring(ok == true)
+            .. " result=" .. tostring(type(res) == "table" and res.sceneId or res or "ok"))
+    end
+    return true, ok == true, res
+end
+
 local HANDLERS = {
     handlePresence,
     handleHealth,
@@ -256,6 +286,8 @@ local HANDLERS = {
     handleMap,
     handleEquipment,
     handleDebugToggle,
+    handleForceShareItem,
+    handleTriggerSuicide,
 }
 
 function API.DebugCommand(npcId, command, args)

@@ -1,0 +1,70 @@
+# Subject: DYNAMIC GROUP ITEM SHARING (donor hands over food/water/medical item to needy teammate + gratitude reply).
+language EN
+namespace hoomans
+
+dialogue semantic.social.item_share
+  # --- FOOD SHARING ---
+  say [role=share_give_eat, need.urgency=critical, actor.social_style=warm|friendly|protective] as share_give_eat_crit_warm:
+    "Here, {addressee.name}—take this {slot.item} right now. You're starving, eat up."
+    "Don't argue, {addressee.name}—take my {slot.item}. You need it way more than I do."
+  say [role=share_give_eat, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as share_give_eat_crit_guarded:
+    "Catch, {addressee.name}—take this {slot.item}. Can't have you passing out on us."
+  say [role=share_give_eat, need.urgency=critical] as share_give_eat_crit:
+    "Here, {addressee.name}—take this {slot.item}, you look like you're about to drop from hunger."
+  say [role=share_give_eat, actor.social_style=warm|friendly|protective] as share_give_eat_warm:
+    "Here you go, {addressee.name}—I've got some {slot.item} to spare. Go ahead and eat."
+  say [role=share_give_eat, actor.social_style=hostile|guarded|withdrawn] as share_give_eat_guarded:
+    "Here, {addressee.name}—take this {slot.item} so your stomach stops giving us away."
+  say [role=share_give_eat] as share_give_eat_default:
+    "Here, {addressee.name}—take this {slot.item}. Grab a bite."
+
+  say [role=share_thanks_eat, need.urgency=critical, actor.social_style=warm|friendly|protective] as share_thanks_eat_crit_warm:
+    "Thank you so much, {slot.giver_address}... I was about to pass out. You saved me."
+    "Thanks, {slot.giver_address}... I really needed this. I won't forget it."
+  say [role=share_thanks_eat, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as share_thanks_eat_crit_guarded:
+    "Appreciate it, {slot.giver_address}. I owe you one."
+  say [role=share_thanks_eat, need.urgency=critical] as share_thanks_eat_crit:
+    "Thanks, {slot.giver_address}... you're a lifesaver, I was starving."
+  say [role=share_thanks_eat, actor.social_style=warm|friendly|protective] as share_thanks_eat_warm:
+    "Thanks, {slot.giver_address}! Really appreciate you sharing."
+  say [role=share_thanks_eat] as share_thanks_eat_default:
+    "Thanks, {slot.giver_address}—I owe you one."
+
+  # --- WATER SHARING ---
+  say [role=share_give_drink, need.urgency=critical, actor.social_style=warm|friendly|protective] as share_give_drink_crit_warm:
+    "Here, {addressee.name}—drink this {slot.item} right now. You're completely dehydrated."
+  say [role=share_give_drink, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as share_give_drink_crit_guarded:
+    "Take this {slot.item}, {addressee.name}. Drink up before you drop."
+  say [role=share_give_drink, need.urgency=critical] as share_give_drink_crit:
+    "Here, {addressee.name}—take this {slot.item}, get some water in you right away."
+  say [role=share_give_drink, actor.social_style=warm|friendly|protective] as share_give_drink_warm:
+    "Here you go, {addressee.name}—have some of my {slot.item}."
+  say [role=share_give_drink] as share_give_drink_default:
+    "Here, {addressee.name}—take this {slot.item} and hydrate."
+
+  say [role=share_thanks_drink, need.urgency=critical, actor.social_style=warm|friendly|protective] as share_thanks_drink_crit_warm:
+    "Thank you, {slot.giver_address}... my throat was burning. You're a lifesaver."
+  say [role=share_thanks_drink, need.urgency=critical] as share_thanks_drink_crit:
+    "Thanks, {slot.giver_address}... I desperately needed water."
+  say [role=share_thanks_drink] as share_thanks_drink_default:
+    "Thanks, {slot.giver_address}—really needed a drink."
+
+  # --- MEDICAL / BANDAGE SHARING ---
+  say [role=share_give_bleed, need.urgency=critical, actor.social_style=warm|friendly|protective] as share_give_bleed_crit_warm:
+    "Here, {addressee.name}—take this {slot.item} right now and wrap that wound before you bleed out!"
+  say [role=share_give_bleed, need.urgency=critical, actor.social_style=hostile|guarded|withdrawn] as share_give_bleed_crit_guarded:
+    "Take this {slot.item}, {addressee.name}—stop the bleeding before you pass out on us!"
+  say [role=share_give_bleed, need.urgency=critical] as share_give_bleed_crit:
+    "Here, {addressee.name}—grab this {slot.item} and patch yourself up right now!"
+  say [role=share_give_bleed] as share_give_bleed_default:
+    "Here, {addressee.name}—take this {slot.item} for that cut."
+
+  say [role=share_thanks_bleed, need.urgency=critical, actor.social_style=warm|friendly|protective] as share_thanks_bleed_crit_warm:
+    "Thank you, {slot.giver_address}... I was losing too much blood—you saved my life."
+  say [role=share_thanks_bleed, need.urgency=critical] as share_thanks_bleed_crit:
+    "Thanks, {slot.giver_address}... getting this wrapped up right now!"
+  say [role=share_thanks_bleed] as share_thanks_bleed_default:
+    "Thanks, {slot.giver_address}—appreciate the bandage."
+
+  say [default] as default:
+    "Here, {addressee.name}—take this {slot.item}."

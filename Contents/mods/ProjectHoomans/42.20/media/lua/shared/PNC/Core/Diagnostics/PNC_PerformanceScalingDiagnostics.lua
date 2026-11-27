@@ -83,6 +83,7 @@ Diagnostics.BodyIdentityAuditEnabled = false
 -- trigger inputs, cooldown/environment/alarm state variables, speaker filtering,
 -- and delivery outcomes so silent beat drops can be pinpointed in console.txt.
 Diagnostics.BeatsAuditEnabled = false
+Diagnostics.SuicideAuditEnabled = false
 Diagnostics.BuildTraceSequence = tonumber(Diagnostics.BuildTraceSequence) or 0
 Diagnostics.BuildTraceSentAt = Diagnostics.BuildTraceSentAt or {}
 Diagnostics.BuildTraceReceivedAt = Diagnostics.BuildTraceReceivedAt or {}
@@ -380,6 +381,15 @@ end
 
 function Diagnostics.IsBeatsAuditEnabled()
     return Diagnostics.BeatsAuditEnabled == true
+end
+
+function Diagnostics.SetSuicideAuditEnabled(enabled)
+    Diagnostics.SuicideAuditEnabled = enabled == true
+    return Diagnostics.SuicideAuditEnabled
+end
+
+function Diagnostics.IsSuicideAuditEnabled()
+    return Diagnostics.SuicideAuditEnabled == true
 end
 
 function Diagnostics.SetInventoryAuditEnabled(enabled)

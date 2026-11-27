@@ -11,6 +11,7 @@ PNC.EventTypes = PNC.EventTypes or {
     NPC_NEED_CRITICAL_DAMAGE = "projecthoomans.npc.needs.criticalDamage",
     NPC_WEIGHT_CATEGORY_CHANGED = "projecthoomans.npc.nutrition.weightCategoryChanged",
     NPC_INVENTORY_CHANGED = "projecthoomans.npc.inventory.changed",
+    NPC_ITEM_SHARED = "projecthoomans.npc.provision.itemShared",
     NPC_SKILL_LEVEL_UP = "projecthoomans.npc.skill.levelUp",
     NPC_WOUNDED = "projecthoomans.npc.health.wounded",
     NPC_WOUND_STATE_CHANGED = "projecthoomans.npc.health.woundStateChanged",

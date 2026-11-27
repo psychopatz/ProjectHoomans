@@ -71,3 +71,76 @@ extend semantic.companion.need_request
     "I'm trying to hold on, {term.address}—*snarl*—just stay back, I didn't ask for this!"
   say [role=knox_reply_confront] as knox_reply_confront_default:
     "Don't talk to me like I'm already dead, {term.address}... I'm still human!"
+
+  # Critical Knox (>=90%) Firearm Suicide Sequence — Resolve, Intervention, Insistence, Compliance, Mourning
+  # Phase 1: Infected NPC resolves to end it on their own terms before turning
+  say [role=suicide_resolve, actor.social_style=warm|friendly|protective] as suicide_resolve_warm:
+    "{addressee.name}... I can feel it taking my mind. I'm not going to turn on you. Let me go out as myself..."
+    "I'm sorry, {addressee.name}... I can't fight it anymore. I'd rather end this with my {slot.weapon} than bite someone I care about..."
+  say [role=suicide_resolve, actor.social_style=hostile|guarded|withdrawn] as suicide_resolve_guarded:
+    "I'm done, {addressee.name}. Ninety percent gone already—I'm not ending up one of those things."
+    "Don't look, {addressee.name}. My hands are still mine for one last minute, and I'm using this {slot.weapon}."
+  say [role=suicide_resolve] as suicide_resolve_default:
+    "{addressee.name}... I'm losing myself. I can't let it turn me—this is the only way out..."
+    "It's over for me, {addressee.name}... I'm ending this before I become one of them."
+
+  # Phase 1 (solo): Infected NPC alone with no witnesses
+  say [role=suicide_resolve_solo, actor.social_style=hostile|guarded|withdrawn] as suicide_resolve_solo_guarded:
+    "Not like this... I'm not turning into one of those things. Going out on my own terms."
+  say [role=suicide_resolve_solo] as suicide_resolve_solo_default:
+    "I can't feel myself anymore... god forgive me, I'm not letting it take me..."
+    "Nobody left to hurt if I stop it right now... goodbye..."
+
+  # Phase 2: Nearby witness NPC tries to stop them at first
+  say [role=suicide_intervene, actor.social_style=warm|friendly|protective] as suicide_intervene_warm:
+    "No—{victim.name}, put the {slot.weapon} down! Please, don't do this, we can still figure something out!"
+    "{victim.name}, stop! Lower that {slot.weapon}, please—I'm not ready to lose you!"
+  say [role=suicide_intervene, actor.social_style=hostile|guarded|withdrawn] as suicide_intervene_guarded:
+    "Hey! {victim.name}, hold on—drop the {slot.weapon}! Don't do anything stupid yet!"
+    "Whoa—easy, {victim.name}! Put that {slot.weapon} down for a second and think!"
+  say [role=suicide_intervene] as suicide_intervene_default:
+    "Wait—{victim.name}, stop! Put the {slot.weapon} down, don't do this!"
+    "{victim.name}, please—wait a second! Don't pull that trigger!"
+
+  # Phase 3: Infected NPC insists it's too late and asks witness to let them go
+  say [role=suicide_insist, actor.social_style=warm|friendly|protective] as suicide_insist_warm:
+    "Please, {addressee.name}... look at me, I'm already slipping. If you care about me, let me go while I still remember your face..."
+    "There's no cure, {addressee.name}... *wheeze*... I'm begging you, don't make me wake up as a monster."
+  say [role=suicide_insist, actor.social_style=hostile|guarded|withdrawn] as suicide_insist_guarded:
+    "Step back, {addressee.name}. You know how this ends—either I do it now, or you have to put me down later."
+    "Don't lie to me, {addressee.name}. It's already over. Let me finish this myself."
+  say [role=suicide_insist] as suicide_insist_default:
+    "You know there's no coming back from this, {addressee.name}... please, just let me go out human..."
+    "I can barely hold on, {addressee.name}... *cough*... step back and let me do this."
+
+  # Phase 4: Witness NPC reluctantly complies and gives their farewell
+  say [role=suicide_comply, actor.social_style=warm|friendly|protective] as suicide_comply_warm:
+    "God... okay... okay, {victim.name}. I won't stop you. I'm so sorry... rest easy, my friend..."
+    "I'm sorry I couldn't save you, {victim.name}... go in peace. We'll remember you..."
+  say [role=suicide_comply, actor.social_style=hostile|guarded|withdrawn] as suicide_comply_guarded:
+    "...Damn it. Alright, {victim.name}. I'll step back. At least you're going out on your own feet."
+    "Fine... I won't get in your way, {victim.name}. Make it quick."
+  say [role=suicide_comply] as suicide_comply_default:
+    "...Okay, {victim.name}. I understand. I'll step back... goodbye..."
+    "God help us... alright, {victim.name}. I won't stop you. Rest in peace..."
+
+  # Phase 7: Witness NPC mourns after the shot using proper pronouns
+  say [role=suicide_mourn, actor.social_style=warm|friendly|protective] as suicide_mourn_warm:
+    "Oh god... {victim.name}... {victim.Subj} deserved so much better than this. Rest in peace..."
+    "Goodbye, {victim.name}... I'll never forget what {victim.subj} did for us. At least {victim.subj} didn't turn..."
+  say [role=suicide_mourn, actor.social_style=hostile|guarded|withdrawn] as suicide_mourn_guarded:
+    "Damn this world... {victim.name} went out on {victim.poss} own terms. Respect."
+    "{victim.Subj} had the guts to end it before turning... rest easy, {victim.name}."
+  say [role=suicide_mourn] as suicide_mourn_default:
+    "Rest in peace, {victim.name}... {victim.subj} went out human, at least."
+    "God... {victim.subj}'s really gone. I'm sorry we couldn't save {victim.obj}..."
+
+  # Optional second witness mourning chime
+  say [role=suicide_mourn_chime, actor.social_style=warm|friendly|protective] as suicide_mourn_chime_warm:
+    "Poor {victim.name}... {victim.subj} was so brave right to the end..."
+    "I can't believe {victim.subj}'s gone... we'll bury {victim.obj} right when it's safe..."
+  say [role=suicide_mourn_chime, actor.social_style=hostile|guarded|withdrawn] as suicide_mourn_chime_guarded:
+    "Nothing left to do for {victim.obj} now... keep moving before that shot draws every deadhead in town."
+  say [role=suicide_mourn_chime] as suicide_mourn_chime_default:
+    "Goodbye, {victim.name}... at least {victim.poss} suffering is over."
+    "That took courage... rest easy, {victim.name}."

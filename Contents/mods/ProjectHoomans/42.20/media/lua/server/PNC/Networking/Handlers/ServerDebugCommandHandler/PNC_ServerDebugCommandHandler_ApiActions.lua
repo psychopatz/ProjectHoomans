@@ -26,6 +26,8 @@ local directDebugActions = {
     set_equipment_slot = true,
     clear_equipment = true,
     toggle_debug = true,
+    force_share_item = true,
+    trigger_suicide = true,
 }
 
 function H.HandleAPIAction(player, args)

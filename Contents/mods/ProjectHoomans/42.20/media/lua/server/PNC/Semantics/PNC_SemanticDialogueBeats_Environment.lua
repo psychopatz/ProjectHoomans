@@ -463,6 +463,9 @@ function Beats.CheckEnvironment(now)
     if type(Beats.CheckCompanionNeeds) == "function" then
         Beats.CheckCompanionNeeds(now)
     end
+    if type(Beats.CheckGroupItemShare) == "function" then
+        Beats.CheckGroupItemShare(now)
+    end
     if type(Beats.MaybeLogPeriodicAuditSnapshot) == "function" then
         Beats.MaybeLogPeriodicAuditSnapshot("env_check", now)
     end

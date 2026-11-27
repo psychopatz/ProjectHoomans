@@ -264,6 +264,7 @@
   "UI_PNC_Debug_SetMixed": "Set Mixed",
   "UI_PNC_Debug_SetRanged": "Set Ranged",
   "UI_PNC_Debug_StopRecording": "Stop Recording Debug",
+  "UI_PNC_Debug_TriggerSuicide": "Trigger Suicide Pipeline",
   "UI_PNC_Debug_UseFullLoadout": "Use My Full Loadout",
   "UI_PNC_Debug_UseHeldWeapon": "Use My Held Weapon",
   "UI_PNC_DiscoveryFoundLooters": "Found a suspicious signal",

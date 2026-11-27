@@ -200,3 +200,22 @@ function Diagnostics.LogBeatsAudit(eventName, fields)
     end
     return true
 end
+
+-- Suicide behavior pipeline tracing. Callers guard on Diagnostics.SuicideAuditEnabled
+-- before assembling fields so the disabled path stays a single boolean check.
+function Diagnostics.LogSuicideAudit(eventName, fields)
+    local output
+    local message
+    if Diagnostics.SuicideAuditEnabled ~= true then return false end
+    output = { "suicide_audit", "event=" .. tostring(eventName or "unknown") }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end

@@ -57,6 +57,13 @@ local ROLE_CUES = {
     self_knox_medium           = { anim = "PNC_Anim_Cough",        animDurationMs = 2600, voice = "sneeze_heavy" },
     self_knox_critical         = { anim = "PNC_Anim_PainHead",     animDurationMs = 3000, voice = "zombie_growl" },
     self_knox                  = { anim = "PNC_Anim_Sneeze",       animDurationMs = 2200, voice = "sneeze" },
+    suicide_resolve            = { anim = "PNC_Anim_PainHead",     animDurationMs = 2600, voice = "sigh" },
+    suicide_resolve_solo       = { anim = "PNC_Anim_PainHead",     animDurationMs = 2600, voice = "sigh" },
+    suicide_intervene          = { anim = "stop",                  animDurationMs = 2600, voice = "shout" },
+    suicide_insist             = { anim = "no",                    animDurationMs = 2400, voice = "sigh" },
+    suicide_comply             = { anim = "PNC_Anim_WipeHead",     animDurationMs = 2600, voice = "sigh" },
+    suicide_mourn              = { anim = "PNC_Anim_PainHead",     animDurationMs = 3200, voice = "sigh" },
+    suicide_mourn_chime        = { anim = "salute",                animDurationMs = 2600, voice = "sigh" },
 }
 
 -- Pool-level cues (second priority; excludes any `compat` pools automatically)

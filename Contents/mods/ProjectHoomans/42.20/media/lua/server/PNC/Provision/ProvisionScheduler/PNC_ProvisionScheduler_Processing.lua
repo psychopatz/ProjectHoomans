@@ -60,6 +60,16 @@ local function canUseWorldBandageRip(record, definition)
         and type(PNC.WorldItemService.RequestBandageRip) == "function"
 end
 
+local function tryTeammateProvisionShare(record, definition)
+    local id = tostring(definition and definition.id or "")
+    if id ~= "food" and id ~= "hydration" and id ~= "bandage" then return false, nil end
+    local beats = PNC.Semantics and PNC.Semantics.DialogueBeats or nil
+    if not beats or type(beats.TryProvisionFromTeammate) ~= "function" then
+        return false, nil
+    end
+    return beats.TryProvisionFromTeammate(record, id)
+end
+
 function H.Process(entry)
     local record = PNC.Registry and PNC.Registry.Get(entry.npcID)
     if not record or record.alive == false then
@@ -73,16 +83,24 @@ function H.Process(entry)
     local following = isFollowing(record)
     local awayFromHome = PNC.HomeDutyService and PNC.HomeDutyService.IsAtHome
         and not PNC.HomeDutyService.IsAtHome(record)
-    if following and not allowAwayWorldRip then
+    if (following or awayFromHome) and not allowAwayWorldRip then
+        local sharedOk, shareRes = tryTeammateProvisionShare(record, definition)
+        if sharedOk then
+            local rt = record.runtime and record.runtime.provision or nil
+            if rt then
+                clearProvisionState(rt, entry.ruleID)
+                rt.lastRequestResult = "provision_shared_by_teammate"
+            end
+            return true, nil, {
+                ruleId = definition.id, ok = true, attempted = true,
+                reason = "provision_shared_by_teammate",
+                donorId = shareRes and shareRes.donorId or nil,
+                itemFullType = shareRes and shareRes.itemFullType or nil,
+            }
+        end
         return false, H.WorldHour() + 0.25, {
             ruleId = definition.id, ok = false, attempted = false,
-            reason = "provision_blocked_while_following",
-        }
-    end
-    if awayFromHome and not allowAwayWorldRip then
-        return false, H.WorldHour() + 0.25, {
-            ruleId = definition.id, ok = false, attempted = false,
-            reason = "provision_waiting_for_home",
+            reason = following and "provision_blocked_while_following" or "provision_waiting_for_home",
         }
     end
     local existingRuntime = record.runtime
@@ -192,6 +210,18 @@ function H.Process(entry)
     end
     runtime.incoming[entry.ruleID] = nil
     runtime.incomingProjection[entry.ruleID] = nil
+    if not ok then
+        local sharedOk, shareRes = tryTeammateProvisionShare(record, definition)
+        if sharedOk then
+            runtime.lastRequestResult = "provision_shared_by_teammate"
+            return true, nil, {
+                ruleId = definition.id, ok = true, attempted = true,
+                reason = "provision_shared_by_teammate", onHand = evaluation.onHand,
+                donorId = shareRes and shareRes.donorId or nil,
+                itemFullType = shareRes and shareRes.itemFullType or nil,
+            }
+        end
+    end
     if not ok and allowAwayWorldRip then
         local ripOK, ripReason = PNC.WorldItemService.RequestBandageRip(record, {
             targetCount = math.max(1, math.ceil(evaluation.deficit)),

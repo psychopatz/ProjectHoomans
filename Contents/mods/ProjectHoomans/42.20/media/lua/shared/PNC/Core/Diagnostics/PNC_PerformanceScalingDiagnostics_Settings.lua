@@ -31,6 +31,8 @@ local BEATS_AUDIT_SETTING_ID =
     "ProjectHoomans.BeatsAudit"
 local BEHAVIOR_SCRIPT_AUDIT_SETTING_ID =
     "ProjectHoomans.BehaviorScriptAudit"
+local SUICIDE_AUDIT_SETTING_ID =
+    "ProjectHoomans.SuicideAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -253,6 +255,18 @@ local function initializeCentralDebugSettings()
             Diagnostics.BehaviorScriptAuditEnabled = enabled == true
         end,
     })
+    settings.Register({
+        id = SUICIDE_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 154,
+        title = "Suicide behavior audit",
+        description = "Logs cause evaluation, firearm/ammo checks, trait/stat roll probability, phase transitions, witness mourning, and aborts.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.SuicideAuditEnabled = enabled == true
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
@@ -293,6 +307,8 @@ local function initializeCentralDebugSettings()
         BEATS_AUDIT_SETTING_ID) == true
     Diagnostics.BehaviorScriptAuditEnabled = settings.IsEnabled(
         BEHAVIOR_SCRIPT_AUDIT_SETTING_ID) == true
+    Diagnostics.SuicideAuditEnabled = settings.IsEnabled(
+        SUICIDE_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()

@@ -305,5 +305,48 @@ Scenes.Register("survival.eat.inventory", {
     end,
 })
 
+Scenes.Register("social.item_share_give", {
+    label = "Share Item (Give)",
+    description = "Hand a carried survival item to a teammate in need.",
+    category = "social",
+    bump = "Anim_Loot",
+    durationMs = 2800,
+    priority = 62,
+    loop = false,
+    blocking = true,
+    interrupts = {
+        movement = false,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onStop = function(record)
+        if type(record) == "table" and type(record.runtime) == "table" then
+            record.runtime.sceneActionProps = nil
+        end
+    end,
+})
+
+Scenes.Register("social.item_share_receive", {
+    label = "Share Item (Receive)",
+    description = "Receive a shared survival item from a teammate.",
+    category = "social",
+    bump = "Anim_Loot",
+    durationMs = 2400,
+    priority = 60,
+    loop = false,
+    blocking = true,
+    interrupts = {
+        movement = false,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onStop = function(record)
+        if type(record) == "table" and type(record.runtime) == "table" then
+            record.runtime.sceneActionProps = nil
+        end
+    end,
+})
 
 return Scenes

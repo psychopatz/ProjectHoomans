@@ -11,6 +11,7 @@ end
 
 local LiveBodyControl = H.LiveBodyControl
 local FireSafety = H.FireSafety
+local Suicide = H.Suicide
 local Combat = H.Combat
 local ThreatGuard = H.ThreatGuard
 local AnimationScenes = H.AnimationScenes
@@ -44,6 +45,17 @@ local function holdForIncomingMedicalCare(record, now)
 end
 
 function H.Run(record, zombie, now)
+    -- If an NPC is in the fatal suicide ragdoll-settle phase, let BehaviorSuicide
+    -- own the body until ragdoll physics finishes instead of letting grounded
+    -- recovery stand them back up.
+    if record and record.runtime and record.runtime.suicideState
+        and record.runtime.suicideState.phase == "ragdoll_settle"
+        and Suicide and Suicide.Tick
+        and Suicide.Tick(record, zombie, now)
+    then
+        return true
+    end
+
     if LiveBodyControl and LiveBodyControl.TickGroundedRecovery
         and LiveBodyControl.TickGroundedRecovery(record, zombie, now)
     then
@@ -81,6 +93,12 @@ function H.Run(record, zombie, now)
     end
 
     if holdForIncomingMedicalCare(record, now) then
+        return true
+    end
+
+    if Suicide and Suicide.Tick
+        and Suicide.Tick(record, zombie, now)
+    then
         return true
     end
 
