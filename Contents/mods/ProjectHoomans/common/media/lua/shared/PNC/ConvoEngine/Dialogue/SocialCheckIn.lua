@@ -580,7 +580,7 @@ return {
                                 ["metadata"] = {
                                     ["choiceKey"] = "choice.weather",
                                     ["responseKey"] = "response.weather",
-                                    ["responseTextFallback"] = "At least the rain covers our footsteps.",
+                                    ["responseTextFallback"] = "Could be worse out there. I just keep moving.",
                                 },
                                 ["utteranceFallback"] = "Some weather we're having.",
                             },

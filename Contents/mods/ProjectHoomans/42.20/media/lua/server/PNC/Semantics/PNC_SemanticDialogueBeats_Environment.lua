@@ -440,9 +440,6 @@ function Beats.CheckEnvironment(now)
             end
         end
     end
-    if type(Beats.CheckNearbyWorldObjects) == "function" then
-        Beats.CheckNearbyWorldObjects(now)
-    end
     local BC = PNC.Semantics and PNC.Semantics.BeatContext or nil
     local frame = {
         now = now,
@@ -457,26 +454,58 @@ function Beats.CheckEnvironment(now)
         return frame.groups or {}
     end
 
-    if Beats.LastWeather ~= nil and type(Beats.CheckGroupBanter) == "function" then
-        Beats.CheckGroupBanter(now, frame)
+    -- Spread the heavier ambient checks across env ticks with a small time
+    -- budget so server_finish.dialogue_beats never spikes 70-900ms in one frame.
+    local envStartMs = nowMs()
+    local envBudgetMs = 5
+    local wxEmitted = false
+    local watcherEmitted = false
+    local tasks = {
+        function()
+            if type(Beats.CheckNearbyWorldObjects) == "function" then
+                Beats.CheckNearbyWorldObjects(now)
+            end
+        end,
+        function()
+            if Beats.LastWeather ~= nil and type(Beats.CheckGroupBanter) == "function" then
+                Beats.CheckGroupBanter(now, frame)
+            end
+        end,
+        function()
+            if type(Beats.CheckCompanionNeeds) == "function" then
+                Beats.CheckCompanionNeeds(now)
+            end
+        end,
+        function()
+            if type(Beats.CheckGroupItemShare) == "function" then
+                Beats.CheckGroupItemShare(now)
+            end
+        end,
+        function()
+            if type(Beats.CheckWeatherAndExposure) == "function" then
+                wxEmitted = Beats.CheckWeatherAndExposure(now, frame) == true
+            end
+        end,
+        function()
+            if type(Beats.CheckStateWatchers) == "function" then
+                watcherEmitted = Beats.CheckStateWatchers(now, frame) == true
+            end
+        end,
+    }
+    local cursor = tonumber(Beats.EnvCheckCursor) or 1
+    if cursor < 1 or cursor > #tasks then cursor = 1 end
+    local ran = 0
+    while ran < #tasks do
+        tasks[cursor]()
+        ran = ran + 1
+        cursor = (cursor % #tasks) + 1
+        if ran < #tasks and (nowMs() - envStartMs) >= envBudgetMs then
+            break
+        end
     end
-    if type(Beats.CheckCompanionNeeds) == "function" then
-        Beats.CheckCompanionNeeds(now)
-    end
-    if type(Beats.CheckGroupItemShare) == "function" then
-        Beats.CheckGroupItemShare(now)
-    end
+    Beats.EnvCheckCursor = cursor
     if type(Beats.MaybeLogPeriodicAuditSnapshot) == "function" then
         Beats.MaybeLogPeriodicAuditSnapshot("env_check", now)
-    end
-
-    local wxEmitted = false
-    if type(Beats.CheckWeatherAndExposure) == "function" then
-        wxEmitted = Beats.CheckWeatherAndExposure(now, frame) == true
-    end
-    local watcherEmitted = false
-    if type(Beats.CheckStateWatchers) == "function" then
-        watcherEmitted = Beats.CheckStateWatchers(now, frame) == true
     end
     if wxEmitted or watcherEmitted then
         return true

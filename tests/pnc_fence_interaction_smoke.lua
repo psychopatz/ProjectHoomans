@@ -220,4 +220,31 @@ T.falsy(Internal.shouldSuppressSpecialAction(
     lane, lane.lastSpecialActionKey, 1500
 ), "special-action cooldown exceeded its boundary")
 
+-- Regression: when LiveBodyControl.BlockVanillaPassage cancels a native path
+-- at a fence without populating blockedStepToX, a recent lastVanillaFenceGuardAt
+-- must still trigger fence_climb instead of rejecting with fence_not_bumped.
+fenceTall = false
+zombieX = 0.5
+capturedSpec = nil
+Internal.passageFindFenceAhead = function()
+    return {
+        object = fence,
+        tall = false,
+        square = fromSquare,
+        fromSquare = fromSquare,
+        landingSquare = toSquare,
+    }
+end
+Internal.passageImprovesGoalDistance = function() return true end
+local guardLane = {
+    lastVanillaFenceGuardAt = 950,
+    goalRevision = 6,
+}
+handled, reason = Internal.tryDoorOrWindowInteraction(
+    zombie, { id = "guard-fence-test" }, guardLane, 3.5, 0.5, 0
+)
+T.truthy(handled, "recent vanilla fence guard hit must start fence_climb without blockedStepToX")
+T.equal(reason, "fence_climb", "vanilla fence guard handoff reason")
+T.equal(guardLane.lastVanillaFenceGuardAt, nil, "vanilla fence guard timestamp cleared once climb starts")
+
 T.finish("pnc_fence_interaction_smoke")

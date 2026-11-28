@@ -106,14 +106,30 @@ local function resolveFence(context)
                 or context.blockedFromSquare,
             fromSquare = context.blockedFromSquare,
             landingSquare = context.blockedSquare,
-        }, true
+        }, true, true
     end
-    return Internal.passageFindFenceAhead(
+    local ahead = Internal.passageFindFenceAhead(
         context.cell,
         context.zombie,
         context.goalX,
         context.goalY
-    ), false
+    )
+    if not ahead then
+        return nil, false, false
+    end
+    -- Native engine movement does not populate lane.blockedStepToX when
+    -- LiveBodyControl.BlockVanillaPassage cancels a fence collision mid-stride.
+    -- Treat a recent vanilla fence guard hit or active collision as a real
+    -- fence contact (while still requiring progress toward the goal).
+    local guardAt = tonumber(context.lane and context.lane.lastVanillaFenceGuardAt) or 0
+    local recentGuard = guardAt > 0
+        and context.now ~= nil
+        and context.now >= guardAt
+        and (context.now - guardAt) <= 1500
+    if recentGuard or context.collided == true then
+        return ahead, true, false
+    end
+    return ahead, false, false
 end
 
 local function resolveFromSquare(context, fence)
@@ -417,11 +433,11 @@ local function recordFenceAction(
 end
 
 function Internal.tryFencePassage(context)
-    local fence, exactBlockedEdge = resolveFence(context)
+    local fence, bumpedFence, exactBlockedEdge = resolveFence(context)
     if not fence or not fence.landingSquare then
         return nil, nil, false
     end
-    if not exactBlockedEdge then
+    if not bumpedFence then
         Internal.logTraversalReject(
             context.record, context.zombie, context.lane,
             "traversal_rejected", "fence_not_bumped",
@@ -483,6 +499,9 @@ function Internal.tryFencePassage(context)
         fenceKey
     ) then
         return false, nil, true
+    end
+    if context.lane then
+        context.lane.lastVanillaFenceGuardAt = nil
     end
     recordFenceAction(
         context, fence, fenceKey, landingX, landingY, landingZ

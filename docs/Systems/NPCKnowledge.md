@@ -23,3 +23,14 @@ Built-in descriptors currently expose the existing NPC social profile through `p
 Social-event mappings are isolated in `PNC_KnowledgeSocialEventAdapter.lua`. Adding a new game event mapping does not modify the knowledge persistence or resolver service.
 
 Limits are deterministic: 64 evidence entries per NPC, 16 per descriptor, 64 journal entries, 16 manual notes, and 512 characters per manual note. Direct disclosures have pruning priority.
+
+## Unified Cross-Mod Core Integration
+
+Shared cross-mod actor knowledge and identity exchange live in `PsychopatzCore` (`PsychopatzActorKnowledge`, `PsychopatzActorIdentityExchange`, `PsychopatzActorKnowledgeServer`, `PsychopatzActorKnowledgeClient`) and are shared across `ProjectHoomans`, `DTAbstract`, and `DTHoomans`:
+
+- **Bidirectional sync**: Core snapshots mirror into `ProjectHoomans` (`PNC_MapCoreActorKnowledge`), and committed `ProjectHoomans` disclosures write back into Core via `PsychopatzCore.ActorKnowledgeServer.SyncDisclosedFacts`.
+- **Unified familiarity thresholds** (`PsychopatzActorIdentityExchange.FAMILIARITY_THRESHOLDS`):
+  - Available from the start (`0`): `identity_name` (after mutual name exchange), `identity_nickname`, `faction` (`faction.identity`).
+  - Relationship-gated: `identity_surname` (`20`), `identity_full_name` (`25`), and backstory tiers (`25 / 50 / 75`).
+- **Identity exchange rules**: No persisted fake aliases and no `"Lie about your name"` suggestion button (lie detection remains active for free-text input). Below familiarity `25`, initial name disclosure reveals nickname if present, else first name.
+- **WorldKnowledge persistence & NPC-to-NPC sharing**: `PsychopatzCore.WorldKnowledge` owns single-copy ModData persistence (`PsychopatzCore.WorldKnowledge`, pruning expired facts on save) so neither `ProjectHoomans` nor `DynamicTrading` duplicates WorldKnowledge payloads. Cooperative NPC-to-NPC social events trigger lightweight mutual `PropagateConversation` exchanges (`max = 2` facts, 24h in-memory pair cooldown, skipping `enemy`/`rival` pairs).

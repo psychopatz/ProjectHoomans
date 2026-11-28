@@ -90,10 +90,17 @@ local function buildContext(
             passageObject = bodyControl.GetVanillaPassageAhead(zombie)
         end
         if passageObject then
-            blockedPassage = passageObject
-            blockedFromSquare = actorSquare
-            blockedSquare = passageObject.getSquare
+            local objSquare = passageObject.getSquare
                 and passageObject:getSquare() or blockedSquare
+            local isSameSquareFence = objSquare == actorSquare
+                and TraversalQuery
+                and TraversalQuery.IsFence
+                and TraversalQuery.IsFence(passageObject) == true
+            if not isSameSquareFence then
+                blockedPassage = passageObject
+                blockedFromSquare = actorSquare
+                blockedSquare = objSquare
+            end
         end
     end
 

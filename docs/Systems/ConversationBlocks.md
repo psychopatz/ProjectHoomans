@@ -5,17 +5,12 @@ Zomboid Build 42.20 implementation. The reusable ConvoEngine mechanism remains i
 PsychopatzCore; this repository owns adopter records, generated package output,
 and gameplay-specific projection only.
 
-ConvoEngine authoring lives under
-`tools/providers/pnc/codebuilder/sources/conversation/dialogue/`, the
-adopter projection is
-`PNC/ConvoEngine/DialogueBlocks.lua`, and generated plans
-and text live under
-`common/media/lua/shared/PNC/ConvoEngine/` and
-`common/media/translation/{EN,TL}/Conversation/Text/convo/`. `EN` is mandatory
-and additional languages are data-driven with English fallback. The Build
-42 runtime continues to own registry, validation, selection, authority,
-persistence, UI, networking, text loading, and debugging; the ConvoEngine projection
-feeds those existing authorities.
+ConvoEngine authoring has two layers during the transition to runtime `.convo` packs:
+
+1. **Primary runtime authoring — ConvoDSL (`.convo`)**: New dialogue pools, branching stories, offers, and extensions are authored as `.convo` files under `common/media/translation/<LANG>/ConvoBlocks/` and loaded directly at runtime by `PsychopatzCore.ConvoEngine.ConvoDSL` (shared by `ProjectHoomans` and `DynamicTrading`). Do not add new legacy JSON small-talk bundles or hand-coded Lua string builders for dialogue lines.
+2. **Legacy compiled layer (`codebuilder`)**: Existing compiled manifests, semantic patterns, lexicon tables, realization templates, and pre-DSL dialogue packs (`tools/providers/pnc/codebuilder/sources/conversation/dialogue/` → `common/media/lua/shared/PNC/ConvoEngine/` and `common/media/translation/{EN,TL}/Conversation/Text/convo/`) remain in place while those generated modules are still referenced at runtime.
+
+`EN` is mandatory and additional languages are data-driven with English fallback. The Build 42 runtime continues to own registry, validation, selection, authority, persistence, UI, networking, text loading, and debugging; both ConvoDSL and the legacy ConvoEngine projection feed those existing authorities.
 
 ## Runtime composition and authority
 

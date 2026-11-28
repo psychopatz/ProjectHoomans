@@ -10,7 +10,7 @@ local Service = PNC.NearbyWaterService
 local H = PNC.NearbyWaterServiceInternal
 local Locator = PNC.NearbyResourceLocator
 local RADIUS = Service.DISCOVERY_RADIUS or 20
-local DISCOVERY_CACHE_MS = 5000
+local DISCOVERY_CACHE_MS = 10000
 local HYDRATION_PLAN_CACHE_MS = 5000
 
 H.HydrationPlanCache = H.HydrationPlanCache or {}
@@ -89,17 +89,6 @@ end
 function H.FindInternal(record, key, mode)
     local origin = H.OriginFor(record)
     if not origin then return nil, noSourceReason(origin) end
-    local itemEntry
-    if mode ~= "fill" then
-        itemEntry = Locator.Find(origin, {
-            radius = RADIUS, cacheMs = DISCOVERY_CACHE_MS,
-            cacheKey = "world_water:" .. tostring(record.id),
-            accept = function(entry)
-                return (not key or entry.key == key)
-                    and Service.IsCleanWater(entry.item)
-            end,
-        })
-    end
     local faucetEntry = Locator.FindObject(origin, {
         radius = RADIUS, cacheMs = DISCOVERY_CACHE_MS,
         cacheKey = mode == "fill"
@@ -114,6 +103,22 @@ function H.FindInternal(record, key, mode)
         faucetEntry.key = faucetEntry.key or Locator.ObjectKeyFor(
             faucetEntry.object, faucetEntry.x, faucetEntry.y, faucetEntry.z)
         attachCapabilities(faucetEntry)
+        -- If a clean faucet is already nearby (<= 6 tiles), avoid running a
+        -- second 41x41 loose-item world scan just to compare distances.
+        if mode == "fill" or (tonumber(faucetEntry.distSq) or math.huge) <= 36 then
+            return faucetEntry
+        end
+    end
+    local itemEntry
+    if mode ~= "fill" then
+        itemEntry = Locator.Find(origin, {
+            radius = RADIUS, cacheMs = DISCOVERY_CACHE_MS,
+            cacheKey = "world_water:" .. tostring(record.id),
+            accept = function(entry)
+                return (not key or entry.key == key)
+                    and Service.IsCleanWater(entry.item)
+            end,
+        })
     end
     if not itemEntry then
         if faucetEntry then return faucetEntry end

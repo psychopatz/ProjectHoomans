@@ -174,6 +174,20 @@ function Internal.GetUpcomingPathPassage(body, navigation)
         passage = inspectSquareEdge(navigation, query, fromSquare, toSquare)
         if passage then return passage end
     end
+    -- When the body slides parallel along a fence, forwardDirection points
+    -- along the fence instead of across it. Probe the goal-directed axis too.
+    local goalStepX = goalX > 0.25 and 1 or (goalX < -0.25 and -1 or 0)
+    local goalStepY = goalY > 0.25 and 1 or (goalY < -0.25 and -1 or 0)
+    if goalStepX ~= 0 and goalStepX ~= primaryX and goalStepX ~= secondaryX then
+        toSquare = cell:getGridSquare(bodyX + goalStepX, bodyY, bodyZ)
+        passage = inspectSquareEdge(navigation, query, fromSquare, toSquare)
+        if passage then return passage end
+    end
+    if goalStepY ~= 0 and goalStepY ~= primaryY and goalStepY ~= secondaryY then
+        toSquare = cell:getGridSquare(bodyX, bodyY + goalStepY, bodyZ)
+        passage = inspectSquareEdge(navigation, query, fromSquare, toSquare)
+        if passage then return passage end
+    end
     return nil
 end
 
