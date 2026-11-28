@@ -1,8 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "question.backstory.suspected",
-  "locale": "EN",
-  "entries": {
-    "say.variants.question.backstory.suspected.authored": "I think it was %1, but I could be mistaken."
-  }
-}

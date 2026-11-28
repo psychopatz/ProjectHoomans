@@ -1,0 +1,1055 @@
+# ConvoDSL dialogue pools.
+language EN
+namespace hoomans
+
+dialogue integration.bandits.hooman_hurt
+  say [topic=colonist] as colonist:
+    "Bandit fire! Pull back and cover the wounded colonist."
+  say [default] as default:
+    "Bandit fire! Stay with the wounded survivor and watch the flank."
+  say [topic=family] as family:
+    "Bandit fire! Stay together and cover the wounded family member."
+  say [topic=lover] as lover:
+    "Bandit fire. Stay close; I have got you."
+
+dialogue integration.companion_dogs.feed
+  say [topic=female] as female:
+    "Here you go, good girl."
+  say [topic=male] as male:
+    "Here you go, good boy."
+  say [topic=unknown] as unknown:
+    "Here you go, good dog."
+
+dialogue integration.companion_dogs.greeting
+  say [topic=female] as female:
+    "Who is a good girl?"
+  say [topic=male] as male:
+    "Who is a good boy?"
+  say [topic=unknown] as unknown:
+    "Who is a good dog?"
+
+dialogue integration.necroa.mask_warning
+  say [topic=colonist] as colonist:
+    "Mask up. We keep the camp safe together."
+  say [default] as default:
+    "Put your mask back on. Knox is airborne."
+  say [topic=family] as family:
+    "Put your mask on, family. I am not losing you to the air."
+
+dialogue integration.necroa.player_mask_removed
+  say [default] as default:
+    "Put your mask back on. The air is not safe."
+  say [topic=hostile] as hostile:
+    "Put your mask back on before you become a problem."
+  say [topic=lover] as lover:
+    "Please put your mask back on, love. This air is not safe."
+
+dialogue integration.projectalife.encounter
+  say [topic=friendly] as friendly:
+    "Those survivors seem friendly. Keep your hands visible."
+  say [topic=hostile] as hostile:
+    "That group looks hostile. Keep cover between us and them."
+  say [topic=unknown] as unknown:
+    "Someone is out there. Let us watch before we approach."
+
+dialogue integration.projectalife.faction
+  say [topic=hostile] as hostile:
+    "That faction may be hostile toward us now. Stay alert."
+  say [topic=incoming] as incoming:
+    "They just opened fire on us. Stay close."
+  say [topic=outgoing] as outgoing:
+    "We hit them. They may retaliate soon."
+
+dialogue integration.projectalife.meta
+  say [topic=aircraft_heli] as aircraft_heli:
+    "Something is flying over us. Keep listening."
+  say [topic=aircraft_military] as aircraft_military:
+    "That aircraft sounds close. Stay sharp."
+  say [topic=ambience] as ambience:
+    "I do not like that sound. Stay close."
+  say [topic=crash] as crash:
+    "That crash sounded close. Keep your eyes open."
+  say [topic=gunfire] as gunfire:
+    "Someone is shooting nearby. Keep your head down."
+
+dialogue conversation.context.replies
+  say [default] as neutral:
+    "I don't know why that is; I only know what I can confirm."
+
+dialogue flow.greeting.exchange
+  say [default] as default:
+    "Hello."
+
+dialogue flow.greeting.exchange.friendly
+  say [default] as default:
+    "Good to see you."
+
+dialogue flow.greeting.exchange.hostile
+  say [default] as default:
+    "Stay back."
+
+dialogue flow.greeting.followup
+  say [topic=friendly] as friendly:
+    "You're welcome. It's good to see you too."
+  say [default] as default:
+    "You're welcome. Take care."
+
+dialogue flow.greeting.opening
+  say [default] as default:
+    "Hey there. Good to see you."
+  say [topic=default_guarded] as default_guarded:
+    "State your business. Keep your distance."
+  say [topic=default_terse] as default_terse:
+    "Hello."
+  say [topic=default_warm] as default_warm:
+    "Hey! It is good to see you."
+  say [topic=friendly] as friendly:
+    "Good to see you."
+  say [topic=friendly_guarded] as friendly_guarded:
+    "Hey. Everything holding together?"
+  say [topic=friendly_terse] as friendly_terse:
+    "Back again? You holding up?"
+  say [topic=friendly_warm] as friendly_warm:
+    "There you are! Good to see you."
+  say [topic=question_default] as question_default:
+    "How have you been?"
+  say [topic=question_friendly] as question_friendly:
+    "How have you been holding up lately?"
+
+dialogue flow.greeting.opening.rain
+  say [default] as neutral:
+    "Hey there. Wet one today."
+
+dialogue flow.greeting.responses
+  say [default] as neutral:
+    "You're welcome. Take care."
+
+dialogue question.whats_up.busy
+  say [default] as neutral:
+    "I'm keeping busy and trying to stay useful."
+  say [topic=guarded] as guarded:
+    "Keeping busy. Don't distract me."
+  say [topic=terse] as terse:
+    "Keeping busy."
+  say [topic=warm] as warm:
+    "I'm keeping busy and trying to stay useful. There's always something to do."
+
+dialogue question.whats_up.default
+  say [default] as neutral:
+    "Not much. I'm just trying to keep things together."
+  say [topic=guarded] as guarded:
+    "Nothing worth discussing. Stay alert."
+  say [topic=terse] as terse:
+    "Just getting by."
+  say [topic=warm] as warm:
+    "Not much. I'm just trying to keep things together. Good to see you, though."
+
+dialogue question.whats_up.default_alt
+  say [default] as neutral:
+    "Same as ever. Staying alive and watching the road."
+  say [topic=guarded] as guarded:
+    "Staying alive. Keep your eyes open."
+  say [topic=terse] as terse:
+    "Staying alive."
+  say [topic=warm] as warm:
+    "Same as ever. Staying alive and watching the road. What about you?"
+
+dialogue question.whats_up.traveling
+  say [default] as neutral:
+    "I'm keeping moving and watching what is ahead."
+  say [topic=guarded] as guarded:
+    "Keeping moving. Don't slow me down."
+  say [topic=terse] as terse:
+    "Keeping moving."
+  say [topic=warm] as warm:
+    "I'm keeping moving and watching what is ahead. Come along if you want."
+
+dialogue question.whats_up.weather
+  say [default] as neutral:
+    "The weather is the main thing on my mind right now."
+  say [topic=guarded] as guarded:
+    "Watching the weather. Stay focused."
+  say [topic=terse] as terse:
+    "Watching the weather."
+  say [topic=warm] as warm:
+    "The weather is the main thing on my mind right now. How are you holding up?"
+
+dialogue question.knowledge_and_bite.responses
+  say [default] as neutral:
+    "I know about %s."
+
+dialogue accept
+  say [topic=accept_dataset_pending_started] as accept_dataset_pending_started:
+    "Okay, I'll get started."
+  say [topic=accept_dataset_pending_care] as accept_dataset_pending_care:
+    "All right. I can take care of that."
+
+dialogue compliment
+  say [topic=compliment_dataset_kind_of_you] as compliment_dataset_kind_of_you:
+    "That's kind of you. I appreciate it."
+  say [topic=compliment_dataset_means_a_lot] as compliment_dataset_means_a_lot:
+    "Aw, thank you. That means a lot."
+
+dialogue flow.weather.raining
+  say [topic=flow_weather_raining_dataset_contextual_switch] as flow_weather_raining_dataset_contextual_switch:
+    "It is raining right now. We can return to that proposal when you are ready."
+
+dialogue greeting
+  say [topic=greeting_dataset_holding_up] as greeting_dataset_holding_up:
+    "Hey. How are you holding up?"
+  say [topic=greeting_dataset_good_to_see] as greeting_dataset_good_to_see:
+    "Good to see you again."
+  say [topic=greeting_dataset_how_things] as greeting_dataset_how_things:
+    "Hey. How are things going?"
+
+dialogue offer
+  say [topic=offer_dataset_hungry_share] as offer_dataset_hungry_share:
+    "That would help a lot. Could I have some?"
+  say [topic=offer_dataset_hungry_appreciate] as offer_dataset_hungry_appreciate:
+    "I'd appreciate a bite. Would you share?"
+
+dialogue question.activity
+  say [topic=question_activity_dataset_keep_moving] as question_activity_dataset_keep_moving:
+    "Just doing what I can to keep things moving."
+  say [topic=question_activity_dataset_bit_of_everything] as question_activity_dataset_bit_of_everything:
+    "A little bit of everything."
+  say [topic=question_activity_dataset_taking_care] as question_activity_dataset_taking_care:
+    "Just taking care of what needs doing."
+
+dialogue question.backstory.ambiguous
+  say [topic=question_backstory_ambiguous_authored] as question_backstory_ambiguous_authored:
+    "Which part of my past do you mean?"
+
+dialogue question.backstory.follow_up.location
+  say [topic=question_backstory_follow_up_location_authored] as question_backstory_follow_up_location_authored:
+    "I remember that part of my life, but I don't have more detail about where it was."
+
+dialogue question.backstory.follow_up.miss
+  say [topic=question_backstory_follow_up_miss_authored] as question_backstory_follow_up_miss_authored:
+    "Sometimes. I still think about that part of my life."
+
+dialogue question.backstory.refusal
+  say [topic=question_backstory_refusal_authored] as question_backstory_refusal_authored:
+    "I'm not ready to talk about that yet."
+
+dialogue question.backstory.suspected
+  say [topic=question_backstory_suspected_authored] as question_backstory_suspected_authored:
+    "I think it was %1, but I could be mistaken."
+
+dialogue question.wellbeing
+  say [topic=question_wellbeing_dataset_hanging_in] as question_wellbeing_dataset_hanging_in:
+    "I'm hanging in there. Thanks for asking."
+  say [topic=question_wellbeing_dataset_all_things_considered] as question_wellbeing_dataset_all_things_considered:
+    "Doing okay, all things considered."
+  say [topic=question_wellbeing_dataset_getting_by] as question_wellbeing_dataset_getting_by:
+    "I'm getting by, one day at a time. How about you?"
+  say [topic=question_wellbeing_dataset_hungry] as question_wellbeing_dataset_hungry:
+    "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it."
+  say [topic=question_wellbeing_dataset_thirsty] as question_wellbeing_dataset_thirsty:
+    "I'm pretty thirsty. If you have water, could you spare some?"
+  say [topic=question_wellbeing_dataset_tired] as question_wellbeing_dataset_tired:
+    "I'm tired, though I can manage for now."
+
+dialogue question.wellbeing.unknown
+  say [topic=question_wellbeing_unknown_dataset_causal_followup] as question_wellbeing_unknown_dataset_causal_followup:
+    "I can tell something is off, but I do not know what caused it yet."
+
+dialogue refuse
+  say [topic=refuse_dataset_pending_unavailable] as refuse_dataset_pending_unavailable:
+    "I can't take that on right now."
+  say [topic=refuse_dataset_pending_enough] as refuse_dataset_pending_enough:
+    "Not this time. I have enough to manage."
+
+dialogue response_pool.question.identity
+  say [topic=question_identity_dataset_stranger_alt_1] as question_identity_dataset_stranger_alt_1:
+    "I keep my name to myself until I know someone better. What should I call you?"
+  say [topic=question_identity_dataset_stranger_alt_2] as question_identity_dataset_stranger_alt_2:
+    "Let's get to know each other first. What do people call you?"
+  say [topic=question_identity_dataset_wary_alt_1] as question_identity_dataset_wary_alt_1:
+    "I don't trust you enough to share my name. Who are you, really?"
+  say [topic=question_identity_dataset_wary_alt_2] as question_identity_dataset_wary_alt_2:
+    "After that lie, I'm not telling you my name. Tell me the truth about yours."
+
+dialogue thanks
+  say [topic=thanks_dataset_no_problem] as thanks_dataset_no_problem:
+    "No problem at all."
+  say [topic=thanks_dataset_anytime] as thanks_dataset_anytime:
+    "Anytime."
+  say [topic=thanks_dataset_glady] as thanks_dataset_glady:
+    "Glad I could help."
+
+dialogue corpse.reaction.default
+  say [default] as neutral:
+    "Someone died here. We should remember that."
+
+dialogue corpse.reaction.revenge
+  say [default] as neutral:
+    "Someone is going to answer for this."
+
+dialogue social.farewell.depart
+  say [default] as default:
+    "Take care."
+  say [topic=friendly] as friendly:
+    "Take care, {addressee.name}. I will see you soon."
+  say [topic=hostile] as hostile:
+    "Get out of my sight."
+  say [topic=wary] as wary:
+    "Keep your distance out there."
+  say [topic=colonist] as colonist:
+    "Watch your perimeter out there, {addressee.name}."
+  say [topic=friend] as friend:
+    "Stay safe out there, {addressee.name}. Come back in one piece."
+  say [topic=family] as family:
+    "Be careful out there. You know how much you mean to me."
+  say [topic=lover] as lover:
+    "Come back to me safely, {addressee.name}. Please don't stay gone long."
+  say [topic=player_default] as player_default:
+    "Stay safe out there."
+  say [topic=player_hostile] as player_hostile:
+    "We're done talking."
+  say [topic=player_wary] as player_wary:
+    "I'm heading out. Stay sharp."
+  say [topic=player_colonist] as player_colonist:
+    "Keep holding the line, {addressee.name}. I'll check back soon."
+  say [topic=player_friend] as player_friend:
+    "Take care of yourself, {addressee.name}. Talk soon."
+  say [topic=player_family] as player_family:
+    "Be safe while I'm out, {addressee.name}. I'll be right back."
+  say [topic=player_lover] as player_lover:
+    "Stay safe for me. I'll come right back to you."
+
+dialogue leader_loss.close
+  say [default] as neutral:
+    "We lost someone close to us. We need to stay together."
+
+dialogue leader_loss.colonist
+  say [default] as neutral:
+    "Our leader is gone. We keep the group together."
+
+dialogue leader_loss.default
+  say [default] as neutral:
+    "We lost our leader. We need to decide what comes next."
+
+dialogue leader_loss.devoted
+  say [default] as neutral:
+    "We lost someone important. We need to stay together."
+
+dialogue leader_loss.dissent
+  say [default] as neutral:
+    "The old order is gone. What happens next is up to us."
+
+dialogue leader_loss.distant
+  say [default] as neutral:
+    "The leader is gone. Someone needs to decide what comes next."
+
+dialogue conversation.safety.danger
+  say [default] as neutral:
+    "Watch out. We need to move now."
+
+dialogue conversation.safety.default
+  say [default] as neutral:
+    "Stay alert."
+
+dialogue social.reaction.default
+  say [default] as neutral:
+    "I hear you."
+
+dialogue identity.exchange.responses
+  say [default] as neutral:
+    "That's a rude way to answer."
+
+dialogue medical.distress
+  say [default] as default:
+    "I need help with this wound."
+  say [topic=mercy] as mercy:
+    "Please. I need help with this wound, don't let me die."
+  say [topic=urgent] as urgent:
+    "I am hurt! I need help now!"
+
+dialogue medical.distress.call
+  say [topic=bandage] as bandage:
+    "I'm hurt and down! Need a bandage over here!"
+  say [topic=bleedout] as bleedout:
+    "I'm bleeding out! I need a tourniquet or bandage now!"
+  say [default] as default:
+    "I'm down! I need help over here!"
+  say [topic=dehydration] as dehydration:
+    "So thirsty... I need water before I pass out."
+  say [topic=exhaustion] as exhaustion:
+    "Pushed too far. I can't lift my arms."
+  say [topic=mercy] as mercy:
+    "I'm down! Please, don't kill me!"
+  say [topic=rescue] as rescue:
+    "I'm trapped here! I need help over here!"
+  say [topic=starvation] as starvation:
+    "Haven't eaten in days... I'm starving to death."
+
+dialogue medical.distress.repeat
+  say [topic=bandage] as bandage:
+    "I still need these wounds patched! Hurry!"
+  say [topic=bleedout] as bleedout:
+    "I am still losing blood! Please, help me!"
+  say [default] as default:
+    "I'm not up yet. Please help me."
+  say [topic=dehydration] as dehydration:
+    "I still need water to recover. My throat is on fire."
+  say [topic=exhaustion] as exhaustion:
+    "I still need a little more time to recover."
+  say [topic=mercy] as mercy:
+    "I am still asking you to spare me. Please."
+  say [topic=rescue] as rescue:
+    "I am still down here! Do not leave me!"
+  say [topic=starvation] as starvation:
+    "I still need something to eat. I'm fading fast."
+
+dialogue medical.distress.teammate
+  say [default] as default:
+    "They are hurt! Stay with them while I cover you."
+  say [topic=found] as found:
+    "I found a bandage for them. Hold still while I patch them up."
+  say [topic=missing] as missing:
+    "I am out of bandages! Can someone spare one for them?"
+
+dialogue medical.distress.update
+  say [topic=bandage] as bandage:
+    "I am still down and waiting for a patch."
+  say [topic=bleedout] as bleedout:
+    "The bleeding has not stopped. I still need a bandage."
+  say [default] as default:
+    "I am still down. I still need help."
+  say [topic=dehydration] as dehydration:
+    "I still need water before I can move."
+  say [topic=exhaustion] as exhaustion:
+    "I still need time to recover my strength."
+  say [topic=mercy] as mercy:
+    "I am still down. Please do not finish me."
+  say [topic=rescue] as rescue:
+    "I am still here. Please come back for me."
+  say [topic=starvation] as starvation:
+    "I still need food before I can get up."
+
+dialogue medical.distress.treatment
+  say [topic=bandage] as bandage:
+    "The wound is treated. I can move when you are ready."
+  say [default] as default:
+    "Thank you. That treatment helped."
+
+dialogue navigation.camp
+  say [default] as neutral:
+    "Where should we set up?"
+  say [topic=guarded] as guarded:
+    "Where do you want to risk it?"
+  say [topic=terse] as terse:
+    "Where?"
+  say [topic=warm] as warm:
+    "Where should we set up camp?"
+
+dialogue navigation.camp_empty
+  say [default] as neutral:
+    "I don't see a good place to set up here."
+  say [topic=guarded] as guarded:
+    "There is nowhere safe to set up here."
+  say [topic=terse] as terse:
+    "No good place here."
+  say [topic=warm] as warm:
+    "I don't see a safe place to set up here."
+
+dialogue navigation.default
+  say [default] as neutral:
+    "All right. What would you like to discuss?"
+  say [topic=guarded] as guarded:
+    "All right. What now?"
+  say [topic=terse] as terse:
+    "What is it?"
+  say [topic=warm] as warm:
+    "Sure. What would you like to discuss?"
+
+dialogue navigation.orders
+  say [default] as neutral:
+    "All right. What do you need?"
+  say [topic=guarded] as guarded:
+    "All right. What is it?"
+  say [topic=terse] as terse:
+    "What do you need?"
+  say [topic=warm] as warm:
+    "Sure. What do you need?"
+
+dialogue navigation.subject_change
+  say [default] as neutral:
+    "All right. What did you want to talk about?"
+  say [topic=guarded] as guarded:
+    "All right. What is it?"
+  say [topic=terse] as terse:
+    "What else?"
+  say [topic=warm] as warm:
+    "Sure. What did you want to talk about?"
+
+dialogue social.apology.default
+  say [default] as neutral:
+    "What are you apologizing for?"
+  say [topic=guarded] as guarded:
+    "What are you apologizing for?"
+  say [topic=terse] as terse:
+    "What are you apologizing for?"
+  say [topic=warm] as warm:
+    "What are you apologizing for?"
+
+dialogue social.apology.friendly
+  say [default] as neutral:
+    "It's okay. We can put that behind us."
+  say [topic=guarded] as guarded:
+    "I heard you. Leave it there."
+  say [topic=terse] as terse:
+    "It's okay."
+  say [topic=warm] as warm:
+    "It's okay. I appreciate you saying that."
+
+dialogue social.apology.stressed
+  say [default] as neutral:
+    "I know things are tense. Let's keep it calm."
+  say [topic=guarded] as guarded:
+    "Things are tense. Leave it there."
+  say [topic=terse] as terse:
+    "Keep it calm."
+  say [topic=warm] as warm:
+    "I know things are tense. Thanks for saying that."
+
+dialogue social.apology.withdrawn
+  say [default] as neutral:
+    "All right. Let's leave it there."
+  say [topic=guarded] as guarded:
+    "All right. Leave it there."
+  say [topic=terse] as terse:
+    "Leave it."
+  say [topic=warm] as warm:
+    "All right. Let's leave it there for now."
+
+dialogue conversation.acknowledged.default
+  say [default] as neutral:
+    "All right. Ask if you want to talk more."
+  say [topic=guarded] as guarded:
+    "Understood. We'll leave it there."
+  say [topic=terse] as terse:
+    "All right."
+  say [topic=warm] as warm:
+    "All right. I'm here if you want to talk more."
+
+dialogue emote.player.clap
+  say [default] as neutral:
+    "Well done, {addressee.name}."
+
+dialogue emote.player.insult
+  say [default] as neutral:
+    "Back off, {addressee.name}."
+
+dialogue emote.player.salute
+  say [default] as neutral:
+    "Respect, {addressee.name}."
+
+dialogue emote.player.thankyou
+  say [default] as neutral:
+    "Thanks, {addressee.name}."
+
+dialogue emote.player.thumbsdown
+  say [default] as neutral:
+    "No. That's not good enough, {addressee.name}."
+
+dialogue emote.player.thumbsup
+  say [default] as neutral:
+    "Good work, {addressee.name}."
+
+dialogue emote.player.wavebye
+  say [default] as neutral:
+    "Take care, {addressee.name}."
+
+dialogue emote.player.wavehi
+  say [default] as neutral:
+    "Hey, {addressee.name}."
+
+dialogue emote.reply.clap
+  say [default] as neutral:
+    "Thanks."
+  say [topic=warm] as warm:
+    "You're too kind."
+
+dialogue emote.reply.default
+  say [default] as neutral:
+    "I hear you."
+
+dialogue emote.reply.insult
+  say [default] as neutral:
+    "Keep it respectful."
+  say [topic=warm] as warm:
+    "You're lucky I know you."
+
+dialogue emote.reply.salute
+  say [default] as neutral:
+    "Stay sharp."
+  say [topic=warm] as warm:
+    "Always. Stay safe out there."
+
+dialogue emote.reply.thankyou
+  say [default] as neutral:
+    "You're welcome."
+  say [topic=warm] as warm:
+    "Anytime. We look after our own."
+
+dialogue emote.reply.thumbsdown
+  say [default] as neutral:
+    "I got the message. Tell me what's wrong."
+
+dialogue emote.reply.thumbsup
+  say [default] as neutral:
+    "Good."
+  say [topic=warm] as warm:
+    "That's the spirit."
+
+dialogue emote.reply.thumbsup.active
+  say [default] as neutral:
+    "Good. Let's keep moving on this."
+
+dialogue emote.reply.wavebye
+  say [default] as neutral:
+    "Take care."
+  say [topic=warm] as warm:
+    "Goodbye. Come back in one piece."
+
+dialogue emote.reply.wavehi
+  say [default] as neutral:
+    "Hey."
+  say [topic=terse] as terse:
+    "There you are."
+  say [topic=warm] as warm:
+    "Hey again. Good to see a friendly face."
+
+dialogue interaction.argument.deescalate
+  say [default] as neutral:
+    "Easy. We don't need to make this worse."
+  say [topic=guarded] as guarded:
+    "Fine. Just lower your voice."
+  say [topic=terse] as terse:
+    "Easy."
+  say [topic=warm] as warm:
+    "Calm down. This isn't helping either of us."
+
+dialogue interaction.argument.retaliate
+  say [default] as neutral:
+    "You're really testing me right now."
+  say [topic=guarded] as guarded:
+    "Say that again and see how far it gets you."
+  say [topic=terse] as terse:
+    "Keep talking."
+  say [topic=warm] as warm:
+    "You're pushing this too far."
+
+dialogue interaction.context.clarify
+  say [default] as neutral:
+    "What are you referring to?"
+
+dialogue interaction.first_contact.challenge
+  say [default] as neutral:
+    "Hold it. Who are you?"
+  say [topic=guarded] as guarded:
+    "That's close enough. What do you want?"
+  say [topic=terse] as terse:
+    "Who are you?"
+  say [topic=warm] as warm:
+    "Easy. I don't know you yet."
+
+dialogue interaction.memory.acknowledge
+  say [default] as neutral:
+    "I hear you."
+  say [topic=guarded] as guarded:
+    "All right. I heard you."
+  say [topic=terse] as terse:
+    "Mm."
+  say [topic=warm] as warm:
+    "Yeah. I can see why that stayed with you."
+
+dialogue interaction.memory.acknowledge_flavor
+  say [default] as neutral:
+    "The listener gives a small acknowledging nod."
+  say [topic=guarded] as guarded:
+    "The listener gives a guarded nod."
+  say [topic=terse] as terse:
+    "A brief nod follows."
+  say [topic=warm] as warm:
+    "The listener softens and nods with quiet understanding."
+
+dialogue interaction.memory.followup
+  say [default] as neutral:
+    "You did? What happened after that?"
+  say [topic=guarded] as guarded:
+    "Why are you telling me that?"
+  say [topic=terse] as terse:
+    "And then?"
+  say [topic=warm] as warm:
+    "Really? Tell me more about that."
+
+dialogue interaction.news.acknowledge
+  say [default] as neutral:
+    "That's good to know."
+  say [topic=guarded] as guarded:
+    "I'll keep it in mind."
+  say [topic=terse] as terse:
+    "Got it."
+  say [topic=warm] as warm:
+    "Thanks for telling me. I'll keep that in mind."
+
+dialogue interaction.scene.horde_prompt
+  say [default] as neutral:
+    "That's a horde. We fighting through or pulling back?"
+  say [topic=guarded] as guarded:
+    "Big group ahead. We decide now: engage or avoid."
+  say [topic=terse] as terse:
+    "Horde. Fight or fall back?"
+  say [topic=warm] as warm:
+    "That's a lot of them. Stay close—fight or fall back?"
+
+dialogue interaction.scene.horde_reply_brave
+  say [default] as neutral:
+    "We can take them."
+  say [topic=guarded] as guarded:
+    "If we commit, we hit hard and stay together."
+  say [topic=terse] as terse:
+    "Stand and fight."
+  say [topic=warm] as warm:
+    "I'm with you. We can take them."
+
+dialogue interaction.scene.horde_reply_cautious
+  say [default] as neutral:
+    "Too many. We should pull back."
+  say [topic=guarded] as guarded:
+    "Bad odds. Give them space."
+  say [topic=terse] as terse:
+    "Pull back."
+  say [topic=warm] as warm:
+    "I'd rather get us out of this alive. Pull back."
+
+dialogue interaction.scene.horde_reply_steady
+  say [default] as neutral:
+    "Hold here. Don't rush it."
+  say [topic=guarded] as guarded:
+    "No rush. Hold position and watch the pressure."
+  say [topic=terse] as terse:
+    "Hold. Watch them."
+  say [topic=warm] as warm:
+    "Stay together. Let's hold before we commit."
+
+dialogue interaction.scene.post_combat_clear
+  say [default] as neutral:
+    "Looks clear now. That got rough for a minute."
+  say [topic=guarded] as guarded:
+    "Don't relax yet. Scan for stragglers."
+  say [topic=terse] as terse:
+    "Clear."
+  say [topic=warm] as warm:
+    "We made it through! Is everyone okay?"
+
+dialogue interaction.scene.task_work_assigned
+  say [default] as neutral:
+    "I've got work to do. I'll get on it."
+  say [topic=guarded] as guarded:
+    "I'll do the work. Watch my back while I do."
+  say [topic=terse] as terse:
+    "On it."
+  say [topic=warm] as warm:
+    "Happy to help with this! I'll get right on it."
+
+dialogue interaction.scene.task_work_completed
+  say [default] as neutral:
+    "That's done. One less thing to worry about."
+  say [topic=guarded] as guarded:
+    "Task is done. I'm taking a breather."
+  say [topic=terse] as terse:
+    "Done."
+  say [topic=warm] as warm:
+    "All finished! Glad I could help get this done."
+
+dialogue interaction.scene.excursion_departing
+  say [default] as neutral:
+    "We're moving out. Keep close."
+  say [topic=guarded] as guarded:
+    "We're outbound. Keep the group tight."
+  say [topic=terse] as terse:
+    "Moving out. Stay close."
+  say [topic=warm] as warm:
+    "We're heading out. Stay close and we'll get through it."
+
+dialogue interaction.scene.excursion_failed
+  say [default] as neutral:
+    "Trip's off. Something went wrong."
+  say [topic=guarded] as guarded:
+    "Excursion failed. We regroup here."
+  say [topic=terse] as terse:
+    "Trip's off."
+  say [topic=warm] as warm:
+    "We're calling it off. Better safe than forcing it."
+
+dialogue interaction.scene.excursion_home
+  say [default] as neutral:
+    "We're back. Good."
+  say [topic=guarded] as guarded:
+    "We're back. Check in and settle down."
+  say [topic=terse] as terse:
+    "Back home."
+  say [topic=warm] as warm:
+    "We're home. Good to have everyone back."
+
+dialogue interaction.scene.excursion_preparing
+  say [default] as neutral:
+    "We're getting ready to head out."
+  say [topic=guarded] as guarded:
+    "Prep first. We move when everyone's ready."
+  say [topic=terse] as terse:
+    "Get ready. We leave soon."
+  say [topic=warm] as warm:
+    "We're getting ready. Make sure you've got what you need."
+
+dialogue interaction.scene.excursion_returning
+  say [default] as neutral:
+    "We're heading home."
+  say [topic=guarded] as guarded:
+    "We're returning. Stay alert until we're home."
+  say [topic=terse] as terse:
+    "Heading home."
+  say [topic=warm] as warm:
+    "Time to head home. Let's get everyone back safe."
+
+dialogue interaction.scene.grounded_news_answer
+  say [default] as neutral:
+    "That is what I can confirm right now."
+  say [topic=guarded] as guarded:
+    "Nothing else I can verify yet."
+  say [topic=terse] as terse:
+    "That is all I can confirm."
+  say [topic=warm] as warm:
+    "I wish I knew more, but that is what I can confirm."
+
+dialogue interaction.scene.grounded_news_share
+  say [default] as neutral:
+    "I heard something worth passing on."
+  say [topic=guarded] as guarded:
+    "I have something I can confirm."
+  say [topic=terse] as terse:
+    "Got some news for you."
+  say [topic=warm] as warm:
+    "I thought you should hear what I learned."
+
+dialogue social.acknowledged
+  say [default] as neutral:
+    "All right. Understood."
+  say [topic=bond_guarded] as bond_guarded:
+    "%s, understood. We'll leave it there."
+  say [topic=bond_neutral] as bond_neutral:
+    "%s, all right."
+  say [topic=bond_terse] as bond_terse:
+    "%s, all right."
+  say [topic=bond_warm] as bond_warm:
+    "%s, all right. I hear you."
+  say [topic=guarded] as guarded:
+    "Understood. We'll leave it there."
+  say [topic=terse] as terse:
+    "All right."
+  say [topic=warm] as warm:
+    "All right. I hear you."
+
+dialogue social.dispute_friendly
+  say [default] as neutral:
+    "I disagree, but I hear what you're saying."
+  say [topic=guarded] as guarded:
+    "I disagree. Leave it there."
+  say [topic=terse] as terse:
+    "Disagree."
+  say [topic=warm] as warm:
+    "I disagree, friend, but I respect your perspective."
+
+dialogue social.dispute_stressed
+  say [default] as neutral:
+    "Tensions are high. Let's table this for later."
+  say [topic=guarded] as guarded:
+    "I hear you. Not now."
+  say [topic=terse] as terse:
+    "Not now."
+  say [topic=warm] as warm:
+    "Hey, we're both frayed right now. Let's take a breath."
+
+dialogue social.dispute_trusted
+  say [default] as neutral:
+    "I trust your judgment usually, but not on this."
+  say [topic=guarded] as guarded:
+    "I still don't agree. Leave it there."
+  say [topic=terse] as terse:
+    "Not this time."
+  say [topic=warm] as warm:
+    "You know I'd follow you through hell, but not into this."
+
+dialogue social.dispute_withdrawn
+  say [default] as neutral:
+    "All right. Let's step back from this."
+  say [topic=guarded] as guarded:
+    "Let's leave it there."
+  say [topic=terse] as terse:
+    "Drop it."
+  say [topic=warm] as warm:
+    "Let's leave it there for now, friend. We're still good."
+
+dialogue social.hostile_boundary
+  say [default] as neutral:
+    "That tone isn't acceptable."
+  say [topic=guarded] as guarded:
+    "Don't talk to me like that."
+  say [topic=terse] as terse:
+    "Watch it."
+  say [topic=warm] as warm:
+    "Hey, where is this hostility coming from? We're allies."
+
+dialogue social.reaction.responses
+  say [default] as neutral:
+    "I appreciate you saying that. We're all under pressure."
+
+dialogue social.hostile_short
+  say [default] as neutral:
+    "Watch your language."
+  say [topic=guarded] as guarded:
+    "Watch your mouth. Now."
+  say [topic=terse] as terse:
+    "Shut it."
+  say [topic=warm] as warm:
+    "Hey, watch your mouth, friend. We're better than that."
+
+dialogue social.hostile_stressed
+  say [default] as neutral:
+    "That's enough. Everyone needs to step back."
+  say [topic=guarded] as guarded:
+    "That's enough. Back away."
+  say [topic=terse] as terse:
+    "Back off."
+  say [topic=warm] as warm:
+    "Hey, please, give me some space. I'm overwhelmed."
+
+dialogue social.hostile_withdrawn
+  say [default] as neutral:
+    "Please leave me alone."
+  say [topic=guarded] as guarded:
+    "Leave me alone. Now."
+  say [topic=terse] as terse:
+    "Leave."
+  say [topic=warm] as warm:
+    "I just need some time alone, friend. Please."
+
+dialogue social.offer_friendly
+  say [default] as neutral:
+    "Thanks. I'll keep that in mind."
+  say [topic=bond_guarded] as bond_guarded:
+    "%s, no thanks. I'll handle it."
+  say [topic=bond_neutral] as bond_neutral:
+    "%s, that's kind of you. I'll keep it in mind."
+  say [topic=bond_terse] as bond_terse:
+    "%s, thanks."
+  say [topic=bond_warm] as bond_warm:
+    "%s, thank you. I'll keep it in mind."
+  say [topic=guarded] as guarded:
+    "No thanks. I can handle it."
+  say [topic=terse] as terse:
+    "Thanks."
+  say [topic=warm] as warm:
+    "Thank you, I appreciate the offer."
+
+dialogue social.parley.ceasefire
+  say [default] as default:
+    "Let's call a ceasefire."
+
+dialogue social.parley.ceasefire.accepted
+  say [default] as default:
+    "Fine. Stand down."
+
+dialogue social.parley.ceasefire.already_peaceful
+  say [default] as default:
+    "We aren't fighting."
+
+dialogue social.profanity
+  say [default] as neutral:
+    "Watch your language."
+
+dialogue social.threat_boundary
+  say [default] as neutral:
+    "Step back or we have a problem."
+  say [topic=guarded] as guarded:
+    "Back away. Now."
+  say [topic=terse] as terse:
+    "Back off."
+  say [topic=warm] as warm:
+    "Hey, please, don't do this. Step back."
+
+dialogue tool_reply.accepted_generic
+  say [default] as neutral:
+    "I hear you."
+
+dialogue tool_reply.admire
+  say [default] as neutral:
+    "I appreciate that more than you know."
+
+dialogue tool_reply.apology
+  say [default] as neutral:
+    "All right. Let us move on."
+
+dialogue tool_reply.ask_name.named
+  say [default] as neutral:
+    "I am %s."
+
+dialogue tool_reply.ask_name.prompt
+  say [default] as neutral:
+    "I'll tell you my name once we've established some trust. What's your name?"
+
+dialogue tool_reply.ask_name.rejected
+  say [default] as neutral:
+    "I am not ready to share that yet."
+
+dialogue tool_reply.ask_name.unnamed
+  say [default] as neutral:
+    "You want to know my name? Give me a second."
+
+dialogue tool_reply.comfort
+  say [default] as neutral:
+    "Thanks. I needed that."
+
+dialogue tool_reply.compliment
+  say [default] as neutral:
+    "That is kind of you to say."
+
+dialogue tool_reply.flirt
+  say [default] as neutral:
+    "Careful. You are making me smile."
+
+dialogue tool_reply.hostile
+  say [default] as neutral:
+    "Watch your mouth."
+
+dialogue tool_reply.insult
+  say [default] as neutral:
+    "Is that supposed to bother me?"
+
+dialogue tool_reply.orientation
+  say [default] as neutral:
+    "That is not really how I swing."
+
+dialogue tool_reply.personality
+  say [default] as neutral:
+    "That is just how I am wired."
+
+dialogue tool_reply.praise
+  say [default] as neutral:
+    "Just doing what had to be done."
+
+dialogue tool_reply.relationship
+  say [default] as neutral:
+    "We are not there yet."
+
+dialogue tool_reply.romantic
+  say [default] as neutral:
+    "Careful. You are making me smile."
+
+dialogue tool_reply.sexual
+  say [default] as neutral:
+    "You are bold. I cannot say I dislike that."

@@ -1,0 +1,395 @@
+# ConvoDSL dialogue pools.
+language EN
+namespace hoomans
+
+dialogue combat.callout.reply_alerted
+  say [topic=alerted_neutral] as alerted_neutral:
+    "Heard you, {addressee.name}! Looking for {target.name} {scene.location} now!"
+  say [topic=alerted_tactical] as alerted_tactical:
+    "Copy contact, {addressee.name}! Scanning for {target.name} {scene.location}!"
+  say [topic=alerted_hostile] as alerted_hostile:
+    "Keep {target.name} busy {scene.location}, {addressee.name}! Coming over now!"
+  say [topic=blindside_reply] as blindside_reply:
+    "Whoa, good catch, {addressee.name}! I'm on it!"
+  say [topic=last_one_reply] as last_one_reply:
+    "Finish it off, {addressee.name}, I've got your back!"
+
+dialogue combat.callout.reply_defensive
+  say [topic=defensive_neutral] as defensive_neutral:
+    "Whoa, {addressee.name}, keeping clear of {target.name} {scene.location}!"
+  say [topic=defensive_shaken] as defensive_shaken:
+    "Be careful with {target.name} {scene.location}, {addressee.name}, I'm staying back!"
+  say [topic=wingman_defensive] as wingman_defensive:
+    "You handle {target.name}, {addressee.name}! I'm staying clear!"
+
+dialogue combat.callout.reply_engage
+  say [topic=engaging_neutral] as engaging_neutral:
+    "I see {target.name} {scene.location}, {addressee.name}! Moving in!"
+  say [topic=engaging_tactical] as engaging_tactical:
+    "Visual confirmed on {target.name} {scene.location}, {addressee.name}, engaging!"
+  say [topic=engaging_hostile] as engaging_hostile:
+    "Got {target.name} in my sights {scene.location}, {addressee.name}! Finishing this!"
+  say [topic=engaging_shaken] as engaging_shaken:
+    "Oh shit, {addressee.name}, {target.name}?! Stay right by me!"
+  say [topic=engaging_brave] as engaging_brave:
+    "I'm ready, {addressee.name}. Let's drop {target.name}."
+  say [topic=engaging_aggressive] as engaging_aggressive:
+    "Hell yeah, {addressee.name}, save {target.name} for me!"
+  say [topic=engaging_supportive] as engaging_supportive:
+    "Stay behind me if it gets ugly, {addressee.name}!"
+  say [topic=engaging_exhausted] as engaging_exhausted:
+    "I'm beat, {addressee.name}, but I'll still watch your flank."
+  say [topic=anchor_combat] as anchor_combat:
+    "I've got the rear covered, {addressee.name}!"
+  say [topic=anchor_tactical] as anchor_tactical:
+    "Rear guard set, {addressee.name}, push forward!"
+
+dialogue combat.callout.reply_wingman
+  say [topic=engaging_neutral] as engaging_neutral:
+    "Right behind you, {addressee.name}! I'll flank {target.name}!"
+  say [topic=engaging_tactical] as engaging_tactical:
+    "Flanking wide, {addressee.name}, keep {target.name} pinned!"
+  say [topic=engaging_hostile] as engaging_hostile:
+    "Save some of {target.name} for me, {addressee.name}! Going around!"
+  say [topic=shaken] as shaken:
+    "Oh shit, there's more? Stay close, {addressee.name}!"
+  say [topic=brave] as brave:
+    "I'm ready too, {addressee.name}. Let's finish them."
+  say [topic=aggressive] as aggressive:
+    "Save one for me, {addressee.name}!"
+  say [topic=alerted_neutral] as alerted_neutral:
+    "Moving up behind you, {addressee.name}! Watching for {target.name}!"
+  say [topic=alerted_tactical] as alerted_tactical:
+    "Covering your six, {addressee.name}, scanning for {target.name}!"
+
+dialogue combat.callout.threat
+  say [topic=zombie_neutral] as zombie_neutral:
+    "Heads up, {addressee.name}, {target.name} moving {scene.location}!"
+  say [topic=zombie_tactical] as zombie_tactical:
+    "Contact, {scene.location}! {target.name}, weapons up!"
+  say [topic=zombie_hostile] as zombie_hostile:
+    "Drop them! {target.name} prowling {scene.location}!"
+  say [topic=hostile_neutral] as hostile_neutral:
+    "Watch out, {target.name} spotted {scene.location}!"
+  say [topic=hostile_tactical] as hostile_tactical:
+    "Hostile contact! {target.name} {scene.location}, weapons ready!"
+  say [topic=hostile_hostile] as hostile_hostile:
+    "Flush them out! Got {target.name} {scene.location}!"
+  say [topic=crawler] as crawler:
+    "Watch your feet! Got {target.name} dragging {scene.location}!"
+  say [topic=blindside] as blindside:
+    "Look out, {addressee.name}! Got {target.name} right behind you!"
+  say [topic=last_one] as last_one:
+    "Just this last one left! Put {target.name} down!"
+
+dialogue combat.checkin.reply
+  say [topic=ok] as ok:
+    "All good here, {addressee.name}, barely broke a sweat."
+
+dialogue combat.checkin.warn
+  say [topic=injured] as injured:
+    "All clear! Are you okay, {addressee.name}?"
+  say [topic=clear] as clear:
+    "That's the last of them, {addressee.name}. Everybody good?"
+
+dialogue condition.stamina.reply
+  say [topic=cover_winded] as cover_winded:
+    "I've got you covered, {addressee.name}! Catch your breath!"
+
+dialogue condition.stamina.warn
+  say [topic=winded] as winded:
+    "Whoa, {addressee.name}, give me a second to catch my breath."
+  say [topic=exhausted] as exhausted:
+    "I'm completely gassed, {addressee.name}! Cover me while I catch my breath!"
+
+dialogue medical.bandage.cover_reply
+  say [topic=cover_bandage] as cover_bandage:
+    "I've got you covered, {addressee.name}! Take your time!"
+
+dialogue medical.bandage.cover_warn
+  say [topic=self] as self:
+    "Cover me, {addressee.name}, I'm bandaging up!"
+  say [topic=ally] as ally:
+    "Cover us {scene.location}, {addressee.name}, I'm bandaging {target.name}!"
+
+dialogue medical.injury.status_reply
+  say [topic=injured_has_bandage] as injured_has_bandage:
+    "I'm bleeding a bit, {addressee.name}, got bandages on me so I'll patch it up."
+  say [topic=injured_no_bandage] as injured_no_bandage:
+    "I'm bleeding, {addressee.name}, and I'm out of bandages!"
+  say [topic=medic_has_bandage] as medic_has_bandage:
+    "Hang on, {addressee.name}, I've got a spare bandage! Hold still!"
+  say [topic=medic_no_bandage] as medic_no_bandage:
+    "I'm out too, {addressee.name}! Keep pressure on it while we look for bandages!"
+
+dialogue world.weather.rain_reply
+  say [topic=rain_reply] as rain_reply:
+    "Tell me about it, {addressee.name}. Keep your eyes peeled, rain hides their footsteps."
+
+dialogue world.weather.rain_warn
+  say [topic=rain_open] as rain_open:
+    "Great, it's starting to pour, {addressee.name}. We might want some cover soon."
+
+dialogue combat.horde.ack
+  say [topic=avoid_default] as avoid_default:
+    "Copy. We go around."
+  say [topic=avoid_relief] as avoid_relief:
+    "Good. Let's go around."
+  say [topic=engage_default] as engage_default:
+    "I'm with you. Let's go."
+  say [topic=engage_eager] as engage_eager:
+    "Ready to strike! Let's take them down."
+  say [topic=engage_hesitant] as engage_hesitant:
+    "If you say so... alright. I'm with you."
+  say [topic=engage_reserved] as engage_reserved:
+    "Alright. Moving."
+  say [topic=hold_default] as hold_default:
+    "Holding for now."
+  say [topic=hold_eager] as hold_eager:
+    "Holding. Say when."
+  say [topic=hold_hesitant] as hold_hesitant:
+    "Okay. Holding here."
+
+dialogue combat.horde.prompt
+  say [default] as default:
+    "That's a lot of them. We fighting or going around?"
+  say [topic=eager] as eager:
+    "That's a hell of a crowd. We taking them?"
+  say [topic=reserved] as reserved:
+    "Horde ahead. Engage or go around?"
+  say [topic=shaken] as shaken:
+    "God... that's a lot. Are we really fighting all of them?"
+
+dialogue combat.human_kill.aggressive
+  say [default] as neutral:
+    "He's down. Keep pushing."
+
+dialogue combat.human_kill.brave
+  say [default] as neutral:
+    "Threat's down. Stay sharp."
+
+dialogue combat.human_kill.cold
+  say [default] as neutral:
+    "One less problem."
+
+dialogue combat.human_kill.practical
+  say [default] as neutral:
+    "He's down. Check the area."
+
+dialogue combat.human_kill.reserved
+  say [default] as neutral:
+    "He's down."
+
+dialogue combat.human_kill.shaken
+  say [default] as neutral:
+    "Jesus... he's dead."
+
+dialogue combat.human_kill.supportive
+  say [default] as neutral:
+    "He's down. You alright?"
+
+dialogue combat.kill.blade
+  say [topic=aggressive_blade_head] as aggressive_blade_head:
+    "Took its head clean off."
+  say [topic=brave_blade_head] as brave_blade_head:
+    "Clean cut. Next."
+  say [topic=cold_blade_head] as cold_blade_head:
+    "Head came apart. Moving on."
+  say [topic=practical_blade] as practical_blade:
+    "Blade did its job. Keep moving."
+  say [topic=reserved_blade] as reserved_blade:
+    "Cut down."
+  say [topic=shaken_blade_head] as shaken_blade_head:
+    "Oh God... there's blood everywhere."
+
+dialogue combat.kill.firearm
+  say [topic=aggressive_firearm_high_named_say_1] as aggressive_firearm_high_named_say_1:
+    "This {slot.weapon.name} still shoots straight."
+  say [topic=aggressive_firearm_high_named_say_2] as aggressive_firearm_high_named_say_2:
+    "Right where I wanted it. Down."
+  say [topic=brave_firearm_high] as brave_firearm_high:
+    "Dead center. Keep moving."
+  say [topic=cold_firearm_high] as cold_firearm_high:
+    "Clean shot."
+  say [topic=practical_firearm_high] as practical_firearm_high:
+    "Good shot placement. Check the lane."
+  say [topic=practical_firearm_low] as practical_firearm_low:
+    "Hit it. Don't count on luck twice."
+  say [topic=reserved_firearm] as reserved_firearm:
+    "Hit."
+  say [topic=shaken_firearm_low] as shaken_firearm_low:
+    "Jesus... I actually hit it."
+  say [topic=supportive_firearm] as supportive_firearm:
+    "Got it. You good?"
+
+dialogue combat.kill.heavy_melee
+  say [topic=aggressive_axe_head] as aggressive_axe_head:
+    "Split that rotten head wide open."
+  say [topic=aggressive_blunt] as aggressive_blunt:
+    "Felt that one crack."
+  say [topic=aggressive_spear] as aggressive_spear:
+    "That's why I like the reach."
+  say [topic=brave_axe] as brave_axe:
+    "One chop. Done."
+  say [topic=brave_spear] as brave_spear:
+    "Kept it right where I wanted it."
+  say [topic=cold_heavy_melee] as cold_heavy_melee:
+    "Crushed it."
+  say [topic=practical_axe_spear] as practical_axe_spear:
+    "Good reach. Keep the line."
+  say [topic=practical_blunt] as practical_blunt:
+    "Crushed it. Watch the next one."
+  say [topic=supportive_melee] as supportive_melee:
+    "It's down. Keep close."
+
+dialogue combat.kill.unarmed
+  say [topic=practical_unarmed] as practical_unarmed:
+    "It's down. I need a weapon."
+  say [topic=shaken_unarmed] as shaken_unarmed:
+    "Oh God. I did that with my hands."
+
+dialogue combat.reaction.kill_killer_aggressive
+  say [default] as neutral:
+    "Got one. Who's next?"
+
+dialogue combat.reaction.kill_killer_brave
+  say [default] as neutral:
+    "Down. Keep moving."
+
+dialogue combat.reaction.kill_killer_cold
+  say [default] as neutral:
+    "Done. Keep up."
+
+dialogue combat.reaction.kill_killer_practical
+  say [default] as neutral:
+    "Got it. Check the area."
+
+dialogue combat.reaction.kill_killer_reserved
+  say [default] as neutral:
+    "Down."
+
+dialogue combat.reaction.kill_killer_shaken
+  say [default] as neutral:
+    "It's down... give me a second."
+
+dialogue combat.reaction.kill_killer_supportive
+  say [default] as neutral:
+    "Got it. Stay close."
+
+dialogue combat.reaction.kill_witness_aggressive
+  say [default] as neutral:
+    "Nice. Hit the next one."
+
+dialogue combat.reaction.kill_witness_brave
+  say [default] as neutral:
+    "Clean kill. Check the flanks."
+
+dialogue combat.reaction.kill_witness_cold
+  say [default] as neutral:
+    "Don't expect applause."
+
+dialogue combat.reaction.kill_witness_practical
+  say [default] as neutral:
+    "Good. Check the area."
+
+dialogue combat.reaction.kill_witness_reserved
+  say [default] as neutral:
+    "One down."
+
+dialogue combat.reaction.kill_witness_shaken
+  say [default] as neutral:
+    "It's down... but there are more."
+
+dialogue combat.reaction.kill_witness_supportive
+  say [default] as neutral:
+    "Good one. You okay?"
+
+dialogue combat.assault.betrayal
+  say [default] as default:
+    "I wasn't even looking for a fight, {addressee.name}! Now you're dead!"
+  say [topic=shaken] as shaken:
+    "Why are you attacking me?! Stay back! I'll fight if I have to!"
+  say [topic=brave] as brave:
+    "Big mistake jumping someone who wasn't bothering you!"
+  say [topic=aggressive] as aggressive:
+    "Thought I was an easy target, huh?! Big mistake!"
+
+dialogue combat.assault.friendly_fire
+  say [topic=first] as first:
+    "Whoa, easy there, {addressee.name}! I'm on your side!"
+  say [topic=warn] as warn:
+    "Seriously, {addressee.name}, knock it off with the shoving!"
+  say [topic=penalty] as penalty:
+    "That does it, {addressee.name}. Keep pulling this stunt and we're going to have real trouble."
+
+dialogue combat.assault.hostile_taunt
+  say [topic=backpack] as backpack:
+    "Nice {slot.loot.name} on your back! Drop it before I pry it off you!"
+  say [topic=weapon] as weapon:
+    "Nice {slot.loot.name} you've got there! It'll look better in my hands!"
+  say [topic=money] as money:
+    "Still carrying {slot.loot.name} around like banks still matter? Drop your pack!"
+  say [topic=general] as general:
+    "Empty your pockets now or bleed for every scrap you're carrying!"
+
+dialogue combat.assault.react
+  say [default] as default:
+    "Why did you do that?!"
+  say [topic=aggressive] as aggressive:
+    "You just made a big mistake."
+  say [topic=brave] as brave:
+    "That's it. You're done."
+  say [topic=reserved] as reserved:
+    "Back off. Now."
+  say [topic=shaken] as shaken:
+    "What the hell?! Stay back!"
+
+dialogue combat.tactical_spatial.hostile
+  say [topic=clock] as clock:
+    "Hostiles at {scene.clock}!"
+  say [topic=coarse] as coarse:
+    "Hostiles {scene.relative}!"
+
+dialogue combat.horde.choice
+  say [topic=avoid] as avoid:
+    "Go around."
+  say [topic=engage] as engage:
+    "Take them."
+  say [topic=hold] as hold:
+    "Hold for now."
+
+dialogue combat.horde.deescalated
+  say [default] as neutral:
+    "They're thinning out. Don't relax yet."
+
+dialogue combat.horde.default
+  say [default] as neutral:
+    "Horde nearby. Keep your eyes up."
+
+dialogue combat.horde.escalated
+  say [default] as neutral:
+    "More are piling in. This is getting bad."
+
+dialogue combat.horde.started
+  say [default] as neutral:
+    "That's a lot of them. Stay sharp."
+
+dialogue combat.reaction.default
+  say [default] as neutral:
+    "Good work. Keep watching the area."
+
+dialogue combat.reaction.retreat
+  say [default] as neutral:
+    "I need a moment before I can swing again."
+
+dialogue combat.reaction.threat
+  say [default] as neutral:
+    "That threat is down. Stay alert."
+
+dialogue combat.tactical_spatial.zombie.clock
+  say [default] as neutral:
+    "Zombies, {scene.clock}!"
+
+dialogue combat.tactical_spatial.zombie.coarse
+  say [default] as neutral:
+    "Zombies {scene.relative}!"

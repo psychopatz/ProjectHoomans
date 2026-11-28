@@ -39,10 +39,43 @@ local function pruneTerminalHistory()
     end
 end
 
+local function hasAnyEntry(tbl)
+    if type(tbl) ~= "table" then return false end
+    for _ in pairs(tbl) do return true end
+    return false
+end
+
+local function hasAnyWorkContext()
+    if hasAnyEntry(Repository.State and Repository.State.byId) then
+        return true
+    end
+    local settleRepo = PNC.SettlementRepository
+    -- If SettlementRepository is absent (isolated unit test), run normally.
+    if not settleRepo then return true end
+    if type(settleRepo.State) == "table"
+        and (hasAnyEntry(settleRepo.State.bases)
+            or hasAnyEntry(settleRepo.State.facilities))
+    then
+        return true
+    end
+    local lumber = PNC.LumberService
+    if lumber and type(lumber.Data) == "table"
+        and type(lumber.Data.zoneOrder) == "table"
+        and #lumber.Data.zoneOrder > 0
+    then
+        return true
+    end
+    return false
+end
+
 function Internal.Tick(at)
     at = tonumber(at) or now()
     if at < Service.NextPassAt then return 0 end
     Service.NextPassAt = at + Definitions.BALANCE.schedulerCadenceMs
+    Repository.Load()
+    if not hasAnyWorkContext() then
+        return 0
+    end
     local timerName
     local timerStart
     if ScalingDiagnostics then
@@ -50,7 +83,6 @@ function Internal.Tick(at)
             "WorkService.Tick", at)
         ScalingDiagnostics.Increment("WorkService.PumpCalls")
     end
-    Repository.Load()
     local reconciliationTimerName
     local reconciliationTimerStart
     if ScalingDiagnostics then

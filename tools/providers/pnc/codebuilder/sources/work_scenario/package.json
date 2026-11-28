@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.work-scenario.package.v1",
-  "version": 1,
-  "package": "ProjectHoomans.WorkScenario",
-  "owner": "ProjectHoomans",
-  "shards": [
-    "defs/colony_work_scenarios.json"
-  ]
-}

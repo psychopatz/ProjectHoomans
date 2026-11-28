@@ -1,8 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.v1",
-  "id": "construction.combat_injury.mobility_reference",
-  "owner": "ProjectHoomans",
-  "type": "construction",
-  "strategy": "INJURY_MOBILITY_REFERENCE",
-  "dialogueAct": "INFORM"
-}

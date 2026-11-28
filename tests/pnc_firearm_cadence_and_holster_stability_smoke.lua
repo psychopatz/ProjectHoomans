@@ -178,4 +178,38 @@ assertEq(relaxedAim, false, "Cleared combat stance should lower weapon aim")
 assertEq(animVars.PNCRangedAiming, false, "PNCRangedAiming should reset to false out of combat")
 assertEq(relaxedWalk, "Walk", "Out-of-combat walking should return normal Walk")
 
+-- Regression: even if CombatStance is still armed, a body whose gun is holstered
+-- (empty primary hand) must NEVER enter PNCRangedAiming / WalkAim.
+Stance.Maintain(rec, 4000)
+local holsteredVars = { PNCPrimaryType = "rifle", PNCRangedAiming = true }
+local holsteredBody = {
+    getVariableString = function(_, k) return holsteredVars[k] end,
+    setVariable = function(_, k, v) holsteredVars[k] = v end,
+    getPrimaryHandItem = function() return nil end,
+}
+local holsteredWalk, holsteredAim = AnimInternal.resolveContinuousRangedAim(
+    holsteredBody, rec, "Walk", false
+)
+assertEq(holsteredAim, false, "Holstered rifle (empty primary hand) must not aim empty air")
+assertEq(holsteredVars.PNCRangedAiming, false, "PNCRangedAiming must be false when primary hand is empty")
+assertEq(holsteredWalk, "Walk", "Holstered rifle must walk normally instead of WalkAim")
+
+-- Regression: NPC undergoing suicide keeps CombatStance (weapon in hand) during
+-- forced holster checks, while resolveContinuousRangedAim keeps PNCRangedAiming=false
+-- so WalkAim/IdleAim never fights the suicide animation scene.
+local suicideRec = { id = "npc_suicide_guard", alive = true, runtime = { suicideState = { phase = "resolve" } } }
+Stance.Maintain(suicideRec, 4000)
+local suicideVars = { PNCPrimaryType = "handgun", PNCRangedAiming = true }
+local suicideBody = {
+    getVariableString = function(_, k) return suicideVars[k] end,
+    setVariable = function(_, k, v) suicideVars[k] = v end,
+    getPrimaryHandItem = function() return { getFullType = function() return "Base.Pistol" end } end,
+}
+local suicideWalk, suicideAim = AnimInternal.resolveContinuousRangedAim(
+    suicideBody, suicideRec, "Walk", false
+)
+assertEq(suicideAim, false, "Suicide scene must not be overridden by continuous ranged aiming")
+assertEq(suicideVars.PNCRangedAiming, false, "PNCRangedAiming must be false during suicide scene")
+assertEq(suicideWalk, "Walk", "Suicide scene must not upgrade walkType to WalkAim")
+
 print("PASS: pnc_firearm_cadence_and_holster_stability_smoke")

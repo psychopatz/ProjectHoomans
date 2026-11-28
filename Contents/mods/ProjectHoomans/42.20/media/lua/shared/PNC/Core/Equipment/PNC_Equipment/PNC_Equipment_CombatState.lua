@@ -36,6 +36,13 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
         and PNC.CombatStance.IsArmed(record) == true
     then
         attackMode = true
+    elseif not attackMode and force == true
+        and PNC.CombatStance and PNC.CombatStance.Clear
+        and record.runtime.target == nil
+        and record.runtime.attackAction == nil
+        and record.runtime.suicideState == nil
+    then
+        PNC.CombatStance.Clear(record)
     end
     workPresentation = Equipment.ResolveWorkPresentation
         and Equipment.ResolveWorkPresentation(record) or nil

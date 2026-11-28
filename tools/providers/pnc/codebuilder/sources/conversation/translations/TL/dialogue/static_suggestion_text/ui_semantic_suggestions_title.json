@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "ui.semantic_suggestions.title",
-  "locale": "TL",
-  "entries": {
-    "say.variants.neutral": "MGA MUNGKAHING PANG-USAP",
-    "textRows.semantic_suggestions.title": "MGA MUNGKAHING PANG-USAP"
-  }
-}

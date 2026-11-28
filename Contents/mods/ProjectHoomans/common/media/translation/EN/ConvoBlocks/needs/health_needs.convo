@@ -1,0 +1,173 @@
+# ConvoDSL dialogue pools.
+language EN
+namespace hoomans
+
+dialogue flow.needs.exchange
+  say [default] as default:
+    "Do you need anything?"
+
+dialogue flow.needs.exchange.completed
+  say [default] as default:
+    "Thanks, that helps."
+
+dialogue question.needs.offer
+  say [topic=fatigue] as fatigue:
+    "A little rest would help, but this isn't something I can count."
+  say [topic=hunger] as hunger:
+    "Food would help, but I don't have an exact amount yet."
+  say [topic=hunger_guarded] as hunger_guarded:
+    "I need food. Keep your distance."
+  say [topic=hunger_terse] as hunger_terse:
+    "I need food."
+  say [topic=hunger_warm] as hunger_warm:
+    "Food would help, if you can spare it."
+  say [topic=thirst] as thirst:
+    "Water would help, but I don't have an exact amount yet."
+  say [topic=unknown] as unknown:
+    "I don't know what I need right now."
+
+dialogue question.needs.proposal
+  say [topic=hunger] as hunger:
+    "I can keep that as a proposal, but I still need the item and amount before I record a commitment."
+  say [topic=thirst] as thirst:
+    "I can keep that as a proposal, but I still need the item and amount before I record a commitment."
+  say [topic=unknown] as unknown:
+    "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment."
+  say [default] as default:
+    "I can keep that as a proposal, but I still need the item and amount before I record a commitment."
+
+dialogue question.needs.quantity
+  say [topic=hunger] as hunger:
+    "I know food is what I need, but I can't give you an exact amount yet."
+  say [topic=thirst] as thirst:
+    "I know water is what I need, but I can't give you an exact amount yet."
+  say [topic=unknown] as unknown:
+    "I can't confirm an exact amount yet. Which item do you mean?"
+  say [default] as default:
+    "I can confirm water is a need, but which item do you mean?"
+
+dialogue question.health_state.healthy
+  say [default] as neutral:
+    "I'm doing okay."
+  say [topic=guarded] as guarded:
+    "I'm fine. Don't make a thing of it."
+  say [topic=terse] as terse:
+    "I'm okay."
+  say [topic=warm] as warm:
+    "I'm doing okay. Thanks for checking in."
+
+dialogue question.health_state.injured
+  say [default] as neutral:
+    "I'm hurt, but I'm managing."
+  say [topic=guarded] as guarded:
+    "I'm hurt. Give me space."
+  say [topic=terse] as terse:
+    "I'm hurt."
+  say [topic=warm] as warm:
+    "I'm hurt, but I'm managing. Thanks for asking."
+
+dialogue question.health_state.unknown
+  say [default] as neutral:
+    "I can't confirm my health status right now."
+  say [topic=guarded] as guarded:
+    "I can't confirm that."
+  say [topic=terse] as terse:
+    "Can't confirm."
+  say [topic=warm] as warm:
+    "I can't confirm it right now, but thanks for asking."
+
+dialogue question.medical_bite.negative
+  say [default] as neutral:
+    "No, I don't have a recorded bite."
+  say [topic=guarded] as guarded:
+    "No bite. Leave it there."
+  say [topic=terse] as terse:
+    "No bite."
+  say [topic=warm] as warm:
+    "No, I don't have a recorded bite. Thanks for checking."
+
+dialogue question.medical_bite.positive
+  say [default] as neutral:
+    "Yes, I've been bitten."
+  say [topic=guarded] as guarded:
+    "Yes. I've been bitten. That's all."
+  say [topic=terse] as terse:
+    "Yes. I've been bitten."
+  say [topic=warm] as warm:
+    "Yes. I've been bitten, and I appreciate you checking."
+
+dialogue question.medical_bite.unknown
+  say [default] as neutral:
+    "I can't confirm whether I've been bitten."
+  say [topic=guarded] as guarded:
+    "I can't confirm that. Don't press me."
+  say [topic=terse] as terse:
+    "Can't confirm."
+  say [topic=warm] as warm:
+    "I can't confirm it, but thanks for checking."
+
+dialogue question.wellbeing.dataset.getting_by
+  say [default] as neutral:
+    "I'm getting by, one day at a time. How about you?"
+  say [topic=guarded] as guarded:
+    "I'm getting by. Leave it there."
+  say [topic=terse] as terse:
+    "Getting by."
+  say [topic=warm] as warm:
+    "I'm getting by. Thanks for asking."
+
+dialogue question.wellbeing.default
+  say [default] as neutral:
+    "I'm okay. How about you?"
+  say [topic=guarded] as guarded:
+    "I'm managing. Don't press me."
+  say [topic=terse] as terse:
+    "I'm okay."
+  say [topic=warm] as warm:
+    "I'm doing okay. Thanks for asking."
+
+dialogue question.wellbeing.fatigue
+  say [default] as neutral:
+    "I'm worn out, but I can still manage."
+
+dialogue question.wellbeing.fatigue_alt
+  say [default] as neutral:
+    "I'm tired. A little rest would help."
+
+dialogue question.wellbeing.follow_up.responses
+  say [default] as neutral:
+    "Doing okay, all things considered."
+
+dialogue question.wellbeing.hunger
+  say [default] as neutral:
+    "I'm pretty hungry, if I'm honest. Do you have anything to eat?"
+
+dialogue question.wellbeing.hunger_alt
+  say [default] as neutral:
+    "I'm getting hungry. Could you spare something to eat?"
+
+dialogue question.wellbeing.injured
+  say [default] as neutral:
+    "A little banged up, but I'll manage."
+  say [topic=guarded] as guarded:
+    "I'm hurt. That's all I can say."
+  say [topic=terse] as terse:
+    "I'm hurt. I can manage."
+  say [topic=warm] as warm:
+    "I took a hit, but I'm steady enough to keep going."
+
+dialogue question.wellbeing.panic
+  say [default] as neutral:
+    "I'm pretty shaken up right now."
+
+dialogue question.wellbeing.stress
+  say [default] as neutral:
+    "I'm tense, but I can keep going."
+
+dialogue question.wellbeing.thirst
+  say [default] as neutral:
+    "I'm pretty thirsty. Could you spare some water?"
+
+dialogue question.wellbeing.thirst_alt
+  say [default] as neutral:
+    "I could really use a drink. Do you have any water?"

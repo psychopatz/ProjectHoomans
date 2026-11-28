@@ -128,11 +128,26 @@ function Internal.resolveContinuousRangedAim(zombie, record, engineWalkType, isC
         or ""
     local isFirearm = primaryType == "handgun" or primaryType == "rifle"
     local runtime = type(record) == "table" and record.runtime or nil
+    -- Suicide scenes borrow CombatStance solely to keep the firearm unholstered
+    -- in hand; never override the suicide scene with continuous WalkAim/IdleAim.
+    if runtime and runtime.suicideState ~= nil then
+        if zombie and zombie.setVariable then
+            zombie:setVariable("PNCRangedAiming", false)
+        end
+        return walk, false
+    end
     local stance = PNC and PNC.CombatStance or nil
     local armed = (runtime and runtime.combatStance == true)
         or (stance and type(stance.IsArmed) == "function" and stance.IsArmed(record) == true)
         or false
-    local aiming = isFirearm and armed and isCrawling ~= true
+    -- Never enter or hold the continuous firearm-aiming pose while the weapon
+    -- is holstered/stowed (empty hands). Otherwise the NPC aims empty air
+    -- while the rifle is visibly slung on their back.
+    local hasHeldPrimary = true
+    if zombie and type(zombie.getPrimaryHandItem) == "function" then
+        hasHeldPrimary = zombie:getPrimaryHandItem() ~= nil
+    end
+    local aiming = isFirearm and armed and hasHeldPrimary and isCrawling ~= true
     if zombie and zombie.setVariable then
         zombie:setVariable("PNCRangedAiming", aiming)
     end

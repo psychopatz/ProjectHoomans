@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "question.wellbeing.unknown",
-  "locale": "TL",
-  "entries": {
-    "say.variants.question.wellbeing.unknown.dataset.causal_followup": "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito.",
-    "say.variants.question.wellbeing.unknown.dataset.causal_followup.plan.turn.dataset_causal_wellbeing_unknown.segment.0": "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito."
-  }
-}

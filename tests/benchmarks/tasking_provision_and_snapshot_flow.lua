@@ -504,8 +504,8 @@ local okDef, reasonDef, emittedDef = PNC.SocialEncounterTracker.EndEncounter(
 )
 T.truthy(okDef, "deferred EndEncounter succeeds")
 T.equal(reasonDef, "encounter_socialized", "deferred EndEncounter drains initial slice")
-T.equal(emittedDef, 2, "deferred EndEncounter drains only 2 pairs on first tick")
-T.equal(socialEmits, 2, "only 2 emits ran synchronously on end frame")
+T.equal(emittedDef, 1, "deferred EndEncounter drains only 1 pair on first tick")
+T.equal(socialEmits, 1, "only 1 emit ran synchronously on end frame")
 local drains = 0
 while (tonumber(PNC.SocialEncounterTracker.PendingPairHead) or 1)
     <= (tonumber(PNC.SocialEncounterTracker.PendingPairTail) or 0)

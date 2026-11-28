@@ -76,7 +76,7 @@ function Tracker.DrainPendingPairs(maxCount)
         return 0
     end
     local limit = math.max(1, math.floor(tonumber(maxCount)
-        or tonumber(Tracker.MAX_PENDING_EMITS_PER_PUMP) or 2))
+        or tonumber(Tracker.MAX_PENDING_EMITS_PER_PUMP) or 1))
     local processed = 0
     local emitted = 0
     while head <= tail and processed < limit do
@@ -211,7 +211,7 @@ function Tracker.EndEncounter(encounterID, occurredAt, options)
         end
         if deferPairs and Tracker.DrainPendingPairs then
             emitted = emitted + Tracker.DrainPendingPairs(
-                Tracker.MAX_PENDING_EMITS_PER_PUMP or 2
+                Tracker.MAX_PENDING_EMITS_PER_PUMP or 1
             )
         end
     end

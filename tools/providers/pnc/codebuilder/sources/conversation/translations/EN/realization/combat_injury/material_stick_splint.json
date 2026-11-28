@@ -1,8 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "lexeme.combat_injury.material_stick_splint",
-  "locale": "EN",
-  "entries": {
-    "realization.forms": "a stick for a splint"
-  }
-}

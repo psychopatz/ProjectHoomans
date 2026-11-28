@@ -100,6 +100,9 @@ function Internal.applyHands(zombie, record, equipment, descriptor, attackMode)
                 Internal.refreshHands(zombie)
             end
         end
+        if zombie and zombie.setVariable then
+            zombie:setVariable("PNCRangedAiming", false)
+        end
         Internal.setEquipmentVariables(
             zombie,
             descriptor.primaryType,

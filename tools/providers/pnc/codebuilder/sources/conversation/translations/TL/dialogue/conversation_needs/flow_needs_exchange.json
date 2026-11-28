@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "exchange",
-  "locale": "TL",
-  "entries": {
-    "say.variants.default": "May kailangan ka ba?",
-    "reply.completed.say.variants.default": "Salamat, malaking tulong iyan."
-  }
-}

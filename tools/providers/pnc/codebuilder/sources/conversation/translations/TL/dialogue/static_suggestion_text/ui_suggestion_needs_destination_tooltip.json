@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "ui.suggestion.needs_destination.tooltip",
-  "locale": "TL",
-  "entries": {
-    "say.variants.neutral": "Pumili muna ng pupuntahan.",
-    "textRows.suggestion.needs_destination.tooltip": "Pumili muna ng pupuntahan."
-  }
-}

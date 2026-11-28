@@ -1,7 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.v1",
-  "id": "lexeme.combat_injury.material_stick_splint",
-  "owner": "ProjectHoomans",
-  "type": "lexeme",
-  "concept": "COMBAT_TREATMENT_STICK_SPLINT"
-}

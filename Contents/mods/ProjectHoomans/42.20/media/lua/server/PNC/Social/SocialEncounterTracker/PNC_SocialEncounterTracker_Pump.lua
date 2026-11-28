@@ -18,6 +18,22 @@ local participantCapable = Internal.participantCapable
 local targetInSeriousDanger = Internal.targetInSeriousDanger
 local emit = Internal.emit
 
+local function anyLiveNPCInCombat()
+    local reg = PNC.Registry
+    local live = reg and reg.LiveZombies or nil
+    if type(live) ~= "table" or type(reg.Get) ~= "function" then
+        return false
+    end
+    for npcID in pairs(live) do
+        local rec = reg.Get(npcID)
+        local rt = rec and rec.runtime or nil
+        if rt and (rt.target ~= nil or rt.attackAction ~= nil) then
+            return true
+        end
+    end
+    return false
+end
+
 function Tracker.Pump(occurredAt)
     local encounterID
     local encounter
@@ -34,10 +50,31 @@ function Tracker.Pump(occurredAt)
     if not occurredAt then
         return 0
     end
-    -- Drain a small bounded slice of deferred encounter pair emissions every
-    -- tick so large group fights never freeze a frame for 1+ second on end.
+    -- Drain at most 1 deferred encounter pair emission on a short wall-clock
+    -- cooldown, and defer while any live NPC is actively fighting so heavy
+    -- social-memory saves never hitch a combat frame.
     if Tracker.DrainPendingPairs then
-        Tracker.DrainPendingPairs(Tracker.MAX_PENDING_EMITS_PER_PUMP or 2)
+        local head = tonumber(Tracker.PendingPairHead) or 1
+        local tail = tonumber(Tracker.PendingPairTail) or 0
+        if head <= tail then
+            local nowMs = PNC.Core and PNC.Core.Now and tonumber(PNC.Core.Now()) or 0
+            local nextDrainAt = tonumber(Tracker.NextPendingDrainAtMs) or 0
+            local backlog = tail - head + 1
+            if nowMs <= 0 or nowMs >= nextDrainAt then
+                if backlog < 48 and anyLiveNPCInCombat() then
+                    if nowMs > 0 then
+                        Tracker.NextPendingDrainAtMs = nowMs + 500
+                    end
+                else
+                    local drained = Tracker.DrainPendingPairs(
+                        Tracker.MAX_PENDING_EMITS_PER_PUMP or 1
+                    )
+                    if drained > 0 and nowMs > 0 then
+                        Tracker.NextPendingDrainAtMs = nowMs + 250
+                    end
+                end
+            end
+        end
     end
     if Tracker.LastPumpAt
         and occurredAt - Tracker.LastPumpAt < PUMP_INTERVAL_HOURS

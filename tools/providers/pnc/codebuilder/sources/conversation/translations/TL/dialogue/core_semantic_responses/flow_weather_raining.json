@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "flow.weather.raining",
-  "locale": "TL",
-  "entries": {
-    "say.variants.flow.weather.raining.dataset.contextual_switch": "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na.",
-    "say.variants.flow.weather.raining.dataset.contextual_switch.plan.turn.dataset_contextual_weather_switch.segment.0": "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na."
-  }
-}

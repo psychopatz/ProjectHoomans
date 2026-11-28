@@ -1,8 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "pnc.dialogue.follow",
-  "locale": "EN",
-  "entries": {
-    "say.variants.accepted": "Okay, I'll come with you."
-  }
-}

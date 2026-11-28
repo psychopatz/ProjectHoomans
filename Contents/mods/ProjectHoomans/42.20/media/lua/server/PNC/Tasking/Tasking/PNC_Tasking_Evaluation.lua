@@ -18,7 +18,56 @@ local LOW_BAND_ONLY_DOMAINS = {
     autonomy = true,
 }
 
+local BASE_ONLY_DOMAINS = {
+    work = true,
+    farming = true,
+    fishing = true,
+    lumber = true,
+    corpse_haul = true,
+}
+
+local function hasAnyEntry(tbl)
+    if type(tbl) ~= "table" then return false end
+    for _ in pairs(tbl) do return true end
+    return false
+end
+
+local function hasAnyBaseOrWork(record)
+    local settleRepo = PNC.SettlementRepository
+    local workRepo = PNC.WorkRepository
+    -- If neither repository is loaded (isolated unit test), do not gate.
+    if not settleRepo and not workRepo then return true end
+    if settleRepo and type(settleRepo.State) == "table" then
+        if hasAnyEntry(settleRepo.State.bases)
+            or hasAnyEntry(settleRepo.State.facilities)
+        then
+            return true
+        end
+    end
+    if workRepo and type(workRepo.State) == "table"
+        and hasAnyEntry(workRepo.State.byId)
+    then
+        return true
+    end
+    if type(record) == "table" and type(record.orderSpec) == "table" then
+        local kind = string.lower(tostring(record.orderSpec.kind or ""))
+        if kind == "camp" or kind == "work" then return true end
+    end
+    return false
+end
+
+local cachedDomainList = nil
+local cachedDomainCount = -1
+local cachedProvidersRef = nil
+
 local function sortedProviderDomains(providers)
+    local count = 0
+    for _ in pairs(providers) do count = count + 1 end
+    if cachedDomainList and cachedProvidersRef == providers
+        and cachedDomainCount == count
+    then
+        return cachedDomainList
+    end
     local domains = {}
     for domain in pairs(providers) do
         domains[#domains + 1] = domain
@@ -29,6 +78,9 @@ local function sortedProviderDomains(providers)
         if ra ~= rb then return ra < rb end
         return tostring(a) < tostring(b)
     end)
+    cachedDomainList = domains
+    cachedDomainCount = count
+    cachedProvidersRef = providers
     return domains
 end
 
@@ -36,6 +88,7 @@ function H.Collect(record)
     local candidates = {}
     local failures = {}
     local hasEmergencyCandidate = false
+    local baseOrWorkActive = hasAnyBaseOrWork(record)
     local maximum = math.max(1, math.floor(tonumber(
         Tasking.MAX_CANDIDATES_PER_PROVIDER) or 64))
     local npcContextSvc = Tasking.NPCContext
@@ -49,7 +102,9 @@ function H.Collect(record)
     for dIdx = 1, #orderedDomains do
         local domain = orderedDomains[dIdx]
         local provider = Tasking.Providers[domain]
-        if not (hasEmergencyCandidate and LOW_BAND_ONLY_DOMAINS[domain]) then
+        if not (hasEmergencyCandidate and LOW_BAND_ONLY_DOMAINS[domain])
+            and not (not baseOrWorkActive and BASE_ONLY_DOMAINS[domain])
+        then
             local provTimerName, provTimerStart
             if ScalingDiagnostics and ScalingDiagnostics.Enabled == true then
                 provTimerName, provTimerStart = ScalingDiagnostics.BeginTiming(

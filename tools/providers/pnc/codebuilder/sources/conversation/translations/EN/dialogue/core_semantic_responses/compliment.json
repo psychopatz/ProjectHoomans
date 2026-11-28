@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "compliment",
-  "locale": "EN",
-  "entries": {
-    "say.variants.compliment.dataset.kind_of_you": "That's kind of you. I appreciate it.",
-    "say.variants.compliment.dataset.means_a_lot": "Aw, thank you. That means a lot."
-  }
-}

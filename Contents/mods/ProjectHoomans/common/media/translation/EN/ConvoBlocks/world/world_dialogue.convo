@@ -1,0 +1,103 @@
+# ConvoDSL dialogue pools.
+language EN
+namespace hoomans
+
+dialogue chronology.milestone.react
+  say [topic=first_week_steady] as first_week_steady:
+    "Seven days since the world went sideways. Still breathing, {addressee.name}, and that counts for something."
+  say [topic=first_week_warm] as first_week_warm:
+    "A whole week still standing {scene.location}, {addressee.name}. Glad I'm not walking these streets alone."
+  say [topic=first_week_guarded] as first_week_guarded:
+    "Week one. Don't get comfortable—most folks who relaxed didn't make it past day three."
+  say [topic=first_month_steady] as first_month_steady:
+    "Thirty days since everything fell apart, {addressee.name}. Hard to believe the calendar even still matters."
+  say [topic=first_month_warm] as first_month_warm:
+    "We made it a whole month {scene.location}, {addressee.name}. Whatever comes next, I'm glad we're still here together."
+  say [topic=first_month_guarded] as first_month_guarded:
+    "Month's gone by. Canned goods are thinning out, and the quiet ones are the ones you watch for."
+  say [topic=first_season_steady] as first_season_steady:
+    "Whole season gone by since the outbreak, {addressee.name}. Weather's turning, and we're still here."
+  say [topic=first_season_warm] as first_season_warm:
+    "An entire season together {scene.location}, {addressee.name}. Never thought I'd be grateful for a quiet night like this."
+  say [topic=first_season_guarded] as first_season_guarded:
+    "Three months in. Anyone still walking around now knows how to fight—or how to hide."
+  say [topic=first_year_steady] as first_year_steady:
+    "A full year, {addressee.name}. Three hundred sixty-five days since Kentucky went dark."
+  say [topic=first_year_warm] as first_year_warm:
+    "A full year {scene.location}, {addressee.name}. Against every odd, we're still standing."
+  say [topic=first_year_guarded] as first_year_guarded:
+    "One year. Most folks didn't make it past the first snow—stay smart if you want a second."
+  say [topic=anniversary_steady] as anniversary_steady:
+    "Funny how a day like today brings old memories back, {addressee.name}."
+  say [topic=anniversary_warm] as anniversary_warm:
+    "Days like today hit a little harder {scene.location}, {addressee.name}. Glad we're still here to remember."
+  say [topic=anniversary_guarded] as anniversary_guarded:
+    "Calendar's just numbers now, {addressee.name}. Remembering doesn't keep the fences patched."
+
+dialogue world.alarm.react
+  say [topic=house_alarm_open] as house_alarm_open:
+    "Shit, an alarm {scene.location}! {addressee.name}, every deadhead in blocks is gonna hear that!"
+  say [topic=house_alarm_reply] as house_alarm_reply:
+    "I hear it, {addressee.name}. Weapons up and keep moving away from that noise."
+
+dialogue world.event.food_crisis
+  say [topic=experienced] as experienced:
+    "We're scraping the bottom of the pantry {scene.location}, {addressee.name}. Gotta stretch every can we've got."
+  say [topic=rumor] as rumor:
+    "Word is food's getting scarce down the road, {addressee.name}. Folks are already fighting over canned goods."
+  say [topic=uncertain] as uncertain:
+    "Can't swear to it, {addressee.name}, but talk is food's getting hard to find out past the creek."
+  say [topic=reply] as reply:
+    "Yeah, {addressee.name}, I noticed our rations thinning out too. Best we stretch what's left."
+
+dialogue world.event.raider_surge
+  say [topic=experienced] as experienced:
+    "Ran into armed crews {scene.location} myself, {addressee.name}. They aren't asking polite questions."
+  say [topic=witnessed] as witnessed:
+    "Saw armed crews working {scene.location} from the treeline, {addressee.name}. Keep your head down."
+  say [topic=rumor] as rumor:
+    "Heard armed crews are working the highway, {addressee.name}. Best we stick to the back roads."
+  say [topic=uncertain] as uncertain:
+    "Not sure how organized they are, {addressee.name}, but I keep hearing talk of roadblocks past town."
+  say [topic=reply] as reply:
+    "Copy that, {addressee.name}. Keep a shell chambered and stay off the open pavement."
+
+dialogue world.event.surplus
+  say [topic=experienced] as experienced:
+    "Garden plots {scene.location} are finally paying off, {addressee.name}. First decent harvest we've pulled in weeks."
+  say [topic=rumor] as rumor:
+    "Word is the farms outside town brought in a strong harvest, {addressee.name}. Might ease things up for everybody."
+  say [topic=uncertain] as uncertain:
+    "Can't say how long it'll last, {addressee.name}, but folks say there's extra harvest moving through the camps."
+  say [topic=reply] as reply:
+    "Good to hear, {addressee.name}. Let's get what we can jarred and stored before it spoils."
+
+dialogue world.media.broadcast
+  say [topic=tv_watching_life_and_living_open] as tv_watching_life_and_living_open:
+    "Shh, {addressee.name}, keep watching {slot.show.name}! You can actually learn solid survival tricks from this."
+  say [topic=tv_watching_life_and_living_reply] as tv_watching_life_and_living_reply:
+    "Taking mental notes already, {addressee.name}. Keep the volume reasonable so we don't draw company."
+  say [topic=tv_watching_show_open] as tv_watching_show_open:
+    "Still weird hearing voices on {slot.show.name}, {addressee.name}. Almost feels normal for a minute."
+  say [topic=tv_watching_show_reply] as tv_watching_show_reply:
+    "Feels oddly grounding listening to {slot.show.name} with you, {addressee.name}."
+
+dialogue world.object.notice
+  say [topic=tv_reminisce_open] as tv_reminisce_open:
+    "Seeing an old TV still sitting there hits strange, {addressee.name}. Miss lazy nights on the couch."
+  say [topic=tv_reminisce_reply] as tv_reminisce_reply:
+    "Yeah, {addressee.name}, feels like a lifetime ago when that was our biggest worry."
+  say [topic=tv_power_out_open] as tv_power_out_open:
+    "Dead screen and dark tubes, {addressee.name}. Without the grid, that TV's just furniture."
+  say [topic=tv_power_out_reply] as tv_power_out_reply:
+    "Feels eerie seeing every screen dead like that, {addressee.name}."
+
+dialogue world.utility.outage
+  say [topic=power_shutoff_open] as power_shutoff_open:
+    "Did everything just go dark {scene.location}? Looks like the power grid finally died today, {addressee.name}."
+  say [topic=power_shutoff_reply] as power_shutoff_reply:
+    "Yeah, {addressee.name}, no more free electricity. Watch the spoilage and stock fuel."
+  say [topic=water_shutoff_open] as water_shutoff_open:
+    "Pipes just ran dry {scene.location} today, {addressee.name}. Water system finally quit on us."
+  say [topic=water_shutoff_reply] as water_shutoff_reply:
+    "Got it, {addressee.name}. Rain collectors and pots are top priority now."

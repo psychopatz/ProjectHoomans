@@ -68,6 +68,13 @@ local function copy(value, depth)
 end
 
 local function hasContentTemplate(templateID)
+    local rc = PNC.ConvoEngine and PNC.ConvoEngine.ResponseCatalog or nil
+    if type(rc) == "table" and (
+        (type(rc.GetRaw) == "function" and rc.GetRaw(templateID) ~= nil)
+        or (type(rc.POOLS) == "table" and rc.POOLS[templateID] ~= nil)
+    ) then
+        return true
+    end
     if type(ConversationRegistry.PHRASE_FAMILIES) == "table"
         and type(ConversationRegistry.PHRASE_FAMILIES[templateID]) == "table"
     then

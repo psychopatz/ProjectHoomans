@@ -1,8 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "lexeme.combat_injury.groin",
-  "locale": "TL",
-  "entries": {
-    "realization.forms": "singit"
-  }
-}

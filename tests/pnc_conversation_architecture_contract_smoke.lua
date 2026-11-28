@@ -91,28 +91,27 @@ T.truthy(composition:find("PNC_Necroa_ZombieCaptionAdapter", 1, true),
 
 local coreRepository = assert(os.getenv("PZ_TEST_CORE_REPOSITORY"),
     "PZ_TEST_CORE_REPOSITORY is required")
-local sourceBase = coreRepository
-    .. "/tools/semantic_harness/codebuilder/sources/conversation"
-local legacyPsdlFile = io.popen(
-    "find '" .. sourceBase:gsub("'", "'\\''") .. "/psdl' -type f 2>/dev/null || true",
+local convoBlocksRoot = coreRepository
+    .. "/Contents/mods/PsychopatzCore/common/media/translation/EN/ConvoBlocks"
+local legacyCodebuilderCheck = io.popen(
+    "find '" .. (coreRepository .. "/tools/semantic_harness/codebuilder"):gsub("'", "'\\''")
+        .. "' -type f 2>/dev/null || true",
     "r"
 )
-local legacyCheck = legacyPsdlFile and legacyPsdlFile:read("*a") or ""
-if legacyPsdlFile then legacyPsdlFile:close() end
-T.equal(legacyCheck, "", "Core psdl source bucket is eliminated")
+local legacyCheck = legacyCodebuilderCheck and legacyCodebuilderCheck:read("*a") or ""
+if legacyCodebuilderCheck then legacyCodebuilderCheck:close() end
+T.equal(legacyCheck, "", "legacy Core codebuilder pipeline is retired")
 local contentFiles = {}
-for _, subdir in ipairs({ "dialogue", "behavior", "beat", "realization" }) do
-    local quotedRoot = "'" .. (sourceBase .. "/" .. subdir):gsub("'", "'\\''") .. "'"
-    local finder = assert(io.popen(
-        "find " .. quotedRoot .. " -type f -name '*.json' -print | sort",
-        "r"
-    ))
-    for fileName in finder:lines() do
-        table.insert(contentFiles, fileName)
-    end
-    finder:close()
+local quotedRoot = "'" .. convoBlocksRoot:gsub("'", "'\\''") .. "'"
+local finder = assert(io.popen(
+    "find " .. quotedRoot .. " -type f -name '*.convo' -print | sort",
+    "r"
+))
+for fileName in finder:lines() do
+    table.insert(contentFiles, fileName)
 end
-T.truthy(#contentFiles >= 1, "Core-owned ConvoEngine conversation shards are discoverable")
+finder:close()
+T.truthy(#contentFiles >= 1, "Core-owned ConvoDSL (.convo) packs are discoverable")
 for _, fileName in ipairs(contentFiles) do
     local sourceHandle = assert(io.open(fileName, "rb"))
     local contentSource = sourceHandle:read("*a")
@@ -125,10 +124,6 @@ for _, fileName in ipairs(contentFiles) do
             fileName .. " retains migration marker: " .. marker)
     end
 end
-T.falsy(io.open(
-    coreRepository .. "/tools/semantic_harness/codebuilder/sources/"
-        .. "semantic_dialogue_content.json", "rb"),
-    "monolithic Dialogue Content source is retired")
 
 -- Current metadata contains the real authority boundary, never the phase
 -- vocabulary that described how the repository got here.

@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "ui.suggestion.companion_orders.label",
-  "locale": "TL",
-  "entries": {
-    "say.variants.neutral": "May ipapagawa ako sa iyo...",
-    "textRows.suggestion.companion_orders.label": "May ipapagawa ako sa iyo..."
-  }
-}

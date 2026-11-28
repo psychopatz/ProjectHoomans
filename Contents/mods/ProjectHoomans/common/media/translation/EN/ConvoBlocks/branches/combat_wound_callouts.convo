@@ -1,0 +1,56 @@
+# Branching combat wound callout & triage stories.
+language EN
+namespace hoomans
+
+story combat.injury.triage_exchange
+  trigger intent=QUESTION, subject=HEALTH
+  say [default]:
+    "Still holding my ground, {addressee.name}, caught a hit and keeping eyes forward."
+
+    choice bite_non_lethal_stabilized (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "bite_non_lethal_stabilized"
+      reply [default]:
+        "Thank god saliva doesn't carry it here, {addressee.name}. Still stings awful, wrapping it tight now."
+        end
+
+    choice bite_psychopath_threatened (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "bite_psychopath_threatened"
+      reply [default]:
+        "Keep that barrel down, {addressee.name}! We finish clearing the dead before anyone talks about executions."
+        end
+
+    choice bite_quarantined (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "bite_quarantined"
+      reply [default]:
+        "I know the rules, {addressee.name}. Help me clear the stragglers and I'll stay apart from the group."
+        end
+
+    choice covered_for_treatment (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "covered_for_treatment"
+      reply [default]:
+        "Thanks, {addressee.name}! Keep them off my back while I tie off this open bleed."
+        end
+
+    choice ordered_fallback (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "ordered_fallback"
+      reply [default]:
+        "Alright, backing up two steps behind you, {addressee.name}. Cover me while I catch my breath!"
+        end
+
+    choice patched_push_on (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "patched_push_on"
+      reply [default]:
+        "Dressings are tight, {addressee.name}. Stay on my side and we'll sweep the rest of them."
+        end
+
+    choice reassured_bond (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "reassured_bond"
+      reply [default]:
+        "Heard you loud and clear, {addressee.name}. Still breathing, still swinging beside you."
+        end
+
+    choice refused (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "refused"
+      reply [default]:
+        "Save the talk for when there aren't teeth snapping in our faces!"
+        end

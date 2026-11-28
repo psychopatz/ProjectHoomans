@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "ui.suggestion.talk_again_about.label",
-  "locale": "TL",
-  "entries": {
-    "say.variants.neutral": "Pag-usapan muli ang",
-    "textRows.suggestion.talk_again_about.label": "Pag-usapan muli ang"
-  }
-}

@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "question.wellbeing.unknown",
-  "locale": "EN",
-  "entries": {
-    "say.variants.question.wellbeing.unknown.dataset.causal_followup": "I can tell something is off, but I do not know what caused it yet.",
-    "say.variants.question.wellbeing.unknown.dataset.causal_followup.plan.turn.dataset_causal_wellbeing_unknown.segment.0": "I can tell something is off, but I do not know what caused it yet."
-  }
-}

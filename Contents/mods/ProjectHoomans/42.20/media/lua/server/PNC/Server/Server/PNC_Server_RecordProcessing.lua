@@ -26,6 +26,20 @@ function H.GetSyncInterval(record)
     if record and record.presenceState ~= Const.PRESENCE_LIVE then
         return 500
     end
+    -- In singleplayer there are no remote clients; ClientPresenceTick already
+    -- refreshes local snapshots and forced events sync immediately. Avoid
+    -- rebuilding PresenceDelta 35 times/sec on routine combat/pathing ticks.
+    local isSingleplayer = not (isServer and isServer() == true)
+        and not (isClient and isClient() == true)
+    if isSingleplayer then
+        if runtime and (runtime.attackAction or runtime.target
+            or (runtime.pathing and (runtime.pathing.phase == "requested"
+                or runtime.pathing.phase == "active")))
+        then
+            return 250
+        end
+        return 600
+    end
     if runtime and runtime.attackAction then
         return 75
     end

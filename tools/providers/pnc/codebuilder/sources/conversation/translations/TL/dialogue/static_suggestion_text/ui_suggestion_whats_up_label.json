@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "ui.suggestion.whats_up.label",
-  "locale": "TL",
-  "entries": {
-    "say.variants.neutral": "Ano ang balita?",
-    "textRows.suggestion.whats_up.label": "Ano ang balita?"
-  }
-}

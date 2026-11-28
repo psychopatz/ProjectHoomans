@@ -1,9 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "refuse",
-  "locale": "EN",
-  "entries": {
-    "say.variants.refuse.dataset.pending_unavailable": "I can't take that on right now.",
-    "say.variants.refuse.dataset.pending_enough": "Not this time. I have enough to manage."
-  }
-}

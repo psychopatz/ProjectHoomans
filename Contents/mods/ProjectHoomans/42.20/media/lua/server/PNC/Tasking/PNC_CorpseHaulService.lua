@@ -74,10 +74,23 @@ require "PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_Dispatch"
 
 Internal.bindWorkService()
 
+local function hasAnyEntry(tbl)
+    if type(tbl) ~= "table" then return false end
+    for _ in pairs(tbl) do return true end
+    return false
+end
+
 function Service.Pump(now)
     now = tonumber(now) or Core.Now()
     if now < (tonumber(Service.Runtime.nextScanAt) or 0) then return end
     Service.Runtime.nextScanAt = now + Service.SCAN_INTERVAL_MS
+    local settleRepo = PNC.SettlementRepository
+    if settleRepo and type(settleRepo.State) == "table"
+        and not hasAnyEntry(settleRepo.State.bases)
+        and not hasAnyEntry(Service.Runtime.byTask)
+    then
+        return
+    end
     local timerName
     local timerStart
     if ScalingDiagnostics then

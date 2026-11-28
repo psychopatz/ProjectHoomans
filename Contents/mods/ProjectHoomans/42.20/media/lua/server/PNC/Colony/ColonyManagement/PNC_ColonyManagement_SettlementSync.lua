@@ -59,16 +59,21 @@ local function baseIdFor(payload)
     return facility and tostring(facility.baseId or "") or nil
 end
 
+local hasPending = false
+
 local function onSettlementMutation(payload)
     local baseId = baseIdFor(payload)
     if baseId and PNC.BaseService and PNC.BaseService.Get(baseId) then
         -- Construction and validation can emit several state changes in one
         -- simulation step. Rebuild one snapshot per base on the next tick.
         PendingBaseIds[baseId] = true
+        hasPending = true
     end
 end
 
 local function flushPending()
+    if not hasPending then return end
+    hasPending = false
     local pending = PendingBaseIds
     Management.Internal.SettlementSyncPendingBaseIds = {}
     PendingBaseIds = Management.Internal.SettlementSyncPendingBaseIds

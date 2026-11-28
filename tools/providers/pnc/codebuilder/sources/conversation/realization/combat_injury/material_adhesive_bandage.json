@@ -1,7 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.v1",
-  "id": "lexeme.combat_injury.material_adhesive_bandage",
-  "owner": "ProjectHoomans",
-  "type": "lexeme",
-  "concept": "COMBAT_TREATMENT_ADHESIVE_BANDAGE"
-}

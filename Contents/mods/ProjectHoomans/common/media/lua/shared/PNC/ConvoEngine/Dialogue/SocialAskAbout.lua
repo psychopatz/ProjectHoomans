@@ -1,4 +1,4 @@
--- Generated; do not edit by hand.
+-- Hand-maintained ProjectHoomans ConvoEngine module.
 return {
     {
         ["domain"] = "social_ask_about",

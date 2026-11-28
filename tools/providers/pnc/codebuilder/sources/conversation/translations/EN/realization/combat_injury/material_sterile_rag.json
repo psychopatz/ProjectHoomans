@@ -1,8 +1,0 @@
-{
-  "schema": "psychopatz.convo-engine.translation.v1",
-  "family": "lexeme.combat_injury.material_sterile_rag",
-  "locale": "EN",
-  "entries": {
-    "realization.forms": "a sterilized strip of cloth"
-  }
-}

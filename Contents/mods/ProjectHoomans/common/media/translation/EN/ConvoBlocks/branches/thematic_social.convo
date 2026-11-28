@@ -1,0 +1,494 @@
+# Branching thematic social, colony, travel, and wellbeing stories.
+language EN
+namespace hoomans
+
+story colony.work.status_exchange
+  trigger intent=QUESTION, subject=COLONY_WORK
+  say [default]:
+    "Back fence still has a loose plank {scene.location}, {addressee.name}, and the rain barrels need checking. How are we looking on chores?"
+
+    choice agreed (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "agreed"
+      reply [default]:
+        "Good, {addressee.name}. Grab a hammer and some nails—we'll get it buttoned up before dark."
+        end
+
+    choice checked_in (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "checked_in"
+      reply [default]:
+        "It's holding for now {scene.location}, {addressee.name}, just needs another pair of hands when we get a quiet hour."
+        end
+
+    choice deferred (intent=SUGGEST, subject=SOCIAL, tone=neutral):
+      label: "Defer for now"
+      reply [default]:
+        "Fair enough. Let's leave the heavy hammering until morning so we don't draw anything."
+        end
+
+    choice negotiate (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "negotiate"
+      reply [default]:
+        "I'll haul timber for you, {addressee.name}, as long as somebody splits dusk watch with me."
+        end
+
+    choice refuse_unsafe_work (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "refuse_unsafe_work"
+      reply [default]:
+        "Not walking out on an open roof while alarms and shots are echoing two blocks away."
+        end
+
+    choice refused (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "refused"
+      reply [default]:
+        "Not the time for chores. Keep your eyes on the yard."
+        end
+
+    choice reluctant (intent=SUGGEST, subject=SOCIAL, tone=guarded):
+      label: "Hesitate"
+      reply [default]:
+        "Alright, though my back's tight—we're keeping it brief and quiet."
+        end
+
+    choice volunteer (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "volunteer"
+      reply [default]:
+        "Hand me the crowbar—I'll knock that job out right now so nobody pulls double duty."
+        end
+
+story combat.aftermath.debrief_exchange
+  trigger intent=INFORM, subject=COMBAT
+  say [default]:
+    "That got ugly fast, {addressee.name}. You catch any scratches or bites back there?"
+
+    choice cleared (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "cleared"
+      reply [default]:
+        "Looks like the rest of them wandered off down the alley. Keep it quiet for a minute."
+        end
+
+    choice contradicted (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "contradicted"
+      reply [default]:
+        "Those weren't raiders, {addressee.name}—some panicked kid set off a burglar alarm down the block."
+        end
+
+    choice corroborated (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "corroborated"
+      reply [default]:
+        "Yeah, counted the same shots from the back window—there's still stragglers down that lane."
+        end
+
+    choice debriefed (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "debriefed"
+      reply [default]:
+        "Nothing through the jacket, thank God, {addressee.name}. Door's wedged shut—let's catch our breath and check our gear."
+        end
+
+    choice refused (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "refused"
+      reply [default]:
+        "Don't crowd me right now. Watch the window."
+        end
+
+    choice shaken (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "shaken"
+      reply [default]:
+        "I'm not bit, just rattled. Give me a second to get my hands steady."
+        end
+
+    choice withdraw (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "withdraw"
+      reply [default]:
+        "Talk later. Reloading first and bolting the back door."
+        end
+
+story social.greeting.first_contact
+  trigger intent=GREETING, subject=SOCIAL
+  say [default]:
+    "Hold up a second. You're still breathing—that's a good start."
+  say [actor.social_style=warm|friendly|protective]:
+    "Thank goodness, a living face. Steady now, I'm not looking for a fight."
+  say [actor.social_style=guarded|withdrawn|hostile]:
+    "Stay back a step. I don't know you, and folks out here get jumpy fast."
+  say [topic=contextual]:
+    "Quiet street to be walking alone. You scavenging these houses or looking for someone?"
+
+    choice accepted (intent=AGREE, subject=SOCIAL, tone=warm):
+      label: "Agree / cooperate"
+      reply [default]:
+        "Fair enough—lower the crowbar and come under the awning out of sight."
+        end
+
+    choice blocked (intent=DISAGREE, subject=SOCIAL, tone=hostile):
+      label: "Shut it down"
+      reply [default]:
+        "Not now. Keep moving."
+        end
+      reply [actor.social_style=guarded|withdrawn|hostile]:
+        "Back off—this isn't the time to talk."
+        end
+
+    choice cautious (intent=SUGGEST, subject=SOCIAL, tone=guarded):
+      label: "Respond cautiously"
+      reply [default]:
+        "Fair enough. You mind your business, I'll mind mine."
+        end
+      reply [topic=contextual]:
+        "Just keep your eyes on the treeline if you're heading down that road."
+        end
+
+    choice declined (intent=DISAGREE, subject=SOCIAL, tone=guarded):
+      label: "Decline"
+      reply [default]:
+        "Suit yourself. Just keep walking."
+        end
+      reply [actor.social_style=guarded|withdrawn|hostile]:
+        "Then we're done talking. Move along before you draw the dead."
+        end
+
+    choice end_conversation (intent=FAREWELL, subject=SOCIAL, tone=neutral):
+      label: "End the exchange"
+      reply [default]:
+        "No trouble here—passing along and letting you keep your corner."
+        end
+
+    choice evasive (intent=DISAGREE, subject=SOCIAL, tone=guarded):
+      label: "Stay guarded"
+      reply [default]:
+        "Keep your secrets if you want. Just don't bring trouble my way."
+        end
+
+    choice rejected (intent=DISAGREE, subject=SOCIAL, tone=hostile):
+      label: "Push back"
+      reply [default]:
+        "Keep walking down the shoulder. We aren't taking strangers inside tonight."
+        end
+
+    choice reluctant (intent=SUGGEST, subject=SOCIAL, tone=guarded):
+      label: "Hesitate"
+      reply [default]:
+        "You get two minutes by the curb to state your piece, nothing closer."
+        end
+
+story social.identity.personal_history
+  trigger intent=QUESTION, subject=IDENTITY
+  say [default]:
+    "Hard to picture what this county looked like before July. Where were you when things fell apart?"
+  say [actor.social_style=warm|friendly|protective]:
+    "Feels good talking to someone who remembers normal life, {addressee.name}. What did you used to do around here?"
+  say [actor.social_style=guarded|withdrawn|hostile]:
+    "Folks out here don't talk much about who they used to be. Doesn't always end well."
+  say [topic=contextual]:
+    "Seeing these empty storefronts still throws me off. Did you have family or work out this way?"
+
+    choice blocked (intent=DISAGREE, subject=SOCIAL, tone=hostile):
+      label: "Shut it down"
+      reply [default]:
+        "Not the time for life stories."
+        end
+      reply [actor.social_style=guarded|withdrawn|hostile]:
+        "Save it. Keep your eyes on the street."
+        end
+
+    choice evasive (intent=DISAGREE, subject=SOCIAL, tone=guarded):
+      label: "Stay guarded"
+      reply [default]:
+        "Doesn't matter much what I did before. Only matters what keeps us alive today."
+        end
+
+    choice guarded (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "guarded"
+      reply [default]:
+        "Let's just say I worked with my hands and leave the rest behind."
+        end
+      reply [topic=contextual]:
+        "Too many names I don't want to say out loud anymore. Maybe another night."
+        end
+
+    choice protect_source (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "protect_source"
+      reply [default]:
+        "Not giving names for folks who didn't ask to be dragged back into Knox County's mess."
+        end
+
+    choice refused (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "refused"
+      reply [default]:
+        "I'd rather not dig into all that."
+        end
+      reply [actor.social_style=guarded|withdrawn|hostile]:
+        "Drop it. My past is my own business."
+        end
+
+    choice reveal_source (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "reveal_source"
+      reply [default]:
+        "Alright, {addressee.name}—our old crew split near the rail yard, and that's where I got my rig."
+        end
+
+    choice shared (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "shared"
+      reply [default]:
+        "Funny how fast a regular job turns into useless trivia, huh, {addressee.name}? Good knowing a bit about you."
+        end
+      reply [actor.social_style=warm|friendly|protective]:
+        "Feels good remembering we had real lives once, {addressee.name}. Appreciate you sharing that."
+        end
+
+    choice withdraw (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "withdraw"
+      reply [default]:
+        "Enough looking back. Past won't bar tonight's windows."
+        end
+
+story knowledge.gossip.exchange
+  trigger intent=GOSSIP, subject=WORLD_KNOWLEDGE
+  say [default]:
+    "Heard any word from down the road? Trying to piece together what's still standing."
+  say [actor.social_style=warm|friendly|protective]:
+    "Good catching you here, {addressee.name}—heard anything useful about clear roads or decent supplies nearby?"
+  say [actor.social_style=guarded|withdrawn|hostile]:
+    "Lot of wild rumors flying around lately. You heard anything that actually checks out?"
+  say [topic=contextual]:
+    "Saw smoke rising east of the river earlier, and the chopper's been rattling nerves all week. Heard anything?"
+
+    choice blocked (intent=DISAGREE, subject=SOCIAL, tone=hostile):
+      label: "Shut it down"
+      reply [default]:
+        "Not the time for rumors—keep your head down."
+        end
+      reply [actor.social_style=guarded|withdrawn|hostile]:
+        "Save the chatter. Watch the street."
+        end
+
+    choice contradicted (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "contradicted"
+      reply [default]:
+        "No, that doesn't square with what happened there. Somebody fed you a bad steer."
+        end
+
+    choice corroborated (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "corroborated"
+      reply [default]:
+        "That tracks with what I witnessed near {slot.location}, {addressee.name}. Same signs, same direction."
+        end
+      reply [topic=contextual]:
+        "Both reports line up—between the emergency broadcast and firsthand sightings out by {slot.location}, we know it's real."
+        end
+
+    choice known (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "known"
+      reply [default]:
+        "Yeah, I saw that myself—{slot.location} is choked up, so steer clear if you're smart."
+        end
+      reply [actor.social_style=warm|friendly|protective]:
+        "Actually, yes—{addressee.name}, word is solid on that. Worth keeping in your pocket."
+        end
+      reply [topic=contextual]:
+        "Can vouch for part of it, {addressee.name}: saw fresh tracks and open shutters near {slot.location} yesterday."
+        end
+
+    choice protect_source (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "protect_source"
+      reply [default]:
+        "Doesn't matter who brought word in. Take the warning, skip asking for names."
+        end
+
+    choice refused (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "refused"
+      reply [default]:
+        "I don't trade in gossip. Ask somebody else."
+        end
+      reply [actor.social_style=guarded|withdrawn|hostile]:
+        "Keep me out of it. Word gets around, and so does trouble."
+        end
+
+    choice reveal_source (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "reveal_source"
+      reply [default]:
+        "I trust you enough to say it straight: spotted it with my own eyes along the shoulder past dusk."
+        end
+
+    choice uncertain (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "uncertain"
+      reply [default]:
+        "Heard folks talking about it, sure, but nobody I'd bet my boots on."
+        end
+      reply [topic=contextual]:
+        "Could be true, could be somebody spooked by shadows. Treat it like a rumor until you see it."
+        end
+
+story social.conflict.mediate_exchange
+  trigger intent=SUGGEST, subject=CONFLICT
+  say [default]:
+    "Everyone's snapping at each other over the watch schedule and the pantry, {addressee.name}. We need to sort this out before someone walks out."
+
+    choice acknowledged (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "acknowledged"
+      reply [default]:
+        "I hear you, {addressee.name}. Nobody's trying to shortchange anyone here—we just need clearer rules."
+        end
+
+    choice apologize (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "apologize"
+      reply [default]:
+        "You're right—I snapped too hard over the rations. That one's on me, {addressee.name}."
+        end
+
+    choice challenge (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "challenge"
+      reply [default]:
+        "Say that again to my face if you think I'm the one cutting corners around here."
+        end
+
+    choice defend (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "defend"
+      reply [default]:
+        "Hold on—I didn't pocket anything. Somebody moved the crates before dawn watch."
+        end
+
+    choice deferred (intent=SUGGEST, subject=SOCIAL, tone=neutral):
+      label: "Defer for now"
+      reply [default]:
+        "Fine. Let's cool off and talk about it after we've both had some water and rest."
+        end
+
+    choice mediate (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "mediate"
+      reply [default]:
+        "Both sides have a point—put the ledger out on the table and we reset shifts fair."
+        end
+
+    choice reconciled (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "reconciled"
+      reply [default]:
+        "Alright, {addressee.name}. We're all tired and short on sleep. Let's split the watch evenly and drop it."
+        end
+
+    choice strained (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "strained"
+      reply [default]:
+        "Forget it. Not much point talking when nobody's listening."
+        end
+
+story travel.excursion.plan_exchange
+  trigger intent=SUGGEST, subject=TRAVEL
+  say [default]:
+    "We're running low on canned goods and spare batteries, {addressee.name}. Think we can make a quick run {scene.location}?"
+
+    choice agreed (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "agreed"
+      reply [default]:
+        "Alright, {addressee.name}. Pack light, keep the crowbar handy, and we stick to the side streets."
+        end
+
+    choice assessed (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "assessed"
+      reply [default]:
+        "Roads looked quiet earlier {scene.location}, {addressee.name}, though there's always a few stragglers near the gas station."
+        end
+
+    choice deferred (intent=SUGGEST, subject=SOCIAL, tone=neutral):
+      label: "Defer for now"
+      reply [default]:
+        "Better to wait for first light. Fog's too thick out by the highway right now."
+        end
+
+    choice postpone (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "postpone"
+      reply [default]:
+        "Hold off moving out until the storm breaks and visibility clears."
+        end
+
+    choice refused (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "refused"
+      reply [default]:
+        "No sense going out there right now. Stay put until it's safe."
+        end
+
+    choice reluctant (intent=SUGGEST, subject=SOCIAL, tone=guarded):
+      label: "Hesitate"
+      reply [default]:
+        "I don't love the odds on that road, {addressee.name}, though I'll tag along carefully."
+        end
+
+    choice request_escort (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "request_escort"
+      reply [default]:
+        "I'll run that stretch only if we bring a second gun along for cover."
+        end
+
+    choice reroute (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "reroute"
+      reply [default]:
+        "Take the service alley west instead—avoids the ambush stretch completely."
+        end
+
+story wellbeing.needs.checkin
+  trigger intent=QUESTION, subject=WELLBEING
+  say [default]:
+    "You holding up all right? You look like you've had a rough stretch."
+  say [actor.social_style=warm|friendly|protective]:
+    "Glad to see you still on your feet, {addressee.name}. Need anything while we've got a quiet moment?"
+  say [actor.social_style=guarded|withdrawn|hostile]:
+    "You look half-spent. Don't tell me you're fine if you're running on empty."
+  say [topic=contextual]:
+    "With the water pressure gone and the nights getting colder, how are you keeping up?"
+
+    choice accept_treatment (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "accept_treatment"
+      reply [default]:
+        "Alright—wrap it tight before it dirties. Appreciate you carrying clean dressing."
+        end
+
+    choice blocked (intent=DISAGREE, subject=SOCIAL, tone=hostile):
+      label: "Shut it down"
+      reply [default]:
+        "Can't do this right now—keep your eyes up."
+        end
+      reply [actor.social_style=guarded|withdrawn|hostile]:
+        "Leave it. I've got bigger problems in front of me."
+        end
+
+    choice declined (intent=DISAGREE, subject=SOCIAL, tone=guarded):
+      label: "Decline"
+      reply [default]:
+        "I'm fine. Worry about your own pack."
+        end
+      reply [actor.social_style=guarded|withdrawn|hostile]:
+        "Don't fuss over me. I'll handle my own business."
+        end
+
+    choice deferred (intent=SUGGEST, subject=SOCIAL, tone=neutral):
+      label: "Defer for now"
+      reply [default]:
+        "Let's get somewhere with four walls first, then we'll sort out what's short."
+        end
+      reply [topic=contextual]:
+        "I'll manage until dusk—just need a quiet roof and five minutes off my feet."
+        end
+
+    choice dismissed (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "dismissed"
+      reply [default]:
+        "Quit fussing over me. Keep your hands on your weapon."
+        end
+
+    choice evasive (intent=DISAGREE, subject=SOCIAL, tone=guarded):
+      label: "Stay guarded"
+      reply [default]:
+        "Getting by well enough. No sense complaining about it."
+        end
+
+    choice holding_up (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "holding_up"
+      reply [default]:
+        "Tired to the bone, sure, but still standing and ready to move."
+        end
+
+    choice refuse_treatment (intent=INFORM, subject=SOCIAL, tone=neutral):
+      label: "refuse_treatment"
+      reply [default]:
+        "Keep your roll for someone bleeding out—I'll stitch myself later."
+        end
+

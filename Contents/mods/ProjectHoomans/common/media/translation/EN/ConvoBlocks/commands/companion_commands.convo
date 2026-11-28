@@ -1,0 +1,453 @@
+# ConvoDSL dialogue pools.
+language EN
+namespace hoomans
+
+dialogue command.companion.follow
+  say [default] as default:
+    "Follow me."
+
+dialogue command.companion.return_home
+  say [default] as default:
+    "Go home."
+
+dialogue command.companion.stay
+  say [default] as default:
+    "Stay here."
+
+dialogue command.player.attack_auto
+  say [default] as neutral:
+    "{addressee.name}, use your best judgment."
+
+dialogue command.player.attack_melee
+  say [default] as neutral:
+    "{addressee.name}, keep it close."
+
+dialogue command.player.attack_none
+  say [default] as neutral:
+    "{addressee.name}, stay out of the fight."
+
+dialogue command.player.attack_ranged
+  say [default] as neutral:
+    "{addressee.name}, keep your distance."
+
+dialogue command.player.camp
+  say [default] as neutral:
+    "Make camp here, {addressee.name}."
+
+dialogue command.player.camp_none
+  say [default] as neutral:
+    "..."
+
+dialogue command.player.camp_rejected
+  say [default] as neutral:
+    "I can't find a safe room or campfire nearby."
+
+dialogue command.player.follow
+  say [default] as neutral:
+    "{addressee.name}, on me."
+
+dialogue command.player.generic
+  say [default] as neutral:
+    "Understood, {addressee.name}."
+
+dialogue command.player.return_home
+  say [default] as neutral:
+    "{addressee.name}, head home."
+
+dialogue command.player.stay
+  say [default] as neutral:
+    "{addressee.name}, wait here."
+
+dialogue command.reply.attack_auto
+  say [default] as neutral:
+    "I'll handle it."
+
+dialogue command.reply.attack_melee
+  say [default] as neutral:
+    "Going in close."
+
+dialogue command.reply.attack_none
+  say [default] as neutral:
+    "I'll avoid trouble."
+
+dialogue command.reply.attack_ranged
+  say [default] as neutral:
+    "I'll cover you."
+
+dialogue command.reply.camp
+  say [default] as neutral:
+    "We'll make camp here."
+
+dialogue command.reply.camp_rejected
+  say [default] as neutral:
+    "I can't find a safe room or campfire nearby."
+
+dialogue command.reply.follow
+  say [default] as neutral:
+    "Right behind you."
+
+dialogue command.reply.generic_rejected
+  say [default] as neutral:
+    "I can't do that right now."
+
+dialogue command.reply.return_home
+  say [default] as neutral:
+    "Heading home."
+
+dialogue command.reply.stay
+  say [default] as neutral:
+    "I'll stay here."
+
+dialogue companion.action.responses
+  say [default] as neutral:
+    "I can't follow you right now."
+
+dialogue pnc.dialogue.follow
+  say [topic=accepted] as accepted:
+    "Okay, I'll come with you."
+
+dialogue pnc.lab.stay_with_you
+  say [topic=accepted] as accepted:
+    "Okay, I'll stay with you."
+
+dialogue companion.reaction
+  say [topic=abandonment] as abandonment:
+    "Stay with me next time. We watch each other's backs."
+  say [topic=camp_rejected] as camp_rejected:
+    "I can't find a safe room or campfire nearby."
+  say [default] as default:
+    "I heard you. We will handle it together."
+
+dialogue quest.clinic_supplies.accept.failed
+  say [default] as default:
+    "I couldn't accept that request."
+
+dialogue quest.clinic_supplies.accept.queued
+  say [default] as default:
+    "I'll bring the clinic supplies."
+
+dialogue quest.clinic_supplies.accept.rejected
+  say [default] as default:
+    "I can't accept that request right now."
+
+dialogue quest.clinic_supplies.offer.failed
+  say [default] as default:
+    "I couldn't check that clinic-supplies request."
+
+dialogue quest.clinic_supplies.offer.queued
+  say [default] as default:
+    "I can help with the clinic supplies."
+
+dialogue quest.clinic_supplies.offer.rejected
+  say [default] as default:
+    "I can't take that clinic-supplies request right now."
+
+dialogue quest.clinic_supplies.status.failed
+  say [default] as default:
+    "I couldn't check that request."
+
+dialogue quest.clinic_supplies.status.queued
+  say [default] as default:
+    "I'll check the clinic-supplies request."
+
+dialogue quest.clinic_supplies.status.rejected
+  say [default] as default:
+    "I can't check that request right now."
+
+dialogue quest.clinic_supplies.turn_in.failed
+  say [default] as default:
+    "I couldn't turn in the clinic supplies."
+
+dialogue quest.clinic_supplies.turn_in.queued
+  say [default] as default:
+    "I'll turn in the clinic supplies."
+
+dialogue quest.clinic_supplies.turn_in.rejected
+  say [default] as default:
+    "I can't turn that in yet."
+
+dialogue question.backstory.known
+  say [default] as default:
+    "Before all this, I was %1."
+  say [topic=education] as education:
+    "I studied %1."
+  say [topic=family_background] as family_background:
+    "My family was %1."
+  say [topic=fear] as fear:
+    "I have always been afraid of %1."
+  say [topic=former_job] as former_job:
+    "I worked as %1 before all this."
+  say [topic=hobby] as hobby:
+    "I used to enjoy %1."
+  say [topic=hometown] as hometown:
+    "I grew up in %1."
+  say [topic=tragedy] as tragedy:
+    "Something happened: %1."
+
+dialogue question.relationship_status.responses
+  say [default] as neutral:
+    "That's kind of you to ask. I don't have a clear answer right now."
+
+dialogue social.relationship.proposal
+  say [default] as default:
+    "Be my partner."
+
+dialogue social.relationship.proposal.accepted
+  say [default] as default:
+    "Yes, I want that too."
+
+dialogue social.relationship.proposal.already_partner
+  say [default] as default:
+    "We're already together."
+
+dialogue social.relationship.proposal.rejected
+  say [default] as default:
+    "I'm not ready for that."
+
+dialogue question.residence.responses
+  say [default] as neutral:
+    "That's all I can confirm about where I live right now."
+
+dialogue gift.completed
+  say [default] as default:
+    "Thank you for the gift."
+
+dialogue gift.failed
+  say [default] as default:
+    "I couldn't accept that gift."
+
+dialogue gift.pending
+  say [default] as default:
+    "I'll take a look at that gift."
+
+dialogue gift.rejected
+  say [default] as default:
+    "I can't accept that gift right now."
+
+dialogue gift.selection_required
+  say [default] as default:
+    "I need to see what you brought me first."
+
+dialogue task.consume.active
+  say [default] as default:
+    "I'm using that now."
+
+dialogue task.consume.admitted
+  say [default] as default:
+    "I'll use that."
+
+dialogue task.consume.completed
+  say [default] as default:
+    "That's done."
+
+dialogue task.consume.failed
+  say [default] as default:
+    "I couldn't use that."
+
+dialogue task.consume.rejected
+  say [default] as default:
+    "I can't use that right now."
+
+dialogue task.drink.active
+  say [default] as default:
+    "Taking a drink now."
+
+dialogue task.drink.admitted
+  say [default] as default:
+    "I'll have a drink."
+
+dialogue task.drink.completed
+  say [default] as default:
+    "Much better. Thirst is gone."
+
+dialogue task.drink.failed
+  say [default] as default:
+    "I couldn't get a drink."
+
+dialogue task.drink.rejected
+  say [default] as default:
+    "I'm not thirsty right now."
+
+dialogue task.eat.active
+  say [default] as default:
+    "Eating now."
+
+dialogue task.eat.admitted
+  say [default] as default:
+    "I'll eat that."
+
+dialogue task.eat.completed
+  say [default] as default:
+    "Finished eating. Feeling much better."
+
+dialogue task.eat.failed
+  say [default] as default:
+    "I couldn't eat that."
+
+dialogue task.eat.rejected
+  say [default] as default:
+    "I'm not hungry right now."
+
+dialogue task.fetch.active
+  say [default] as default:
+    "I'm working on that now."
+
+dialogue task.fetch.admitted
+  say [default] as default:
+    "I'll fetch that."
+
+dialogue task.fetch.completed
+  say [default] as default:
+    "Here you go."
+
+dialogue task.fetch.failed
+  say [default] as default:
+    "I couldn't fetch that."
+
+dialogue task.fetch.rejected
+  say [default] as default:
+    "I can't fetch that right now."
+
+dialogue task.give.active
+  say [default] as default:
+    "Handing that over now."
+
+dialogue task.give.admitted
+  say [default] as default:
+    "I'll give that to you."
+
+dialogue task.give.completed
+  say [default] as default:
+    "There you go."
+
+dialogue task.give.failed
+  say [default] as default:
+    "I couldn't give that to you."
+
+dialogue task.give.rejected
+  say [default] as default:
+    "I can't give that to you right now."
+
+dialogue task.refill.active
+  say [default] as default:
+    "Refilling the container now."
+
+dialogue task.refill.admitted
+  say [default] as default:
+    "I'll refill that."
+
+dialogue task.refill.completed
+  say [default] as default:
+    "All topped off. Container is full."
+
+dialogue task.refill.failed
+  say [default] as default:
+    "I couldn't refill that."
+
+dialogue task.refill.rejected
+  say [default] as default:
+    "I can't refill that right now."
+
+dialogue task.wait_at.active
+  say [default] as default:
+    "Waiting here now."
+
+dialogue task.wait_at.admitted
+  say [default] as default:
+    "Okay, I'll wait there."
+
+dialogue task.wait_at.completed
+  say [default] as default:
+    "Finished waiting."
+
+dialogue task.wait_at.failed
+  say [default] as default:
+    "I couldn't wait there."
+
+dialogue task.wait_at.rejected
+  say [default] as default:
+    "I can't wait there right now."
+
+dialogue tool_reply.cooldown
+  say [default] as neutral:
+    "You have had your turn with the compliments today."
+
+dialogue tool_reply.order_camp
+  say [default] as neutral:
+    "All right. We will make camp here."
+
+dialogue tool_reply.order_follow
+  say [default] as neutral:
+    "All right. I am with you."
+
+dialogue tool_reply.order_generic
+  say [default] as neutral:
+    "All right."
+
+dialogue tool_reply.order_rejected
+  say [default] as neutral:
+    "I cannot do that right now."
+
+dialogue tool_reply.order_stay
+  say [default] as neutral:
+    "All right. I will hold here."
+
+dialogue tool_reply.queued_admire
+  say [default] as neutral:
+    "I hear you."
+
+dialogue tool_reply.queued_apology
+  say [default] as neutral:
+    "I hear you."
+
+dialogue tool_reply.queued_comfort
+  say [default] as neutral:
+    "I hear you."
+
+dialogue tool_reply.queued_compliment
+  say [default] as neutral:
+    "I heard the compliment."
+
+dialogue tool_reply.queued_flirt
+  say [default] as neutral:
+    "I heard you."
+
+dialogue tool_reply.queued_generic
+  say [default] as neutral:
+    "I hear you."
+
+dialogue tool_reply.queued_hostile
+  say [default] as neutral:
+    "I heard you. Watch yourself."
+
+dialogue tool_reply.queued_insult
+  say [default] as neutral:
+    "I heard you."
+
+dialogue tool_reply.queued_praise
+  say [default] as neutral:
+    "I hear you."
+
+dialogue tool_reply.queued_romantic
+  say [default] as neutral:
+    "I heard you. You are bold, I will give you that."
+
+dialogue tool_reply.queued_sexual
+  say [default] as neutral:
+    "I heard you. Give me a second."
+
+dialogue tool_reply.rejected_game
+  say [default] as neutral:
+    "Not now."
+
+dialogue tool_reply.rejected_generic
+  say [default] as neutral:
+    "That did not land well."
+
+dialogue tool_reply.rejected_hostile
+  say [default] as neutral:
+    "Back off."
+
+dialogue tool_reply.rejected_sexual
+  say [default] as neutral:
+    "That is not happening."
