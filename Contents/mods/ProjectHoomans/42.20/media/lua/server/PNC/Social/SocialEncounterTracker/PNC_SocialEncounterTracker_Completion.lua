@@ -45,19 +45,72 @@ local function releaseEncounter(encounter)
     Tracker.Encounters[encounter.id] = nil
 end
 
-function Tracker.EndEncounter(encounterID, occurredAt)
+local function dispatchPairEvent(payload, beatState)
+    local resultValue = emit(payload)
+    local count = 0
+    if resultValue and resultValue.ok then
+        count = resultValue.memoriesCreated or 0
+        if beatState and not beatState.notified then
+            local beats = PNC.Semantics and PNC.Semantics.DialogueBeats
+            if beats and type(beats.OnCombatEncounterCleared) == "function" then
+                beatState.notified = true
+                pcall(beats.OnCombatEncounterCleared, {
+                    encounterID = beatState.encounterID,
+                    actorKey = payload.actorKey,
+                    targetKey = payload.targetKey,
+                    hordeAttack = beatState.hordeAttack,
+                    threatCount = beatState.threatCount,
+                    earnedDelta = tonumber(resultValue.memoriesCreated) or 1,
+                })
+            end
+        end
+    end
+    return count
+end
+
+function Tracker.DrainPendingPairs(maxCount)
+    local queue = Tracker.PendingPairEmits
+    local head = tonumber(Tracker.PendingPairHead) or 1
+    local tail = tonumber(Tracker.PendingPairTail) or (type(queue) == "table" and #queue or 0)
+    if type(queue) ~= "table" or head > tail then
+        return 0
+    end
+    local limit = math.max(1, math.floor(tonumber(maxCount)
+        or tonumber(Tracker.MAX_PENDING_EMITS_PER_PUMP) or 2))
+    local processed = 0
+    local emitted = 0
+    while head <= tail and processed < limit do
+        local item = queue[head]
+        queue[head] = nil
+        head = head + 1
+        if item and item.payload then
+            processed = processed + 1
+            emitted = emitted + dispatchPairEvent(item.payload, item.beatState)
+        end
+    end
+    if head > tail then
+        Tracker.PendingPairEmits = {}
+        Tracker.PendingPairHead = 1
+        Tracker.PendingPairTail = 0
+    else
+        Tracker.PendingPairHead = head
+    end
+    return emitted
+end
+
+function Tracker.EndEncounter(encounterID, occurredAt, options)
     local encounter = Tracker.Encounters[encounterID]
     local keys = {}
     local left
     local right
     local i
     local j
-    local resultValue
     local emitted = 0
     local eventType
     local actorKey
     local targetKey
     local hordeAttack
+    local deferPairs = type(options) == "table" and options.deferPairs == true
     occurredAt = finite(occurredAt, nil)
     if not encounter or not occurredAt then
         return false, "encounter_not_found", 0
@@ -75,6 +128,16 @@ function Tracker.EndEncounter(encounterID, occurredAt)
     end
     if encounterQualifies(encounter, occurredAt) then
         hordeAttack = encounter.hordeAttack == true
+        local threatCount = countEntries(encounter.threatIDs)
+        local durationHours = occurredAt - encounter.startedAt
+        local maxPairs = math.max(1, tonumber(Tracker.MAX_SHARED_PAIRS_PER_ENCOUNTER) or 24)
+        local pairsProcessed = 0
+        local beatState = {
+            notified = false,
+            encounterID = encounter.id,
+            hordeAttack = hordeAttack,
+            threatCount = threatCount,
+        }
         for left, _ in pairs(encounter.participants) do
             if participantAlive(encounter, left)
                 and encounter.participants[left].eligibleForShared ~= false
@@ -82,12 +145,22 @@ function Tracker.EndEncounter(encounterID, occurredAt)
                 keys[#keys + 1] = left
             end
         end
-        table.sort(keys)
+        -- Prioritize non-NPC (player) keys first so bounded pair budgets always
+        -- preserve every player-companion memory before NPC-NPC pairs.
+        table.sort(keys, function(a, b)
+            local aNpc = EntityRef.IsNPC(a)
+            local bNpc = EntityRef.IsNPC(b)
+            if aNpc ~= bNpc then return not aNpc end
+            return tostring(a) < tostring(b)
+        end)
         for i = 1, #keys do
+            if pairsProcessed >= maxPairs then break end
             for j = i + 1, #keys do
+                if pairsProcessed >= maxPairs then break end
                 left = keys[i]
                 right = keys[j]
                 if EntityRef.IsNPC(left) or EntityRef.IsNPC(right) then
+                    pairsProcessed = pairsProcessed + 1
                     actorKey = left
                     targetKey = right
                     if hordeAttack and EntityRef.IsNPC(right)
@@ -99,7 +172,7 @@ function Tracker.EndEncounter(encounterID, occurredAt)
                     eventType = hordeAttack
                         and "survived_horde_attack"
                         or "survived_combat_together"
-                    resultValue = emit({
+                    local payload = {
                         id = "social:shared_"
                             .. (hordeAttack and "horde_attack" or "combat")
                             .. ":" .. encounter.id
@@ -114,30 +187,32 @@ function Tracker.EndEncounter(encounterID, occurredAt)
                         z = encounter.z,
                         context = {
                             encounterID = encounter.id,
-                            threatCount =
-                                countEntries(encounter.threatIDs),
-                            durationHours =
-                                occurredAt - encounter.startedAt,
+                            threatCount = threatCount,
+                            durationHours = durationHours,
                             hordeAttack = hordeAttack,
                         },
-                    })
-                    if resultValue.ok then
-                        emitted = emitted
-                            + (resultValue.memoriesCreated or 0)
-                        local beats = PNC.Semantics and PNC.Semantics.DialogueBeats
-                        if beats and type(beats.OnCombatEncounterCleared) == "function" then
-                            pcall(beats.OnCombatEncounterCleared, {
-                                encounterID = encounter.id,
-                                actorKey = actorKey,
-                                targetKey = targetKey,
-                                hordeAttack = hordeAttack,
-                                threatCount = countEntries(encounter.threatIDs),
-                                earnedDelta = tonumber(resultValue.memoriesCreated) or 1,
-                            })
+                    }
+                    if deferPairs then
+                        Tracker.PendingPairEmits = Tracker.PendingPairEmits or {}
+                        local tail = (tonumber(Tracker.PendingPairTail) or 0) + 1
+                        Tracker.PendingPairTail = tail
+                        if not Tracker.PendingPairHead or Tracker.PendingPairHead < 1 then
+                            Tracker.PendingPairHead = 1
                         end
+                        Tracker.PendingPairEmits[tail] = {
+                            payload = payload,
+                            beatState = beatState,
+                        }
+                    else
+                        emitted = emitted + dispatchPairEvent(payload, beatState)
                     end
                 end
             end
+        end
+        if deferPairs and Tracker.DrainPendingPairs then
+            emitted = emitted + Tracker.DrainPendingPairs(
+                Tracker.MAX_PENDING_EMITS_PER_PUMP or 2
+            )
         end
     end
     releaseEncounter(encounter)

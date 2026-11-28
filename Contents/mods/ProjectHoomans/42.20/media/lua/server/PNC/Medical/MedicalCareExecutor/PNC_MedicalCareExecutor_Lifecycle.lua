@@ -14,6 +14,9 @@ local hasTaskBandage = Internal.hasTaskBandage
 local Treatment = Internal.Treatment
 local Common = Internal.Common
 
+local lastCandidateSupportAt = {}
+local CANDIDATE_SUPPORT_COOLDOWN_MS = 5000
+
 function Executor.GetCandidates(npcId)
     local actor = Registry and Registry.Get and Registry.Get(npcId) or nil
     local candidates = {}
@@ -21,13 +24,19 @@ function Executor.GetCandidates(npcId)
     local tasks = Service.List(false)
     if #tasks == 0 then return candidates end
     local at = PNC.Core.Now()
+    local actorInCombat = actor.runtime
+        and (actor.runtime.target ~= nil or actor.runtime.attackAction ~= nil)
     for i = 1, #tasks do
         local task = tasks[i]
         local supplyTask = preflightMissingSupply(task, at)
-        if supplyTask then
-            Executor.RequestBandageSupport(supplyTask.id)
-        elseif task.status == Status.WAITING_FOR_SUPPLY then
-            Executor.RequestBandageSupport(task.id)
+        local supportTaskId = supplyTask and supplyTask.id
+            or (task.status == Status.WAITING_FOR_SUPPLY and task.id or nil)
+        if supportTaskId and not actorInCombat then
+            local lastAt = tonumber(lastCandidateSupportAt[supportTaskId]) or -CANDIDATE_SUPPORT_COOLDOWN_MS
+            if at - lastAt >= CANDIDATE_SUPPORT_COOLDOWN_MS or at < lastAt then
+                lastCandidateSupportAt[supportTaskId] = at
+                Executor.RequestBandageSupport(supportTaskId)
+            end
         end
         if #candidates == 0 then
             local ready = (tonumber(task.retryAt) or 0) <= at

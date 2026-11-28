@@ -61,11 +61,17 @@ function Triggers.WakeActionable(record)
     return false
 end
 
+local NEED_CANDIDATES_CACHE_MS = 2500
+
 function Triggers.GetCandidates(npcId, npcContext)
     local record = (type(npcContext) == "table" and npcContext.record)
         or recordFor(npcId)
     local candidates = {}
     if not record then return candidates end
+    local rt = record.runtime
+    if rt and (rt.target ~= nil or rt.attackAction ~= nil) then
+        return candidates
+    end
     local ctx = type(npcContext) == "table" and npcContext
         or (PNC.Tasking and PNC.Tasking.NPCContext
             and PNC.Tasking.NPCContext.GetActive
@@ -76,27 +82,56 @@ function Triggers.GetCandidates(npcId, npcContext)
     then
         return candidates
     end
-    for _, definition in ipairs(Definitions.List()) do
-        local actionable, metadata = Definitions.Evaluate(
-            definition, record, false)
-        local available = not manuallyDisabled(record, definition)
-            and actionable and hasRoute(record, definition)
-        if available then
-            local route = resolveAwayRoute(record, definition)
-            candidates[#candidates + 1] = route
-                and AwayRoutes.BuildCandidate(
-                    route, record, definition, metadata)
-                or {
-                    taskId = "need_facility:" .. definition.id .. ":"
-                        .. tostring(record.id),
-                    npcId = tostring(record.id), kind = definition.kind,
-                    sourceDomain = "NeedFacility", sourceRef = definition.id,
-                    precedence = metadata.precedence,
-                    urgency = metadata.urgency,
-                    capability = definition.capability,
-                    interruptPolicy = "NORMAL", revision = 1,
-                }
+    local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    local cache = rt and rt._needFacilityEmptyCache or nil
+    if cache and now > 0 and cache.at > 0 and now >= cache.at
+        and (now - cache.at) < NEED_CANDIDATES_CACHE_MS
+        and cache.rev == (tonumber(record.recordRevision) or 0)
+    then
+        local dx = (tonumber(record.x) or 0) - cache.x
+        local dy = (tonumber(record.y) or 0) - cache.y
+        if (dx * dx + dy * dy) <= 9.0 then
+            return candidates
         end
+    end
+    for _, definition in ipairs(Definitions.List()) do
+        if not manuallyDisabled(record, definition) then
+            local actionable, metadata = Definitions.Evaluate(
+                definition, record, false)
+            if actionable then
+                local route = resolveAwayRoute(record, definition)
+                local homeOk = (route == nil)
+                    and not AwayRoutes.IsAwayCompanion(record)
+                    and PNC.NeedFacilityHomeRoute
+                    and PNC.NeedFacilityHomeRoute.IsAvailable(record, definition)
+                if route ~= nil or homeOk then
+                    candidates[#candidates + 1] = route
+                        and AwayRoutes.BuildCandidate(
+                            route, record, definition, metadata)
+                        or {
+                            taskId = "need_facility:" .. definition.id .. ":"
+                                .. tostring(record.id),
+                            npcId = tostring(record.id), kind = definition.kind,
+                            sourceDomain = "NeedFacility", sourceRef = definition.id,
+                            precedence = metadata.precedence,
+                            urgency = metadata.urgency,
+                            capability = definition.capability,
+                            interruptPolicy = "NORMAL", revision = 1,
+                        }
+                end
+            end
+        end
+    end
+    if #candidates == 0 and now > 0 then
+        record.runtime = record.runtime or {}
+        record.runtime._needFacilityEmptyCache = {
+            at = now,
+            x = tonumber(record.x) or 0,
+            y = tonumber(record.y) or 0,
+            rev = tonumber(record.recordRevision) or 0,
+        }
+    elseif record.runtime then
+        record.runtime._needFacilityEmptyCache = nil
     end
     return candidates
 end

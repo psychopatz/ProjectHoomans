@@ -113,10 +113,6 @@ local function resolveHoomansContext(entry)
         record = record or foundRec
     end
 
-    if type(snapshot) ~= "table" and type(record) ~= "table" then
-        return entry
-    end
-
     local enriched = {}
     for key, value in pairs(entry) do
         enriched[key] = value
@@ -125,13 +121,15 @@ local function resolveHoomansContext(entry)
     enriched.npcId = enriched.npcId or id
     if type(snapshot) == "table" then
         enriched.snapshot = snapshot
-        if enriched.tacticalClass == nil then
+        if snapshot.tacticalClass ~= nil and tostring(snapshot.tacticalClass) ~= ""
+            and (enriched.tacticalClass == nil or tostring(enriched.tacticalClass) == "" or tostring(enriched.tacticalClass) == "neutral")
+        then
             enriched.tacticalClass = snapshot.tacticalClass
         end
-        if enriched.recruited == nil then
+        if snapshot.recruited == true or enriched.recruited == nil then
             enriched.recruited = snapshot.recruited
         end
-        if enriched.colonyOwned == nil then
+        if snapshot.colonyOwned == true or enriched.colonyOwned == nil then
             enriched.colonyOwned = snapshot.colonyOwned
         end
         if enriched.orderKind == nil then
@@ -149,6 +147,9 @@ local function resolveHoomansContext(entry)
         if enriched.affiliation == nil then
             enriched.affiliation = snapshot.affiliation
         end
+        if snapshot.faction ~= nil and tostring(snapshot.faction) ~= "" then
+            enriched.faction = snapshot.faction
+        end
         if enriched.ownerUsername == nil then
             enriched.ownerUsername = snapshot.ownerUsername
         end
@@ -158,13 +159,15 @@ local function resolveHoomansContext(entry)
     end
     if type(record) == "table" then
         enriched.record = record
-        if enriched.tacticalClass == nil then
+        if record.tacticalClass ~= nil and tostring(record.tacticalClass) ~= ""
+            and (enriched.tacticalClass == nil or tostring(enriched.tacticalClass) == "" or tostring(enriched.tacticalClass) == "neutral")
+        then
             enriched.tacticalClass = record.tacticalClass
         end
-        if enriched.recruited == nil then
+        if record.recruited == true or enriched.recruited == nil then
             enriched.recruited = record.recruited
         end
-        if enriched.colonyOwned == nil then
+        if record.colonyOwned == true or enriched.colonyOwned == nil then
             enriched.colonyOwned = record.colonyOwned
         end
         if enriched.orderKind == nil
@@ -177,6 +180,9 @@ local function resolveHoomansContext(entry)
         end
         if enriched.affiliation == nil then
             enriched.affiliation = record.affiliation
+        end
+        if record.faction ~= nil and tostring(record.faction) ~= "" then
+            enriched.faction = record.faction
         end
         if enriched.ownerUsername == nil then
             enriched.ownerUsername = record.ownerUsername
@@ -317,16 +323,23 @@ if CoreActorMap and type(CoreActorMap.RegisterDecorator) == "function" then
                 and type(Display.AreNamesVisible) == "function"
                 and Display.AreNamesVisible() == true or false
 
-            -- Preserve DynamicTrading's commercial marker and hover payload.
+            local enriched = resolveHoomansContext(entry)
+            local resolvedType = Palette.ResolveType(enriched)
+
+            -- Preserve DynamicTrading's commercial marker only for alive,
+            -- neutral, trade-capable merchants. Never let trader styling
+            -- override colonists, followers, hostiles, dead NPCs, or
+            -- non-merchant group escorts/guards.
             if style.hoverMetadata
                 and style.hoverMetadata.traderID
+                and style.hoverMetadata.tradeAvailable ~= false
+                and resolvedType == "neutral"
             then
                 return style
             end
 
-            local enriched = resolveHoomansContext(entry)
             style.label = displayLabel(enriched)
-            style.color = Palette.Resolve(enriched)
+            style.color = Palette.Get(resolvedType)
             style.size = 9
             style.icon = iconFor(enriched, style.color)
             style.hoverMetadata = style.hoverMetadata or {}

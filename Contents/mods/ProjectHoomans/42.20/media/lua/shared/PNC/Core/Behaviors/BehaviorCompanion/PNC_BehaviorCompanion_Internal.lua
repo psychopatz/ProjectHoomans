@@ -120,8 +120,20 @@ function Internal.ShouldIssueFollowMove(record, target, mode, now)
     then
         safetyRefresh = false
     end
+    local nativeMoving = navigation
+        and navigation.provider == "engine_path"
+        and navigation.nativeActive == true
+    local activeEpsilon = epsilon
+    if nativeMoving then
+        local elapsedSinceIssue = now - (tonumber(state.issuedAt) or 0)
+        if elapsedSinceIssue < (tonumber(Const.FOLLOW_ACTIVE_RETARGET_MIN_MS) or 400) then
+            activeEpsilon = math.max(epsilon, tonumber(Const.FOLLOW_ACTIVE_RETARGET_EPSILON) or 1.25)
+        else
+            activeEpsilon = math.max(epsilon, 0.65)
+        end
+    end
     changed = state.issuedTargetX == nil
-        or (dx * dx) + (dy * dy) >= epsilon * epsilon
+        or (dx * dx) + (dy * dy) >= activeEpsilon * activeEpsilon
         or math.abs(
             (tonumber(target.z) or 0)
                 - (tonumber(state.issuedTargetZ) or 0)

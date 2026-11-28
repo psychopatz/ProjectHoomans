@@ -164,9 +164,13 @@ function Lifecycle.PumpStartupBodyCleanup(now, force)
             state.lastStats = stats
             return stats
         end
-        state.nextMaintenanceAt = now
-            + (tonumber(Const.BODY_SHELL_MAINTENANCE_MS) or 1000)
-        return Lifecycle.SweepPersistedLiveShells(now, force == true)
+        local baseMs = tonumber(Const.BODY_SHELL_MAINTENANCE_MS) or 1000
+        local sweepStats = Lifecycle.SweepPersistedLiveShells(now, force == true)
+        local quietSweep = type(sweepStats) == "table"
+            and (tonumber(sweepStats.removed) or 0) <= 0
+            and (tonumber(sweepStats.pendingRehydrate) or 0) <= 0
+        state.nextMaintenanceAt = now + (quietSweep and math.max(5000, baseMs * 5) or baseMs)
+        return sweepStats
     end
     stats = Lifecycle.SweepPersistedLiveShells(now, true)
     state.lastStats = stats

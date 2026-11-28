@@ -95,8 +95,11 @@ function Perception.FindZombieByID(zombieId)
         return zombie
     end
     if Spatial.Rebuild then
-        Spatial.Rebuild(Core.Now(), false)
-        return Spatial.FindZombieByID(zombieId)
+        local now = Core and Core.Now and Core.Now() or 0
+        if Spatial.LastRebuildAt ~= now then
+            Spatial.Rebuild(now, false)
+            return Spatial.FindZombieByID(zombieId)
+        end
     end
     return nil
 end

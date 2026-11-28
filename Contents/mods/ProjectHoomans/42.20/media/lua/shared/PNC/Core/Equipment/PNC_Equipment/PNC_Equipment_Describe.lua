@@ -26,6 +26,7 @@ function Equipment.Describe(record)
         record.runtime = runtime
     end
     cacheKey = configuredMode .. "|" .. tostring(fullType or "")
+        .. "|" .. ((record and record.recruited == true) and "1" or "0")
     cached = runtime and runtime.equipmentDescribeCache or nil
     if cached and cached.key == cacheKey and cached.value then
         return cached.value
@@ -66,11 +67,23 @@ function Equipment.Describe(record)
             weaponStatus = "mixed_unarmed_fallback_melee"
         end
     elseif configuredMode == "melee" then
-        combatModeResolved = "melee"
-        if descriptor.hasWeapon then
-            weaponStatus = "melee_ready"
+        if descriptor.hasUsableFirearm
+            and (not record or record.recruited ~= true)
+        then
+            -- Autonomous (non-recruited) NPCs holding a usable firearm (for
+            -- example canonical caravan/neutral spawns whose default weaponMode
+            -- fell back to "melee") should fire it instead of walking up to
+            -- bash zombies in melee. Recruited companions keep explicit player
+            -- "melee" commands intact.
+            combatModeResolved = "mixed"
+            weaponStatus = "mixed_ranged_ready"
         else
-            weaponStatus = "melee_unarmed"
+            combatModeResolved = "melee"
+            if descriptor.hasWeapon then
+                weaponStatus = "melee_ready"
+            else
+                weaponStatus = "melee_unarmed"
+            end
         end
     end
 

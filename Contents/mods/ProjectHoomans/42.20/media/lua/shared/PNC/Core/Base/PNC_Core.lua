@@ -332,16 +332,68 @@ function Core.GetNearestPlayerPosition(x, y)
     return best
 end
 
+local LOG_THROTTLE_MAX_KEYS = 256
+local logThrottleState = {}
+local logThrottleKeyCount = 0
+
+function Core.ResetLogThrottle()
+    logThrottleState = {}
+    logThrottleKeyCount = 0
+end
+
 function Core.Log(level, message)
     print("[PNC][" .. tostring(level or "INFO") .. "] " .. tostring(message or ""))
+end
+
+function Core.LogThrottled(level, key, intervalMs, messageOrFn)
+    local now = Core.Now and Core.Now() or 0
+    local windowMs = math.max(0, tonumber(intervalMs) or 2000)
+    local k = tostring(key or "default")
+    local entry = logThrottleState[k]
+    if entry and windowMs > 0 and (now - entry.lastAt) < windowMs and now >= entry.lastAt then
+        entry.suppressed = entry.suppressed + 1
+        return false
+    end
+    local suppressed = entry and entry.suppressed or 0
+    if not entry then
+        if logThrottleKeyCount >= LOG_THROTTLE_MAX_KEYS then
+            logThrottleState = {}
+            logThrottleKeyCount = 0
+        end
+        entry = { lastAt = now, suppressed = 0 }
+        logThrottleState[k] = entry
+        logThrottleKeyCount = logThrottleKeyCount + 1
+    else
+        entry.lastAt = now
+        entry.suppressed = 0
+    end
+    local msg
+    if type(messageOrFn) == "function" then
+        msg = tostring(messageOrFn() or "")
+    else
+        msg = tostring(messageOrFn or "")
+    end
+    if suppressed > 0 then
+        msg = "[suppressed=" .. tostring(suppressed) .. "] " .. msg
+    end
+    Core.Log(level, msg)
+    return true
 end
 
 function Core.LogInfo(message)
     Core.Log("INFO", message)
 end
 
+function Core.LogInfoThrottled(key, intervalMs, messageOrFn)
+    return Core.LogThrottled("INFO", key, intervalMs, messageOrFn)
+end
+
 function Core.LogWarn(message)
     Core.Log("WARN", message)
+end
+
+function Core.LogWarnThrottled(key, intervalMs, messageOrFn)
+    return Core.LogThrottled("WARN", key, intervalMs, messageOrFn)
 end
 
 function Core.LogDebug(message)

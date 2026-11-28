@@ -83,9 +83,19 @@ function Provider.HandleShockingEvent(event)
                     local npcKey = tostring(rec.id)
                     local currentOffer = Provider.OffersByNPC[npcKey]
                     local newPri = tonumber(reaction.priority) or 50
-                    if not currentOffer
+                    local inActiveCombat = rec.runtime
+                        and (rec.runtime.target ~= nil or rec.runtime.attackAction ~= nil)
+                    local intentName = tostring(reaction.intent or "")
+                    if inActiveCombat
+                        and (intentName == "Investigate" or intentName == "StopAndAssess")
+                    then
+                        -- NPC is already engaged in combat; do not overwrite combat movement
+                        -- or spam task reevaluations with an investigation/assess reaction.
+                    elseif not currentOffer
                         or (tonumber(currentOffer.expiresAt) or 0) <= at
-                        or newPri >= (tonumber(currentOffer.priority) or 0)
+                        or newPri > (tonumber(currentOffer.priority) or 0)
+                        or (newPri == (tonumber(currentOffer.priority) or 0)
+                            and (at - (tonumber(currentOffer.createdAt) or 0)) >= 1000)
                     then
                         Provider.OffersByNPC[npcKey] = {
                             npcId = npcKey,
@@ -306,6 +316,9 @@ function Provider.Tick(lease)
     elseif intent == "SmartFlee" then
         moveAwayFrom(rec, zombie, st.targetX, st.targetY, st.targetZ, 18.0, "reaction_smart_flee")
     elseif intent == "Investigate" then
+        if rec.runtime and (rec.runtime.target ~= nil or rec.runtime.attackAction ~= nil) then
+            return PNC.Tasking.Commands.Complete(lease.leaseId, "COMBAT_PREEMPTED")
+        end
         local clue = PNC.PerceptionService and PNC.PerceptionService.GetMostRecentClue
             and PNC.PerceptionService.GetMostRecentClue(rec, nil, at) or nil
         if not clue then

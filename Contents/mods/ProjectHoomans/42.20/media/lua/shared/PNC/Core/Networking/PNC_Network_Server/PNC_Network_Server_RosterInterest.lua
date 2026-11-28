@@ -358,15 +358,18 @@ function Network.FlushRosterDeltas(now, force)
         legacy = legacy or buildRosterDelta(entries, false)
         return legacy
     end
-    Core.ForEachPlayer(function(player)
-        local payload = getPayload(Internal.UsesLeanRosterPortraits(player))
-        if #payload.entries > 0 then
-            Internal.SendToPlayer(player, Const.CMD_ROSTER_DELTA, payload)
-        end
-    end)
-    -- Keep local startup/host notifications on their existing resolved path.
-    if triggerEvent and ((not isServer or not isServer()) or hasHostedLocalPlayer()) then
-        local payload = getPayload(false)
+    local serverMode = isServer and isServer() == true
+    if serverMode then
+        Core.ForEachPlayer(function(player)
+            local payload = getPayload(Internal.UsesLeanRosterPortraits(player))
+            if #payload.entries > 0 then
+                Internal.SendToPlayer(player, Const.CMD_ROSTER_DELTA, payload)
+            end
+        end)
+    end
+    -- Keep local startup/host notifications on the same unified lean payload path.
+    if triggerEvent and ((not serverMode) or hasHostedLocalPlayer()) then
+        local payload = getPayload(true)
         if #payload.entries > 0 then
             triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_ROSTER_DELTA, payload)
         end

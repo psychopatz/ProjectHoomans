@@ -251,11 +251,19 @@ function Beats.CheckNearbyWorldObjects(now)
     local ax = math.floor(tonumber(anchor.x) or 0)
     local ay = math.floor(tonumber(anchor.y) or 0)
     local az = math.floor(tonumber(anchor.z) or 0)
+    -- Skip world-object banter scans for off-screen NPCs (> 16 tiles from players).
+    local nearestDistSq = anchor.runtime and tonumber(anchor.runtime.nearestPlayerDistSq) or nil
+    if nearestDistSq ~= nil and nearestDistSq > (16 * 16) then
+        return false
+    end
     local ctx = buildContext(anchor, partner, now)
     local worldCtx = PNC and PNC.WorldItemContext
+    local inspectedObjects = 0
+    local MAX_INSPECTED_OBJECTS = 128
 
     local function checkObject(obj, sq, distSq)
-        if not obj then return nil end
+        if not obj or inspectedObjects >= MAX_INSPECTED_OBJECTS then return nil end
+        inspectedObjects = inspectedObjects + 1
         for hi = 1, #activeHooks do
             local h = activeHooks[hi]
             if distSq <= (h.maxDistance * h.maxDistance) then
@@ -274,28 +282,48 @@ function Beats.CheckNearbyWorldObjects(now)
         return nil
     end
 
-    for dx = -OBJECT_SCAN_RADIUS, OBJECT_SCAN_RADIUS do
-        for dy = -OBJECT_SCAN_RADIUS, OBJECT_SCAN_RADIUS do
-            local distSq = dx * dx + dy * dy
-            if worldCtx and worldCtx.GetSquareSnapshot then
-                local snap = worldCtx.GetSquareSnapshot(cell, ax + dx, ay + dy, az, now)
-                if snap and snap.square then
-                    local objs = snap.objects or {}
-                    for oi = 1, #objs do
-                        local hitId = checkObject(objs[oi], snap.square, distSq)
-                        if hitId then return true, hitId end
-                    end
-                end
-            else
-                local sq = safeCall(cell, "getGridSquare", ax + dx, ay + dy, az)
-                if sq then
-                    local objs, n = countAndGetObjects(sq)
-                    for oi = 1, n do
-                        local hitId = checkObject(objectAt(objs, oi), sq, distSq)
-                        if hitId then return true, hitId end
-                    end
+    local function inspectSquare(dx, dy)
+        local distSq = dx * dx + dy * dy
+        if worldCtx and worldCtx.GetSquareSnapshot then
+            local snap = worldCtx.GetSquareSnapshot(cell, ax + dx, ay + dy, az, now)
+            if snap and snap.square then
+                local objs = snap.objects or {}
+                for oi = 1, #objs do
+                    local hitId = checkObject(objs[oi], snap.square, distSq)
+                    if hitId then return hitId end
+                    if inspectedObjects >= MAX_INSPECTED_OBJECTS then return nil end
                 end
             end
+        else
+            local sq = safeCall(cell, "getGridSquare", ax + dx, ay + dy, az)
+            if sq then
+                local objs, n = countAndGetObjects(sq)
+                for oi = 1, n do
+                    local hitId = checkObject(objectAt(objs, oi), sq, distSq)
+                    if hitId then return hitId end
+                    if inspectedObjects >= MAX_INSPECTED_OBJECTS then return nil end
+                end
+            end
+        end
+        return nil
+    end
+
+    local hit0 = inspectSquare(0, 0)
+    if hit0 then return true, hit0 end
+    for ring = 1, OBJECT_SCAN_RADIUS do
+        if inspectedObjects >= MAX_INSPECTED_OBJECTS then break end
+        for d = -ring, ring do
+            local h1 = inspectSquare(d, -ring)
+            if h1 then return true, h1 end
+            local h2 = inspectSquare(d, ring)
+            if h2 then return true, h2 end
+            if d > -ring and d < ring then
+                local h3 = inspectSquare(-ring, d)
+                if h3 then return true, h3 end
+                local h4 = inspectSquare(ring, d)
+                if h4 then return true, h4 end
+            end
+            if inspectedObjects >= MAX_INSPECTED_OBJECTS then break end
         end
     end
     return false

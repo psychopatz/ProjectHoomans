@@ -187,21 +187,75 @@ local function makeCandidate(record, entry)
     }
 end
 
+Provider.EMPTY_DISCOVERY_COOLDOWN_MS = 1500
+Provider.CONTEXT_CACHE_TTL_MS = 3000
+
+local function isInActiveCombatOrFollowing(record)
+    local rt = record and record.runtime or nil
+    if rt and (rt.target ~= nil or rt.attackAction ~= nil) then
+        return true
+    end
+    local orderKind = record and record.orderSpec and record.orderSpec.kind or nil
+    local followKind = PNC.Const and PNC.Const.ORDER_FOLLOW or "follow"
+    if orderKind ~= nil and tostring(orderKind) == tostring(followKind) then
+        return true
+    end
+    return false
+end
+
 function Provider.GetCandidates(npcId, options)
     local record = resolveRecord(npcId)
     if not record or record.alive == false then return {} end
     if record.runtime and (record.runtime.workOrderId or record.runtime.medicalCare or record.runtime.treatment) then
         return {}
     end
+    if isInActiveCombatOrFollowing(record) then
+        return {}
+    end
     local at = nowMs(type(options) == "table" and options.at or nil)
-    local contexts = buildContextMap(record, at)
+    local rt = record.runtime
+    if rt and rt._autonomyEmptyAt and (not options or options.force ~= true) then
+        local elapsed = at - (tonumber(rt._autonomyEmptyAt) or 0)
+        if elapsed >= 0 and elapsed < Provider.EMPTY_DISCOVERY_COOLDOWN_MS then
+            local dx = (tonumber(record.x) or 0) - (tonumber(rt._autonomyEmptyX) or 0)
+            local dy = (tonumber(record.y) or 0) - (tonumber(rt._autonomyEmptyY) or 0)
+            if (dx * dx + dy * dy) <= 4.0 then
+                return {}
+            end
+        end
+    end
+    local contexts = nil
+    local evalCache = rt and rt._autonomyEvalCache or nil
+    if evalCache and (not options or options.force ~= true)
+        and type(evalCache.contexts) == "table"
+    then
+        local elapsed = at - (tonumber(evalCache.at) or 0)
+        if elapsed >= 0 and elapsed < Provider.CONTEXT_CACHE_TTL_MS then
+            local dx = (tonumber(record.x) or 0) - (tonumber(evalCache.x) or 0)
+            local dy = (tonumber(record.y) or 0) - (tonumber(evalCache.y) or 0)
+            if (dx * dx + dy * dy) <= 9.0 then
+                contexts = evalCache.contexts
+            end
+        end
+    end
+    if not contexts then
+        contexts = buildContextMap(record, at)
+    end
     local hasAny = false
     for _ in pairs(contexts) do
         hasAny = true
         break
     end
     if not hasAny then
+        record.runtime = record.runtime or {}
+        record.runtime._autonomyEmptyAt = at
+        record.runtime._autonomyEmptyX = tonumber(record.x) or 0
+        record.runtime._autonomyEmptyY = tonumber(record.y) or 0
+        record.runtime._autonomyEvalCache = nil
         return {}
+    end
+    if record.runtime then
+        record.runtime._autonomyEmptyAt = nil
     end
 
     local scored = Scorer.EvaluateAll(record, function(adSpec)
@@ -211,9 +265,20 @@ function Provider.GetCandidates(npcId, options)
     end, at, options)
 
     local candidates = {}
+    local byTaskId = {}
     for i = 1, #scored do
-        candidates[#candidates + 1] = makeCandidate(record, scored[i])
+        local cand = makeCandidate(record, scored[i])
+        candidates[#candidates + 1] = cand
+        byTaskId[cand.taskId] = true
     end
+    record.runtime = record.runtime or {}
+    record.runtime._autonomyEvalCache = {
+        at = at,
+        x = tonumber(record.x) or 0,
+        y = tonumber(record.y) or 0,
+        contexts = contexts,
+        byTaskId = byTaskId,
+    }
     return candidates
 end
 
@@ -221,6 +286,16 @@ function Provider.Validate(intent)
     if type(intent) ~= "table" or not intent.npcId then return false end
     local record = resolveRecord(intent.npcId)
     if not record or record.alive == false then return false end
+    if record.runtime and (record.runtime.workOrderId or record.runtime.medicalCare or record.runtime.treatment) then
+        return false
+    end
+    if isInActiveCombatOrFollowing(record) then
+        return false
+    end
+    local cache = record.runtime and record.runtime._autonomyEvalCache or nil
+    if cache and cache.at == nowMs() and type(cache.byTaskId) == "table" then
+        return cache.byTaskId[intent.taskId] == true
+    end
     local candidates = Provider.GetCandidates(intent.npcId)
     for i = 1, #candidates do
         if candidates[i].taskId == intent.taskId then
@@ -238,6 +313,12 @@ function Provider.Assign(intent)
     local at = nowMs()
     local adId = tostring(intent.adId or intent.sourceRef or "")
     local ctx = intent.autonomyContext
+    if not ctx then
+        local cache = record.runtime and record.runtime._autonomyEvalCache or nil
+        if cache and cache.at == at and type(cache.contexts) == "table" then
+            ctx = cache.contexts[adId]
+        end
+    end
     if not ctx then
         local contexts = buildContextMap(record, at)
         ctx = contexts[adId]

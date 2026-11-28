@@ -54,6 +54,10 @@ end
 
 local function canUseWorldBandageRip(record, definition)
     if tostring(definition and definition.id or "") ~= "bandage" then return false end
+    local rt = record and record.runtime or nil
+    if rt and (rt.target ~= nil or rt.attackAction ~= nil) then
+        return false
+    end
     local liveConst = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
     return record and record.presenceState == liveConst
         and PNC.WorldItemService ~= nil

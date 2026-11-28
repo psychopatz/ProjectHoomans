@@ -126,6 +126,38 @@ function Diagnostics.LogRuntimeSummary(now)
         "spatial=" .. timingText("Spatial.Rebuild"),
         "corpse=" .. timingText("CorpseHaul.Pump"),
     }
+    local top1Name, top1Max = nil, 0
+    local top2Name, top2Max = nil, 0
+    local top3Name, top3Max = nil, 0
+    for stageName, st in pairs(Diagnostics.Timings or {}) do
+        if stageName ~= "Server.Update"
+            and stageName ~= "Server.Prepare"
+            and stageName ~= "Server.Finish"
+            and stageName ~= "Server.ProcessRecord"
+        then
+            local m = tonumber(st and st.maxMs) or 0
+            if m > top1Max then
+                top3Name, top3Max = top2Name, top2Max
+                top2Name, top2Max = top1Name, top1Max
+                top1Name, top1Max = stageName, m
+            elseif m > top2Max then
+                top3Name, top3Max = top2Name, top2Max
+                top2Name, top2Max = stageName, m
+            elseif m > top3Max then
+                top3Name, top3Max = stageName, m
+            end
+        end
+    end
+    if top1Name then
+        local topStr = top1Name .. ":" .. string.format("%.0fms", top1Max)
+        if top2Name then
+            topStr = topStr .. "," .. top2Name .. ":" .. string.format("%.0fms", top2Max)
+            if top3Name then
+                topStr = topStr .. "," .. top3Name .. ":" .. string.format("%.0fms", top3Max)
+            end
+        end
+        fields[#fields + 1] = "topStages=" .. topStr
+    end
     local message = table.concat(fields, " ")
     if PNC.Core and PNC.Core.LogInfo then
         PNC.Core.LogInfo(message)
@@ -138,6 +170,9 @@ end
 function Diagnostics.BeginFrame()
     if Diagnostics.Enabled ~= true then return Diagnostics.Frame end
     Diagnostics.Frame = Diagnostics.Frame + 1
+    if type(Internal.ResetTickSpike) == "function" then
+        Internal.ResetTickSpike()
+    end
     return Diagnostics.Frame
 end
 

@@ -186,6 +186,94 @@ assertColor(byID.npc_neutral.color, Palette.COLORS.neutral,
 assertColor(byID.npc_trader.color, TRADER_COLOR,
     "DynamicTrading trader must keep trader color via shared CoreActorMap")
 
+-- Regression: a recruited follower who is STILL a member of a DynamicTrading
+-- trader group (e.g., settlement faction trader record.m) must render bright
+-- green for its owning player, while in MP another player's recruited colonist
+-- must NOT render green for the local player.
+coreActors[#coreActors + 1] = {
+    actorID = "npc_recruited_dt_member",
+    position = { x = 100, y = 200, z = 0 },
+}
+PNC.ClientState.snapshots["npc_recruited_dt_member"] = {
+    id = "npc_recruited_dt_member",
+    recruited = true,
+    colonyOwned = true,
+    orderKind = "follow",
+    ownerUsername = "alice",
+}
+CoreActorMap.RegisterDecorator("DynamicTrading:Trader", {
+    priority = 100,
+    decorate = function(entry, style)
+        if entry.actorID == "npc_trader" or entry.actorID == "npc_recruited_dt_member" then
+            style.color = TRADER_COLOR
+            style.hoverMetadata = { traderID = "trader:settlement_1" }
+        end
+        return style
+    end,
+})
+CoreActorMap.InvalidateCache()
+local markers2 = CoreActorMap.BuildMarkers()
+local byID2 = {}
+for _, m in ipairs(markers2) do byID2[m.actorID] = m end
+assertColor(byID2.npc_recruited_dt_member.color, Palette.COLORS.follower,
+    "local player's recruited follower in a DT trader group must render bright green (not yellow)")
+
+-- MP ownership check: when local player is 'bob', alice's recruited colonist
+-- must NOT render green.
+local origIsClient = isClient
+local origGetPlayer = getPlayer
+isClient = function() return true end
+getPlayer = function() return { getUsername = function() return "bob" end } end
+CoreActorMap.InvalidateCache()
+local markersMP = CoreActorMap.BuildMarkers()
+local byIDMP = {}
+for _, m in ipairs(markersMP) do byIDMP[m.actorID] = m end
+assertColor(byIDMP.npc_recruited_dt_member.color, TRADER_COLOR,
+    "in MP, another player's colonist in a DT trader group must not render green for local player")
+isClient = origIsClient
+getPlayer = origGetPlayer
+
+-- Regression: trader decoration must never override hostile or dead NPC types.
+coreActors[#coreActors + 1] = {
+    actorID = "npc_hostile_in_dt",
+    position = { x = 110, y = 210, z = 0 },
+}
+coreActors[#coreActors + 1] = {
+    actorID = "npc_dead_in_dt",
+    position = { x = 120, y = 220, z = 0 },
+}
+PNC.ClientState.snapshots["npc_hostile_in_dt"] = {
+    id = "npc_hostile_in_dt",
+    tacticalClass = "hostile",
+    alive = true,
+}
+PNC.ClientState.snapshots["npc_dead_in_dt"] = {
+    id = "npc_dead_in_dt",
+    tacticalClass = "neutral",
+    alive = false,
+}
+CoreActorMap.RegisterDecorator("DynamicTrading:Trader", {
+    priority = 100,
+    decorate = function(entry, style)
+        if entry.actorID == "npc_trader"
+            or entry.actorID == "npc_hostile_in_dt"
+            or entry.actorID == "npc_dead_in_dt"
+        then
+            style.color = TRADER_COLOR
+            style.hoverMetadata = { traderID = "trader:settlement_1", tradeAvailable = true }
+        end
+        return style
+    end,
+})
+CoreActorMap.InvalidateCache()
+local markers3 = CoreActorMap.BuildMarkers()
+local byID3 = {}
+for _, m in ipairs(markers3) do byID3[m.actorID] = m end
+assertColor(byID3.npc_hostile_in_dt.color, Palette.COLORS.hostile,
+    "DT trader decoration must never override hostile red")
+assertColor(byID3.npc_dead_in_dt.color, Palette.COLORS.dead,
+    "DT trader decoration must never override dead gray")
+
 -- Server visibility filter check (PNC_CoreSurvivorWorldPresentationAdapter)
 PNC.Registry = {
     Get = function(id)

@@ -120,12 +120,20 @@ local function findSeat(record, zombie)
     local best
     local bestDistance
     local examined = 0
+    local inspectedObjects = 0
+    local MAX_INSPECTED_OBJECTS = 256
     if detector and type(detector.matches) == "function"
         and type(detector.describe) == "function"
         and targetsService and targetsService.ResolveResource
     then
         local worldContext = PNC and PNC.WorldItemContext
         local function checkObject(square, object, objectIndex)
+            if inspectedObjects >= MAX_INSPECTED_OBJECTS
+                or examined >= Service.MAX_OBJECTS
+            then
+                return
+            end
+            inspectedObjects = inspectedObjects + 1
             local resource
             local targets
             local target
@@ -140,7 +148,6 @@ local function findSeat(record, zombie)
                 object
             )
             if not called or matched ~= true then return end
-            if examined >= Service.MAX_OBJECTS then return end
             examined = examined + 1
             described, resource = pcall(
                 detector.describe,
@@ -182,27 +189,52 @@ local function findSeat(record, zombie)
                 }
             end
         end
-        for dx = -Service.SEARCH_RADIUS, Service.SEARCH_RADIUS do
-            for dy = -Service.SEARCH_RADIUS, Service.SEARCH_RADIUS do
-                if dx * dx + dy * dy <= Service.SEARCH_RADIUS
-                    * Service.SEARCH_RADIUS
-                then
-                    if worldContext and worldContext.GetSquareSnapshot then
-                        local snap = worldContext.GetSquareSnapshot(
-                            cell, originX + dx, originY + dy, originZ)
-                        if snap and snap.square then
-                            local objs = snap.objects or {}
-                            for oi = 1, #objs do
-                                checkObject(snap.square, objs[oi], oi - 1)
-                            end
+        local maxR = math.max(1, tonumber(Service.SEARCH_RADIUS) or 8)
+        local maxRSq = maxR * maxR
+        local function inspectSquare(dx, dy)
+            if dx * dx + dy * dy > maxRSq then return end
+            if worldContext and worldContext.GetSquareSnapshot then
+                local snap = worldContext.GetSquareSnapshot(
+                    cell, originX + dx, originY + dy, originZ)
+                if snap and snap.square then
+                    local objs = snap.objects or {}
+                    for oi = 1, #objs do
+                        checkObject(snap.square, objs[oi], oi - 1)
+                        if inspectedObjects >= MAX_INSPECTED_OBJECTS
+                            or examined >= Service.MAX_OBJECTS
+                        then
+                            return
                         end
-                    else
-                        local square = cell:getGridSquare(
-                            originX + dx, originY + dy, originZ)
-                        eachObject(square, function(object, objectIndex)
-                            checkObject(square, object, objectIndex)
-                        end)
                     end
+                end
+            else
+                local square = cell:getGridSquare(
+                    originX + dx, originY + dy, originZ)
+                eachObject(square, function(object, objectIndex)
+                    checkObject(square, object, objectIndex)
+                end)
+            end
+        end
+        -- Expand in concentric rings so nearby seats short-circuit immediately
+        -- instead of scanning all O(R^2) squares in the radius.
+        inspectSquare(0, 0)
+        for ring = 1, maxR do
+            if best or inspectedObjects >= MAX_INSPECTED_OBJECTS
+                or examined >= Service.MAX_OBJECTS
+            then
+                break
+            end
+            for d = -ring, ring do
+                inspectSquare(d, -ring)
+                inspectSquare(d, ring)
+                if d > -ring and d < ring then
+                    inspectSquare(-ring, d)
+                    inspectSquare(ring, d)
+                end
+                if inspectedObjects >= MAX_INSPECTED_OBJECTS
+                    or examined >= Service.MAX_OBJECTS
+                then
+                    break
                 end
             end
         end

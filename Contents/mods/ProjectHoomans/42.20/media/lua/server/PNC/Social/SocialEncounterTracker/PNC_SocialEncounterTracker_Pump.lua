@@ -34,6 +34,11 @@ function Tracker.Pump(occurredAt)
     if not occurredAt then
         return 0
     end
+    -- Drain a small bounded slice of deferred encounter pair emissions every
+    -- tick so large group fights never freeze a frame for 1+ second on end.
+    if Tracker.DrainPendingPairs then
+        Tracker.DrainPendingPairs(Tracker.MAX_PENDING_EMITS_PER_PUMP or 2)
+    end
     if Tracker.LastPumpAt
         and occurredAt - Tracker.LastPumpAt < PUMP_INTERVAL_HOURS
     then
@@ -148,7 +153,7 @@ function Tracker.Pump(occurredAt)
     end
     table.sort(toEnd)
     for _, encounterID in ipairs(toEnd) do
-        Tracker.EndEncounter(encounterID, occurredAt)
+        Tracker.EndEncounter(encounterID, occurredAt, { deferPairs = true })
     end
     return #toEnd
 end

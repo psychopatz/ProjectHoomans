@@ -325,6 +325,26 @@ function LiveBodyControl.ScanLoadedManagedBodies(source)
     return repaired
 end
 
+local lastTileProtectionCheck = setmetatable({}, { __mode = "k" })
+
+local function shouldRunTileProtection(zombie, now)
+    local x = zombie.getX and math.floor(tonumber(zombie:getX()) or 0) or 0
+    local y = zombie.getY and math.floor(tonumber(zombie:getY()) or 0) or 0
+    local z = zombie.getZ and math.floor(tonumber(zombie:getZ()) or 0) or 0
+    local prev = lastTileProtectionCheck[zombie]
+    if prev and prev.x == x and prev.y == y and prev.z == z
+        and now >= prev.at and (now - prev.at) < 250
+    then
+        return false
+    end
+    if prev then
+        prev.x, prev.y, prev.z, prev.at = x, y, z, now
+    else
+        lastTileProtectionCheck[zombie] = { x = x, y = y, z = z, at = now }
+    end
+    return true
+end
+
 function LiveBodyControl.OnZombieUpdate(zombie)
     local record
     local navigation
@@ -363,8 +383,11 @@ function LiveBodyControl.OnZombieUpdate(zombie)
         if Core.ProtectVisualClothingFromFall then
             Core.ProtectVisualClothingFromFall(zombie)
         end
-        LiveBodyControl.ProtectManagedCampfire(zombie)
-        LiveBodyControl.ProtectManagedPlant(zombie)
+        local protectNow = Core.Now and Core.Now() or 0
+        if shouldRunTileProtection(zombie, protectNow) then
+            LiveBodyControl.ProtectManagedCampfire(zombie)
+            LiveBodyControl.ProtectManagedPlant(zombie)
+        end
     end
     if Diagnostics then
         Diagnostics.Increment("LiveAbstract.ManagedBodyUpdates")

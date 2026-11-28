@@ -63,15 +63,31 @@ end
 
 local function logOwnershipRejection(zombie, record, requested, reason,
     currentState, currentBump)
-    if not Core or not Core.LogWarn then return end
-    Core.LogWarn(
-        "[PNC][ANIM] bump_rejected npc="
-            .. tostring(record and record.id or "nil")
-            .. " requested=" .. tostring(requested or "")
-            .. " current=" .. tostring(currentBump or "")
-            .. " action=" .. tostring(currentState or "")
-            .. " reason=" .. tostring(reason or "")
-    )
+    if not Core then return end
+    local npcId = tostring(record and record.id or "nil")
+    local reqStr = tostring(requested or "")
+    local reasonStr = tostring(reason or "")
+    if Core.LogWarnThrottled then
+        Core.LogWarnThrottled(
+            "anim_bump_rejected:" .. npcId .. ":" .. reqStr .. ":" .. reasonStr,
+            2000,
+            function()
+                return "[PNC][ANIM] bump_rejected npc=" .. npcId
+                    .. " requested=" .. reqStr
+                    .. " current=" .. tostring(currentBump or "")
+                    .. " action=" .. tostring(currentState or "")
+                    .. " reason=" .. reasonStr
+            end
+        )
+    elseif Core.LogWarn then
+        Core.LogWarn(
+            "[PNC][ANIM] bump_rejected npc=" .. npcId
+                .. " requested=" .. reqStr
+                .. " current=" .. tostring(currentBump or "")
+                .. " action=" .. tostring(currentState or "")
+                .. " reason=" .. reasonStr
+        )
+    end
 end
 
 local function beginTrace(zombie, record, requested, resolved, now)

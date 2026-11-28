@@ -67,7 +67,15 @@ function Sectors.CountGroups(id)
     local total = 0
     for groupID in pairs(Sectors.GroupIDs[id] or {}) do
         local group = PNC.AbstractGroups.Get(groupID)
-        if group and not group.homeCommunityId then total = total + 1 end
+        -- Settlement-owned groups and externally budgeted DT trader caravans
+        -- have their own caps; do not let them starve roaming Refugee/Looter/
+        -- Scavenger/Wanderer sector budgets. CountAllGroups still enforces
+        -- HARD_MAX_GROUPS_PER_SECTOR across every group type.
+        if group and not group.homeCommunityId
+            and tostring(group.groupType or "") ~= "TRADER"
+        then
+            total = total + 1
+        end
     end
     return total
 end

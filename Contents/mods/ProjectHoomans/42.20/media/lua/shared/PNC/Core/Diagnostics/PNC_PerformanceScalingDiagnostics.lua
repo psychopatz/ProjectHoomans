@@ -230,9 +230,90 @@ local function timingState(name)
     return state
 end
 
+Diagnostics.TickSpike = Diagnostics.TickSpike or {
+    ThresholdMs = 50,
+    LogIntervalMs = 2000,
+    LastLogAt = 0,
+    prepareMs = 0,
+    finishMs = 0,
+    recordTotalMs = 0,
+    recordCount = 0,
+    slowestNpcId = nil,
+    slowestNpcMs = 0,
+    top1Name = nil, top1Ms = 0,
+    top2Name = nil, top2Ms = 0,
+    top3Name = nil, top3Ms = 0,
+}
+
+local function resetTickSpike()
+    local s = Diagnostics.TickSpike
+    s.prepareMs = 0
+    s.finishMs = 0
+    s.recordTotalMs = 0
+    s.recordCount = 0
+    s.slowestNpcId = nil
+    s.slowestNpcMs = 0
+    s.top1Name = nil; s.top1Ms = 0
+    s.top2Name = nil; s.top2Ms = 0
+    s.top3Name = nil; s.top3Ms = 0
+end
+
+local function recordTickStageSpike(name, elapsed)
+    local s = Diagnostics.TickSpike
+    if elapsed <= s.top3Ms then return end
+    if elapsed > s.top1Ms then
+        s.top3Name, s.top3Ms = s.top2Name, s.top2Ms
+        s.top2Name, s.top2Ms = s.top1Name, s.top1Ms
+        s.top1Name, s.top1Ms = name, elapsed
+    elseif elapsed > s.top2Ms then
+        s.top3Name, s.top3Ms = s.top2Name, s.top2Ms
+        s.top2Name, s.top2Ms = name, elapsed
+    else
+        s.top3Name, s.top3Ms = name, elapsed
+    end
+end
+
+local function emitTickSpikeIfNeeded(totalMs, now)
+    local s = Diagnostics.TickSpike
+    if Diagnostics.RuntimeLogEnabled ~= true then return end
+    if totalMs < (tonumber(s.ThresholdMs) or 50) then return end
+    local interval = tonumber(s.LogIntervalMs) or 2000
+    if now - (tonumber(s.LastLogAt) or 0) < interval and now >= (tonumber(s.LastLogAt) or 0) then
+        return
+    end
+    s.LastLogAt = now
+    local topStr = ""
+    if s.top1Name then
+        topStr = s.top1Name .. ":" .. string.format("%.0fms", s.top1Ms)
+        if s.top2Name then
+            topStr = topStr .. "," .. s.top2Name .. ":" .. string.format("%.0fms", s.top2Ms)
+            if s.top3Name then
+                topStr = topStr .. "," .. s.top3Name .. ":" .. string.format("%.0fms", s.top3Ms)
+            end
+        end
+    else
+        topStr = "none"
+    end
+    local npcStr = s.slowestNpcId
+        and (tostring(s.slowestNpcId) .. ":" .. string.format("%.0fms", s.slowestNpcMs))
+        or "none"
+    local msg = string.format(
+        "stutter_spike total=%.0fms prepare=%.0fms record=%.0fms(%d) finish=%.0fms top=%s slowestNpc=%s",
+        totalMs, s.prepareMs, s.recordTotalMs, s.recordCount, s.finishMs, topStr, npcStr
+    )
+    if PNC.Core and PNC.Core.LogWarn then
+        PNC.Core.LogWarn(msg)
+    else
+        print("[PNC][WARN] " .. msg)
+    end
+end
+
+Diagnostics.Internal.ResetTickSpike = resetTickSpike
+
 function Diagnostics.EndTiming(name, startedAt, context)
     if Diagnostics.Enabled ~= true or not name or startedAt == nil then return 0 end
-    local elapsed = math.max(0, timingNow() - (tonumber(startedAt) or 0))
+    local now = timingNow()
+    local elapsed = math.max(0, now - (tonumber(startedAt) or 0))
     local state = timingState(name)
     state.calls = state.calls + 1
     state.totalMs = state.totalMs + elapsed
@@ -240,6 +321,23 @@ function Diagnostics.EndTiming(name, startedAt, context)
     state.maxMs = math.max(state.maxMs, elapsed)
     if context ~= nil then state.lastContext = tostring(context) end
     if elapsed >= 5 then state.slowCalls = state.slowCalls + 1 end
+    local s = Diagnostics.TickSpike
+    if name == "Server.Prepare" then
+        s.prepareMs = elapsed
+    elseif name == "Server.Finish" then
+        s.finishMs = elapsed
+    elseif name == "Server.ProcessRecord" then
+        s.recordTotalMs = s.recordTotalMs + elapsed
+        s.recordCount = s.recordCount + 1
+        if elapsed > s.slowestNpcMs then
+            s.slowestNpcMs = elapsed
+            s.slowestNpcId = context ~= nil and tostring(context) or "unknown"
+        end
+    elseif name == "Server.Update" then
+        emitTickSpikeIfNeeded(elapsed, now)
+    else
+        recordTickStageSpike(name, elapsed)
+    end
     return elapsed
 end
 

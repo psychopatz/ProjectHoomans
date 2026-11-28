@@ -27,7 +27,7 @@ local function localSnapshotInterval(record, previous, now)
     if (previousVisual and previousVisual.attackActive == true)
         or (attack and now < (tonumber(attack.finishAt) or 0))
     then
-        return tonumber(Const.CLIENT_LOCAL_SNAPSHOT_ATTACK_MS) or 50
+        return tonumber(Const.CLIENT_LOCAL_SNAPSHOT_ATTACK_MS) or 100
     end
     if record and record.presenceState == Const.PRESENCE_LIVE
         and pathing
@@ -38,7 +38,7 @@ local function localSnapshotInterval(record, previous, now)
             or now < (tonumber(pathing.specialMoveUntil) or 0)
         )
     then
-        return tonumber(Const.CLIENT_LOCAL_SNAPSHOT_MOVE_MS) or 150
+        return tonumber(Const.CLIENT_LOCAL_SNAPSHOT_MOVE_MS) or 250
     end
     if record and record.presenceState == Const.PRESENCE_LIVE then
         return tonumber(Const.CLIENT_LOCAL_SNAPSHOT_IDLE_MS) or 500
@@ -122,7 +122,19 @@ local function refreshLocalAuthoritySnapshots(now)
         elseif tonumber(previous.presenceRevision) ~= tonumber(record.presenceRevision)
             or now >= dueAt
         then
-            if type(Network.BuildPresenceDelta) == "function" then
+            local revChanged = tonumber(previous.presenceRevision) ~= tonumber(record.presenceRevision)
+                or tonumber(previous.recordRevision) ~= tonumber(record.recordRevision)
+            local posChanged = math.abs((tonumber(previous.x) or 0) - (tonumber(record.x) or 0)) > 0.05
+                or math.abs((tonumber(previous.y) or 0) - (tonumber(record.y) or 0)) > 0.05
+                or (tonumber(previous.z) or 0) ~= (tonumber(record.z) or 0)
+            local runtime = record.runtime
+            local attackActive = runtime and runtime.attackAction ~= nil
+                and now < (tonumber(runtime.attackAction.finishAt) or 0)
+            local prevAttackActive = previous.visualState and previous.visualState.attackActive == true
+            if not revChanged and not posChanged and not attackActive and not prevAttackActive then
+                builtAtByID[id] = now
+                snapshot = nil
+            elseif type(Network.BuildPresenceDelta) == "function" then
                 presenceDelta = Network.BuildPresenceDelta(record)
                 if type(presenceDelta) == "table"
                     and presenceDelta.id ~= nil

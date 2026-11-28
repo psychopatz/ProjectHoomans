@@ -33,21 +33,44 @@ function Scheduler.Pump(now)
         processTimerName, processTimerStart = ScalingDiagnostics.BeginTiming(
             "Provision.Process", now)
     end
-    while processed < Scheduler.MAX_PER_SLICE
-        and #Scheduler.Queue > 0 and inspected < maximumInspect
-    do
-        local entry = table.remove(Scheduler.Queue, 1)
-        Scheduler.Queued[H.Key(entry.npcID, entry.ruleID)] = nil
-        inspected = inspected + 1
-        if (entry.readyAt or 0) <= H.WorldHour() then
+    local sliceBudgetMs = math.max(1, tonumber(Scheduler.SLICE_TIME_BUDGET_MS) or 4)
+    local sliceStartedAt = PNC.Core and PNC.Core.Now and PNC.Core.Now() or now
+    local worldHour = H.WorldHour()
+    local oldQueue = Scheduler.Queue
+    local nextQueue = {}
+    local deferred = {}
+    local budgetHit = false
+    for idx = 1, #oldQueue do
+        local entry = oldQueue[idx]
+        if not budgetHit
+            and processed < Scheduler.MAX_PER_SLICE
+            and (entry.readyAt or 0) <= worldHour
+        then
+            inspected = inspected + 1
+            Scheduler.Queued[H.Key(entry.npcID, entry.ruleID)] = nil
             local complete, readyAt = H.Process(entry)
             processed = processed + 1
             if not complete then
-                Scheduler.MarkDirty(entry.npcID, entry.ruleID, readyAt)
+                deferred[#deferred + 1] = {
+                    npcID = entry.npcID,
+                    ruleID = entry.ruleID,
+                    readyAt = readyAt,
+                }
+            end
+            local elapsed = (PNC.Core and PNC.Core.Now and PNC.Core.Now() or sliceStartedAt)
+                - sliceStartedAt
+            if elapsed >= sliceBudgetMs then
+                budgetHit = true
             end
         else
-            Scheduler.MarkDirty(entry.npcID, entry.ruleID, entry.readyAt)
+            inspected = inspected + 1
+            nextQueue[#nextQueue + 1] = entry
         end
+    end
+    Scheduler.Queue = nextQueue
+    for idx = 1, #deferred do
+        local d = deferred[idx]
+        Scheduler.MarkDirty(d.npcID, d.ruleID, d.readyAt)
     end
     if processTimerName then
         ScalingDiagnostics.EndTiming(processTimerName, processTimerStart)

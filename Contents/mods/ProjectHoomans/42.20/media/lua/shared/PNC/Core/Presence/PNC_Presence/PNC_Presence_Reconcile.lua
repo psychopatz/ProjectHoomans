@@ -373,7 +373,7 @@ function Presence.RefreshMaterializationCandidates(now, force)
     Internal.LastInterestRefreshAt = now
     if not Spatial or not Spatial.QueryNPCs then return 0 end
     indexWasReady = Spatial.NPCInitialized == true
-    if Spatial.Rebuild then
+    if Spatial.Rebuild and (not indexWasReady or Spatial.LastRebuildAt ~= now) then
         -- Rebuild before querying. On a relog the registry can be loaded while
         -- the index is still empty; querying first creates a one-tick blind
         -- spot and makes the nearby NPC look permanently abstract.

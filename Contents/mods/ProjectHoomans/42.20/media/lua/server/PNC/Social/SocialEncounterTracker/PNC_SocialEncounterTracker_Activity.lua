@@ -21,6 +21,9 @@ function Tracker.Reset()
     Tracker.Encounters = {}
     Tracker.ByParticipant = {}
     Tracker.ByThreat = {}
+    Tracker.PendingPairEmits = {}
+    Tracker.PendingPairHead = 1
+    Tracker.PendingPairTail = 0
     Tracker.NextSequence = 0
     Tracker.LastPumpAt = nil
 end

@@ -8,9 +8,34 @@ local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 local ActorControl = PNC.ActorControl
 local H = Tasking.Internal
 
+local EMERGENCY_DOMAINS = {
+    reaction = 1,
+    medical_care = 2,
+    NeedFacility = 3,
+}
+
+local LOW_BAND_ONLY_DOMAINS = {
+    autonomy = true,
+}
+
+local function sortedProviderDomains(providers)
+    local domains = {}
+    for domain in pairs(providers) do
+        domains[#domains + 1] = domain
+    end
+    table.sort(domains, function(a, b)
+        local ra = EMERGENCY_DOMAINS[a] or 100
+        local rb = EMERGENCY_DOMAINS[b] or 100
+        if ra ~= rb then return ra < rb end
+        return tostring(a) < tostring(b)
+    end)
+    return domains
+end
+
 function H.Collect(record)
     local candidates = {}
     local failures = {}
+    local hasEmergencyCandidate = false
     local maximum = math.max(1, math.floor(tonumber(
         Tasking.MAX_CANDIDATES_PER_PROVIDER) or 64))
     local npcContextSvc = Tasking.NPCContext
@@ -20,34 +45,52 @@ function H.Collect(record)
     if ScalingDiagnostics then
         ScalingDiagnostics.Increment("NPCDecisions.CandidateBuilds")
     end
-    for domain, provider in pairs(Tasking.Providers) do
-        local context = { npcId = record.id, domain = domain }
-        local ok, values, callbackError = H.SafeCall(
-            "provider_get_candidates", provider.GetCandidates, context,
-            record.id, npcContext)
-        if not ok then
-            failures[#failures + 1] = { domain = domain,
-                error = callbackError }
-        end
-        local providerCount = 0
-        for _, value in ipairs(ok and type(values) == "table" and values
-            or {}) do
-            if providerCount >= maximum then
-                Tasking.Diagnostics.counters.candidateTruncations =
-                    Tasking.Diagnostics.counters.candidateTruncations + 1
-                break
+    local orderedDomains = sortedProviderDomains(Tasking.Providers)
+    for dIdx = 1, #orderedDomains do
+        local domain = orderedDomains[dIdx]
+        local provider = Tasking.Providers[domain]
+        if not (hasEmergencyCandidate and LOW_BAND_ONLY_DOMAINS[domain]) then
+            local provTimerName, provTimerStart
+            if ScalingDiagnostics and ScalingDiagnostics.Enabled == true then
+                provTimerName, provTimerStart = ScalingDiagnostics.BeginTiming(
+                    "Tasking.Provider." .. tostring(domain))
             end
-            providerCount = providerCount + 1
-            local intent = PNC.TaskIntent.Normalize(value)
-            if intent then
-                local validOK, valid = H.SafeCall("provider_validate",
-                    provider.Validate, context, intent)
-                if validOK and valid == true then
-                    candidates[#candidates + 1] = intent
-                elseif not validOK then
-                    failures[#failures + 1] = { domain = domain,
-                        error = "VALIDATE_CALLBACK_FAILED" }
+            local context = { npcId = record.id, domain = domain }
+            local ok, values, callbackError = H.SafeCall(
+                "provider_get_candidates", provider.GetCandidates, context,
+                record.id, npcContext)
+            if not ok then
+                failures[#failures + 1] = { domain = domain,
+                    error = callbackError }
+            end
+            local providerCount = 0
+            for _, value in ipairs(ok and type(values) == "table" and values
+                or {}) do
+                if providerCount >= maximum then
+                    Tasking.Diagnostics.counters.candidateTruncations =
+                        Tasking.Diagnostics.counters.candidateTruncations + 1
+                    break
                 end
+                providerCount = providerCount + 1
+                local intent = PNC.TaskIntent.Normalize(value)
+                if intent then
+                    local validOK, valid = H.SafeCall("provider_validate",
+                        provider.Validate, context, intent)
+                    if validOK and valid == true then
+                        candidates[#candidates + 1] = intent
+                        if intent.precedence == "HARD_EMERGENCY"
+                            or intent.precedence == "SURVIVAL_CRITICAL"
+                        then
+                            hasEmergencyCandidate = true
+                        end
+                    elseif not validOK then
+                        failures[#failures + 1] = { domain = domain,
+                            error = "VALIDATE_CALLBACK_FAILED" }
+                    end
+                end
+            end
+            if provTimerName then
+                ScalingDiagnostics.EndTiming(provTimerName, provTimerStart, record.id)
             end
         end
     end

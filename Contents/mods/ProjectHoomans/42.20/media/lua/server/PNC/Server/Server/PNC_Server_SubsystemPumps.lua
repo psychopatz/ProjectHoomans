@@ -283,10 +283,22 @@ function H.FinishTick(now)
         and PNC.SocialEncounterTracker.Pump
         and PNC.SocialEventHooks
     then
+        local tName, tStart
+        if H.TimingSample == true and ScalingDiagnostics then
+            tName, tStart = ScalingDiagnostics.BeginTiming(
+                "server_finish.social_encounters", H.TimingNow)
+        end
         H.SafePhase("server_finish.social_encounters", pumpSocialEncounters)
+        if tName then ScalingDiagnostics.EndTiming(tName, tStart) end
     end
     if PNC.SocialGreeting and PNC.SocialGreeting.Pump then
+        local tName, tStart
+        if H.TimingSample == true and ScalingDiagnostics then
+            tName, tStart = ScalingDiagnostics.BeginTiming(
+                "server_finish.social_greeting", H.TimingNow)
+        end
         H.SafePhase("server_finish.social_greeting", pumpSocialGreeting)
+        if tName then ScalingDiagnostics.EndTiming(tName, tStart) end
     end
     if PNC.Server and PNC.Server.TickRegistry then
         PNC.Server.TickRegistry.PumpPhase("finish", now, function(stage, fn, at)

@@ -197,8 +197,20 @@ function ZombieAggro.RefreshActiveSet(now, force)
         Diagnostics.Increment("ZombieAggro.AggroRefreshes")
     end
     if Registry and Registry.ForEachLive and Spatial and Spatial.QueryZombies then
+        local offScreenDistSq = (tonumber(Const.ZOMBIE_AGGRO_OFFSCREEN_DIST) or 22)
+        offScreenDistSq = offScreenDistSq * offScreenDistSq
+        local offScreenIntervalMs = tonumber(Const.ZOMBIE_AGGRO_OFFSCREEN_REFRESH_MS) or 1000
         Registry.ForEachLive(function(record, body)
             if record and body and record.alive ~= false then
+                local rt = record.runtime
+                local nearestDistSq = rt and tonumber(rt.nearestPlayerDistSq) or nil
+                if nearestDistSq ~= nil and nearestDistSq > offScreenDistSq then
+                    local lastOffAt = tonumber(rt._lastOffScreenAggroRefreshAt) or 0
+                    if now >= lastOffAt and (now - lastOffAt) < offScreenIntervalMs then
+                        return
+                    end
+                    rt._lastOffScreenAggroRefreshAt = now
+                end
                 if Diagnostics then
                     Diagnostics.Increment("ZombieAggro.RefreshNPCs")
                 end

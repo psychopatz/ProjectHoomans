@@ -40,15 +40,39 @@ local function entryFacts(entry)
         record.tacticalClass,
         "neutral"
     )))
-    local colonist = verifier
+    local function ownedByLocalPlayer()
+        local localPlayer = type(getPlayer) == "function" and getPlayer() or nil
+        if not localPlayer then return true end
+        if verifier and type(verifier.IsOwnedByPlayer) == "function" then
+            return verifier.IsOwnedByPlayer(entry, localPlayer) == true
+        end
+        local ownerUser = firstValue(entry.ownerUsername, snapshot.ownerUsername, record.ownerUsername)
+        if ownerUser ~= nil and localPlayer.getUsername then
+            return tostring(ownerUser) == tostring(localPlayer:getUsername() or "")
+        end
+        return true
+    end
+
+    local isMultiplayer = (type(isClient) == "function" and isClient() == true)
+        or (type(isServer) == "function" and isServer() == true)
+    local factionName = string.lower(tostring(firstValue(
+        entry.faction,
+        snapshot.faction,
+        record.faction,
+        ""
+    )))
+    local rawColonist = verifier
         and verifier.IsColonyOwnedNPC
         and verifier.IsColonyOwnedNPC(entry)
+        or factionName == "colonist"
+        or tacticalClass == "colonist"
         or entry.colonyOwned == true
         or entry.recruited == true
         or snapshot.colonyOwned == true
         or snapshot.recruited == true
         or record.colonyOwned == true
         or record.recruited == true
+    local colonist = rawColonist and (not isMultiplayer or ownedByLocalPlayer())
     local deathMarker = entry.deathMarker == true
         or snapshot.deathMarker == true
         or record.deathMarker == true

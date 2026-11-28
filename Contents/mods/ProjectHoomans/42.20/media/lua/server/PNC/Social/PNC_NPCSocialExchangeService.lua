@@ -118,7 +118,13 @@ function Service.IsEligibleParticipant(record)
     end
     local rt = record.runtime
     if type(rt) == "table" then
-        if rt.available == false or rt.inCombat == true or rt.fleeing == true then
+        if rt.available == false or rt.inCombat == true or rt.fleeing == true
+            or rt.target ~= nil or rt.attackAction ~= nil
+        then
+            return false
+        end
+        local inCombatUntil = tonumber(rt.inCombatUntil) or 0
+        if inCombatUntil > 0 and nowMs() < inCombatUntil then
             return false
         end
         if rt.conversationActive == true or rt.inConversation == true then
