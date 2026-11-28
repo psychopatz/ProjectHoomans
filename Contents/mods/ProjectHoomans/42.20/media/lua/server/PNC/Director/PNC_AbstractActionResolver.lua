@@ -112,4 +112,35 @@ end
 
 Actions.Register("SCAVENGE", PNC.AbstractScavengeResolver)
 
+local CampActionHandler = {
+    Duration = function()
+        local cond = PsychopatzCore and PsychopatzCore.SurvivorWorld
+            and PsychopatzCore.SurvivorWorld.TravelConditions or nil
+        if cond and type(cond.EvaluateForArchetype) == "function" then
+            local eval = cond.EvaluateForArchetype("DEFAULT")
+            if eval and eval.shouldCampNight and (tonumber(eval.recommendedWaitHours) or 0) > 0 then
+                return eval.recommendedWaitHours
+            end
+        end
+        return 2.5
+    end,
+    Apply = function(group)
+        if type(group) ~= "table" then return nil, "invalid_group" end
+        local needs = Groups and type(Groups.GetNeeds) == "function"
+            and Groups.GetNeeds(group) or nil
+        if type(needs) == "table" then
+            needs.fatigue = math.max(0, (tonumber(needs.fatigue) or 0) - 0.65)
+            needs.morale = math.min(1, (tonumber(needs.morale) or 0.5) + 0.12)
+        end
+        if type(group.resources) == "table" then
+            group.resources.food = math.max(0, (tonumber(group.resources.food) or 0) - 4)
+            group.resources.water = math.max(0, (tonumber(group.resources.water) or 0) - 4)
+        end
+        return { rested = true, fatigue = needs and needs.fatigue or 0 }, "camp_completed"
+    end,
+}
+
+Actions.Register("CAMP", CampActionHandler)
+Actions.Register("REST", CampActionHandler)
+
 return Actions

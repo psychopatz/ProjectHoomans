@@ -14,6 +14,16 @@ local CoreGroupTravel = require
     "PNC/Core/Director/PNC_CoreGroupTraversalBridge"
 local TravelConditions = require
     "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldTravelConditions"
+local ScavengeLedger = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldScavengeLedger"
+local GroupJourney = require
+    "PsychopatzCore/World/SurvivorWorld/Traversal/PsychopatzSurvivorWorldGroupJourney"
+local RoutePlanner = require
+    "PsychopatzCore/World/SurvivorWorld/Traversal/PsychopatzSurvivorWorldRoutePlanner"
+local CorridorGraph = require
+    "PsychopatzCore/World/SurvivorWorld/Traversal/PsychopatzSurvivorWorldCorridorGraph"
+local WorldEvents = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldEvents"
 
 function Traversal.CalculateTravelHours(group, target)
     local dx, dy = target.x - group.location.x, target.y - group.location.y
@@ -31,16 +41,21 @@ function Traversal.CalculateTravelHours(group, target)
         math.min(Config.MAX_TRAVEL_HOURS, distance / math.max(1, speed))), distance
 end
 
--- Opportunistically pause a traveling group in a nearby MetaGrid building
--- during heavy storms or rainy nights so players encounter sheltering travelers.
+-- Opportunistically pause a traveling group in a nearby building or wilderness
+-- clearing during storms, rainy nights, or clear nights (for non-nocturnal
+-- archetypes like Traders, Scavengers, and Refugees).
 function Traversal.EvaluateWeatherShelter(group, at, envOverride)
     if type(group) ~= "table" or group.state ~= "TRAVELING"
         or type(group.journey) ~= "table" or group.journey.state ~= "en_route"
     then
         return false, "not_en_route"
     end
-    local cond = TravelConditions and TravelConditions.Evaluate
-        and TravelConditions.Evaluate(envOverride) or nil
+    local cond = nil
+    if TravelConditions and type(TravelConditions.EvaluateForArchetype) == "function" then
+        cond = TravelConditions.EvaluateForArchetype(group.groupType, envOverride)
+    elseif TravelConditions and type(TravelConditions.Evaluate) == "function" then
+        cond = TravelConditions.Evaluate(envOverride)
+    end
     if not cond or cond.shouldSeekShelter ~= true then
         group.shelteringForWeather = nil
         return false, "weather_clear"
@@ -53,25 +68,122 @@ function Traversal.EvaluateWeatherShelter(group, at, envOverride)
     local shelterPos = nil
     local resolver = PNC.CommunitySiteResolver
     if resolver and type(resolver.FindAvailableNear) == "function" then
-        local site = resolver.FindAvailableNear(gx, gy, 0, 50)
+        local site = resolver.FindAvailableNear(gx, gy, 0, 60)
         if type(site) == "table" and type(site.home) == "table" then
-            shelterPos = site.home
+            shelterPos = {
+                x = site.home.x,
+                y = site.home.y,
+                z = site.home.z or 0,
+                kind = "building",
+            }
         end
     end
-    group.journey.state = "waiting"
-    group.journey.waitRemainingHours = 1.5
-    if shelterPos then
-        group.journey.x = shelterPos.x
-        group.journey.y = shelterPos.y
+    if not shelterPos and RoutePlanner and type(RoutePlanner.SelectNextScavengePOI) == "function" then
+        local poi = RoutePlanner.SelectNextScavengePOI(gx, gy, {
+            minDistance = 0,
+            maxDistance = 90,
+            sectorRadius = 0,
+            worldAgeHours = at,
+        })
+        if poi then
+            shelterPos = {
+                x = poi.x,
+                y = poi.y,
+                z = poi.z or 0,
+                kind = poi.kind == "wilderness" and "wilderness_camp" or "building_poi",
+            }
+        end
+    end
+    local waitHours = tonumber(cond.recommendedWaitHours) or 1.5
+    if GroupJourney and type(GroupJourney.SetShelterWait) == "function" then
+        GroupJourney.SetShelterWait(group.journey, waitHours, shelterPos, cond.reason)
+    else
+        group.journey.state = "waiting"
+        group.journey.waitRemainingHours = waitHours
+    end
+    if cond.shouldCampNight == true then
+        local needs = Groups and type(Groups.GetNeeds) == "function" and Groups.GetNeeds(group) or nil
+        if type(needs) == "table" then
+            needs.fatigue = math.max(0, (tonumber(needs.fatigue) or 0) - 0.55)
+        end
+        if type(group.resources) == "table" then
+            group.resources.food = math.max(0, (tonumber(group.resources.food) or 0) - 4)
+            group.resources.water = math.max(0, (tonumber(group.resources.water) or 0) - 4)
+        end
+        if WorldEvents and type(WorldEvents.Publish) == "function" then
+            local cx = shelterPos and shelterPos.x or gx
+            local cy = shelterPos and shelterPos.y or gy
+            WorldEvents.Publish({
+                id = "camp_remains:" .. tostring(group.id) .. ":" .. tostring(math.floor(tonumber(at) or 0)),
+                kind = "CAMP_REMAINS",
+                ownerMod = "ProjectHoomans",
+                x = cx,
+                y = cy,
+                z = shelterPos and shelterPos.z or 0,
+                createdAt = tonumber(at) or 0,
+                ttlHours = 12,
+                summary = tostring(group.groupType or "Travelers") .. " camped here overnight",
+                tags = { camp_remains = true },
+            }, tonumber(at) or 0)
+        end
     end
     group.shelteringForWeather = true
     group.diagnostics = group.diagnostics or {}
     group.diagnostics.weatherShelter = {
         at = tonumber(at) or 0,
         reason = cond.reason,
-        inBuilding = shelterPos ~= nil,
+        isNightCamp = cond.shouldCampNight == true,
+        waitHours = waitHours,
+        inBuilding = shelterPos ~= nil and shelterPos.kind ~= "wilderness_camp",
     }
     return true, cond.reason
+end
+
+-- En-route house/clearing pit stop: when a group pauses at a tagged pit_stop_poi
+-- or pit_stop_wilderness waypoint, it replenishes its own abstracted supplies,
+-- records depletion in Core ScavengeLedger (so other groups branch out), and
+-- adds carriedSupplies for scavengers returning to their home settlement.
+function Traversal.ProcessEnRoutePitStop(group, at)
+    if type(group) ~= "table" or group.state ~= "TRAVELING"
+        or type(group.journey) ~= "table" or group.journey.state ~= "waiting"
+        or group.shelteringForWeather == true
+    then
+        return false, "not_pit_stop"
+    end
+    local route = group.journey.route
+    local pts = type(route) == "table" and route.points or nil
+    local segIdx = math.floor(tonumber(group.journey.segmentIndex) or 1)
+    -- Journey.Advance increments segmentIndex before entering "waiting", so
+    -- pts[segIdx] is the exact pit-stop waypoint the group is currently paused at.
+    local wp = type(pts) == "table" and pts[segIdx] or nil
+    if type(wp) ~= "table"
+        or (wp.tag ~= "pit_stop_poi" and wp.tag ~= "pit_stop_wilderness")
+    then
+        return false, "waypoint_not_pit_stop"
+    end
+    if group._lastPitStopIndex == segIdx then
+        return false, "pit_stop_already_processed"
+    end
+    group._lastPitStopIndex = segIdx
+    at = tonumber(at) or Store.WorldAgeHours()
+
+    if ScavengeLedger and type(ScavengeLedger.RecordScavenge) == "function" then
+        ScavengeLedger.RecordScavenge(wp.x, wp.y, 0.45, at)
+    end
+    if CorridorGraph and type(CorridorGraph.RecordTrafficHeat) == "function"
+        and (group.groupType == "TRADER" or group.groupType == "SCAVENGER")
+    then
+        CorridorGraph.RecordTrafficHeat(wp.x, wp.y, 0.50, at)
+    end
+    if type(group.resources) == "table" then
+        group.resources.food = math.min(100, (tonumber(group.resources.food) or 0) + 15)
+        group.resources.water = math.min(100, (tonumber(group.resources.water) or 0) + 15)
+        group.resources.supplies = math.min(100, (tonumber(group.resources.supplies) or 0) + 8)
+    end
+    if group.homeCommunityId or group.groupType == "SCAVENGER" then
+        group.carriedSupplies = (tonumber(group.carriedSupplies) or 0) + 12
+    end
+    return true, wp.tag
 end
 
 function Traversal.Begin(groupOrID, targetOrID, at)
@@ -193,7 +305,24 @@ function Traversal.Arrive(groupOrID, at)
     end
     group.location = Locations.Ref(target)
     group.targetLocation = nil
+    group._lastPitStopIndex = nil
     group.visited[target.id] = true
+    if ScavengeLedger and type(ScavengeLedger.RecordScavenge) == "function"
+        and (group.mission == "SCAVENGE" or target.type == "BUILDING" or target.type == "SCAVENGE_POI")
+    then
+        ScavengeLedger.RecordScavenge(target.x, target.y, 0.50, at)
+        if group.homeCommunityId or group.groupType == "SCAVENGER" then
+            group.carriedSupplies = (tonumber(group.carriedSupplies) or 0) + 18
+        end
+    end
+    if group.homeCommunityId
+        and (tonumber(group.carriedSupplies) or 0) > 0
+        and (target.type == "SETTLEMENT" or target.communityId == group.homeCommunityId)
+        and PNC.CommunitySustainabilityService
+        and type(PNC.CommunitySustainabilityService.DepositScavengerSupplies) == "function"
+    then
+        PNC.CommunitySustainabilityService.DepositScavengerSupplies(group, at)
+    end
     Groups.SetState(group, "ARRIVED", at, at)
     Groups.SynchronizeMembersAtLocation(group)
     if mobile and PNC.Factions.UpdateMobileGroup

@@ -558,3 +558,43 @@ option ProjectHoomans.OffCameraColonistSOSItemLossPercent
     page = ProjectHoomans,
     translation = ProjectHoomans.OffCameraColonistSOSItemLossPercent,
 }
+
+option ProjectHoomans.WorldNPCShareLooters
+{
+    type = double,
+    default = 0.35,
+    min = 0.0,
+    max = 1.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.WorldNPCShareLooters,
+}
+
+option ProjectHoomans.WorldNPCShareScavengers
+{
+    type = double,
+    default = 0.25,
+    min = 0.0,
+    max = 1.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.WorldNPCShareScavengers,
+}
+
+option ProjectHoomans.WorldNPCShareRefugees
+{
+    type = double,
+    default = 0.20,
+    min = 0.0,
+    max = 1.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.WorldNPCShareRefugees,
+}
+
+option ProjectHoomans.WorldNPCShareTraders
+{
+    type = double,
+    default = 0.20,
+    min = 0.0,
+    max = 1.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.WorldNPCShareTraders,
+}

@@ -100,4 +100,102 @@ function Budget.NeighborPressure(sectorID, kind)
     return count > 0 and total / count or 1
 end
 
+-- Strictly excludes player-owned NPCs (including former colonists who fled and
+-- turned into refugees) from world spawner quotas and limiters.
+function Budget.IsPlayerProtectedNPC(record)
+    if type(record) ~= "table" then return false end
+    return record.recruited == true
+        or record.colonyOwned == true
+        or record.playerOrigin == true
+        or record.owner == "player"
+        or record.ownerPlayer ~= nil
+        or (type(record.meta) == "table" and record.meta.playerOrigin == true)
+end
+
+local function normalizeSliceArchetype(raw)
+    local up = string.upper(tostring(raw or ""))
+    if up == "TRADER" or up == "MERCHANT" or up == "CARAVAN"
+        or up == "CARAVAN_GUARD" or up == "TRADER_GUARD"
+    then
+        return "TRADER"
+    end
+    if up == "LOOTER" or up == "RAIDER" or up == "BANDIT" or up == "HOSTILE" then
+        return "LOOTER"
+    end
+    if up == "SCAVENGER" or up == "FORAGER" then
+        return "SCAVENGER"
+    end
+    return "REFUGEE"
+end
+
+-- Slices maxWorldNPCs proportionally across LOOTER / SCAVENGER / REFUGEE / TRADER
+-- using largest-remainder rounding so integer quotas sum exactly to maxWorldNPCs.
+function Budget.ComputeTypeQuotas(maxWorldNPCs, weightsOverride)
+    local cap = math.max(0, math.floor(tonumber(maxWorldNPCs) or 0))
+    local weights = type(weightsOverride) == "table" and weightsOverride
+        or (PNC.Sandbox and PNC.Sandbox.WorldNPCShareWeights and PNC.Sandbox.WorldNPCShareWeights())
+        or { LOOTER = 0.35, SCAVENGER = 0.25, REFUGEE = 0.20, TRADER = 0.20 }
+    local keys = { "LOOTER", "SCAVENGER", "REFUGEE", "TRADER" }
+    local sum = 0
+    for i = 1, #keys do
+        sum = sum + math.max(0, tonumber(weights[keys[i]]) or 0)
+    end
+    if sum <= 0.0001 then
+        weights = { LOOTER = 0.35, SCAVENGER = 0.25, REFUGEE = 0.20, TRADER = 0.20 }
+        sum = 1.0
+    end
+    local quotas = {}
+    local remainders = {}
+    local assigned = 0
+    for i = 1, #keys do
+        local k = keys[i]
+        local exact = cap * (math.max(0, tonumber(weights[k]) or 0) / sum)
+        local whole = math.floor(exact)
+        quotas[k] = whole
+        assigned = assigned + whole
+        remainders[#remainders + 1] = { key = k, rem = exact - whole }
+    end
+    table.sort(remainders, function(a, b)
+        if a.rem ~= b.rem then return a.rem > b.rem end
+        return a.key < b.key
+    end)
+    local idx = 1
+    while assigned < cap and idx <= #remainders do
+        local k = remainders[idx].key
+        quotas[k] = quotas[k] + 1
+        assigned = assigned + 1
+        idx = idx + 1
+    end
+    return quotas
+end
+
+function Budget.CountWildNPCsByType(records)
+    local counts = { LOOTER = 0, SCAVENGER = 0, REFUGEE = 0, TRADER = 0 }
+    local source = records
+    if not source and PNC.Registry and type(PNC.Registry.GetAll) == "function" then
+        source = PNC.Registry.GetAll()
+    end
+    if type(source) ~= "table" then return counts end
+    for _, rec in pairs(source) do
+        if type(rec) == "table" and rec.alive ~= false
+            and not Budget.IsPlayerProtectedNPC(rec)
+        then
+            local bucket = normalizeSliceArchetype(
+                rec.archetype or rec.groupType or rec.role or rec.factionArchetype
+            )
+            counts[bucket] = (counts[bucket] or 0) + 1
+        end
+    end
+    return counts
+end
+
+function Budget.CanSpawnArchetype(archetype, maxWorldNPCs, records, weightsOverride)
+    local bucket = normalizeSliceArchetype(archetype)
+    local quotas = Budget.ComputeTypeQuotas(maxWorldNPCs, weightsOverride)
+    local counts = Budget.CountWildNPCsByType(records)
+    local current = counts[bucket] or 0
+    local quota = quotas[bucket] or 0
+    return current < quota, current, quota
+end
+
 return Budget

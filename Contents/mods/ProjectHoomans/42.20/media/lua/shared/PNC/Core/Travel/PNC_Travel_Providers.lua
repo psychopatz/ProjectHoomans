@@ -133,6 +133,11 @@ Providers.RegisterRouteProvider("corridor", function(_, request, origin, destina
     local planned, reason = planner.PlanRoute(origin, destination, {
         seed = request and request.seed or nil,
         maxWaypoints = request and request.maxWaypoints or nil,
+        archetype = request and (request.archetype or request.groupType) or nil,
+        includePitStops = request and request.includePitStops or nil,
+        maxPitStops = request and request.maxPitStops or nil,
+        pitStopWaitHours = request and request.pitStopWaitHours or nil,
+        worldAgeHours = request and request.worldAgeHours or nil,
     })
     if type(planned) == "table" and reason == "corridor_planned" then
         return planned

@@ -23,6 +23,9 @@ function H.RunBatch(at, budget, cursorName, predicate)
         local group = groups[Traversal[cursorName]]
         if predicate(group) then
             if group.state == "TRAVELING" then
+                if type(Traversal.ProcessEnRoutePitStop) == "function" then
+                    Traversal.ProcessEnRoutePitStop(group, at)
+                end
                 if type(Traversal.EvaluateWeatherShelter) == "function" then
                     Traversal.EvaluateWeatherShelter(group, at)
                 end
@@ -41,6 +44,11 @@ function H.RunBatch(at, budget, cursorName, predicate)
 end
 
 function Traversal.AdvanceTravelBatch(at, budget)
+    if PNC.CommunitySustainabilityService
+        and type(PNC.CommunitySustainabilityService.TickBatch) == "function"
+    then
+        PNC.CommunitySustainabilityService.TickBatch(at, 2)
+    end
     return H.RunBatch(at, budget, "TravelCursor",
         function(group) return group.state == "TRAVELING"
             or group.state == "ACTIVE" end)

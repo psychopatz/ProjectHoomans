@@ -119,6 +119,9 @@ function Bridge.Begin(group, target, travelHours, at)
             mode = "abstract",
             ownerMod = "ProjectHoomans",
             ownerRef = "abstract_group",
+            archetype = group.groupType,
+            includePitStops = group.mission ~= "FLEE_MIGRATE",
+            maxPitStops = group.mission == "FLEE_MIGRATE" and 0 or 2,
         },
         at
     )

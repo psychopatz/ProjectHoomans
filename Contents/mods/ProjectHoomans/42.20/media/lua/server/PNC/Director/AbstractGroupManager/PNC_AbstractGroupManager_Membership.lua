@@ -77,19 +77,13 @@ function Groups.ReconcileMembers(groupOrID, faction)
     end
     local signature = H.MemberSignature(ids)
     group.diagnostics = group.diagnostics or {}
-    if group.diagnostics.memberSignature == signature
-        and #(group.memberIds or {}) == #ids
-    then
-        return false, "unchanged"
-    end
-    group.memberIds = ids
-    group.memberActorIDs = ids
-    group.leaderId = faction and faction.leaderNPCID or group.leaderId
-    group.diagnostics.memberSignature = signature
     -- Event-driven dissolution: if a non-community group has 0 living members
-    -- in both Hoomans and Core, dissolve it immediately instead of keeping an
-    -- empty ghost group alive.
+    -- in both Hoomans and Core, dissolve it immediately (even if it was already
+    -- empty in a pre-fix save!).
     if #ids == 0 and group.homeCommunityId == nil then
+        group.memberIds = ids
+        group.memberActorIDs = ids
+        group.diagnostics.memberSignature = signature
         if Locations and type(Locations.Depart) == "function" then
             pcall(Locations.Depart, group, Store and Store.WorldAgeHours and Store.WorldAgeHours() or 0)
         end
@@ -106,6 +100,15 @@ function Groups.ReconcileMembers(groupOrID, faction)
         end
         return true, "dissolved_empty"
     end
+    if group.diagnostics.memberSignature == signature
+        and #(group.memberIds or {}) == #ids
+    then
+        return false, "unchanged"
+    end
+    group.memberIds = ids
+    group.memberActorIDs = ids
+    group.leaderId = faction and faction.leaderNPCID or group.leaderId
+    group.diagnostics.memberSignature = signature
     Groups.MarkCombatProfileDirty(group, "membership_changed")
     H.Touch(group, "group_members_reconciled")
     if PNC.CoreSurvivorWorldAdapter

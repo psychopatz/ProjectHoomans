@@ -38,12 +38,30 @@ function Generator.GetArchetypeWeights(sectorID, worldAge)
     local counts = H.CurrentComposition(sectorID)
     local age = PNC.PopulationBudget.WorldAgeWeights(worldAge)
     local hostileMult = hostileActivityMultiplier(sectorID, worldAge)
+    local sandboxShares = PNC.Sandbox and type(PNC.Sandbox.WorldNPCShareWeights) == "function"
+        and PNC.Sandbox.WorldNPCShareWeights() or nil
     local weights = {}
-    for archetype, weight in pairs(Config.GROUP_ARCHETYPE_WEIGHTS) do
-        local ageWeight = archetype == "REFUGEE" and age.refugee or age.established
-        local eventMult = archetype == "LOOTER" and hostileMult or 1.0
-        weights[archetype] = math.max(0.01, weight * ageWeight * eventMult)
-            / (1 + (counts[archetype] or 0) * 1.75)
+    for archetype, defaultWeight in pairs(Config.GROUP_ARCHETYPE_WEIGHTS) do
+        local baseWeight = defaultWeight
+        if sandboxShares then
+            if archetype == "LOOTER" then
+                baseWeight = tonumber(sandboxShares.LOOTER) or defaultWeight
+            elseif archetype == "SCAVENGER" then
+                baseWeight = tonumber(sandboxShares.SCAVENGER) or defaultWeight
+            elseif archetype == "REFUGEE" then
+                baseWeight = tonumber(sandboxShares.REFUGEE) or defaultWeight
+            elseif archetype == "WANDERER" then
+                baseWeight = (tonumber(sandboxShares.REFUGEE) or defaultWeight) * 0.5
+            end
+        end
+        if baseWeight <= 0 then
+            weights[archetype] = 0
+        else
+            local ageWeight = archetype == "REFUGEE" and age.refugee or age.established
+            local eventMult = archetype == "LOOTER" and hostileMult or 1.0
+            weights[archetype] = math.max(0.01, baseWeight * ageWeight * eventMult)
+                / (1 + (counts[archetype] or 0) * 1.75)
+        end
     end
     return weights
 end

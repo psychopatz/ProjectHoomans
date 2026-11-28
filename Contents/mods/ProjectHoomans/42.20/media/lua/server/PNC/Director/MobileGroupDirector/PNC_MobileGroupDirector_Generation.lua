@@ -286,10 +286,34 @@ function Director.GenerateForFaction(factionID, spec)
         Factions.SetLeader(faction.id, created[1].id, at)
     end
     if PNC.AbstractGroups and PNC.AbstractGroups.ImportMobileFaction then
-        PNC.AbstractGroups.ImportMobileFaction(
+        local importedGroup = PNC.AbstractGroups.ImportMobileFaction(
             Factions.Get(faction.id),
             { groupID = spec.groupID }
         )
+        -- Put debug-spawned (and newly generated) mobile groups onto the same
+        -- unified SurvivorWorld corridor travel pipeline so looters, traders,
+        -- scavengers, and refugees share one road mesh and can cross paths.
+        if type(importedGroup) == "table"
+            and spec.debug == true
+            and importedGroup.state ~= "TRAVELING"
+            and PNC.AbstractTraversal
+            and type(PNC.AbstractTraversal.ChooseDestination) == "function"
+            and type(PNC.AbstractTraversal.Begin) == "function"
+        then
+            local dest = PNC.AbstractTraversal.ChooseDestination(importedGroup)
+            if dest then
+                local started = PNC.AbstractTraversal.Begin(importedGroup, dest, at)
+                if started and PNC.Travel and PNC.Travel.Service
+                    and type(PNC.Travel.Service.OnMaterialized) == "function"
+                then
+                    for _, record in ipairs(created) do
+                        if record and record.presenceState == Const.PRESENCE_LIVE then
+                            PNC.Travel.Service.OnMaterialized(record)
+                        end
+                    end
+                end
+            end
+        end
     end
     local ids = {}
     for _, record in ipairs(created) do

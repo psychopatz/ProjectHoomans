@@ -80,6 +80,14 @@ function Candidates.Evaluate(locationOrID, factionArchetypeID, resolved, now,
     if spacing < Config.SETTLEMENT_HARD_MIN_DISTANCE then
         return reject("TOO_CLOSE_TO_EXISTING_SETTLEMENT")
     end
+    local sw = PsychopatzCore and PsychopatzCore.SurvivorWorld or nil
+    if sw and sw.CorridorGraph and type(sw.CorridorGraph.HasSettlementWithin) == "function" then
+        if sw.CorridorGraph.HasSettlementWithin(
+            location.x, location.y, Config.SETTLEMENT_HARD_MIN_DISTANCE
+        ) then
+            return reject("TOO_CLOSE_TO_EXISTING_SETTLEMENT")
+        end
+    end
     local components = result.components
     components.siteQuality = location.sourceSite and 18 or 0
     components.food = math.min(18,
@@ -108,6 +116,22 @@ function Candidates.Evaluate(locationOrID, factionArchetypeID, resolved, now,
     for _, value in pairs(components) do result.score = result.score + value end
     result.eligible = true
     return result
+end
+
+function Candidates.RegisterPlayerBaseHub(baseId, x, y, z, label)
+    local sw = PsychopatzCore and PsychopatzCore.SurvivorWorld or nil
+    if not sw or not sw.CorridorGraph
+        or type(sw.CorridorGraph.RegisterSettlementNode) ~= "function"
+    then
+        return nil, "corridor_graph_unavailable"
+    end
+    return sw.CorridorGraph.RegisterSettlementNode(
+        tostring(baseId or "player_base"),
+        x,
+        y,
+        z or 0,
+        { kind = "settlement", owner = "player", label = label or "Player Base" }
+    )
 end
 
 return Candidates

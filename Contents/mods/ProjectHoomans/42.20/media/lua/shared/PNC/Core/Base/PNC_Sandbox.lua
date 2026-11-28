@@ -247,4 +247,26 @@ function Settings.OffCameraColonistSOSItemLossPercent()
     return Settings.GetNumber("OffCameraColonistSOSItemLossPercent", 50.0, 0.0, 100.0)
 end
 
+-- Auto-normalized world NPC share weights slicing the total wild NPC cap.
+-- Player-owned NPCs (including former player colonists who turn into refugees)
+-- are strictly excluded from these spawner quotas.
+function Settings.WorldNPCShareWeights()
+    local raw = {
+        LOOTER = Settings.GetNumber("WorldNPCShareLooters", 0.35, 0.0, 1.0),
+        SCAVENGER = Settings.GetNumber("WorldNPCShareScavengers", 0.25, 0.0, 1.0),
+        REFUGEE = Settings.GetNumber("WorldNPCShareRefugees", 0.20, 0.0, 1.0),
+        TRADER = Settings.GetNumber("WorldNPCShareTraders", 0.20, 0.0, 1.0),
+    }
+    local sum = raw.LOOTER + raw.SCAVENGER + raw.REFUGEE + raw.TRADER
+    if sum <= 0.0001 then
+        return { LOOTER = 0.35, SCAVENGER = 0.25, REFUGEE = 0.20, TRADER = 0.20 }
+    end
+    return {
+        LOOTER = raw.LOOTER / sum,
+        SCAVENGER = raw.SCAVENGER / sum,
+        REFUGEE = raw.REFUGEE / sum,
+        TRADER = raw.TRADER / sum,
+    }
+end
+
 require "PNC/Core/Base/PNC_Sandbox_Health"

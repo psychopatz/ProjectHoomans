@@ -10,6 +10,14 @@ local Encounters = PNC.AbstractEncounters
 local Actions = PNC.AbstractActions
 local ResourceNeeds = PNC.AbstractResourceNeeds
 local Config = PNC.DirectorConfig
+local ScavengeLedger = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldScavengeLedger"
+local RoutePlanner = require
+    "PsychopatzCore/World/SurvivorWorld/Traversal/PsychopatzSurvivorWorldRoutePlanner"
+local CorridorGraph = require
+    "PsychopatzCore/World/SurvivorWorld/Traversal/PsychopatzSurvivorWorldCorridorGraph"
+local Diplomacy = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldDiplomacy"
 
 function H.ResourceValue(group, location)
     return ResourceNeeds.ValuePotential(group, location.resourcePotential or {})
@@ -33,13 +41,38 @@ function Traversal.ScoreDestination(group, location, distance)
         end
     end
     components.scavenged = -(tonumber(location.scavengedLevel) or 0) * 0.65
+    if ScavengeLedger and type(ScavengeLedger.GetDepletion) == "function"
+        and location.type ~= "SETTLEMENT"
+    then
+        local dep = ScavengeLedger.GetDepletion(location.x, location.y, Store.WorldAgeHours())
+        if dep >= ScavengeLedger.EXHAUSTED_THRESHOLD then
+            components.ledgerDepletion = -180
+        elseif dep > 0 then
+            components.ledgerDepletion = -(dep * 90)
+        end
+    end
     local avoidedUntil = group.recentAvoidedLocations
         and group.recentAvoidedLocations[location.id] or 0
     components.recentThreat = avoidedUntil > Store.WorldAgeHours() and -250 or 0
-    components.mission = group.mission == "RETURN_HOME"
+    local loadedReturn = group.homeCommunityId
+        and (tonumber(group.carriedSupplies) or 0) >= 24
+        and (location.type == "SETTLEMENT" or location.communityId == group.homeCommunityId)
+    components.mission = loadedReturn and 120
+        or group.mission == "RETURN_HOME"
         and group.homeCommunityId and location.type == "SETTLEMENT" and 40
         or group.mission == "REST" and location.tags.SAFE and 30
         or group.mission == "SCAVENGE" and components.resources * 0.35 or 0
+    -- Looters specifically target settlements (both AI and Player) for raids.
+    if Diplomacy and Diplomacy.IsLooterType(group.groupType) and location.type == "SETTLEMENT" then
+        components.looterRaid = 65
+    end
+    -- Starving/desperate Refugees or Scavengers push harder toward high-resource targets.
+    if Diplomacy and type(Diplomacy.ComputeDesperation) == "function" then
+        local desp = Diplomacy.ComputeDesperation(group)
+        if desp >= Diplomacy.DESPERATION_HOSTILE_THRESHOLD then
+            components.desperation = components.resources * 0.50
+        end
+    end
     local total = 0
     for _, value in pairs(components) do
         if type(value) == "number" then total = total + value end
@@ -71,6 +104,55 @@ function Traversal.ChooseDestination(group)
     table.sort(evaluations, function(a, b)
         return a.components.final > b.components.final
     end)
+    if (not best or (bestScore and bestScore < -120)) then
+        -- Looters stalk the hottest Trader/Scavenger supply corridor when no settlement is in range.
+        if Diplomacy and Diplomacy.IsLooterType(group.groupType)
+            and CorridorGraph and type(CorridorGraph.FindHottestCorridorPoint) == "function"
+        then
+            local hot = CorridorGraph.FindHottestCorridorPoint(
+                group.location.x, group.location.y, 1200, Store.WorldAgeHours()
+            )
+            if hot and hot.heat >= 0.4 then
+                local ambushLoc = {
+                    id = "ambush_corridor:" .. tostring(math.floor(hot.x)) .. ":" .. tostring(math.floor(hot.y)),
+                    type = "AMBUSH_POINT",
+                    x = hot.x,
+                    y = hot.y,
+                    z = 0,
+                    danger = 0,
+                    tags = { ROAD = true, AMBUSH = true },
+                    resourcePotential = { food = 30, water = 20, supplies = 30 },
+                }
+                if Locations and type(Locations.Register) == "function" then
+                    pcall(Locations.Register, ambushLoc)
+                end
+                best = ambushLoc
+            end
+        end
+        if not best and RoutePlanner and type(RoutePlanner.SelectNextScavengePOI) == "function" then
+            local poi = RoutePlanner.SelectNextScavengePOI(
+                group.location.x,
+                group.location.y,
+                { worldAgeHours = Store.WorldAgeHours() }
+            )
+            if poi then
+                local poiLoc = {
+                    id = "poi_loc:" .. tostring(poi.id),
+                    type = "SCAVENGE_POI",
+                    x = poi.x,
+                    y = poi.y,
+                    z = poi.z or 0,
+                    danger = 0,
+                    tags = { BUILDING = poi.kind == "poi", WILDERNESS = poi.kind == "wilderness" },
+                    resourcePotential = { food = 25, water = 20, supplies = 18 },
+                }
+                if Locations and type(Locations.Register) == "function" then
+                    pcall(Locations.Register, poiLoc)
+                end
+                best = poiLoc
+            end
+        end
+    end
     group.diagnostics = group.diagnostics or {}
     group.diagnostics.destinationEvaluations = evaluations
     return best, best and "selected" or "no_candidate"
