@@ -304,11 +304,78 @@ end
 
 function Adapter.CanCommitGeneratedPlans()
     local extensions = PNC.SurvivorWorldExtensions
+    if extensions and extensions.Active ~= true
+        and type(extensions.ActivateCutover) == "function"
+    then
+        -- Self-heal if early f:0 boot ran before ModData was ready so
+        -- PopulationDirector never gets permanently stuck on CORE_GENERATION_REQUIRED.
+        pcall(extensions.ActivateCutover)
+    end
     return World and World.Bootstrap
         and type(World.Bootstrap.CommitCommunityPlan) == "function"
         and type(World.Bootstrap.CommitGroupPlan) == "function"
         and extensions and extensions.Active == true
         and generatedPlanActorRegistry() ~= nil
+end
+
+-- Unified Core-first group creation entrypoint for ProjectHoomans (used by
+-- Population Director, Debug Spawns, and Caravans so every group originates
+-- in PsychopatzCore.SurvivorWorld and promotes through the exact same seam).
+function Adapter.CreateUnifiedGroup(spec, reason)
+    if type(spec) ~= "table" then return nil, "spec_required" end
+    if not Adapter.CanCommitGeneratedPlans()
+        or type(World.Bootstrap.CreateUnifiedGroup) ~= "function"
+    then
+        return nil, "core_unified_group_unavailable"
+    end
+    local current, failure = Adapter.EnsureCanonical()
+    if not current then return nil, failure end
+    local actorReg = generatedPlanActorRegistry()
+    local canonical, plan = World.Bootstrap.CreateUnifiedGroup(current, spec, actorReg)
+    if not canonical then return nil, plan end
+
+    local okDirty
+    okDirty, failure = dirty(reason or "pnc_unified_group_created")
+    if not okDirty then return nil, failure end
+
+    refreshGeneratedViews()
+    local viewGroup = PNC.AbstractGroups
+        and type(PNC.AbstractGroups.Get) == "function"
+        and PNC.AbstractGroups.Get(canonical.id) or canonical
+
+    if spec.materializeImmediate == true and type(canonical.memberActorIDs) == "table" then
+        local provider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
+        local pos = spec.location or spec.position or canonical.location or {}
+        for i = 1, #canonical.memberActorIDs do
+            local actorID = tostring(canonical.memberActorIDs[i])
+            local rec = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(actorID) or nil
+            if not rec and provider and type(provider.PromoteActor) == "function" then
+                local okP, promoted = pcall(provider.PromoteActor, actorID, PsychopatzCore, {
+                    x = pos.x,
+                    y = pos.y,
+                    z = pos.z or 0,
+                    forceLive = true,
+                })
+                if okP and type(promoted) == "table" then rec = promoted end
+            end
+            if rec then
+                rec.x = tonumber(pos.x) or rec.x
+                rec.y = tonumber(pos.y) or rec.y
+                rec.z = tonumber(pos.z) or rec.z or 0
+                rec.runtime = rec.runtime or {}
+                rec.runtime.forceLive = true
+                rec.runtime.forcePresenceCheck = true
+                if PNC.SpatialIndex and type(PNC.SpatialIndex.UpdateNPC) == "function" then
+                    PNC.SpatialIndex.UpdateNPC(rec)
+                end
+                if PNC.Presence and type(PNC.Presence.Reconcile) == "function" then
+                    pcall(PNC.Presence.Reconcile, rec)
+                end
+            end
+        end
+    end
+
+    return viewGroup, canonical, plan
 end
 
 local function ensureGeneratedPlanFaction(current, plan)

@@ -109,10 +109,29 @@ function Fishing.Tick(record, zombie)
     end
 
     actorX, actorY, actorZ = actorPosition(record, zombie)
+    local distToStand = PNC.Core.Distance(actorX, actorY, standX, standY)
     if math.abs(actorZ - standZ) > 0.6
-        or PNC.Core.Distance(actorX, actorY, standX, standY)
-            > FISHING_STAND_RADIUS
+        or distToStand > FISHING_STAND_RADIUS
     then
+        local sw = PsychopatzCore and PsychopatzCore.SurvivorWorld or nil
+        local planner = sw and sw.RoutePlanner or nil
+        if distToStand >= 40 and planner and type(planner.StepTowardCorridor) == "function" then
+            record.runtime = record.runtime or {}
+            local sx, sy, sz, nextCache, stepReason = planner.StepTowardCorridor(
+                record.runtime.fishingCorridorRoute,
+                { x = actorX, y = actorY, z = actorZ or 0 },
+                { x = standX, y = standY, z = standZ or 0 },
+                { archetype = "COLONIST", minCorridorDistance = 40 }
+            )
+            record.runtime.fishingCorridorRoute = nextCache
+            if Common and Common.MoveRecord then
+                Common.MoveRecord(record, zombie, sx, sy, sz,
+                    "walk", stepReason == "corridor_waypoint" and 4 or 0.65,
+                    "fishing_corridor")
+            end
+            return true
+        end
+        if record.runtime then record.runtime.fishingCorridorRoute = nil end
         if record.presenceState == Const.PRESENCE_ABSTRACT then
             record.activeBehavior = "Fishing:WaitingNearby"
             return true

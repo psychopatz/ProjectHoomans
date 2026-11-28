@@ -63,8 +63,9 @@ local function isHazardousOrDoorwaySquare(sq)
     if sq.isOnFire and sq:isOnFire() == true then return true end
     if sq.HasStairs and sq:HasStairs() == true then return true end
     if sq.getDeadBody and sq:getDeadBody() ~= nil then return true end
-    if sq.getDoor and (sq:getDoor(true) ~= nil or sq:getDoor(false) ~= nil) then
-        return true
+    if sq.getIsoDoor then
+        local ok, door = pcall(sq.getIsoDoor, sq)
+        if ok and door ~= nil then return true end
     end
     return false
 end

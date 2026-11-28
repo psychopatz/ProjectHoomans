@@ -251,6 +251,17 @@ function API.DiscloseForPlayer(player, options)
     local snapshot
     snapshot, reason = API.GetForPlayer(player, npcID)
     if not snapshot then return nil, reason end
+    local coreKnowledgeServer = PsychopatzCore
+        and PsychopatzCore.ActorKnowledgeServer or nil
+    if coreKnowledgeServer
+        and type(coreKnowledgeServer.SyncDisclosedFacts) == "function"
+    then
+        pcall(coreKnowledgeServer.SyncDisclosedFacts, player, npcID, snapshot, {
+            sourceActorID = npcID,
+            provider = "ProjectHoomans",
+            requestID = options.requestID or topicID,
+        })
+    end
     return {
         accepted = true,
         committed = committed,

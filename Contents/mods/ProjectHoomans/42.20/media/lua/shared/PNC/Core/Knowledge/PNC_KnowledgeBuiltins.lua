@@ -299,24 +299,44 @@ Descriptors.Register({
         truthField = "nickname", topicID = "identity_nickname",
     },
 })
+local coreThresholds = PsychopatzCore
+    and PsychopatzCore.ActorIdentityExchange
+    and PsychopatzCore.ActorIdentityExchange.FAMILIARITY_THRESHOLDS
+    or {}
 local fullIdentity = {
     allowInference = false,
     allowObservation = false,
     allowDisclosure = true,
-    minimumFamiliarity = 25,
+    minimumFamiliarity = tonumber(coreThresholds.identity_full_name) or 25,
+    suspectedThreshold = .30,
+    knownThreshold = .70,
+}
+local surnameIdentity = {
+    allowInference = false,
+    allowObservation = false,
+    allowDisclosure = true,
+    minimumFamiliarity = tonumber(coreThresholds.identity_surname) or 20,
+    suspectedThreshold = .30,
+    knownThreshold = .70,
+}
+local factionIdentity = {
+    allowInference = false,
+    allowObservation = false,
+    allowDisclosure = true,
+    minimumFamiliarity = tonumber(coreThresholds.faction) or 0,
     suspectedThreshold = .30,
     knownThreshold = .70,
 }
 for _, identityFacet in ipairs({
-    { id = "identity.full_name", field = "displayName" },
-    { id = "identity.forename", field = "forename" },
-    { id = "identity.surname", field = "surname" },
+    { id = "identity.full_name", field = "displayName", discovery = fullIdentity },
+    { id = "identity.forename", field = "forename", discovery = fullIdentity },
+    { id = "identity.surname", field = "surname", discovery = surnameIdentity },
 }) do
     Descriptors.Register({
         id = identityFacet.id, version = 1, category = "identity",
         providerID = "pnc_identity", resolverID = "direct_fact",
         valueType = "text_enum", privacy = "personal",
-        discovery = fullIdentity,
+        discovery = identityFacet.discovery,
         capabilities = { disclosable = true, decayable = false },
         presentation = {
             truthField = identityFacet.field,
@@ -341,7 +361,7 @@ Descriptors.Register({
 Descriptors.Register({
     id = "faction.identity", version = 1, category = "faction", providerID = "pnc_faction",
     resolverID = "direct_fact", valueType = "text_enum", privacy = "personal",
-    discovery = personal, capabilities = { disclosable = true, decayable = false },
+    discovery = factionIdentity, capabilities = { disclosable = true, decayable = false },
     presentation = { topicID = "faction" },
 })
 

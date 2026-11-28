@@ -32,7 +32,7 @@ Commands.RegisterProvider("travel", {
         }
         return Commands.Dispatch("travel", target, {
             speedProfile = "walk",
-            routeProvider = "direct",
+            routeProvider = "corridor",
             ownerRef = "debug_map_command",
         })
     end,

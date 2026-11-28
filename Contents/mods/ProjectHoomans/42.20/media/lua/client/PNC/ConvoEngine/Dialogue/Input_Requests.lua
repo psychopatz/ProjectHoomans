@@ -297,6 +297,54 @@ function Requests.PrepareIdentityRequest(view, ir, context)
         return nil
     end
 
+    if ir.intent == "QUESTION" and ir.subject == "IDENTITY_FACTION" then
+        local knownFaction = type(context) == "table"
+            and type(context.factionName) == "string"
+            and context.factionName ~= ""
+        if not knownFaction then
+            return {
+                kind = "faction_disclosure",
+                npcID = npcID,
+                topicID = "faction",
+                conversationToken = lifecycle and lifecycle.token,
+            }
+        end
+        return nil
+    end
+
+    if ir.intent == "QUESTION"
+        and (ir.subject == "IDENTITY_NICKNAME" or ir.subject == "IDENTITY_SURNAME")
+        and type(context) == "table"
+        and context.identityState == "known"
+    then
+        local nk = type(context.npcKnowledge) == "table" and context.npcKnowledge or {}
+        local nkId = type(nk.identity) == "table" and nk.identity or {}
+        if ir.subject == "IDENTITY_NICKNAME" then
+            local hasNick = nk.nicknameKnown == true
+                or (type(nkId.nickname) == "string" and nkId.nickname ~= "")
+            if not hasNick then
+                return {
+                    kind = "identity_facet_disclosure",
+                    npcID = npcID,
+                    topicID = "identity_nickname",
+                    conversationToken = lifecycle and lifecycle.token,
+                }
+            end
+        elseif ir.subject == "IDENTITY_SURNAME" then
+            local hasSurname = nk.surnameKnown == true
+                or (type(nkId.surname) == "string" and nkId.surname ~= "")
+            if not hasSurname then
+                return {
+                    kind = "identity_facet_disclosure",
+                    npcID = npcID,
+                    topicID = "identity_full_name",
+                    conversationToken = lifecycle and lifecycle.token,
+                }
+            end
+        end
+        return nil
+    end
+
     if ir.intent == "QUESTION" and ir.subject == "NPC_BACKSTORY" then
         local kind = backstoryKind(ir)
         if not kind then return nil end
@@ -365,6 +413,25 @@ function Requests.DispatchIdentityRequest(request)
                 conversationToken = request.conversationToken,
                 origin = "semantic_dialogue",
                 preferenceItemType = request.preferenceItemType,
+            }
+        )
+    end
+    if request.kind == "faction_disclosure"
+        or request.kind == "identity_facet_disclosure"
+    then
+        if type(client.RequestNPCKnowledgeTopic) ~= "function" then
+            return false, tostring(request.kind) .. "_unavailable"
+        end
+        local pending = PNC.Network and PNC.Network.ClientState
+            and PNC.Network.ClientState.pendingDisclosure
+            and PNC.Network.ClientState.pendingDisclosure[
+                tostring(request.npcID)
+            ]
+        if pending then return false, "identity_request_pending" end
+        return client.RequestNPCKnowledgeTopic(
+            request.npcID, request.topicID or "faction", {
+                conversationToken = request.conversationToken,
+                origin = "semantic_dialogue",
             }
         )
     end

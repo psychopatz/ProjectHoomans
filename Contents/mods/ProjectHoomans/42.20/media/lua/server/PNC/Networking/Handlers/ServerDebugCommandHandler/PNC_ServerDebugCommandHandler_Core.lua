@@ -226,6 +226,42 @@ function Handler.SpawnMobileGroup(player, args)
     local worldAgeHours = gameTime and gameTime.getWorldAgeHours
         and tonumber(gameTime:getWorldAgeHours()) or 0
 
+    -- Unified Core-first pipeline: create debug groups through PsychopatzCore
+    -- SurvivorWorld (identical to Starter Bootstrap & Population Director), then
+    -- promote immediately at the cursor so there is no split creation system.
+    local CoreAdapter = PNC.CoreSurvivorWorldAdapter
+    if CoreAdapter and type(CoreAdapter.CreateUnifiedGroup) == "function"
+        and CoreAdapter.CanCommitGeneratedPlans and CoreAdapter.CanCommitGeneratedPlans()
+    then
+        local gType = archetypeID == "looter" and "LOOTER"
+            or (archetypeID == "scavenger" and "SCAVENGER" or "REFUGEE")
+        local viewGroup, canonical, plan = CoreAdapter.CreateUnifiedGroup({
+            archetypeID = archetypeID,
+            groupType = gType,
+            location = { x = x, y = y, z = z },
+            memberCount = groupSize,
+            source = "DEBUG_UNIFIED_SPAWN",
+            createdAt = worldAgeHours,
+            materializeImmediate = tostring(args and args.presenceMode or "live") == "live",
+        }, "debug_unified_mobile_group")
+        if viewGroup then
+            if PNC.AbstractTraversal
+                and type(PNC.AbstractTraversal.ChooseDestination) == "function"
+                and type(PNC.AbstractTraversal.Begin) == "function"
+            then
+                local dest = PNC.AbstractTraversal.ChooseDestination(viewGroup)
+                if dest then
+                    PNC.AbstractTraversal.Begin(viewGroup, dest, worldAgeHours)
+                end
+            end
+            return viewGroup, "unified_core_group_created", {
+                group = viewGroup,
+                canonical = canonical,
+                plan = plan,
+            }
+        end
+    end
+
     local ok, reason, faction = Factions.Create({
         name = "Debug " .. archetypeID .. " " .. tostring(math.floor(worldAgeHours * 10)),
         archetypeID = archetypeID,

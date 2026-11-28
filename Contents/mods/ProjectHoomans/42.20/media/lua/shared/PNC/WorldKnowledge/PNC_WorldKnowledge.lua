@@ -467,22 +467,21 @@ function Adapter.Explain(record, factID, at)
     return CoreWKG and CoreWKG.Explain(actorID(record), factID, at)
 end
 
-function Adapter.Save()
-    if not CoreWKG or not ModData or type(ModData.getOrCreate) ~= "function" then return false end
-    local store = ModData.getOrCreate("PNC.WorldKnowledge")
-    local payload = CoreWKG.ToPayload()
-    store.schemaVersion = payload.schemaVersion
-    store.ledger = payload.ledger
-    store.actors = payload.actors
-    return true
+function Adapter.Save(options)
+    if not CoreWKG or type(CoreWKG.Save) ~= "function" then return false end
+    local payload = CoreWKG.Save(options)
+    if payload and ModData and type(ModData.remove) == "function"
+        and type(ModData.exists) == "function"
+        and ModData.exists("PNC.WorldKnowledge")
+    then
+        ModData.remove("PNC.WorldKnowledge")
+    end
+    return payload ~= nil
 end
 
-function Adapter.Load()
-    if not CoreWKG or not ModData or type(ModData.get) ~= "function" then return false end
-    local store = ModData.get("PNC.WorldKnowledge")
-    if type(store) ~= "table" then return false end
-    return CoreWKG.FromPayload({ schema = "PsychopatzCore.WorldKnowledge",
-        schemaVersion = store.schemaVersion, ledger = store.ledger, actors = store.actors })
+function Adapter.Load(options)
+    if not CoreWKG or type(CoreWKG.Load) ~= "function" then return false end
+    return CoreWKG.Load(options)
 end
 
 return Adapter

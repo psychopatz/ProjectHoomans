@@ -100,10 +100,11 @@ end
 assert(hasShortage, "expected SUPPLY_SHORTAGE Core world event before collapse")
 assert(hasCollapsed, "expected SETTLEMENT_COLLAPSED Core world event")
 
--- 4. Player base Tier-1 hub registration enforces 800-tile spacing in Core CorridorGraph.
+-- 4. Player base Tier-1 hub registration enforces 400-tile hard / 800-tile preferred spacing.
 CorridorGraph.RegisterSettlementNode("player_main_base", 5000, 5000, 0, { owner = "player" })
-assert(CorridorGraph.HasSettlementWithin(5500, 5000, 800), "500 tiles from player base must be blocked by 800-tile spacing")
-assert(not CorridorGraph.HasSettlementWithin(5900, 5000, 800), "900 tiles from player base must be allowed")
-assert(PNC.DirectorConfig.Population.SETTLEMENT_HARD_MIN_DISTANCE == 800, "SETTLEMENT_HARD_MIN_DISTANCE must be 800")
+assert(CorridorGraph.HasSettlementWithin(5300, 5000, 400), "300 tiles from player base must be blocked by 400-tile hard spacing")
+assert(not CorridorGraph.HasSettlementWithin(5500, 5000, 400), "500 tiles from player base must be allowed")
+assert(PNC.DirectorConfig.Population.SETTLEMENT_HARD_MIN_DISTANCE == 400, "SETTLEMENT_HARD_MIN_DISTANCE must be 400")
+assert(PNC.DirectorConfig.Population.SETTLEMENT_PREFERRED_DISTANCE == 800, "SETTLEMENT_PREFERRED_DISTANCE must be 800")
 
 print("PASS pnc_living_corridor_and_economy_smoke")

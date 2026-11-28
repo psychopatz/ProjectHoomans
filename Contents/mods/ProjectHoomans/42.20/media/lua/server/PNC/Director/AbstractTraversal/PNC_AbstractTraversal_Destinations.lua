@@ -66,6 +66,23 @@ function Traversal.ScoreDestination(group, location, distance)
     if Diplomacy and Diplomacy.IsLooterType(group.groupType) and location.type == "SETTLEMENT" then
         components.looterRaid = 65
     end
+    -- Traders & Caravans prioritize settlements signaling food/water shortages in Core.
+    local upType = string.upper(tostring(group.groupType or ""))
+    if (upType == "TRADER" or upType == "CARAVAN")
+        and location.type == "SETTLEMENT"
+        and CorridorGraph and CorridorGraph.State and CorridorGraph.State.anchors
+    then
+        local cid = location.communityId or location.communityID
+            or (location.sourceSite and location.sourceSite.occupantCommunityID)
+        local anchor = cid and CorridorGraph.State.anchors[tostring(cid)] or nil
+        if anchor then
+            if anchor.demandLevel == "critical" then
+                components.tradeDemand = 140
+            elseif anchor.demandLevel == "shortage" then
+                components.tradeDemand = 85
+            end
+        end
+    end
     -- Starving/desperate Refugees or Scavengers push harder toward high-resource targets.
     if Diplomacy and type(Diplomacy.ComputeDesperation) == "function" then
         local desp = Diplomacy.ComputeDesperation(group)

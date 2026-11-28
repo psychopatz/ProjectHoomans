@@ -67,6 +67,7 @@ end
 -- duplicate Hoomans button registration on reload.
 if Hub and type(Hub.UnregisterTool) == "function" then
     Hub.UnregisterTool("pnc.map.raw_entities")
+    Hub.UnregisterTool("pnc.map.settlement_sigils")
 end
 
 return DebugMap

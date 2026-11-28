@@ -20,16 +20,43 @@ local function text(key, fallback)
     return getText and PNC.Translation.GetKey(key) or fallback or key
 end
 
-local function isVisible()
-    return PNC.MapDisplay
-        and PNC.MapDisplay.AreBasesVisible
-        and PNC.MapDisplay.AreBasesVisible()
-        and PNC.MapRawEntityDebug
+local function isKnowledgeBypassed()
+    return PNC.MapRawEntityDebug
         and (PNC.MapRawEntityDebug.IsEnabled and PNC.MapRawEntityDebug.IsEnabled()
             or not PNC.MapRawEntityDebug.IsEnabled and PNC.MapRawEntityDebug.ShowRawEntities == true)
         and (ClientState.communityDebugAuthorized == true
             or PNC.Client and PNC.Client.CanUseDebug
                 and PNC.Client.CanUseDebug())
+end
+
+local function isSettlementKnown(snapshot, site, community)
+    if isKnowledgeBypassed() then return true end
+    local relation = relationFor(snapshot, community)
+    if relation and relation.isPlayerFaction == true then
+        return true
+    end
+    local discovery = ClientState and ClientState.worldDiscovery or nil
+    local entities = type(discovery) == "table" and discovery.entities or nil
+    if type(entities) ~= "table" then return false end
+    local commID = community and tostring(community.id or "") or ""
+    local siteID = site and tostring(site.id or "") or ""
+    local minPhase = PNC.WorldDiscoveryTypes and PNC.WorldDiscoveryTypes.PHASE_RUMORED or 1
+    for i = 1, #entities do
+        local e = entities[i]
+        if type(e) == "table" and (tonumber(e.phase) or 0) >= minPhase then
+            local eid = tostring(e.entityID or "")
+            if (commID ~= "" and eid == commID) or (siteID ~= "" and eid == siteID) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function isVisible()
+    return PNC.MapDisplay
+        and PNC.MapDisplay.AreBasesVisible
+        and PNC.MapDisplay.AreBasesVisible() == true
 end
 
 local function communitiesBySite(snapshot)
@@ -359,5 +386,9 @@ MarkerDiagnostics.RegisterSource("ProjectHoomans:Communities", {
     priority = 60,
     list = CommunityLayer.ListDiagnostics,
 })
+
+CommunityLayer.Internal = CommunityLayer.Internal or {}
+CommunityLayer.Internal.IsKnowledgeBypassed = isKnowledgeBypassed
+CommunityLayer.Internal.IsSettlementKnown = isSettlementKnown
 
 return CommunityLayer

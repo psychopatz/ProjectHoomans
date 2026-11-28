@@ -85,7 +85,7 @@ function Service.SendHome(record, baseId, reason, options)
     local journey, journeyReason = PNC.Travel.Service.Start(record, {
         destination = { x = point.x, y = point.y, z = point.z },
         arrivalRadius = point.radius,
-        routeProvider = "direct",
+        routeProvider = "corridor",
         speedProfile = "walk",
         ownerMod = "ProjectHoomans",
         ownerRef = "colony_return_home",

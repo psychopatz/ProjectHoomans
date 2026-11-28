@@ -179,8 +179,10 @@ T.truthy(WKG.Acquire(alice.coreActorID, runtime.factID, {
     source = "runtime", acquisitionPath = "runtime", learnedAt = 40,
 }), "runtime knowledge")
 T.truthy(Adapter.Save(), "Hoomans WKG save")
-T.equal(#modData["PNC.WorldKnowledge"].ledger.facts, 1,
-    "Hoomans save excludes ephemeral fact")
+T.equal(#modData["PsychopatzCore.WorldKnowledge"].ledger.facts, 1,
+    "Core single-owner save excludes ephemeral fact")
+T.falsy(modData["PNC.WorldKnowledge"],
+    "Hoomans does not duplicate WorldKnowledge into a separate ModData key")
 WKG.Reset({ maxFacts = 8, maxRefs = 8 })
 T.truthy(Adapter.Load(), "Hoomans WKG load")
 T.truthy(WKG.Ledger.Get(WKG.LedgerState, historical.factID),

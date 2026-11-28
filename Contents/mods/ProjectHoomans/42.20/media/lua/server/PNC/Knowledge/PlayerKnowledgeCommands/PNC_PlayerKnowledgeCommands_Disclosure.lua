@@ -74,6 +74,86 @@ function H.BackstoryRefusalText(reason)
     return "I'm not ready to talk about that yet."
 end
 
+function H.FactionDisclosureText(disclosure)
+    local snapshot = type(disclosure) == "table" and disclosure.snapshot or nil
+    local fact = snapshot and H.FactFromSnapshot
+        and H.FactFromSnapshot(snapshot, "faction.identity") or nil
+    local name = fact and tostring(fact.value or "")
+        or (snapshot and snapshot.identity
+            and tostring(snapshot.identity.factionName or ""))
+        or ""
+    if name ~= "" then
+        return "I'm with " .. name .. "."
+    end
+    return "I don't belong to any group I can name."
+end
+
+function H.FactionRefusalText(reason)
+    if reason == "insufficient_familiarity" then
+        return "We haven't known each other long enough for me to get into who I'm with."
+    end
+    if reason == "not_disclosable" then
+        return "I'd rather not say who I'm with."
+    end
+    if reason == "truth_unavailable" then
+        return "I don't belong to any group I can name."
+    end
+    return "I don't share who I'm with yet."
+end
+
+function H.IdentityFacetDisclosureText(topicID, disclosure)
+    local snapshot = type(disclosure) == "table" and disclosure.snapshot or nil
+    local id = snapshot and type(snapshot.identity) == "table"
+        and snapshot.identity or {}
+    if topicID == "identity_nickname" then
+        local fact = snapshot and H.FactFromSnapshot
+            and H.FactFromSnapshot(snapshot, "identity.nickname") or nil
+        local nick = fact and tostring(fact.value or "")
+            or tostring(id.nickname or "")
+        if nick ~= "" then
+            return "Most people call me " .. nick .. "."
+        end
+        return "I don't really use a nickname."
+    end
+    if topicID == "identity_full_name" then
+        local surFact = snapshot and H.FactFromSnapshot
+            and H.FactFromSnapshot(snapshot, "identity.surname") or nil
+        local surname = surFact and tostring(surFact.value or "")
+            or tostring(id.surname or "")
+        if surname ~= "" then
+            return "My surname is " .. surname .. "."
+        end
+        local fullFact = snapshot and H.FactFromSnapshot
+            and H.FactFromSnapshot(snapshot, "identity.full_name") or nil
+        local fullName = fullFact and tostring(fullFact.value or "")
+            or tostring(id.displayName or "")
+        if fullName ~= "" then
+            return "My full name is " .. fullName .. "."
+        end
+        return "I don't have much more to add to my name."
+    end
+    return nil
+end
+
+function H.IdentityFacetRefusalText(topicID, reason)
+    if reason == "identity_claim_required" then
+        return "Who's asking? Tell me your name first."
+    end
+    if topicID == "identity_nickname" then
+        if reason == "truth_unavailable" then
+            return "I don't really use a nickname."
+        end
+        return "I don't really go by a nickname."
+    end
+    if topicID == "identity_full_name" then
+        if reason == "insufficient_familiarity" then
+            return "Let's stick to first names until we know each other a bit better."
+        end
+        return "I'd rather not share my last name right now."
+    end
+    return nil
+end
+
 function Commands.HandleDisclosure(player, args)
     args = type(args) == "table" and args or {}
     local requestID = H.SafeID(args.requestID)
@@ -168,6 +248,11 @@ function Commands.HandleDisclosure(player, args)
                     responsePoolID = responsePoolID,
                     responseText = topicID == "identity_name"
                         and H.IntroductionText(npcID)
+                        or topicID == "faction"
+                        and H.FactionDisclosureText(disclosure)
+                        or (topicID == "identity_nickname"
+                            or topicID == "identity_full_name")
+                        and H.IdentityFacetDisclosureText(topicID, disclosure)
                         or string.sub(topicID, 1, 10) == "backstory."
                         and H.BackstoryDisclosureText(npcID, topicID) or nil,
                     -- The snapshot is already filtered by the authoritative
@@ -197,7 +282,12 @@ function Commands.HandleDisclosure(player, args)
                     requestID = requestID, npcID = npcID, topicID = topicID,
                     success = false, reason = commitReason or "commit_failed",
                     responsePoolID = responsePoolID,
-                    responseText = string.sub(topicID, 1, 10) == "backstory."
+                    responseText = topicID == "faction"
+                        and H.FactionRefusalText(commitReason)
+                        or (topicID == "identity_nickname"
+                            or topicID == "identity_full_name")
+                        and H.IdentityFacetRefusalText(topicID, commitReason)
+                        or string.sub(topicID, 1, 10) == "backstory."
                         and H.BackstoryRefusalText(commitReason) or nil,
                     presentation = { npcID = npcID, state = "error",
                         reason = commitReason or "commit_failed" },

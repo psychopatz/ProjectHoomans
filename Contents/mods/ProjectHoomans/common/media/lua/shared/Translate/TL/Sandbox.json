@@ -164,5 +164,13 @@
     "Sandbox_ProjectHoomans.OffCameraColonistSOSChance": "Tsansa ng Off-Camera Colonist SOS (%%)",
     "Sandbox_ProjectHoomans.OffCameraColonistSOSChance_tooltip": "Porsyento ng tsansa na ang isang kolonista sa panganib sa labas ng kamera ay magpadala ng SOS para sa pagsagip sa halip na mamatay agad.",
     "Sandbox_ProjectHoomans.OffCameraColonistSOSItemLossPercent": "Pagkawala ng Item sa Off-Camera SOS (%%)",
-    "Sandbox_ProjectHoomans.OffCameraColonistSOSItemLossPercent_tooltip": "Porsyento ng dalang gamit na mawawala kapag nakatakas ang kolonista sa panganib sa labas ng kamera sa pamamagitan ng SOS."
+    "Sandbox_ProjectHoomans.OffCameraColonistSOSItemLossPercent_tooltip": "Porsyento ng dalang gamit na mawawala kapag nakatakas ang kolonista sa panganib sa labas ng kamera sa pamamagitan ng SOS.",
+    "Sandbox_ProjectHoomans.WorldNPCShareLooters": "Bahagi ng NPC sa Mundo: Mga Looter",
+    "Sandbox_ProjectHoomans.WorldNPCShareLooters_tooltip": "Relatibong bigat ng spawn ng mga Looter (awtomatikong kino-normalize sa max NPC cap). Hindi kabilang ang mga NPC ng manlalaro.",
+    "Sandbox_ProjectHoomans.WorldNPCShareScavengers": "Bahagi ng NPC sa Mundo: Mga Scavenger",
+    "Sandbox_ProjectHoomans.WorldNPCShareScavengers_tooltip": "Relatibong bigat ng spawn ng mga Scavenger (awtomatikong kino-normalize sa max NPC cap). Hindi kabilang ang mga NPC ng manlalaro.",
+    "Sandbox_ProjectHoomans.WorldNPCShareRefugees": "Bahagi ng NPC sa Mundo: Mga Refugee",
+    "Sandbox_ProjectHoomans.WorldNPCShareRefugees_tooltip": "Relatibong bigat ng spawn ng mga Refugee (awtomatikong kino-normalize sa max NPC cap). Hindi kabilang ang mga dating kolonista ng manlalaro.",
+    "Sandbox_ProjectHoomans.WorldNPCShareTraders": "Bahagi ng NPC sa Mundo: Mga Trader at Bantay",
+    "Sandbox_ProjectHoomans.WorldNPCShareTraders_tooltip": "Relatibong bigat ng spawn ng mga Trader at bantay ng karaban (awtomatikong kino-normalize sa max NPC cap)."
 }

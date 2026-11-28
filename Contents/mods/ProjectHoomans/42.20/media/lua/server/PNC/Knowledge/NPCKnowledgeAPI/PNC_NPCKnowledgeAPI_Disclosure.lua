@@ -31,9 +31,26 @@ local function authorizeDisclosure(player, npcID, options)
 
     -- Identity is disclosed during conversation only after the server has
     -- compared the player's claim with their authoritative character record.
-    -- HandleDisclosure forwards a whitelist of request fields, so a client
-    -- cannot supply verifiedIdentityClaim through the network route.
+    -- Once basic identity has been exchanged, follow-up facet questions
+    -- (nickname, surname/full_name) may be requested from semantic_dialogue
+    -- and are still gated by descriptor familiarity thresholds.
+    local facetFollowUpAllowed = false
+    if (topicID == "identity_nickname" or topicID == "identity_full_name")
+        and origin == "semantic_dialogue"
+        and Knowledge and type(Knowledge.GetDescriptor) == "function"
+    then
+        facetFollowUpAllowed = Knowledge.GetDescriptor(
+                context.characterUUID, npcID, "identity.name"
+            ) ~= nil
+            or Knowledge.GetDescriptor(
+                context.characterUUID, npcID, "identity.nickname"
+            ) ~= nil
+            or Knowledge.GetDescriptor(
+                context.characterUUID, npcID, "identity.full_name"
+            ) ~= nil
+    end
     if identityTopic and origin ~= "debug"
+        and not facetFollowUpAllowed
         and (origin ~= "semantic_identity_claim"
             or verifiedIdentityClaim ~= true)
     then

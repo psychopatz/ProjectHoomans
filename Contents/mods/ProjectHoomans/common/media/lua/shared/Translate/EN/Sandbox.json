@@ -164,5 +164,13 @@
     "Sandbox_ProjectHoomans.OffCameraColonistSOSChance": "Off-Camera Colonist SOS Chance (%%)",
     "Sandbox_ProjectHoomans.OffCameraColonistSOSChance_tooltip": "Percentage chance that a colonist in off-camera danger triggers a rescue SOS instead of dying off-screen.",
     "Sandbox_ProjectHoomans.OffCameraColonistSOSItemLossPercent": "Off-Camera SOS Item Loss (%%)",
-    "Sandbox_ProjectHoomans.OffCameraColonistSOSItemLossPercent_tooltip": "Percentage of carried items lost when a colonist escapes off-camera danger via SOS."
+    "Sandbox_ProjectHoomans.OffCameraColonistSOSItemLossPercent_tooltip": "Percentage of carried items lost when a colonist escapes off-camera danger via SOS.",
+    "Sandbox_ProjectHoomans.WorldNPCShareLooters": "World NPC Share: Looters",
+    "Sandbox_ProjectHoomans.WorldNPCShareLooters_tooltip": "Relative weight of wild Looter spawns (auto-normalized against the max world NPC cap). Player-owned NPCs are never counted.",
+    "Sandbox_ProjectHoomans.WorldNPCShareScavengers": "World NPC Share: Scavengers",
+    "Sandbox_ProjectHoomans.WorldNPCShareScavengers_tooltip": "Relative weight of wild Scavenger spawns (auto-normalized against the max world NPC cap). Player-owned NPCs are never counted.",
+    "Sandbox_ProjectHoomans.WorldNPCShareRefugees": "World NPC Share: Refugees",
+    "Sandbox_ProjectHoomans.WorldNPCShareRefugees_tooltip": "Relative weight of wild Refugee spawns (auto-normalized against the max world NPC cap). Former player colonists who become refugees are strictly excluded.",
+    "Sandbox_ProjectHoomans.WorldNPCShareTraders": "World NPC Share: Traders & Guards",
+    "Sandbox_ProjectHoomans.WorldNPCShareTraders_tooltip": "Relative weight of wild Trader and caravan guard spawns (auto-normalized against the max world NPC cap)."
 }

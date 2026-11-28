@@ -34,9 +34,32 @@ local function appendDirectorRows(rows, snapshot, metrics)
     local cg = snapshot and snapshot.corridorGraph or nil
     if type(cg) == 'table' then
         rows[#rows + 1] = row('Corridor graph', string.format(
-            'seed=%s sectors=%d nodes=%d settlements=%d edges=%d',
+            'seed=%s sectors=%d nodes=%d (hubs=%d poi=%d wild=%d) edges=%d heat=%d',
             tostring(cg.worldSeed or 0), cg.sectorCount or 0,
-            cg.nodeCount or 0, cg.settlementNodeCount or 0, cg.edgeCount or 0))
+            cg.nodeCount or 0, cg.settlementNodeCount or 0,
+            cg.poiNodeCount or 0, cg.wildNodeCount or 0,
+            cg.edgeCount or 0, cg.trafficHeatCount or 0))
+    end
+    local sl = snapshot and snapshot.scavengeLedger or nil
+    if type(sl) == 'table' then
+        rows[#rows + 1] = row('Scavenge ledger', string.format(
+            'tracked=%d/%d exhausted=%d regen=%dh rev=%d',
+            sl.count or 0, sl.maxEntries or 64,
+            sl.exhaustedCount or 0, sl.regenHours or 168, sl.revision or 1))
+    end
+    local em = snapshot and snapshot.eventMaterializer or nil
+    if type(em) == 'table' then
+        rows[#rows + 1] = row('Event materializer', string.format(
+            'handlers=%d materialized=%d cleaned=%d errors=%d',
+            em.handlerCount or 0, em.materialized or 0,
+            em.cleanedUp or 0, em.errors or 0))
+    end
+    local sh = snapshot and snapshot.npcShares or nil
+    if type(sh) == 'table' then
+        rows[#rows + 1] = row('World NPC shares', string.format(
+            'Looter=%.0f%% Scav=%.0f%% Refugee=%.0f%% Trader=%.0f%%',
+            (sh.LOOTER or 0) * 100, (sh.SCAVENGER or 0) * 100,
+            (sh.REFUGEE or 0) * 100, (sh.TRADER or 0) * 100))
     end
     local hz = snapshot and snapshot.hazardResolver or nil
     if type(hz) == 'table' then

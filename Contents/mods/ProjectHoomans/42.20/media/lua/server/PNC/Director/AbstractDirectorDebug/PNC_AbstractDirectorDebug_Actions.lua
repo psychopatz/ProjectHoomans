@@ -110,6 +110,80 @@ function Debug.PerformAction(args)
             and PNC.AbstractAftermathService.PruneExpired
             and PNC.AbstractAftermathService.PruneExpired(Store.WorldAgeHours()) or 0
         ok, reason = true, "aftermath_pruned_" .. tostring(pruned)
+    elseif operation == "trigger_test_settlement_raid" then
+        local list = PNC.Communities and PNC.Communities.List and PNC.Communities.List() or {}
+        local targetComm = nil
+        for i = 1, #list do
+            local c = list[i]
+            if type(c) == "table" and c.status ~= "COLLAPSED" and c.owner ~= "player" then
+                targetComm = c
+                break
+            end
+        end
+        if not targetComm then
+            ok, reason = false, "no_ai_settlement_available"
+        elseif PNC.SettlementInteractionService
+            and type(PNC.SettlementInteractionService.OnGroupArriveAtSettlement) == "function"
+        then
+            targetComm.lastRaidedAt = nil
+            local attacker = Groups.Get(args.groupID) or {
+                id = "debug_raider_squad",
+                groupType = "LOOTER",
+                factionId = "debug_looter_faction",
+                memberIds = {},
+                resources = { food = 5, water = 5, supplies = 5 },
+            }
+            local home = type(targetComm.home) == "table" and targetComm.home or { x = 0, y = 0, z = 0 }
+            local ran, report = PNC.SettlementInteractionService.OnGroupArriveAtSettlement(
+                attacker,
+                { type = "SETTLEMENT", communityId = targetComm.id, x = home.x, y = home.y, z = home.z or 0 },
+                Store.WorldAgeHours()
+            )
+            ok = ran == true
+            reason = type(report) == "table"
+                and ("raid_" .. tostring(report.outcome) .. "_food=" .. tostring(report.stolen and report.stolen.food or 0))
+                or tostring(report or "raid_failed")
+        else
+            ok, reason = false, "settlement_interaction_unavailable"
+        end
+    elseif operation == "simulate_shortage_and_rescue" then
+        local list = PNC.Communities and PNC.Communities.List and PNC.Communities.List() or {}
+        local targetComm = nil
+        for i = 1, #list do
+            local c = list[i]
+            if type(c) == "table" and c.status ~= "COLLAPSED" and c.owner ~= "player" then
+                targetComm = c
+                break
+            end
+        end
+        if not targetComm then
+            ok, reason = false, "no_ai_settlement_available"
+        else
+            targetComm.resources = type(targetComm.resources) == "table" and targetComm.resources or {}
+            targetComm.resources.food = 2
+            targetComm.resources.water = 3
+            targetComm.starvationHours = 24
+            targetComm.lastAITradeAt = nil
+            local home = type(targetComm.home) == "table" and targetComm.home or { x = 0, y = 0, z = 0 }
+            local trader = {
+                id = "debug_caravan_rescue",
+                groupType = "TRADER",
+                factionId = "debug_trader_faction",
+                resources = { supplies = 20 },
+            }
+            local ran, barter = PNC.SettlementInteractionService
+                and PNC.SettlementInteractionService.OnGroupArriveAtSettlement
+                and PNC.SettlementInteractionService.OnGroupArriveAtSettlement(
+                    trader,
+                    { type = "SETTLEMENT", communityId = targetComm.id, x = home.x, y = home.y, z = home.z or 0 },
+                    Store.WorldAgeHours()
+                )
+            ok = ran == true
+            reason = type(barter) == "table"
+                and ("rescued_food+" .. tostring(barter.foodDelivered or 0)
+                    .. "_water+" .. tostring(barter.waterDelivered or 0))
+                or tostring(barter or "rescue_failed")
+        end
     end
     return Debug.BuildSnapshot(args.groupID, args.locationID, {
         action = operation, ok = ok, reason = reason },

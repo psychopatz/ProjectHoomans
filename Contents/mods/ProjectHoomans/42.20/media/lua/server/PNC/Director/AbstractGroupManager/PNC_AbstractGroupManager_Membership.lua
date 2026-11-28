@@ -51,22 +51,29 @@ function Groups.ReconcileMembers(groupOrID, faction)
         and PNC.Factions.Get(group.factionId) or nil
     if not group then return false, "missing_group" end
     local ids
+    local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
     if group.homeCommunityId then
         ids = {}
-        local community = PNC.Communities and PNC.Communities.Get
-            and PNC.Communities.Get(group.homeCommunityId) or nil
-        local coreProvider = PNC.Persistence and PNC.Persistence.CoreProvider or nil
-        for _, npcID in ipairs(group.memberIds or {}) do
+        local sourceMembers = (type(group.memberIds) == "table" and #group.memberIds > 0)
+            and group.memberIds
+            or (type(group.memberActorIDs) == "table" and group.memberActorIDs)
+            or {}
+        for _, npcID in ipairs(sourceMembers) do
             local record = PNC.Registry and PNC.Registry.Get(npcID) or nil
             local isAlive = (record and record.alive ~= false)
                 or (not record
                     and coreProvider
                     and type(coreProvider.IsAliveCoreActor) == "function"
                     and coreProvider.IsAliveCoreActor(npcID, PsychopatzCore))
-            if isAlive and community
-                and community.memberIDs and community.memberIDs[npcID] == true then
+            -- Keep every living group member (starter/bootstrap groups carry
+            -- homeCommunityId while owning their own Core actors that are not
+            -- necessarily duplicated in community.memberIDs).
+            if isAlive then
                 ids[#ids + 1] = npcID
             end
+        end
+        if #ids == 0 then
+            ids = recoverMembersFromCoreActors(group)
         end
         table.sort(ids)
     else
@@ -77,10 +84,10 @@ function Groups.ReconcileMembers(groupOrID, faction)
     end
     local signature = H.MemberSignature(ids)
     group.diagnostics = group.diagnostics or {}
-    -- Event-driven dissolution: if a non-community group has 0 living members
-    -- in both Hoomans and Core, dissolve it immediately (even if it was already
-    -- empty in a pre-fix save!).
-    if #ids == 0 and group.homeCommunityId == nil then
+    -- Event-driven dissolution: if ANY group has 0 living members in both
+    -- Hoomans and Core after recovery, dissolve it immediately instead of
+    -- writing a 0-member ghost back to Core SurvivorWorld.
+    if #ids == 0 then
         group.memberIds = ids
         group.memberActorIDs = ids
         group.diagnostics.memberSignature = signature

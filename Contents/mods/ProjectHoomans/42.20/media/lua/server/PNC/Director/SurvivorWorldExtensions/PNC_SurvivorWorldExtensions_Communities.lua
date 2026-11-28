@@ -97,6 +97,31 @@ function Extensions.RebuildCommunities(coreSnapshot)
                 coreCommunity,
                 extensions[communityID]
             )
+            local sid = tostring(coreCommunity.siteID or ("site:" .. tostring(communityID)))
+            raw.byID[communityID].siteID = sid
+            local home = type(coreCommunity.home) == "table" and coreCommunity.home or nil
+            if home and tonumber(home.x) and tonumber(home.y) and not raw.sitesByID[sid] then
+                local hx = tonumber(home.x)
+                local hy = tonumber(home.y)
+                local hz = tonumber(home.z) or 0
+                local hr = math.max(24, tonumber(home.radius) or 36)
+                raw.sitesByID[sid] = {
+                    id = sid,
+                    kind = "building",
+                    status = coreCommunity.status == "active" and "occupied" or "vacant",
+                    occupantCommunityID = coreCommunity.status == "active" and communityID or nil,
+                    home = { x = hx, y = hy, z = hz, radius = hr },
+                    bounds = {
+                        minX = math.floor(hx - 12),
+                        maxX = math.floor(hx + 12),
+                        minY = math.floor(hy - 12),
+                        maxY = math.floor(hy + 12),
+                        minZ = hz,
+                        maxZ = hz,
+                    },
+                    createdAt = tonumber(coreCommunity.createdAt) or 0,
+                }
+            end
         end
     end
     return PNC.CommunityTypes.NormalizeRegistry(raw)

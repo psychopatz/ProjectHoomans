@@ -20,7 +20,7 @@ end
 function Display.GetNamesTitle()
     return text(
         Display.NamesVisible and "UI_PNC_MapNamesOn" or "UI_PNC_MapNamesOff",
-        Display.NamesVisible and "NPC NAMES: ON" or "NPC NAMES: OFF"
+        Display.NamesVisible and "SURVIVOR NAME TAGS: ON" or "SURVIVOR NAME TAGS: OFF"
     )
 end
 
@@ -29,15 +29,15 @@ function Display.GetNamesTooltip()
         Display.NamesVisible and "UI_PNC_MapNamesOnHelp"
             or "UI_PNC_MapNamesOffHelp",
         Display.NamesVisible
-            and "Hide ordinary NPC names (selected and hovered names remain visible)"
-            or "Show NPC names on the world map"
+            and "Hide survivor name tags on the map (selected/hovered still show)"
+            or "Show survivor name tags on the map"
     )
 end
 
 function Display.GetBasesTitle()
     return text(
         Display.BasesVisible and "UI_PNC_MapWorldOn" or "UI_PNC_MapWorldOff",
-        Display.BasesVisible and "NPC WORLD: ON" or "NPC WORLD: OFF"
+        Display.BasesVisible and "SETTLEMENTS & ZONES: ON" or "SETTLEMENTS & ZONES: OFF"
     )
 end
 
@@ -46,8 +46,8 @@ function Display.GetBasesTooltip()
         Display.BasesVisible and "UI_PNC_MapWorldOnHelp"
             or "UI_PNC_MapWorldOffHelp",
         Display.BasesVisible
-            and "Hide generated settlements and abstract survivor groups"
-            or "Show generated settlements and abstract survivor groups"
+            and "Hide discovered settlement sigils, base radii, and survivor groups"
+            or "Show discovered settlement sigils, base radii, and survivor groups"
     )
 end
 

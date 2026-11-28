@@ -1850,83 +1850,156 @@ function Adapter.QueryPromotionCandidates(players, radius, now, core)
     end
 
     local worldAuthority = PNC.CoreSurvivorWorldAuthority
-    local worldRegistry = worldAuthority and worldAuthority.Registry or nil
+    local worldRegistry = (worldAuthority and worldAuthority.Registry)
+        or (PsychopatzCore and PsychopatzCore.SurvivorWorld
+            and type(PsychopatzCore.SurvivorWorld.GetRuntimeRegistry) == "function"
+            and PsychopatzCore.SurvivorWorld.GetRuntimeRegistry())
+        or nil
     local auditWorldHour = nil
-    if worldRegistry and type(worldRegistry.ListGroups) == "function"
-        and type(worldRegistry.ProjectGroupMemberPosition) == "function"
+    -- ProjectGroupMemberPosition expects worldAgeHours, NOT real-time ms!
+    local worldHour = nil
+    if getGameTime and getGameTime() and getGameTime().getWorldAgeHours then
+        worldHour = tonumber(getGameTime():getWorldAgeHours())
+    end
+    if worldHour == nil and PNC.Travel and PNC.Travel.Service
+        and type(PNC.Travel.Service.WorldHour) == "function"
     then
-        -- ProjectGroupMemberPosition expects worldAgeHours, NOT real-time ms!
-        local worldHour = nil
-        if getGameTime and getGameTime() and getGameTime().getWorldAgeHours then
-            worldHour = tonumber(getGameTime():getWorldAgeHours())
+        worldHour = tonumber(PNC.Travel.Service.WorldHour())
+    end
+    if worldHour == nil then
+        local n = tonumber(now) or 0
+        worldHour = n < 100000000 and n or 0
+    end
+    auditWorldHour = worldHour
+
+    local combinedGroups = {}
+    local seenGroupIDs = {}
+    if worldRegistry and type(worldRegistry.ListGroups) == "function" then
+        for _, g in ipairs(worldRegistry:ListGroups() or {}) do
+            if type(g) == "table" and g.id and not seenGroupIDs[g.id] then
+                seenGroupIDs[g.id] = true
+                combinedGroups[#combinedGroups + 1] = g
+            end
         end
-        if worldHour == nil and PNC.Travel and PNC.Travel.Service
-            and type(PNC.Travel.Service.WorldHour) == "function"
-        then
-            worldHour = tonumber(PNC.Travel.Service.WorldHour())
+    end
+    if PNC.AbstractGroups and type(PNC.AbstractGroups.List) == "function" then
+        for _, g in ipairs(PNC.AbstractGroups.List() or {}) do
+            if type(g) == "table" and g.id and not seenGroupIDs[g.id] then
+                seenGroupIDs[g.id] = true
+                combinedGroups[#combinedGroups + 1] = g
+            end
         end
-        if worldHour == nil then
-            local n = tonumber(now) or 0
-            -- Guard against callers passing real-time milliseconds (> 1e9).
-            worldHour = n < 100000000 and n or 0
-        end
-        auditWorldHour = worldHour
+    end
+
+    if #combinedGroups > 0 then
         local groupRadiusSq = (radius + 24) * (radius + 24)
-        local listedGroups = worldRegistry:ListGroups()
-        worldGroupsCount = #listedGroups
-        for _, group in ipairs(listedGroups) do
-            if type(group.journey) == "table" then
-                journeyGroupsCount = journeyGroupsCount + 1
-                local members = type(group.memberActorIDs) == "table" and group.memberActorIDs or {}
+        worldGroupsCount = #combinedGroups
+        local groupJourneyMod = PsychopatzCore and PsychopatzCore.Travel
+            and PsychopatzCore.Travel.GroupJourney or nil
+        for _, group in ipairs(combinedGroups) do
+            if type(group.journey) == "table" or type(group.location) == "table" then
+                if type(group.journey) == "table" then
+                    journeyGroupsCount = journeyGroupsCount + 1
+                end
+                local members = (type(group.memberActorIDs) == "table" and #group.memberActorIDs > 0)
+                    and group.memberActorIDs
+                    or (type(group.memberIds) == "table" and group.memberIds)
+                    or {}
                 if #members == 0 and skippedDetails and #skippedDetails < 6 then
                     skippedDetails[#skippedDetails + 1] = tostring(group.id) .. ":no_members"
                 elseif #members > 0 then
                     local nearAnyPlayer = false
+                    local liveState = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
                     for _, memberID in ipairs(members) do
                         local id = tostring(memberID)
-                        if not promotedData[id] then
-                            local actor = reg.records and reg.records[id]
-                                or (type(reg.Get) == "function" and reg:Get(id))
-                            if actor then
-                                local projectedPos = worldRegistry:ProjectGroupMemberPosition(
-                                    group.id, id, actor.world, worldHour
+                        local promotedRec = promotedData[id]
+                        local actor = reg.records and reg.records[id]
+                            or (type(reg.Get) == "function" and reg:Get(id))
+                        if actor or promotedRec then
+                            local fallbackWorld = actor and actor.world
+                                or (promotedRec and { x = promotedRec.x, y = promotedRec.y, z = promotedRec.z or 0 })
+                            local projectedPos = nil
+                            if worldRegistry and type(worldRegistry.ProjectGroupMemberPosition) == "function" then
+                                projectedPos = worldRegistry:ProjectGroupMemberPosition(
+                                    group.id, id, fallbackWorld, worldHour
                                 )
-                                if type(projectedPos) == "table"
-                                    and tonumber(projectedPos.x)
-                                    and tonumber(projectedPos.y)
-                                then
-                                    local minD2 = math.huge
-                                    for _, player in ipairs(players) do
-                                        local dx = tonumber(projectedPos.x) - player:getX()
-                                        local dy = tonumber(projectedPos.y) - player:getY()
-                                        local d2 = dx * dx + dy * dy
-                                        if d2 < minD2 then minD2 = d2 end
-                                        if d2 <= groupRadiusSq then
-                                            nearAnyPlayer = true
+                            end
+                            if (type(projectedPos) ~= "table" or not tonumber(projectedPos.x))
+                                and type(group.journey) == "table"
+                                and groupJourneyMod and type(groupJourneyMod.ProjectPosition) == "function"
+                            then
+                                projectedPos = groupJourneyMod.ProjectPosition(group.journey, worldHour)
+                            end
+                            if (type(projectedPos) ~= "table" or not tonumber(projectedPos.x))
+                                and type(group.location) == "table"
+                                and tonumber(group.location.x) and tonumber(group.location.y)
+                            then
+                                projectedPos = {
+                                    x = tonumber(group.location.x),
+                                    y = tonumber(group.location.y),
+                                    z = tonumber(group.location.z) or 0,
+                                }
+                            end
+                            if type(projectedPos) == "table"
+                                and tonumber(projectedPos.x)
+                                and tonumber(projectedPos.y)
+                            then
+                                local minD2 = math.huge
+                                local withinRadius = false
+                                for _, player in ipairs(players) do
+                                    local dx = tonumber(projectedPos.x) - player:getX()
+                                    local dy = tonumber(projectedPos.y) - player:getY()
+                                    local d2 = dx * dx + dy * dy
+                                    if d2 < minD2 then minD2 = d2 end
+                                    if d2 <= groupRadiusSq then
+                                        nearAnyPlayer = true
+                                    end
+                                    if d2 <= radiusSq then
+                                        withinRadius = true
+                                    end
+                                end
+                                if withinRadius then
+                                    if not promotedRec and actor then
+                                        considerActor(actor, minD2)
+                                        if byID[id] then
+                                            byID[id].projectedX = tonumber(projectedPos.x)
+                                            byID[id].projectedY = tonumber(projectedPos.y)
+                                            byID[id].projectedZ = tonumber(projectedPos.z) or 0
                                         end
-                                        if d2 <= radiusSq then
-                                            considerActor(actor, d2)
-                                            if byID[id] then
-                                                byID[id].projectedX = tonumber(projectedPos.x)
-                                                byID[id].projectedY = tonumber(projectedPos.y)
-                                                byID[id].projectedZ = tonumber(projectedPos.z) or 0
-                                            end
+                                    elseif promotedRec
+                                        and promotedRec.alive ~= false
+                                        and promotedRec.presenceState ~= liveState
+                                    then
+                                        promotedRec.x = tonumber(projectedPos.x)
+                                        promotedRec.y = tonumber(projectedPos.y)
+                                        promotedRec.z = tonumber(projectedPos.z) or 0
+                                        if PNC.SpatialIndex
+                                            and type(PNC.SpatialIndex.UpdateNPC) == "function"
+                                        then
+                                            PNC.SpatialIndex.UpdateNPC(promotedRec)
+                                        end
+                                        promotedRec.runtime = promotedRec.runtime or {}
+                                        promotedRec.runtime.forcePresenceCheck = true
+                                        if PNC.Presence
+                                            and type(PNC.Presence.Reconcile) == "function"
+                                        then
+                                            pcall(PNC.Presence.Reconcile, promotedRec)
                                         end
                                     end
-                                    if not nearAnyPlayer then
-                                        if skippedDetails and #skippedDetails < 6 and minD2 <= (radius * 3) * (radius * 3) then
-                                            skippedDetails[#skippedDetails + 1] = tostring(group.id)
-                                                .. ":dist=" .. tostring(math.floor(math.sqrt(minD2)))
-                                                .. "@(" .. tostring(math.floor(projectedPos.x)) .. "," .. tostring(math.floor(projectedPos.y)) .. ")"
-                                        end
-                                        break
+                                end
+                                if not nearAnyPlayer then
+                                    if skippedDetails and #skippedDetails < 6 and minD2 <= (radius * 3) * (radius * 3) then
+                                        skippedDetails[#skippedDetails + 1] = tostring(group.id)
+                                            .. ":dist=" .. tostring(math.floor(math.sqrt(minD2)))
+                                            .. "@(" .. tostring(math.floor(projectedPos.x)) .. "," .. tostring(math.floor(projectedPos.y)) .. ")"
                                     end
-                                elseif skippedDetails and #skippedDetails < 6 then
-                                    skippedDetails[#skippedDetails + 1] = tostring(group.id) .. ":no_proj"
+                                    break
                                 end
                             elseif skippedDetails and #skippedDetails < 6 then
-                                skippedDetails[#skippedDetails + 1] = tostring(group.id) .. ":actor_missing(" .. id .. ")"
+                                skippedDetails[#skippedDetails + 1] = tostring(group.id) .. ":no_proj"
                             end
+                        elseif skippedDetails and #skippedDetails < 6 then
+                            skippedDetails[#skippedDetails + 1] = tostring(group.id) .. ":actor_missing(" .. id .. ")"
                         end
                     end
                 end

@@ -17,6 +17,24 @@ local Common = H.Common
 local Audit = H.Audit
 local Speed = H.Speed
 
+local function resolveFollowStepTarget(runtime, beforeX, beforeY, beforeZ, targetX, targetY, targetZ, distanceBefore)
+    local sw = PsychopatzCore and PsychopatzCore.SurvivorWorld or nil
+    local planner = sw and sw.RoutePlanner or nil
+    if not planner or type(planner.StepTowardCorridor) ~= "function" then
+        return targetX, targetY, targetZ
+    end
+    local sx, sy, sz, nextCache = planner.StepTowardCorridor(
+        type(runtime) == "table" and runtime.followCorridorRoute or nil,
+        { x = beforeX, y = beforeY, z = beforeZ or 0 },
+        { x = targetX, y = targetY, z = targetZ or 0 },
+        { archetype = "COLONIST", minCorridorDistance = 40, replanDistance = 60 }
+    )
+    if type(runtime) == "table" then
+        runtime.followCorridorRoute = nextCache
+    end
+    return sx, sy, sz
+end
+
 function H.Advance(
     record,
     runtime,
@@ -56,15 +74,27 @@ function H.Advance(
     end
     if distanceBefore <= stopDistance and beforeZ == targetZ then
         arrived = true
+        if type(runtime) == "table" then runtime.followCorridorRoute = nil end
     else
-        local accepted, moveReason = Common.MoveRecord(
-            record,
-            nil,
+        local stepX, stepY, stepZ = resolveFollowStepTarget(
+            runtime,
+            beforeX,
+            beforeY,
+            beforeZ,
             targetX,
             targetY,
             targetZ,
+            distanceBefore
+        )
+        local stepStop = (stepX == targetX and stepY == targetY) and stopDistance or 4
+        local accepted, moveReason = Common.MoveRecord(
+            record,
+            nil,
+            stepX,
+            stepY,
+            stepZ,
             "walk",
-            stopDistance,
+            stepStop,
             reason,
             nil,
             owner and movementSpeed or nil

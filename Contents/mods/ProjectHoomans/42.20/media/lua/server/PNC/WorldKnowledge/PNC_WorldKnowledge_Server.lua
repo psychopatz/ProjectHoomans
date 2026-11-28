@@ -43,9 +43,8 @@ EventBus.subscribe(FactionEvents.TREATY_CHANGED,
             { relation = relation }, worldAgeHours)
     end, Adapter)
 
-if type(Events) == "table" and Events.OnSave and type(Events.OnSave.Add) == "function" then
-    Events.OnSave.Add(Adapter.Save)
-end
+-- PsychopatzCore.WorldKnowledge owns OnSave persistence so WorldKnowledge is
+-- written once into Core ModData rather than duplicated per mod.
 Adapter.Load()
 
 return Adapter

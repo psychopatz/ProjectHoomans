@@ -103,8 +103,12 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
         and identityRequest.kind == "identity_claim"
     local isBackstoryDisclosure = identityRequest
         and identityRequest.kind == "backstory_disclosure"
+    local isFactionDisclosure = identityRequest
+        and (identityRequest.kind == "faction_disclosure"
+            or identityRequest.kind == "identity_facet_disclosure")
     if decision.route == "llm_fallback"
         and not isIdentityClaim and not isBackstoryDisclosure
+        and not isFactionDisclosure
     then
         if Internal.ClearPendingGiftConsent then
             Internal.ClearPendingGiftConsent(view)
@@ -266,7 +270,9 @@ function Internal.CommitSingleSubmission(view, prepared, interpretation)
         and (identityRequest.kind == "identity_claim"
             or identityRequest.kind == "identity_evasion"
             or identityRequest.kind == "gift_preference_disclosure"
-            or identityRequest.kind == "backstory_disclosure")
+            or identityRequest.kind == "backstory_disclosure"
+            or identityRequest.kind == "faction_disclosure"
+            or identityRequest.kind == "identity_facet_disclosure")
     local compoundPart = type(part) == "table"
         and part.compoundPart == true
     local compoundIndex = compoundPart and tonumber(part.compoundIndex) or nil

@@ -65,24 +65,38 @@ function Debug.BuildSnapshot(selectedGroupID, selectedLocationID, action,
                 - Store.WorldAgeHours())
     end
     local corridorSnap = nil
-    local cg = PsychopatzCore and PsychopatzCore.SurvivorWorld
-        and PsychopatzCore.SurvivorWorld.CorridorGraph or nil
+    local sw = PsychopatzCore and PsychopatzCore.SurvivorWorld or nil
+    local cg = sw and sw.CorridorGraph or nil
     if cg and type(cg.GetDebugSnapshot) == "function" then
         local raw = cg.GetDebugSnapshot()
         if type(raw) == "table" then
-            local settlementCount = 0
+            local settlementCount, poiCount, wildCount = 0, 0, 0
             for _, n in ipairs(raw.nodes or {}) do
-                if n.kind == "settlement" then settlementCount = settlementCount + 1 end
+                if n.kind == "settlement" then settlementCount = settlementCount + 1
+                elseif n.kind == "poi" then poiCount = poiCount + 1
+                elseif n.kind == "wilderness" then wildCount = wildCount + 1 end
             end
             corridorSnap = {
-                worldSeed = raw.worldSeed,
+                worldSeed = cg.GetWorldSeed and cg.GetWorldSeed() or raw.worldSeed,
                 sectorCount = raw.sectorCount or 0,
                 nodeCount = #(raw.nodes or {}),
                 settlementNodeCount = settlementCount,
+                poiNodeCount = poiCount,
+                wildNodeCount = wildCount,
                 edgeCount = #(raw.edges or {}),
+                trafficHeatCount = cg.State and tonumber(cg.State.trafficHeatCount) or 0,
             }
         end
     end
+    local scavengeSnap = sw and sw.ScavengeLedger
+        and type(sw.ScavengeLedger.GetStats) == "function"
+        and sw.ScavengeLedger.GetStats(Store.WorldAgeHours()) or nil
+    local materializerSnap = sw and sw.EventMaterializer
+        and type(sw.EventMaterializer.GetStats) == "function"
+        and sw.EventMaterializer.GetStats() or nil
+    local npcSharesSnap = PNC.Sandbox
+        and type(PNC.Sandbox.WorldNPCShareWeights) == "function"
+        and PNC.Sandbox.WorldNPCShareWeights() or nil
     local hazardSnap = PNC.AbstractHazardResolver
         and type(PNC.AbstractHazardResolver.GetDebugSnapshot) == "function"
         and H.Copy(PNC.AbstractHazardResolver.GetDebugSnapshot()) or nil
@@ -98,6 +112,9 @@ function Debug.BuildSnapshot(selectedGroupID, selectedLocationID, action,
         jobs = H.Copy(PNC.Scheduler.GetJobs()),
         recentEncounters = H.Copy(Store.Registry.encounters),
         corridorGraph = corridorSnap,
+        scavengeLedger = scavengeSnap,
+        eventMaterializer = materializerSnap,
+        npcShares = npcSharesSnap,
         hazardResolver = hazardSnap,
         aftermath = aftermathSnap,
         generatedAt = Store.WorldAgeHours(), action = H.Copy(action),

@@ -24,6 +24,8 @@ local CorridorGraph = require
     "PsychopatzCore/World/SurvivorWorld/Traversal/PsychopatzSurvivorWorldCorridorGraph"
 local WorldEvents = require
     "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldEvents"
+local SettlementOps = require
+    "PsychopatzCore/World/SurvivorWorld/PsychopatzSurvivorWorldSettlementOps"
 
 function Traversal.CalculateTravelHours(group, target)
     local dx, dy = target.x - group.location.x, target.y - group.location.y
@@ -183,6 +185,13 @@ function Traversal.ProcessEnRoutePitStop(group, at)
     if group.homeCommunityId or group.groupType == "SCAVENGER" then
         group.carriedSupplies = (tonumber(group.carriedSupplies) or 0) + 12
     end
+    local gType = string.upper(tostring(group.groupType or ""))
+    if (gType == "TRADER" or gType == "CARAVAN")
+        and SettlementOps and type(SettlementOps.AddTraderAbstractStock) == "function"
+    then
+        -- Restock trader's separate abstract trade pool (exempt from physical carry-weight cap).
+        SettlementOps.AddTraderAbstractStock(group, 10, "pit_stop_scavenge", at)
+    end
     return true, wp.tag
 end
 
@@ -322,6 +331,11 @@ function Traversal.Arrive(groupOrID, at)
         and type(PNC.CommunitySustainabilityService.DepositScavengerSupplies) == "function"
     then
         PNC.CommunitySustainabilityService.DepositScavengerSupplies(group, at)
+    elseif (target.type == "SETTLEMENT" or target.communityId)
+        and PNC.SettlementInteractionService
+        and type(PNC.SettlementInteractionService.OnGroupArriveAtSettlement) == "function"
+    then
+        PNC.SettlementInteractionService.OnGroupArriveAtSettlement(group, target, at)
     end
     Groups.SetState(group, "ARRIVED", at, at)
     Groups.SynchronizeMembersAtLocation(group)
@@ -390,9 +404,33 @@ function Traversal.Arrive(groupOrID, at)
 end
 
 function Traversal.Advance(group, at)
+    at = tonumber(at) or Store.WorldAgeHours()
     local lod = Groups.RefreshLOD(group, at)
-    if lod == "ACTIVE" then return false, "active_simulation" end
+    if lod == "ACTIVE" then
+        -- Pause the abstract Core journey while members are live/materialized so
+        -- the map stops extrapolating them forward (eliminates rubber-banding)
+        -- and they don't teleport forward after talking/fighting when abstracted.
+        if type(group.journey) == "table" and group.journey.state == "en_route" then
+            group.journey.state = "paused"
+            group.journey.pausedForLive = true
+            group.journey.lastAdvancedAt = at
+            local adapter = PNC.CoreSurvivorWorldAdapter
+            if adapter and type(adapter.CommitGroup) == "function" then
+                pcall(adapter.CommitGroup, group, "pnc_group_journey_paused_live")
+            end
+        end
+        return false, "active_simulation"
+    end
     if group.state == "TRAVELING" then
+        -- Seamlessly resume abstract travel from where live members left off.
+        if type(group.journey) == "table"
+            and group.journey.state == "paused"
+            and group.journey.pausedForLive == true
+        then
+            group.journey.state = "en_route"
+            group.journey.pausedForLive = nil
+            group.journey.lastAdvancedAt = at
+        end
         local journey, journeyReason =
             CoreGroupTravel.Advance(group, at)
         if not journey then

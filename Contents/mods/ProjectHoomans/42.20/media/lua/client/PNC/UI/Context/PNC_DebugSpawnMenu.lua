@@ -213,6 +213,19 @@ function Menu.Add(context, square)
             tr(groupDef.key, groupDef.label))
         addGroupSizeChoices(groupMenu, spawnOption, square, groupDef)
     end
+    -- Unified Trader Caravan entry when DynamicTrading (DTHoomans or DTAbstract) is loaded.
+    if DTCommon and DTCommon.TraderDebug
+        and type(DTCommon.TraderDebug.RequestSpawnAt) == "function"
+    then
+        groupMenu:addOption(
+            tr("UI_PNC_SpawnGroupTraderCaravan", "Trader Caravan (Dynamic Trading)"),
+            nil,
+            function(_, sq)
+                DTCommon.TraderDebug.RequestSpawnAt(0, sq)
+            end,
+            square
+        )
+    end
 
     return root
 end

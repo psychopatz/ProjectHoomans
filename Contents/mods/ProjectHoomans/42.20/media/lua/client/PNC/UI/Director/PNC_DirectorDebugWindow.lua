@@ -70,6 +70,11 @@ function ISPNCDirectorDebugWindow:createChildren()
         { "process_population_queue", "PROCESS POP QUEUE", "success" },
         { "clear_population_log", "CLEAR POP LOG", "quiet" },
         { "toggle_population_pause", "PAUSE POPULATION", "danger" },
+        { "trigger_test_settlement_raid", "TEST RAID", "danger" },
+        { "simulate_shortage_and_rescue", "TEST SHORTAGE/RESCUE", "success" },
+        { "scan_corridor_collisions", "SCAN COLLISIONS", "quiet" },
+        { "run_hazard_tick", "RUN HAZARD TICK", "quiet" },
+        { "prune_aftermath", "PRUNE AFTERMATH", "quiet" },
     }) do
         self.controls[#self.controls + 1] = UI.CreateButton(self, {
             id = definition[1], title = definition[2], target = self,

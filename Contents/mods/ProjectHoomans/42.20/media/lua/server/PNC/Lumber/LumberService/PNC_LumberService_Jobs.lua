@@ -226,7 +226,7 @@ local function guideToZone(job, zone, record, body)
         end
     elseif travel and type(travel.Start) == "function" then
         local started = travel.Start(record, {
-            destination = center, routeProvider = "direct",
+            destination = center, routeProvider = "corridor",
             speedProfile = "walk", visibility = "all", arrivalAction = false,
             ownerMod = "ProjectHoomans", ownerRef = "lumber_zone",
             metadata = { lumberZoneId = tostring(zone.id) },

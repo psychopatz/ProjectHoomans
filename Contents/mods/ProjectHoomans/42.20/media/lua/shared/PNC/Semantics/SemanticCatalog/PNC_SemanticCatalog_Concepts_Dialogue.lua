@@ -119,7 +119,13 @@ function Internal.RegisterDialogueConcepts()
     }, 5)
     registerConcept("FACTION_IDENTITY", {
         "faction", "which faction are you with", "what faction are you in",
+        "what faction are you with", "what faction do you belong to",
+        "which faction do you belong to", "what faction is this",
+        "which faction is this", "what faction is that",
+        "what's your faction", "what is your faction", "your faction",
         "what group are you with", "which group are you with",
+        "what group is this", "which group is this",
+        "what settlement is this", "who runs this place",
         "who are you with", "who do you belong to",
         "are you with any faction",
     }, 5)

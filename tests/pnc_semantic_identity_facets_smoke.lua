@@ -42,6 +42,19 @@ T.equal(faction.diagnostics.matchedPattern,
     "pnc.question.identity.faction",
     "faction question uses the dedicated deterministic pattern")
 
+for _, phrasing in ipairs({
+    "what faction is this",
+    "which faction is this",
+    "what's your faction",
+    "who runs this place",
+}) do
+    local parsed = Parser.Parse(phrasing)
+    T.equal(parsed.intent, "QUESTION",
+        phrasing .. " parses as QUESTION")
+    T.equal(parsed.subject, "IDENTITY_FACTION",
+        phrasing .. " parses as IDENTITY_FACTION")
+end
+
 local generic = Parser.Parse("what's your name")
 T.equal(generic.subject, "IDENTITY",
     "generic name question keeps the identity subject")

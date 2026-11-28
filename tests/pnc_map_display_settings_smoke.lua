@@ -113,24 +113,24 @@ T.truthy(menu.entryButtons["ProjectHoomans:npc_world"],
     "shared menu did not register NPC world")
 local namesButton = menu.entryButtons["ProjectHoomans:npc_names"]
 local basesButton = menu.entryButtons["ProjectHoomans:npc_world"]
-T.truthy(namesButton.title == "NPC NAMES: OFF",
+T.truthy(namesButton.title == "SURVIVOR NAME TAGS: OFF",
     "NPC names default was not off")
-T.truthy(basesButton.title == "NPC WORLD: ON",
+T.truthy(basesButton.title == "SETTLEMENTS & ZONES: ON",
     "authorized NPC-world map presentation was not enabled by default")
 menu:onButton(namesButton)
 T.truthy(PNC.MapDisplay.AreNamesVisible(),
     "NPC names button did not enable labels")
-T.truthy(namesButton.title == "NPC NAMES: ON",
+T.truthy(namesButton.title == "SURVIVOR NAME TAGS: ON",
     "NPC names button title did not update")
 menu:onButton(basesButton)
 T.truthy(not PNC.MapDisplay.AreBasesVisible(),
     "NPC-world button did not disable strategic markers")
-T.truthy(basesButton.title == "NPC WORLD: OFF",
+T.truthy(basesButton.title == "SETTLEMENTS & ZONES: OFF",
     "NPC-world disabled title did not update")
 menu:onButton(basesButton)
 T.truthy(PNC.MapDisplay.AreBasesVisible(),
     "NPC-world button did not enable strategic markers")
-T.truthy(basesButton.title == "NPC WORLD: ON",
+T.truthy(basesButton.title == "SETTLEMENTS & ZONES: ON",
     "NPC-world enabled title did not update")
 T.finish("pnc_map_display_settings_smoke")
 

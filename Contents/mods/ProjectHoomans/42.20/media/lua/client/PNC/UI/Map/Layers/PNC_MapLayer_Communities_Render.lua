@@ -20,6 +20,8 @@ local drawRadius = Internal.DrawRadius
 local drawBounds = Internal.DrawBounds
 local lineDistance = Internal.LineDistance
 local labelFor = Internal.LabelFor
+local isKnowledgeBypassed = Internal.IsKnowledgeBypassed
+local isSettlementKnown = Internal.IsSettlementKnown
 
 local function statusText(snapshot, site, community)
     local relation = relationFor(snapshot, community)
@@ -177,10 +179,10 @@ function CommunityLayer.Render(map)
     end
     if PNC.CommunityDebugOverlay
         and PNC.CommunityDebugOverlay.Update
+        and isKnowledgeBypassed and isKnowledgeBypassed()
     then
         PNC.CommunityDebugOverlay.Update(false)
     end
-    if ClientState.communityDebugAuthorized ~= true then return end
     local snapshot = ClientState.communityDebug or {}
     local communityLookup = communitiesBySite(snapshot)
     local mouseX = map:getMouseX()
@@ -192,10 +194,14 @@ function CommunityLayer.Render(map)
     local hoveredCommunity
     local hoveredColor
     local bestDistance = 7
+    local renderedCount = 0
     for _, site in ipairs(snapshot.sites or {}) do
         local home = site.home
-        if home and home.x and home.y then
-            local community = communityLookup[site.id]
+        local community = communityLookup[site.id]
+        if home and home.x and home.y
+            and (not isSettlementKnown or isSettlementKnown(snapshot, site, community))
+        then
+            renderedCount = renderedCount + 1
             local color = colorFor(
                 snapshot,
                 site,
@@ -273,6 +279,30 @@ function CommunityLayer.Render(map)
             mouseY,
             hoveredColor
         )
+    end
+    -- Non-debug fallback: render base radius circles & labels for discovered
+    -- settlements in ClientState.worldDiscovery even without communityDebug snapshot.
+    if renderedCount == 0 and ClientState.worldDiscovery
+        and type(ClientState.worldDiscovery.entities) == "table"
+    then
+        local settlementKind = PNC.WorldDiscoveryTypes and PNC.WorldDiscoveryTypes.KIND_SETTLEMENT or "settlement"
+        local minPhase = PNC.WorldDiscoveryTypes and PNC.WorldDiscoveryTypes.PHASE_CONTACTED or 2
+        for _, ent in ipairs(ClientState.worldDiscovery.entities) do
+            if ent.kind == settlementKind
+                and (tonumber(ent.phase) or 0) >= minPhase
+                and tonumber(ent.x) and tonumber(ent.y)
+            then
+                local col = { r = 0.52, g = 0.38, b = 0.92 }
+                drawRadius(map, { x = ent.x, y = ent.y, radius = tonumber(ent.radius) or 45 }, col)
+                local sx = map.mapAPI:worldToUIX(ent.x, ent.y)
+                local sy = map.mapAPI:worldToUIY(ent.x, ent.y)
+                map:drawRect(sx - 4, sy - 4, 8, 8, 1, col.r, col.g, col.b)
+                map:drawTextCentre(
+                    tostring(ent.factionName or ent.name or "Settlement"),
+                    sx, sy + 10, 0.95, 0.95, 0.95, 1, UIFont.Small
+                )
+            end
+        end
     end
 end
 

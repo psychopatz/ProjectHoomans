@@ -131,67 +131,73 @@ function Internal.CollectSuggestionBuildSources(state)
         ir,
         predicateTrace
     )
-    appendBranchOffers(
-        candidates,
-        seen,
-        offersFromPlan(context.sceneResponsePlan),
-        "npc_response_plan",
-        revision,
-        context,
-        ir,
-        predicateTrace
-    )
-    appendBranchOffers(
-        candidates,
-        seen,
-        offersFromPlan(response.plan),
-        "npc_response_plan",
-        revision,
-        context,
-        ir,
-        predicateTrace
-    )
+    -- When a mutual identity exchange is pending, StaticProvider_Identity is
+    -- the single authoritative source for the identity-exchange choices
+    -- (matching traders and neutrals). Skip transient plan/offer-realizer rows
+    -- here so they cannot duplicate or shadow the canonical identity choices.
+    if not pendingIdentity then
+        appendBranchOffers(
+            candidates,
+            seen,
+            offersFromPlan(context.sceneResponsePlan),
+            "npc_response_plan",
+            revision,
+            context,
+            ir,
+            predicateTrace
+        )
+        appendBranchOffers(
+            candidates,
+            seen,
+            offersFromPlan(response.plan),
+            "npc_response_plan",
+            revision,
+            context,
+            ir,
+            predicateTrace
+        )
 
-    local offerRealizer = PNC.ConvoEngine and PNC.ConvoEngine.OfferRealizer or nil
-    local activePoolID = response.poolID or response.responsePool
-        or (type(flow) == "table" and flow.responsePool) or nil
-    if activePoolID and offerRealizer and type(offerRealizer.BuildForPool) == "function" then
-        local realized = offerRealizer.BuildForPool(activePoolID, context, context, { maxOffers = 4 })
-        if type(realized) == "table" and #realized > 0 then
-            local mapped = {}
-            for i = 1, #realized do
-                local ro = realized[i]
-                mapped[#mapped + 1] = {
-                    id = ro.id,
-                    label = ro.label,
-                    utterance = ro.say,
-                    intent = ro.intent,
-                    subject = ro.subject,
-                }
+        local offerRealizer = PNC.ConvoEngine and PNC.ConvoEngine.OfferRealizer or nil
+        local activePoolID = response.poolID or response.responsePool
+            or (type(flow) == "table" and flow.responsePool) or nil
+        if activePoolID and offerRealizer and type(offerRealizer.BuildForPool) == "function" then
+            local realized = offerRealizer.BuildForPool(activePoolID, context, context, { maxOffers = 4 })
+            if type(realized) == "table" and #realized > 0 then
+                local mapped = {}
+                for i = 1, #realized do
+                    local ro = realized[i]
+                    mapped[#mapped + 1] = {
+                        id = ro.id,
+                        label = ro.label,
+                        utterance = ro.say,
+                        intent = ro.intent,
+                        subject = ro.subject,
+                    }
+                end
+                appendBranchOffers(
+                    candidates,
+                    seen,
+                    mapped,
+                    "convo_dsl_blueprint",
+                    revision,
+                    context,
+                    ir,
+                    predicateTrace,
+                    { kind = "convo_dsl_blueprint", poolID = activePoolID }
+                )
             end
-            appendBranchOffers(
-                candidates,
-                seen,
-                mapped,
-                "convo_dsl_blueprint",
-                revision,
-                context,
-                ir,
-                predicateTrace,
-                { kind = "convo_dsl_blueprint", poolID = activePoolID }
-            )
         end
+        appendBranchOffers(
+            candidates,
+            seen,
+            offersFromMessages(state.messages),
+            "npc_response_plan",
+            revision,
+            context,
+            ir,
+            predicateTrace
+        )
     end
-    appendBranchOffers(
-        candidates,
-        seen,
-        offersFromMessages(state.messages),
-        "npc_response_plan",
-        revision,
-        context,
-        ir,
-        predicateTrace
-    )
 
     -- All optional/domain providers use the generic registry lane. The
     -- registry filters raw definitions, so providers remain outside this
